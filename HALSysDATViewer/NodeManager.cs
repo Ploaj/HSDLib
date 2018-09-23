@@ -23,7 +23,6 @@ namespace HALSysDATViewer
             static Nested()
             {
             }
-
             internal static readonly NodeManager instance = new NodeManager();
         }
     }
