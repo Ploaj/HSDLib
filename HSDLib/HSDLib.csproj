@@ -65,6 +65,9 @@
     <Compile Include="IHSDNode.cs" />
     <Compile Include="HSDReader.cs" />
     <Compile Include="HSDRoot.cs" />
+    <Compile Include="KAR\CollisionSphere.cs" />
+    <Compile Include="KAR\KAR_Param.cs" />
+    <Compile Include="KAR\KAR_VehicleAttributes.cs" />
     <Compile Include="MaterialAnimation\FOBJDesc.cs" />
     <Compile Include="MaterialAnimation\HSD_AOBJ.cs" />
     <Compile Include="MaterialAnimation\HSD_MatAnim.cs" />
@@ -73,7 +76,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="KAR\" />
     <Folder Include="Melee\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

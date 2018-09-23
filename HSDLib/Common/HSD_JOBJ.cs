@@ -49,8 +49,8 @@ namespace HSDLib.Common
         [FieldData(typeof(uint))]
         public uint NameOffset { get; set; }
 
-        [FieldData(typeof(uint))]
-        public uint Flags { get; set; }
+        [FieldData(typeof(JOBJ_FLAG))]
+        public JOBJ_FLAG Flags { get; set; }
 
         [FieldData(typeof(HSD_JOBJ))]
         public override HSD_JOBJ Child { get; set; }

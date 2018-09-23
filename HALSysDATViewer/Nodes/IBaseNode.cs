@@ -25,21 +25,35 @@ namespace HALSysDATViewer.Nodes
 
         public void ParseData(IHSDNode node, DataGridView Grid)
         {
-
             BindingSource bs = new BindingSource();
+            bs.Add(node);
+            Grid.AutoSize = true;
+            Grid.AutoGenerateColumns = false;
+            Grid.DataSource = bs;
+            Grid.Columns.Clear();
+            //Grid.Rows.Clear();
 
             foreach (var prop in node.GetType().GetProperties())
             {
                 var attrs = (FieldData[])prop.GetCustomAttributes(typeof(FieldData), false);
                 foreach (var attr in attrs)
                 {
-                    if(prop.PropertyType == typeof(uint))
+                    if(prop.PropertyType == typeof(uint) || prop.PropertyType == typeof(float))
                     {
+                        DataGridViewColumn row = new DataGridViewTextBoxColumn();
+                        row.DataPropertyName = prop.Name;
+                        row.Name = prop.Name;
+                        Grid.Columns.Add(row);
+                    }
+                    if (prop.PropertyType == typeof(HSDLib.Common.JOBJ_FLAG))
+                    {
+                        DataGridViewColumn row = new DataGridViewTextBoxColumn();
+                        row.DataPropertyName = prop.Name;
+                        row.Name = prop.Name;
+                        Grid.Columns.Add(row);
                     }
                 }
             }
-
-            Grid.DataSource = bs;
         }
     }
 

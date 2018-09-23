@@ -10,7 +10,7 @@ out vec2 UV0;
 
 uniform mat4 mvp;
 uniform int JOBJIndex;
-uniform mat4 binds[100];
+uniform mat4 binds[200];
 uniform int UVSW;
 uniform int UVSH;
 

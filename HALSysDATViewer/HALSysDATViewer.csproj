@@ -60,6 +60,7 @@
     <Compile Include="NodeManager.cs" />
     <Compile Include="Nodes\FolderNode.cs" />
     <Compile Include="Nodes\IBaseNode.cs" />
+    <Compile Include="Nodes\Node_Generic.cs" />
     <Compile Include="Nodes\Node_JOBJ.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

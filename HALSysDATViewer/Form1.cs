@@ -24,6 +24,8 @@ namespace HALSysDATViewer
         public Camera Camera = new Camera();
         bool ReadyToRender = false;
 
+        private string FileName;
+
         public Form1()
         {
             InitializeComponent();
@@ -33,12 +35,20 @@ namespace HALSysDATViewer
         public void OpenDAT(string FNAME)
         {
             HSD = new HSDFile(FNAME);
+            FileName = FNAME;
             RefreshNodes();
+        }
+
+        public void SaveDAT(string FNAME)
+        {
+            if(HSD != null)
+                HSD.Save(FNAME);
         }
 
         private void RefreshNodes()
         {
             nodeTree.Nodes.Clear();
+            nodeTree.BeginUpdate();
             foreach(HSDRoot root in HSD.Roots)
             {
                 FolderNode n = new FolderNode() { Text = root.Name };
@@ -46,8 +56,11 @@ namespace HALSysDATViewer
                 if (root.Node is HSD_JOBJ)
                     new Node_JOBJ((HSD_JOBJ)root.Node, n);
 
-                nodeTree.Nodes.Add(n);
+                Node_Generic generic = new Node_Generic(root.Node);
+                nodeTree.Nodes.Add(generic);
+                generic.Open();
             }
+            nodeTree.EndUpdate();
             nodeTree.ExpandAll();
         }
 
@@ -56,6 +69,23 @@ namespace HALSysDATViewer
             if(nodeTree.SelectedNode is IBaseNode)
             {
                 ((IBaseNode)nodeTree.SelectedNode).ParseData(dataGridView1);
+            }
+            if (nodeTree.SelectedNode is Node_JOBJ)
+            {
+                HSD_JOBJ j = ((Node_JOBJ)nodeTree.SelectedNode).JOBJ;
+                if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                    Renderer.SetHSD(j);
+            }
+            if (nodeTree.SelectedNode is Node_Generic)
+            {
+                IHSDNode Node = ((Node_Generic)nodeTree.SelectedNode).Node;
+                if(Node is HSD_JOBJ)
+                {
+                    HSD_JOBJ j = (HSD_JOBJ)Node;
+                    if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                        Renderer.SetHSD(j);
+                }
+               
             }
         }
 
@@ -140,6 +170,34 @@ namespace HALSysDATViewer
 
             GL.PopAttrib();
             glControl.SwapBuffers();
+        }
+
+        private void openDATToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "HSD |*.dat";
+
+                if(ofd.ShowDialog() == DialogResult.OK)
+                {
+                    OpenDAT(ofd.FileName);
+                }
+            }
+        }
+
+        private void exportDATToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "HSD |*.dat";
+
+                sfd.FileName = System.IO.Path.GetFileName(FileName);
+
+                if(sfd.ShowDialog() == DialogResult.OK)
+                {
+                    SaveDAT(sfd.FileName);
+                }
+            }
         }
     }
 }
