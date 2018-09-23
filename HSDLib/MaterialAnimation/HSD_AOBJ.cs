@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSDLib.MaterialAnimation
 {
+    [Flags]
     public enum AOBJ_Flags
     {
         ANIM_REWINDED = (1<<26),
@@ -33,7 +34,7 @@ namespace HSDLib.MaterialAnimation
         {
             base.Open(Reader);
             if (PathAnimJoint != 0)
-                throw new Exception("Error Reading AOBJ");
+                throw new Exception("Error Reading AOBJ Path Detected");
         }
     }
 }

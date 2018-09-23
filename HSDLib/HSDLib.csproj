@@ -48,6 +48,7 @@
     <Compile Include="Common\HSD_Array.cs" />
     <Compile Include="Common\HSD_AttributeGroup.cs" />
     <Compile Include="Common\HSD_DOBJ.cs" />
+    <Compile Include="Common\HSD_IOBJ.cs" />
     <Compile Include="Common\HSD_JOBJ.cs" />
     <Compile Include="Common\HSD_Matrix3x3.cs" />
     <Compile Include="Common\HSD_MOBJ.cs" />

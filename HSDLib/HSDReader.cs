@@ -15,19 +15,16 @@ namespace HSDLib
         public Type Type{ get; private set; }
         public bool InLine { get; private set; }
         public int Size { get; private set; }
+        public bool Editable { get; private set; }
+        public bool Viewable { get; private set; }
 
-        public FieldData(Type Type)
-        {
-            this.Type = Type;
-            InLine = false;
-            Size = 4;
-        }
-
-        public FieldData(Type Type, bool InLine, int Size)
+        public FieldData(Type Type, bool InLine = false, int Size = 4, bool Editable = true, bool Viewable = true)
         {
             this.Type = Type;
             this.InLine = InLine;
             this.Size = Size;
+            this.Editable = Editable;
+            this.Viewable = Viewable;
         }
     }
 

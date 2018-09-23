@@ -54,14 +54,14 @@ namespace HSDLib.MaterialAnimation
         }
         private ushort _tlutcount = 0;
 
-        public HSD_Array<HSD_Image> ImageArray;
+        public HSD_Array<HSD_IOBJ> ImageArray;
         public HSD_Array<HSD_Tlut> TlutArray;
 
         public override void Open(HSDReader Reader)
         {
             base.Open(Reader);
 
-            ImageArray = new HSD_Array<HSD_Image>() { SetSize = _imagecount};
+            ImageArray = new HSD_Array<HSD_IOBJ>() { SetSize = _imagecount};
             Reader.Seek(ImageArrayOffset);
             ImageArray.Open(Reader);
             TlutArray = new HSD_Array<HSD_Tlut>() { SetSize = _tlutcount };

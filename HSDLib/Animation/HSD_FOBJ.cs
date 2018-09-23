@@ -11,13 +11,13 @@ namespace HSDLib.Animation
         [FieldData(typeof(byte))]
         public byte AnimationType { get; set; }
 
-        [FieldData(typeof(byte))]
+        [FieldData(typeof(byte), Viewable: false)]
         public byte Flag1 { get; set; }
 
-        [FieldData(typeof(byte))]
+        [FieldData(typeof(byte), Viewable: false)]
         public byte Flag2 { get; set; }
 
-        [FieldData(typeof(byte))]
+        [FieldData(typeof(byte), Viewable: false)]
         public byte Padding2 { get; set; }
 
         [FieldData(typeof(uint))]

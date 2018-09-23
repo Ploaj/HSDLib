@@ -130,7 +130,11 @@ namespace HSDLib.Common
 
     public class HSD_Image : IHSDNode
     {
-        public ushort Width, Height;
+        [FieldData(typeof(ushort))]
+        public ushort Width;
+        [FieldData(typeof(ushort))]
+        public ushort Height;
+        [FieldData(typeof(GXTexFmt))]
         public GXTexFmt Format;
         public uint Mipmap;
         public float MinLOD;

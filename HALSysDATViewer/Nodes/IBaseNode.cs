@@ -38,8 +38,15 @@ namespace HALSysDATViewer.Nodes
                 var attrs = (FieldData[])prop.GetCustomAttributes(typeof(FieldData), false);
                 foreach (var attr in attrs)
                 {
-                    if(prop.PropertyType == typeof(uint) || prop.PropertyType == typeof(float)
-                        || prop.PropertyType.IsEnum)
+                    if(!prop.Name.Contains("Offset") && 
+                        attr.Viewable &&
+                        (prop.PropertyType == typeof(byte) ||
+                        prop.PropertyType == typeof(ushort) ||
+                        prop.PropertyType == typeof(short) ||
+                        prop.PropertyType == typeof(uint) ||
+                        prop.PropertyType == typeof(int) ||
+                        prop.PropertyType == typeof(float) ||
+                        prop.PropertyType.IsEnum))
                     {
                         DataGridViewColumn row = new DataGridViewTextBoxColumn();
                         row.DataPropertyName = prop.Name;
