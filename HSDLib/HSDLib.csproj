@@ -71,7 +71,7 @@
     <Compile Include="KAR\KAR_ModelData.cs" />
     <Compile Include="KAR\KAR_Param.cs" />
     <Compile Include="KAR\KAR_StarAnimation.cs" />
-    <Compile Include="KAR\KAR_Vehicle.cs" />
+    <Compile Include="KAR\KAR_StarVehicle.cs" />
     <Compile Include="KAR\KAR_VehicleAttributes.cs" />
     <Compile Include="KAR\KAR_VehicleCollisionAttributes.cs" />
     <Compile Include="KAR\KAR_VehicleUnk.cs" />

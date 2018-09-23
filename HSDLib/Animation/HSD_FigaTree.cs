@@ -8,13 +8,16 @@ namespace HSDLib.Animation
 {
     public class HSD_FigaTree : IHSDNode
     {
+        [FieldData(typeof(int))]
+        public int Unk1;
+
         public float FrameCount;
         public List<HSD_AnimNode> Nodes = new List<HSD_AnimNode>();
 
         public override void Open(HSDReader Reader)
         {
             //Padding
-            if (Reader.ReadUInt32() != 1) throw new Exception("Error reading figatree");
+            Unk1 = Reader.ReadInt32();
             if (Reader.ReadUInt32() != 0) throw new Exception("Error reading figatree");
             FrameCount = Reader.ReadSingle();
             uint TrackCountOffset = Reader.ReadUInt32();
@@ -65,7 +68,7 @@ namespace HSDLib.Animation
             Writer.Align(4);
 
             Writer.AddObject(this);
-            Writer.Write(1);
+            Writer.Write(Unk1);
             Writer.Write(0);
             Writer.Write(FrameCount);
             Writer.WritePointer(array);

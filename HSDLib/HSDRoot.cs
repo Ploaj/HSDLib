@@ -28,9 +28,13 @@ namespace HSDLib
             {
                 Node = Reader.ReadObject<HSD_FigaTree>(Offset);
             }
-            else if (Name.StartsWith("vcDataStar"))
+            else if (Name.StartsWith("vcDataStar") || Name.StartsWith("vcDataWing"))
             {
-                Node = Reader.ReadObject<KAR_Vehicle>(Offset);
+                Node = Reader.ReadObject<KAR_StarVehicle>(Offset);
+            }
+            else if (Name.StartsWith("vcDataWheel"))
+            {
+                Node = Reader.ReadObject<KAR_WheelVehicle>(Offset);
             }
         }
 
