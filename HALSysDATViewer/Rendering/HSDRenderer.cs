@@ -93,6 +93,7 @@ namespace HALSysDATViewer.Rendering
         public void RefreshRendering()
         {
             TextureManager.Clear();
+            Primitives.Clear();
 
             List<HSD_JOBJ> BoneList = RootNode.DepthFirstList;
             List<RenderDOBJ> DOBJList = GetDOBJS(BoneList);
@@ -115,6 +116,7 @@ namespace HALSysDATViewer.Rendering
             int offset = 0;
             foreach(RenderDOBJ rdobj in DOBJList)
             {
+                if(rdobj.DOBJ.POBJ != null)
                 foreach(HSD_POBJ pobj in rdobj.DOBJ.POBJ.List)
                 {
                     // Decode the Display List Data

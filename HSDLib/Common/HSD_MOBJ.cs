@@ -71,35 +71,38 @@ namespace HSDLib.Common
 
     public class HSD_MCOBJ : IHSDNode
     {
-        public GXColor Ambient;
-        public GXColor Diffuse;
-        public GXColor Specular;
-        public float Alpha;
-        public float Shininess;
+        [FieldData(typeof(byte))]
+        public byte AMB_R { get; set; }
+        [FieldData(typeof(byte))]
+        public byte AMB_G { get; set; }
+        [FieldData(typeof(byte))]
+        public byte AMB_B { get; set; }
+        [FieldData(typeof(byte))]
+        public byte AMB_A { get; set; }
 
-        public override void Open(HSDReader Reader)
-        {
-            Ambient = Reader.ReadType<GXColor>(new GXColor());
-            Diffuse = Reader.ReadType<GXColor>(new GXColor());
-            Specular = Reader.ReadType<GXColor>(new GXColor());
-            Alpha = Reader.ReadSingle();
-            Shininess = Reader.ReadSingle();
-        }
+        [FieldData(typeof(byte))]
+        public byte DIF_R { get; set; }
+        [FieldData(typeof(byte))]
+        public byte DIF_G { get; set; }
+        [FieldData(typeof(byte))]
+        public byte DIF_B { get; set; }
+        [FieldData(typeof(byte))]
+        public byte DIF_A { get; set; }
 
-        public override void Save(HSDWriter Writer)
-        {
-            Writer.AddObject(this);
-            Writer.Write(Ambient.R); Writer.Write(Ambient.G); Writer.Write(Ambient.B); Writer.Write(Ambient.A);
-            Writer.Write(Diffuse.R); Writer.Write(Diffuse.G); Writer.Write(Diffuse.B); Writer.Write(Diffuse.A);
-            Writer.Write(Specular.R); Writer.Write(Specular.G); Writer.Write(Specular.B); Writer.Write(Specular.A);
-            Writer.Write(Alpha);
-            Writer.Write(Shininess);
-        }
-    }
+        [FieldData(typeof(byte))]
+        public byte SPC_R { get; set; }
+        [FieldData(typeof(byte))]
+        public byte SPC_G { get; set; }
+        [FieldData(typeof(byte))]
+        public byte SPC_B { get; set; }
+        [FieldData(typeof(byte))]
+        public byte SPC_A { get; set; }
 
-    public struct GXColor
-    {
-        public byte R, G, B, A;
+        [FieldData(typeof(float))]
+        public float Alpha { get; set; }
+
+        [FieldData(typeof(float))]
+        public float Shininess { get; set; }
     }
 
     public class HSD_PixelProcessing : IHSDNode

@@ -62,10 +62,10 @@ namespace HSDLib.Animation
                         FirstTrack = t;
             }
             Writer.Write((byte)0xFF);
+            Writer.Align(4);
 
             Writer.AddObject(this);
             Writer.Write(1);
-            //Padding
             Writer.Write(0);
             Writer.Write(FrameCount);
             Writer.WritePointer(array);

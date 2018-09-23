@@ -39,8 +39,7 @@ namespace HSDLib.Animation
         public override void Open(HSDReader Reader)
         {
             base.Open(Reader);
-
-            Console.WriteLine(Track.DataOffset.ToString("X") + " " + DataSize);
+            
             Track.Data = Reader.ReadBuffer(Track.DataOffset, DataSize);
         }
 

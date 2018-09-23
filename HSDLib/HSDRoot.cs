@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib.Common;
+﻿using HSDLib.Common;
 using HSDLib.Animation;
 using HSDLib.MaterialAnimation;
+using HSDLib.KAR;
 
 namespace HSDLib
 {
@@ -26,13 +22,15 @@ namespace HSDLib
             }
             else if (Name.EndsWith("_joint"))
             {
-                // JOBJ
                 Node = Reader.ReadObject<HSD_JOBJ>(Offset);
             }
             else if (Name.EndsWith("_figatree"))
             {
-                // JOBJ
                 Node = Reader.ReadObject<HSD_FigaTree>(Offset);
+            }
+            else if (Name.StartsWith("vcDataStar"))
+            {
+                Node = Reader.ReadObject<KAR_Vehicle>(Offset);
             }
         }
 

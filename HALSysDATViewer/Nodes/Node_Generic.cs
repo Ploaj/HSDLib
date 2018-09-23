@@ -20,7 +20,7 @@ namespace HALSysDATViewer.Nodes
         public void Open()
         {
             if (Node == null) return;
-            Text = Node.GetType().Name.Replace("HSD_", "");
+            Text = Node.GetType().Name.Replace("HSD_", "").Replace("KAR_", "");
             foreach (var prop in Node.GetType().GetProperties().Reverse())
             {
                 var attrs = (FieldData[])prop.GetCustomAttributes(typeof(FieldData), false);

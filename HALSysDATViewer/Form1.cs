@@ -61,7 +61,7 @@ namespace HALSysDATViewer
                 generic.Open();
             }
             nodeTree.EndUpdate();
-            nodeTree.ExpandAll();
+            //nodeTree.ExpandAll();
         }
 
         private void nodeTree_AfterSelect(object sender, TreeViewEventArgs e)
@@ -82,7 +82,7 @@ namespace HALSysDATViewer
                 if(Node is HSD_JOBJ)
                 {
                     HSD_JOBJ j = (HSD_JOBJ)Node;
-                    if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                    if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || j.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
                         Renderer.SetHSD(j);
                 }
                

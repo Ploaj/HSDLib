@@ -55,7 +55,7 @@ namespace HSDLib
                     {
                         if (prop.PropertyType.IsEnum)
                         {
-                            prop.SetValue(this, (Enum)Enum.ToObject(attr.Type, Reader.ReadByte()));
+                            prop.SetValue(this, (Enum)Enum.ToObject(prop.PropertyType, Reader.ReadByte()));
                         }else
                             prop.SetValue(this, Reader.ReadByte());
                     }
@@ -85,14 +85,6 @@ namespace HSDLib
                         {
                             Writer.WriteObject(((IHSDNode)prop.GetValue(this)));
                         }
-                        /*uint temp = Reader.Position() + 4;
-                        IHSDNode field = (IHSDNode)Activator.CreateInstance(attr.Type);
-                        dynamic changedObj = field;
-                        uint Offset = Reader.Position();
-                        if (!attr.InLine) Offset = Reader.ReadUInt32();
-                        //Console.WriteLine(attr.Type + " " + Offset.ToString("X"));
-                        prop.SetValue(this, Reader.ReadObject(Offset, changedObj));
-                        if (!attr.InLine) Reader.Seek(temp);*/
                     }
                 }
             }
@@ -146,7 +138,7 @@ namespace HSDLib
                     {
                         if (prop.PropertyType.IsEnum)
                         {
-                            Writer.Write((byte)prop.GetValue(this));
+                            Writer.Write((byte)(int)prop.GetValue(this));
                         }
                         else
                         {

@@ -153,6 +153,5 @@ namespace HSDLib
 
             Writer.Close();
         }
-
     }
 }

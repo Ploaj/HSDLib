@@ -10,8 +10,10 @@ namespace HSDLib.MaterialAnimation
     {
         [FieldData(typeof(HSD_MatAnimJoint))]
         public override HSD_MatAnimJoint Child { get; set; }
+
         [FieldData(typeof(HSD_MatAnimJoint))]
         public override HSD_MatAnimJoint Next { get; set; }
+
         [FieldData(typeof(HSD_MatAnim))]
         public HSD_MatAnim MaterialAnimation { get; set; }
     }

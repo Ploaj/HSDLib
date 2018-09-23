@@ -67,8 +67,14 @@
     <Compile Include="HSDReader.cs" />
     <Compile Include="HSDRoot.cs" />
     <Compile Include="KAR\CollisionSphere.cs" />
+    <Compile Include="KAR\KAR_HandlingAttributes.cs" />
+    <Compile Include="KAR\KAR_ModelData.cs" />
     <Compile Include="KAR\KAR_Param.cs" />
+    <Compile Include="KAR\KAR_StarAnimation.cs" />
+    <Compile Include="KAR\KAR_Vehicle.cs" />
     <Compile Include="KAR\KAR_VehicleAttributes.cs" />
+    <Compile Include="KAR\KAR_VehicleCollisionAttributes.cs" />
+    <Compile Include="KAR\KAR_VehicleUnk.cs" />
     <Compile Include="MaterialAnimation\FOBJDesc.cs" />
     <Compile Include="MaterialAnimation\HSD_AOBJ.cs" />
     <Compile Include="MaterialAnimation\HSD_MatAnim.cs" />

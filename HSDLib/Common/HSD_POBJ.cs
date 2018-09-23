@@ -22,7 +22,8 @@ namespace HSDLib.Common
         [FieldData(typeof(POBJ_FLAG))]
         public POBJ_FLAG Flags { get; set; }
 
-        public HSD_AttributeGroup VertexAttributes;
+        [FieldData(typeof(HSD_AttributeGroup))]
+        public HSD_AttributeGroup VertexAttributes { get; set; }
         public byte[] DisplayListBuffer;
 
         public HSD_JOBJ SingleBind;

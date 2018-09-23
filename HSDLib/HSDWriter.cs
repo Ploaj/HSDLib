@@ -75,8 +75,8 @@ namespace HSDLib
             if (Mode != WriterWriteMode.BUFFER) return;
             if (Writtenbuffers.Contains(b)) return;
             Writtenbuffers.Add(b);
-            BufferOffsets.Add(b, (uint)BaseStream.Position);
             Align(align);
+            BufferOffsets.Add(b, (uint)BaseStream.Position);
             Write(b);
             Align(align);
         }

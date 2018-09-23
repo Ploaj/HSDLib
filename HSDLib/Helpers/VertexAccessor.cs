@@ -113,10 +113,12 @@ namespace HSDLib.Helpers
                         GXVertexBuffer Attr = Polygon.VertexAttributes.Attributes[i];
                         HSDReader VertexBuffer = Buffers[Attr];
                         int index = ig.Indices[i];
-                        float[] f;
+                        float[] f = new float[0];
                         if(VertexBuffer != null)
+                        {
                             VertexBuffer.Seek((uint)(Attr.Stride * index));
-                        f = read3(VertexBuffer, Attr.CompType, Attr.Stride);
+                            f = read3(VertexBuffer, Attr.CompType, Attr.Stride);
+                        }
                         switch (Attr.Name)
                         {
                             case GXAttribName.GX_VA_PNMTXIDX:

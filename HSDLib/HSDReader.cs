@@ -33,7 +33,7 @@ namespace HSDLib
     /// </summary>
     public class HSDReader : BinaryReader
     {
-        private List<uint> RelocationTable = new List<uint>();
+        public List<uint> RelocationTable = new List<uint>();
 
         public HSDReader(Stream input) : base(input)
         {
@@ -142,7 +142,7 @@ namespace HSDLib
         {
             T Object = Activator.CreateInstance<T>();
 
-            if (Offset <= 0)
+            if (Offset <= 0 || Offset == 0xFFFFFFFF)
                 return null;
 
             if (NodeCache.ContainsKey(Offset))
@@ -207,7 +207,9 @@ namespace HSDLib
                     foreach (HSDLib.GX.GXVertexBuffer a in ((HSD_AttributeGroup)ob).Attributes)
                     {
                         if (a.AttributeType != GX.GXAttribType.GX_DIRECT)
+                        {
                             a.DataBuffer = ReadBuffer(a.Offset, (int)(Offsets[BinarySearch(Offsets, a.Offset)] - a.Offset));
+                        }
                     }
                 }
             }

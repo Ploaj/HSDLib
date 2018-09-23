@@ -11,11 +11,11 @@ namespace HSDLib.Common
     public class HSD_IOBJ : IHSDNode
     {
         [FieldData(typeof(ushort))]
-        public ushort Width;
+        public ushort Width { get; set; }
         [FieldData(typeof(ushort))]
-        public ushort Height;
+        public ushort Height { get; set; }
         [FieldData(typeof(GXTexFmt))]
-        public GXTexFmt Format;
+        public GXTexFmt Format { get; set; }
 
         public byte[] Data;
 
