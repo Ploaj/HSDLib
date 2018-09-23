@@ -38,14 +38,8 @@ namespace HALSysDATViewer.Nodes
                 var attrs = (FieldData[])prop.GetCustomAttributes(typeof(FieldData), false);
                 foreach (var attr in attrs)
                 {
-                    if(prop.PropertyType == typeof(uint) || prop.PropertyType == typeof(float))
-                    {
-                        DataGridViewColumn row = new DataGridViewTextBoxColumn();
-                        row.DataPropertyName = prop.Name;
-                        row.Name = prop.Name;
-                        Grid.Columns.Add(row);
-                    }
-                    if (prop.PropertyType == typeof(HSDLib.Common.JOBJ_FLAG))
+                    if(prop.PropertyType == typeof(uint) || prop.PropertyType == typeof(float)
+                        || prop.PropertyType.IsEnum)
                     {
                         DataGridViewColumn row = new DataGridViewTextBoxColumn();
                         row.DataPropertyName = prop.Name;

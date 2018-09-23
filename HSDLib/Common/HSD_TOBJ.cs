@@ -74,8 +74,8 @@ namespace HSDLib.Common
         [FieldData(typeof(ushort))]
         public ushort Padding { get; set; }//= 1;
 
-        [FieldData(typeof(uint))]
-        public uint Flags { get; set; }//= 0x50010;
+        [FieldData(typeof(TOBJ_FLAGS))]
+        public TOBJ_FLAGS Flags { get; set; }
 
         [FieldData(typeof(float))]
         public float Blending { get; set; }//= 1;

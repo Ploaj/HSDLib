@@ -19,7 +19,8 @@ namespace HSDLib.Common
 
     public class HSD_POBJ : IHSDList<HSD_POBJ>
     {
-        public POBJ_FLAG Flags;
+        [FieldData(typeof(POBJ_FLAG))]
+        public POBJ_FLAG Flags { get; set; }
 
         public HSD_AttributeGroup VertexAttributes;
         public byte[] DisplayListBuffer;
