@@ -79,7 +79,7 @@ namespace HALSysDATViewer
             timer.Start();
 
             Renderer = new HSDRenderer();
-            Renderer.SetHSD((HSD_JOBJ)HSD.Roots[0].Node);
+            //Renderer.SetHSD((HSD_JOBJ)HSD.Roots[0].Node);
         }
 
         private void Application_Idle(object sender, EventArgs e)

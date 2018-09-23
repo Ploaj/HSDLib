@@ -166,8 +166,8 @@ namespace HALSysDATViewer.Rendering
 
             Matrix4 mvp = Camera.mvpMatrix;
             GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
-            //if (Bones.Length > 0)
-            GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("binds"), Binds.Length, false, ref Binds[0].Row0.X);
+            if (Binds != null && Binds.Length > 0)
+                GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("binds"), Binds.Length, false, ref Binds[0].Row0.X);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
             GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_pos"), 3, VertexAttribPointerType.Float, false, GXVertex.Stride, 0);

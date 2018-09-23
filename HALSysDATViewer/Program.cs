@@ -15,9 +15,6 @@ namespace HALSysDATViewer
         [STAThread]
         static void Main()
         {
-            //HSDFile f = new HSDFile("C:\\Users\\Owen\\Desktop\\Modlee\\Melee\\root\\PlYsRe.dat");
-            //f.Save("C:\\Users\\Owen\\Desktop\\Modlee\\Melee\\TyMario.dat");
-            //var f2 = new HSDFile("C:\\Users\\Owen\\Desktop\\Modlee\\Melee\\TyMario.dat");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
