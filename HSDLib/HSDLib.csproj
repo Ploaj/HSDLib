@@ -56,11 +56,13 @@
     <Compile Include="Common\HSD_TOBJ.cs" />
     <Compile Include="Common\HSD_Transforms.cs" />
     <Compile Include="GX\Enums.cs" />
-    <Compile Include="GX\GXDisplayList.cs" />
+    <Compile Include="Helpers\GXDisplayList.cs" />
     <Compile Include="GX\GXVertexBuffer.cs" />
+    <Compile Include="Helpers\PrimitiveGroup.cs" />
     <Compile Include="Helpers\Shared.cs" />
     <Compile Include="Helpers\TPL.cs" />
     <Compile Include="Helpers\VertexAccessor.cs" />
+    <Compile Include="Helpers\VertexCompressor.cs" />
     <Compile Include="HSDFile.cs" />
     <Compile Include="HSDWriter.cs" />
     <Compile Include="IHSDNode.cs" />

@@ -29,6 +29,15 @@ namespace HSDLib.Helpers
             Y = y;
             Z = z;
         }
+
+        public static bool operator ==(GXVector3 x, GXVector3 y)
+        {
+            return x.X == y.X && x.Y == y.Y && x.Z == y.Z;
+        }
+        public static bool operator !=(GXVector3 x, GXVector3 y)
+        {
+            return !(x.X == y.X && x.Y == y.Y && x.Z == y.Z);
+        }
     }
     public struct GXColor4
     {
@@ -50,10 +59,18 @@ namespace HSDLib.Helpers
         public GXVector2 TEX0;
         public GXVector2 TEX1;
         public GXColor4 Clr0;
-        public int BindCount;
-        public int B1, B2, B3, B4;
-        public float W1, W2, W3, W4;
-        public const int Stride = (3 + 3 + 2 + 2 + 4 + 1 + 8) * 4;
+        public GXColor4 Clr1;
+        public ushort PMXID;
+        public ushort TEX0MTXIDX;
+
+        public static bool operator ==(GXVertex x, GXVertex y)
+        {
+            return x.Pos == y.Pos && x.PMXID == y.PMXID && x.TEX0MTXIDX == y.TEX0MTXIDX;
+        }
+        public static bool operator !=(GXVertex x, GXVertex y)
+        {
+            return !(y == x);
+        }
     }
 
     public class VertexDecoded
@@ -76,112 +93,104 @@ namespace HSDLib.Helpers
             this.AttributeGroup = Group;
         }
 
-        public VertexDecoded[] GetDecodedVertexBuffers(List<HSD_POBJ> POBJS)
-        {
-            return null;
-        }
 
-        /// <summary>
-        /// Reads the vertex buffer into a more accessable format : <see cref="GXVertex"/>
-        /// </summary>
-        /// <param name="Group">Attribute group used with the given display list</param>
-        /// <param name="DisplayList">Display list belonging to given PBOJ</param>
-        /// <param name="Bones">A list of the <see cref="HSD_JOBJ"/>'s that belong to this model in depth first order</param>
-        /// <returns>Array of <see cref="GXVertex"/></returns>
-        public static GXVertex[] GetDecodedVertices(GXDisplayList DisplayList, HSD_POBJ Polygon, HSD_JOBJ RootJOBJ)
+        public static GXVertex[] GetDecodedVertices(GXPrimitiveGroup PrimitiveGroup, HSD_AttributeGroup Group)
         {
             // Create Vertex List
             List<GXVertex> Vertices = new List<GXVertex>();
 
             // Prepare vertex buffers for reading
             Dictionary<GXVertexBuffer, HSDReader> Buffers = new Dictionary<GXVertexBuffer, HSDReader>();
-            foreach(GXVertexBuffer buffer in Polygon.VertexAttributes.Attributes)
+            foreach (GXVertexBuffer buffer in Group.Attributes)
             {
                 Buffers.Add(buffer, buffer.DataBuffer == null ? null : new HSDReader(new MemoryStream(buffer.DataBuffer)));
             }
 
-            List<HSD_JOBJ> JOBJS = RootJOBJ.DepthFirstList;
-
-            // Read through the Display Lists
-            foreach (GXPrimitiveGroup pg in DisplayList.Primitives)
+            // Decode
+            foreach (GXIndexGroup ig in PrimitiveGroup.Indices)
             {
-                foreach (GXIndexGroup ig in pg.Indices)
+                GXVertex Vertex = new GXVertex();
+                for (int i = 0; i < Group.Attributes.Count; i++)
                 {
-                    GXVertex Vertex = new GXVertex();
-                    for (int i = 0; i < Polygon.VertexAttributes.Attributes.Count; i++)
+                    GXVertexBuffer Attr = Group.Attributes[i];
+                    HSDReader VertexBuffer = Buffers[Attr];
+                    int index = ig.Indices[i];
+                    float[] f = new float[0];
+                    if (VertexBuffer != null)
                     {
-                        GXVertexBuffer Attr = Polygon.VertexAttributes.Attributes[i];
-                        HSDReader VertexBuffer = Buffers[Attr];
-                        int index = ig.Indices[i];
-                        float[] f = new float[0];
-                        if(VertexBuffer != null)
-                        {
-                            VertexBuffer.Seek((uint)(Attr.Stride * index));
-                            f = read3(VertexBuffer, Attr.CompType, Attr.Stride);
-                        }
-                        switch (Attr.Name)
-                        {
-                            case GXAttribName.GX_VA_PNMTXIDX:
-                                int nodeid = index / 3;
-                                if (Polygon.BindGroups.Elements.Length == 0) continue; //|| nodeid / 3 >= poly.BoneWeightList.Count
-                                if (nodeid >= Polygon.BindGroups.Elements.Length)
-                                {
-                                    throw new Exception("Error Reading Joint Data");
-                                }
-                                HSD_JOBJWeight bw = Polygon.BindGroups.Elements[nodeid];
-                                //Vertex.WeightInd = new float[6];
-                                //Vertex.BoneInd = new int[6];
-                                Vertex.BindCount = bw.JOBJs.Count;
-                                for (int k = 0; k < bw.JOBJs.Count; k++)
-                                {
-                                    switch (k)
-                                    {
-                                        case 0:
-                                            Vertex.B1 = JOBJS.IndexOf(bw.JOBJs[k]);
-                                            Vertex.W1 = bw.Weights[k];
-                                            break;
-                                    }
-                                    //Vertex.BoneInd[k] = Bones.IndexOf(bw.JOBJs[k]);
-                                    //Vertex.WeightInd[k] = bw.Weights[k];
-                                }
-                                break;
-                            case GXAttribName.GX_VA_POS:
-                                Vertex.Pos.X = f[0] / (float)Math.Pow(2, Attr.Scale);
-                                Vertex.Pos.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
-                                Vertex.Pos.Z = f[2] / (float)Math.Pow(2, Attr.Scale);
-                                break;
-                            case GXAttribName.GX_VA_NRM:
-                                Vertex.Nrm.X = f[0] / (float)Math.Pow(2, Attr.Scale);
-                                Vertex.Nrm.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
-                                Vertex.Nrm.Z = f[2] / (float)Math.Pow(2, Attr.Scale);
-                                break;
-                            case GXAttribName.GX_VA_TEX0:
-                                Vertex.TEX0.X = f[0] / (float)Math.Pow(2, Attr.Scale);
-                                Vertex.TEX0.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
-                                break;
-                            case GXAttribName.GX_VA_TEX1:
-                                Vertex.TEX1.X = f[0] / (float)Math.Pow(2, Attr.Scale);
-                                Vertex.TEX1.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
-                                break;
-                            default:
-                                Console.WriteLine("To be implemented: " + Attr.Name);
-                                break;
-                        }
+                        VertexBuffer.Seek((uint)(Attr.Stride * index));
+                        f = Read(VertexBuffer, Attr.CompType, Attr.Stride);
                     }
-                    Vertices.Add(Vertex);
+                    switch (Attr.Name)
+                    {
+                        case GXAttribName.GX_VA_PNMTXIDX:
+                            Vertex.PMXID = (ushort)index;
+                            break;
+                        case GXAttribName.GX_VA_TEX0MTXIDX:
+                            Vertex.TEX0MTXIDX = (ushort)index;
+                            break;
+                        case GXAttribName.GX_VA_POS:
+                            Vertex.Pos.X = f[0] / (float)Math.Pow(2, Attr.Scale);
+                            Vertex.Pos.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
+                            Vertex.Pos.Z = f[2] / (float)Math.Pow(2, Attr.Scale);
+                            break;
+                        case GXAttribName.GX_VA_NRM:
+                            Vertex.Nrm.X = f[0] / (float)Math.Pow(2, Attr.Scale);
+                            Vertex.Nrm.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
+                            Vertex.Nrm.Z = f[2] / (float)Math.Pow(2, Attr.Scale);
+                            break;
+                        case GXAttribName.GX_VA_TEX0:
+                            Vertex.TEX0.X = f[0] / (float)Math.Pow(2, Attr.Scale);
+                            Vertex.TEX0.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
+                            break;
+                        case GXAttribName.GX_VA_TEX1:
+                            Vertex.TEX1.X = f[0] / (float)Math.Pow(2, Attr.Scale);
+                            Vertex.TEX1.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
+                            break;
+                        case GXAttribName.GX_VA_CLR0:
+                            Vertex.Clr0.R = ig.Clr0[0] / 255f;
+                            Vertex.Clr0.G = ig.Clr0[1] / 255f;
+                            Vertex.Clr0.B = ig.Clr0[2] / 255f;
+                            Vertex.Clr0.A = ig.Clr0[3] / 255f;
+                            break;
+                        case GXAttribName.GX_VA_CLR1:
+                            Vertex.Clr1.R = ig.Clr1[0] / 255f;
+                            Vertex.Clr1.G = ig.Clr1[1] / 255f;
+                            Vertex.Clr1.B = ig.Clr1[2] / 255f;
+                            Vertex.Clr1.A = ig.Clr1[3] / 255f;
+                            break;
+                        default:
+                            Console.WriteLine("To be implemented: " + Attr.Name);
+                            break;
+                    }
                 }
-            }
-
-            foreach(GXVertexBuffer b in Buffers.Keys)
-            {
-                if(Buffers[b] != null)
-                    Buffers[b].Close();
+                Vertices.Add(Vertex);
             }
 
             return Vertices.ToArray();
         }
 
-        private static float[] read3(HSDReader d, GXCompType type, int size)
+        /// <summary>
+        /// Reads the vertex buffer into a more accessable format : <see cref="GXVertex"/>
+        /// </summary>
+        /// <param name="DisplayList">Display list belonging to given PBOJ</param>
+        /// <param name="Polygon"><see cref="HSD_POBJ"/> the the display list belong to</param>
+        /// <returns>Array of <see cref="GXVertex"/></returns>
+        public static GXVertex[] GetDecodedVertices(GXDisplayList DisplayList, HSD_POBJ Polygon)
+        {
+            // Create Vertex List
+            List<GXVertex> Vertices = new List<GXVertex>();
+
+            // Read through the Display Lists
+            foreach (GXPrimitiveGroup pg in DisplayList.Primitives)
+            {
+                Vertices.AddRange(GetDecodedVertices(pg, Polygon.VertexAttributes));
+            }
+
+            return Vertices.ToArray();
+        }
+
+        private static float[] Read(HSDReader d, GXCompType type, int size)
         {
             switch (type)
             {

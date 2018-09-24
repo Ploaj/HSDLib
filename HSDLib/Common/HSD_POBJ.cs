@@ -98,8 +98,16 @@ namespace HSDLib.Common
 
     public class HSD_JOBJWeight : IHSDNode
     {
-        public List<HSD_JOBJ> JOBJs;
-        public List<float> Weights;
+        public List<HSD_JOBJ> JOBJs = new List<HSD_JOBJ>();
+        public List<float> Weights = new List<float>();
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is HSD_JOBJWeight))
+                return false;
+
+            return JOBJs.SequenceEqual(((HSD_JOBJWeight)obj).JOBJs) && Weights.SequenceEqual(((HSD_JOBJWeight)obj).Weights);
+        }
 
         public override void Open(HSDReader Reader)
         {

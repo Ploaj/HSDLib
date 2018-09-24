@@ -22,8 +22,7 @@ UV0 = vec2(in_tex0.x * UVSW, in_tex0.y * UVSH);
 vec4 Pos = vec4(in_pos, 1);
 
 Pos = binds[JOBJIndex] * Pos;
-if(in_weights.x == 1)
-	Pos = binds[int(in_binds.x)] * Pos;
+if(in_weights.x == 1) Pos = binds[int(in_binds.x)] * Pos;
 
 gl_Position = mvp * vec4(Pos.xyz, 1);
 

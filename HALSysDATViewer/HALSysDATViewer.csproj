@@ -57,6 +57,20 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modeling\SMD.cs" />
+    <Compile Include="Modeling\TriangleConverter\CacheSimulator.cs" />
+    <Compile Include="Modeling\TriangleConverter\Deque\Deque.cs" />
+    <Compile Include="Modeling\TriangleConverter\Deque\GenericDeque.cs" />
+    <Compile Include="Modeling\TriangleConverter\Deque\GenericDeque.Enumerator.cs" />
+    <Compile Include="Modeling\TriangleConverter\Deque\GenericDeque.Node.cs" />
+    <Compile Include="Modeling\TriangleConverter\Deque\GenericDeque.Synchronized.cs" />
+    <Compile Include="Modeling\TriangleConverter\GraphArray.cs" />
+    <Compile Include="Modeling\TriangleConverter\HeapArray.cs" />
+    <Compile Include="Modeling\TriangleConverter\Policy.cs" />
+    <Compile Include="Modeling\TriangleConverter\Remapper.cs" />
+    <Compile Include="Modeling\TriangleConverter\TriangleConverter.cs" />
+    <Compile Include="Modeling\TriangleConverter\Tristripper.cs" />
+    <Compile Include="Rendering\Types.cs" />
     <Compile Include="NodeManager.cs" />
     <Compile Include="Nodes\FolderNode.cs" />
     <Compile Include="Nodes\IBaseNode.cs" />

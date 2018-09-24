@@ -157,16 +157,27 @@ namespace HSDLib
             }
         }
 
-        // for buffers
-        public virtual void PreSave(HSDWriter Writer)
+        public List<T> GetAllOfType<T>()
         {
+            List<T> List = new List<T>();
 
-        }
+            foreach (var prop in GetType().GetProperties())
+            {
+                var attrs = (FieldData[])prop.GetCustomAttributes(typeof(FieldData), false);
+                foreach (var attr in attrs)
+                {
+                    if(prop.GetValue(this) != null && prop.PropertyType == typeof(T))
+                    {
+                        List.Add((T)prop.GetValue(this));
+                    }
 
-        //for textures
-        public virtual void AfterSave(HSDWriter Writer)
-        {
-
+                    if (prop.GetValue(this) != null && attr.Type.IsSubclassOf(typeof(IHSDNode)))
+                    {
+                        List.AddRange(((IHSDNode)prop.GetValue(this)).GetAllOfType<T>());
+                    }
+                }
+            }
+            return List;
         }
     }
 
@@ -227,6 +238,21 @@ namespace HSDLib
             foreach (T Child in JOBJ.Child.List)
             {
                 Enqueue(Child, Que);
+            }
+        }
+
+        public void AddChild(T Child)
+        {
+            if (this.Child == null)
+                this.Child = Child;
+            else
+            {
+                T child = this.Child;
+                while(child.Child != null)
+                {
+                    child = child.Next;
+                }
+                child.Child = Child;
             }
         }
     }

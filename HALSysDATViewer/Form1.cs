@@ -74,7 +74,7 @@ namespace HALSysDATViewer
             {
                 HSD_JOBJ j = ((Node_JOBJ)nodeTree.SelectedNode).JOBJ;
                 if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
-                    Renderer.SetHSD(j);
+                    Renderer.RootNode = j;
             }
             if (nodeTree.SelectedNode is Node_Generic)
             {
@@ -83,7 +83,7 @@ namespace HALSysDATViewer
                 {
                     HSD_JOBJ j = (HSD_JOBJ)Node;
                     if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || j.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
-                        Renderer.SetHSD(j);
+                        Renderer.RootNode = j;
                 }
                
             }
@@ -109,7 +109,7 @@ namespace HALSysDATViewer
             timer.Start();
 
             Renderer = new HSDRenderer();
-            //Renderer.SetHSD((HSD_JOBJ)HSD.Roots[0].Node);
+            //Renderer.SetHSD(smd.RootJOBJ);
         }
 
         private void Application_Idle(object sender, EventArgs e)
@@ -123,7 +123,7 @@ namespace HALSysDATViewer
                 Render();
             }
         }
-        
+
         private void Render()
         {
             glControl.MakeCurrent();
@@ -164,7 +164,7 @@ namespace HALSysDATViewer
             //GL.Enable(EnableCap.CullFace);
 
             DrawTools.DrawFloor(Camera.mvpMatrix);
-            
+
             //RenderHere
             Renderer.Render(ref Camera);
 

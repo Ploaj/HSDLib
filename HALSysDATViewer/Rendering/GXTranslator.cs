@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HSDLib.GX;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using HSDLib.Helpers;
 
 namespace HALSysDATViewer.Rendering
 {

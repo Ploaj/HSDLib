@@ -12,6 +12,17 @@ using OpenTK.Graphics.OpenGL;
 
 namespace HALSysDATViewer.Rendering
 {
+    public struct GLVertex
+    {
+        public Vector3 Position;
+        public Vector3 Normal;
+        public Vector2 UV0;
+        public Vector2 UV1;
+        public Vector4 Bone;
+        public Vector4 Weight;
+        public const int Stride = (3 + 3 + 2 + 2 + 4 + 4) * 4;
+    }
+
     public class HSDRenderer
     {
         public class RenderDOBJ
@@ -32,7 +43,7 @@ namespace HALSysDATViewer.Rendering
         public Shader Shader;
         public int VBO;
 
-        private HSD_JOBJ RootNode
+        public HSD_JOBJ RootNode
         {
             get
             {
@@ -46,8 +57,6 @@ namespace HALSysDATViewer.Rendering
         }
         private HSD_JOBJ _rootNode;
         public List<GLPrimitveGroup> Primitives = new List<GLPrimitveGroup>();
-        public GXVertex[] Vertices;
-        public GLTexture TEX0;
         
         public HSDRenderer()
         {
@@ -55,11 +64,6 @@ namespace HALSysDATViewer.Rendering
             Shader = new Shader();
             Shader.LoadShader("Rendering\\HSD.vert");
             Shader.LoadShader("Rendering\\HSD.frag");
-        }
-
-        public void SetHSD(HSD_JOBJ RootNode)
-        {
-            this.RootNode = RootNode;
         }
 
         private Matrix4[] InverseBinds;
@@ -112,7 +116,7 @@ namespace HALSysDATViewer.Rendering
             UpdateBinds(RootNode, Matrix4.Identity, Matrices);
             Binds = Matrices.ToArray();
 
-            List<GXVertex> Vertices = new List<GXVertex>();
+            List<GLVertex> Vertices = new List<GLVertex>();
             int offset = 0;
             foreach(RenderDOBJ rdobj in DOBJList)
             {
@@ -121,7 +125,7 @@ namespace HALSysDATViewer.Rendering
                 {
                     // Decode the Display List Data
                     GXDisplayList DisplayList = new GXDisplayList(pobj.DisplayListBuffer, pobj.VertexAttributes);
-                    Vertices.AddRange(VertexAccessor.GetDecodedVertices(DisplayList, pobj, RootNode));
+                    Vertices.AddRange(ConvertToGLVertex(VertexAccessor.GetDecodedVertices(DisplayList, pobj), BoneList, pobj.BindGroups != null ? new List<HSD_JOBJWeight>(pobj.BindGroups.Elements) : null));
                     foreach(GXPrimitiveGroup g in DisplayList.Primitives)
                     {
                         GLPrimitveGroup GL = new GLPrimitveGroup();
@@ -134,14 +138,58 @@ namespace HALSysDATViewer.Rendering
                     }
                 }
             }
-            this.Vertices = Vertices.ToArray();
             BindArray(Vertices.ToArray());
         }
 
-        public void BindArray(GXVertex[] Vertices)
+        // have to use a new vertex struct to account for bone weights
+        public GLVertex[] ConvertToGLVertex(GXVertex[] InVerts, List<HSD_JOBJ> BoneList, List<HSD_JOBJWeight> WeightList)
+        {
+            GLVertex[] OutVerts = new GLVertex[InVerts.Length];
+
+            for(int i = 0; i < InVerts.Length; i++)
+            {
+                GXVertex v = InVerts[i];
+                OutVerts[i] = new GLVertex()
+                {
+                    Position = new Vector3(v.Pos.X, v.Pos.Y, v.Pos.Z),
+                    Normal = new Vector3(v.Nrm.X, v.Nrm.Y, v.Nrm.Z),
+                    UV0 = new Vector2(v.TEX0.X, v.TEX0.Y),
+                };
+                if (WeightList == null) continue;
+                HSD_JOBJWeight Weights = WeightList[v.PMXID / 3];
+                if(Weights.JOBJs.Count > 0)
+                {
+                    OutVerts[i].Bone.X = BoneList.IndexOf(Weights.JOBJs[0]);
+                    OutVerts[i].Weight.X = Weights.Weights[0];
+                }
+                if (Weights.JOBJs.Count > 1)
+                {
+                    OutVerts[i].Bone.Y = BoneList.IndexOf(Weights.JOBJs[1]);
+                    OutVerts[i].Weight.Y = Weights.Weights[1];
+                }
+                if (Weights.JOBJs.Count > 2)
+                {
+                    OutVerts[i].Bone.Z = BoneList.IndexOf(Weights.JOBJs[2]);
+                    OutVerts[i].Weight.Z = Weights.Weights[2];
+                }
+                if (Weights.JOBJs.Count > 3)
+                {
+                    OutVerts[i].Bone.W = BoneList.IndexOf(Weights.JOBJs[3]);
+                    OutVerts[i].Weight.W = Weights.Weights[3];
+                }
+                if (Weights.JOBJs.Count > 4)
+                {
+                    Console.WriteLine("Warning: Too many weight to render");
+                }
+            }
+
+            return OutVerts;
+        }
+
+        public void BindArray(GLVertex[] Vertices)
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(GXVertex.Stride * Vertices.Length), Vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(GLVertex.Stride * Vertices.Length), Vertices, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
@@ -166,26 +214,36 @@ namespace HALSysDATViewer.Rendering
             GL.UseProgram(Shader.programId);
             Shader.EnableVertexAttributes();
 
+            // Set Uniforms---------------------------------------------------------------
             Matrix4 mvp = Camera.mvpMatrix;
             GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
             if (Binds != null && Binds.Length > 0)
                 GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("binds"), Binds.Length, false, ref Binds[0].Row0.X);
 
+            // Bind Vertex Buffer---------------------------------------------------------------
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_pos"), 3, VertexAttribPointerType.Float, false, GXVertex.Stride, 0);
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_nrm"), 3, VertexAttribPointerType.Float, false, GXVertex.Stride, 12);
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_tex0"), 2, VertexAttribPointerType.Float, false, GXVertex.Stride, 24);
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_binds"), 4, VertexAttribPointerType.Int, false, GXVertex.Stride, 60);
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_weights"), 4, VertexAttribPointerType.Float, false, GXVertex.Stride, 76);
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_pos"), 3, VertexAttribPointerType.Float, false, GLVertex.Stride, 0);
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_nrm"), 3, VertexAttribPointerType.Float, false, GLVertex.Stride, 12);
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_tex0"), 2, VertexAttribPointerType.Float, false, GLVertex.Stride, 24);
+            //tex1
+            //clr0
+            //clr1
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_binds"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 40);
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_weights"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 56);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             GL.Uniform1(Shader.GetVertexAttributeUniformLocation("TEX0"), 0);
 
             foreach (GLPrimitveGroup p in Primitives)
             {
+                Shader.SetInt("JOBJIndex", p.RenderDOBJ.JOBJIndex);
+
+                // Materials---------------------------------------------------------------
+
+
+                // Textures---------------------------------------------------------------
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GLTexture tex = TextureManager.GetGLTexture(p.RenderDOBJ.Material.Textures);
-                Shader.SetInt("JOBJIndex", p.RenderDOBJ.JOBJIndex);
                 if(tex != null)
                 GL.BindTexture(TextureTarget.Texture2D, tex.ID);
                 if(p.RenderDOBJ.Material.Textures != null)
@@ -193,30 +251,14 @@ namespace HALSysDATViewer.Rendering
                     Shader.SetInt("UVSW", p.RenderDOBJ.Material.Textures.WScale);
                     Shader.SetInt("UVSH", p.RenderDOBJ.Material.Textures.HScale);
                 }
+
+                // Draw---------------------------------------------------------------
                 GL.DrawArrays(p.PrimitiveType, p.Offset, p.Count);
             }
 
             Shader.DisableVertexAttributes();
             GL.UseProgram(0);
 
-        }
-
-        // Do Not Use
-        public void PrimitiveRender()
-        {
-            foreach(GLPrimitveGroup p in Primitives)
-            {
-                GL.PointSize(10f);
-                GL.Begin(p.PrimitiveType);
-
-                for (int i = 0; i < p.Count; i++)
-                {
-                    GL.Color3(Vertices[p.Offset + i].Pos.X, Vertices[p.Offset + i].Pos.Y, Vertices[p.Offset + i].Pos.Z);
-                    GL.Vertex3(Vertices[p.Offset + i].Pos.X, Vertices[p.Offset + i].Pos.Y, Vertices[p.Offset + i].Pos.Z);
-                }
-
-                GL.End();
-            }
         }
     }
 }

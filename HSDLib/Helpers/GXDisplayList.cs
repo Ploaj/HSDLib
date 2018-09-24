@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HSDLib.Common;
+using HSDLib.Helpers;
 using System.IO;
+using HSDLib.GX;
 
-namespace HSDLib.GX
+namespace HSDLib.Helpers
 {
     public enum GXPrimitiveType
     {
@@ -22,7 +24,8 @@ namespace HSDLib.GX
     public class GXIndexGroup
     {
         public ushort[] Indices;
-        public byte[] Clr;
+        public byte[] Clr0;
+        public byte[] Clr1;
     }
 
     public class GXPrimitiveGroup
@@ -51,8 +54,10 @@ namespace HSDLib.GX
                         case GXAttribType.GX_DIRECT:
                             if (att.Name != GXAttribName.GX_VA_CLR0)
                                 g.Indices[i] = Reader.ReadByte();
-                            else
-                                g.Clr = ReadGXClr(Reader, (int)att.CompType);
+                            else if(att.Name == GXAttribName.GX_VA_CLR0)
+                                g.Clr0 = ReadGXClr(Reader, (int)att.CompType);
+                            else if (att.Name == GXAttribName.GX_VA_CLR1)
+                                g.Clr1 = ReadGXClr(Reader, (int)att.CompType);
                             break;
                         case GXAttribType.GX_INDEX8:
                             g.Indices[i] = Reader.ReadByte();
@@ -66,6 +71,7 @@ namespace HSDLib.GX
             }
             return true;
         }
+
         private static byte[] ReadGXClr(HSDReader Reader, int CompType)
         {
             byte[] clr = new byte[] { 1, 1, 1, 1 };
@@ -114,11 +120,99 @@ namespace HSDLib.GX
 
             return clr;
         }
+
+        public void Write(HSDWriter Writer, HSD_AttributeGroup Attributes)
+        {
+            Writer.Write((byte)PrimitiveType);
+            Writer.Write((ushort)Indices.Length);
+            foreach(GXIndexGroup ig in Indices)
+            {
+                GXIndexGroup g = ig;
+                int i = 0;
+                foreach (GXVertexBuffer att in Attributes.Attributes)
+                {
+                    switch (att.AttributeType)
+                    {
+                        case GXAttribType.GX_DIRECT:
+                            if (att.Name != GXAttribName.GX_VA_CLR0)
+                                Writer.Write((byte)g.Indices[i]);
+                            else if (att.Name == GXAttribName.GX_VA_CLR0)
+                                WriteGXClr(g.Clr0, Writer, att.CompType);
+                            else if (att.Name == GXAttribName.GX_VA_CLR1)
+                                WriteGXClr(g.Clr1, Writer, att.CompType);
+                            break;
+                        case GXAttribType.GX_INDEX8:
+                            Writer.Write((byte)g.Indices[i]);
+                            break;
+                        case GXAttribType.GX_INDEX16:
+                            Writer.Write(g.Indices[i]);
+                            break;
+                    }
+                    i++;
+                }
+            }
+        }
+
+        public static void WriteGXClr(byte[] clr, HSDWriter d, GXCompType type)
+        {
+            switch ((int)type)
+            {
+                case 0: // GX_RGB565
+                    d.Write((short)ClrTo565(clr));
+                    break;
+                case 1: // GX_RGB888
+                    d.Write(clr[0]);
+                    d.Write(clr[1]);
+                    d.Write(clr[2]);
+                    break;
+                case 2: // GX_RGBX888
+                    d.Write(clr[0]);
+                    d.Write(clr[1]);
+                    d.Write(clr[2]);
+                    d.Write(0);
+                    break;
+                case 3: // GX_RGBA4
+                    short s = (short)((((clr[0] >> 4) & 0xF) << 12) | (((clr[1] >> 4) & 0xF) << 8) | (((clr[2] >> 4) & 0xF) << 4) | (((clr[3] >> 4) & 0xF)));
+                    d.Write((ushort)s);
+                    break;
+                case 4: // GX_RGBA6
+                    int three = (((clr[0] >> 2) << 18) | ((clr[1] >> 2) << 12) | ((clr[2] >> 2) << 6) | (clr[3] >> 2));
+                    d.Write((byte)((three >> 16)&0xFF));
+                    d.Write((byte)((three >> 8) & 0xFF));
+                    d.Write((byte)((three) & 0xFF));
+                    break;
+                case 5: // GX_RGBX888
+                    d.Write(clr[0]);
+                    d.Write(clr[1]);
+                    d.Write(clr[2]);
+                    d.Write(clr[3]);
+                    break;
+            }
+        }
+
+        private static ushort ClrTo565(byte[] color)
+        {
+            byte red = color[0];
+            byte green = color[0];
+            byte blue = color[0];
+
+            int b = (blue >> 3) & 0x1f;
+            int g = ((green >> 2) & 0x3f) << 5;
+            int r = ((red >> 3) & 0x1f) << 11;
+
+            return (ushort)(r | g | b);
+        }
     }
 
     public class GXDisplayList
     {
         public List<GXPrimitiveGroup> Primitives = new List<GXPrimitiveGroup>();
+
+        public GXDisplayList()
+        {
+
+        }
+
         public GXDisplayList(byte[] Buffer, HSD_AttributeGroup Group)
         {
             HSDReader Reader = new HSDReader(new MemoryStream(Buffer));
@@ -130,6 +224,25 @@ namespace HSDLib.GX
                 Primitives.Add(g);
             }
             Reader.Close();
+        }
+
+        public byte[] ToBuffer(HSD_AttributeGroup Group)
+        {
+            MemoryStream o = new MemoryStream();
+            HSDWriter Writer = new HSDWriter(o);
+
+            foreach(GXPrimitiveGroup g in Primitives)
+            {
+                g.Write(Writer, Group);
+            }
+            Writer.Write((byte)0);
+
+            Writer.Align(0x20);
+
+            Writer.Close();
+            byte[] bytes = o.ToArray();
+            o.Close();
+            return bytes;
         }
     }
 }
