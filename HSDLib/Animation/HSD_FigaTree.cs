@@ -3,22 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSDLib.MaterialAnimation;
 
 namespace HSDLib.Animation
 {
     public class HSD_FigaTree : IHSDNode
     {
         [FieldData(typeof(int))]
-        public int Unk1;
+        public int Type { get; set; }
 
-        public float FrameCount;
+        [FieldData(typeof(float))]
+        public float FrameCount { get; set; }
+
+        [FieldData(typeof(HSD_MatAnimJoint))]
+        public HSD_MatAnimJoint MatAnimJoint { get; set; }
+
         public List<HSD_AnimNode> Nodes = new List<HSD_AnimNode>();
 
         public override void Open(HSDReader Reader)
         {
-            //Padding
-            Unk1 = Reader.ReadInt32();
-            if (Reader.ReadUInt32() != 0) throw new Exception("Error reading figatree");
+            Type = Reader.ReadInt32();
+            if (Type == -1)
+                MatAnimJoint = Reader.ReadObject<HSD_MatAnimJoint>(Reader.ReadUInt32());
+            else
+                Reader.ReadInt32(); // nothing
             FrameCount = Reader.ReadSingle();
             uint TrackCountOffset = Reader.ReadUInt32();
             uint TrackOffset = Reader.ReadUInt32();
@@ -48,6 +56,9 @@ namespace HSDLib.Animation
 
         public override void Save(HSDWriter Writer)
         {
+            if (MatAnimJoint == null)
+                Writer.WriteObject(MatAnimJoint);
+
             foreach (HSD_AnimNode node in Nodes)
             {
                 foreach (HSD_Track t in node.Tracks)
@@ -68,8 +79,11 @@ namespace HSDLib.Animation
             Writer.Align(4);
 
             Writer.AddObject(this);
-            Writer.Write(Unk1);
-            Writer.Write(0);
+            Writer.Write(MatAnimJoint == null ? 1 : -1);
+            if (MatAnimJoint == null)
+                Writer.Write(0);
+            else
+                Writer.WritePointer(MatAnimJoint);
             Writer.Write(FrameCount);
             Writer.WritePointer(array);
             Writer.WritePointer(FirstTrack);

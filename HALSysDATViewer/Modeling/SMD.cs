@@ -23,6 +23,7 @@ namespace HALSysDATViewer.Modeling
     {
         public HSD_JOBJ RootJOBJ;
         public List<SMDTriangle> Triangles;
+        public List<HSD_JOBJWeight> BoneWeightList = new List<HSD_JOBJWeight>();
 
         public SMD()
         {
@@ -46,6 +47,8 @@ namespace HALSysDATViewer.Modeling
             Dictionary<int, HSD_JOBJ> BoneList = new Dictionary<int, HSD_JOBJ>();
 
             int time = 0;
+
+            List<HSD_JOBJ> JOBJBoneList;
             while ((line = reader.ReadLine()) != null)
             {
                 line = Regex.Replace(line, @"\s+", " ");
@@ -100,6 +103,7 @@ namespace HALSysDATViewer.Modeling
                             b.Transforms.SZ = 1f;
                         }
                     }
+                    JOBJBoneList = RootJOBJ.DepthFirstList;
                 }
 
                 if (current.Equals("triangles"))
@@ -125,13 +129,24 @@ namespace HALSysDATViewer.Modeling
                         vert.TEX0 = new GXVector2(float.Parse(args[7]), float.Parse(args[8]));
                         if (args.Length > 9)
                         {
+                            // eww, gross, please fix later
                             int wCount = int.Parse(args[9]);
                             int w = 10;
+                            HSD_JOBJWeight bw = new HSD_JOBJWeight();
                             for (int i = 0; i < wCount; i++)
                             {
                                 int bone = (int.Parse(args[w++]));
                                 float weight = (float.Parse(args[w++]));
+                                bw.JOBJs.Add(BoneList[bone]);
+                                bw.Weights.Add(weight);
                             }
+                            int mtxid = BoneWeightList.IndexOf(bw);
+                            if(mtxid == -1)
+                            {
+                                mtxid = BoneWeightList.Count;
+                                BoneWeightList.Add(bw);
+                            }
+                            vert.PMXID = (ushort)(mtxid * 3);
                         }
                         switch (j)
                         {
@@ -142,15 +157,6 @@ namespace HALSysDATViewer.Modeling
                     }
                 }
             }
-
-            GXVertex[] Verts = GetVertices();
-            List<HSD_JOBJWeight> WeightList = PMXIDCreate(ref Verts);
-
-            TriangleConverter.TriangleConverter tc = new TriangleConverter.TriangleConverter(true, 52, 2, true);
-            int pointcount = 0;
-            int facecount;
-            List<PrimitiveGroup> Groups = tc.GroupPrimitives(Verts, out pointcount, out facecount);
-            Console.WriteLine(Groups[0]._triangles.Count + " " + Verts.Length + " " + WeightList.Count +" "+ pointcount + " " + facecount);
         }
 
         public GXVertex[] GetVertices()
@@ -158,9 +164,9 @@ namespace HALSysDATViewer.Modeling
             List<GXVertex> Vertices = new List<GXVertex>(Triangles.Count * 3);
             foreach (SMDTriangle t in Triangles)
             {
-                Vertices.Add(t.v1);
-                Vertices.Add(t.v2);
                 Vertices.Add(t.v3);
+                Vertices.Add(t.v2);
+                Vertices.Add(t.v1);
             }
             return Vertices.ToArray();
         }

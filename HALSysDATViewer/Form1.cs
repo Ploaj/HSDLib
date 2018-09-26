@@ -161,7 +161,8 @@ namespace HALSysDATViewer
             // objects shouldn't show through opaque parts of floor
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
-            //GL.Enable(EnableCap.CullFace);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Front);
 
             DrawTools.DrawFloor(Camera.mvpMatrix);
 

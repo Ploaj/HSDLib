@@ -14,9 +14,18 @@ namespace HSDLib.KAR
 
         [FieldData(typeof(int))]
         public int Unk1 { get; set; }
+        
+        [FieldData(typeof(byte))]
+        public byte BoneCount { get; set; }
 
-        [FieldData(typeof(int))]
-        public int Unk2 { get; set; }
+        [FieldData(typeof(byte))]
+        public byte Unk2 { get; set; }
+
+        [FieldData(typeof(byte))]
+        public byte Unk4 { get; set; }
+
+        [FieldData(typeof(byte))]
+        public byte Unk5 { get; set; }
 
         [FieldData(typeof(int))]
         public int Unk3 { get; set; }

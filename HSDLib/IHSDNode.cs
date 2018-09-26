@@ -248,11 +248,11 @@ namespace HSDLib
             else
             {
                 T child = this.Child;
-                while(child.Child != null)
+                while (child.Next != null)
                 {
                     child = child.Next;
                 }
-                child.Child = Child;
+                child.Next = Child;
             }
         }
     }
