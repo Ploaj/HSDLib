@@ -9,7 +9,7 @@ using HSDLib.Helpers;
 using System.IO;
 using System.Text.RegularExpressions;
 using OpenTK.Graphics.OpenGL;
-using HALSysDATViewer.Modeling.TriangleConverter;
+using HSDLib.Helpers.TriangleConverter;
 
 namespace HALSysDATViewer.Modeling
 {

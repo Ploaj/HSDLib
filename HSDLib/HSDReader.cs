@@ -33,11 +33,12 @@ namespace HSDLib
     /// </summary>
     public class HSDReader : BinaryReader
     {
+        public bool BigEndian { get; set; }
         public List<uint> RelocationTable = new List<uint>();
 
         public HSDReader(Stream input) : base(input)
         {
-
+            BigEndian = true;
         }
 
         public void ReadRelocationTable(int Size)
@@ -71,9 +72,21 @@ namespace HSDLib
 
         public byte[] Reverse(byte[] b)
         {
-            if (BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian && BigEndian)
                 Array.Reverse(b);
             return b;
+        }
+        
+        public int ExtendedByte()
+        {
+            int type = ReadByte();
+            int i = type;
+            if ((i & 0x80) != 0) // max 16 bit I think
+            {
+                i = ReadByte();
+                type = (type & 0x7F) | (i << 7);
+            }
+            return type;
         }
 
         public override Int16 ReadInt16()

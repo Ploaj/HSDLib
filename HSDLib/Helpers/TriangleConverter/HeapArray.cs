@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace HALSysDATViewer.Modeling.TriangleConverter
+namespace HSDLib.Helpers.TriangleConverter
 {
     enum CompareType
     {

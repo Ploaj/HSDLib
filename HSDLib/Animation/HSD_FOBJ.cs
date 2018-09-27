@@ -6,6 +6,25 @@ using System.Threading.Tasks;
 
 namespace HSDLib.Animation
 {
+    public enum GXAnimDataFormat
+    {
+        Float = 0x00,
+        Short = 0x20,
+        UShort = 0x40,
+        SByte = 0x60,
+        Byte = 0x80
+    }
+
+    public enum InterpolationType
+    {
+        Constant = 1,
+        Linear = 2,
+        HermiteValue = 3,
+        Hermite = 4,
+        HermiteCurve = 5,
+        Step = 6
+    }
+    
     public class HSD_FOBJ : IHSDNode
     {
         [FieldData(typeof(byte))]

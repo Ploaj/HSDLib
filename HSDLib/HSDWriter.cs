@@ -25,6 +25,7 @@ namespace HSDLib
             public object Object;
         }
 
+        public bool BigEndian { get; set; }
         private List<RelocationPointer> Pointers = new List<RelocationPointer>();
         private Dictionary<object, uint> ObjectOffsets = new Dictionary<object, uint>();
         private Dictionary<object, uint> ObjectOffsetsHOLD;
@@ -56,7 +57,7 @@ namespace HSDLib
 
         public HSDWriter(Stream input) : base(input)
         {
-
+            BigEndian = true;
         }
 
         public void WriteTexture(byte[] b)
@@ -121,7 +122,7 @@ namespace HSDLib
         {
             if (Mode != WriterWriteMode.NORMAL)
                 return new byte[0];
-            if (BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian && BigEndian)
                 Array.Reverse(b);
             return b;
         }
@@ -149,6 +150,19 @@ namespace HSDLib
         public override void Write(short value)
         {
             Write(Reverse(BitConverter.GetBytes(value)));
+        }
+        
+        public void ExtendedByte(int i)
+        {
+            if (i > 0xFF || (i & 0x80) > 0)
+            {
+                Write((byte)((i & 0x7F) | 0x80));
+                Write((byte)(i >> 7));
+            }
+            else
+            {
+                Write((byte)i);
+            }
         }
 
         public override void Write(byte value)

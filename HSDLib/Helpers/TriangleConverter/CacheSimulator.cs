@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HALSysDATViewer.Modeling.TriangleConverter
+namespace HSDLib.Helpers.TriangleConverter
 {
     class CacheSimulator
     {

@@ -43,6 +43,12 @@ namespace HSDLib
             Decompile(FileName);
         }
 
+        public HSDFile()
+        {
+            Roots = new List<HSDRoot>();
+            Resources = new List<HSDRoot>();
+        }
+
         /// <summary>
         /// Reads data into class system
         /// </summary>

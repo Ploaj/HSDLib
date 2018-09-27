@@ -6,7 +6,7 @@ using HSDLib.Helpers;
 //https://github.com/libertyernie/brawltools/tree/40d7431b1a01ef4a0411cd69e51411bd581e93e2/BrawlLib/Modeling/Triangle%20Converter
 
 
-namespace HALSysDATViewer.Modeling.TriangleConverter
+namespace HSDLib.Helpers.TriangleConverter
 {
     public class TriangleConverter
     {
