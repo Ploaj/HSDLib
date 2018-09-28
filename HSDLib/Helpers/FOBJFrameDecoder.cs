@@ -73,7 +73,7 @@ namespace HSDLib.Helpers
                             value = ReadVal(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
                             break;
                         default:
-                            throw new Exception("end");
+                            throw new Exception("Unknown Interpolation Type " + interpolation.ToString("X"));
                     }
 
                     FOBJKey kf = new FOBJKey();

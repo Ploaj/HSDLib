@@ -9,6 +9,8 @@ namespace HALSysDATViewer.Rendering
 {
     public class Math3D
     {
+        public static float DegToRad = (float)(Math.PI / 180f);
+
         public static Quaternion FromEulerAngles(float z, float y, float x)
         {
             {

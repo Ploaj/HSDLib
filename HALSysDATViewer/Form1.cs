@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSDLib;
 using HSDLib.Common;
+using HSDLib.Animation;
 using HALSysDATViewer.Nodes;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -85,7 +86,12 @@ namespace HALSysDATViewer
                     if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || j.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
                         Renderer.RootNode = j;
                 }
-               
+                if (Node is HSD_FigaTree)
+                {
+                    Renderer.FigaTree = (HSD_FigaTree)Node;
+                    trackBar1.Maximum = (int)((HSD_FigaTree)Node).FrameCount;
+                }
+
             }
         }
 
@@ -199,6 +205,11 @@ namespace HALSysDATViewer
                     SaveDAT(sfd.FileName);
                 }
             }
+        }
+
+        private void trackBar1_ValueChanged(object sender, EventArgs e)
+        {
+            Renderer.SetFrame(trackBar1.Value);
         }
     }
 }

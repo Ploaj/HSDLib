@@ -15,14 +15,19 @@ namespace HSDLib.Animation
         Byte = 0x80
     }
 
+    public enum JointTrackType
+    {
+        HSD_A_J_ROTX = 1, HSD_A_J_ROTY, HSD_A_J_ROTZ, HSD_A_J_PATH, HSD_A_J_TRAX, HSD_A_J_TRAY, HSD_A_J_TRAZ, HSD_A_J_SCAX, HSD_A_J_SCAY, HSD_A_J_SCAZ, HSD_A_J_NODE, HSD_A_J_BRANCH, HSD_A_J_SETBYTE0, HSD_A_J_SETBYTE1, HSD_A_J_SETBYTE2, HSD_A_J_SETBYTE3, HSD_A_J_SETBYTE4, HSD_A_J_SETBYTE5, HSD_A_J_SETBYTE6, HSD_A_J_SETBYTE7, HSD_A_J_SETBYTE8, HSD_A_J_SETBYTE9, HSD_A_J_SETFLOAT0, HSD_A_J_SETFLOAT1, HSD_A_J_SETFLOAT2, HSD_A_J_SETFLOAT3, HSD_A_J_SETFLOAT4, HSD_A_J_SETFLOAT5, HSD_A_J_SETFLOAT6, HSD_A_J_SETFLOAT7, HSD_A_J_SETFLOAT8, HSD_A_J_SETFLOAT9
+    }
+
     public enum InterpolationType
     {
-        Constant = 1,
+        Step = 1,
         Linear = 2,
         HermiteValue = 3,
         Hermite = 4,
         HermiteCurve = 5,
-        Step = 6
+        Constant = 6
     }
     
     public class HSD_FOBJ : IHSDNode

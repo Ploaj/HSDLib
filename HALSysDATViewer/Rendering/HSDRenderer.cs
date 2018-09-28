@@ -9,6 +9,7 @@ using HSDLib.GX;
 using HSDLib.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using HSDLib.Animation;
 
 namespace HALSysDATViewer.Rendering
 {
@@ -25,6 +26,85 @@ namespace HALSysDATViewer.Rendering
 
     public class HSDRenderer
     {
+        public class AnimTrack
+        {
+            public List<FOBJKey> Keys;
+            public byte TrackType;
+
+            public float GetValue(float Frame)
+            {
+                // register
+                float Value1 = 0;
+                float Value2 = 0;
+                float Tan1 = 0;
+                float Tan2 = 0;
+                float Frame1 = 0;
+                float Frame2 = 0;
+                InterpolationType CurrentInterpolation = InterpolationType.Constant;
+
+                //Process key frames until value
+                for(int i = 0; i < Keys.Count; i++)
+                {
+                    if (Keys[i].Frame > Frame)
+                    {
+                        if(Keys[i].InterpolationType == InterpolationType.HermiteCurve)
+                        {
+                            Value2 = Keys[i + 1].Value;
+                        }else
+                        {
+                            Value2 = Keys[i].Value;
+                        }
+                        if(Keys[i].InterpolationType != InterpolationType.HermiteValue)
+                            Tan2 = Keys[i].Tan;
+                        Frame2 = Keys[i].Frame;
+                        break;
+                    }
+                    Tan2 = 0;
+                    Value2 = 0;
+                    switch (Keys[i].InterpolationType)
+                    {
+                        case InterpolationType.Constant:
+                            Value1 = Keys[i].Value;
+                            break;
+                        case InterpolationType.Step:
+                            CurrentInterpolation = Keys[i].InterpolationType;
+                            Value1 = Keys[i].Value;
+                            break;
+                        case InterpolationType.Linear:
+                            CurrentInterpolation = Keys[i].InterpolationType;
+                            Frame1 = Keys[i].Frame;
+                            Value1 = Keys[i].Value;
+                            break;
+                        case InterpolationType.Hermite:
+                            CurrentInterpolation = Keys[i].InterpolationType;
+                            Frame1 = Keys[i].Frame;
+                            Value1 = Keys[i].Value;
+                            Tan1 = Keys[i].Tan;
+                            break;
+                    }
+
+                }
+                if (Frame1 == Frame2 || CurrentInterpolation == InterpolationType.Step)
+                    return Value1;
+                
+                float FrameDiff = Frame - Frame1;
+                float Weight = FrameDiff / (Frame2 - Frame1);
+
+                if (CurrentInterpolation == InterpolationType.Linear)
+                    return AnimationHelperInterpolation.Lerp(Value1, Value2, Weight);
+
+                if (CurrentInterpolation == InterpolationType.Hermite || CurrentInterpolation == InterpolationType.HermiteValue)
+                    return AnimationHelperInterpolation.Herp(Value1, Value2, Tan1, Tan2, FrameDiff, Weight);
+
+                return Value1;
+            }
+        }
+
+        public class AnimNode
+        {
+            public List<AnimTrack> Tracks = new List<AnimTrack>();
+        }
+
         public class RenderDOBJ
         {
             public HSD_MOBJ Material;
@@ -57,7 +137,32 @@ namespace HALSysDATViewer.Rendering
         }
         private HSD_JOBJ _rootNode;
         public List<GLPrimitveGroup> Primitives = new List<GLPrimitveGroup>();
-        
+
+        public HSD_FigaTree FigaTree
+        {
+            set
+            {
+                Nodes.Clear();
+                HSD_FigaTree Tree = value;
+                foreach(HSD_AnimNode node in Tree.Nodes)
+                {
+                    AnimNode n = new AnimNode();
+                    foreach(HSD_Track t in node.Tracks)
+                    {
+                        AnimTrack track = new AnimTrack();
+                        track.TrackType = t.Track.AnimationType;
+                        track.Keys = new FOBJFrameDecoder(t.Track).GetKeys();
+                        n.Tracks.Add(track);
+                    }
+                    Nodes.Add(n);
+                }
+            }
+        }
+
+        private List<AnimNode> Nodes = new List<AnimNode>();
+        private Matrix4[] InverseBinds;
+        private Matrix4[] Binds;
+
         public HSDRenderer()
         {
             GL.GenBuffers(1, out VBO);
@@ -65,9 +170,6 @@ namespace HALSysDATViewer.Rendering
             Shader.LoadShader("Rendering\\HSD.vert");
             Shader.LoadShader("Rendering\\HSD.frag");
         }
-
-        private Matrix4[] InverseBinds;
-        private Matrix4[] Binds;
 
         public Matrix4 FromGXMatrix(HSD_Matrix4x3 m)
         {
@@ -77,11 +179,51 @@ namespace HALSysDATViewer.Rendering
                 0, 0, 0, 1);
         }
 
-        public void UpdateBinds(HSD_JOBJ jobj, Matrix4 Parent, List<Matrix4> Matrices)
+        private int BoneIndex = 0;
+        public void SetFrame(float Frame)
         {
-            Matrix4 Transform = Matrix4.CreateScale(jobj.Transforms.SX, jobj.Transforms.SY, jobj.Transforms.SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.Transforms.RZ, jobj.Transforms.RY, jobj.Transforms.RX)) *
-                Matrix4.CreateTranslation(jobj.Transforms.TX, jobj.Transforms.TY, jobj.Transforms.TZ);
+            if (Nodes.Count < Binds.Length) return;
+            List<Matrix4> Matrices = new List<Matrix4>();
+            BoneIndex = 0;
+            UpdateBinds(RootNode, Matrix4.Identity, Matrices, Frame);
+            Binds = Matrices.ToArray();
+        }
+
+        public void UpdateBinds(HSD_JOBJ jobj, Matrix4 Parent, List<Matrix4> Matrices, float frame = -1)
+        {
+            float TX = jobj.Transforms.TX;
+            float TY = jobj.Transforms.TY;
+            float TZ = jobj.Transforms.TZ;
+            float RX = jobj.Transforms.RX;
+            float RY = jobj.Transforms.RY;
+            float RZ = jobj.Transforms.RZ;
+            float SX = jobj.Transforms.SX;
+            float SY = jobj.Transforms.SY;
+            float SZ = jobj.Transforms.SZ;
+            if(frame != -1)
+            {
+                AnimNode node = Nodes[BoneIndex];
+                foreach (AnimTrack t in node.Tracks)
+                {
+                    switch ((JointTrackType)t.TrackType)
+                    {
+                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(frame); break;
+                    }
+                }
+                BoneIndex++;
+            }
+
+            Matrix4 Transform = Matrix4.CreateScale(SX, SY, SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
+                Matrix4.CreateTranslation(TX, TY, TZ);
 
             if (Parent != null)
                 Transform *= Parent;
@@ -90,7 +232,7 @@ namespace HALSysDATViewer.Rendering
             if (jobj.Child != null)
                 foreach (HSD_JOBJ j in jobj.Children)
                 {
-                    UpdateBinds(j, Transform, Matrices);
+                    UpdateBinds(j, Transform, Matrices, frame);
                 }
         }
 
