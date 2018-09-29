@@ -27,7 +27,7 @@ namespace HSDLib.Common
         public byte[] DisplayListBuffer;
 
         public HSD_JOBJ SingleBind;
-        public HSD_Array<HSD_JOBJWeight> BindGroups;
+        public HSD_PointerArray<HSD_JOBJWeight> BindGroups;
 
         public override void Open(HSDReader Reader)
         {
@@ -55,7 +55,7 @@ namespace HSDLib.Common
                 if (Flags.HasFlag(POBJ_FLAG.ENVELOPE))
                 {
                     // offsets to array of bone-weight combinations
-                    BindGroups = Reader.ReadObject<HSD_Array<HSD_JOBJWeight>>(WeightListOffset);
+                    BindGroups = Reader.ReadObject<HSD_PointerArray<HSD_JOBJWeight>>(WeightListOffset);
                 }else
                 if (Flags.HasFlag(POBJ_FLAG.SHAPEANIM))
                 {

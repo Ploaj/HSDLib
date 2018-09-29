@@ -9,6 +9,44 @@ namespace HSDLib.Common
     public class HSD_Array<T> : IHSDNode where T : IHSDNode
     {
         public T[] Elements;
+        public int Size
+        {
+            set
+            {
+                Elements = new T[value];
+            }
+            get
+            {
+                if (Elements == null) return 0;
+                return Elements.Length;
+            }
+        }
+
+        public HSD_Array(int Size)
+        {
+            this.Size = Size;
+        }
+
+        public override void Open(HSDReader Reader)
+        {
+            for(int i = 0; i < Size; i++)
+            {
+                Elements[i] = Reader.ReadObject<T>(Reader.Position());
+            }
+        }
+
+        public override void Save(HSDWriter Writer)
+        {
+            foreach(T item in Elements)
+            {
+                item.Save(Writer);
+            }
+        }
+    }
+
+    public class HSD_PointerArray<T> : IHSDNode where T : IHSDNode
+    {
+        public T[] Elements;
         public int SetSize = -1;
 
         public override void Open(HSDReader Reader)
