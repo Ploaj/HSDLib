@@ -68,7 +68,7 @@
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DrawTools.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
-    <Compile Include="Rendering\HSDRenderer.cs" />
+    <Compile Include="Rendering\JOBJRenderer.cs" />
     <Compile Include="Rendering\Math3D.cs" />
     <Compile Include="Rendering\Shader.cs" />
     <Compile Include="Rendering\TextureManager.cs" />

@@ -36,6 +36,18 @@ namespace HSDLib
             {
                 Node = Reader.ReadObject<KAR_WheelVehicle>(Offset);
             }
+            else if (Name.StartsWith("grModelMotion"))
+            {
+                Node = Reader.ReadObject<KAR_GrModelMotion>(Offset);
+            }
+            else if (Name.StartsWith("grModel"))
+            {
+                Node = Reader.ReadObject<KAR_GrModel>(Offset);
+            }
+            else if (Name.StartsWith("grData"))
+            {
+                Node = Reader.ReadObject<KAR_GrData>(Offset);
+            }
         }
 
         public override void Save(HSDWriter Writer)

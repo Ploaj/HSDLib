@@ -33,7 +33,7 @@ namespace HALSysDATViewer.Rendering
         {
             switch (wm)
             {
-                case GXWrapMode.CLAMP: return TextureWrapMode.Clamp;
+                case GXWrapMode.CLAMP: return TextureWrapMode.ClampToEdge;
                 case GXWrapMode.MIRROR: return TextureWrapMode.MirroredRepeat;
                 case GXWrapMode.REPEAT: return TextureWrapMode.Repeat;
             }

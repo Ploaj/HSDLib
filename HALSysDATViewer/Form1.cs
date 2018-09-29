@@ -20,7 +20,7 @@ namespace HALSysDATViewer
     public partial class Form1 : Form
     {
         public HSDFile HSD;
-        public HSDRenderer Renderer;
+        public JOBJRenderer Renderer;
 
         public Camera Camera = new Camera();
         bool ReadyToRender = false;
@@ -114,7 +114,7 @@ namespace HALSysDATViewer
             timer.Tick += new EventHandler(Application_Idle);
             timer.Start();
 
-            Renderer = new HSDRenderer();
+            Renderer = new JOBJRenderer();
             //Renderer.SetHSD(smd.RootJOBJ);
         }
 
@@ -167,8 +167,8 @@ namespace HALSysDATViewer
             // objects shouldn't show through opaque parts of floor
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
-            GL.Enable(EnableCap.CullFace);
-            GL.CullFace(CullFaceMode.Front);
+            //GL.Enable(EnableCap.CullFace);
+            //GL.CullFace(CullFaceMode.Front);
 
             DrawTools.DrawFloor(Camera.mvpMatrix);
 

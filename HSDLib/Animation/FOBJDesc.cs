@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib.Animation;
-
-namespace HSDLib.MaterialAnimation
+﻿namespace HSDLib.Animation
 {
     public class FOBJDesc : IHSDList<FOBJDesc>
     {

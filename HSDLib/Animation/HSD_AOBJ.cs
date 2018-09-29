@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSDLib.MaterialAnimation
+namespace HSDLib.Animation
 {
     [Flags]
     public enum AOBJ_Flags

@@ -24,7 +24,7 @@ namespace HALSysDATViewer.Rendering
         public const int Stride = (3 + 3 + 2 + 2 + 4 + 4) * 4;
     }
 
-    public class HSDRenderer
+    public class JOBJRenderer
     {
         public class AnimTrack
         {
@@ -163,7 +163,7 @@ namespace HALSysDATViewer.Rendering
         private Matrix4[] InverseBinds;
         private Matrix4[] Binds;
 
-        public HSDRenderer()
+        public JOBJRenderer()
         {
             GL.GenBuffers(1, out VBO);
             Shader = new Shader();
