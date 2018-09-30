@@ -37,6 +37,7 @@ namespace HSDLib.Common
 
         public override void Save(HSDWriter Writer)
         {
+            Writer.AddObject(this);
             foreach(T item in Elements)
             {
                 item.Save(Writer);

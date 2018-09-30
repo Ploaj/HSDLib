@@ -3,10 +3,12 @@
 in vec3 in_pos;
 in vec3 in_nrm;
 in vec2 in_tex0;
+in vec4 in_clr0;
 in vec4 in_binds;
 in vec4 in_weights;
 
 out vec2 UV0;
+out vec4 CLR0;
 
 uniform mat4 mvp;
 uniform int JOBJIndex;
@@ -19,6 +21,7 @@ void main()
 {
 
 UV0 = vec2(in_tex0.x * UVSW, in_tex0.y * UVSH);
+CLR0 = in_clr0;
 
 vec4 Pos = vec4(in_pos, 1);
 

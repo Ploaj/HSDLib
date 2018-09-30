@@ -52,18 +52,18 @@ namespace HSDLib.Helpers
                     switch (att.AttributeType)
                     {
                         case GXAttribType.GX_DIRECT:
-                            if (att.Name != GXAttribName.GX_VA_CLR0)
-                                g.Indices[i] = Reader.ReadByte();
-                            else if(att.Name == GXAttribName.GX_VA_CLR0)
+                            if (att.Name == GXAttribName.GX_VA_CLR0)
                                 g.Clr0 = ReadGXClr(Reader, (int)att.CompType);
                             else if (att.Name == GXAttribName.GX_VA_CLR1)
                                 g.Clr1 = ReadGXClr(Reader, (int)att.CompType);
+                            else
+                                g.Indices[i] = Reader.ReadByte();
                             break;
                         case GXAttribType.GX_INDEX8:
                             g.Indices[i] = Reader.ReadByte();
                             break;
                         case GXAttribType.GX_INDEX16:
-                            g.Indices[i] = (ushort)Reader.ReadUInt16();
+                            g.Indices[i] = Reader.ReadUInt16();
                             break;
                     }
                     i++;

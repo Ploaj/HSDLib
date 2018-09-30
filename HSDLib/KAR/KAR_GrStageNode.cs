@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSDLib.KAR
 {
-    public class KAR_GrStageNode : IHSDNode
+    public class KAR_GroundDatStageNode : IHSDNode
     {
         [FieldData(typeof(uint))]
         public uint Unk1 { get; set; }

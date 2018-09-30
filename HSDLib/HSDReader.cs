@@ -198,9 +198,8 @@ namespace HSDLib
                 IHSDNode ob = NodeCache[Offsets[i]];
                 if (ob is HSD_AttributeGroup)
                 {
-                    foreach(HSDLib.GX.GXVertexBuffer a in ((HSD_AttributeGroup)ob).Attributes)
+                    foreach(GX.GXVertexBuffer a in ((HSD_AttributeGroup)ob).Attributes)
                     {
-                        //Console.WriteLine(a.Offset.ToString("X"));
                         if(!Offsets.Contains(a.Offset))
                             Offsets.Add(a.Offset);
                     }

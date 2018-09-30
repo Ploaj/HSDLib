@@ -46,7 +46,7 @@ namespace HSDLib
             }
             else if (Name.StartsWith("grData"))
             {
-                Node = Reader.ReadObject<KAR_GrData>(Offset);
+                Node = Reader.ReadObject<KAR_GroundData>(Offset);
             }
         }
 

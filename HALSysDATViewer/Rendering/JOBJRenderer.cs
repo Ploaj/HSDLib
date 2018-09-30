@@ -19,9 +19,10 @@ namespace HALSysDATViewer.Rendering
         public Vector3 Normal;
         public Vector2 UV0;
         public Vector2 UV1;
+        public Vector4 CLR0;
         public Vector4 Bone;
         public Vector4 Weight;
-        public const int Stride = (3 + 3 + 2 + 2 + 4 + 4) * 4;
+        public const int Stride = (3 + 3 + 2 + 2 + 4 + 4 + 4) * 4;
     }
 
     public class JOBJRenderer
@@ -297,6 +298,10 @@ namespace HALSysDATViewer.Rendering
                     Normal = new Vector3(v.Nrm.X, v.Nrm.Y, v.Nrm.Z),
                     UV0 = new Vector2(v.TEX0.X, v.TEX0.Y),
                 };
+                if (v.Clr0.A != 0 || v.Clr0.R != 0 || v.Clr0.G != 0 || v.Clr0.B != 0)
+                    OutVerts[i].CLR0 = new Vector4(v.Clr0.R, v.Clr0.G, v.Clr0.B, v.Clr0.A);
+                else
+                    OutVerts[i].CLR0 = new Vector4(1, 1, 1, 1);
                 if (WeightList == null) continue;
                 HSD_JOBJWeight Weights = WeightList[v.PMXID / 3];
                 if(Weights.JOBJs.Count > 0)
@@ -368,10 +373,10 @@ namespace HALSysDATViewer.Rendering
             GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_nrm"), 3, VertexAttribPointerType.Float, false, GLVertex.Stride, 12);
             GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_tex0"), 2, VertexAttribPointerType.Float, false, GLVertex.Stride, 24);
             //tex1
-            //clr0
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_clr0"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 40);
             //clr1
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_binds"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 40);
-            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_weights"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 56);
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_binds"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 56);
+            GL.VertexAttribPointer(Shader.GetVertexAttributeUniformLocation("in_weights"), 4, VertexAttribPointerType.Float, false, GLVertex.Stride, 72);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             GL.Uniform1(Shader.GetVertexAttributeUniformLocation("TEX0"), 0);
@@ -380,9 +385,20 @@ namespace HALSysDATViewer.Rendering
             {
                 Shader.SetInt("JOBJIndex", p.RenderDOBJ.JOBJIndex);
 
+                GL.PushAttrib(AttribMask.AllAttribBits);
                 // Materials---------------------------------------------------------------
+                if(p.RenderDOBJ.Material.PixelProcessing != null)
+                {
+                    HSD_PixelProcessing pp = p.RenderDOBJ.Material.PixelProcessing;
+                    
+                    GL.Enable(EnableCap.Blend);
+                    GL.BlendEquation(GXTranslator.toBlendMode(pp.BlendMode));
+                    GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
 
-
+                    GL.Enable(EnableCap.AlphaTest);
+                    GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp0), pp.AlphaRef0 / 255f);
+                    GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp1), pp.AlphaRef1 / 255f);
+                }
                 // Textures---------------------------------------------------------------
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GLTexture tex = TextureManager.GetGLTexture(p.RenderDOBJ.Material.Textures);
@@ -396,6 +412,7 @@ namespace HALSysDATViewer.Rendering
 
                 // Draw---------------------------------------------------------------
                 GL.DrawArrays(p.PrimitiveType, p.Offset, p.Count);
+                GL.PopAttrib();
             }
 
             Shader.DisableVertexAttributes();

@@ -33,36 +33,27 @@ namespace HSDLib.KAR
         [FieldData(typeof(uint))]
         public uint Unk3 { get; set; }
 
-        [FieldData(typeof(KAR_GrModel_Unk))]
-        public KAR_GrModel_Unk UnkGroup { get; set; }
-    }
+        [FieldData(typeof(uint), Viewable: false)]
+        public uint ArrayOffset { get; set; }
 
-    public class KAR_GrModel_Unk : IHSDNode
-    {
-        [FieldData(typeof(KAR_GrModel_Unk1), InLine: true)]
-        public KAR_GrModel_Unk1 Group1 { get; set; }
-        [FieldData(typeof(KAR_GrModel_Unk1), InLine: true)]
-        public KAR_GrModel_Unk1 Group2 { get; set; }
-        [FieldData(typeof(KAR_GrModel_Unk1), InLine: true)]
-        public KAR_GrModel_Unk1 Group3 { get; set; }
-        [FieldData(typeof(KAR_GrModel_Unk1), InLine: true)]
-        public KAR_GrModel_Unk1 Group4 { get; set; }
+        public HSD_Array<KAR_GrModel> UnkGroup { get; set; }
 
         public override void Open(HSDReader Reader)
         {
-            uint start = Reader.Position();
-            Reader.Seek(start);
-            Group1 = new KAR_GrModel_Unk1();
-            Group1.Open(Reader);
-            Reader.Seek(start + 8);
-            Group2 = new KAR_GrModel_Unk1();
-            Group2.Open(Reader);
-            Reader.Seek(start + 16);
-            Group3 = new KAR_GrModel_Unk1();
-            Group3.Open(Reader);
-            Reader.Seek(start + 24);
-            Group4 = new KAR_GrModel_Unk1();
-            Group4.Open(Reader);
+            base.Open(Reader);
+
+            Reader.Seek(ArrayOffset);
+            //UnkGroup = new HSD_Array<KAR_GrModel>(4);
+            //UnkGroup.Open(Reader);
+        }
+
+        public override void Save(HSDWriter Writer)
+        {
+            UnkGroup.Save(Writer);
+
+            base.Save(Writer);
+
+            Writer.WritePointerAt((int)Writer.BaseStream.Position - 4, UnkGroup);
         }
     }
 
@@ -81,6 +72,7 @@ namespace HSDLib.KAR
 
         public override void Open(HSDReader Reader)
         {
+            Reader.PrintPosition();
             base.Open(Reader);
 
             Groups = new List<KAR_GrModel_UnkGroup>(UnkSize);
