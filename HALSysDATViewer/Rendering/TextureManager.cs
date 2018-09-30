@@ -34,6 +34,7 @@ namespace HALSysDATViewer.Rendering
             }
             GLTexture T = new GLTexture(B);
             B.Dispose();
+            GC.Collect();
 
             GL.BindTexture(TextureTarget.Texture2D, T.ID);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GXTranslator.toWrapMode(tobj.WrapS));

@@ -111,6 +111,7 @@ namespace HALSysDATViewer.Rendering
             public HSD_MOBJ Material;
             public HSD_DOBJ DOBJ;
             public int JOBJIndex;
+            public List<GLPrimitveGroup> Primitives = new List<GLPrimitveGroup>();
         }
 
         public class GLPrimitveGroup
@@ -118,11 +119,11 @@ namespace HALSysDATViewer.Rendering
             public PrimitiveType PrimitiveType;
             public int Offset;
             public int Count;
-            public RenderDOBJ RenderDOBJ;
         }
 
         public Shader Shader;
         public int VBO;
+        public int UBO;
 
         public HSD_JOBJ RootNode
         {
@@ -137,7 +138,7 @@ namespace HALSysDATViewer.Rendering
             }
         }
         private HSD_JOBJ _rootNode;
-        public List<GLPrimitveGroup> Primitives = new List<GLPrimitveGroup>();
+        public List<RenderDOBJ> RenderDOBJS = new List<RenderDOBJ>();
 
         public HSD_FigaTree FigaTree
         {
@@ -166,7 +167,9 @@ namespace HALSysDATViewer.Rendering
 
         public JOBJRenderer()
         {
-            GL.GenBuffers(1, out VBO);
+            VBO = GL.GenBuffer();
+            UBO = GL.GenBuffer();
+
             Shader = new Shader();
             Shader.LoadShader("Rendering\\HSD.vert");
             Shader.LoadShader("Rendering\\HSD.frag");
@@ -188,6 +191,9 @@ namespace HALSysDATViewer.Rendering
             BoneIndex = 0;
             UpdateBinds(RootNode, Matrix4.Identity, Matrices, Frame);
             Binds = Matrices.ToArray();
+            
+            GL.BindBuffer(BufferTarget.UniformBuffer, UBO);
+            GL.BufferData(BufferTarget.UniformBuffer, System.Runtime.InteropServices.Marshal.SizeOf(typeof(Matrix4)) * Binds.Length, Binds, BufferUsageHint.DynamicDraw);
         }
 
         public void UpdateBinds(HSD_JOBJ jobj, Matrix4 Parent, List<Matrix4> Matrices, float frame = -1)
@@ -240,7 +246,6 @@ namespace HALSysDATViewer.Rendering
         public void RefreshRendering()
         {
             TextureManager.Clear();
-            Primitives.Clear();
 
             List<HSD_JOBJ> BoneList = RootNode.DepthFirstList;
             List<RenderDOBJ> DOBJList = GetDOBJS(BoneList);
@@ -259,28 +264,33 @@ namespace HALSysDATViewer.Rendering
             UpdateBinds(RootNode, Matrix4.Identity, Matrices);
             Binds = Matrices.ToArray();
 
+            GL.BindBuffer(BufferTarget.UniformBuffer, UBO);
+            GL.BufferData(BufferTarget.UniformBuffer, System.Runtime.InteropServices.Marshal.SizeOf(typeof(Matrix4)) * Binds.Length, Binds, BufferUsageHint.DynamicDraw);
+
+
             List<GLVertex> Vertices = new List<GLVertex>();
             int offset = 0;
             foreach(RenderDOBJ rdobj in DOBJList)
             {
-                if(rdobj.DOBJ.POBJ != null)
-                foreach(HSD_POBJ pobj in rdobj.DOBJ.POBJ.List)
-                {
-                    // Decode the Display List Data
-                    GXDisplayList DisplayList = new GXDisplayList(pobj.DisplayListBuffer, pobj.VertexAttributes);
-                    Vertices.AddRange(ConvertToGLVertex(VertexAccessor.GetDecodedVertices(DisplayList, pobj), BoneList, pobj.BindGroups != null ? new List<HSD_JOBJWeight>(pobj.BindGroups.Elements) : null));
-                    foreach(GXPrimitiveGroup g in DisplayList.Primitives)
+                rdobj.Primitives.Clear();
+                if (rdobj.DOBJ.POBJ != null)
+                    foreach (HSD_POBJ pobj in rdobj.DOBJ.POBJ.List)
                     {
-                        GLPrimitveGroup GL = new GLPrimitveGroup();
-                        GL.PrimitiveType = GXTranslator.toPrimitiveType(g.PrimitiveType);
-                        GL.Offset = offset;
-                        GL.Count = g.Indices.Length;
-                        GL.RenderDOBJ = rdobj;
-                        offset += GL.Count;
-                        Primitives.Add(GL);
+                        // Decode the Display List Data
+                        GXDisplayList DisplayList = new GXDisplayList(pobj.DisplayListBuffer, pobj.VertexAttributes);
+                        Vertices.AddRange(ConvertToGLVertex(VertexAccessor.GetDecodedVertices(DisplayList, pobj), BoneList, pobj.BindGroups != null ? new List<HSD_JOBJWeight>(pobj.BindGroups.Elements) : null));
+                        foreach (GXPrimitiveGroup g in DisplayList.Primitives)
+                        {
+                            GLPrimitveGroup GL = new GLPrimitveGroup();
+                            GL.PrimitiveType = GXTranslator.toPrimitiveType(g.PrimitiveType);
+                            GL.Offset = offset;
+                            GL.Count = g.Indices.Length;
+                            offset += GL.Count;
+                            rdobj.Primitives.Add(GL);
+                        }
                     }
-                }
             }
+            RenderDOBJS = DOBJList;
             BindArray(Vertices.ToArray());
         }
 
@@ -358,6 +368,8 @@ namespace HALSysDATViewer.Rendering
 
         public void Render(ref Camera Camera)
         {
+            if (RenderDOBJS.Count <= 0)
+                return;
             GL.UseProgram(Shader.programId);
             Shader.EnableVertexAttributes();
 
@@ -365,7 +377,8 @@ namespace HALSysDATViewer.Rendering
             Matrix4 mvp = Camera.mvpMatrix;
             GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
             if (Binds != null && Binds.Length > 0)
-                GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("binds"), Binds.Length, false, ref Binds[0].Row0.X);
+                GL.BindBufferBase(BufferRangeTarget.UniformBuffer, Shader.GetUniformBlockIndex("Bones"), UBO);
+            //GL.UniformMatrix4(Shader.GetVertexAttributeUniformLocation("binds"), Binds.Length, false, ref Binds[0].Row0.X);
 
             // Bind Vertex Buffer---------------------------------------------------------------
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
@@ -381,16 +394,22 @@ namespace HALSysDATViewer.Rendering
 
             GL.Uniform1(Shader.GetVertexAttributeUniformLocation("TEX0"), 0);
 
-            foreach (GLPrimitveGroup p in Primitives)
+            foreach(RenderDOBJ dobj in RenderDOBJS)
             {
-                Shader.SetInt("JOBJIndex", p.RenderDOBJ.JOBJIndex);
+                Shader.SetInt("JOBJIndex", dobj.JOBJIndex);
 
-                GL.PushAttrib(AttribMask.AllAttribBits);
                 // Materials---------------------------------------------------------------
-                if(p.RenderDOBJ.Material.PixelProcessing != null)
+                if(dobj.Material.MaterialColor != null)
                 {
-                    HSD_PixelProcessing pp = p.RenderDOBJ.Material.PixelProcessing;
-                    
+
+                }
+
+                // Processing---------------------------------------------------------------
+                GL.PushAttrib(AttribMask.AllAttribBits);
+                if (dobj.Material.PixelProcessing != null)
+                {
+                    HSD_PixelProcessing pp = dobj.Material.PixelProcessing;
+
                     GL.Enable(EnableCap.Blend);
                     GL.BlendEquation(GXTranslator.toBlendMode(pp.BlendMode));
                     GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
@@ -399,19 +418,23 @@ namespace HALSysDATViewer.Rendering
                     GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp0), pp.AlphaRef0 / 255f);
                     GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp1), pp.AlphaRef1 / 255f);
                 }
+
                 // Textures---------------------------------------------------------------
                 GL.ActiveTexture(TextureUnit.Texture0);
-                GLTexture tex = TextureManager.GetGLTexture(p.RenderDOBJ.Material.Textures);
-                if(tex != null)
-                GL.BindTexture(TextureTarget.Texture2D, tex.ID);
-                if(p.RenderDOBJ.Material.Textures != null)
+                GLTexture tex = TextureManager.GetGLTexture(dobj.Material.Textures);
+                if (tex != null)
+                    GL.BindTexture(TextureTarget.Texture2D, tex.ID);
+                if (dobj.Material.Textures != null)
                 {
-                    Shader.SetInt("UVSW", p.RenderDOBJ.Material.Textures.WScale);
-                    Shader.SetInt("UVSH", p.RenderDOBJ.Material.Textures.HScale);
+                    Shader.SetInt("UVSW", dobj.Material.Textures.WScale);
+                    Shader.SetInt("UVSH", dobj.Material.Textures.HScale);
                 }
 
                 // Draw---------------------------------------------------------------
-                GL.DrawArrays(p.PrimitiveType, p.Offset, p.Count);
+                foreach (GLPrimitveGroup p in dobj.Primitives)
+                {
+                    GL.DrawArrays(p.PrimitiveType, p.Offset, p.Count);
+                }
                 GL.PopAttrib();
             }
 
