@@ -37,6 +37,11 @@ namespace HALSysDATViewer.Rendering
             programId = GL.CreateProgram();
             //errorLog.AppendHardwareAndVersionInfo();
         }
+        
+        public int GetUniformBlockIndex(string name)
+        {
+            return GL.GetUniformBlockIndex(programId, name);
+        }
 
         // Shader Uniforms. Keep track of undeclared variables, so they can be fixed later.
         public void SetFloat(string uniformName, float value)

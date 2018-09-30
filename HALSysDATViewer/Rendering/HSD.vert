@@ -12,8 +12,12 @@ out vec4 CLR0;
 
 uniform mat4 mvp;
 uniform int JOBJIndex;
-//uniform mat4 invbinds[400];
-uniform mat4 binds[400];
+
+uniform Bones
+{
+    mat4 transforms[400];
+} bones;
+
 uniform int UVSW;
 uniform int UVSH;
 
@@ -25,8 +29,8 @@ CLR0 = in_clr0;
 
 vec4 Pos = vec4(in_pos, 1);
 
-Pos = binds[JOBJIndex] * Pos;
-if(in_weights.x == 1) Pos = binds[int(in_binds.x)] * Pos;
+Pos = bones.transforms[JOBJIndex] * Pos;
+if(in_weights.x == 1) Pos = bones.transforms[int(in_binds.x)] * Pos;
 
 gl_Position = mvp * vec4(Pos.xyz, 1);
 
