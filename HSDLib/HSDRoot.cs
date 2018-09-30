@@ -30,7 +30,7 @@ namespace HSDLib
             }
             else if (Name.StartsWith("vcDataStar") || Name.StartsWith("vcDataWing"))
             {
-                Node = Reader.ReadObject<KAR_StarVehicle>(Offset);
+                Node = Reader.ReadObject<KAR_VcStarVehicle>(Offset);
             }
             else if (Name.StartsWith("vcDataWheel"))
             {
@@ -46,7 +46,7 @@ namespace HSDLib
             }
             else if (Name.StartsWith("grData"))
             {
-                Node = Reader.ReadObject<KAR_GroundData>(Offset);
+                Node = Reader.ReadObject<KAR_GrData>(Offset);
             }
         }
 

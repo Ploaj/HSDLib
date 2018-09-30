@@ -7,7 +7,7 @@ using HSDLib.Common;
 
 namespace HSDLib.KAR
 {
-    public class KAR_ModelData : IHSDNode
+    public class KAR_VcModelData : IHSDNode
     {
         [FieldData(typeof(HSD_JOBJ))]
         public HSD_JOBJ JOBJRoot { get; set; }

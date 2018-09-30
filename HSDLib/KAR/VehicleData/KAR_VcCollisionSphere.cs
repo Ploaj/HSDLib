@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSDLib.KAR
 {
-    public class CollisionSphere : IHSDNode
+    public class KAR_VcCollisionSphere : IHSDNode
     {
         [FieldData(typeof(uint))]
         public uint Unk1 { get; set; }

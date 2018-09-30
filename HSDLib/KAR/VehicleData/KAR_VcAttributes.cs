@@ -1,6 +1,6 @@
 ﻿namespace HSDLib.KAR
 {
-    public class KAR_VehicleAttributes : IHSDNode
+    public class KAR_VcAttributes : IHSDNode
     {
         [FieldData(typeof(int))]
         public int KirbySitHeight { get; set; }

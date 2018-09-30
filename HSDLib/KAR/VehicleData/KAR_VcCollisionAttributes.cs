@@ -1,6 +1,6 @@
 ﻿namespace HSDLib.KAR
 {
-    public class KAR_VehicleCollisionAttributes : IHSDNode
+    public class KAR_VcCollisionAttributes : IHSDNode
     {
         [FieldData(typeof(float))]
         public float StarGroundDistance

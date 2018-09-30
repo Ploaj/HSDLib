@@ -3,7 +3,7 @@ using HSDLib.MaterialAnimation;
 
 namespace HSDLib.KAR
 {
-    public class KAR_StarAnimation : IHSDNode
+    public class KAR_VcStarAnimation : IHSDNode
     {
         [FieldData(typeof(HSD_FigaTree))]
         public HSD_FigaTree MovingAnim { get; set; }
@@ -99,7 +99,7 @@ namespace HSDLib.KAR
         public int Unk13 { get; set; }
     }
 
-    public class KAR_WheelAnimation : IHSDNode
+    public class KAR_VcWheelAnimation : IHSDNode
     {
         [FieldData(typeof(HSD_FigaTree))]
         public HSD_FigaTree MovingAnim { get; set; }

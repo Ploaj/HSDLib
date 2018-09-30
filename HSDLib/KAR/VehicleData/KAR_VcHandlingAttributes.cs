@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSDLib.KAR
 {
-    public class KAR_HandlingAttributes : IHSDNode
+    public class KAR_VcHandlingAttributes : IHSDNode
     {
         [FieldData(typeof(float))]
         public float AffectsBounciness

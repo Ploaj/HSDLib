@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HSDLib.KAR
 {
-    public class KAR_VehicleUnk : IHSDNode
+    public class KAR_VcUnk : IHSDNode
     {
         [FieldData(typeof(KAR_VehicleUnk_1))]
         public KAR_VehicleUnk_1 Unk_1 { get; set; }
