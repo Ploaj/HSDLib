@@ -39,6 +39,16 @@ namespace HSDLib
             Decompile(FileName);
         }
 
+        /// <summary>
+        /// Opens and reads the HSD file into a class
+        /// </summary>
+        /// <param name="FileName">The path to the file</param>
+        /// <returns></returns>
+        public HSDFile(byte[] Data)
+        {
+            Decompile(Data);
+        }
+
         public HSDFile()
         {
             Roots = new List<HSDRoot>();

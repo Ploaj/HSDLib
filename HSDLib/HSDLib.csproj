@@ -63,8 +63,8 @@
     <Compile Include="GX\GXVertexBuffer.cs" />
     <Compile Include="Helpers\FOBJFrameEncoder.cs" />
     <Compile Include="Helpers\PrimitiveGroup.cs" />
-    <Compile Include="Helpers\Shared.cs" />
-    <Compile Include="Helpers\TPL.cs" />
+    <Compile Include="Helpers\TextureConverter\Shared.cs" />
+    <Compile Include="Helpers\TextureConverter\TPL.cs" />
     <Compile Include="Helpers\TriangleConverter\CacheSimulator.cs" />
     <Compile Include="Helpers\TriangleConverter\Deque\Deque.cs" />
     <Compile Include="Helpers\TriangleConverter\Deque\GenericDeque.cs" />

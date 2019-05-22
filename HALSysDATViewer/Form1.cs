@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSDLib;
 using HSDLib.Common;
@@ -67,9 +61,8 @@ namespace HALSysDATViewer
 
         private void nodeTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if(nodeTree.SelectedNode is IBaseNode)
+            if(nodeTree.SelectedNode is IBaseNode n)
             {
-                ((IBaseNode)nodeTree.SelectedNode).ParseData(dataGridView1);
             }
             if (nodeTree.SelectedNode is Node_JOBJ)
             {
@@ -91,7 +84,7 @@ namespace HALSysDATViewer
                     Renderer.FigaTree = (HSD_FigaTree)Node;
                     trackBar1.Maximum = (int)((HSD_FigaTree)Node).FrameCount;
                 }
-
+                propertyGrid1.SelectedObject = Node;
             }
         }
 
@@ -143,21 +136,6 @@ namespace HALSysDATViewer
             GL.ClearColor(Color.DarkSlateGray);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-
-
-            if (glControl.ClientRectangle.Contains(glControl.PointToClient(Cursor.Position))
-             && glControl.Focused)
-            {
-                Camera.Update();
-            }
-            try
-            {
-                if (OpenTK.Input.Mouse.GetState() != null)
-                    Camera.mouseSLast = OpenTK.Input.Mouse.GetState().WheelPrecise;
-            }
-            catch
-            {
-            }
             
             GL.UseProgram(0);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -210,6 +188,20 @@ namespace HALSysDATViewer
         private void trackBar1_ValueChanged(object sender, EventArgs e)
         {
             Renderer.SetFrame(trackBar1.Value);
+        }
+
+
+        private void glControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            Camera.Update();
+            try
+            {
+                if (OpenTK.Input.Mouse.GetState() != null)
+                    Camera.mouseSLast = OpenTK.Input.Mouse.GetState().WheelPrecise;
+            }
+            catch
+            {
+            }
         }
     }
 }
