@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using HSDLib.MaterialAnimation;
 
 namespace HSDLib.Animation
 {
     public class HSD_FigaTree : IHSDNode
     {
-        [FieldData(typeof(int))]
         public int Type { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float FrameCount { get; set; }
-
-        [FieldData(typeof(HSD_MatAnimJoint))]
+        
         public HSD_MatAnimJoint MatAnimJoint { get; set; }
 
         public List<HSD_AnimNode> Nodes = new List<HSD_AnimNode>();

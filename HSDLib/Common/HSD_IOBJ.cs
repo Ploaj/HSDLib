@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib.GX;
+﻿using HSDLib.GX;
 using HSDLib.Helpers;
 
 namespace HSDLib.Common
 {
     public class HSD_IOBJ : IHSDNode
     {
-        [FieldData(typeof(ushort))]
         public ushort Width { get; set; }
-        [FieldData(typeof(ushort))]
+
         public ushort Height { get; set; }
-        [FieldData(typeof(GXTexFmt))]
+
         public GXTexFmt Format { get; set; }
 
         public byte[] Data;

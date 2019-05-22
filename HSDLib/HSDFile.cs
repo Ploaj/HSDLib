@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDLib
 {
     /// <summary>
     /// Hals DAT sysdolphin format
-    /// Used in Kirby Air Ride and Super Smash Bros. Melee
+    /// Used in Kirby Air Ride, Super Smash Bros. Melee, Mario Kart Arcade, and Pokemon Channel
     /// </summary>
     public class HSDFile
     {
@@ -50,14 +46,29 @@ namespace HSDLib
         }
 
         /// <summary>
-        /// Reads data into class system
+        /// Reads data into class system from file
         /// </summary>
         /// <param name="FileName">The path to the file</param>
         /// <returns></returns>
         public void Decompile(string FileName)
         {
-            HSDReader Reader = new HSDReader(new System.IO.FileStream(FileName, System.IO.FileMode.Open));
-            
+            Decompile(new FileStream(FileName, FileMode.Open));
+        }
+
+        /// <summary>
+        /// Reads data into class system from byte array
+        /// </summary>
+        /// <param name="FileName">The path to the file</param>
+        /// <returns></returns>
+        public void Decompile(byte[] Data)
+        {
+            Decompile(new MemoryStream(Data));
+        }
+
+        private void Decompile(Stream stream)
+        {
+            HSDReader Reader = new HSDReader(stream);
+
             HSDHeader Header = Reader.ReadType<HSDHeader>(new HSDHeader());
 
             Roots = new List<HSDRoot>(Header.RootCount);
@@ -101,6 +112,10 @@ namespace HSDLib
             Reader.Close();
         }
 
+        /// <summary>
+        /// Saves the HSDFile as a .dat
+        /// </summary>
+        /// <param name="FileName"></param>
         public void Save(string FileName)
         {
             HSDWriter Writer = new HSDWriter(new FileStream(FileName, FileMode.Create));

@@ -5,6 +5,11 @@ using HSDLib.KAR;
 
 namespace HSDLib
 {
+    /// <summary>
+    /// A root of the hsd structure
+    /// Contains a single HSDNode and a Name
+    /// The type of node depends on the file type
+    /// </summary>
     public class HSDRoot : IHSDNode
     {
         public string Name;

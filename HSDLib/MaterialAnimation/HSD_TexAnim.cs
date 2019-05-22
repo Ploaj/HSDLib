@@ -6,22 +6,16 @@ namespace HSDLib.MaterialAnimation
 {
     public class HSD_TexAnim : IHSDList<HSD_TexAnim>
     {
-        [FieldData(typeof(HSD_TexAnim))]
         public override HSD_TexAnim Next { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint GXTexMapID { get; set; }
-
-        [FieldData(typeof(HSD_AOBJ))]
+        
         public HSD_AOBJ AnimationObject { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint ImageArrayOffset { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint TlutArrayOffset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort ImageCount {
             get
             {
@@ -34,8 +28,7 @@ namespace HSDLib.MaterialAnimation
             }
         }
         private ushort _imagecount = 0;
-
-        [FieldData(typeof(ushort))]
+        
         public ushort TlutCount
         {
             get

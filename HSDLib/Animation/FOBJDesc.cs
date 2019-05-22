@@ -2,16 +2,13 @@
 {
     public class FOBJDesc : IHSDList<FOBJDesc>
     {
-        [FieldData(typeof(FOBJDesc))]
         public override FOBJDesc Next { get; set; }
         
-        [FieldData(typeof(uint))]
         public uint DataLength { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint StartFrame { get; set; }
         
-        [FieldData(typeof(HSD_FOBJ), true, 0x8)]
+        [HSDInLine()]
         public HSD_FOBJ Track { get; set; }
         
         public override void Open(HSDReader Reader)

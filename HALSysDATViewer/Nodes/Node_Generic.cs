@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows.Forms;
 using HSDLib;
 
@@ -21,28 +17,26 @@ namespace HALSysDATViewer.Nodes
         {
             if (Node == null) return;
             Text = Node.GetType().Name.Replace("HSD_", "").Replace("KAR_", "");
-            foreach (var prop in Node.GetType().GetProperties().Reverse())
+            foreach (var prop in Node.Children)
             {
-                var attrs = (FieldData[])prop.GetCustomAttributes(typeof(FieldData), false);
-                foreach (var attr in attrs)
+                if (prop != null)
                 {
-                    if (prop.GetValue(Node) != null)
+                    Node_Generic Child = new Node_Generic(prop);
+                    Nodes.Add(Child);
+                    Child.Open();
+                    /*if (prop.Name.Equals("Next") && attr.Type.IsSubclassOf(typeof(IHSDNode)))
                     {
-                        if (prop.Name.Equals("Next") && attr.Type.IsSubclassOf(typeof(IHSDNode)))
-                        {
-                            Node_Generic Sibling = new Node_Generic((IHSDNode)prop.GetValue(Node));
-                            Parent.Nodes.Add(Sibling);
-                            Sibling.Open();
-                        }
-                        else
-                        if (attr.Type.IsSubclassOf(typeof(IHSDNode)))
-                        {
-                            Node_Generic Child = new Node_Generic((IHSDNode)prop.GetValue(Node));
-                            Nodes.Add(Child);
-                            Child.Open();
-                        }
+                        Node_Generic Sibling = new Node_Generic((IHSDNode)prop.GetValue(Node));
+                        Parent.Nodes.Add(Sibling);
+                        Sibling.Open();
                     }
-                        
+                    else
+                    if (attr.Type.IsSubclassOf(typeof(IHSDNode)))
+                    {
+                        Node_Generic Child = new Node_Generic((IHSDNode)prop.GetValue(Node));
+                        Nodes.Add(Child);
+                        Child.Open();
+                    }*/
                 }
             }
         }

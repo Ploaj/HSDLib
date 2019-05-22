@@ -1,91 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib.Common;
+﻿using HSDLib.Common;
+using System.ComponentModel;
 
 namespace HSDLib.KAR
 {
     public class KAR_GrModel : IHSDNode
     {
-        [FieldData(typeof(KAR_GrMainModel))]
         public KAR_GrMainModel MainModel { get; set; }
-
-        [FieldData(typeof(KAR_GrSkyboxModel))]
+        
         public KAR_GrSkyboxModel SkyboxModel { get; set; }
-
-        [FieldData(typeof(KAR_GrUnk2Model))]
+        
         public KAR_GrUnk2Model Unk2Model { get; set; }
-
-        [FieldData(typeof(KAR_GrUnk3Model))]
+        
         public KAR_GrUnk3Model Unk3Model { get; set; }
     }
-
-
+    
     public class KAR_GrMainModel : IHSDNode
     {
-        [FieldData(typeof(HSD_JOBJ))]
         public HSD_JOBJ JOBJRoot { get; set; }
         
-        [FieldData(typeof(uint))]
         public uint Unk1 { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint Unk2 { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint Unk3 { get; set; }
-
-        [FieldData(typeof(KAR_GrModel_ModelUnk1))]
+        
         public KAR_GrModel_ModelUnk1 ModelUnk1 { get; set; }
     }
 
     public class KAR_GrModel_ModelUnk1 : IHSDNode
     {
-        [FieldData(typeof(uint), Viewable: false)]
-        public uint OffsetUnk1_1 { get; set; }
+        //[FieldData(typeof(uint), Viewable: false)]
+        public uint OffsetUnk1_1 { get; internal set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        //[FieldData(typeof(ushort), Viewable: false)]
         public ushort SizeUnk1_1 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
-        public ushort Padding { get; set; }
+        //[FieldData(typeof(ushort), Viewable: false)]
+        public ushort Padding { get; internal set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_1> GroupsUnk1_1 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_1> GroupsUnk1_1;
 
-        [FieldData(typeof(uint), Viewable: false)]
+        [Browsable(false)]
         public uint OffsetUnk1_2 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [Browsable(false)]
         public ushort SizeUnk1_2 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [Browsable(false)]
         public ushort Padding2 { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_2> GroupsUnk1_2 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_2> GroupsUnk1_2;
 
-        [FieldData(typeof(uint), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public uint OffsetUnk1_3 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort SizeUnk1_3 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding3 { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_3> GroupsUnk1_3 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_3> GroupsUnk1_3;
 
-        [FieldData(typeof(uint), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public uint OffsetUnk1_4 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort SizeUnk1_4 { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding4 { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4;
 
         public override void Open(HSDReader Reader)
         {
@@ -154,34 +140,26 @@ namespace HSDLib.KAR
 
     public class KAR_GrModel_ModelUnk1_1 : IHSDNode
     {
-        [FieldData(typeof(uint))]
         public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat1 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat2 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat3 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat4 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat5 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat6 { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4;
 
         public override void Open(HSDReader Reader)
         {
@@ -214,37 +192,28 @@ namespace HSDLib.KAR
 
     public class KAR_GrModel_ModelUnk1_2 : IHSDNode
     {
-        [FieldData(typeof(uint))]
         public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat1 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat2 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat3 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat4 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat5 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat6 { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint UnkUInt7 { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4;
 
         public override void Open(HSDReader Reader)
         {
@@ -278,53 +247,41 @@ namespace HSDLib.KAR
 
     public class KAR_GrModel_ModelUnk1_3 : IHSDNode
     {
-        [FieldData(typeof(float))]
         public float UnkFloat1 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat2 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat3 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat4 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat5 { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float UnkFloat6 { get; set; }
     }
 
     public class KAR_GrModel_ModelUnk1_4 : IHSDNode
     {
-        [FieldData(typeof(ushort))]
         public ushort Unk { get; set; }
     }
 
     public class KAR_GrSkyboxModel : IHSDNode
     {
-        [FieldData(typeof(HSD_JOBJ))]
         public HSD_JOBJ JOBJRoot { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint Unknown { get; set; }
     }
-
-
+    
     public class KAR_GrUnk2Model : IHSDNode
     {
-        [FieldData(typeof(uint))]
         public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
-        public ushort Padding { get; set; }
+        //[FieldData(typeof(ushort), Viewable: false)]
+        public ushort Padding { get; internal set; }
 
-        public HSD_Array<KAR_GrUnk2_1Model> GroupsUnk2_1 { get; set; }
+        public HSD_Array<KAR_GrUnk2_1Model> GroupsUnk2_1;
 
         public override void Open(HSDReader Reader)
         {
@@ -363,22 +320,19 @@ namespace HSDLib.KAR
 
     public class KAR_GrUnk2_1Model : IHSDNode
     {
-        [FieldData(typeof(ushort))]
         public ushort ID { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding { get; set; }
-
-        [FieldData(typeof(uint))]
-        public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
+        public uint Offset { get; internal set; }
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding2 { get; set; }
 
-        public HSD_Array<KAR_GrUnk2_1DModel> GroupsUnk2_1D { get; set; }
+        public HSD_Array<KAR_GrUnk2_1DModel> GroupsUnk2_1D;
 
         public override void Open(HSDReader Reader)
         {
@@ -406,19 +360,16 @@ namespace HSDLib.KAR
 
     public class KAR_GrUnk2_1DModel : IHSDNode
     {
-        [FieldData(typeof(float))]
         public float Unk { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4;
 
         public override void Open(HSDReader Reader)
         {
@@ -446,16 +397,14 @@ namespace HSDLib.KAR
 
     public class KAR_GrUnk3Model : IHSDNode
     {
-        [FieldData(typeof(uint))]
         public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding { get; set; }
 
-        public HSD_Array<KAR_GrUnk3DModel> GroupsUnk3D { get; set; }
+        public HSD_Array<KAR_GrUnk3DModel> GroupsUnk3D;
 
         public override void Open(HSDReader Reader)
         {
@@ -486,16 +435,14 @@ namespace HSDLib.KAR
 
     public class KAR_GrUnk3DModel : IHSDNode
     {
-        [FieldData(typeof(uint))]
         public uint Offset { get; set; }
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Size { get; set; }
 
-        [FieldData(typeof(ushort), Viewable: false)]
+        [System.ComponentModel.Browsable(false)]
         public ushort Padding { get; set; }
 
-        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4 { get; set; }
+        public HSD_Array<KAR_GrModel_ModelUnk1_4> GroupsUnk1_4;
 
         public override void Open(HSDReader Reader)
         {

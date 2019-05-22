@@ -52,10 +52,10 @@ namespace HALSysDATViewer
             nodeTree.BeginUpdate();
             foreach(HSDRoot root in HSD.Roots)
             {
-                FolderNode n = new FolderNode() { Text = root.Name };
+                //FolderNode n = new FolderNode() { Text = root.Name };
 
-                if (root.Node is HSD_JOBJ)
-                    new Node_JOBJ((HSD_JOBJ)root.Node, n);
+                //if (root.Node is HSD_JOBJ)
+                //    new Node_JOBJ((HSD_JOBJ)root.Node, n);
 
                 Node_Generic generic = new Node_Generic(root.Node);
                 nodeTree.Nodes.Add(generic);

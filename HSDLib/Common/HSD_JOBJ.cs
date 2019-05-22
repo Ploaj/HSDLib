@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDLib.Common
 {
@@ -46,28 +41,21 @@ namespace HSDLib.Common
 
     public class HSD_JOBJ : IHSDTree<HSD_JOBJ>
     {
-        [FieldData(typeof(uint))]
         public uint NameOffset { get; set; }
-
-        [FieldData(typeof(JOBJ_FLAG))]
+        
         public JOBJ_FLAG Flags { get; set; }
-
-        [FieldData(typeof(HSD_JOBJ))]
+        
         public override HSD_JOBJ Child { get; set; }
-
-        [FieldData(typeof(HSD_JOBJ))]
+        
         public override HSD_JOBJ Next { get; set; }
-
-        [FieldData(typeof(HSD_DOBJ))]
+        
         public HSD_DOBJ DOBJ { get; set; }
 
-        [FieldData(typeof(HSD_Transforms), true, 4*3*4)]
+        [HSDInLine()]
         public HSD_Transforms Transforms { get; set; }
-
-        [FieldData(typeof(HSD_Matrix4x3))]
+        
         public HSD_Matrix4x3 InverseMatrix { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint ROBJOffset { get; set; }
 
         public override void Open(HSDReader Reader)

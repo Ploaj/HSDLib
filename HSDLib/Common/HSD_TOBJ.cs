@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HSDLib.GX;
 using HSDLib.Helpers;
 
@@ -44,55 +40,39 @@ namespace HSDLib.Common
 
     public class HSD_TOBJ : IHSDList<HSD_TOBJ>
     {
-        [FieldData(typeof(uint))]
         public uint NameOffset { get; set; }
-
-        [FieldData(typeof(HSD_TOBJ))]
+        
         public override HSD_TOBJ Next { get; set; }
-
-        [FieldData(typeof(GXTexMapID))]
+        
         public GXTexMapID TexMapID { get; set; }//= GXTexMapID.GX_TEXMAP0;
         
-        [FieldData(typeof(uint))]
         public uint GXTexGenSrc { get; set; }//= 4;
 
-        [FieldData(typeof(HSD_Transforms), true, 4 * 3 * 4)]
+        [HSDInLine()]
         public HSD_Transforms Transform { get; set; }//= new HSD_Transforms();
-
-        [FieldData(typeof(GXWrapMode))]
+        
         public GXWrapMode WrapS { get; set; }//= GXWrapMode.REPEAT;
-
-        [FieldData(typeof(GXWrapMode))]
+        
         public GXWrapMode WrapT { get; set; }//= GXWrapMode.REPEAT;
-
-        [FieldData(typeof(byte))]
+        
         public byte WScale { get; set; }//= 1;
-
-        [FieldData(typeof(byte))]
+        
         public byte HScale { get; set; }//= 1;
-
-        [FieldData(typeof(ushort))]
+        
         public ushort Padding { get; set; }//= 1;
-
-        [FieldData(typeof(TOBJ_FLAGS))]
+        
         public TOBJ_FLAGS Flags { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float Blending { get; set; }//= 1;
-
-        [FieldData(typeof(GXTexFilter))]
+        
         public GXTexFilter MagFilter { get; set; }//= GXTexFilter.GX_LINEAR;
-
-        [FieldData(typeof(HSD_Image))]
+        
         public HSD_Image ImageData { get; set; }//
-
-        [FieldData(typeof(HSD_Tlut))]
+        
         public HSD_Tlut Tlut { get; set; }//
-
-        [FieldData(typeof(HSD_TOBJ_LOD))]
+        
         public HSD_TOBJ_LOD LOD { get; set; }//
-
-        [FieldData(typeof(HSD_TOBJ_TEV))]
+        
         public HSD_TOBJ_TEV TEV { get; set; }
     }
 
@@ -130,12 +110,9 @@ namespace HSDLib.Common
 
     public class HSD_Image : IHSDNode
     {
-        [FieldData(typeof(ushort))]
-        public ushort Width;
-        [FieldData(typeof(ushort))]
-        public ushort Height;
-        [FieldData(typeof(GXTexFmt))]
-        public GXTexFmt Format;
+        public ushort Width { get; set; }
+        public ushort Height { get; set; }
+        public GXTexFmt Format { get; set; }
         public uint Mipmap;
         public float MinLOD;
         public float MaxLOD;
@@ -172,57 +149,48 @@ namespace HSDLib.Common
 
     public class HSD_TOBJ_LOD : IHSDNode
     {
-        [FieldData(typeof(GXTexFilter))]
-        public GXTexFilter MinFilter;
-        [FieldData(typeof(float))]
-        public float Bias;
-        [FieldData(typeof(bool))]
-        public bool BiasClamp;
-        [FieldData(typeof(bool))]
-        public bool EnableEdgeLOD;
-        [FieldData(typeof(GXAnisotropy))]
-        public GXAnisotropy Anisotropy;
+        public GXTexFilter MinFilter { get; set; }
+        public float Bias { get; set; }
+        public bool BiasClamp { get; set; }
+        public bool EnableEdgeLOD { get; set; }
+        public GXAnisotropy Anisotropy { get; set; }
     }
 
     public class HSD_TOBJ_TEV : IHSDNode
     {
-        [FieldData(typeof(byte))]
         public byte color_op { get; set; }
-        [FieldData(typeof(byte))]
         public byte alpha_op { get; set; }
-        [FieldData(typeof(byte))]
         public byte color_bias { get; set; }
-        [FieldData(typeof(byte))]
         public byte alpha_bias { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte color_scale { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte alpha_scale { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte color_clamp { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte color_a { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte color_b { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte color_c { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte color_d { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte alpha_a { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte alpha_b { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte alpha_c { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte alpha_d { get; set; }
-        [FieldData(typeof(uint))]
+        
         public uint konst { get; set; }
-        [FieldData(typeof(uint))]
+        
         public uint tev0 { get; set; }
-        [FieldData(typeof(uint))]
+        
         public uint tev1 { get; set; }
-        [FieldData(typeof(uint))]
+        
         public uint active { get; set; }
     }
 }

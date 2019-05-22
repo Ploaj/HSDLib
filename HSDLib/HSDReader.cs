@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Reflection;
 using HSDLib.Common;
 
@@ -13,19 +10,20 @@ namespace HSDLib
     public class FieldData : Attribute
     {
         public Type Type{ get; private set; }
-        public bool InLine { get; private set; }
-        public int Size { get; private set; }
-        public bool Editable { get; private set; }
-        public bool Viewable { get; private set; }
 
-        public FieldData(Type Type, bool InLine = false, int Size = 4, bool Editable = true, bool Viewable = true)
+        public FieldData(Type Type)
         {
             this.Type = Type;
-            this.InLine = InLine;
-            this.Size = Size;
-            this.Editable = Editable;
-            this.Viewable = Viewable;
         }
+    }
+
+    public class HSDInLineAttribute : Attribute
+    {
+
+    }
+
+    public class HSDParseIgnoreAttribute : Attribute
+    {
     }
 
     /// <summary>

@@ -17,6 +17,9 @@ namespace HSDLib
         TEXTURE
     }
 
+    /// <summary>
+    /// Class to assist with reading/writing HSD files
+    /// </summary>
     public class HSDWriter : BinaryWriter
     {
         private class RelocationPointer

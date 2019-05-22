@@ -50,85 +50,85 @@ namespace HSDLib.Common
 
     public class HSD_MOBJ : IHSDNode
     {
-        [FieldData(typeof(uint))]
+        
         public uint NameOffset { get; set; }
-
-        [FieldData(typeof(RENDER_MODE))]
+        
         public RENDER_MODE RenderFlags { get; set; }
-
-        [FieldData(typeof(HSD_TOBJ))]
+        
         public HSD_TOBJ Textures { get; set; }
-
-        [FieldData(typeof(HSD_MCOBJ))]
+        
         public HSD_MCOBJ MaterialColor { get; set; }
-
-        [FieldData(typeof(uint))]
+        
         public uint UnusedRenderOffset { get; set; }
-
-        [FieldData(typeof(HSD_PixelProcessing))]
+        
         public HSD_PixelProcessing PixelProcessing { get; set; }
     }
 
     public class HSD_MCOBJ : IHSDNode
     {
-        [FieldData(typeof(byte))]
         public byte AMB_R { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte AMB_G { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte AMB_B { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte AMB_A { get; set; }
 
-        [FieldData(typeof(byte))]
+        
         public byte DIF_R { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte DIF_G { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte DIF_B { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte DIF_A { get; set; }
 
-        [FieldData(typeof(byte))]
+        
         public byte SPC_R { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte SPC_G { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte SPC_B { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte SPC_A { get; set; }
+        
 
-        [FieldData(typeof(float))]
         public float Alpha { get; set; }
-
-        [FieldData(typeof(float))]
+        
         public float Shininess { get; set; }
     }
 
     public class HSD_PixelProcessing : IHSDNode
     {
-        [FieldData(typeof(byte))]
         public byte Flags { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte AlphaRef0 { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte AlphaRef1 { get; set; }
-        [FieldData(typeof(byte))]
+        
         public byte DestinationAlpha { get; set; }
+
         [FieldData(typeof(byte))]
         public GXBlendMode BlendMode { get; set; }
+
         [FieldData(typeof(byte))]
         public GXBlendFactor SrcFactor { get; set; }
+
         [FieldData(typeof(byte))]
         public GXBlendFactor DstFactor { get; set; }
+
         [FieldData(typeof(byte))]
         public GXLogicOp BlendOp { get; set; }
+
         [FieldData(typeof(byte))]
         public GXCompareType DepthFunction { get; set; }
+
         [FieldData(typeof(byte))]
         public GXCompareType AlphaComp0 { get; set; }
+
         [FieldData(typeof(byte))]
         public GXAlphaOp AlphaOp { get; set; }
+
         [FieldData(typeof(byte))]
         public GXCompareType AlphaComp1 { get; set; }
     }

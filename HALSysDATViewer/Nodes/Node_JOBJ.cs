@@ -24,14 +24,19 @@ namespace HALSysDATViewer.Nodes
             Parent.Nodes.Add(this);
             Text = "Joint Object_" + JOBJ.Flags.ToString("X");
             this.JOBJ = JOBJ;
-            if (JOBJ.Child != null)
+            foreach(var child in JOBJ.Children)
             {
-                new Node_JOBJ((HSD_JOBJ)JOBJ.Child, this);
+                new Node_JOBJ(child, this);
+
+            }
+            /*if (JOBJ.Child != null)
+            {
+                new Node_JOBJ(JOBJ.Child, this);
             }
             if(JOBJ.Next != null)
             {
-                new Node_JOBJ((HSD_JOBJ)JOBJ.Next, Parent);
-            }
+                new Node_JOBJ(JOBJ.Next, Parent);
+            }*/
         }
 
         public override void Register()

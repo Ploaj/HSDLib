@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib.GX;
 
 namespace HSDLib.Common
 {
@@ -19,10 +16,8 @@ namespace HSDLib.Common
 
     public class HSD_POBJ : IHSDList<HSD_POBJ>
     {
-        [FieldData(typeof(POBJ_FLAG))]
         public POBJ_FLAG Flags { get; set; }
-
-        [FieldData(typeof(HSD_AttributeGroup))]
+        
         public HSD_AttributeGroup VertexAttributes { get; set; }
         public byte[] DisplayListBuffer;
 

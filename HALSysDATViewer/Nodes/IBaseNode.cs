@@ -35,7 +35,6 @@ namespace HALSysDATViewer.Nodes
                 foreach (var attr in attrs)
                 {
                     if(!prop.Name.Contains("Offset") && 
-                        attr.Viewable &&
                         (prop.PropertyType == typeof(byte) ||
                         prop.PropertyType == typeof(ushort) ||
                         prop.PropertyType == typeof(short) ||
