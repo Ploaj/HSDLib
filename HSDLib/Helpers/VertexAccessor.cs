@@ -84,16 +84,6 @@ namespace HSDLib.Helpers
     /// </summary>
     public class VertexAccessor
     {
-        private GXVertexBuffer Attribute;
-        private HSD_AttributeGroup AttributeGroup;
-
-        public VertexAccessor(GXVertexBuffer Attribute, HSD_AttributeGroup Group)
-        {
-            this.Attribute = Attribute;
-            this.AttributeGroup = Group;
-        }
-
-
         public static GXVertex[] GetDecodedVertices(GXPrimitiveGroup PrimitiveGroup, HSD_AttributeGroup Group)
         {
             // Create Vertex List
@@ -166,8 +156,30 @@ namespace HSDLib.Helpers
                 }
                 Vertices.Add(Vertex);
             }
+            
 
             return Vertices.ToArray();
+        }
+
+
+        /// <summary>
+        /// Returns display list for <see cref="HSD_POBJ"/>
+        /// </summary>
+        /// <param name="Polygon"></param>
+        /// <returns></returns>
+        public static GXDisplayList GetDisplayList(HSD_POBJ Polygon)
+        {
+            return new GXDisplayList(Polygon.DisplayListBuffer, Polygon.VertexAttributes);
+        }
+
+        /// <summary>
+        /// Gets decoded vertices for <see cref="HSD_POBJ"/>
+        /// </summary>
+        /// <param name="Polygon"></param>
+        /// <returns></returns>
+        public static GXVertex[] GetDecodedVertices(HSD_POBJ Polygon)
+        {
+            return GetDecodedVertices(GetDisplayList(Polygon), Polygon);
         }
 
         /// <summary>
@@ -176,7 +188,7 @@ namespace HSDLib.Helpers
         /// <param name="DisplayList">Display list belonging to given PBOJ</param>
         /// <param name="Polygon"><see cref="HSD_POBJ"/> the the display list belong to</param>
         /// <returns>Array of <see cref="GXVertex"/></returns>
-        public static GXVertex[] GetDecodedVertices(GXDisplayList DisplayList, HSD_POBJ Polygon)
+        private static GXVertex[] GetDecodedVertices(GXDisplayList DisplayList, HSD_POBJ Polygon)
         {
             // Create Vertex List
             List<GXVertex> Vertices = new List<GXVertex>();

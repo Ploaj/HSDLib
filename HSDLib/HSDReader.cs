@@ -142,7 +142,7 @@ namespace HSDLib
             return (uint)BaseStream.Position;
         }
 
-        private Dictionary<uint, IHSDNode> NodeCache = new Dictionary<uint, IHSDNode>();
+        private SortedDictionary<uint, IHSDNode> NodeCache = new SortedDictionary<uint, IHSDNode>();
         public T ReadObject<T>(uint Offset) where T : IHSDNode
         {
             T Object = Activator.CreateInstance<T>();
@@ -226,6 +226,14 @@ namespace HSDLib
 
             // Close the stream
             base.Close();
+        }
+
+        public void PrintOffsets()
+        {
+            foreach(var v in NodeCache)
+            {
+                Console.WriteLine(v.Key.ToString("X") + " " + v.Value.GetType());
+            }
         }
 
         public int BinarySearch(List<uint> List, uint Offset)

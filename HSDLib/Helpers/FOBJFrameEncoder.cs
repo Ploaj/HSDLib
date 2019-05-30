@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using HSDLib.Animation;
-using HSDLib.GX;
 
 namespace HSDLib.Helpers
 {
@@ -93,7 +89,7 @@ namespace HSDLib.Helpers
         }
 
         //TODO: Increase Accuracy
-        public static int QuantizeScaler(float max, bool Signed, out GXAnimDataFormat Type)
+        private static int QuantizeScaler(float max, bool Signed, out GXAnimDataFormat Type)
         {
             float error = 0.00001f;
             if (Signed)

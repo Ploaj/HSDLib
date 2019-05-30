@@ -59,12 +59,18 @@ namespace HSDLib
         {
             // a little wonky to have to go through the saving process 3 times
             // but this does result in smaller filesizes due to data alignment
+
+            // the correct order is probably buffer->images->jobjweights->attributegroups->dobj/pobj->jobjs
+            // but it probably doesn't matter?
             Writer.Mode = WriterWriteMode.BUFFER;
             Node.Save(Writer);
+
             Writer.Mode = WriterWriteMode.NORMAL;
             Node.Save(Writer);
+
             Writer.Mode = WriterWriteMode.TEXTURE;
             Node.Save(Writer);
+
             Writer.Mode = WriterWriteMode.NORMAL;
         }
     }

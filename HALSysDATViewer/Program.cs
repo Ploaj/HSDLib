@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using HSDLib.Common;
+using HSDLib.Helpers.TriangleConverter;
+using HSDLib.Helpers;
 
 namespace HALSysDATViewer
 {
@@ -11,6 +14,7 @@ namespace HALSysDATViewer
         [STAThread]
         static void Main()
         {
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

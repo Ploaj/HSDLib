@@ -6,21 +6,26 @@ using System.IO;
 
 namespace HSDLib.Helpers
 {
+    /// <summary>
+    /// Helper class for creating the vertex buffer
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class BufferMaker<T>
     {
         public List<T> Collection = new List<T>();
+        private Dictionary<T, int> QuickIndex = new Dictionary<T, int>();
 
         public ushort GetIndex(T o)
         {
-            int index = Collection.IndexOf(o);
-
-            if(index == -1)
+            int index = 0;
+            if(!QuickIndex.ContainsKey(o))
             {
                 index = Collection.Count;
                 Collection.Add(o);
+                QuickIndex.Add(o, index);
             }
-
-            return (ushort)index;
+            
+            return (ushort)QuickIndex[o];
         }
 
         public byte[] GetData(GXVertexBuffer Buffer)
@@ -77,6 +82,9 @@ namespace HSDLib.Helpers
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class VertexCompressor
     {
         private Dictionary<GXVertexBuffer, BufferMaker<object>> BufferLinker = new Dictionary<GXVertexBuffer, BufferMaker<object>>();
@@ -89,7 +97,6 @@ namespace HSDLib.Helpers
             {
                 if (BufferData.ContainsKey(BufferLinker[b]))
                 {
-
                     b.DataBuffer = BufferData[BufferLinker[b]];
                     continue;
                 }
@@ -102,7 +109,13 @@ namespace HSDLib.Helpers
             }
         }
 
-        public ushort GetIndex(GXVertexBuffer v, object o)
+        /// <summary>
+        /// Gets the index of a value in the buffer
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        private ushort GetIndex(GXVertexBuffer v, object o)
         {
             if (!BufferLinker.ContainsKey(v))
             {
@@ -122,8 +135,14 @@ namespace HSDLib.Helpers
             }
             return BufferLinker[v].GetIndex(o);
         }
-
-        // Creates a primitive group
+        
+        /// <summary>
+        /// Creates a primitive group for the vertex buffer
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="Vertices"></param>
+        /// <param name="Attributes"></param>
+        /// <returns></returns>
         public GXPrimitiveGroup Compress(GXPrimitiveType type, GXVertex[] Vertices, HSD_AttributeGroup Attributes)
         {
             GXPrimitiveGroup g = new GXPrimitiveGroup();

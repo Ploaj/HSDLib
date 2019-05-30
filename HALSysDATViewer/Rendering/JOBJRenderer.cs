@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib;
 using HSDLib.Common;
-using HSDLib.GX;
 using HSDLib.Helpers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -35,69 +30,74 @@ namespace HALSysDATViewer.Rendering
             public float GetValue(float Frame)
             {
                 // register
-                float Value1 = 0;
-                float Value2 = 0;
-                float Tan1 = 0;
-                float Tan2 = 0;
-                float Frame1 = 0;
-                float Frame2 = 0;
+                float ValueLeft = 0;
+                float ValueRight = 0;
+                float TanLeft = 0;
+                float TanRight = 0;
+                float FrameLeft = 0;
+                float FrameRight = 0;
                 InterpolationType CurrentInterpolation = InterpolationType.Constant;
 
-                //Process key frames until value
+                // get current frame state
                 for(int i = 0; i < Keys.Count; i++)
                 {
-                    if (Keys[i].Frame > Frame)
-                    {
-                        if(Keys[i].InterpolationType == InterpolationType.HermiteCurve)
-                        {
-                            Value2 = Keys[i + 1].Value;
-                        }else
-                        {
-                            Value2 = Keys[i].Value;
-                        }
-                        if(Keys[i].InterpolationType != InterpolationType.HermiteValue)
-                            Tan2 = Keys[i].Tan;
-                        Frame2 = Keys[i].Frame;
-                        break;
-                    }
-                    Tan2 = 0;
-                    Value2 = 0;
                     switch (Keys[i].InterpolationType)
                     {
                         case InterpolationType.Constant:
-                            Value1 = Keys[i].Value;
-                            break;
-                        case InterpolationType.Step:
-                            CurrentInterpolation = Keys[i].InterpolationType;
-                            Value1 = Keys[i].Value;
+                            ValueRight = Keys[i].Value;
+                            ValueLeft = ValueRight;
                             break;
                         case InterpolationType.Linear:
-                            CurrentInterpolation = Keys[i].InterpolationType;
-                            Frame1 = Keys[i].Frame;
-                            Value1 = Keys[i].Value;
+                            ValueLeft = ValueRight;
+                            FrameLeft = FrameRight;
+                            ValueRight = Keys[i].Value;
+                            FrameRight = Keys[i].Frame;
+                            break;
+                        case InterpolationType.Step:
+                            ValueLeft = ValueRight;
+                            FrameLeft = FrameRight;
+                            ValueRight = Keys[i].Value;
+                            FrameRight = Keys[i].Frame;
                             break;
                         case InterpolationType.Hermite:
-                            CurrentInterpolation = Keys[i].InterpolationType;
-                            Frame1 = Keys[i].Frame;
-                            Value1 = Keys[i].Value;
-                            Tan1 = Keys[i].Tan;
+                            ValueLeft = ValueRight;
+                            FrameLeft = FrameRight;
+                            TanLeft = TanRight;
+                            ValueRight = Keys[i].Value;
+                            FrameRight = Keys[i].Frame;
+                            TanRight = Keys[i].Tan;
+                            break;
+                        case InterpolationType.HermiteCurve:
+                            TanRight = Keys[i].Tan;
+                            break;
+                        case InterpolationType.HermiteValue:
+                            ValueLeft = ValueRight;
+                            FrameLeft = FrameRight;
+                            ValueRight = Keys[i].Value;
+                            FrameRight = Keys[i].Frame;
                             break;
                     }
 
+                    if (FrameRight > Frame && Keys[i].InterpolationType != InterpolationType.HermiteCurve)
+                        break;
+
+                    CurrentInterpolation = Keys[i].InterpolationType;
                 }
-                if (Frame1 == Frame2 || CurrentInterpolation == InterpolationType.Step)
-                    return Value1;
+
+
+                if (FrameLeft == FrameRight || CurrentInterpolation == InterpolationType.Step || CurrentInterpolation == InterpolationType.Constant)
+                    return ValueLeft;
                 
-                float FrameDiff = Frame - Frame1;
-                float Weight = FrameDiff / (Frame2 - Frame1);
-
+                float FrameDiff = Frame - FrameLeft;
+                float Weight = FrameDiff / (FrameRight - FrameLeft);
+                
                 if (CurrentInterpolation == InterpolationType.Linear)
-                    return AnimationHelperInterpolation.Lerp(Value1, Value2, Weight);
+                    return AnimationHelperInterpolation.Lerp(ValueLeft, ValueRight, Weight);
 
-                if (CurrentInterpolation == InterpolationType.Hermite || CurrentInterpolation == InterpolationType.HermiteValue)
-                    return AnimationHelperInterpolation.Herp(Value1, Value2, Tan1, Tan2, FrameDiff, Weight);
+                if (CurrentInterpolation == InterpolationType.Hermite || CurrentInterpolation == InterpolationType.HermiteValue || CurrentInterpolation == InterpolationType.HermiteCurve)
+                    return AnimationHelperInterpolation.Herp(ValueLeft, ValueRight, TanLeft, TanRight, FrameDiff, Weight);
 
-                return Value1;
+                return ValueLeft;
             }
         }
 
@@ -146,6 +146,7 @@ namespace HALSysDATViewer.Rendering
             {
                 Nodes.Clear();
                 HSD_FigaTree Tree = value;
+                FrameCount = Tree.FrameCount;
                 foreach(HSD_AnimNode node in Tree.Nodes)
                 {
                     AnimNode n = new AnimNode();
@@ -161,6 +162,7 @@ namespace HALSysDATViewer.Rendering
             }
         }
 
+        private float FrameCount;
         private List<AnimNode> Nodes = new List<AnimNode>();
         private Matrix4[] InverseBinds;
         private Matrix4[] Binds;
@@ -278,7 +280,7 @@ namespace HALSysDATViewer.Rendering
                     {
                         // Decode the Display List Data
                         GXDisplayList DisplayList = new GXDisplayList(pobj.DisplayListBuffer, pobj.VertexAttributes);
-                        Vertices.AddRange(ConvertToGLVertex(VertexAccessor.GetDecodedVertices(DisplayList, pobj), BoneList, pobj.BindGroups != null ? new List<HSD_JOBJWeight>(pobj.BindGroups.Elements) : null));
+                        Vertices.AddRange(ConvertToGLVertex(VertexAccessor.GetDecodedVertices(pobj), BoneList, pobj.BindGroups != null ? new List<HSD_JOBJWeight>(pobj.BindGroups.Elements) : null));
                         foreach (GXPrimitiveGroup g in DisplayList.Primitives)
                         {
                             GLPrimitveGroup GL = new GLPrimitveGroup();
@@ -441,6 +443,34 @@ namespace HALSysDATViewer.Rendering
             Shader.DisableVertexAttributes();
             GL.UseProgram(0);
 
+            RenderTrack();
+
+        }
+
+        private void RenderTrack()
+        {
+            if (Nodes.Count == 0)
+                return;
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.LoadIdentity();
+
+            GL.Begin(PrimitiveType.LineLoop);
+
+            var node = Nodes[5];
+            float MaxValue = 0;
+
+            foreach (var v in node.Tracks[0].Keys)
+                MaxValue = Math.Max(v.Value, MaxValue);
+
+            for(int i = 0; i < FrameCount; i++)
+            {
+                GL.Vertex2(-1 + (i / FrameCount) * 2, -1 + (node.Tracks[0].GetValue(i) / MaxValue) * 2);
+            }
+            
+            GL.End();
+
+            GL.PopMatrix();
         }
     }
 }

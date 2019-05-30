@@ -118,6 +118,8 @@ namespace HSDLib
                 r.Open(Reader);
             }
 
+            //Reader.PrintOffsets();
+
             //Clean up
             Reader.Close();
         }

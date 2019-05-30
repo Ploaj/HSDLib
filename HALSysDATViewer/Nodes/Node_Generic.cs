@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Windows.Forms;
 using HSDLib;
+using HSDLib.Common;
+using System;
 
 namespace HALSysDATViewer.Nodes
 {
@@ -11,6 +13,18 @@ namespace HALSysDATViewer.Nodes
         public Node_Generic(IHSDNode Node)
         {
             this.Node = Node;
+
+            if(Node.GetType() == typeof(HSD_JOBJ))
+            {
+                ImageKey = "jobj";
+                SelectedImageKey = "jobj";
+            }
+        }
+        
+        public void Refresh()
+        {
+            Nodes.Clear();
+            Open();
         }
 
         public void Open()
@@ -24,19 +38,6 @@ namespace HALSysDATViewer.Nodes
                     Node_Generic Child = new Node_Generic(prop);
                     Nodes.Add(Child);
                     Child.Open();
-                    /*if (prop.Name.Equals("Next") && attr.Type.IsSubclassOf(typeof(IHSDNode)))
-                    {
-                        Node_Generic Sibling = new Node_Generic((IHSDNode)prop.GetValue(Node));
-                        Parent.Nodes.Add(Sibling);
-                        Sibling.Open();
-                    }
-                    else
-                    if (attr.Type.IsSubclassOf(typeof(IHSDNode)))
-                    {
-                        Node_Generic Child = new Node_Generic((IHSDNode)prop.GetValue(Node));
-                        Nodes.Add(Child);
-                        Child.Open();
-                    }*/
                 }
             }
         }

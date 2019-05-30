@@ -71,12 +71,12 @@ namespace HALSysDATViewer.Modeling
                     int ParentIndex = int.Parse(args[s]);
                     if (ParentIndex == -1)
                     {
-
                         RootJOBJ = b;
                         RootJOBJ.Flags |= JOBJ_FLAG.SKELETON_ROOT;
                     }
                     else
                     {
+                        if(BoneList.ContainsKey(ParentIndex))
                         BoneList[ParentIndex].AddChild(b);
                     }
                     BoneList.Add(id, b);

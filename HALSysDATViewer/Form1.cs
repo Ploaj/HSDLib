@@ -16,6 +16,8 @@ namespace HALSysDATViewer
         public HSDFile HSD;
         public JOBJRenderer Renderer;
 
+        private ContextMenu DOBJ_Context;
+
         public Camera Camera = new Camera();
         bool ReadyToRender = false;
 
@@ -24,6 +26,29 @@ namespace HALSysDATViewer
         public Form1()
         {
             InitializeComponent();
+            DOBJ_Context = new ContextMenu();
+
+            MenuItem m = new MenuItem("Clear Mesh");
+            m.Click += (sender, args) =>
+            {
+                if (((Node_Generic)nodeTree.SelectedNode).Node is HSD_DOBJ dobj)
+                {
+                    dobj.POBJ = null;
+                    ((Node_Generic)nodeTree.SelectedNode).Refresh();
+                }
+            };
+            DOBJ_Context.MenuItems.Add(m);
+
+            
+
+            nodeTree.MouseDown += (sender, args) => nodeTree.SelectedNode = nodeTree.GetNodeAt(args.X, args.Y);
+            nodeTree.NodeMouseClick += (sender, args) =>
+            {
+                if (nodeTree.SelectedNode != null && args.Button == MouseButtons.Right && ((Node_Generic)nodeTree.SelectedNode).Node is HSD_DOBJ)
+                {
+                    DOBJ_Context.Show(nodeTree, args.Location);
+                }
+            };
             ReadyToRender = true;
         }
 
