@@ -16,6 +16,7 @@ namespace HSDLib
         /// Warning: slow
         /// </summary>
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         public IHSDNode[] Children
         {
             get
@@ -42,6 +43,7 @@ namespace HSDLib
         /// Returns all of the siblings for this now
         /// </summary>
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         private List<IHSDNode> Siblings
         {
             get
@@ -294,12 +296,14 @@ namespace HSDLib
         /// Next object in the list, also know as the next sibling
         /// </summary>
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         public virtual T Next { get; set; }
 
         /// <summary>
         /// returns this list as an array to make easier to work with
         /// </summary>
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         public T[] List
         {
             get
@@ -319,9 +323,11 @@ namespace HSDLib
     public class IHSDTree<T> : IHSDList<T> where T : IHSDTree<T>
     {
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         public virtual T Child { get; set; }
 
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         public T[] Children
         {
             get
@@ -333,6 +339,7 @@ namespace HSDLib
         }
 
         [HSDParseIgnore()]
+        [System.ComponentModel.Browsable(false)]
         public List<T> DepthFirstList
         {
             get

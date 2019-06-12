@@ -22,11 +22,12 @@ namespace HSDLib.Helpers
                 vmax = Math.Max(Math.Abs(key.Value), vmax);
                 tmax = Math.Max(Math.Abs(key.Tan), tmax);
             }
-            GXAnimDataFormat t;
+            GXAnimDataFormat t = GXAnimDataFormat.Float;
             fobj.ValueScale = (uint)QuantizeScaler(vmax, vsigned, out t);
             fobj.ValueFormat = t;
-            fobj.TanScale = (uint)QuantizeScaler(tmax, tsigned, out t);
-            fobj.TanFormat = t;
+            GXAnimDataFormat t2 = GXAnimDataFormat.Float;
+            fobj.TanScale = (uint)QuantizeScaler(tmax, tsigned, out t2);
+            fobj.TanFormat = t2;
             
             MemoryStream o = new MemoryStream();
             using (HSDWriter Writer = new HSDWriter(o))
@@ -34,7 +35,7 @@ namespace HSDLib.Helpers
                 Writer.BigEndian = false;
 
                 int time = 0;
-                for(int i = 0;i < Keys.Count;)
+                for(int i = 0; i < Keys.Count;)
                 {
                     InterpolationType ip = Keys[i].InterpolationType;
                     int j;
@@ -44,29 +45,34 @@ namespace HSDLib.Helpers
                             break;
                     }
 
-                    int flag = (j << 4) | (int)ip;
+                    int flag = ((j - 1) << 4) | (int)ip;
                     Writer.ExtendedByte(flag);
 
                     for (int k = i; k < i + j; k++)
                     {
-                        switch (Keys[k].InterpolationType)
+                        int DeltaTime = 0;
+                        if (k + 1 < Keys.Count)
+                            DeltaTime = (int)(Keys[k + 1].Frame - Keys[k].Frame);
+                        if (k == Keys.Count)
+                            DeltaTime = 1;
+                        switch (ip)
                         {
                             case InterpolationType.Step:
                                 WriteVal(Writer, Keys[k].Value, fobj.ValueFormat, fobj.ValueScale);
-                                Writer.ExtendedByte((int)(Keys[k].Frame - time));
+                                Writer.ExtendedByte(DeltaTime);
                                 break;
                             case InterpolationType.Linear:
                                 WriteVal(Writer, Keys[k].Value, fobj.ValueFormat, fobj.ValueScale);
-                                Writer.ExtendedByte((int)(Keys[k].Frame - time));
+                                Writer.ExtendedByte(DeltaTime);
                                 break;
                             case InterpolationType.HermiteValue:
                                 WriteVal(Writer, Keys[k].Value, fobj.ValueFormat, fobj.ValueScale);
-                                Writer.ExtendedByte((int)(Keys[k].Frame - time));
+                                Writer.ExtendedByte(DeltaTime);
                                 break;
                             case InterpolationType.Hermite:
                                 WriteVal(Writer, Keys[k].Value, fobj.ValueFormat, fobj.ValueScale);
                                 WriteVal(Writer, Keys[k].Tan, fobj.TanFormat, fobj.TanScale);
-                                Writer.ExtendedByte((int)(Keys[k].Frame - time));
+                                Writer.ExtendedByte(DeltaTime);
                                 break;
                             case InterpolationType.HermiteCurve:
                                 WriteVal(Writer, Keys[k].Tan, fobj.TanFormat, fobj.TanScale);
@@ -77,14 +83,16 @@ namespace HSDLib.Helpers
                             default:
                                 throw new Exception("end");
                         }
-                        time = (int)Keys[k].Frame;
+                        if(ip != InterpolationType.HermiteCurve)
+                            time = (int)Keys[k].Frame;
                     }
 
                     i += j;
                 }
             }
-            fobj.Data = o.GetBuffer();
+            fobj.Data = o.ToArray();
             o.Close();
+            o.Dispose();
             return fobj;
         }
 
@@ -108,7 +116,6 @@ namespace HSDLib.Helpers
                     float Estimated = (float)(((short)(Math.Pow(2, i) * max)) / Math.Pow(2, i));
                     if (Math.Abs(max - Estimated) < error)
                     {
-                        Console.WriteLine(max + " " + Estimated);
                         Type = GXAnimDataFormat.Short;
                         return (int)Math.Pow(2, i);
                     }

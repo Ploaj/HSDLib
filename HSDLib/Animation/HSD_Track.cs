@@ -18,10 +18,13 @@
 
         public override void Save(HSDWriter Writer)
         {
+            if(Track != null && Track.Data != null)
+                DataSize = (ushort)Track.Data.Length;
+
             base.Save(Writer);
 
-            int start = (int)Writer.BaseStream.Position;
-            Writer.WriteAt(start, (uint)Track.Data.Length << 16);
+            //int start = (int)Writer.BaseStream.Position;
+            //Writer.WriteAt(start, (uint)Track.Data.Length << 16);
         }
     }
 }

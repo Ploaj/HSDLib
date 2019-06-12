@@ -239,7 +239,7 @@ namespace HSDLib.Helpers
                     rgba = tmpTpl.fromCI14X2(imageData, paletteDataRgba, width, height);
                     break;
                 case TPL_TextureFormat.CMP:
-                    rgba = tmpTpl.fromCMP(imageData, width, height);
+                    rgba = TPL.fromCMP(imageData, width, height);
                     break;
                 default:
                     rgba = new byte[0];
@@ -1177,7 +1177,7 @@ namespace HSDLib.Helpers
 
 
 
-        private int avg(int w0, int w1, int c0, int c1)
+        private static int avg(int w0, int w1, int c0, int c1)
         {
             int a0 = c0 >> 11;
             int a1 = c1 >> 11;
@@ -1888,7 +1888,7 @@ namespace HSDLib.Helpers
         #endregion
 
         #region CMP
-        private byte[] fromCMP(byte[] tpl, int width, int height)
+        public static byte[] fromCMP(byte[] tpl, int width, int height)
         {
             uint[] output = new uint[width * height];
             ushort[] c = new ushort[4];

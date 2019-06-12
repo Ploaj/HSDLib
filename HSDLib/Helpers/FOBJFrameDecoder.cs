@@ -29,6 +29,14 @@ namespace HSDLib.Helpers
             this.FOBJ = FOBJ;
         }
 
+        public static List<FOBJKey> DecodeTrack(HSD_FOBJ FOBJ)
+        {
+            using (FOBJFrameDecoder e = new FOBJFrameDecoder(FOBJ))
+            {
+                return e.GetKeys();
+            }
+        }
+
         public List<FOBJKey> GetKeys(float FrameCount = -1)
         {
             List<FOBJKey> Keys = new List<FOBJKey>();

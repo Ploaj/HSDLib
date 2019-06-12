@@ -62,10 +62,10 @@ namespace HSDLib.Animation
         public byte AnimationType { get; set; }
 
         [System.ComponentModel.Browsable(false)]
-        public byte Flag1 { get; internal set; }
+        public byte ValueFlag { get; internal set; }
 
         [System.ComponentModel.Browsable(false)]
-        public byte Flag2 { get; internal set; }
+        public byte TangentFlag { get; internal set; }
 
         [System.ComponentModel.Browsable(false)]
         public byte Padding2 { get; internal set; }
@@ -77,11 +77,11 @@ namespace HSDLib.Animation
         {
             get
             {
-                return (uint)Math.Pow(2, Flag1 & 0x1F);
+                return (uint)Math.Pow(2, ValueFlag & 0x1F);
             }
             set
             {
-                Flag1 = (byte)((Flag1 & 0xF0) | (byte)Math.Log(value, 2));
+                ValueFlag = (byte)((ValueFlag & 0xE0) | (byte)Math.Log(value, 2));
             }
         }
 
@@ -90,11 +90,11 @@ namespace HSDLib.Animation
         {
             get
             {
-                return (uint)Math.Pow(2, Flag2 & 0x1F);
+                return (uint)Math.Pow(2, TangentFlag & 0x1F);
             }
             set
             {
-                Flag2 = (byte)((Flag2 & 0xF0) | (byte)Math.Log(value, 2));
+                TangentFlag = (byte)((TangentFlag & 0xE0) | (byte)Math.Log(value, 2));
             }
         }
 
@@ -103,11 +103,11 @@ namespace HSDLib.Animation
         {
             get
             {
-                return (GXAnimDataFormat)(Flag1 & 0xF0);
+                return (GXAnimDataFormat)(ValueFlag & 0xE0);
             }
             set
             {
-                Flag1 = (byte)((Flag1 & 0x1F) | (byte)value);
+                ValueFlag = (byte)((ValueFlag & 0x1F) | (byte)value);
             }
         }
 
@@ -116,11 +116,11 @@ namespace HSDLib.Animation
         {
             get
             {
-                return (GXAnimDataFormat)(Flag2 & 0xF0);
+                return (GXAnimDataFormat)(TangentFlag & 0xE0);
             }
             set
             {
-                Flag2 = (byte)((Flag2 & 0x1F) | (byte)value);
+                TangentFlag = (byte)((TangentFlag & 0x1F) | (byte)value);
             }
         }
 
