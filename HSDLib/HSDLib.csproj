@@ -51,6 +51,7 @@
     <Compile Include="Common\HSD_DOBJ.cs" />
     <Compile Include="Common\HSD_IOBJ.cs" />
     <Compile Include="Common\HSD_JOBJ.cs" />
+    <Compile Include="Common\HSD_JOBJWeight.cs" />
     <Compile Include="Common\HSD_Matrix3x3.cs" />
     <Compile Include="Common\HSD_MOBJ.cs" />
     <Compile Include="Common\HSD_POBJ.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Common\HSD_Transforms.cs" />
     <Compile Include="GX\Enums.cs" />
     <Compile Include="Helpers\AnimationInterpolationHelper.cs" />
+    <Compile Include="Helpers\DOBJHandler.cs" />
     <Compile Include="Helpers\FOBJFrameDecoder.cs" />
     <Compile Include="Helpers\GXDisplayList.cs" />
     <Compile Include="GX\GXVertexBuffer.cs" />

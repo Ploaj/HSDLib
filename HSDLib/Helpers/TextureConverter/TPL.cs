@@ -112,6 +112,16 @@ namespace HSDLib.Helpers
         /// </summary>
         public int NumOfTextures { get { return (int)tplHeader.NumOfTextures; } }
 
+        public static bool HasPalette(int format)
+        {
+            if (format == (int)TPL_TextureFormat.CI4
+                || format == (int)TPL_TextureFormat.CI8
+                || format == (int)TPL_TextureFormat.CI14X2)
+                return true;
+
+            return false;
+        }
+
         #region IDisposable Members
         private bool isDisposed = false;
 
@@ -2122,6 +2132,7 @@ namespace HSDLib.Helpers
             else if (tplFormat == TPL_TextureFormat.CI8) toCI8();
             else toCI14X2();
         }
+
 
         #region Private Functions
         private void toCI4()

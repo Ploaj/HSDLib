@@ -8,6 +8,8 @@ using HALSysDATViewer.Nodes;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using HALSysDATViewer.Rendering;
+using HALSysDATViewer.Modeling;
+using System.IO;
 
 namespace HALSysDATViewer
 {
@@ -227,6 +229,54 @@ namespace HALSysDATViewer
             catch
             {
             }
+        }
+
+        private void exportSMDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog d = new SaveFileDialog())
+            {
+                d.Filter = "Source Model (*.smd)|*.smd";
+
+                if(d.ShowDialog() == DialogResult.OK)
+                {
+                    ExportSMD(d.FileName, (HSD_JOBJ)((Node_Generic)nodeTree.Nodes[0]).Node);
+                }
+            }
+        }
+
+        private void ExportSMD(string FileName, HSD_JOBJ jobj)
+        {
+            var bones = ((HSD_JOBJ)HSD.Roots[0].Node).DepthFirstList;
+
+            Console.WriteLine(bones.Count);
+
+            using (StreamWriter w = new StreamWriter(new FileStream(FileName, FileMode.Create)))
+            {
+                w.WriteLine("#version 1");
+
+                w.WriteLine("nodes");
+                var index = 0;
+                foreach (var j in bones)
+                {
+                    int parentIndex = -1;
+                    foreach (var n in bones)
+                        foreach (var child in n.Children)
+                            if (child == j)
+                                parentIndex = bones.IndexOf(n);
+                    w.WriteLine($"{index} \"JOBJ_{index}\" {parentIndex}");
+                    index++;
+                }
+                w.WriteLine("end");
+                w.WriteLine("skeleton");
+                index = 0;
+                foreach (var j in bones)
+                {
+                    w.WriteLine($"{index} {j.Transforms.TX} {j.Transforms.TY} {j.Transforms.TZ} {j.Transforms.RX} {j.Transforms.RY} {j.Transforms.RZ}");
+                    index++;
+                }
+                w.WriteLine("end");
+            }
+
         }
     }
 }

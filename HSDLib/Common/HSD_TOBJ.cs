@@ -1,6 +1,7 @@
 ﻿using System;
 using HSDLib.GX;
 using HSDLib.Helpers;
+using System.Drawing;
 
 namespace HSDLib.Common
 {
@@ -74,6 +75,42 @@ namespace HSDLib.Common
         public HSD_TOBJ_LOD LOD { get; set; }//
         
         public HSD_TOBJ_TEV TEV { get; set; }
+
+        /// <summary>
+        /// Creates a <see cref="Bitmap"/> of this texture
+        /// </summary>
+        /// <returns></returns>
+        public Bitmap ToBitmap()
+        {
+            if(ImageData != null && Tlut != null)
+                return TPL.ConvertFromTextureMelee(ImageData.Data, ImageData.Width, ImageData.Height, (int)ImageData.Format, Tlut.Data, Tlut.ColorCount, (int)Tlut.Format);
+
+            if (ImageData != null)
+                return TPL.ConvertFromTextureMelee(ImageData.Data, ImageData.Width, ImageData.Height, (int)ImageData.Format, null, 0, 0);
+
+            return null;
+        }
+
+        /// <summary>
+        /// Sets the image data from a <see cref="Bitmap"/>
+        /// </summary>
+        /// <param name="b"></param>
+        public void SetFromBitmap(Bitmap b, GXTexFmt imageFormat, GXTlutFmt paletteFormat)
+        {
+            byte[] palData;
+            ImageData = new HSD_Image();
+            ImageData.Width = (ushort)b.Width;
+            ImageData.Height = (ushort)b.Height;
+            ImageData.Format = imageFormat;
+            ImageData.Data = TPL.ConvertToTextureMelee(b, (int)imageFormat, (int)paletteFormat, out palData);
+            if(palData != null && palData.Length > 0)
+            {
+                Tlut = new HSD_Tlut();
+                Tlut.Format = paletteFormat;
+                Tlut.ColorCount = (ushort)(palData.Length / 2);
+                Tlut.Data = palData;
+            }
+        }
     }
 
     public class HSD_Tlut : IHSDNode

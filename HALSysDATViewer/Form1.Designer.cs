@@ -30,22 +30,23 @@
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.glControl = new OpenTK.GLControl();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.nodeTree = new System.Windows.Forms.TreeView();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openDATToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportDATToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.splitter2 = new System.Windows.Forms.Splitter();
+            this.exportSMDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            this.groupBox3.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -73,6 +74,27 @@
             this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.glControl_Paint);
             this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.glControl_MouseMove);
             this.glControl.Resize += new System.EventHandler(this.glControl_Resize);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.trackBar1);
+            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.groupBox4.Location = new System.Drawing.Point(3, 165);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(284, 71);
+            this.groupBox4.TabIndex = 4;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Animation Track";
+            // 
+            // trackBar1
+            // 
+            this.trackBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trackBar1.Location = new System.Drawing.Point(6, 19);
+            this.trackBar1.Name = "trackBar1";
+            this.trackBar1.Size = new System.Drawing.Size(272, 45);
+            this.trackBar1.TabIndex = 0;
+            this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
             // groupBox3
             // 
@@ -110,7 +132,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openDATToolStripMenuItem,
-            this.exportDATToolStripMenuItem});
+            this.exportDATToolStripMenuItem,
+            this.exportSMDToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -130,27 +153,6 @@
             this.exportDATToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.exportDATToolStripMenuItem.Text = "Export DAT";
             this.exportDATToolStripMenuItem.Click += new System.EventHandler(this.exportDATToolStripMenuItem_Click);
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.trackBar1);
-            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox4.Location = new System.Drawing.Point(3, 165);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(284, 71);
-            this.groupBox4.TabIndex = 4;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Animation Track";
-            // 
-            // trackBar1
-            // 
-            this.trackBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackBar1.Location = new System.Drawing.Point(6, 19);
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(272, 45);
-            this.trackBar1.TabIndex = 0;
-            this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
             // propertyGrid1
             // 
@@ -177,6 +179,13 @@
             this.splitter2.TabIndex = 7;
             this.splitter2.TabStop = false;
             // 
+            // exportSMDToolStripMenuItem
+            // 
+            this.exportSMDToolStripMenuItem.Name = "exportSMDToolStripMenuItem";
+            this.exportSMDToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.exportSMDToolStripMenuItem.Text = "Export SMD";
+            this.exportSMDToolStripMenuItem.Click += new System.EventHandler(this.exportSMDToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -193,12 +202,12 @@
             this.Text = "HSD Renderer";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -219,6 +228,7 @@
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.Splitter splitter2;
+        private System.Windows.Forms.ToolStripMenuItem exportSMDToolStripMenuItem;
     }
 }
 

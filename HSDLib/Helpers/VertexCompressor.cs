@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using HSDLib.Common;
+using HSDLib.Helpers.TriangleConverter;
 using System.IO;
 
 namespace HSDLib.Helpers
@@ -137,6 +138,88 @@ namespace HSDLib.Helpers
         }
         
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="triList"></param>
+        /// <param name="attrGroup"></param>
+        /// <param name="weights"></param>
+        public HSD_POBJ CreatePOBJ(List<GXVertex> triList, HSD_AttributeGroup attrGroup, List<HSD_JOBJWeight> weights)
+        {
+            TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(true, 100, 3, true);
+            int pointCount, faceCount;
+
+            var groups = converter.GroupPrimitives(triList.ToArray(), out pointCount, out faceCount);
+
+            HSD_POBJ rootPOBJ = null;
+            HSD_POBJ prevPOBJ = null;
+
+            foreach (var g in groups)
+            {
+                var jobjweights = new List<HSD_JOBJWeight>();
+                var pmidToNewID = new Dictionary<ushort, ushort>();
+                
+                foreach (var n in g._nodes)
+                {
+                    pmidToNewID.Add(n, (ushort)(jobjweights.Count * 3));
+                    jobjweights.Add(weights[n / 3]);
+                }
+
+                GXDisplayList newdl = new GXDisplayList();
+
+                foreach (var t in g._triangles)
+                {
+                    var newVert = new List<GXVertex>();
+                    for (int p = 0; p < t.Points.Count; p++)
+                    {
+                        var point = t.Points[p];
+                        point.PMXID = pmidToNewID[point.PMXID];
+                        t.Points[p] = point;
+                        newVert.Add(point);
+                        //Console.WriteLine(t.points[p].PMID + " " + point.PMXID + " " + pmidToNewID[point.PMXID] + " " + jobjweights.Count);
+
+                    }
+                    
+                    newdl.Primitives.Add(Compress(GXPrimitiveType.Triangles, newVert.ToArray(), attrGroup));
+                }
+                foreach (var t in g._tristrips)
+                {
+                    var newVert = new List<GXVertex>();
+                    for (int p = 0; p < t.Points.Count; p++)
+                    {
+                        //Console.WriteLine(t.Points[p].PMXID + " " + g._nodes.Count);
+                        var point = t.Points[p];
+                        point.PMXID = pmidToNewID[point.PMXID];
+                        t.Points[p] = point;
+                        newVert.Add(point);
+                    }
+                    newdl.Primitives.Add(Compress(GXPrimitiveType.TriangleStrip, newVert.ToArray(), attrGroup));
+                }
+
+                HSD_PointerArray<HSD_JOBJWeight> bindWeights = new HSD_PointerArray<HSD_JOBJWeight>();
+                bindWeights.Elements = jobjweights.ToArray();
+
+                var newpobj = new HSD_POBJ();
+
+                newpobj.Flags = POBJ_FLAG.ENVELOPE;
+                newpobj.BindGroups = bindWeights;
+                newpobj.VertexAttributes = attrGroup;
+                newpobj.DisplayListBuffer = newdl.ToBuffer(attrGroup);
+
+                if (prevPOBJ == null)
+                {
+                    rootPOBJ = newpobj;
+                }
+                else
+                {
+                    prevPOBJ.Next = newpobj;
+                }
+                prevPOBJ = newpobj;
+            }
+
+            return rootPOBJ;
+        }
+
+        /// <summary>
         /// Creates a primitive group for the vertex buffer
         /// </summary>
         /// <param name="type"></param>
@@ -178,6 +261,7 @@ namespace HSDLib.Helpers
                                 case GXAttribName.GX_VA_NRM: ig.Indices[i] = GetIndex(b, v.Nrm); break;
                                 case GXAttribName.GX_VA_TEX0: ig.Indices[i] = GetIndex(b, v.TEX0); break;
                                 case GXAttribName.GX_VA_TEX1: ig.Indices[i] = GetIndex(b, v.TEX1); break;
+                                case GXAttribName.GX_VA_CLR0: ig.Indices[i] = GetIndex(b, v.Clr0); break;
                                 default:
                                     throw new Exception("Error Building " + b.Name);
                             }

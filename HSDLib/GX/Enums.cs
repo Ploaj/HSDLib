@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HSDLib.GX
+﻿namespace HSDLib.GX
 {
-
     public enum GXAnisotropy
     {
         GX_ANISO_1, GX_ANISO_2, GX_ANISO_4, GX_MAX_ANISOTROPY
@@ -14,17 +7,50 @@ namespace HSDLib.GX
 
     public enum GXTexFmt
     {
+        /// <summary>
+        /// Intensity, 4bpp
+        /// </summary>
         I4 = 0,
-        I8,
-        IA4,
-        IA8,
-        RGB565,
-        RGB5A3,
-        RGBA8,
-        CI4,
-        CI8,
-        CI14x2,
-        CMPR
+        /// <summary>
+        /// Intensity, 8bpp
+        /// </summary>
+        I8 = 1,
+        /// <summary>
+        /// Intensity, Alpha, 8bpp
+        /// </summary>
+        IA4 = 2,
+        /// <summary>
+        /// Intensity, Alpha, 16bpp
+        /// </summary>
+        IA8 = 3,
+        /// <summary>
+        /// RGB, 16bpp
+        /// </summary>
+        RGB565 = 4,
+        /// <summary>
+        /// RGB, Alpha, 16bpp
+        /// </summary>
+        RGB5A3 = 5,
+        /// <summary>
+        /// RGB, Alpha, 32bpp
+        /// </summary>
+        RGBA8 = 6,
+        /// <summary>
+        /// Indexed, 4bpp
+        /// </summary>
+        CI4 = 8,
+        /// <summary>
+        /// Indexed, 8bpp
+        /// </summary>
+        CI8 = 9,
+        /// <summary>
+        /// Indexed, 14bpp
+        /// </summary>
+        CI14X2 = 10,
+        /// <summary>
+        /// S3TC Compressed
+        /// </summary>
+        CMP = 14,
     }
 
     public enum GXTexMapID

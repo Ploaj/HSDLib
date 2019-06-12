@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Reflection;
-using HSDLib.Common;
+using System.Security.Cryptography;
 
 namespace HSDLib
 {
@@ -33,7 +29,7 @@ namespace HSDLib
         private Dictionary<object, uint> ObjectOffsets = new Dictionary<object, uint>();
         private Dictionary<object, uint> ObjectOffsetsHOLD;
         private Dictionary<object, uint> BufferOffsets = new Dictionary<object, uint>();
-        private List<byte[]> Writtenbuffers = new List<byte[]>();
+        private HashSet<string> Writtenbuffers = new HashSet<string>();
         public WriterWriteMode Mode
         {
             get
@@ -66,27 +62,42 @@ namespace HSDLib
         public void WriteTexture(byte[] b)
         {
             if (Mode != WriterWriteMode.TEXTURE) return;
-            if (Writtenbuffers.Contains(b)) return;
-            Writtenbuffers.Add(b);
+            string key = "";
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                key = Convert.ToBase64String(sha256Hash.ComputeHash(b));
+            }
+            if (Writtenbuffers.Contains(key)) return;
+            Writtenbuffers.Add(key);
             Align(0x20);
-            BufferOffsets.Add(b, (uint)BaseStream.Position);
+            BufferOffsets.Add(key, (uint)BaseStream.Position);
             Write(b);
             Align(0x20);
         }
 
         public void WriteBuffer(byte[] b, int align = 0x20)
         {
+            if (b == null)
+                return;
+            string key = "";
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                key = Convert.ToBase64String(sha256Hash.ComputeHash(b));
+            }
             if (Mode != WriterWriteMode.BUFFER) return;
-            if (Writtenbuffers.Contains(b)) return;
-            Writtenbuffers.Add(b);
+            if (Writtenbuffers.Contains(key)) return;
+            Writtenbuffers.Add(key);
             Align(align);
-            BufferOffsets.Add(b, (uint)BaseStream.Position);
+            BufferOffsets.Add(key, (uint)BaseStream.Position);
             Write(b);
             Align(align);
         }
         
         public void WriteObject(IHSDNode o)
         {
+            if (o == null)
+                return;
+            Align(4);
             if (!ObjectOffsets.ContainsKey(o))
                 o.Save(this);
         }
@@ -203,11 +214,19 @@ namespace HSDLib
         {
             foreach(RelocationPointer pointer in Pointers)
             {
-                if (ObjectOffsets.ContainsKey(pointer.Object))
-                    WriteAt((int)pointer.Offset, ObjectOffsets[pointer.Object] - 0x20);
+                var obj = pointer.Object;
+                if (obj is byte[] buffer)
+                {
+                    using (SHA256 sha256Hash = SHA256.Create())
+                    {
+                        obj = Convert.ToBase64String(sha256Hash.ComputeHash(buffer));
+                    }
+                }
+                if (ObjectOffsets.ContainsKey(obj))
+                    WriteAt((int)pointer.Offset, ObjectOffsets[obj] - 0x20);
                 else
-                if (BufferOffsets.ContainsKey(pointer.Object))
-                    WriteAt((int)pointer.Offset, BufferOffsets[pointer.Object] - 0x20);
+                if (BufferOffsets.ContainsKey(obj))
+                    WriteAt((int)pointer.Offset, BufferOffsets[obj] - 0x20);
                 if (write)
                     Write(pointer.Offset - 0x20);
             }

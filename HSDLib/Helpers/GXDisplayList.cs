@@ -116,6 +116,8 @@ namespace HSDLib.Helpers
                     clr[2] = Reader.ReadByte();
                     clr[3] = Reader.ReadByte();
                     break;
+                default:
+                    throw new Exception("Unknown Color Type");
             }
 
             return clr;
@@ -207,7 +209,7 @@ namespace HSDLib.Helpers
     public class GXDisplayList
     {
         public List<GXPrimitiveGroup> Primitives = new List<GXPrimitiveGroup>();
-
+        
         public GXDisplayList()
         {
 
@@ -215,6 +217,8 @@ namespace HSDLib.Helpers
 
         public GXDisplayList(byte[] Buffer, HSD_AttributeGroup Group)
         {
+            if (Buffer == null)
+                return;
             HSDReader Reader = new HSDReader(new MemoryStream(Buffer));
             while(Reader.Position() < Buffer.Length)
             {
@@ -242,6 +246,7 @@ namespace HSDLib.Helpers
             Writer.Close();
             byte[] bytes = o.ToArray();
             o.Close();
+
             return bytes;
         }
     }

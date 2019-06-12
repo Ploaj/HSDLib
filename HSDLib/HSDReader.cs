@@ -151,17 +151,17 @@ namespace HSDLib
 
         public T ReadObject<T>(uint Offset, T Type) where T : IHSDNode
         {
-            T Object = Activator.CreateInstance<T>();
-
             if (Offset <= 0 || Offset == 0xFFFFFFFF)
                 return null;
 
             if (NodeCache.ContainsKey(Offset))
                 return (T)NodeCache[Offset];
 
+            T Object = Activator.CreateInstance<T>();
+
+            NodeCache.Add(Offset, Object);
             Seek(Offset);
             Object.Open(this);
-            NodeCache.Add(Offset, Object);
             return Object;
         }
 

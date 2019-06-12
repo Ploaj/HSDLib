@@ -138,16 +138,36 @@ namespace HSDLib.Helpers
                             Vertex.TEX1.Y = f[1] / (float)Math.Pow(2, Attr.Scale);
                             break;
                         case GXAttribName.GX_VA_CLR0:
-                            Vertex.Clr0.R = ig.Clr0[0] / 255f;
-                            Vertex.Clr0.G = ig.Clr0[1] / 255f;
-                            Vertex.Clr0.B = ig.Clr0[2] / 255f;
-                            Vertex.Clr0.A = ig.Clr0[3] / 255f;
-                            break;
+                            if(Attr.AttributeType == GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.Clr0.R = ig.Clr0[0] / 255f;
+                                Vertex.Clr0.G = ig.Clr0[1] / 255f;
+                                Vertex.Clr0.B = ig.Clr0[2] / 255f;
+                                Vertex.Clr0.A = ig.Clr0[3] / 255f;
+                            }
+                            if (Attr.AttributeType == GXAttribType.GX_INDEX8)
+                            {
+                                Vertex.Clr0.R = f[0];
+                                Vertex.Clr0.G = f[1];
+                                Vertex.Clr0.B = f[2];
+                                Vertex.Clr0.A = f[3];
+                            }
+                                break;
                         case GXAttribName.GX_VA_CLR1:
-                            Vertex.Clr1.R = ig.Clr1[0] / 255f;
-                            Vertex.Clr1.G = ig.Clr1[1] / 255f;
-                            Vertex.Clr1.B = ig.Clr1[2] / 255f;
-                            Vertex.Clr1.A = ig.Clr1[3] / 255f;
+                            if (Attr.AttributeType == GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.Clr1.R = ig.Clr1[0] / 255f;
+                                Vertex.Clr1.G = ig.Clr1[1] / 255f;
+                                Vertex.Clr1.B = ig.Clr1[2] / 255f;
+                                Vertex.Clr1.A = ig.Clr1[3] / 255f;
+                            }
+                            if (Attr.AttributeType == GXAttribType.GX_INDEX8)
+                            {
+                                Vertex.Clr1.R = f[0];
+                                Vertex.Clr1.G = f[1];
+                                Vertex.Clr1.B = f[2];
+                                Vertex.Clr1.A = f[3];
+                            }
                             break;
                         default:
                             Console.WriteLine("To be implemented: " + Attr.Name);
@@ -156,6 +176,10 @@ namespace HSDLib.Helpers
                 }
                 Vertices.Add(Vertex);
             }
+
+            foreach (var b in Buffers)
+                if(b.Value != null)
+                    b.Value.Dispose();
             
 
             return Vertices.ToArray();
