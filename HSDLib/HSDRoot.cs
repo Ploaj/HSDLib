@@ -2,6 +2,7 @@
 using HSDLib.Animation;
 using HSDLib.MaterialAnimation;
 using HSDLib.KAR;
+using HSDLib.Melee.PlData;
 
 namespace HSDLib
 {
@@ -53,6 +54,10 @@ namespace HSDLib
             {
                 Node = Reader.ReadObject<KAR_GrData>(Offset);
             }
+            else if (Name.StartsWith("ftData"))
+            {
+                Node = Reader.ReadObject<SBM_FighterData>(Offset);
+            }
         }
 
         public override void Save(HSDWriter Writer)
@@ -62,6 +67,9 @@ namespace HSDLib
 
             // the correct order is probably buffer->images->jobjweights->attributegroups->dobj/pobj->jobjs
             // but it probably doesn't matter?
+            Writer.Mode = WriterWriteMode.STRING;
+            Node.Save(Writer);
+
             Writer.Mode = WriterWriteMode.BUFFER;
             Node.Save(Writer);
 

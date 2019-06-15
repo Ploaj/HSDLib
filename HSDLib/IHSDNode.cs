@@ -118,7 +118,10 @@ namespace HSDLib
                     if (type == typeof(bool))
                     prop.SetValue(this, Reader.ReadBoolean());
                 else
-                    if (type == typeof(byte))
+                    if (type == typeof(string))
+                    prop.SetValue(this, Reader.ReadString(Reader.ReadInt32()));
+                else
+                if (type == typeof(byte))
                 {
                     if (type.IsEnum)
                     {
@@ -225,6 +228,12 @@ namespace HSDLib
                 else
                 if (type == typeof(bool))
                     Writer.Write((bool)prop.GetValue(this));
+                else
+                if (type == typeof(string))
+                    if ((string)prop.GetValue(this) != "")
+                        Writer.WritePointer(prop.GetValue(this));
+                    else
+                        Writer.Write(0);
                 else
                 if (type == typeof(byte))
                 {

@@ -10,7 +10,8 @@ namespace HSDLib
     {
         NORMAL,
         BUFFER, 
-        TEXTURE
+        TEXTURE,
+        STRING
     }
 
     /// <summary>
@@ -77,16 +78,19 @@ namespace HSDLib
 
         public void WriteBuffer(byte[] b, int align = 0x20)
         {
-            if (b == null)
-                return;
+            if (b == null) return;
+            if (Mode != WriterWriteMode.BUFFER) return;
+
             string key = "";
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 key = Convert.ToBase64String(sha256Hash.ComputeHash(b));
             }
-            if (Mode != WriterWriteMode.BUFFER) return;
+
             if (Writtenbuffers.Contains(key)) return;
+
             Writtenbuffers.Add(key);
+
             Align(align);
             BufferOffsets.Add(key, (uint)BaseStream.Position);
             Write(b);
@@ -117,8 +121,24 @@ namespace HSDLib
             ObjectOffsets.Add(o, (uint)BaseStream.Position);
         }
 
+        public void AddBuffer(object o)
+        {
+            if (Mode != WriterWriteMode.BUFFER) return;
+            if(!BufferOffsets.ContainsKey(o))
+            BufferOffsets.Add(o, (uint)BaseStream.Position);
+        }
+
+        public Dictionary<string, long> stringOffsets = new Dictionary<string, long>();
         public void WritePointer(object Object)
         {
+            if (Object is string s && Mode == WriterWriteMode.STRING)
+            {
+                if (stringOffsets.ContainsKey(s))
+                    return;
+                stringOffsets.Add(s, (uint)BaseStream.Position);
+                Write(s.ToCharArray());
+                Write(new byte[4 - (BaseStream.Position % 4)]);
+            }
             if (Mode != WriterWriteMode.NORMAL) return;
             if (Object == null)
             {
@@ -212,7 +232,7 @@ namespace HSDLib
 
         public int WriteRelocationTable(bool write = true)
         {
-            foreach(RelocationPointer pointer in Pointers)
+            foreach (RelocationPointer pointer in Pointers)
             {
                 var obj = pointer.Object;
                 if (obj is byte[] buffer)
@@ -222,11 +242,20 @@ namespace HSDLib
                         obj = Convert.ToBase64String(sha256Hash.ComputeHash(buffer));
                     }
                 }
+
+                if (BufferOffsets.ContainsKey(obj))
+                {
+                    WriteAt((int)pointer.Offset, BufferOffsets[obj] - 0x20);
+                }
+                else
+                if (obj is string str) // TODO: fix
+                {
+                    if (stringOffsets.ContainsKey(str))
+                        WriteAt((int)pointer.Offset, (uint)stringOffsets[str] - 0x20);
+                }
+                else
                 if (ObjectOffsets.ContainsKey(obj))
                     WriteAt((int)pointer.Offset, ObjectOffsets[obj] - 0x20);
-                else
-                if (BufferOffsets.ContainsKey(obj))
-                    WriteAt((int)pointer.Offset, BufferOffsets[obj] - 0x20);
                 if (write)
                     Write(pointer.Offset - 0x20);
             }

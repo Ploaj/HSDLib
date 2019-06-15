@@ -94,7 +94,7 @@ namespace HALSysDATViewer
             if (nodeTree.SelectedNode is Node_JOBJ)
             {
                 HSD_JOBJ j = ((Node_JOBJ)nodeTree.SelectedNode).JOBJ;
-                if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                //if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                     Renderer.RootNode = j;
             }
             if (nodeTree.SelectedNode is Node_Generic)
@@ -103,7 +103,7 @@ namespace HALSysDATViewer
                 if(Node is HSD_JOBJ)
                 {
                     HSD_JOBJ j = (HSD_JOBJ)Node;
-                    if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || j.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
+                    if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || j.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA) || j.Flags.HasFlag(JOBJ_FLAG.ROOT_XLU))
                         Renderer.RootNode = j;
                 }
                 if (Node is HSD_FigaTree)
@@ -239,14 +239,14 @@ namespace HALSysDATViewer
 
                 if(d.ShowDialog() == DialogResult.OK)
                 {
-                    ExportSMD(d.FileName, (HSD_JOBJ)((Node_Generic)nodeTree.Nodes[0]).Node);
+                    ExportSMD(d.FileName, (HSD_JOBJ)((Node_Generic)nodeTree.SelectedNode).Node);
                 }
             }
         }
 
         private void ExportSMD(string FileName, HSD_JOBJ jobj)
         {
-            var bones = ((HSD_JOBJ)HSD.Roots[0].Node).DepthFirstList;
+            var bones = ((HSD_JOBJ)((Node_Generic)nodeTree.SelectedNode).Node).DepthFirstList;
 
             Console.WriteLine(bones.Count);
 

@@ -54,7 +54,6 @@ namespace HSDLib.Helpers
                     double value = 0;
                     double tan = 0;
                     int time = 0;
-
                     switch (interpolation)
                     {
                         case InterpolationType.Step:
@@ -83,12 +82,13 @@ namespace HSDLib.Helpers
                         default:
                             throw new Exception("Unknown Interpolation Type " + interpolation.ToString("X"));
                     }
+                    //Console.WriteLine(clock + " " + value + " " + FOBJ.ValueFormat );
 
                     FOBJKey kf = new FOBJKey();
                     kf.InterpolationType = interpolation;
                     kf.Value = (float)value;
                     kf.Frame = clock;
-                    kf.Tan = (float)(tan);
+                    kf.Tan = (float)tan;
                     Keys.Add(kf);
                     clock += time;
                 }
@@ -115,19 +115,6 @@ namespace HSDLib.Helpers
                     return 0;
             }
         }
-
-        /*public float GetValueAt(float Time)
-        {
-            List<FOBJKey> Keys = GetKeys();
-            
-            for(int i = 0; i < Keys.Count; i++)
-            {
-                if(Time > Keys.Count)
-                {
-
-                }
-            }
-        }*/
 
         public void Dispose()
         {

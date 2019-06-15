@@ -64,6 +64,7 @@
     <Compile Include="Helpers\GXDisplayList.cs" />
     <Compile Include="GX\GXVertexBuffer.cs" />
     <Compile Include="Helpers\FOBJFrameEncoder.cs" />
+    <Compile Include="Helpers\MeleeScript.cs" />
     <Compile Include="Helpers\PrimitiveGroup.cs" />
     <Compile Include="Helpers\TextureConverter\Shared.cs" />
     <Compile Include="Helpers\TextureConverter\TPL.cs" />
@@ -104,10 +105,12 @@
     <Compile Include="MaterialAnimation\HSD_MatAnim.cs" />
     <Compile Include="MaterialAnimation\HSD_MatAnimJoint.cs" />
     <Compile Include="MaterialAnimation\HSD_TexAnim.cs" />
+    <Compile Include="Melee\PlData\SBM_FighterArticle.cs" />
+    <Compile Include="Melee\PlData\SBM_FighterAttributes.cs" />
+    <Compile Include="Melee\PlData\SBM_FighterData.cs" />
+    <Compile Include="Melee\PlData\SBM_FighterSubAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Melee\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

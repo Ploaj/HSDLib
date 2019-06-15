@@ -137,6 +137,18 @@ namespace HSDLib
             return str;
         }
 
+        public string ReadString(int position)
+        {
+            var temp = BaseStream.Position;
+            BaseStream.Position = position;
+            string str = "";
+            char ch;
+            while ((ch = ReadChar()) != 0)
+                str = str + ch;
+            BaseStream.Position = temp;
+            return str;
+        }
+
         public uint Position()
         {
             return (uint)BaseStream.Position;
