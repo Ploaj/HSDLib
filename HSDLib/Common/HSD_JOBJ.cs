@@ -64,5 +64,6 @@ namespace HSDLib.Common
             if (ROBJOffset != 0)
                 throw new Exception("Path in joint detected");
         }
+
     }
 }

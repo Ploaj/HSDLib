@@ -52,6 +52,7 @@
     <Compile Include="Common\HSD_IOBJ.cs" />
     <Compile Include="Common\HSD_JOBJ.cs" />
     <Compile Include="Common\HSD_JOBJWeight.cs" />
+    <Compile Include="Common\HSD_LOBJ.cs" />
     <Compile Include="Common\HSD_Matrix3x3.cs" />
     <Compile Include="Common\HSD_MOBJ.cs" />
     <Compile Include="Common\HSD_POBJ.cs" />
@@ -90,8 +91,14 @@
     <Compile Include="HSDRoot.cs" />
     <Compile Include="Animation\FOBJDesc.cs" />
     <Compile Include="Animation\HSD_AOBJ.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrCollisionNode.cs" />
     <Compile Include="KAR\GroundData\KAR_GrData.cs" />
     <Compile Include="KAR\GroundData\KAR_GrDataStageNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrLightNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrPartitionNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrPositionNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrYakumonoNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrSplineNode.cs" />
     <Compile Include="KAR\GroundModel\KAR_GrModel.cs" />
     <Compile Include="KAR\GroundModel\KAR_GrModelMotion.cs" />
     <Compile Include="KAR\VehicleData\KAR_VcAttributes.cs" />
