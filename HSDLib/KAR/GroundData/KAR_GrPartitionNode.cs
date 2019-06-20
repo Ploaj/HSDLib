@@ -134,7 +134,7 @@ namespace HSDLib.KAR
             Writer.Write((short)Partitions.Count);
             Writer.Write((short)0);
 
-            Writer.Write(0x00000005);
+            Writer.Write(0x05000000);
             Writer.WritePointer(CollidableTriangles);
             Writer.Write((short)CollidableTriangles.Count);
             Writer.Write((short)0);

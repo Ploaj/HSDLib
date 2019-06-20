@@ -33,7 +33,6 @@ namespace HSDLib.KAR
         public KAR_GrPositionList ItemAreaPositions { get; set; }
 
         public KAR_GrPositionList VehicleAreaPositions { get; set; }
-
     }
 
     public class KAR_GrPositionList : IHSDNode

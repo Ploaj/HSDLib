@@ -19,8 +19,12 @@ namespace HSDLib.KAR
         public int VertexSize { get; set; }
         public int FaceStart { get; set; }
         public int FaceSize { get; set; }
-        public int UnknownStart { get; set; }
-        public int UnknownSize { get; set; }
+        public int UnknownStart1 { get; set; }
+        public int UnknownSize1 { get; set; }
+        public int UnknownStart2 { get; set; }
+        public int UnknownSize2 { get; set; }
+        public int UnknownStart3 { get; set; }
+        public int UnknownSize3 { get; set; }
     }
 
     public class KAR_GrCollisionNode : IHSDNode
