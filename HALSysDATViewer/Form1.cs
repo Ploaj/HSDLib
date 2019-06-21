@@ -10,6 +10,7 @@ using OpenTK.Graphics.OpenGL;
 using HALSysDATViewer.Rendering;
 using HALSysDATViewer.Modeling;
 using System.IO;
+using HSDLib.KAR;
 
 namespace HALSysDATViewer
 {
@@ -17,6 +18,7 @@ namespace HALSysDATViewer
     {
         public HSDFile HSD;
         public JOBJRenderer Renderer;
+        public GrDataRenderer GrDataRenderer;
 
         private ContextMenu DOBJ_Context;
 
@@ -97,6 +99,7 @@ namespace HALSysDATViewer
                 //if (j.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                     Renderer.RootNode = j;
             }
+            GrDataRenderer.Data = null;
             if (nodeTree.SelectedNode is Node_Generic)
             {
                 IHSDNode Node = ((Node_Generic)nodeTree.SelectedNode).Node;
@@ -110,6 +113,11 @@ namespace HALSysDATViewer
                 {
                     Renderer.FigaTree = (HSD_FigaTree)Node;
                     trackBar1.Maximum = (int)((HSD_FigaTree)Node).FrameCount;
+                }
+                if (Node is KAR_GrData data)
+                {
+                    GrDataRenderer.Data = data;
+                    //Tools.CollisionBucket.Export("test.obj", data);
                 }
                 propertyGrid1.SelectedObject = Node;
             }
@@ -136,6 +144,7 @@ namespace HALSysDATViewer
 
             Renderer = new JOBJRenderer();
             //Renderer.SetHSD(smd.RootJOBJ);
+            GrDataRenderer = new GrDataRenderer();
         }
 
         private void Application_Idle(object sender, EventArgs e)
@@ -179,6 +188,8 @@ namespace HALSysDATViewer
 
             //RenderHere
             Renderer.Render(ref Camera);
+
+            GrDataRenderer.Render();
 
             GL.PopAttrib();
             glControl.SwapBuffers();

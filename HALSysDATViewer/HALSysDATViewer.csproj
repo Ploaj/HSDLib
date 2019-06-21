@@ -68,11 +68,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DrawTools.cs" />
+    <Compile Include="Rendering\GrDataRenderer.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\JOBJRenderer.cs" />
     <Compile Include="Rendering\Math3D.cs" />
     <Compile Include="Rendering\Shader.cs" />
     <Compile Include="Rendering\TextureManager.cs" />
+    <Compile Include="Tools\CollisionBucket.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

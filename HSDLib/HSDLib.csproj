@@ -99,8 +99,12 @@
     <Compile Include="KAR\GroundData\KAR_GrPositionNode.cs" />
     <Compile Include="KAR\GroundData\KAR_GrYakumonoNode.cs" />
     <Compile Include="KAR\GroundData\KAR_GrSplineNode.cs" />
+    <Compile Include="KAR\GroundModel\KAR_GrBoundingShapes.cs" />
+    <Compile Include="KAR\GroundModel\KAR_GrMainModel.cs" />
     <Compile Include="KAR\GroundModel\KAR_GrModel.cs" />
+    <Compile Include="KAR\GroundModel\KAR_GrModelBounding.cs" />
     <Compile Include="KAR\GroundModel\KAR_GrModelMotion.cs" />
+    <Compile Include="KAR\GroundModel\KAR_GrSkyBoxModel.cs" />
     <Compile Include="KAR\VehicleData\KAR_VcAttributes.cs" />
     <Compile Include="KAR\VehicleData\KAR_VcCollisionAttributes.cs" />
     <Compile Include="KAR\VehicleData\KAR_VcCollisionSphere.cs" />
@@ -118,6 +122,8 @@
     <Compile Include="Melee\PlData\SBM_FighterSubAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Melee\GrData\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

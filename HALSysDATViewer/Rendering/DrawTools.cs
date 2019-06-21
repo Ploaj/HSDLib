@@ -66,5 +66,32 @@ namespace HALSysDATViewer.Rendering
 
             GL.Enable(EnableCap.DepthTest);
         }
+
+        public static void DrawBoundingBox(Vector3 start, Vector3 end, Vector3 color)
+        {
+            GL.LineWidth(3f);
+            GL.Color3(color);
+            GL.Begin(PrimitiveType.Lines);
+
+            GL.Vertex3(start.X, start.Y, start.Z);
+            GL.Vertex3(end.X, start.Y, start.Z);
+
+            GL.Vertex3(start.X, start.Y, start.Z);
+            GL.Vertex3(start.X, end.Y, start.Z);
+
+            GL.Vertex3(start.X, start.Y, start.Z);
+            GL.Vertex3(start.X, start.Y, end.Z);
+
+            GL.Vertex3(end.X, end.Y, end.Z);
+            GL.Vertex3(start.X, end.Y, end.Z);
+
+            GL.Vertex3(end.X, end.Y, end.Z);
+            GL.Vertex3(end.X, start.Y, end.Z);
+
+            GL.Vertex3(end.X, end.Y, end.Z);
+            GL.Vertex3(end.X, end.Y, start.Z);
+
+            GL.End();
+        }
     }
 }

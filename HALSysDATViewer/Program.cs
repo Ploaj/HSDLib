@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using HSDLib.Common;
-using HSDLib.Helpers.TriangleConverter;
-using HSDLib.Helpers;
 
 namespace HALSysDATViewer
 {
