@@ -3,6 +3,7 @@ using HSDLib.Animation;
 using HSDLib.MaterialAnimation;
 using HSDLib.KAR;
 using HSDLib.Melee.PlData;
+using HSDLib.Melee;
 
 namespace HSDLib
 {
@@ -58,6 +59,30 @@ namespace HSDLib
             {
                 Node = Reader.ReadObject<SBM_FighterData>(Offset);
             }
+            else if (Name.StartsWith("grGroundParam"))
+            {
+                Node = Reader.ReadObject<SBM_GrGroundParam>(Offset);
+            }
+            else if (Name.StartsWith("coll_data"))
+            {
+                Node = Reader.ReadObject<SBM_GrCollData>(Offset);
+            }
+            else if (Name.StartsWith("map_plit"))
+            {
+                Node = Reader.ReadObject<SBM_GrMapPLIT>(Offset);
+            }
+            else if (Name.StartsWith("ALDYakuAll"))
+            {
+                Node = Reader.ReadObject<SBM_GrYakuAll>(Offset);
+            }
+            else if (Name.StartsWith("map_head"))
+            {
+                Node = Reader.ReadObject<SBM_GrMapHead>(Offset);
+            }
+            else if (Name.StartsWith("map_texg"))
+            {
+                Node = Reader.ReadObject<SBM_GrMapTexG>(Offset);
+            }
         }
 
         public override void Save(HSDWriter Writer)
@@ -67,19 +92,10 @@ namespace HSDLib
 
             // the correct order is probably buffer->images->jobjweights->attributegroups->dobj/pobj->jobjs
             // but it probably doesn't matter?
-            Writer.Mode = WriterWriteMode.STRING;
+            if (Node == null)
+                return;
+            
             Node.Save(Writer);
-
-            Writer.Mode = WriterWriteMode.BUFFER;
-            Node.Save(Writer);
-
-            Writer.Mode = WriterWriteMode.NORMAL;
-            Node.Save(Writer);
-
-            Writer.Mode = WriterWriteMode.TEXTURE;
-            Node.Save(Writer);
-
-            Writer.Mode = WriterWriteMode.NORMAL;
         }
     }
 }

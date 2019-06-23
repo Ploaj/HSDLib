@@ -141,7 +141,9 @@ namespace HSDLib
             Writer.Write(0);
 
             // Write Data
-            foreach(HSDRoot r in Roots)
+
+            Writer.Mode = WriterWriteMode.STRING;
+            foreach (HSDRoot r in Roots)
             {
                 r.Save(Writer);
             }
@@ -149,6 +151,38 @@ namespace HSDLib
             {
                 r.Save(Writer);
             }
+
+            Writer.Mode = WriterWriteMode.BUFFER;
+            foreach (HSDRoot r in Roots)
+            {
+                r.Save(Writer);
+            }
+            foreach (HSDRoot r in Resources)
+            {
+                r.Save(Writer);
+            }
+
+            Writer.Mode = WriterWriteMode.NORMAL;
+            foreach (HSDRoot r in Roots)
+            {
+                r.Save(Writer);
+            }
+            foreach (HSDRoot r in Resources)
+            {
+                r.Save(Writer);
+            }
+
+            Writer.Mode = WriterWriteMode.TEXTURE;
+            foreach (HSDRoot r in Roots)
+            {
+                r.Save(Writer);
+            }
+            foreach (HSDRoot r in Resources)
+            {
+                r.Save(Writer);
+            }
+
+            Writer.Mode = WriterWriteMode.NORMAL;
             //write relocation table
             uint RelocOffset = (uint)Writer.BaseStream.Position;
             uint RelocCount = (uint)Writer.WriteRelocationTable();

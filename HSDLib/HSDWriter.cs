@@ -256,6 +256,7 @@ namespace HSDLib
                 else
                 if (ObjectOffsets.ContainsKey(obj))
                     WriteAt((int)pointer.Offset, ObjectOffsets[obj] - 0x20);
+                
                 if (write)
                     Write(pointer.Offset - 0x20);
             }

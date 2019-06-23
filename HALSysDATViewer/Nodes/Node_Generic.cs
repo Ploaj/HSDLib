@@ -13,6 +13,8 @@ namespace HALSysDATViewer.Nodes
         public Node_Generic(IHSDNode Node)
         {
             this.Node = Node;
+            if (Node == null)
+                return;
 
             if(Node.GetType() == typeof(HSD_JOBJ))
             {

@@ -88,7 +88,7 @@ namespace HSDRawViewer
                     if (rootStrings[i].Contains("grData"))
                         name = "GrData";
 
-                    RootNodes.Add(new DataNode(name, rootOffsets[i], offsetToData[rootOffsets[i]]));
+                    RootNodes.Add(new DataNode(rootStrings[i], rootOffsets[i], offsetToData[rootOffsets[i]]));
                 }
             }
         }

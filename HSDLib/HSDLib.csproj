@@ -116,14 +116,18 @@
     <Compile Include="MaterialAnimation\HSD_MatAnim.cs" />
     <Compile Include="MaterialAnimation\HSD_MatAnimJoint.cs" />
     <Compile Include="MaterialAnimation\HSD_TexAnim.cs" />
+    <Compile Include="Melee\GrData\SBM_GrCollData.cs" />
+    <Compile Include="Melee\GrData\SBM_GrGroundParam.cs" />
+    <Compile Include="Melee\GrData\SBM_GrMapHead.cs" />
+    <Compile Include="Melee\GrData\SBM_GrMapPLIT.cs" />
+    <Compile Include="Melee\GrData\SBM_GrMapTexG.cs" />
+    <Compile Include="Melee\GrData\SBM_GrYakuAll.cs" />
     <Compile Include="Melee\PlData\SBM_FighterArticle.cs" />
     <Compile Include="Melee\PlData\SBM_FighterAttributes.cs" />
     <Compile Include="Melee\PlData\SBM_FighterData.cs" />
     <Compile Include="Melee\PlData\SBM_FighterSubAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Melee\GrData\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

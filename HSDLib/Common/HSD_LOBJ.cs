@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSDLib.Animation;
+using System;
 
 namespace HSDLib.Common
 {
@@ -24,6 +25,21 @@ namespace HSDLib.Common
         LOBJ_DIFF_DIRTY = (1 << 7),
         LOBJ_SPEC_DIRTY = (1 << 8)
     }
+    
+    public class HSD_Light : IHSDNode
+    {
+        public HSD_LOBJ LightObject { get; set; }
+
+        public HSD_LightAnimPointer AnimPointer { get; set; }
+    }
+
+    public class HSD_LightAnimPointer : IHSDNode
+    {
+        public HSD_AOBJ LightAnim { get; set; }
+
+        public int Unknown { get; set; }
+    }
+
     public class HSD_LOBJ : IHSDList<HSD_LOBJ>
     {
         public int ClassName { get; set; }
