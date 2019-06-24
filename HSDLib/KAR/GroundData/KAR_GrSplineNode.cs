@@ -5,7 +5,7 @@ namespace HSDLib.KAR
 {
     public class KAR_GrSplineNode : IHSDNode
     {
-        public KAR_GrCourseSplineSetup CourseSplineSetup { get; set; }
+        /*public KAR_GrCourseSplineSetup CourseSplineSetup { get; set; }
 
         public KAR_GrSplineSetup RangeSplineSetup { get; set; }
         public KAR_GrSplineSetup GravitySplineSetup { get; set; }
@@ -15,41 +15,9 @@ namespace HSDLib.KAR
 
         public KAR_GrCourseSpline UnknownGetSplineDataAll { get; set; }
         
-        public KAR_GrSplineSetup RailSplineSetup { get; set; }
+        public KAR_GrSplineSetup RailSplineSetup { get; set; }*/
     }
-
-    public class KAR_GrFlowSetup : IHSDNode
-    {
-        public KAR_GrCourseSpline Spline { get; set; }
-        public int Unknown { get; set; }
-    }
-
-    public class KAR_GrCourseSplineSetup : IHSDNode
-    {
-        public KAR_GrCourseSpline CourseSplineList { get; set; }
-        public KAR_GrCourseSplineTable UnknownList { get; set; }
-        public KAR_GrCourseSplineTable UnknownList2 { get; set; }
-        public KAR_GrCourseSplineTable UnknownList3 { get; set; }
-        public int Loop { get; set; } = 1;
-        public int UnknownPointer { get; set; }
-        public int Unknown3 { get; set; }
-        public KAR_GrCourseUnknownFloats UnknownFloats { get; set; }
-        public int UnknownRuntime1 { get; set; } // runtime variable
-        public int UnknownRuntime2 { get; set; } // runtime variable
-        public int Unknown7 { get; set; }
-        public int UnknownRuntime3 { get; set; } // runtime variable
-        public int UnknownRuntime4 { get; set; } // runtime variable
-        public int UnknownRuntime5 { get; set; } // runtime variable
-    }
-
-    public class KAR_GrCourseUnknownFloats
-    {
-        public float V1 { get; set; }
-        public float V2 { get; set; }
-        public float V3 { get; set; }
-        public float V4 { get; set; }
-    }
-
+    
     public class KAR_GrCourseSpline : IHSDNode
     {
         public List<HSD_Spline> Paths = new List<HSD_Spline>();

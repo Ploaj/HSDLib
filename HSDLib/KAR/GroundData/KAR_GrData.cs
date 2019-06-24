@@ -28,7 +28,7 @@
 
         public int EventNode { get; set; }// event node
 
-        public int FogNode { get; set; }// node 14 fog?
+        public KAR_GrFogNode FogNode { get; set; }
 
         public int RailCollisionNode { get; set; }// rail collision?
 
@@ -42,6 +42,12 @@
 
         public int Node20 { get; set; }// node 20 respawns?
 
-        public int UnknownNode { get; set; }// unknown
+        public int StadiumNode { get; set; }// unknown
+
+        public int UnknownNode1 { get; set; }// unknown
+
+        public int UnknownNode2 { get; set; }// unknown
+
+        public int UnknownNode3 { get; set; }// unknown
     }
 }

@@ -47,4 +47,36 @@ namespace HSDLib.KAR
         public int Unknown5 { get; set; } = -1;
         public int Unknown6 { get; set; } = 0;
     }
+
+    public class KAR_GrFlowSetup : IHSDNode
+    {
+        public KAR_GrCourseSpline Spline { get; set; }
+        public int Unknown { get; set; }
+    }
+
+    public class KAR_GrCourseSplineSetup : IHSDNode
+    {
+        public KAR_GrCourseSpline CourseSplineList { get; set; }
+        public KAR_GrCourseSplineTable UnknownList { get; set; }
+        public KAR_GrCourseSplineTable UnknownList2 { get; set; }
+        public KAR_GrCourseSplineTable UnknownList3 { get; set; }
+        public int Loop { get; set; } = 1;
+        public int UnknownPointer { get; set; }
+        public int Unknown3 { get; set; }
+        public KAR_GrCourseUnknownFloats UnknownFloats { get; set; }
+        public int UnknownRuntime1 { get; set; } // runtime variable
+        public int UnknownRuntime2 { get; set; } // runtime variable
+        public int Unknown7 { get; set; }
+        public int UnknownRuntime3 { get; set; } // runtime variable
+        public int UnknownRuntime4 { get; set; } // runtime variable
+        public int UnknownRuntime5 { get; set; } // runtime variable
+    }
+
+    public class KAR_GrCourseUnknownFloats : IHSDNode
+    {
+        public float V1 { get; set; }
+        public float V2 { get; set; }
+        public float V3 { get; set; }
+        public float V4 { get; set; }
+    }
 }

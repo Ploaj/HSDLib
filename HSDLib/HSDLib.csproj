@@ -93,6 +93,7 @@
     <Compile Include="Animation\FOBJDesc.cs" />
     <Compile Include="Animation\HSD_AOBJ.cs" />
     <Compile Include="KAR\GroundData\KAR_GrCollisionNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrFogNode.cs" />
     <Compile Include="KAR\GroundData\KAR_GrSplineSetup.cs" />
     <Compile Include="KAR\GroundData\KAR_GrData.cs" />
     <Compile Include="KAR\GroundData\KAR_GrDataStageNode.cs" />
