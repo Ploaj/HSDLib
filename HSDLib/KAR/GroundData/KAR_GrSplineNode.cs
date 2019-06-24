@@ -1,43 +1,58 @@
-﻿using HSDLib.Helpers;
-using System;
+﻿using HSDLib.Common;
 using System.Collections.Generic;
 
 namespace HSDLib.KAR
 {
     public class KAR_GrSplineNode : IHSDNode
     {
-        public KAR_GrMainPathSetup MainPathSetup { get; set; }
+        public KAR_GrCourseSplineSetup CourseSplineSetup { get; set; }
 
-        //TODO: rest of these
-        public int AIPathSetup { get; set; }
-        public int Unknown1 { get; set; }
-        public int Unknown2 { get; set; }
-        public int ConveyPath { get; set; }
-        public int Unknown3 { get; set; }
-        public int RailPath { get; set; }
+        public KAR_GrSplineSetup RangeSplineSetup { get; set; }
+        public KAR_GrSplineSetup GravitySplineSetup { get; set; }
+
+        public KAR_GrFlowSetup AirFlowSetup { get; set; }
+        public KAR_GrFlowSetup ConveyerFlowSetup { get; set; }
+
+        public KAR_GrCourseSpline UnknownGetSplineDataAll { get; set; }
+        
+        public KAR_GrSplineSetup RailSplineSetup { get; set; }
     }
 
-    public class KAR_GrMainPathSetup : IHSDNode
+    public class KAR_GrFlowSetup : IHSDNode
     {
-        public KAR_GrPathList MainPathList1 { get; set; }
-        public KAR_GrPathList MainPathList2 { get; set; }
-        public KAR_GrPathList MainPathList3 { get; set; }
-        public KAR_GrPathList MainPathList4 { get; set; }
-        public int Unknown1 { get; set; } = 1;
-        public int Unknown2 { get; set; }
+        public KAR_GrCourseSpline Spline { get; set; }
+        public int Unknown { get; set; }
+    }
+
+    public class KAR_GrCourseSplineSetup : IHSDNode
+    {
+        public KAR_GrCourseSpline CourseSplineList { get; set; }
+        public KAR_GrCourseSplineTable UnknownList { get; set; }
+        public KAR_GrCourseSplineTable UnknownList2 { get; set; }
+        public KAR_GrCourseSplineTable UnknownList3 { get; set; }
+        public int Loop { get; set; } = 1;
+        public int UnknownPointer { get; set; }
         public int Unknown3 { get; set; }
-        public int Unknown4 { get; set; }
-        public int Unknown5 { get; set; }
-        public int Unknown6 { get; set; }
+        public KAR_GrCourseUnknownFloats UnknownFloats { get; set; }
+        public int UnknownRuntime1 { get; set; } // runtime variable
+        public int UnknownRuntime2 { get; set; } // runtime variable
         public int Unknown7 { get; set; }
-        public int Unknown8 { get; set; }
-        public int Unknown9 { get; set; }
-        public int Unknown10 { get; set; }
+        public int UnknownRuntime3 { get; set; } // runtime variable
+        public int UnknownRuntime4 { get; set; } // runtime variable
+        public int UnknownRuntime5 { get; set; } // runtime variable
     }
 
-    public class KAR_GrPathList : IHSDNode
+    public class KAR_GrCourseUnknownFloats
     {
-        public List<KAR_GrPath> Paths = new List<KAR_GrPath>();
+        public float V1 { get; set; }
+        public float V2 { get; set; }
+        public float V3 { get; set; }
+        public float V4 { get; set; }
+    }
+
+    public class KAR_GrCourseSpline : IHSDNode
+    {
+        public List<HSD_Spline> Paths = new List<HSD_Spline>();
 
         public override void Open(HSDReader Reader)
         {
@@ -56,7 +71,7 @@ namespace HSDLib.KAR
                 if (offsets[i] == 0)
                     continue;
                 Reader.Seek(offsets[i]);
-                var path = new KAR_GrPath();
+                var path = new HSD_Spline();
                 path.Open(Reader);
                 Paths.Add(path);
             }
@@ -84,64 +99,34 @@ namespace HSDLib.KAR
         }
     }
 
-    public class KAR_GrPath : IHSDNode
-    {
-        public List<GXVector3> Points = new List<GXVector3>();
-        public List<float> PointPercents = new List<float>();
 
-        public float UnknownFloat;
+    public class KAR_GrCourseSplineTable : IHSDNode
+    {
+        public List<int> Indices = new List<int>();
 
         public override void Open(HSDReader Reader)
         {
-            int PathPointCount = Reader.ReadInt32();
-            if (Reader.ReadInt32() != 0)
-                throw new NotSupportedException("Dat not supported");
-            uint PointTableOffset = Reader.ReadUInt32();
-            UnknownFloat = Reader.ReadSingle();
-            uint PathTableOffset = Reader.ReadUInt32();
-            if (Reader.ReadInt32() != 0)
-                throw new NotSupportedException("Dat not supported");
-            if (Reader.ReadInt32() != 0)
-                throw new NotSupportedException("Dat not supported");
-            if (Reader.ReadInt32() != 0)
-                throw new NotSupportedException("Dat not supported");
-
-            Reader.Seek(PointTableOffset);
-            for(int i = 0; i < PathPointCount; i++)
+            var offset = Reader.ReadUInt32();
+            var count = Reader.ReadInt32();
+            
+            Reader.Seek(offset);
+            for (int i = 0; i < count; i++)
             {
-                Points.Add(new GXVector3(Reader.ReadSingle(), Reader.ReadSingle(), Reader.ReadSingle()));
-            }
-
-            Reader.Seek(PathTableOffset);
-            for (int i = 0; i < PathPointCount; i++)
-            {
-                PointPercents.Add(Reader.ReadSingle());
+                Indices.Add(Reader.ReadInt32());
             }
         }
 
         public override void Save(HSDWriter Writer)
         {
-            Writer.AddObject(Points);
-            foreach (var point in Points)
+            Writer.AddObject(Indices);
+            foreach (var p in Indices)
             {
-                Writer.Write(point.X);
-                Writer.Write(point.Y);
-                Writer.Write(point.Z);
+                Writer.Write(p);
             }
 
-            Writer.AddObject(PointPercents);
-            foreach (var per in PointPercents)
-                Writer.Write(per);
-
             Writer.AddObject(this);
-            Writer.Write(Points.Count);
-            Writer.Write(0);
-            Writer.WritePointer(Points);
-            Writer.Write(UnknownFloat);
-            Writer.WritePointer(PointPercents);
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
+            Writer.WritePointer(Indices);
+            Writer.Write(Indices.Count);
         }
     }
 }

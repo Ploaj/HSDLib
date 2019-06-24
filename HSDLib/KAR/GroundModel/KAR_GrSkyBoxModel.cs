@@ -6,7 +6,7 @@ namespace HSDLib.KAR
     {
         public HSD_JOBJ JOBJRoot { get; set; }
 
-        public uint Unknown { get; set; }
+        public KAR_GrModelMotion MotionJoint { get; set; }
     }
 
 }

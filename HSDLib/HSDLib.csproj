@@ -56,6 +56,7 @@
     <Compile Include="Common\HSD_Matrix3x3.cs" />
     <Compile Include="Common\HSD_MOBJ.cs" />
     <Compile Include="Common\HSD_POBJ.cs" />
+    <Compile Include="Common\HSD_Spline.cs" />
     <Compile Include="Common\HSD_TOBJ.cs" />
     <Compile Include="Common\HSD_Transforms.cs" />
     <Compile Include="GX\Enums.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Animation\FOBJDesc.cs" />
     <Compile Include="Animation\HSD_AOBJ.cs" />
     <Compile Include="KAR\GroundData\KAR_GrCollisionNode.cs" />
+    <Compile Include="KAR\GroundData\KAR_GrSplineSetup.cs" />
     <Compile Include="KAR\GroundData\KAR_GrData.cs" />
     <Compile Include="KAR\GroundData\KAR_GrDataStageNode.cs" />
     <Compile Include="KAR\GroundData\KAR_GrLightNode.cs" />

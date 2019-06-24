@@ -19,21 +19,52 @@ namespace HSDLib.KAR
         public int VertexSize { get; set; }
         public int FaceStart { get; set; }
         public int FaceSize { get; set; }
+        public int Unknown1 { get; set; }
+        public int Unknown2 { get; set; }
+    }
+
+    public class KAR_ZoneCollisionTriangle : IHSDNode
+    {
+        public int UnknownZone { get; set; }
+        public int V1 { get; set; }
+        public int V2 { get; set; }
+        public int V3 { get; set; }
+        public int Color { get; set; }
+        public int Unknown { get; set; }
+    }
+
+    public class KAR_ZoneCollisionJoint : IHSDNode
+    {
+        public int BoneID { get; set; }
+        public int ZoneVertexStart { get; set; }
+        public int ZoneVertexSize { get; set; }
+        public int ZoneFaceStart { get; set; }
+        public int ZoneFaceSize { get; set; }
+        public int UnknownPointer { get; set; }
+        public int Pointer { get; set; }
         public int UnknownStart1 { get; set; }
         public int UnknownSize1 { get; set; }
         public int UnknownStart2 { get; set; }
         public int UnknownSize2 { get; set; }
         public int UnknownStart3 { get; set; }
         public int UnknownSize3 { get; set; }
+        public int UnknownStart4 { get; set; }
+        public int UnknownSize4 { get; set; }
+        public int UnknownStart5 { get; set; }
+        public int UnknownSize5 { get; set; }
+        public int UnknownStart6 { get; set; }
+        public int UnknownSize6 { get; set; }
     }
 
     public class KAR_GrCollisionNode : IHSDNode
     {
         public List<GXVector3> Vertices = new List<GXVector3>();
-
         public List<KAR_CollisionTriangle> Faces = new List<KAR_CollisionTriangle>();
-
         public List<KAR_CollisionJoint> Joints = new List<KAR_CollisionJoint>();
+
+        public List<GXVector3> ZoneVertices = new List<GXVector3>();
+        public List<KAR_ZoneCollisionTriangle> ZoneFaces = new List<KAR_ZoneCollisionTriangle>();
+        public List<KAR_ZoneCollisionJoint> ZoneJoints = new List<KAR_ZoneCollisionJoint>();
 
         public override void Open(HSDReader Reader)
         {
@@ -43,12 +74,12 @@ namespace HSDLib.KAR
             var faceCount = Reader.ReadInt32();
             var jointOffset = Reader.ReadUInt32();
             var jointCount = Reader.ReadInt32();
-            var unk1Offset = Reader.ReadUInt32();
-            var unk1Count = Reader.ReadInt32();
-            var unk2Offset = Reader.ReadUInt32();
-            var unk2Count = Reader.ReadInt32();
-            var unk3Offset = Reader.ReadUInt32();
-            var unk3Count = Reader.ReadInt32();
+            var zonevertexOffset = Reader.ReadUInt32();
+            var zonevertexCount = Reader.ReadInt32();
+            var zonefaceOffset = Reader.ReadUInt32();
+            var zonefaceCount = Reader.ReadInt32();
+            var zonejointOffset = Reader.ReadUInt32();
+            var zonejointCount = Reader.ReadInt32();
 
             Reader.Seek(vertexOffset);
             for (int i = 0; i < vertexCount; i++)
@@ -70,8 +101,25 @@ namespace HSDLib.KAR
                 Joints.Add(joint);
             }
 
-            if (unk1Offset != 0 || unk2Offset != 0 || unk3Offset != 0)
-                throw new System.NotSupportedException("File node supported");
+            Reader.Seek(zonevertexOffset);
+            for (int i = 0; i < zonevertexCount; i++)
+                ZoneVertices.Add(new GXVector3(Reader.ReadSingle(), Reader.ReadSingle(), Reader.ReadSingle()));
+
+            Reader.Seek(zonefaceOffset);
+            for (int i = 0; i < zonefaceCount; i++)
+            {
+                KAR_ZoneCollisionTriangle tri = new KAR_ZoneCollisionTriangle();
+                tri.Open(Reader);
+                ZoneFaces.Add(tri);
+            }
+
+            Reader.Seek(zonejointOffset);
+            for (int i = 0; i < zonejointCount; i++)
+            {
+                KAR_ZoneCollisionJoint joint = new KAR_ZoneCollisionJoint();
+                joint.Open(Reader);
+                ZoneJoints.Add(joint);
+            }
         }
 
         public override void Save(HSDWriter Writer)
@@ -96,6 +144,26 @@ namespace HSDLib.KAR
                 Writer.WriteObject(v);
             }
 
+            Writer.AddObject(ZoneVertices);
+            foreach (var v in ZoneVertices)
+            {
+                Writer.Write(v.X);
+                Writer.Write(v.Y);
+                Writer.Write(v.Z);
+            }
+
+            Writer.AddObject(ZoneFaces);
+            foreach (var v in ZoneFaces)
+            {
+                Writer.WriteObject(v);
+            }
+
+            Writer.AddObject(ZoneJoints);
+            foreach (var v in ZoneJoints)
+            {
+                Writer.WriteObject(v);
+            }
+
             Writer.AddObject(this);
             Writer.WritePointer(Vertices);
             Writer.Write(Vertices.Count);
@@ -104,12 +172,12 @@ namespace HSDLib.KAR
             Writer.WritePointer(Joints);
             Writer.Write(Joints.Count);
 
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
+            Writer.WritePointer(ZoneVertices);
+            Writer.Write(ZoneVertices.Count);
+            Writer.WritePointer(ZoneFaces);
+            Writer.Write(ZoneFaces.Count);
+            Writer.WritePointer(ZoneJoints);
+            Writer.Write(ZoneJoints.Count);
         }
     }
 }
