@@ -1,5 +1,6 @@
 ﻿using System;
 using HSDLib.Common;
+using System.Collections.Generic;
 
 namespace HSDLib.KAR
 {
@@ -14,13 +15,34 @@ namespace HSDLib.KAR
 
     public class KAR_GrLightNode : IHSDNode
     {
-        public HSD_Light Light1 { get; set; }
+        // null terminated pointer list
+        public List<HSD_Light> Lights { get; set; } = new List<HSD_Light>();
 
-        public HSD_Light Light2 { get; set; }
+        public override void Open(HSDReader Reader)
+        {
+            var off = Reader.ReadUInt32();
+            while(off != 0)
+            {
+                var temp = Reader.Position();
+                Reader.Seek(off);
+                HSD_Light l = new HSD_Light();
+                l.Open(Reader);
+                Lights.Add(l);
+                Reader.Seek(temp);
+                off = Reader.ReadUInt32();
+            }
+        }
 
-        public HSD_Light Light3 { get; set; }
+        public override void Save(HSDWriter Writer)
+        {
+            foreach (var v in Lights)
+                v.Save(Writer);
 
-        public HSD_Light Light4 { get; set; }
+            Writer.AddObject(this);
+            foreach (var v in Lights)
+                Writer.WritePointer(v);
+            Writer.Write(0);
+        }
     }
 
 }
