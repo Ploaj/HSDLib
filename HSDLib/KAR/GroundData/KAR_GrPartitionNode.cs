@@ -16,6 +16,10 @@ namespace HSDLib.KAR
 
         public List<bool> CollidableTrianglesBits = new List<bool>();
 
+        public List<short> UnknownIndices = new List<short>();
+
+        public List<short> UnknownIndices2 = new List<short>();
+
         public override void Open(HSDReader Reader)
         {
             var partitionPointer = Reader.ReadUInt32();
@@ -70,6 +74,12 @@ namespace HSDLib.KAR
                 var pointer = Reader.ReadUInt32();
                 var count = Reader.ReadInt16();
                 Reader.ReadInt16();
+
+                var temp = Reader.Position();
+                Reader.Seek(pointer);
+                for (int i = 0; i < count; i++)
+                    UnknownIndices.Add(Reader.ReadInt16());
+                Reader.Seek(temp);
             }
 
             { //TODO:
@@ -77,6 +87,12 @@ namespace HSDLib.KAR
                 var pointer = Reader.ReadUInt32();
                 var count = Reader.ReadInt16();
                 Reader.ReadInt16();
+
+                var temp = Reader.Position();
+                Reader.Seek(pointer);
+                for (int i = 0; i < count; i++)
+                    UnknownIndices2.Add(Reader.ReadInt16());
+                Reader.Seek(temp);
             }
 
             { //TODO:
@@ -124,6 +140,16 @@ namespace HSDLib.KAR
             foreach (var v in CollidableTriangles)
                 Writer.Write(v);
             Writer.Align(4);
+            
+            Writer.AddObject(UnknownIndices);
+            foreach (var v in UnknownIndices)
+                Writer.Write(v);
+            Writer.Align(4);
+            
+            Writer.AddObject(UnknownIndices2);
+            foreach (var v in UnknownIndices2)
+                Writer.Write(v);
+            Writer.Align(4);
 
             Writer.AddObject(CollidableTrianglesBits);
             Writer.Write(new byte[(CollidableTriangles.Count / 8) + 5]);
@@ -139,13 +165,15 @@ namespace HSDLib.KAR
             Writer.Write((short)CollidableTriangles.Count);
             Writer.Write((short)0);
 
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
+            Writer.Write(0x05000000);
+            Writer.WritePointer(UnknownIndices);
+            Writer.Write((short)UnknownIndices.Count);
+            Writer.Write((short)0);
 
-            Writer.Write(0);
-            Writer.Write(0);
-            Writer.Write(0);
+            Writer.Write(0x05000000);
+            Writer.WritePointer(UnknownIndices2);
+            Writer.Write((short)UnknownIndices2.Count);
+            Writer.Write((short)0);
 
             Writer.Write(0);
             Writer.Write(0);

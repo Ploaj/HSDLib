@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using HSDLib.Common;
-using HSDLib.Helpers.TriangleConverter;
 using System.IO;
 
 namespace HSDLib.Helpers

@@ -119,6 +119,10 @@ namespace HALSysDATViewer
                     GrDataRenderer.Data = data;
                     //Tools.CollisionBucket.Export("test.obj", data);
                 }
+                if (Node is HSD_PointerArray<HSD_JOBJDesc> jobjs)
+                {
+                    Renderer.RootNode = jobjs.Elements[0].RootJoint;
+                }
                 propertyGrid1.SelectedObject = Node;
             }
         }
@@ -250,14 +254,14 @@ namespace HALSysDATViewer
 
                 if(d.ShowDialog() == DialogResult.OK)
                 {
-                    ExportSMD(d.FileName, (HSD_JOBJ)((Node_Generic)nodeTree.SelectedNode).Node);
+                    ExportSMD(d.FileName, Renderer.RootNode);
                 }
             }
         }
 
         private void ExportSMD(string FileName, HSD_JOBJ jobj)
         {
-            var bones = ((HSD_JOBJ)((Node_Generic)nodeTree.SelectedNode).Node).DepthFirstList;
+            var bones = Renderer.RootNode.DepthFirstList;
 
             Console.WriteLine(bones.Count);
 

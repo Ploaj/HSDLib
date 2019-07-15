@@ -41,6 +41,7 @@ namespace HSDLib.KAR
     public class KAR_GrFogUnknown2 : IHSDNode
     {
         public int Unknown { get; set; }
+        public int Unknown2 { get; set; }
     }
 
     public class KAR_GrFogRegionGroup : IHSDNode

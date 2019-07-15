@@ -44,10 +44,10 @@
 
         public int StadiumNode { get; set; }// unknown
 
-        public int UnknownNode1 { get; set; }// unknown
+        //public int UnknownNode1 { get; set; }// unknown
 
-        public int UnknownNode2 { get; set; }// unknown
+        //public int UnknownNode2 { get; set; }// unknown
 
-        public int UnknownNode3 { get; set; }// unknown
+        //public int UnknownNode3 { get; set; }// unknown
     }
 }

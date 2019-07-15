@@ -23,11 +23,7 @@ namespace HSDLib.Common
             uint PointTableOffset = Reader.ReadUInt32();
             TotalLength = Reader.ReadSingle();
             uint segmentLengthOffset = Reader.ReadUInt32();
-            if (Reader.ReadInt32() != 0)
-                Console.WriteLine("Resave not supported"); //throw new NotSupportedException("Dat not supported");
-            if (Reader.ReadInt32() != 0)
-                Console.WriteLine("Resave not supported"); //throw new NotSupportedException("Dat not supported");
-            if (Reader.ReadInt32() != 0)
+            if (Reader.ReadInt32() != 0) // this is a pointer to a float array of length 5?
                 Console.WriteLine("Resave not supported"); //throw new NotSupportedException("Dat not supported");
 
             Reader.Seek(PointTableOffset);
@@ -45,6 +41,12 @@ namespace HSDLib.Common
 
         public override void Save(HSDWriter Writer)
         {
+            WriteData(Writer);
+            WriteObject(Writer);
+        }
+
+        public void WriteData(HSDWriter Writer)
+        {
             Writer.AddObject(Points);
             foreach (var point in Points)
             {
@@ -54,9 +56,12 @@ namespace HSDLib.Common
             }
 
             Writer.AddObject(SegmentLengths);
-            foreach (var per in SegmentLengths)
-                Writer.Write(per);
+            foreach (var length in SegmentLengths)
+                Writer.Write(length);
+        }
 
+        public void WriteObject(HSDWriter Writer)
+        {
             Writer.AddObject(this);
             Writer.Write(Type);
             Writer.Write((ushort)Points.Count);
@@ -64,8 +69,6 @@ namespace HSDLib.Common
             Writer.WritePointer(Points);
             Writer.Write(TotalLength);
             Writer.WritePointer(SegmentLengths);
-            Writer.Write(0);
-            Writer.Write(0);
             Writer.Write(0);
         }
     }

@@ -1,0 +1,110 @@
+﻿using HSDRaw.Common.Animation;
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace HSDRaw.Tools
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public class FOBJFrameEncoder
+    {
+        public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, JointTrackType TrackType)
+        {
+            return EncodeFrames(Keys, (byte)TrackType);
+        }
+
+        public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, byte TrackType)
+        {
+            HSD_FOBJ fobj = new HSD_FOBJ();
+            fobj.AnimationType = (JointTrackType)TrackType;
+
+            // perform quantization
+            FOBJQuantanizer valueQ = new FOBJQuantanizer();
+            FOBJQuantanizer tangentQ = new FOBJQuantanizer();
+
+            foreach (FOBJKey key in Keys)
+            {
+                valueQ.AddValue(key.Value);
+                tangentQ.AddValue(key.Tan);
+            }
+
+            fobj.ValueScale = valueQ.GetValueScale();
+            fobj.ValueFormat = valueQ.GetDataFormat();
+
+            fobj.TanScale = tangentQ.GetValueScale();
+            fobj.TanFormat = tangentQ.GetDataFormat();
+
+            MemoryStream o = new MemoryStream();
+            using (BinaryWriterExt Writer = new BinaryWriterExt(o))
+            {
+                Writer.BigEndian = false;
+
+                int time = 0;
+                for (int i = 0; i < Keys.Count;)
+                {
+                    GXInterpolationType ip = Keys[i].InterpolationType;
+                    int j;
+                    for (j = 0; j < Keys.Count - i; j++)
+                    {
+                        if (Keys[i + j].InterpolationType != ip)
+                            break;
+                    }
+
+                    int flag = ((j - 1) << 4) | (int)ip;
+                    Writer.ExtendedByte(flag);
+
+                    for (int k = i; k < i + j; k++)
+                    {
+                        int DeltaTime = 0;
+
+                        if (k + 1 < Keys.Count)
+                            DeltaTime = (int)(Keys[k + 1].Frame - Keys[k].Frame);
+
+                        if (k == Keys.Count)
+                            DeltaTime = 1;
+
+                        switch (ip)
+                        {
+                            case GXInterpolationType.Step:
+                                valueQ.WriteValue(Writer, Keys[k].Value);
+                                Writer.ExtendedByte(DeltaTime);
+                                break;
+                            case GXInterpolationType.Linear:
+                                valueQ.WriteValue(Writer, Keys[k].Value);
+                                Writer.ExtendedByte(DeltaTime);
+                                break;
+                            case GXInterpolationType.HermiteValue:
+                                valueQ.WriteValue(Writer, Keys[k].Value);
+                                Writer.ExtendedByte(DeltaTime);
+                                break;
+                            case GXInterpolationType.Hermite:
+                                valueQ.WriteValue(Writer, Keys[k].Value);
+                                tangentQ.WriteValue(Writer, Keys[k].Tan);
+                                Writer.ExtendedByte(DeltaTime);
+                                break;
+                            case GXInterpolationType.HermiteCurve:
+                                tangentQ.WriteValue(Writer, Keys[k].Tan);
+                                break;
+                            case GXInterpolationType.Constant:
+                                valueQ.WriteValue(Writer, Keys[k].Value);
+                                break;
+                            default:
+                                throw new Exception("end");
+                        }
+
+                        if (ip != GXInterpolationType.HermiteCurve)
+                            time = (int)Keys[k].Frame;
+                    }
+
+                    i += j;
+                }
+            }
+            fobj.Buffer = o.ToArray();
+            o.Dispose();
+            return fobj;
+        }
+
+    }
+}

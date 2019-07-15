@@ -63,6 +63,9 @@ namespace HSDLib.KAR
             var offset = Reader.ReadUInt32();
             var count = Reader.ReadInt32();
 
+            if (offset == 0)
+                return;
+
             Reader.Seek(offset);
             for (int i = 0; i < count; i++)
             {
@@ -70,17 +73,26 @@ namespace HSDLib.KAR
             }
         }
 
-        public override void Save(HSDWriter Writer)
+        public void WriteData(HSDWriter Writer)
         {
             Writer.AddObject(Indices);
             foreach (var p in Indices)
             {
                 Writer.Write(p);
             }
+        }
 
+        public void WriteObject(HSDWriter Writer)
+        {
             Writer.AddObject(this);
             Writer.WritePointer(Indices);
             Writer.Write(Indices.Count);
+        }
+
+        public override void Save(HSDWriter Writer)
+        {
+            WriteData(Writer);
+            WriteObject(Writer);
         }
     }
 
@@ -103,6 +115,11 @@ namespace HSDLib.KAR
 
         public override void Save(HSDWriter Writer)
         {
+            foreach (var p in Splines)
+            {
+                p.WriteData(Writer);
+            }
+
             Writer.AddObject(Splines);
             foreach (var p in Splines)
             {
@@ -125,6 +142,14 @@ namespace HSDLib.KAR
         public int Unknown4 { get; set; } = -1;
         public int Unknown5 { get; set; } = -1;
         public int Unknown6 { get; set; } = 0;
+
+        public void WriteData(HSDWriter Writer)
+        {
+            Unknown1.WriteData(Writer);
+            Unknown2.WriteData(Writer);
+            Unknown1.WriteObject(Writer);
+            Unknown2.WriteObject(Writer);
+        }
     }
 
     public class KAR_GrFlowSetup : IHSDNode
@@ -136,9 +161,9 @@ namespace HSDLib.KAR
     public class KAR_GrCourseSplineSetup : IHSDNode
     {
         public KAR_GrSplineList CourseSplineList { get; set; }
-        public KAR_GrCourseSplineTable UnknownList { get; set; }
-        public KAR_GrCourseSplineTable UnknownList2 { get; set; }
-        public KAR_GrCourseSplineTable UnknownList3 { get; set; }
+        public KAR_GrCourseSplineTable UnknownTable { get; set; }
+        public KAR_GrCourseSpineTableList UnknownTableList1 { get; set; }
+        public KAR_GrCourseSpineTableList UnknownTableList2 { get; set; }
         public int Loop { get; set; } = 1;
         public int UnknownPointer { get; set; }
         public int Unknown3 { get; set; }
@@ -149,6 +174,35 @@ namespace HSDLib.KAR
         public int UnknownRuntime3 { get; set; } // runtime variable
         public int UnknownRuntime4 { get; set; } // runtime variable
         public int UnknownRuntime5 { get; set; } // runtime variable
+    }
+
+    public class KAR_GrCourseSpineTableList : IHSDNode
+    {
+        public List<KAR_GrCourseSplineTable> Tables = new List<KAR_GrCourseSplineTable>();
+
+        public override void Open(HSDReader Reader)
+        {
+            var start = Reader.Position();
+            for(int i = 0; i < 4; i++)
+            {
+                Reader.Seek(start + (uint)(8 * i));
+                KAR_GrCourseSplineTable table = new KAR_GrCourseSplineTable();
+                if (table.Indices.Count == 0)
+                    break;
+                table.Open(Reader);
+                Tables.Add(table);
+            }
+        }
+
+        public override void Save(HSDWriter Writer)
+        {
+            foreach (var table in Tables)
+                table.WriteData(Writer);
+
+            Writer.AddObject(this);
+            foreach (var table in Tables)
+                table.WriteObject(Writer);
+        }
     }
 
     public class KAR_GrCourseUnknownFloats : IHSDNode

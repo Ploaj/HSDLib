@@ -83,6 +83,10 @@ namespace HSDLib
             {
                 Node = Reader.ReadObject<SBM_GrMapTexG>(Offset);
             }
+            else if (Name.StartsWith("Sc"))
+            {
+                Node = Reader.ReadObject<HSD_SOBJ>(Offset);
+            }
         }
 
         public override void Save(HSDWriter Writer)

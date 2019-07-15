@@ -1,0 +1,190 @@
+﻿using HSDRaw.GX;
+using System;
+using System.Collections.Generic;
+
+namespace HSDRaw.Common
+{
+    [Flags]
+    public enum POBJ_FLAG
+    {
+        SKIN = (0 << 12),
+        SHAPEANIM = (1 << 12),
+        ENVELOPE = (1 << 13),
+        CULLFRONT = (1 << 14),
+        CULLBACK = (1 << 15)
+    }
+    
+    /// <summary>
+    /// Polygon Objects contain display list rendering information
+    /// Using ToDisplayList<see cref="ToDisplayList"/> for easier processing
+    /// </summary>
+    public class HSD_POBJ : HSDListAccessor<HSD_POBJ>
+    {
+        public override int TrimmedSize { get; } = 0x18;
+
+        public override HSD_POBJ Next { get => _s.GetReference<HSD_POBJ>(0x04); set => _s.SetReference(0x04, value); }
+        
+        /// <summary>
+        /// List of GX Attributes
+        /// Must end with NULL<see cref="GXAttribName"/> attribute name
+        /// </summary>
+        public GX_Attribute[] Attributes {
+            get
+            {
+                var data = _s.GetReference<HSDAccessor>(0x08);
+                var count = data._s.Length / 0x18;
+                List<GX_Attribute> attributes = new List<GX_Attribute>();
+                for(int i = 0; i < count; i++)
+                {
+                    attributes.Add(new GX_Attribute());
+                    attributes[i]._s = new HSDStruct(data._s.GetBytes(i * 0x18, 0x18));
+                    foreach(var r in data._s.References)
+                    {
+                        if (r.Key >= i * 0x18 && r.Key < (i + 1) * 0x18)
+                            attributes[i]._s.References.Add(r.Key - (i * 0x18), r.Value);
+                    }
+                    if (attributes[i].AttributeName == GXAttribName.GX_VA_NULL)
+                        break;
+                }
+                return attributes.ToArray();
+            }
+            set
+            {
+                if (value.Length == 0)
+                {
+                    _s.SetReference(0x08, null);
+                    return;
+                }
+
+                var re = _s.GetReference<HSDAccessor>(0x08);
+                if(re == null)
+                {
+                    _s.SetReferenceStruct(0x08, new HSDStruct());
+                    re = _s.GetReference<HSDAccessor>(0x08);
+                }
+
+                List<byte> data = new List<byte>();
+
+                re._s.References.Clear();
+                int off = 0;
+                foreach (var v in value)
+                {
+                    data.AddRange(v._s.GetData());
+                    foreach(var r in v._s.References)
+                    {
+                        re._s.References.Add(r.Key + off, r.Value);
+                    }
+                    off += 0x18;
+                }
+
+                re._s.SetData(data.ToArray());
+            }
+        }
+
+        public POBJ_FLAG Flags { get => (POBJ_FLAG)_s.GetInt16(0x0C); set => _s.SetInt16(0x0C, (short)value); }
+
+        public int DisplayListSize { get => _s.GetInt16(0x0E) * 32; internal set => _s.SetInt16(0x0E, (short)(value / 32)); }
+        
+        public byte[] DisplayListBuffer
+        {
+            get => _s.GetBuffer(0x10);
+            internal set
+            {
+                _s.SetBuffer(0x10, value);
+                DisplayListSize = value.Length;
+            }
+        }
+        
+        /// <summary>
+        /// Transforms model by single bound jobj
+        /// </summary>
+        public HSD_JOBJ SingleBoundJOBJ
+        {
+            get
+            {
+                if (Flags.HasFlag(POBJ_FLAG.SKIN) && !Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+                {
+                    return _s.GetReference<HSD_JOBJ>(0x14);
+                }
+                return null;
+            }
+            set
+            {
+                Flags = Flags & ~POBJ_FLAG.SKIN;
+                Flags = Flags & ~POBJ_FLAG.ENVELOPE;
+                _s.SetData(new byte[4]);
+                if (value != null)
+                {
+                    Flags = Flags | POBJ_FLAG.SKIN;
+                }
+                _s.SetReference(0, value);
+            }
+        }
+
+        /// <summary>
+        /// Contains the Envelope Weights for this polygon
+        /// </summary>
+        public HSD_Envelope[] EnvelopeWeights
+        {
+            get
+            {
+                if (Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+                {
+                    return _s.GetReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14).Array;
+                }
+                return null;
+            }
+            set
+            {
+                Flags = Flags & ~POBJ_FLAG.SKIN;
+                Flags = Flags & ~POBJ_FLAG.ENVELOPE;
+                if (value != null && value.Length > 0)
+                {
+                    Flags = Flags | POBJ_FLAG.ENVELOPE;
+                    if (_s.GetReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14) == null)
+                        _s.SetReference(0x14, new HSDNullPointerArrayAccessor<HSD_Envelope>());
+                    _s.GetReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14).Array = value;
+                }
+                else
+                    _s.SetReference(0x14, null);
+            }
+        }
+        
+        /// <summary>
+        /// Converts the pobj into an easier to read format <see cref="GX_DisplayList"/>
+        /// Note: this operation is slow
+        /// </summary>
+        private GX_DisplayList DisplayList
+        {
+            get
+            {
+                return new GX_DisplayList(this);
+            }
+            set
+            {
+                Attributes = value.Attributes.ToArray();
+                DisplayListBuffer = value.ToBuffer();
+                EnvelopeWeights = value.Envelopes.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Wraps the data in the PBOJ into a <see cref="GX_DisplayList"/>
+        /// </summary>
+        /// <returns></returns>
+        public GX_DisplayList ToDisplayList()
+        {
+            return DisplayList;
+        }
+
+        /// <summary>
+        /// Transfers data from <see cref="GX_DisplayList"/> into POBJ structure
+        /// </summary>
+        /// <param name="dl"></param>
+        public void FromDisplayList(GX_DisplayList dl)
+        {
+            DisplayList = dl;
+        }
+
+    }
+}

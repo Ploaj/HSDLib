@@ -113,6 +113,10 @@
       <Project>{efe904b0-4306-40f9-a971-abc904cb9dd8}</Project>
       <Name>HSDLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj">
+      <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
+      <Name>HSDRaw</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,8 +5,10 @@ using System.Linq;
 
 namespace HSDRawViewer
 {
-    class RawHSD
+    public class RawHSD
     {
+        public char[] UnknownChars = new char[4];
+
         public List<DataNode> RootNodes = new List<DataNode>();
         public Dictionary<int, byte[]> offsetToData = new Dictionary<int, byte[]>();
         public Dictionary<int, List<int>> offsetToOffsets = new Dictionary<int, List<int>>();
@@ -24,6 +26,8 @@ namespace HSDRawViewer
                 int relocOffset = r.ReadInt32() + 0x20;
                 int relocCount = r.ReadInt32();
                 int rootCount = r.ReadInt32();
+                int refCount = r.ReadInt32();
+                UnknownChars = r.ReadChars(4);
 
                 List<int> Offsets = new List<int>();
                 HashSet<int> OffsetContain = new HashSet<int>();
@@ -89,7 +93,7 @@ namespace HSDRawViewer
                     if (rootStrings[i].Contains("grData"))
                         name = "GrData";
 
-                    RootNodes.Add(new DataNode(name, rootOffsets[i], offsetToData[rootOffsets[i]]));
+                    //RootNodes.Add(new DataNode(name, rootOffsets[i], offsetToData[rootOffsets[i]]));
                 }
             }
         }
@@ -101,9 +105,10 @@ namespace HSDRawViewer
                 var root1 = RootNodes[i];
                 var root2 = toCompare.RootNodes[i];
 
-                CompareOffsets(toCompare, root1.Offset, root2.Offset, "");
+                //CompareOffsets(toCompare, root1.Offset, root2.Offset, "");
             }
         }
+
         private void CompareOffsets(RawHSD toCompare, int offset1, int offset2, string depth)
         {
             if (offsetToData[offset1].Length != toCompare.offsetToData[offset2].Length)
@@ -138,5 +143,6 @@ namespace HSDRawViewer
             if (!data1.SequenceEqual(data2))
                 Console.WriteLine($"{depth}: content mismatch");
         }
+
     }
 }

@@ -15,7 +15,11 @@ namespace HSDLib.KAR
 
     public class KAR_GrLightNode : IHSDNode
     {
-        // null terminated pointer list
+        public HSD_Light Light1 { get; set; }
+        public HSD_Light Light2 { get; set; }
+        public HSD_Light Light3 { get; set; }
+        public HSD_Light Light4 { get; set; }
+        /*// null terminated pointer list
         public List<HSD_Light> Lights { get; set; } = new List<HSD_Light>();
 
         public override void Open(HSDReader Reader)
@@ -42,7 +46,7 @@ namespace HSDLib.KAR
             foreach (var v in Lights)
                 Writer.WritePointer(v);
             Writer.Write(0);
-        }
+        }*/
     }
 
 }

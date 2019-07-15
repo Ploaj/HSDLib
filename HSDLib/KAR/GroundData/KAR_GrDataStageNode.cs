@@ -117,15 +117,20 @@ namespace HSDLib.KAR
         public float OoBMaxYArea { get; set; }
         
         public float OoBMaxZArea { get; set; }
+        
+        public KAR_StagePadCountPointer PointerToBoostPad { get; set; }
+    }
 
-        [System.ComponentModel.Browsable(false)]
-        public uint PointerToPointer { get; set; }
+    public class KAR_StagePadCountPointer : IHSDNode
+    {
+        public KAR_StagePadCount PadCount { get; set; }
+    }
 
-        public override void Open(HSDReader Reader)
-        {
-            base.Open(Reader);
-            Console.WriteLine("TODO: Stage Node Pointer " + PointerToPointer.ToString("X"));
-        }
+    //TODO: this may be a list
+    public class KAR_StagePadCount : IHSDNode
+    {
+        public int Index0 { get; set; }
+        public int Index1 { get; set; }
     }
 
     public class KAR_StageNodeFloats : IHSDNode

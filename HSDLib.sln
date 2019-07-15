@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HALSysDATViewer", "HALSysDA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSDRawViewer", "HSDRawViewer\HSDRawViewer.csproj", "{755580A7-D09D-4EEC-9129-2DD7A6951A31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSDRaw", "HSDRaw\HSDRaw.csproj", "{ED9126AF-8A1E-465D-840A-8754A945414D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{755580A7-D09D-4EEC-9129-2DD7A6951A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{755580A7-D09D-4EEC-9129-2DD7A6951A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{755580A7-D09D-4EEC-9129-2DD7A6951A31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED9126AF-8A1E-465D-840A-8754A945414D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED9126AF-8A1E-465D-840A-8754A945414D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED9126AF-8A1E-465D-840A-8754A945414D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED9126AF-8A1E-465D-840A-8754A945414D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -77,13 +77,13 @@ namespace HSDLib.KAR
                 Writer.WritePointer(YakuData);
             Writer.Write(YakuData.Count);
             
-            if (YakuData.Count == 0)
+            if (YakuStaticData.Count == 0)
                 Writer.Write(0);
             else
                 Writer.WritePointer(YakuStaticData);
             Writer.Write(YakuStaticData.Count);
             
-            if (YakuData.Count == 0)
+            if (YakuCommonData.Count == 0)
                 Writer.Write(0);
             else
                 Writer.WritePointer(YakuCommonData);

@@ -1,5 +1,6 @@
 ﻿using HSDLib.Animation;
 using System;
+using System.Collections.Generic;
 
 namespace HSDLib.Common
 {
