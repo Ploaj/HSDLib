@@ -26,7 +26,7 @@ namespace HSDRaw
             List<HSDStruct> list = new List<HSDStruct>();
             var contain = new HashSet<HSDStruct>();
             Search(ref contain, ref list);
-            list.Reverse();
+            //list.Reverse();
             return list;
         }
 

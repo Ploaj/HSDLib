@@ -122,7 +122,7 @@ namespace HSDRaw.Tools
                 }
             }
             ValueType = GXAnimDataFormat.Float;
-            return (int)Math.Pow(2, 1);
+            return (int)Math.Pow(2, 0);
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace HSDRaw.Tools
             switch (ValueType)
             {
                 case GXAnimDataFormat.Float:
-                    d.Write(Value);
+                    d.Write(Value * ValueScale);
                     break;
                 case GXAnimDataFormat.Short:
                     d.Write((short)(Quantanize(Value, ValueType, ValueScale)));

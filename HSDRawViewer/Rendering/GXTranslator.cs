@@ -29,6 +29,11 @@ namespace HSDRawViewer.Rendering
             return new Vector3(v.X, v.Y, v.Z);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public static TextureMagFilter toMagFilter(GXTexFilter filter)
         {
             switch (filter)
@@ -42,6 +47,11 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <returns></returns>
         public static PrimitiveType toPrimitiveType(GXPrimitiveType pt)
         {
             switch (pt)
@@ -58,6 +68,11 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="wm"></param>
+        /// <returns></returns>
         public static TextureWrapMode toWrapMode(GXWrapMode wm)
         {
             switch (wm)
@@ -69,6 +84,11 @@ namespace HSDRawViewer.Rendering
             return TextureWrapMode.Repeat;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static AlphaFunction toAlphaFunction(GXCompareType type)
         {
             switch (type)
@@ -86,6 +106,11 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public static BlendEquationMode toBlendMode(GXBlendMode mode)
         {
             switch (mode)
@@ -98,6 +123,11 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="factor"></param>
+        /// <returns></returns>
         public static BlendingFactor toBlendingFactor(GXBlendFactor factor)
         {
             switch (factor)
@@ -113,5 +143,49 @@ namespace HSDRawViewer.Rendering
                     return BlendingFactor.SrcAlpha;
             }
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static DepthFunction toDepthFunction(GXCompareType type)
+        {
+            switch (type)
+            {
+                case GXCompareType.Always:
+                    return DepthFunction.Always;
+                case GXCompareType.Equal:
+                    return DepthFunction.Equal;
+                case GXCompareType.GEqual:
+                    return DepthFunction.Gequal;
+                case GXCompareType.Greater:
+                    return DepthFunction.Greater;
+                case GXCompareType.LEqual:
+                    return DepthFunction.Lequal;
+                case GXCompareType.Less:
+                    return DepthFunction.Less;
+                case GXCompareType.NEqual:
+                    return DepthFunction.Notequal;
+                case GXCompareType.Never:
+                    return DepthFunction.Never;
+            }
+            return DepthFunction.Never;
+        }
+        
+        public static BlendEquationMode toBlendEquationMode(GXBlendMode mode)
+        {
+            switch (mode)
+            {
+                case GXBlendMode.GX_BLEND:
+                    return BlendEquationMode.FuncAdd;
+                case GXBlendMode.GX_SUBTRACT:
+                    return BlendEquationMode.FuncSubtract;
+                case GXBlendMode.GX_LOGIC:
+                    return BlendEquationMode.FuncReverseSubtract;
+            }
+            return BlendEquationMode.FuncAdd;
+        }
+
     }
 }

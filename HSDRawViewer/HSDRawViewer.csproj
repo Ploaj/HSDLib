@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Converters\ConvSVG.cs" />
+    <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="DataNode.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -68,6 +69,7 @@
     <Compile Include="Rendering\Renderer.cs" />
     <Compile Include="Rendering\RendererAnimation.cs" />
     <Compile Include="Rendering\RendererJOBJ.cs" />
+    <Compile Include="Rendering\Shader.cs" />
     <Compile Include="Rendering\TriangleConverter.cs" />
     <Compile Include="Rendering\Viewport.cs">
       <SubType>Component</SubType>

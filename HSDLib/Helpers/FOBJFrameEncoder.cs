@@ -120,7 +120,7 @@ namespace HSDLib.Helpers
                 }
             }
             ValueType = GXAnimDataFormat.Float;
-            return (int)Math.Pow(2, 1);
+            return (int)Math.Pow(2, 0);
         }
 
         /// <summary>

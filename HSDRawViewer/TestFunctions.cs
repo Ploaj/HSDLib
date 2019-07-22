@@ -5,6 +5,7 @@ using HSDRaw.Tools;
 using System.Collections.Generic;
 using HSDRawViewer.Rendering;
 using HSDRaw.Common.Animation;
+using System;
 
 namespace HSDRawViewer
 {
@@ -138,5 +139,46 @@ namespace HSDRawViewer
             file.Save(filePath + "_noImage");
         }
 
+        public static void Compare(string oldpath, string newpath)
+        {
+            var f1 = new HSDRawFile(oldpath);
+            var f2 = new HSDRawFile(newpath);
+
+            var ss1 = f1.Roots[0].Data._s.GetSubStructs();
+            var ss2 = f2.Roots[0].Data._s.GetSubStructs();
+
+            Console.WriteLine(f1.Roots[0].Data._s.GetSubStructs().Count + " " + f2.Roots[0].Data._s.GetSubStructs().Count);
+
+            CompareNode(f1.Roots[0].Data._s, f2.Roots[0].Data._s, new HashSet<HSDStruct>());
+        }
+
+        private static void CompareNode(HSDStruct s1, HSDStruct s2, HashSet<HSDStruct> done)
+        {
+            if (done.Contains(s1))
+                return;
+            done.Add(s1);
+
+            //System.Console.WriteLine("Checking " + s1.Length + " " + s2.Length + " " + s1.References.Count + " "  + s2.References.Count);
+            for (int i = 0; i < s1.Length; i++)
+            {
+                if (s1.GetByte(i) != s2.GetByte(i))
+                {
+                    Console.WriteLine("content mismatch");
+                }
+            }
+            if (s1.Length != s2.Length)
+            {
+                Console.WriteLine("Size mismatch");
+            }
+            if(s1.References.Count != s2.References.Count)
+            {
+                Console.WriteLine("Reference mismatch");
+            }
+            foreach(var re in s2.References)
+            {
+                var re2 = s2.References[re.Key];
+                CompareNode(re.Value, re2, done);
+            }
+        }
     }
 }

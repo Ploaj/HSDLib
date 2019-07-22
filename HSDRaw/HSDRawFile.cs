@@ -2,6 +2,7 @@
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Gr;
 using HSDRaw.Melee.Mn;
+using HSDRaw.Melee.Pl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -189,6 +190,13 @@ namespace HSDRaw
                         a = jobj;
                     }
                     else
+                    if (rootStrings[i].StartsWith("ftData"))
+                    {
+                        var acc = new SBM_PlayerData();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
                     if (rootStrings[i].EndsWith("MnSelectChrDataTable"))
                     {
                         var acc = new SBM_SelectChrDataTable();
@@ -244,7 +252,7 @@ namespace HSDRaw
             Save(new FileStream(fileName, FileMode.Create));
         }
 
-        public void Save(Stream stream)
+        public void Save(Stream stream, bool bufferAlign = true)
         {
             // gather all structs
             var allStructs = new List<HSDStruct>();
@@ -304,7 +312,7 @@ namespace HSDRaw
                     // todo: trim extra data?
                     // no refereneces = buffer?
                     // textures need to be 0x20 aligned... but there is no way to detect which structures are textures
-                    if (s.Length > 0x50 && s.References.Count == 0) 
+                    if (s.Length > 0x50 && s.References.Count == 0 && bufferAlign) 
                         writer.Align(0x20);
                     else
                         writer.Align(4);

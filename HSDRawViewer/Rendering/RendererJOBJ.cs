@@ -205,25 +205,38 @@ namespace HSDRawViewer.Rendering
         }
 
         /// <summary>
-        /// Renders a data object using Legacy OpenGL
-        /// Warning: this can be very slow
+        /// 
         /// </summary>
-        /// <param name="dobj"></param>
-        private void RenderDOBJ_Legacy(HSD_DOBJ dobj, Matrix4 Transform)
+        /// <param name="mobj"></param>
+        private void BindMOBJ_Legacy(HSD_MOBJ mobj, out float wscale, out float hscale)
         {
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.PushMatrix();
-            GL.MultMatrix(ref Transform);
+            wscale = 1;
+            hscale = 1;
+            if (mobj == null)
+                return;
 
-            // bind materials/textures
+            var pp = mobj.PixelProcessing;
+            if (pp != null)
+            {
+                //GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp0), pp.AlphaRef0 / 255f);
 
-            float wscale = 1;
-            float hscale = 1;
+                GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
 
-            if (dobj.Mobj != null && dobj.Mobj.Textures != null && imageBufferToTexture.ContainsKey(dobj.Mobj.Textures.ImageData.ImageData))
+                GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
+                
+                //GL.BlendEquation(GXTranslator.toBlendEquationMode(pp.BlendMode));
+            }
+
+            var color = mobj.MaterialColor;
+            if(color != null)
+            {
+            }
+
+            // Bind Textures
+            if (mobj.Textures != null && imageBufferToTexture.ContainsKey(mobj.Textures.ImageData.ImageData))
             {
                 GL.Enable(EnableCap.Texture2D);
-                foreach (var tex in dobj.Mobj.Textures.List)
+                foreach (var tex in mobj.Textures.List)
                 {
                     if (!imageBufferToTexture.ContainsKey(tex.ImageData.ImageData))
                         return;
@@ -244,6 +257,31 @@ namespace HSDRawViewer.Rendering
             {
                 GL.Disable(EnableCap.Texture2D);
             }
+        }
+
+        /// <summary>
+        /// Renders a data object using Legacy OpenGL
+        /// Warning: this can be very slow
+        /// </summary>
+        /// <param name="dobj"></param>
+        private void RenderDOBJ_Legacy(HSD_DOBJ dobj, Matrix4 Transform)
+        {
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.MultMatrix(ref Transform);
+
+            // bind materials/textures
+
+            float wscale = 1;
+            float hscale = 1;
+            //GL.Enable(EnableCap.AlphaTest);
+            //GL.AlphaFunc(AlphaFunction.Lequal, 255);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendEquation(BlendEquationMode.FuncAdd);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+            BindMOBJ_Legacy(dobj.Mobj, out wscale, out hscale);
 
             // render primitives
             foreach (var p in dobj.Pobj.List)
