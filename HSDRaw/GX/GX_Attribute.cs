@@ -31,6 +31,9 @@
             {
                 var re = _s.GetReference<HSDAccessor>(0x14);
 
+                if (re == null)
+                    re = _s.GetCreateReference<HSDAccessor>(0x14);
+
                 re._s.SetData(value);
             }
         }

@@ -13,7 +13,7 @@
 
         public static bool operator ==(GX_Vertex x, GX_Vertex y)
         {
-            return x.POS == y.POS && x.PNMTXIDX == y.PNMTXIDX && x.TEX0MTXIDX == y.TEX0MTXIDX;
+            return x.POS == y.POS && x.NRM == y.NRM && x.PNMTXIDX == y.PNMTXIDX && x.TEX0MTXIDX == y.TEX0MTXIDX;
         }
         public static bool operator !=(GX_Vertex x, GX_Vertex y)
         {

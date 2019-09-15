@@ -40,6 +40,7 @@
             this.hexViewTab = new System.Windows.Forms.TabPage();
             this.propertyTab = new System.Windows.Forms.TabPage();
             this.renderTab = new System.Windows.Forms.TabPage();
+            this.addRootFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.propertyTab.SuspendLayout();
@@ -93,6 +94,8 @@
             // 
             // editToolStripMenuItem
             // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addRootFromFileToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
@@ -148,6 +151,13 @@
             this.renderTab.Text = "Rendered";
             this.renderTab.UseVisualStyleBackColor = true;
             // 
+            // addRootFromFileToolStripMenuItem
+            // 
+            this.addRootFromFileToolStripMenuItem.Name = "addRootFromFileToolStripMenuItem";
+            this.addRootFromFileToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.addRootFromFileToolStripMenuItem.Text = "Add Root From File";
+            this.addRootFromFileToolStripMenuItem.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -182,6 +192,7 @@
         private System.Windows.Forms.TabPage renderTab;
         private System.Windows.Forms.TabPage propertyTab;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem;
     }
 }
 

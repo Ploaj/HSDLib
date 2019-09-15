@@ -141,6 +141,7 @@ namespace HSDRawViewer
         private void OpenFile(string FilePath)
         {
             treeView1.Nodes.Clear();
+            RawHSDFile = new HSDRawFile();
             RawHSDFile.Open(FilePath);
             foreach(var r in RawHSDFile.Roots)
             {
@@ -174,17 +175,10 @@ namespace HSDRawViewer
 
         public void GenerateContextMenus()
         {
-            MenuItem delete = new MenuItem("Delete");
-            delete.Click += (sender, args) =>
-            {
-                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
-                {
-                    node.Delete();
-                }
-            };
 
             {
                 var cm = new ContextMenu();
+                AttachCommonMenus(cm);
 
                 MenuItem OpenAsJOBJ = new MenuItem("Open As JOBJ");
                 OpenAsJOBJ.Click += (sender, args) => SelectNode(new HSD_JOBJ());
@@ -201,6 +195,7 @@ namespace HSDRawViewer
 
             {
                 var cm = new ContextMenu();
+                AttachCommonMenus(cm);
 
                 MenuItem OpenAsAJ = new MenuItem("Export As SVG");
                 OpenAsAJ.Click += (sender, args) =>
@@ -211,8 +206,74 @@ namespace HSDRawViewer
 
                 typeToContextMenu.Add(typeof(SBM_Coll_Data), cm);
             }
-            
-            commonContextMenu.MenuItems.Add(delete);
+
+            {
+                var cm = new ContextMenu();
+                AttachCommonMenus(cm);
+
+                MenuItem OpenAsAJ = new MenuItem("Import Model Group");
+                OpenAsAJ.Click += (sender, args) =>
+                {
+                    if(SelectedDataNode.Accessor is SBM_Map_Head)
+                    {
+                        SelectedDataNode.ImportModelGroup();
+                    }
+                };
+                cm.MenuItems.Add(OpenAsAJ);
+
+                typeToContextMenu.Add(typeof(SBM_Map_Head), cm);
+            }
+
+            AttachCommonMenus(commonContextMenu);
+
+        }
+
+        private void AttachCommonMenus(ContextMenu menu)
+        {
+            MenuItem delete = new MenuItem("Delete");
+            delete.Click += (sender, args) =>
+            {
+                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
+                {
+                    node.Delete();
+                }
+            };
+            MenuItem export = new MenuItem("Export");
+            export.Click += (sender, args) =>
+            {
+                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
+                {
+                    node.Export();
+                }
+            };
+            MenuItem import = new MenuItem("Import");
+            import.Click += (sender, args) =>
+            {
+                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
+                {
+                    node.Import();
+                }
+            };
+
+            menu.MenuItems.Add(delete);
+            menu.MenuItems.Add(export);
+            menu.MenuItems.Add(import);
+        }
+
+        private void addRootFromFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog f = new OpenFileDialog())
+            {
+                f.Filter = "HSD (*.dat)|*.dat";
+                f.FileName = Text;
+
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    var file = new HSDRawFile(f.FileName);
+
+                    RawHSDFile.Roots.Add(file.Roots[0]);
+                }
+            }
         }
     }
 }

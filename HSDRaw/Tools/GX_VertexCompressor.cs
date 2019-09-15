@@ -32,7 +32,7 @@ namespace HSDRaw.Tools
         public byte[] GenerateBuffer(GX_Attribute Attribute)
         {
             MemoryStream o = new MemoryStream();
-
+            
             using (BinaryWriterExt Writer = new BinaryWriterExt(o))
             {
                 Writer.BigEndian = true;
@@ -96,26 +96,21 @@ namespace HSDRaw.Tools
     {
         private Dictionary<GX_Attribute, GX_BufferMaker<object>> BufferLinker = new Dictionary<GX_Attribute, GX_BufferMaker<object>>();
 
-        // Creates the new buffers
+        private Dictionary<GX_Attribute, HSDStruct> AttributeToStruct = new Dictionary<GX_Attribute, HSDStruct>();
+
+        /// <summary>
+        /// Generates the buffer data and writes it to all given <see cref="GX_Attribute"/>
+        /// </summary>
         public void SaveChanges()
         {
-            //Dictionary<GX_BufferMaker<object>, byte[]> BufferData = new Dictionary<GX_BufferMaker<object>, byte[]>();
-            foreach (GX_Attribute b in BufferLinker.Keys)
+            foreach (var b in BufferLinker)
             {
-                /*if (BufferData.ContainsKey(BufferLinker[b]))
+                if (b.Key != null && b.Value != null)
                 {
-                    b.Buffer = BufferData[BufferLinker[b]];
-                    continue;
-                }*/
+                    byte[] data = b.Value.GenerateBuffer(b.Key);
 
-                byte[] data = BufferLinker[b].GenerateBuffer(b);
-
-                //TODO, check if null?
-                b.Buffer = data;
-
-                //BufferData.Add(BufferLinker[b], data);
-
-                Console.WriteLine(b.AttributeName + " " + b.Buffer.Length.ToString("X"));
+                    AttributeToStruct[b.Key].SetData(data);
+                }
             }
         }
 
@@ -142,6 +137,9 @@ namespace HSDRaw.Tools
                     }
                 }*/
                 BufferLinker.Add(v, new GX_BufferMaker<object>());
+
+                // hack
+                AttributeToStruct.Add(v, v._s.GetCreateReference<HSDAccessor>(0x14)._s);
             }
             return BufferLinker[v].GetIndex(o);
         }
@@ -211,7 +209,7 @@ namespace HSDRaw.Tools
                 triList[i] = v;
             }
 
-            Console.WriteLine("WeightList Created: " + weights.Count + " " + triList.Count);
+            //Console.WriteLine("WeightList Created: " + weights.Count + " " + triList.Count);
 
             return CreatePOBJsFromTriangleList(triList, attrGroup, weights);
         }

@@ -107,19 +107,53 @@ namespace HSDRaw.Common
         /// <param name="rgba"></param>
         /// <param name="format"></param>
         /// <param name="palFormat"></param>
-        public void EncodeImageData(byte[] rgba, GXTexFmt format, GXTlutFmt palFormat)
+        public void EncodeImageData(byte[] data, int width, int height, GXTexFmt format, GXTlutFmt palFormat)
         {
-            throw new NotImplementedException();
+            if (format != GXTexFmt.CMP)
+            {
+                byte[] palData;
+                var encodedData = TPLConv.EncodeTPL(data, width, height, format, palFormat, out palData);
+
+                if (TPLConv.IsPalettedFormat(format))
+                {
+                    TlutData = new HSD_Tlut();
+                    TlutData.Format = palFormat;
+                    TlutData.TlutData = palData;
+                    TlutData.ColorCount = (short)(palData.Length / 2);
+                }
+                else
+                    TlutData = null;
+
+                ImageData = new HSD_Image();
+                ImageData.ImageData = encodedData;
+                ImageData.Width = (short)width;
+                ImageData.Height = (short)height;
+                ImageData.Format = format;
+            }
+            else
+            {
+                TlutData = null;
+
+                ImageData = new HSD_Image();
+                ImageData.ImageData = TPLConv.ToCMP(data, width, height);
+                ImageData.Width = (short)width;
+                ImageData.Height = (short)height;
+                ImageData.Format = format;
+            }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rgba"></param>
-        /// <param name="format"></param>
-        public void EncodeImageData(byte[] rgba, GXTexFmt format)
+
+        public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            if (obj is HSDAccessor acc)
+                return _s.Equals(acc._s);
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return _s.GetHashCode();
         }
     }
 

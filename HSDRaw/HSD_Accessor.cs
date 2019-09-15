@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace HSDRaw
@@ -205,10 +205,12 @@ namespace HSDRaw
             {
                 if (_s == null)
                     _s = new HSDStruct(new byte[value.Length * 4 + 4]);
+                _s.References.Clear();
                 _s.SetData(new byte[value.Length * 4 + 4]);
 
                 for (int i = 0; i < value.Length; i++)
                     this[i] = value[i];
+                
             }
         }
 
@@ -229,6 +231,22 @@ namespace HSDRaw
         }
 
         //TODO: Add and Remove Functions
+
+        public void Remove(T value)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.Remove(value);
+            Array = arr.ToArray();
+        }
+
+        public void Add(T value)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.Add(value);
+            Array = arr.ToArray();
+        }
     }
 
 
@@ -261,6 +279,7 @@ namespace HSDRaw
                 if (_s == null)
                     _s = new HSDStruct(new byte[value.Length * Stride]);
 
+                _s.References.Clear();
                 _s.SetData(new byte[value.Length * Stride]);
 
                 for (int i = 0; i < value.Length; i++)

@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using System.Linq;
+using System.Collections;
+using HSDRaw.Melee.Gr;
 
 namespace HSDRawViewer
 {
     public class DataNode : TreeNode
     {
+        public bool ArrayMember { get; internal set; } = false;
+        private string ArrayName { get; set; }
+        private int ArrayIndex { get; set; }
         public HSDAccessor Accessor { get; set; }
 
         private static Dictionary<Type, string> typeToImageKey = new Dictionary<Type, string>()
@@ -59,6 +65,24 @@ namespace HSDRawViewer
             }
         }
 
+        public void Refresh()
+        {
+            if (Parent != null && Parent is DataNode parent)
+            {
+                if (ArrayMember)
+                {
+                    var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+                    prop.SetValue(parent.Accessor, prop.GetValue(parent.Accessor));
+
+                    parent.Refresh();
+                }
+
+            }
+
+            Collapse();
+            Expand();
+        }
+
         public void ExpandData()
         {
             HashSet<HSDStruct> strucs = new HashSet<HSDStruct>();
@@ -73,11 +97,21 @@ namespace HSDRawViewer
 
                     if (acc != null)
                     {
+                        int index = 0;
                         foreach (var a in acc)
                         {
+                            if (a == null) continue;
                             strucs.Add(a._s);
-                            Nodes.Add(new DataNode(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : ":\t" + prop.PropertyType.Name), a));
+                            Nodes.Add(
+                                new DataNode
+                                (prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}:\t" + prop.PropertyType.Name), a)
+                            {
+                                ArrayMember = true,
+                                ArrayName = prop.Name,
+                                ArrayIndex = index
+                            });
                             AddNext(a);
+                            index++;
                         }
                     }
 
@@ -104,14 +138,111 @@ namespace HSDRawViewer
             }
         }
 
+        public void Export()
+        {
+            using (SaveFileDialog f = new SaveFileDialog())
+            {
+                f.Filter = "HSD (*.dat)|*.dat";
+                f.FileName = Text;
+
+                if(f.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile r = new HSDRawFile();
+                    HSDRootNode root = new HSDRootNode();
+                    root.Data = Accessor;
+                    root.Name = System.IO.Path.GetFileNameWithoutExtension(f.FileName);
+                    r.Roots.Add(root);
+                    r.Save(f.FileName);
+                }
+            }
+        }
+
+        private bool OpenDAT(out HSDRawFile file)
+        {
+            file = null;
+            using (OpenFileDialog f = new OpenFileDialog())
+            {
+                f.Filter = "HSD (*.dat)|*.dat";
+                f.FileName = Text;
+
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    file = new HSDRawFile(f.FileName);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void ReplaceMe(HSDAccessor newStruct)
+        {
+            Accessor._s.SetData(newStruct._s.GetData());
+            Accessor._s.References.Clear();
+            foreach (var v in newStruct._s.References)
+            {
+                Accessor._s.References.Add(v.Key, v.Value);
+            }
+        }
+
+        public void Import()
+        {
+            HSDRawFile file;
+            if (OpenDAT(out file))
+            {
+                ReplaceMe(file.Roots[0].Data);
+            }
+        }
+
         public void Delete()
         {
             if(Parent != null && Parent is DataNode parent)
             {
-                parent.Accessor._s.RemoveReferenceToStruct(Accessor._s);
-                parent.Nodes.Remove(this);
+                if (ArrayMember)
+                {
+                    // this is a mess
+                    var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+
+                    var arr = prop.GetValue(parent.Accessor) as object[];
+                    
+                    var list = arr.ToList();
+                    list.RemoveAt(ArrayIndex);
+
+                    var outputArray = Array.CreateInstance(Accessor.GetType(), list.Count);
+                    Array.Copy(list.ToArray(), outputArray, list.Count);
+
+                    prop.SetValue(parent.Accessor, outputArray);
+                }
+                else
+                if(parent.Accessor._s.RemoveReferenceToStruct(Accessor._s))
+                    parent.Nodes.Remove(this);
+
+
+                parent.Refresh();
             }
         }
+
+
+#region Special
+
+        /// <summary>
+        /// Opens a <see cref="SBM_Model_Group"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
+        /// </summary>
+        public void ImportModelGroup()
+        {
+            HSDRawFile file;
+            if (Accessor is SBM_Map_Head head && OpenDAT(out file))
+            {
+                var group = head.ModelGroups.ToList();
+
+                group.Add(new SBM_Model_Group() { _s = file.Roots[0].Data._s });
+
+                head.ModelGroups = group.ToArray();
+
+                Refresh();
+            }
+        }
+
+#endregion
 
     }
 }

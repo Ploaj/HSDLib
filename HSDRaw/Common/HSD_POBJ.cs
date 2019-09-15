@@ -37,12 +37,7 @@ namespace HSDRaw.Common
                 for(int i = 0; i < count; i++)
                 {
                     attributes.Add(new GX_Attribute());
-                    attributes[i]._s = new HSDStruct(data._s.GetBytes(i * 0x18, 0x18));
-                    foreach(var r in data._s.References)
-                    {
-                        if (r.Key >= i * 0x18 && r.Key < (i + 1) * 0x18)
-                            attributes[i]._s.References.Add(r.Key - (i * 0x18), r.Value);
-                    }
+                    attributes[i]._s = data._s.GetEmbededStruct(i * 0x18, 0x18);
                     if (attributes[i].AttributeName == GXAttribName.GX_VA_NULL)
                         break;
                 }
@@ -62,22 +57,16 @@ namespace HSDRaw.Common
                     _s.SetReferenceStruct(0x08, new HSDStruct());
                     re = _s.GetReference<HSDAccessor>(0x08);
                 }
-
-                List<byte> data = new List<byte>();
-
+                
+                re._s.Resize(0x18 * value.Length);
                 re._s.References.Clear();
+
                 int off = 0;
                 foreach (var v in value)
                 {
-                    data.AddRange(v._s.GetData());
-                    foreach(var r in v._s.References)
-                    {
-                        re._s.References.Add(r.Key + off, r.Value);
-                    }
-                    off += 0x18;
+                    re._s.SetEmbededStruct(off, v._s);
+                    off += v.TrimmedSize;
                 }
-
-                re._s.SetData(data.ToArray());
             }
         }
 
@@ -141,9 +130,7 @@ namespace HSDRaw.Common
                 if (value != null && value.Length > 0)
                 {
                     Flags = Flags | POBJ_FLAG.ENVELOPE;
-                    if (_s.GetReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14) == null)
-                        _s.SetReference(0x14, new HSDNullPointerArrayAccessor<HSD_Envelope>());
-                    _s.GetReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14).Array = value;
+                    _s.GetCreateReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14).Array = value;
                 }
                 else
                     _s.SetReference(0x14, null);

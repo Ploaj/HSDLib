@@ -33,6 +33,10 @@ namespace HSDRaw.Tools
     /// </summary>
     public class TPLConv
     {
+        public static byte[] EncodeTPL(byte[] rgba, int width, int height, GXTexFmt format, GXTlutFmt palformat, out byte[] paletteData)
+        {
+            return EncodeTPL(Shared.ByteArrayToUIntArray(rgba), width, height, format, palformat, out paletteData);
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -973,9 +977,9 @@ namespace HSDRaw.Tools
 
             return Shared.UIntArrayToByteArray(output);
         }
-        
-        #endregion
 
+        #endregion
+        
         public static byte[] ToCMP(byte[] data, int width, int height)
         {
             byte[] output = new byte[width * height];
@@ -996,10 +1000,12 @@ namespace HSDRaw.Tools
                     int y2 = y >> 3;
 
                     int off = (8 * x1) + (16 * y1) + (32 * x2) + (4 * ww * y2);
+
                     output[off + 0] = data[off1 + 1];
                     output[off + 1] = data[off1 + 0];
                     output[off + 2] = data[off1 + 3];
                     output[off + 3] = data[off1 + 2];
+
                     for (int i = 0; i < 4; i++)
                     {
                         output[off + 4 + i] = SwapBits(data[off1 + 4 + i]);

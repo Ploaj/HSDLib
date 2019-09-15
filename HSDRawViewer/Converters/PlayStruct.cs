@@ -83,7 +83,7 @@ namespace HSDRawViewer.Converters
 
                     for (int i = 0; i < f.Actions.Length; i++)
                     {
-                        SBM_FighterSubAction subaction = new SBM_FighterSubAction();
+                        SBM_FighterSubAction subaction = new HSDRaw.Melee.Pl.SBM_FighterSubAction();
                         subaction._s = val._s.GetEmbededStruct(0x18 * i, 0x18);
 
                         if (!ExportedAnimations.Contains(subaction.Name) && subaction.Name != null && subaction.Name != "")
@@ -113,7 +113,10 @@ namespace HSDRawViewer.Converters
 
                     XmlSerializer writer = new XmlSerializer(typeof(ScriptFile));
                     using (var w = new XmlTextWriter(new FileStream(path + prop.Name + ".txt", FileMode.Create), Encoding.UTF8))
+                    {
+                        w.Formatting = Formatting.Indented;
                         writer.Serialize(w, f);
+                    }
                 }
                 else
                 {

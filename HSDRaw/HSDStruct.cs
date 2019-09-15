@@ -188,16 +188,17 @@ namespace HSDRaw
         /// Removes all references to given struct
         /// </summary>
         /// <param name="strct"></param>
-        public void RemoveReferenceToStruct(HSDStruct strct)
+        public bool RemoveReferenceToStruct(HSDStruct strct)
         {
             foreach (var v in _references)
             {
                 if (v.Value == strct)
                 {
                     SetReferenceStruct(v.Key, null);
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
 
         /// <summary>
@@ -265,7 +266,7 @@ namespace HSDRaw
         /// <param name="value"></param>
         public void SetArray<T>(int loc, int locCount, T[] value) where T : HSDAccessor
         {
-            if (value == null)
+            if (value == null || value.Length == 0)
             {
                 SetInt32(locCount, 0);
                 SetReference(loc, null);

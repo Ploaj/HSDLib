@@ -3,19 +3,25 @@ using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Gr;
 using HSDRaw.Melee.Mn;
 using HSDRaw.Melee.Pl;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
 namespace HSDRaw
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class HSDRootNode
     {
         public string Name { get; set; }
         public HSDAccessor Data { get; set; }
     }
 
+    /// <summary>
+    /// Holds raw HSD DAT structure information
+    /// </summary>
     public class HSDRawFile
     {
         private char[] UnknownChars = new char[4];
@@ -28,26 +34,45 @@ namespace HSDRaw
         /// </summary>
         private List<HSDStruct> _structCache = new List<HSDStruct>();
         
+        /// <summary>
+        /// 
+        /// </summary>
         public HSDRawFile()
         {
 
         }
 
+        /// <summary>
+        /// Loads dat data from file path
+        /// </summary>
+        /// <param name="filePath"></param>
         public HSDRawFile(string filePath)
         {
             Open(filePath);
         }
 
+        /// <summary>
+        /// Loads dat data from byte array
+        /// </summary>
+        /// <param name="data"></param>
         public HSDRawFile(byte[] data)
         {
             Open(new MemoryStream(data));
         }
 
+        /// <summary>
+        /// Opens dat file from path
+        /// </summary>
+        /// <param name="filePath"></param>
         public void Open(string filePath)
         {
             Open(new FileStream(filePath, FileMode.Open));
         }
 
+        /// <summary>
+        /// Opens dat file from stream
+        /// </summary>
+        /// <param name="stream"></param>
         public void Open(Stream stream)
         {
             using (BinaryReaderExt r = new BinaryReaderExt(stream))
@@ -247,11 +272,20 @@ namespace HSDRaw
             }
         }
 
+        /// <summary>
+        /// Saves dat data to filepath
+        /// </summary>
+        /// <param name="fileName"></param>
         public void Save(string fileName)
         {
             Save(new FileStream(fileName, FileMode.Create));
         }
 
+        /// <summary>
+        /// saves dat data to stream with optional alignment
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="bufferAlign"></param>
         public void Save(Stream stream, bool bufferAlign = true)
         {
             // gather all structs
@@ -305,13 +339,11 @@ namespace HSDRaw
                 // write structs
                 foreach (var s in _structCache)
                 {
-                    if (unused.Contains(s))
-                        Console.WriteLine(writer.BaseStream.Position.ToString("X"));
-
-                    // align buffers and general alignment?
-                    // todo: trim extra data?
+                    // align buffers and general alignment
+                    // TODO: trim extra data? Not a problem aside from potential filesize
                     // no refereneces = buffer?
                     // textures need to be 0x20 aligned... but there is no way to detect which structures are textures
+                    // this can result in unnessecary padding
                     if (s.Length > 0x50 && s.References.Count == 0 && bufferAlign) 
                         writer.Align(0x20);
                     else
