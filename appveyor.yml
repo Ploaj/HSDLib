@@ -1,0 +1,35 @@
+configuration: Release
+
+image: Visual Studio 2017
+
+branches:
+  only:
+    - master
+
+before_build:
+- ps: nuget restore
+
+build:
+  verbosity: minimal
+
+deploy:
+  tag: LatestCommit
+  release: HSD Raw Viewer [Latest Commit]
+  description: 'This build is updated every time a commit is pushed to the master branch.\n\nMessage: $(APPVEYOR_REPO_COMMIT_MESSAGE)\n\n Timestamp: $(APPVEYOR_REPO_COMMIT_TIMESTAMP)'
+  provider: GitHub
+  auth_token:
+    secure: xauaTCyRR7zXmIIk4uXxttIa2s/DKhiMVYbGn6BMy/suM2ow6gUe0GNrnS+d1Q/q
+  artifact: HSDRAW.zip
+  draft: false
+  prerelease: true
+  force_update: true
+  on:
+    branch: master
+
+after_build:
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\Metanoia.exe"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\Metanoia.exe.config"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\OpenTK.dll"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\OpenTK.GLControl.dll"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRaw.dll"
+  - appveyor PushArtifact "HSDRAW.zip"
