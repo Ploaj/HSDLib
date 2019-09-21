@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
+using HSDRaw.AirRide.Vc;
 
 namespace HSDRaw
 {
@@ -267,6 +268,20 @@ namespace HSDRaw
                     if (rootStrings[i].StartsWith("map_head"))
                     {
                         var acc = new SBM_Map_Head();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].StartsWith("vcDataStar"))
+                    {
+                        var acc = new KAR_vcDataStar();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].StartsWith("vcDataWheel"))
+                    {
+                        var acc = new KAR_vcDataWheel();
                         acc._s = str;
                         a = acc;
                     }
