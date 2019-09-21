@@ -1,5 +1,4 @@
-﻿using HSDLib.Helpers;
-using HSDRaw.Common.Animation;
+﻿using HSDRaw.Common.Animation;
 using System;
 using System.Collections.Generic;
 
@@ -81,6 +80,24 @@ namespace HSDRawViewer.Rendering
                 return AnimationHelperInterpolation.Herp(ValueLeft, ValueRight, TanLeft, TanRight, FrameDiff, Weight);
 
             return ValueLeft;
+        }
+    }
+
+    public class AnimationHelperInterpolation
+    {
+        public static float Lerp(float LHS, float RHS, float Weight)
+        {
+            return LHS * (1 - Weight) + RHS * Weight;
+        }
+
+        public static float Herp(float LHS, float RHS, float LS, float RS, float Diff, float Weight)
+        {
+            float Result;
+
+            Result = LHS + (LHS - RHS) * (2 * Weight - 3) * Weight * Weight;
+            Result += (Diff * (Weight - 1)) * (LS * (Weight - 1) + RS * Weight);
+
+            return Result;
         }
     }
 

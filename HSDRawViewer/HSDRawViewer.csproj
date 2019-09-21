@@ -8,9 +8,10 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>HSDRawViewer</RootNamespace>
     <AssemblyName>HSDRawViewer</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -123,10 +124,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HSDLib\HSDLib.csproj">
-      <Project>{efe904b0-4306-40f9-a971-abc904cb9dd8}</Project>
-      <Name>HSDLib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\HSDRaw\HSDRaw.csproj">
       <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
       <Name>HSDRaw</Name>

@@ -208,6 +208,13 @@ namespace HSDRaw
                         a = jobj;
                     }
                     else
+                    if (rootStrings[i].EndsWith("_animjoint"))
+                    {
+                        var jobj = new HSD_AnimJoint();
+                        jobj._s = str;
+                        a = jobj;
+                    }
+                    else
                     if (rootStrings[i].EndsWith("_figatree"))
                     {
                         var jobj = new HSD_FigaTree();
@@ -225,6 +232,13 @@ namespace HSDRaw
                     if (rootStrings[i].EndsWith("MnSelectChrDataTable"))
                     {
                         var acc = new SBM_SelectChrDataTable();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].EndsWith("MnSelectStageDataTable"))
+                    {
+                        var acc = new SBM_MnSelectStageDataTable();
                         acc._s = str;
                         a = acc;
                     }

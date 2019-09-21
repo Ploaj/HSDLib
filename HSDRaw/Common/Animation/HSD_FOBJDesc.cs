@@ -6,7 +6,7 @@
     /// </summary>
     public class HSD_FOBJDesc : HSDListAccessor<HSD_FOBJDesc>
     {
-        public override int TrimmedSize => 0x10;
+        public override int TrimmedSize => 0x14;
 
         public override HSD_FOBJDesc Next { get => _s.GetReference<HSD_FOBJDesc>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -25,8 +25,8 @@
             set
             {
                 _s.SetEmbededStruct(0x0C, value._s);
-                if (value == null)
-                    DataLength = value._s.Length;
+                if (value != null)
+                    DataLength = value.Buffer.Length;
                 else
                     DataLength = 0;
             }

@@ -181,6 +181,18 @@ namespace HSDRaw
                 return list;
             }
         }
+
+        public void Add(T t)
+        {
+            if(Next == null)
+            {
+                Next = t;
+            }
+            else
+            {
+                Next.Add(t);
+            }
+        }
     }
 
     /// <summary>

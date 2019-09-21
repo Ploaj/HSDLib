@@ -20,7 +20,7 @@ namespace HSDRawViewer
             offsetToData.Clear();
             offsetToOffsets.Clear();
             offsetToInnerOffsets.Clear();
-            using (HSDLib.HSDReader r = new HSDLib.HSDReader(new FileStream(FilePath, FileMode.Open)))
+            /*using (HSDLib.HSDReader r = new HSDLib.HSDReader(new FileStream(FilePath, FileMode.Open)))
             {
                 r.ReadInt32(); // dat size
                 int relocOffset = r.ReadInt32() + 0x20;
@@ -95,7 +95,7 @@ namespace HSDRawViewer
 
                     //RootNodes.Add(new DataNode(name, rootOffsets[i], offsetToData[rootOffsets[i]]));
                 }
-            }
+            }*/
         }
 
         public void Comparse(RawHSD toCompare)
