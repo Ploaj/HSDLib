@@ -127,6 +127,7 @@ namespace HSDRawViewer
 
         private void InitializeStructs()
         {
+            if(File.Exists("Structs.txt"))
             using (StreamReader r = new StreamReader(new FileStream("Structs.txt", FileMode.Open)))
             {
                 while (!r.EndOfStream)
