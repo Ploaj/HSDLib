@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System;
 using HSDRaw.AirRide.Vc;
+using HSDRaw.Melee.Ef;
 
 namespace HSDRaw
 {
@@ -282,6 +283,20 @@ namespace HSDRaw
                     if (rootStrings[i].StartsWith("vcDataWheel"))
                     {
                         var acc = new KAR_vcDataWheel();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].EndsWith("_texg"))
+                    {
+                        var acc = new HSD_TEXGraphic();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].StartsWith("eff"))
+                    {
+                        var acc = new SBM_EffectTable();
                         acc._s = str;
                         a = acc;
                     }

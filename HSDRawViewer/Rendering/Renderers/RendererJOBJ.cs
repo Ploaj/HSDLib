@@ -140,22 +140,22 @@ namespace HSDRawViewer.Rendering
             float SY = jobj.SY;
             float SZ = jobj.SZ;
 
-            if (animated && Frame != -1 && Nodes.Count > BoneIndex)
+            if (animated && Viewport.Frame != -1 && Nodes.Count > BoneIndex)
             {
                 AnimNode node = Nodes[BoneIndex];
                 foreach (AnimTrack t in node.Tracks)
                 {
                     switch (t.TrackType)
                     {
-                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(Viewport.Frame); break;
                     }
                 }
                 BoneIndex++;
@@ -348,8 +348,6 @@ namespace HSDRawViewer.Rendering
         #region Animation Loader
 
         private List<AnimNode> Nodes = new List<AnimNode>();
-        public int Frame = 0;
-        public float FrameCount { get; set; }
         
         /// <summary>
         /// 
@@ -357,7 +355,9 @@ namespace HSDRawViewer.Rendering
         /// <param name="joint"></param>
         public void SetAnimJoint(HSD_AnimJoint joint)
         {
-            FrameCount = 0;
+            Viewport.MaxFrame = 0;
+            Viewport.EnableAnimationTrack = true;
+            Viewport.AnimSpeed = 1;
             Nodes.Clear();
             if (joint == null)
                 return;
@@ -366,7 +366,7 @@ namespace HSDRawViewer.Rendering
                 AnimNode n = new AnimNode();
                 if (j.AOBJ != null)
                 {
-                    FrameCount = Math.Max(FrameCount, j.AOBJ.EndFrame);
+                    Viewport.MaxFrame = (int)Math.Max(Viewport.MaxFrame, j.AOBJ.EndFrame);
 
                     foreach (var fdesc in j.AOBJ.FObjDesc.List)
                     {
@@ -389,7 +389,9 @@ namespace HSDRawViewer.Rendering
             Nodes.Clear();
             if (tree == null)
                 return;
-            FrameCount = tree.FrameCount;
+            Viewport.MaxFrame = (int)tree.FrameCount;
+            Viewport.EnableAnimationTrack = true;
+            Viewport.AnimSpeed = 1;
             foreach (var tracks in tree.Nodes)
             {
                 AnimNode n = new AnimNode();

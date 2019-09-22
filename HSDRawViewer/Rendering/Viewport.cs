@@ -11,9 +11,17 @@ namespace HSDRawViewer.Rendering
 {
     public class Viewport : Panel
     {
+        private GroupBox _animationGroup;
+        private Button _animationPlayButton;
+
         private GLControl _glViewport;
 
+        public int ViewportWidth => _glViewport.Width;
+        public int ViewportHeight => _glViewport.Height;
+
         public Matrix4 Camera;
+
+        public bool ReadyToRender { get; internal set; } = false;
 
         public Matrix4 Translation
         {
@@ -145,6 +153,37 @@ namespace HSDRawViewer.Rendering
 
         private HSDAccessor _selectedAccessor { get; set; }
 
+
+        // Animation Track
+        public static int AnimSpeed = 1;
+        public static int MaxFrame { get; set; } = 0;
+        public static int Frame { get; set; } = 0;
+        public static bool EnableAnimationTrack
+        {
+            get => _enableAnimationTrack;
+                set
+            {
+                _enableAnimationTrack = value;
+            }
+        }
+        private static bool _enableAnimationTrack = false;
+
+        private int FrameTimer = 0;
+        private bool IsPlaying
+        {
+            get => _isPlaying;
+            set
+            {
+                _isPlaying = value;
+
+                if (IsPlaying)
+                    _animationPlayButton.Text = "Pause";
+                else
+                    _animationPlayButton.Text = "Play";
+            }
+        }
+        private bool _isPlaying = false;
+        
         public Viewport()
         {
             _glViewport = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
@@ -153,11 +192,47 @@ namespace HSDRawViewer.Rendering
             _glViewport.MouseMove += Viewport_MouseMove;
             _glViewport.KeyPress += Viewport_KeyDown;
             _glViewport.Paint += Render;
+            _glViewport.AutoSize = true;
             _glViewport.Dock = DockStyle.Fill;
 
             _renderer = new Renderer();
 
+            _animationGroup = new GroupBox();
+            _animationGroup.Visible = false;
+            _animationGroup.Text = "Animation Track";
+            _animationGroup.Dock = DockStyle.Bottom;
+
+            _animationPlayButton = new Button();
+            _animationPlayButton.Text = "Play";
+            _animationPlayButton.Click += (sender, args) =>
+            {
+                IsPlaying = !IsPlaying;
+            };
+            _animationPlayButton.Dock = DockStyle.Fill;
+
+            _animationGroup.Controls.Add(_animationPlayButton);
+
+            ClearControls();
+
+            Application.Idle += RenderLoop;
+        }
+
+        public void RenderLoop(object sender, EventArgs args)
+        {
+            if (ReadyToRender && EnableAnimationTrack)
+            {
+                _glViewport.Invalidate();
+            }
+        }
+
+        public void ClearControls()
+        {
+            Controls.Clear();
+            Frame = 0;
+            IsPlaying = false;
+            EnableAnimationTrack = false;
             Controls.Add(_glViewport);
+            Controls.Add(_animationGroup);
         }
 
         private void UpdateCamera()
@@ -167,6 +242,12 @@ namespace HSDRawViewer.Rendering
     
         public void Render(object sender, EventArgs args)
         {
+            if (!_animationGroup.Visible && EnableAnimationTrack)
+                _animationGroup.Visible = true;
+
+            if (_animationGroup.Visible && !EnableAnimationTrack)
+                _animationGroup.Visible = false;
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Enable(EnableCap.DepthTest);
@@ -175,19 +256,52 @@ namespace HSDRawViewer.Rendering
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref Camera);
 
+            if (IsPlaying)
+            {
+                FrameTimer++;
+                if (FrameTimer > AnimSpeed)
+                {
+                    IncrementFrame();
+                    FrameTimer = 0;
+                }
+            }
+
             RenderFloor();
 
             // rendering here
             if (SelectedAccessor != null)
-                _renderer.Render(Camera, SelectedAccessor);
+                _renderer.Render(Camera, SelectedAccessor, this);
             
             _glViewport.SwapBuffers();
         }
 
+        public void AddToolStrip(ToolStrip t)
+        {
+            Controls.Add(t);
+            _glViewport.BringToFront();
+        }
 
+        public static void IncrementFrame()
+        {
+            Frame++;
+            if (Frame >= MaxFrame)
+                Frame = 0;
+            if (Frame < 0)
+                Frame = MaxFrame - 1;
+        }
+
+        public static void DecrementFrame()
+        {
+            Frame--;
+            if (Frame >= MaxFrame)
+                Frame = 0;
+            if (Frame < 0)
+                Frame = MaxFrame - 1;
+        }
+        
         private void Viewport_Resize(object sender, EventArgs e)
         {
-            GL.Viewport(0, 0, Width, Height);
+            GL.Viewport(0, 0, _glViewport.Width, _glViewport.Height);
             UpdateCamera();
             _glViewport.Invalidate();
         }
@@ -220,6 +334,7 @@ namespace HSDRawViewer.Rendering
         {
             GL.ClearColor(Color.DarkSlateGray);
             Translation = Matrix4.CreateTranslation(_defaultTranslation);
+            ReadyToRender = true;
         }
         
         private void Viewport_MouseMove(object sender, MouseEventArgs e)

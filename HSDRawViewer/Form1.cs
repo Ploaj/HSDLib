@@ -122,6 +122,7 @@ namespace HSDRawViewer
                     _Viewport.SelectedAccessor = cast;
                 }
                 SelectedDataNode = n;
+                LocationLabel.Text = "Location: " + n.FullPath;
             }
         }
 

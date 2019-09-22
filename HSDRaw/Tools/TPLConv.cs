@@ -188,6 +188,31 @@ namespace HSDRaw.Tools
 
             return false;
         }
+
+        public static int GetImageSize(GXTexFmt format, int width, int height)
+        {
+            int size = width * height;
+            switch (format)
+            {
+                case GXTexFmt.CI4:
+                case GXTexFmt.I4:
+                    return size / 2;
+                case GXTexFmt.IA4:
+                case GXTexFmt.I8:
+                case GXTexFmt.CI14X2:
+                case GXTexFmt.CMP:
+                case GXTexFmt.CI8:
+                    return size;
+                case GXTexFmt.IA8:
+                case GXTexFmt.RGB565:
+                case GXTexFmt.RGB5A3:
+                    return size * 2;
+                case GXTexFmt.RGBA8:
+                    return size * 4;
+                default:
+                    return size;
+            }
+        }
         
         private static int avg(int w0, int w1, int c0, int c1)
         {

@@ -67,10 +67,13 @@
     <Compile Include="RawHSD.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\Math3D.cs" />
+    <Compile Include="Rendering\Renderers\CollDataRenderer.cs" />
+    <Compile Include="Rendering\Renderers\TexGRenderer.cs" />
     <Compile Include="Rendering\Renderer.cs" />
-    <Compile Include="Rendering\RendererAnimation.cs" />
-    <Compile Include="Rendering\RendererJOBJ.cs" />
+    <Compile Include="Rendering\Renderers\RendererAnimation.cs" />
+    <Compile Include="Rendering\Renderers\RendererJOBJ.cs" />
     <Compile Include="Rendering\Shader.cs" />
+    <Compile Include="Rendering\TextureManager.cs" />
     <Compile Include="Rendering\TriangleConverter.cs" />
     <Compile Include="Rendering\Viewport.cs">
       <SubType>Component</SubType>

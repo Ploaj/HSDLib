@@ -34,13 +34,14 @@
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addRootFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.hexViewTab = new System.Windows.Forms.TabPage();
             this.propertyTab = new System.Windows.Forms.TabPage();
             this.renderTab = new System.Windows.Forms.TabPage();
-            this.addRootFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LocationLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.propertyTab.SuspendLayout();
@@ -100,12 +101,19 @@
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
             // 
+            // addRootFromFileToolStripMenuItem
+            // 
+            this.addRootFromFileToolStripMenuItem.Name = "addRootFromFileToolStripMenuItem";
+            this.addRootFromFileToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.addRootFromFileToolStripMenuItem.Text = "Add Root From File";
+            this.addRootFromFileToolStripMenuItem.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem_Click);
+            // 
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(3, 3);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(470, 385);
+            this.propertyGrid1.Size = new System.Drawing.Size(690, 409);
             this.propertyGrid1.TabIndex = 2;
             // 
             // tabControl1
@@ -114,10 +122,10 @@
             this.tabControl1.Controls.Add(this.propertyTab);
             this.tabControl1.Controls.Add(this.renderTab);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(220, 24);
+            this.tabControl1.Location = new System.Drawing.Point(220, 40);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(484, 417);
+            this.tabControl1.Size = new System.Drawing.Size(484, 401);
             this.tabControl1.TabIndex = 4;
             // 
             // hexViewTab
@@ -125,7 +133,7 @@
             this.hexViewTab.Location = new System.Drawing.Point(4, 22);
             this.hexViewTab.Name = "hexViewTab";
             this.hexViewTab.Padding = new System.Windows.Forms.Padding(3);
-            this.hexViewTab.Size = new System.Drawing.Size(476, 391);
+            this.hexViewTab.Size = new System.Drawing.Size(476, 375);
             this.hexViewTab.TabIndex = 0;
             this.hexViewTab.Text = "Hex View";
             this.hexViewTab.UseVisualStyleBackColor = true;
@@ -136,7 +144,7 @@
             this.propertyTab.Location = new System.Drawing.Point(4, 22);
             this.propertyTab.Name = "propertyTab";
             this.propertyTab.Padding = new System.Windows.Forms.Padding(3);
-            this.propertyTab.Size = new System.Drawing.Size(476, 391);
+            this.propertyTab.Size = new System.Drawing.Size(696, 415);
             this.propertyTab.TabIndex = 2;
             this.propertyTab.Text = "Property View";
             this.propertyTab.UseVisualStyleBackColor = true;
@@ -146,17 +154,20 @@
             this.renderTab.Location = new System.Drawing.Point(4, 22);
             this.renderTab.Name = "renderTab";
             this.renderTab.Padding = new System.Windows.Forms.Padding(3);
-            this.renderTab.Size = new System.Drawing.Size(476, 391);
+            this.renderTab.Size = new System.Drawing.Size(696, 415);
             this.renderTab.TabIndex = 1;
             this.renderTab.Text = "Rendered";
             this.renderTab.UseVisualStyleBackColor = true;
             // 
-            // addRootFromFileToolStripMenuItem
+            // LocationLabel
             // 
-            this.addRootFromFileToolStripMenuItem.Name = "addRootFromFileToolStripMenuItem";
-            this.addRootFromFileToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.addRootFromFileToolStripMenuItem.Text = "Add Root From File";
-            this.addRootFromFileToolStripMenuItem.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem_Click);
+            this.LocationLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.LocationLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LocationLabel.Location = new System.Drawing.Point(220, 24);
+            this.LocationLabel.Name = "LocationLabel";
+            this.LocationLabel.Size = new System.Drawing.Size(484, 16);
+            this.LocationLabel.TabIndex = 5;
+            this.LocationLabel.Text = "Location:";
             // 
             // Form1
             // 
@@ -164,6 +175,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(704, 441);
             this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.LocationLabel);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -193,6 +205,7 @@
         private System.Windows.Forms.TabPage propertyTab;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem;
+        private System.Windows.Forms.Label LocationLabel;
     }
 }
 
