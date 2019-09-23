@@ -306,7 +306,7 @@ namespace HSDRaw
                 if (i < 0 || i > Length)
                     throw new IndexOutOfRangeException();
                 var t = Activator.CreateInstance<T>();
-                t._s = _s.GetEmbededStruct(i * Stride, Stride);
+                t._s = _s.GetEmbeddedStruct(i * Stride, Stride);
                 return t;
             }
             set

@@ -207,7 +207,7 @@ namespace HSDRaw
         /// <param name="loc"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        public HSDStruct GetEmbededStruct(int loc, int length)
+        public HSDStruct GetEmbeddedStruct(int loc, int length)
         {
             HSDStruct s = new HSDStruct();
 
@@ -225,7 +225,7 @@ namespace HSDRaw
         }
         
         /// <summary>
-        /// Sets a struct to the one embedded in this one
+        /// Embeddeds a given <see cref="HSDStruct"/> at given location
         /// </summary>
         /// <param name="loc"></param>
         /// <param name="str"></param>
@@ -234,13 +234,79 @@ namespace HSDRaw
             if(str == null)
                 return;
 
+            // Sets the bytes for this range
             SetBytes(loc, str.GetData());
+
+            // Remove references in this range
+            for(int i = loc; i < loc + str.Length; i++)
+            {
+                if (References.ContainsKey(i))
+                    References.Remove(i);
+            }
             
+            // Copy new references over
             foreach (var v in str._references)
             {
                 SetReferenceStruct(loc + v.Key, v.Value);
             }
             
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="loc"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public T[] GetEmbeddedAccessorArray<T>(int loc, int count) where T : HSDAccessor
+        {
+            int structSize = Activator.CreateInstance<T>().TrimmedSize;
+            if (structSize == -1)
+                throw new NotImplementedException("Size is not implemented for " + typeof(T).ToString());
+
+            int length = structSize * count;
+            if (Length < loc + length)
+                throw new IndexOutOfRangeException("Embedded array reaches out of bound");
+
+            T[] v = new T[count];
+
+            for(int i = 0; i < count; i++)
+            {
+                v[i] = Activator.CreateInstance<T>();
+                v[i]._s = GetEmbeddedStruct(loc + structSize * i, v[i].TrimmedSize);
+            }
+
+            return v;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="loc"></param>
+        /// <param name="values"></param>
+        public void SetEmbeddedAccessorArray<T>(int loc, T[] values) where T : HSDAccessor
+        {
+            //TODO: allow multiple embed structs?
+
+            var length = Activator.CreateInstance<T>().TrimmedSize;
+            
+            // clear existing struct references
+            for (int i = loc; i < Length; i++)
+                if (References.ContainsKey(i))
+                    References.Remove(i);
+
+            // resize struct to fix
+            Resize(loc + values.Length * length);
+
+            // embed data
+            for(int i = 0; i < values.Length; i++)
+            {
+                if (values[i]._s.Length > length)
+                    throw new OverflowException($"Struct size ({values[i].GetType()})=>({typeof(T)}) was larger than expected {values[i]._s.Length} > {length}");
+                SetEmbededStruct(loc + i * length, values[i]._s);
+            }
         }
 
         /// <summary>

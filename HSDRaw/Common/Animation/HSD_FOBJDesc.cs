@@ -19,7 +19,7 @@
             get
             {
                 HSD_FOBJ fobj = new HSD_FOBJ();
-                fobj._s = _s.GetEmbededStruct(0x0C, 0x8);
+                fobj._s = _s.GetEmbeddedStruct(0x0C, 0x8);
                 return fobj;
             }
             set

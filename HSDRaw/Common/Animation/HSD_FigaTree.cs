@@ -130,7 +130,7 @@ namespace HSDRaw.Common.Animation
             var tracks = _s.GetReference<HSDAccessor>(0x10);
             
             HSD_Track track = new HSD_Track();
-            track._s = tracks._s.GetEmbededStruct(index * 0x0C, 0x0C);
+            track._s = tracks._s.GetEmbeddedStruct(index * 0x0C, 0x0C);
 
             return track;
         }

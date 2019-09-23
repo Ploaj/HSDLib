@@ -84,7 +84,7 @@ namespace HSDRawViewer.Converters
                     for (int i = 0; i < f.Actions.Length; i++)
                     {
                         SBM_FighterSubAction subaction = new HSDRaw.Melee.Pl.SBM_FighterSubAction();
-                        subaction._s = val._s.GetEmbededStruct(0x18 * i, 0x18);
+                        subaction._s = val._s.GetEmbeddedStruct(0x18 * i, 0x18);
 
                         if (!ExportedAnimations.Contains(subaction.Name) && subaction.Name != null && subaction.Name != "")
                         {

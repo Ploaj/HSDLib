@@ -37,7 +37,7 @@ namespace HSDRaw.Common
                 for(int i = 0; i < count; i++)
                 {
                     attributes.Add(new GX_Attribute());
-                    attributes[i]._s = data._s.GetEmbededStruct(i * 0x18, 0x18);
+                    attributes[i]._s = data._s.GetEmbeddedStruct(i * 0x18, 0x18);
                     if (attributes[i].AttributeName == GXAttribName.GX_VA_NULL)
                         break;
                 }

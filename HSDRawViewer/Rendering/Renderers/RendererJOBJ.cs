@@ -357,7 +357,7 @@ namespace HSDRawViewer.Rendering
         {
             Viewport.MaxFrame = 0;
             Viewport.EnableAnimationTrack = true;
-            Viewport.AnimSpeed = 1;
+            Viewport.AnimSpeed = 2;
             Nodes.Clear();
             if (joint == null)
                 return;
@@ -391,7 +391,7 @@ namespace HSDRawViewer.Rendering
                 return;
             Viewport.MaxFrame = (int)tree.FrameCount;
             Viewport.EnableAnimationTrack = true;
-            Viewport.AnimSpeed = 1;
+            Viewport.AnimSpeed = 2;
             foreach (var tracks in tree.Nodes)
             {
                 AnimNode n = new AnimNode();

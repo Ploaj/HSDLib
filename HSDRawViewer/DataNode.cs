@@ -110,6 +110,9 @@ namespace HSDRawViewer
                                 ArrayName = prop.Name,
                                 ArrayIndex = index
                             });
+                            // add substructs too so they don't get appended at the end
+                            foreach (var ss in a._s.References)
+                                strucs.Add(ss.Value);
                             AddNext(a);
                             index++;
                         }

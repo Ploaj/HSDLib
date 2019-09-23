@@ -23,7 +23,7 @@ namespace HSDRaw.Common
                     if (i > 0)
                     {
                         images[i] = new HSD_ParticleImage();
-                        images[i]._s = _s.GetEmbededStruct(offset, length);
+                        images[i]._s = _s.GetEmbeddedStruct(offset, length);
                         images[i].SubtractOffset(offset);
                     }
                 }
@@ -32,7 +32,7 @@ namespace HSDRaw.Common
                     var offset = _s.GetInt32(0x04 * (Length - 1));
                     var length = _s.Length - offset;
                     images[Length - 1] = new HSD_ParticleImage();
-                    images[Length - 1]._s = _s.GetEmbededStruct(offset, length);
+                    images[Length - 1]._s = _s.GetEmbeddedStruct(offset, length);
                     images[Length - 1].SubtractOffset(offset);
                 }
                 return images;
