@@ -334,12 +334,14 @@ namespace HSDRaw
         {
             if (value == null || value.Length == 0)
             {
-                SetInt32(locCount, 0);
+                if(locCount != -1)
+                    SetInt32(locCount, 0);
                 SetReference(loc, null);
             }
             else
             {
-                SetInt32(locCount, value.Length);
+                if (locCount != -1)
+                    SetInt32(locCount, value.Length);
                 var re = GetCreateReference<HSDArrayAccessor<T>>(loc);
                 re.Array = value;
             }

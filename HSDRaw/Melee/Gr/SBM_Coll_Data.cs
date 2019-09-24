@@ -15,6 +15,7 @@ namespace HSDRaw.Melee.Gr
         AlienGoop   = 8,
         Water       = 10,
         Glass       = 12,
+        GreatBay    = 13,
         FlatZone    = 16,
         Checkered   = 18
     }

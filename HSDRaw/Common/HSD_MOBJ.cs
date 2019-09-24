@@ -88,9 +88,9 @@ namespace HSDRaw.Common
         public byte SPC_B { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
         public byte SPC_A { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
 
-        public int AmbientColorABGR { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
-        public int DiffuseColorABGR { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
-        public int SpecularColorABGR { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+        public uint AmbientColorABGR { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
+        public uint DiffuseColorABGR { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
+        public uint SpecularColorABGR { get => (uint)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
         
         public float Alpha { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
 

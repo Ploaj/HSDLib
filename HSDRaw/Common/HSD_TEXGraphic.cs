@@ -7,22 +7,22 @@ namespace HSDRaw.Common
     /// <summary>
     /// WIP: Missing Editing features
     /// </summary>
-    public class HSD_TEXGraphic : HSDAccessor
+    public class HSD_TEXGraphicBank : HSDAccessor
     {
         public int Length { get => _s.GetInt32(0x00); internal set => _s.SetInt32(0x00, value); }
 
-        public HSD_ParticleImage[] ParticleImages
+        public HSD_TexGraphic[] ParticleImages
         {
             get
             {
-                HSD_ParticleImage[] images = new HSD_ParticleImage[Length];
+                HSD_TexGraphic[] images = new HSD_TexGraphic[Length];
                 for(int i = 0; i < Length - 1; i++)
                 {
                     var offset = _s.GetInt32(0x04 * i);
                     var length = _s.GetInt32(0x04 * (i + 1)) - offset;
                     if (i > 0)
                     {
-                        images[i] = new HSD_ParticleImage();
+                        images[i] = new HSD_TexGraphic();
                         images[i]._s = _s.GetEmbeddedStruct(offset, length);
                         images[i].SubtractOffset(offset);
                     }
@@ -31,7 +31,7 @@ namespace HSDRaw.Common
                 {
                     var offset = _s.GetInt32(0x04 * (Length - 1));
                     var length = _s.Length - offset;
-                    images[Length - 1] = new HSD_ParticleImage();
+                    images[Length - 1] = new HSD_TexGraphic();
                     images[Length - 1]._s = _s.GetEmbeddedStruct(offset, length);
                     images[Length - 1].SubtractOffset(offset);
                 }
@@ -40,7 +40,7 @@ namespace HSDRaw.Common
         }
     }
 
-    public class HSD_ParticleImage : HSDAccessor
+    public class HSD_TexGraphic : HSDAccessor
     {
         public int ImageCount { get => _s.GetInt32(0x00); internal set => _s.SetInt32(0x00, value); }
 

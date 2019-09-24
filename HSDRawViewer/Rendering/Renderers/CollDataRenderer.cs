@@ -39,6 +39,7 @@ namespace HSDRawViewer.Rendering.Renderers
             { CollMaterial.Glass, new Vector3(0xC0 / 255f, 0xC0 / 255f, 0xFF / 255f) },
             { CollMaterial.Checkered, new Vector3(0xFF / 255f, 0xFF / 255f, 0xC0 / 255f) },
             { CollMaterial.FlatZone, new Vector3(0xC0 / 255f, 0xC0 / 255f, 0xC0 / 255f) },
+            { CollMaterial.GreatBay, new Vector3(1f, 0, 0) },
         };
 
         private static void RenderCollRegion(SBM_CollVertex[] vertices, SBM_CollLink[] links, int start, int count)

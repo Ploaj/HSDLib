@@ -13,6 +13,7 @@ namespace HSDRawViewer.Rendering
     {
         private GroupBox _animationGroup;
         private Button _animationPlayButton;
+        private TrackBar _animationTrackBar;
 
         private GLControl _glViewport;
 
@@ -210,7 +211,13 @@ namespace HSDRawViewer.Rendering
             };
             _animationPlayButton.Dock = DockStyle.Fill;
 
+            _animationTrackBar = new TrackBar();
+            _animationTrackBar.Dock = DockStyle.Top;
+            //_animationTrackBar.DataBindings.Add(new Binding("Value", this, "Frame"));
+            //DataBindings.Add("Frame", _animationTrackBar, "Value");
+
             _animationGroup.Controls.Add(_animationPlayButton);
+            _animationGroup.Controls.Add(_animationTrackBar);
 
             ClearControls();
 
@@ -243,7 +250,11 @@ namespace HSDRawViewer.Rendering
         public void Render(object sender, EventArgs args)
         {
             if (!_animationGroup.Visible && EnableAnimationTrack)
+            {
                 _animationGroup.Visible = true;
+                _animationTrackBar.Maximum = MaxFrame;
+                _animationTrackBar.Minimum = 0;
+            }
 
             if (_animationGroup.Visible && !EnableAnimationTrack)
                 _animationGroup.Visible = false;

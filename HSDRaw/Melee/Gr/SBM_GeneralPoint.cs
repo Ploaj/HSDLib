@@ -51,9 +51,9 @@ namespace HSDRaw.Melee.Gr
     {
         public override int TrimmedSize => 0x0C;
 
-        public HSD_JOBJ Points { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
+        public HSD_JOBJ JOBJReference { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
 
-        public SBM_GeneralPointInfo[] Lights
+        public SBM_GeneralPointInfo[] Points
         {
             get
             {

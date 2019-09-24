@@ -55,15 +55,18 @@ namespace HSDRawViewer.Rendering
                 ClearCache();
                 currentAccessor = accessor;
 
-                if (accessor is HSD_ParticleImage)
-                {
+                if (accessor is HSD_TexGraphic)
                     vp.AddToolStrip(TexGraphicRenderer.ToolStrip);
-                }
+                if (accessor is HSD_TOBJ)
+                    vp.AddToolStrip(RendererTOBJ.ToolStrip);
             }
 
             GL.PushAttrib(AttribMask.AllAttribBits);
 
-            if (accessor is HSD_ParticleImage image)
+            if (accessor is HSD_TOBJ tobj)
+                RendererTOBJ.Render(tobj, vp.ViewportWidth, vp.ViewportHeight);
+            else
+            if (accessor is HSD_TexGraphic image)
                 TexGraphicRenderer.Render(image, vp.ViewportWidth, vp.ViewportHeight);
             else
             if (accessor is HSD_JOBJ jobj)

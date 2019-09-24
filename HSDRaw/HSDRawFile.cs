@@ -289,7 +289,7 @@ namespace HSDRaw
                     else
                     if (rootStrings[i].EndsWith("_texg"))
                     {
-                        var acc = new HSD_TEXGraphic();
+                        var acc = new HSD_TEXGraphicBank();
                         acc._s = str;
                         a = acc;
                     }

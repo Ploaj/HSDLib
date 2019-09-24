@@ -45,7 +45,10 @@ namespace HSDRawViewer
                 ImageKey = "known";
                 SelectedImageKey = "known";
             }
-            Nodes.Add(new TreeNode()); // dummy
+
+            // add dummy only if this node has references
+            if(accessor._s.References.Count != 0)
+                Nodes.Add(new TreeNode()); // dummy
         }
 
         private void AddNext(HSDAccessor access)
@@ -134,6 +137,7 @@ namespace HSDRawViewer
                 }
             }
 
+            // appends structs without labels
             foreach (var v in Accessor._s.References)
             {
                 if(!strucs.Contains(v.Value))

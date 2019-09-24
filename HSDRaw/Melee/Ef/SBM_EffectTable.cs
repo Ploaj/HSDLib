@@ -7,7 +7,7 @@ namespace HSDRaw.Melee.Ef
     {
         // Particle at 0x00
 
-        public HSD_TEXGraphic TextureGraphics { get => _s.GetReference<HSD_TEXGraphic>(0x04); set => _s.SetReference(0x04, value); }
+        public HSD_TEXGraphicBank TextureGraphics { get => _s.GetReference<HSD_TEXGraphicBank>(0x04); set => _s.SetReference(0x04, value); }
 
         // Unknown at 0x08
 
