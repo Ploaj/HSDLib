@@ -32,4 +32,7 @@ after_build:
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\OpenTK.dll"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\OpenTK.GLControl.dll"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRaw.dll"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\DirectXTexNet.dll"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\x64"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\x86"
   - appveyor PushArtifact "HSDRAW.zip"
