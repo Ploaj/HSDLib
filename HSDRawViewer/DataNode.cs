@@ -47,7 +47,7 @@ namespace HSDRawViewer
             }
 
             // add dummy only if this node has references
-            if(accessor._s.References.Count != 0)
+            //if(accessor._s.References.Count != 0)
                 Nodes.Add(new TreeNode()); // dummy
         }
 

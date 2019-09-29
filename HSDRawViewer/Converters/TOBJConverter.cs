@@ -68,7 +68,7 @@ namespace HSDRawViewer.Converters
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        private static Bitmap RgbaToImage(byte[] data, int width, int height)
+        public static Bitmap RgbaToImage(byte[] data, int width, int height)
         {
             if (width == 0) width = 1;
             if (height == 0) height = 1;

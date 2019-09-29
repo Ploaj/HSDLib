@@ -1,5 +1,7 @@
 ﻿using HSDRaw.Common;
+using HSDRawViewer.Converters;
 using OpenTK.Graphics.OpenGL;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering
@@ -35,6 +37,39 @@ namespace HSDRawViewer.Rendering
                 ActualSize = !ActualSize;
             };
             _toolStrip.Items.Add(toggleSize);
+
+            ToolStripButton export = new ToolStripButton("Export Strip");
+            export.Click += (sender, args) =>
+            {
+                using (SaveFileDialog d = new SaveFileDialog())
+                {
+                    d.Filter = "PNG (*.png)|*.png";
+
+                    if(d.ShowDialog() == DialogResult.OK)
+                    {
+                        var bitmap = new Bitmap(ParticleGroup.Width * ParticleGroup.ImageCount, ParticleGroup.Height);
+                        using (var g = Graphics.FromImage(bitmap))
+                        {
+                            var imageData = ParticleGroup.GetRGBAImageData();
+                            for (int i = 0; i < ParticleGroup.ImageCount; i++)
+                            {
+                                var frame = TOBJConverter.RgbaToImage(imageData[i], ParticleGroup.Width, ParticleGroup.Height);
+                                g.DrawImage(frame, ParticleGroup.Width * i, 0);
+                            }
+                        }
+                        bitmap.Save(d.FileName);
+                        bitmap.Dispose();
+                    }
+                }
+            };
+            _toolStrip.Items.Add(export);
+
+            ToolStripButton import = new ToolStripButton("Import Strip");
+            import.Click += (sender, args) =>
+            {
+
+            };
+            //_toolStrip.Items.Add(import);
         }
 
         public static void Render(HSD_TexGraphic particle, int windowWidth, int windowHeight)
