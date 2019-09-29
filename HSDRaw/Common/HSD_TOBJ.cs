@@ -116,7 +116,8 @@ namespace HSDRaw.Common
 
                 if (TPLConv.IsPalettedFormat(format))
                 {
-                    TlutData = new HSD_Tlut();
+                    if(TlutData == null)
+                        TlutData = new HSD_Tlut();
                     TlutData.Format = palFormat;
                     TlutData.TlutData = palData;
                     TlutData.ColorCount = (short)(palData.Length / 2);
@@ -124,7 +125,8 @@ namespace HSDRaw.Common
                 else
                     TlutData = null;
 
-                ImageData = new HSD_Image();
+                if(ImageData == null)
+                    ImageData = new HSD_Image();
                 ImageData.ImageData = encodedData;
                 ImageData.Width = (short)width;
                 ImageData.Height = (short)height;
@@ -134,7 +136,8 @@ namespace HSDRaw.Common
             {
                 TlutData = null;
 
-                ImageData = new HSD_Image();
+                if(ImageData == null)
+                    ImageData = new HSD_Image();
                 ImageData.ImageData = TPLConv.ToCMP(data, width, height);
                 ImageData.Width = (short)width;
                 ImageData.Height = (short)height;

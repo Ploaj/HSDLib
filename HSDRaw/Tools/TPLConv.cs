@@ -1007,7 +1007,7 @@ namespace HSDRaw.Tools
         
         public static byte[] ToCMP(byte[] data, int width, int height)
         {
-            byte[] output = new byte[width * height];
+            byte[] output = new byte[width * height / 2];
 
             int off1 = 0;
             for (int y = 0; y < height; y += 4)

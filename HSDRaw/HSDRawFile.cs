@@ -325,6 +325,31 @@ namespace HSDRaw
             Save(new FileStream(fileName, FileMode.Create));
         }
 
+        public bool IsBuffer(HSDStruct a)
+        {
+            return a.References.Count == 0 && a.Length >= 0x50;
+        }
+
+        //https://stackoverflow.com/questions/16340/how-do-i-generate-a-hashcode-from-a-byte-array-in-c/16381
+        public static int ComputeHash(params byte[] data)
+        {
+            unchecked
+            {
+                const int p = 16777619;
+                int hash = (int)2166136261;
+
+                for (int i = 0; i < data.Length; i++)
+                    hash = (hash ^ data[i]) * p;
+
+                hash += hash << 13;
+                hash ^= hash >> 7;
+                hash += hash << 3;
+                hash ^= hash >> 17;
+                hash += hash << 5;
+                return hash;
+            }
+        }
+
         /// <summary>
         /// saves dat data to stream with optional alignment
         /// </summary>
@@ -332,7 +357,7 @@ namespace HSDRaw
         /// <param name="bufferAlign"></param>
         public void Save(Stream stream, bool bufferAlign = true)
         {
-            // gather all structs
+            // gather all structs--------------------------------------------------------------------------
             var allStructs = new List<HSDStruct>();
             foreach (var r in Roots)
             {
@@ -349,9 +374,9 @@ namespace HSDRaw
 
             // struct cache cleanup
 
-            // remove unused structs
+            // remove unused structs--------------------------------------------------------------------------
             var unused = new List<HSDStruct>();
-            //Console.WriteLine(_structCache.Count + " " + allStructs.Count);
+
             foreach (var s in _structCache)
             {
                 if (!allStructs.Contains(s))
@@ -359,19 +384,56 @@ namespace HSDRaw
             }
             foreach(var s in unused)
             {
-                //TODO: this may be bugged
-                //Console.WriteLine("removing 0x" + s.GetData().Length.ToString("X"));
+                //TODO: this may be bugged?
+                //Console.WriteLine("removing 0x" + s.Length.ToString("X"));
                 _structCache.Remove(s);
             }
 
-            // add missing structs
+            // add missing structs--------------------------------------------------------------------------
             foreach (var s in allStructs)
             {
-                if(!_structCache.Contains(s))
-                    _structCache.Add(s);
+                if (!_structCache.Contains(s))
+                {
+                    if (IsBuffer(s))
+                        _structCache.Insert(0, s);
+                    else
+                        _structCache.Add(s);
+                }
             }
             allStructs.Clear();
 
+            // remove duplicate buffers--------------------------------------------------------------------------
+            Dictionary<int, HSDStruct> hashToStruct = new Dictionary<int, HSDStruct>();
+            var toRemove = new List<HSDStruct>();
+            foreach (var v in _structCache)
+            {
+                if (IsBuffer(v))
+                {
+                    var hash = ComputeHash(v.GetData());
+                    if (hashToStruct.ContainsKey(hash))
+                    {
+                        // correct references and remove this hash
+                        foreach(var s in _structCache)
+                        {
+                            var keys = s.References.Keys.ToArray();
+                            foreach (var re in keys)
+                            {
+                                if (s.References[re] == v)
+                                    s.References[re] = hashToStruct[hash];
+                            }
+                        }
+                        toRemove.Add(v);
+                    }
+                    else
+                    {
+                        hashToStruct.Add(hash, v);
+                    }
+                }
+            }
+            foreach (var v in toRemove)
+                _structCache.Remove(v);
+
+            // build file --------------------------------------------------------------------------
             using (BinaryWriterExt writer = new BinaryWriterExt(stream))
             {
                 writer.BigEndian = true;
@@ -388,7 +450,7 @@ namespace HSDRaw
                     // no refereneces = buffer?
                     // textures need to be 0x20 aligned... but there is no way to detect which structures are textures
                     // this can result in unnessecary padding
-                    if (s.Length > 0x50 && s.References.Count == 0 && bufferAlign) 
+                    if (IsBuffer(s) && bufferAlign) 
                         writer.Align(0x20);
                     else
                         writer.Align(4);
