@@ -26,6 +26,31 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        public int ImageCount
+        {
+            get
+            {
+                return (int)nudCount.Value;
+            }
+        }
+
+        public bool ShowCount
+        {
+            set
+            {
+                if (value)
+                {
+                    countLabel.Visible = true;
+                    nudCount.Visible = true;
+                }
+                else
+                {
+                    countLabel.Visible = false;
+                    nudCount.Visible = false;
+                }
+            }
+        }
+
         public TextureImportDialog()
         {
             InitializeComponent();
@@ -35,6 +60,9 @@ namespace HSDRawViewer.GUI
 
             cbFormat.SelectedItem = GXTexFmt.CMP;
             sbPalFormat.SelectedItem = GXTlutFmt.RGB565;
+
+            countLabel.Visible = false;
+            nudCount.Visible = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -46,6 +74,11 @@ namespace HSDRawViewer.GUI
         private void cbFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
             sbPalFormat.Enabled = TPLConv.IsPalettedFormat(TextureFormat);
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

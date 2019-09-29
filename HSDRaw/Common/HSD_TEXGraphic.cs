@@ -16,26 +16,46 @@ namespace HSDRaw.Common
             get
             {
                 HSD_TexGraphic[] images = new HSD_TexGraphic[Length];
-                for(int i = 0; i < Length - 1; i++)
+                for(int i = 0; i <= Length; i++)
                 {
                     var offset = _s.GetInt32(0x04 * i);
                     var length = _s.GetInt32(0x04 * (i + 1)) - offset;
+                    if(i == Length)
+                        length = _s.Length - offset;
                     if (i > 0)
                     {
-                        images[i] = new HSD_TexGraphic();
-                        images[i]._s = _s.GetEmbeddedStruct(offset, length);
-                        images[i].SubtractOffset(offset);
+                        images[i - 1] = new HSD_TexGraphic();
+                        images[i - 1]._s = _s.GetEmbeddedStruct(offset, length);
+                        images[i - 1].SubtractOffset(offset);
                     }
                 }
-                if(Length > 0)
-                {
-                    var offset = _s.GetInt32(0x04 * (Length - 1));
-                    var length = _s.Length - offset;
-                    images[Length - 1] = new HSD_TexGraphic();
-                    images[Length - 1]._s = _s.GetEmbeddedStruct(offset, length);
-                    images[Length - 1].SubtractOffset(offset);
-                }
                 return images;
+            }
+            set
+            {
+                Length = value.Length;
+
+                int length = 4;
+
+                length += 4 * value.Length;
+
+                if (length % 0x20 != 0)
+                    length += 0x20 - (length % 0x20);
+                
+                var offset = length;
+
+                foreach (var v in value)
+                    length += v._s.Length;
+
+                _s.Resize(length);
+                for(int i = 0; i < value.Length; i++)
+                {
+                    _s.SetInt32(4 + 4 * i, offset);
+                    value[i].AddOffset(offset);
+                    _s.SetBytes(offset, value[i]._s.GetData());
+                    value[i].SubtractOffset(offset);
+                    offset += value[i]._s.Length;
+                }
             }
         }
     }
@@ -106,6 +126,64 @@ namespace HSDRaw.Common
             }
             
             return images;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobjs"></param>
+        public void SetFromTOBJs(HSD_TOBJ[] tobjs)
+        {
+            // set texture information
+            ImageCount = tobjs.Length;
+            ImageFormat = tobjs[0].ImageData.Format;
+            Width = tobjs[0].ImageData.Width;
+            Height = tobjs[0].ImageData.Height;
+            if (tobjs[0].TlutData != null)
+                PaletteFormat = tobjs[0].TlutData.Format;
+            
+            //
+            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
+            int imageSize = TPLConv.GetImageSize(ImageFormat, Width, Height);
+
+            // header length 
+            var newLength = 0x18;
+
+            // add offsets
+            newLength += tobjs.Length * 4;
+            if (isPaletted)
+                newLength += tobjs.Length * 4;
+
+            // align buffer
+            if(newLength % 0x20 != 0)
+                newLength += 0x20 - (newLength % 0x20);
+
+            var offset = newLength;
+
+            // add padding for data
+            newLength += imageSize * tobjs.Length;
+
+            if (isPaletted)
+                newLength += 0x200 * tobjs.Length;
+
+            // resize buffer
+            _s.Resize(newLength);
+            
+            // now inject offsets to palette and image data
+            
+            for(int i = 0; i < ImageCount; i++)
+            {
+                _s.SetInt32(0x18 + i * 4, offset);
+                _s.SetBytes(offset, tobjs[i].ImageData.ImageData);
+                offset += imageSize;
+
+                if (isPaletted)
+                {
+                    _s.SetInt32(0x18 + (ImageCount + i) * 4, offset);
+                    _s.SetBytes(offset, tobjs[i].TlutData.TlutData);
+                    offset += 0x200;
+                }
+            }
         }
     }
 }

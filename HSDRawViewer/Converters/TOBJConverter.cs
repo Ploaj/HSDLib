@@ -30,6 +30,19 @@ namespace HSDRawViewer.Converters
         public static void InjectBitmap(HSD_TOBJ tobj, string filepath, GXTexFmt imgFormat, GXTlutFmt palFormat)
         {
             Bitmap bmp = new Bitmap(filepath);
+            InjectBitmap(tobj, bmp, imgFormat, palFormat);
+            bmp.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobj"></param>
+        /// <param name="bmp"></param>
+        /// <param name="imgFormat"></param>
+        /// <param name="palFormat"></param>
+        public static void InjectBitmap(HSD_TOBJ tobj, Bitmap bmp, GXTexFmt imgFormat, GXTlutFmt palFormat)
+        {
             if (imgFormat != GXTexFmt.CMP)
             {
                 var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -44,7 +57,9 @@ namespace HSDRawViewer.Converters
             }
             else
             {
-                using (var origImage = TexHelper.Instance.LoadFromWICFile(filepath, WIC_FLAGS.NONE))
+                var temp = System.IO.Path.GetTempFileName() + ".png";
+                bmp.Save(temp);
+                using (var origImage = TexHelper.Instance.LoadFromWICFile(temp, WIC_FLAGS.NONE))
                 {
                     var scratch = origImage.Compress(0, DXGI_FORMAT.BC1_UNORM_SRGB, TEX_COMPRESS_FLAGS.DEFAULT, 1);
                     var ptr = scratch.GetPixels();
@@ -52,13 +67,13 @@ namespace HSDRawViewer.Converters
                     byte[] data = new byte[length];
 
                     Marshal.Copy(ptr, data, 0, (int)length);
-                    
+
                     scratch.Dispose();
 
                     tobj.EncodeImageData(data, bmp.Width, bmp.Height, GXTexFmt.CMP, GXTlutFmt.IA8);
                 }
+                System.IO.File.Delete(temp);
             }
-            bmp.Dispose();
         }
 
         /// <summary>

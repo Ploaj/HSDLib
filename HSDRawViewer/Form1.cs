@@ -20,10 +20,12 @@ namespace HSDRawViewer
 
         private Dictionary<string, StructData> stringToStruct = new Dictionary<string, StructData>();
 
-        private DataNode SelectedDataNode = null;
+        public static DataNode SelectedDataNode { get; internal set; } = null;
 
         private Dictionary<Type, ContextMenu> typeToContextMenu = new Dictionary<Type, ContextMenu>();
         private ContextMenu commonContextMenu = new ContextMenu();
+
+        public static bool RefreshNode = false;
 
         public Form1()
         {
@@ -177,7 +179,6 @@ namespace HSDRawViewer
 
         public void GenerateContextMenus()
         {
-
             {
                 var cm = new ContextMenu();
                 AttachCommonMenus(cm);

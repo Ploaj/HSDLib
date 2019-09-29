@@ -75,11 +75,12 @@ namespace HSDRawViewer
                 if (ArrayMember)
                 {
                     var prop = parent.Accessor.GetType().GetProperty(ArrayName);
-                    prop.SetValue(parent.Accessor, prop.GetValue(parent.Accessor));
+                    var arr = prop.GetValue(parent.Accessor) as HSDAccessor[];
+                    arr[ArrayIndex] = Accessor;
+                    prop.SetValue(parent.Accessor, arr);
 
-                    parent.Refresh();
                 }
-
+                //parent.Refresh();
             }
 
             Collapse();
