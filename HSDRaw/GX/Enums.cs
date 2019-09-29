@@ -79,7 +79,7 @@
         RGBX8 = 2,
         RGBA4 = 3,
         RGBA6 = 4,
-        RGBA8 = 5
+        RGBA8 = 5,
     }
 
     public enum GXAnisotropy

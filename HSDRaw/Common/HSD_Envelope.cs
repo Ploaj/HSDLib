@@ -8,7 +8,7 @@ namespace HSDRaw.Common
     /// </summary>
     public class HSD_Envelope : HSDAccessor
     {
-        public int EnvelopeCount { get { return (_s.Length / 8) - 1; } }
+        public int EnvelopeCount { get { return _s.References.Count; } }// (_s.Length / 8) - 1;
 
         public float[] Weights
         {
@@ -47,11 +47,17 @@ namespace HSDRaw.Common
 
         public HSD_JOBJ GetJOBJAt(int index)
         {
+            if (8 * index >= _s.Length)
+                throw new IndexOutOfRangeException("JOBJ out of envelope range");
+
             return _s.GetReference<HSD_JOBJ>(8 * index);
         }
 
         public float GetWeightAt(int index)
         {
+            if (8 * index + 4 >= _s.Length)
+                throw new IndexOutOfRangeException("Weight out of envelope range");
+
             return _s.GetFloat(8 * index + 4);
         }
 

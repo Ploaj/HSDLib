@@ -151,7 +151,8 @@ namespace HSDRaw.Common
             {
                 Attributes = value.Attributes.ToArray();
                 DisplayListBuffer = value.ToBuffer();
-                EnvelopeWeights = value.Envelopes.ToArray();
+                if(value.Attributes.Find(e=>e.AttributeName == GXAttribName.GX_VA_PNMTXIDX) != null)
+                    EnvelopeWeights = value.Envelopes.ToArray();
             }
         }
 

@@ -208,10 +208,12 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="mobj"></param>
-        private void BindMOBJ_Legacy(HSD_MOBJ mobj, out float wscale, out float hscale)
+        private void BindMOBJ_Legacy(HSD_MOBJ mobj, out float wscale, out float hscale, out bool mirrorX, out bool mirrorY)
         {
             wscale = 1;
             hscale = 1;
+            mirrorX = false;
+            mirrorY = false;
             if (mobj == null)
                 return;
 
@@ -251,6 +253,9 @@ namespace HSDRawViewer.Rendering
 
                     wscale = tex.WScale;
                     hscale = tex.HScale;
+
+                    mirrorX = tex.WrapS == GXWrapMode.MIRROR;
+                    mirrorY = tex.WrapT == GXWrapMode.MIRROR;
                 }
             }
             else
@@ -274,6 +279,8 @@ namespace HSDRawViewer.Rendering
 
             float wscale = 1;
             float hscale = 1;
+            bool mirrorX = false;
+            bool mirrorY = false;
             //GL.Enable(EnableCap.AlphaTest);
             //GL.AlphaFunc(AlphaFunction.Lequal, 255);
             GL.Enable(EnableCap.Blend);
@@ -281,7 +288,7 @@ namespace HSDRawViewer.Rendering
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
-            BindMOBJ_Legacy(dobj.Mobj, out wscale, out hscale);
+            BindMOBJ_Legacy(dobj.Mobj, out wscale, out hscale, out mirrorX, out mirrorY);
 
             // render primitives
             foreach (var p in dobj.Pobj.List)
@@ -303,6 +310,8 @@ namespace HSDRawViewer.Rendering
                         var tx0 = GXTranslator.toVector2(dl.Vertices[offset + i].TEX0);
                         tx0.X *= wscale;
                         tx0.Y *= hscale;
+                        if(mirrorY)
+                            tx0.Y += 1;
                         if (envelopeWeights != null)
                         {
                             if (dl.Vertices[offset + i].PNMTXIDX / 3 >= envelopeWeights.Length)
@@ -315,10 +324,14 @@ namespace HSDRawViewer.Rendering
                             else
                             if (en.EnvelopeCount == 1)
                             {
-                                var t = jobjToWorldTransformCache[en.GetJOBJAt(0)];
-                                pos = Vector3.TransformPosition(pos, t);
+                                if (jobjToWorldTransformCache.ContainsKey(en.GetJOBJAt(0)))
+                                {
+                                    var t = jobjToWorldTransformCache[en.GetJOBJAt(0)];
+                                    pos = Vector3.TransformPosition(pos, t);
+                                }
                             }
                             else
+                            if(p.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
                             {
                                 Vector3 bindpos = Vector3.Zero;
                                 for (int j = 0; j < en.EnvelopeCount; j++)

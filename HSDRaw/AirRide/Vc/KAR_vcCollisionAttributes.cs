@@ -17,6 +17,6 @@
         public float Unknown8 { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
         public float Unknown9 { get => _s.GetFloat(0x2c); set => _s.SetFloat(0x2c, value); }
         public float Unknown10 { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
-        public int Unknown11 { get => _s.GetInt32(0x34); set => _s.SetInt32(0x34, value); }
+        public int Flag { get => _s.GetInt32(0x34); set => _s.SetInt32(0x34, value); }
     }
 }

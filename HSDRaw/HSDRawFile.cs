@@ -360,7 +360,7 @@ namespace HSDRaw
             foreach(var s in unused)
             {
                 //TODO: this may be bugged
-                Console.WriteLine("removing 0x" + s.GetData().Length.ToString("X"));
+                //Console.WriteLine("removing 0x" + s.GetData().Length.ToString("X"));
                 _structCache.Remove(s);
             }
 

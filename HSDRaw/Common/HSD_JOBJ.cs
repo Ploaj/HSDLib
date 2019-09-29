@@ -62,10 +62,19 @@ namespace HSDRaw.Common
         public float TX { get => _s.GetFloat(0x2C); set => _s.SetFloat(0x2C, value); }
         public float TY { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
         public float TZ { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
-        
+
         // matrix
 
         // robj
 
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

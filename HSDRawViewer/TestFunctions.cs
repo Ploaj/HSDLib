@@ -21,8 +21,6 @@ namespace HSDRawViewer
 
             var rootJOBJ = (HSD_JOBJ)(file.Roots[0].Data);
 
-            GX_Attribute[] attributes = null;
-
             var compressor = new GX_VertexCompressor();
             foreach (var jobj in rootJOBJ.DepthFirstList)
             {
@@ -31,8 +29,13 @@ namespace HSDRawViewer
                     {
                         if (dobj.Pobj != null)
                         {
+                            GXAttribName[] attributes = null;
                             if (attributes == null)
-                                attributes = dobj.Pobj.Attributes;
+                            {
+                                attributes = new GXAttribName[dobj.Pobj.Attributes.Length - 1];
+                                for (int i = 0; i < attributes.Length; i++)
+                                    attributes[i] = dobj.Pobj.Attributes[i].AttributeName;
+                            }
 
                             List<GX_Vertex> triList = new List<GX_Vertex>();
                             List<HSD_JOBJ[]> bones = new List<HSD_JOBJ[]>();
@@ -99,7 +102,7 @@ namespace HSDRawViewer
                     }
             }
             compressor.SaveChanges();
-            file.Save(path + "_rebuilt");
+            file.Save(path + "_rebuilt.dat");
         }
 
         public static void RebuildFigaTree(string path, string outpath)
