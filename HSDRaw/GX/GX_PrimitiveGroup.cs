@@ -77,12 +77,12 @@ namespace HSDRaw.GX
                     switch (att.AttributeType)
                     {
                         case GXAttribType.GX_DIRECT:
-                            if (att.AttributeName != GXAttribName.GX_VA_CLR0)
-                                writer.Write((byte)g.Indices[i]);
-                            else if (att.AttributeName == GXAttribName.GX_VA_CLR0)
+                            if (att.AttributeName == GXAttribName.GX_VA_CLR0)
                                 WriteGXClr(g.Clr0, writer, att.CompType);
                             else if (att.AttributeName == GXAttribName.GX_VA_CLR1)
                                 WriteGXClr(g.Clr1, writer, att.CompType);
+                            else
+                                writer.Write((byte)g.Indices[i]);
                             break;
                         case GXAttribType.GX_INDEX8:
                             writer.Write((byte)g.Indices[i]);

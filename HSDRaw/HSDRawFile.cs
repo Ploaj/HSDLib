@@ -350,6 +350,39 @@ namespace HSDRaw
             }
         }
 
+        private void RemoveDuplicateBuffers()
+        {
+            Dictionary<int, HSDStruct> hashToStruct = new Dictionary<int, HSDStruct>();
+            var toRemove = new List<HSDStruct>();
+            foreach (var v in _structCache)
+            {
+                if (IsBuffer(v))
+                {
+                    var hash = ComputeHash(v.GetData());
+                    if (hashToStruct.ContainsKey(hash))
+                    {
+                        // correct references and remove this hash
+                        foreach (var s in _structCache)
+                        {
+                            var keys = s.References.Keys.ToArray();
+                            foreach (var re in keys)
+                            {
+                                if (s.References[re] == v)
+                                    s.References[re] = hashToStruct[hash];
+                            }
+                        }
+                        toRemove.Add(v);
+                    }
+                    else
+                    {
+                        hashToStruct.Add(hash, v);
+                    }
+                }
+            }
+            foreach (var v in toRemove)
+                _structCache.Remove(v);
+        }
+
         /// <summary>
         /// saves dat data to stream with optional alignment
         /// </summary>
@@ -403,35 +436,7 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
-            Dictionary<int, HSDStruct> hashToStruct = new Dictionary<int, HSDStruct>();
-            var toRemove = new List<HSDStruct>();
-            foreach (var v in _structCache)
-            {
-                if (IsBuffer(v))
-                {
-                    var hash = ComputeHash(v.GetData());
-                    if (hashToStruct.ContainsKey(hash))
-                    {
-                        // correct references and remove this hash
-                        foreach(var s in _structCache)
-                        {
-                            var keys = s.References.Keys.ToArray();
-                            foreach (var re in keys)
-                            {
-                                if (s.References[re] == v)
-                                    s.References[re] = hashToStruct[hash];
-                            }
-                        }
-                        toRemove.Add(v);
-                    }
-                    else
-                    {
-                        hashToStruct.Add(hash, v);
-                    }
-                }
-            }
-            foreach (var v in toRemove)
-                _structCache.Remove(v);
+            RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------
             using (BinaryWriterExt writer = new BinaryWriterExt(stream))

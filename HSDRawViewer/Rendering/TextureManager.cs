@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
+using OpenTK;
 
 namespace HSDRawViewer.Rendering
 {
@@ -9,6 +10,7 @@ namespace HSDRawViewer.Rendering
         public int TextureCount => Textures.Count;
 
         private List<int> Textures = new List<int>();
+        private List<Vector2> TextureSizes = new List<Vector2>();
 
         public int Get(int index)
         {
@@ -31,6 +33,7 @@ namespace HSDRawViewer.Rendering
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
             Textures.Add(texid);
+            TextureSizes.Add(new Vector2(width, height));
         }
 
         public void ClearTextures()
@@ -61,6 +64,11 @@ namespace HSDRawViewer.Rendering
                     GL.End();
                 }
             }
+        }
+
+        public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize)
+        {
+            RenderTexture(index, windowWidth, windowHeight, actualSize, (int)TextureSizes[index].X, (int)TextureSizes[index].Y);
         }
 
         public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize, int actualWidth, int actualHeight)

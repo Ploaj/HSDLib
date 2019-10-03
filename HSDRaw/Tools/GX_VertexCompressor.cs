@@ -145,12 +145,17 @@ namespace HSDRaw.Tools
                 }
             }
 
+            Attribute.AttributeType = GXAttribType.GX_INDEX8;
+            if (Collection.Count > byte.MaxValue)
+                Attribute.AttributeType = GXAttribType.GX_INDEX16;
+
             //Console.WriteLine($"Scale {scale} {byteScale} {sbyteScale} {shortScale} {ushortScale}");
             //Console.WriteLine(signed + " " + max + " " + error + " " + Epsilon + " " + Math.Abs(max - error));
-            //Console.WriteLine(Attribute.AttributeName + " " + Attribute.CompType + " " + Attribute.Scale);
-
+            
             // calculate stride
             Attribute.Stride = AttributeStride(Attribute);
+            //Console.WriteLine(Attribute.AttributeName + " " + Attribute.CompType + " " + Attribute.Scale + " " + Attribute.Stride);
+
         }
 
         private short AttributeStride(GX_Attribute attribute)
@@ -252,7 +257,7 @@ namespace HSDRaw.Tools
             return (ushort)QuickIndex[o];
         }
 
-        public byte[] GenerateBuffer()
+        public void GenerateBuffer()
         {
             OptimizeCompression();
 
@@ -269,11 +274,11 @@ namespace HSDRaw.Tools
                         WriteData(Writer, vc2.Y, Attribute.CompType, Attribute.Scale);
                     }
                     else
-                    if (ob is GXVector3)
+                    if (ob is GXVector3 vc3)
                     {
-                        WriteData(Writer, ((GXVector3)ob).X, Attribute.CompType, Attribute.Scale);
-                        WriteData(Writer, ((GXVector3)ob).Y, Attribute.CompType, Attribute.Scale);
-                        WriteData(Writer, ((GXVector3)ob).Z, Attribute.CompType, Attribute.Scale);
+                        WriteData(Writer, vc3.X, Attribute.CompType, Attribute.Scale);
+                        WriteData(Writer, vc3.Y, Attribute.CompType, Attribute.Scale);
+                        WriteData(Writer, vc3.Z, Attribute.CompType, Attribute.Scale);
                     }
                     else
                         throw new NotSupportedException("Error Writing: " + ob.GetType());
@@ -281,12 +286,8 @@ namespace HSDRaw.Tools
                 Writer.Align(0x20);
             }
 
-            byte[] data = o.ToArray();
+            Attribute.Buffer = o.ToArray();
             o.Dispose();
-
-            Attribute.Buffer = data;
-
-            return data;
         }
 
         private void WriteData(BinaryWriterExt Writer, float Value, GXCompType Type, float Scale)
@@ -343,13 +344,13 @@ namespace HSDRaw.Tools
             foreach (var pobj in CreatedPOBJs)
             {
                 var names = pobjToAttributes[pobj];
-                var dl = pobjToDisplayList[pobj];
                 var attrs = GetAttributes(names);
+
+                var dl = pobjToDisplayList[pobj];
                 
                 dl.Attributes.Clear();
                 dl.Attributes.AddRange(attrs);
-
-                pobj.Attributes = attrs;
+                
                 pobj.FromDisplayList(dl);
             }
         }

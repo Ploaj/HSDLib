@@ -80,8 +80,9 @@
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\Math3D.cs" />
     <Compile Include="Rendering\Renderers\CollDataRenderer.cs" />
+    <Compile Include="Rendering\Renderers\RendererTexAnim.cs" />
     <Compile Include="Rendering\Renderers\RendererTOBJ.cs" />
-    <Compile Include="Rendering\Renderers\TexGRenderer.cs" />
+    <Compile Include="Rendering\Renderers\RendererTEXG.cs" />
     <Compile Include="Rendering\Renderer.cs" />
     <Compile Include="Rendering\Renderers\RendererAnimation.cs" />
     <Compile Include="Rendering\Renderers\RendererJOBJ.cs" />

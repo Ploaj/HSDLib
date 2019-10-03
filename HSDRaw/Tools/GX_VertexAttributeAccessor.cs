@@ -107,9 +107,9 @@ namespace HSDRaw.Tools
                                 Vertex.CLR0.G = ig.Clr0[1] / 255f;
                                 Vertex.CLR0.B = ig.Clr0[2] / 255f;
                                 Vertex.CLR0.A = ig.Clr0[3] / 255f;
-                            }
-                            if (attribute.AttributeType == GXAttribType.GX_INDEX8)
+                            }else
                             {
+                                f = ReadClr(accessor, attribute, index);
                                 Vertex.CLR0.R = f[0];
                                 Vertex.CLR0.G = f[1];
                                 Vertex.CLR0.B = f[2];
@@ -123,9 +123,9 @@ namespace HSDRaw.Tools
                                 Vertex.CLR1.G = ig.Clr1[1] / 255f;
                                 Vertex.CLR1.B = ig.Clr1[2] / 255f;
                                 Vertex.CLR1.A = ig.Clr1[3] / 255f;
-                            }
-                            if (attribute.AttributeType == GXAttribType.GX_INDEX8)
+                            }else
                             {
+                                f = ReadClr(accessor, attribute, index);
                                 Vertex.CLR1.R = f[0];
                                 Vertex.CLR1.G = f[1];
                                 Vertex.CLR1.B = f[2];
@@ -141,6 +141,56 @@ namespace HSDRaw.Tools
             }
             
             return Vertices.ToArray();
+        }
+
+        private static float[] ReadClr(HSDAccessor accessor, GX_Attribute attribute, int index)
+        {
+            var c = new float[4] { 1f, 1f, 1f, 1f};
+
+            int offset = index * attribute.Stride;
+
+            // TODO: are these in the right order?
+            switch (attribute.CompType)
+            {
+                case GXCompType.RGB565:
+                    var pixel = accessor._s.GetInt16(offset);
+                    c[0] = ((((pixel >> 0) & 0x1F) << 3) & 0xff) / 255f;
+                    c[1] = ((((pixel >> 5) & 0x3F) << 2) & 0xff) / 255f;
+                    c[2] = ((((pixel >> 11) & 0x1F) << 3) & 0xff) / 255f;
+                    break;
+                case GXCompType.RGB8:
+                    c[0] = accessor._s.GetByte(offset) / 255f;
+                    c[1] = accessor._s.GetByte(offset + 1) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 2) / 255f;
+                    break;
+                case GXCompType.RGBA4: 
+                    c[0] = (accessor._s.GetByte(offset) >> 4) * 16 / 255f;
+                    c[1] = (accessor._s.GetByte(offset) & 0xF) * 16 / 255f;
+                    c[2] = (accessor._s.GetByte(offset + 1) >> 4) * 16 / 255f;
+                    c[4] = (accessor._s.GetByte(offset + 1) & 0xF) / 255f;
+                    break;
+                case GXCompType.RGBA6: //TODO: this is approximate
+                    var p = accessor._s.GetInt32(offset) & 0xFFFFFF;
+                    c[0] = ((p >> 18) & 0x3F) / 0x3F;
+                    c[1] = ((p >> 12) & 0x3F) / 0x3F;
+                    c[2] = ((p >> 6) & 0x3F) / 0x3F;
+                    c[3] = ((p) & 0x3F) / 0x3F;
+                    break;
+                case GXCompType.RGBA8:
+                    c[0] = accessor._s.GetByte(offset) / 255f;
+                    c[1] = accessor._s.GetByte(offset + 1) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 2) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 4) / 255f;
+                    break;
+                case GXCompType.RGBX8:
+                    c[0] = accessor._s.GetByte(offset) / 255f;
+                    c[1] = accessor._s.GetByte(offset + 1) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 2) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 4) / 255f;
+                    break;
+            }
+
+            return c;
         }
 
         /// <summary>

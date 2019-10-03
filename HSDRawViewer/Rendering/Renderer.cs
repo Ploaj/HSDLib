@@ -5,6 +5,7 @@ using HSDRaw.Melee.Gr;
 using HSDRawViewer.Rendering.Renderers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
@@ -57,6 +58,8 @@ namespace HSDRawViewer.Rendering
 
                 if (accessor is HSD_TexGraphic)
                     vp.AddToolStrip(TexGraphicRenderer.ToolStrip);
+                if (accessor is HSD_TexAnim)
+                    vp.AddToolStrip(RendererTexAnim.ToolStrip);
                 if (accessor is HSD_TOBJ)
                     vp.AddToolStrip(RendererTOBJ.ToolStrip);
             }
@@ -69,14 +72,49 @@ namespace HSDRawViewer.Rendering
             if (accessor is HSD_TexGraphic image)
                 TexGraphicRenderer.Render(image, vp.ViewportWidth, vp.ViewportHeight);
             else
+            if (accessor is HSD_TexAnim texanim)
+                RendererTexAnim.Render(texanim, vp.ViewportWidth, vp.ViewportHeight);
+            else
             if (accessor is HSD_JOBJ jobj)
+            {
                 JOBJRenderer.Render(jobj);
+                RenderFloor();
+            }
             else
             if (accessor is SBM_Coll_Data coll)
+            {
                 CollDataRenderer.RenderColl_Data(coll);
+                RenderFloor();
+            }
 
             GL.PopAttrib();
         }
+
+
+        private void RenderFloor()
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            int size = 50;
+            int space = 5;
+
+            GL.LineWidth(1f);
+            GL.Color3(Color.White);
+            GL.Begin(PrimitiveType.Lines);
+
+            for (int i = -size; i <= size; i += space)
+            {
+                GL.Vertex3(-size, 0, i);
+                GL.Vertex3(size, 0, i);
+
+                GL.Vertex3(i, 0, -size);
+                GL.Vertex3(i, 0, size);
+            }
+
+            GL.End();
+            GL.PopAttrib();
+        }
+
 
     }
 }
