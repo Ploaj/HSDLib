@@ -419,7 +419,8 @@ namespace HSDRaw
             {
                 //TODO: this may be bugged?
                 //Console.WriteLine("removing 0x" + s.Length.ToString("X"));
-                _structCache.Remove(s);
+                if(_structCache.Contains(s))
+                    _structCache.Remove(s);
             }
 
             // add missing structs--------------------------------------------------------------------------

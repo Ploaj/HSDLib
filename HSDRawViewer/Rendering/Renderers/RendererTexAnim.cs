@@ -1,8 +1,10 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Converters;
 using HSDRawViewer.GUI;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -10,10 +12,17 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
-    public class RendererTexAnim
+    public class RendererTexAnim : IRenderer
     {
+        public Type[] SupportedTypes
+        {
+            get
+            {
+                return new Type[] { typeof(HSD_TexAnim)};
+            }
+        }
 
-        public static ToolStrip ToolStrip
+        public ToolStrip ToolStrip
         {
             get
             {
@@ -24,15 +33,16 @@ namespace HSDRawViewer.Rendering.Renderers
                 return _toolStrip;
             }
         }
-        private static ToolStrip _toolStrip;
 
-        private static HSD_TexAnim TextureAnim;
+        private ToolStrip _toolStrip;
 
-        private static bool ActualSize = false;
+        private HSD_TexAnim TextureAnim;
 
-        private static TextureManager TextureManager = new TextureManager();
+        private bool ActualSize = false;
 
-        private static void InitToolStrip()
+        private TextureManager TextureManager = new TextureManager();
+
+        private void InitToolStrip()
         {
             _toolStrip = new ToolStrip();
 
@@ -135,6 +145,8 @@ namespace HSDRawViewer.Rendering.Renderers
 
                                     TextureAnim.TlutBuffers = tb;
                                 }
+
+                                ((DataNode)Form1.SelectedDataNode.Parent).Refresh();
                             }
                         }
                     }
@@ -143,21 +155,30 @@ namespace HSDRawViewer.Rendering.Renderers
             _toolStrip.Items.Add(import);
         }
 
-        public static void Render(HSD_TexAnim anim, int windowWidth, int windowHeight)
+        public void Clear()
         {
+            TextureAnim = null;
+            TextureManager.ClearTextures();
+        }
+
+        public void Render(HSDAccessor a, int windowWidth, int windowHeight)
+        {
+            HSD_TexAnim anim = a as HSD_TexAnim;
+
             if (!Viewport.EnableAnimationTrack)
             {
                 Viewport.EnableAnimationTrack = true;
-                Viewport.Frame = 0;
-                Viewport.MaxFrame = anim.ImageCount;
-                Viewport.AnimSpeed = 30;
             }
 
             if (TextureAnim != anim)
             {
                 TextureManager.ClearTextures();
-                
-                for(int i = 0; i < anim.ImageCount; i++)
+
+                Viewport.Frame = 0;
+                Viewport.MaxFrame = anim.ImageCount;
+                Viewport.AnimSpeed = 30;
+
+                for (int i = 0; i < anim.ImageCount; i++)
                 {
                     var v = anim.ImageBuffers.Array[i];
                     HSD_TlutBuffer pal = null;

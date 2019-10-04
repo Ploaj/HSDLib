@@ -1,15 +1,24 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRawViewer.Converters;
 using HSDRawViewer.GUI;
-using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace HSDRawViewer.Rendering
+namespace HSDRawViewer.Rendering.Renderers
 {
-    public class TexGraphicRenderer
+    public class TexGraphicRenderer : IRenderer
     {
-        public static ToolStrip ToolStrip
+        public Type[] SupportedTypes
+        {
+            get
+            {
+                return new Type[] { typeof(HSD_TexGraphic) };
+            }
+        }
+
+        public ToolStrip ToolStrip
         {
             get
             {
@@ -20,15 +29,15 @@ namespace HSDRawViewer.Rendering
                 return _toolStrip;
             }
         }
-        private static ToolStrip _toolStrip;
+        private ToolStrip _toolStrip;
 
-        private static HSD_TexGraphic ParticleGroup;
+        private HSD_TexGraphic ParticleGroup;
         
-        private static bool ActualSize = false;
+        private bool ActualSize = false;
 
-        private static TextureManager TextureManager = new TextureManager();
+        private TextureManager TextureManager = new TextureManager();
 
-        private static void InitToolStrip()
+        private void InitToolStrip()
         {
             _toolStrip = new ToolStrip();
 
@@ -103,9 +112,17 @@ namespace HSDRawViewer.Rendering
             _toolStrip.Items.Add(import);
         }
 
-        public static void Render(HSD_TexGraphic particle, int windowWidth, int windowHeight)
+        public void Clear()
         {
-            if(ParticleGroup != particle)
+            ParticleGroup = null;
+            TextureManager.ClearTextures();
+        }
+
+        public void Render(HSDAccessor a, int windowWidth, int windowHeight)
+        {
+            HSD_TexGraphic particle = a as HSD_TexGraphic;
+
+            if (ParticleGroup != particle)
             {
                 TextureManager.ClearTextures();
                 Viewport.Frame = 0;

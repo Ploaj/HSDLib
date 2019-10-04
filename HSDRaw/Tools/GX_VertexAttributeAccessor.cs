@@ -167,7 +167,7 @@ namespace HSDRaw.Tools
                     c[0] = (accessor._s.GetByte(offset) >> 4) * 16 / 255f;
                     c[1] = (accessor._s.GetByte(offset) & 0xF) * 16 / 255f;
                     c[2] = (accessor._s.GetByte(offset + 1) >> 4) * 16 / 255f;
-                    c[4] = (accessor._s.GetByte(offset + 1) & 0xF) / 255f;
+                    c[4] = (accessor._s.GetByte(offset + 1) & 0xF) * 16 / 255f;
                     break;
                 case GXCompType.RGBA6: //TODO: this is approximate
                     var p = accessor._s.GetInt32(offset) & 0xFFFFFF;
@@ -180,13 +180,13 @@ namespace HSDRaw.Tools
                     c[0] = accessor._s.GetByte(offset) / 255f;
                     c[1] = accessor._s.GetByte(offset + 1) / 255f;
                     c[2] = accessor._s.GetByte(offset + 2) / 255f;
-                    c[2] = accessor._s.GetByte(offset + 4) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 3) / 255f;
                     break;
                 case GXCompType.RGBX8:
                     c[0] = accessor._s.GetByte(offset) / 255f;
                     c[1] = accessor._s.GetByte(offset + 1) / 255f;
                     c[2] = accessor._s.GetByte(offset + 2) / 255f;
-                    c[2] = accessor._s.GetByte(offset + 4) / 255f;
+                    c[2] = accessor._s.GetByte(offset + 3) / 255f;
                     break;
             }
 

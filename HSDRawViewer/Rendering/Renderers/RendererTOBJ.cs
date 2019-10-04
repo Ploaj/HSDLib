@@ -2,12 +2,22 @@
 using HSDRawViewer.Converters;
 using HSDRawViewer.GUI;
 using System.Windows.Forms;
+using System;
+using HSDRaw;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
-    public class RendererTOBJ
+    public class RendererTOBJ : IRenderer
     {
-        public static ToolStrip ToolStrip
+        public Type[] SupportedTypes
+        {
+            get
+            {
+                return new Type[] { typeof(HSD_TOBJ) };
+            }
+        }
+
+        public ToolStrip ToolStrip
         {
             get
             {
@@ -18,15 +28,15 @@ namespace HSDRawViewer.Rendering.Renderers
                 return _toolStrip;
             }
         }
-        private static ToolStrip _toolStrip;
+        private ToolStrip _toolStrip;
 
-        private static HSD_TOBJ Tobj;
+        private HSD_TOBJ Tobj;
 
-        private static TextureManager Manager = new TextureManager();
+        private TextureManager Manager = new TextureManager();
 
-        private static bool ActualSize = false;
+        private bool ActualSize = false;
 
-        private static void InitToolStrip()
+        private void InitToolStrip()
         {
             _toolStrip = new ToolStrip();
 
@@ -78,9 +88,17 @@ namespace HSDRawViewer.Rendering.Renderers
 
         }
 
-        public static void Render(HSD_TOBJ tobj, int windowWidth, int windowHeight)
+        public void Clear()
         {
-            if(Tobj != tobj)
+            Tobj = null;
+            Manager.ClearTextures();
+        }
+
+        public void Render(HSDAccessor a, int windowWidth, int windowHeight)
+        {
+            HSD_TOBJ tobj = a as HSD_TOBJ;
+
+            if (Tobj != tobj)
             {
                 Manager.ClearTextures();
                 Tobj = tobj;

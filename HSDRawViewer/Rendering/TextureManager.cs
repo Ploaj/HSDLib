@@ -31,7 +31,7 @@ namespace HSDRawViewer.Rendering
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, 0);
-
+            
             Textures.Add(texid);
             TextureSizes.Add(new Vector2(width, height));
         }
@@ -42,6 +42,7 @@ namespace HSDRawViewer.Rendering
             {
                 GL.DeleteTexture(tex);
             }
+            Textures.Clear();
         }
         
         private static void RenderCheckerBack(int sizeOfChecker, float width, float height)
@@ -70,7 +71,7 @@ namespace HSDRawViewer.Rendering
         {
             RenderTexture(index, windowWidth, windowHeight, actualSize, (int)TextureSizes[index].X, (int)TextureSizes[index].Y);
         }
-
+        
         public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize, int actualWidth, int actualHeight)
         {
             GL.PushMatrix();
@@ -82,7 +83,7 @@ namespace HSDRawViewer.Rendering
             GL.Enable(EnableCap.Texture2D);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, Textures[index]);
+            GL.BindTexture(TextureTarget.Texture2D, Get(index));
 
             float w = windowWidth;
             float h = windowHeight;

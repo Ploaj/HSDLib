@@ -146,9 +146,14 @@ namespace HSDRaw.Common.Animation
             return FOBJFrameDecoder.GetKeys(this);
         }
 
-        public void SetKeys(List<FOBJKey> keys)
+        public void SetKeys(List<FOBJKey> keys, JointTrackType type)
         {
-            //TODO:
+            var fobj = FOBJFrameEncoder.EncodeFrames(keys, type);
+
+            AnimationType = type;
+            ValueFlag = fobj.ValueFlag;
+            TangentFlag = fobj.TangentFlag;
+            Buffer = fobj.Buffer;
         }
 
     }

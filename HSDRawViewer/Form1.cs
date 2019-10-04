@@ -8,6 +8,7 @@ using HSDRawViewer.Rendering;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Gr;
+using HSDRawViewer.Converters;
 
 namespace HSDRawViewer
 {
@@ -225,6 +226,52 @@ namespace HSDRawViewer
                 cm.MenuItems.Add(OpenAsAJ);
 
                 typeToContextMenu.Add(typeof(SBM_Map_Head), cm);
+            }
+
+            {
+                var cm = new ContextMenu();
+                AttachCommonMenus(cm);
+
+                MenuItem Export = new MenuItem("Export Frames TXT");
+                Export.Click += (sender, args) =>
+                {
+                    using (SaveFileDialog d = new SaveFileDialog())
+                    {
+                        d.Filter = "TXT (*.txt)|*.txt";
+
+                        if(d.ShowDialog() == DialogResult.OK)
+                        {
+                            if (SelectedDataNode.Accessor is HSD_FOBJ fobj)
+                                File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobj));
+
+                            if (SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
+                                File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobjdesc));
+                        }
+                    }
+                };
+                cm.MenuItems.Add(Export);
+
+                MenuItem Import = new MenuItem("Import Frames TXT");
+                Import.Click += (sender, args) =>
+                {
+                    using (OpenFileDialog d = new OpenFileDialog())
+                    {
+                        d.Filter = "TXT (*.txt)|*.txt";
+
+                        if (d.ShowDialog() == DialogResult.OK)
+                        {
+                            if (SelectedDataNode.Accessor is HSD_FOBJ fobj)
+                                ConvFOBJ.ImportKeys(fobj, File.ReadAllLines(d.FileName));
+
+                            if (SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
+                                ConvFOBJ.ImportKeys(fobjdesc, File.ReadAllLines(d.FileName));
+                        }
+                    }
+                };
+                cm.MenuItems.Add(Import);
+
+                typeToContextMenu.Add(typeof(HSD_FOBJ), cm);
+                typeToContextMenu.Add(typeof(HSD_FOBJDesc), cm);
             }
 
             AttachCommonMenus(commonContextMenu);
