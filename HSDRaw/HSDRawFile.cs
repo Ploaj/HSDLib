@@ -350,13 +350,26 @@ namespace HSDRaw
             }
         }
 
+        private bool IsRoot(HSDStruct s)
+        {
+            foreach (var v in Roots)
+                if (v.Data._s == s)
+                    return true;
+
+            foreach (var v in References)
+                if (v.Data._s == s)
+                    return true;
+
+            return false;
+        }
+
         private void RemoveDuplicateBuffers()
         {
             Dictionary<int, HSDStruct> hashToStruct = new Dictionary<int, HSDStruct>();
             var toRemove = new List<HSDStruct>();
             foreach (var v in _structCache)
             {
-                if (IsBuffer(v))
+                if (IsBuffer(v) && !IsRoot(v))
                 {
                     var hash = ComputeHash(v.GetData());
                     if (hashToStruct.ContainsKey(hash))
