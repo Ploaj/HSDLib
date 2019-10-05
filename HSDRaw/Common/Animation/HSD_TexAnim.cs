@@ -17,7 +17,7 @@ namespace HSDRaw.Common.Animation
             get => _s.GetReference<HSDArrayAccessor<HSD_TexBuffer>>(0x0C);
             set
             {
-                ImageCount = (short)value.Length;
+                ImageCount = value != null ? (short)value.Length : (short)0;
                 _s.SetReference(0x0C, value);
             }
         }
@@ -27,7 +27,7 @@ namespace HSDRaw.Common.Animation
             get => _s.GetReference<HSDArrayAccessor<HSD_TlutBuffer>>(0x10);
             set
             {
-                TlutCount = (short)value.Length;
+                TlutCount = value != null ? (short)value.Length : (short)0;
                 _s.SetReference(0x10, value);
             }
         }

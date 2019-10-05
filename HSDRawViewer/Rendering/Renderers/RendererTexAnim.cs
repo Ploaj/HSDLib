@@ -153,6 +153,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 }
                                 else
                                 {
+                                    TextureAnim.TlutBuffers = null;
                                     if (TextureAnim?.AnimationObject?.FObjDesc?.List.Count > 1)
                                         TextureAnim.AnimationObject.FObjDesc.Next = null;
                                 }
