@@ -131,7 +131,7 @@ namespace HSDRawViewer.Rendering
             }
         }
 
-        private Vector3 _defaultTranslation = new Vector3(0, -50, -100);
+        private Vector3 _defaultTranslation = new Vector3(0, -25, -80);
         private Vector3 _defaultRotation = new Vector3(0, 0, 0);
 
         private Renderer _renderer { get; set; }
@@ -149,6 +149,7 @@ namespace HSDRawViewer.Rendering
                     _renderer.SetFigaTree(null);
                     _selectedAccessor = value;
                 }
+                ResetCamera();
             }
         }
 
@@ -245,6 +246,14 @@ namespace HSDRawViewer.Rendering
         private void UpdateCamera()
         {
             Camera = Transform * Translation * Perspective;
+        }
+
+        private void ResetCamera()
+        {
+            _rotation = _defaultRotation;
+            Translation = Matrix4.CreateTranslation(_defaultTranslation);
+            UpdateCamera();
+            _glViewport.Invalidate();
         }
     
         public void Render(object sender, EventArgs args)

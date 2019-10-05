@@ -12,27 +12,43 @@ namespace HSDRaw.Tools.Melee
             public string Name;
             public bool Hex = false;
         }
+
+        public string Name { get; internal set; }
+        public byte Command { get; internal set; }
         public List<Bitmapper> BMap = new List<Bitmapper>();
-        public byte Command;
         private int ParamCount = 0;
 
-        public MeleeCMDAction(byte Command, string Map)
+        public int BitSize { get; internal set; }
+        public int ByteSize { get => BitSize / 8; }
+
+        public MeleeCMDAction(byte Command, string name, string Map)
         {
+            Name = name;
             this.Command = Command;
+
             string[] args = Map.Split('|');
-            for (int i = 0; i < args.Length; i += 2)
-            {
-                Bitmapper map = new Bitmapper();
-                if (args[i + 1].Contains("x"))
+            
+            BitSize = 6;
+            if (args.Length > 1)
+                for (int i = 0; i < args.Length; i += 2)
                 {
-                    args[i + 1] = args[i + 1].Split('x')[1];
-                    map.Hex = true;
+                    Bitmapper map = new Bitmapper();
+                    if (args[i + 1].Contains("x"))
+                    {
+                        args[i + 1] = args[i + 1].Split('x')[1];
+                        map.Hex = true;
+                    }
+                    map.Count = int.Parse(args[i + 1]);
+                    map.Name = args[i];
+                    BitSize += map.Count;
+                    BMap.Add(map);
+
+                    if (!map.Name.Equals("None"))
+                        ParamCount++;
                 }
-                map.Count = int.Parse(args[i + 1]);
-                map.Name = args[i];
-                BMap.Add(map);
-                if (!map.Name.Equals("None")) ParamCount++;
-            }
+
+            if (BitSize == 6)
+                BitSize = 32;
         }
 
         private class Bitreader
@@ -107,7 +123,12 @@ namespace HSDRaw.Tools.Melee
                 o.Write(v, BMap[i].Count);
             }
 
-            return o.Bytes.ToArray();
+            var data = o.Bytes.ToArray();
+
+            if (data.Length % 8 != 0)
+                throw new Exception("Subaction " + Command.ToString() + " was unsuccessfully compiled");
+
+            return data;
         }
     }
 
@@ -115,125 +136,97 @@ namespace HSDRaw.Tools.Melee
     {
         public static string FunctionPrefix = "function_";
 
-        private static Dictionary<byte, int> CMD_SIZES = new Dictionary<byte, int>()
+        public static List<MeleeCMDAction> SubActions { get; } = new List<MeleeCMDAction>()
         {
-            { 0x01, 0x04 },
-            { 0x02, 0x04 },
-            { 0x03, 0x04 },
-            { 0x04, 0x04 },
-            { 0x05, 0x08 },
-            { 0x06, 0x04 },
-            { 0x07, 0x08 },
-            { 0x0A, 0x14 },
-            { 0x0B, 0x14 },
-            { 0x0F, 0x04 },
-            { 0x10, 0x04 },
-            { 0x11, 0x0C },
-            { 0x12, 0x04 },
-            { 0x13, 0x04 },
-            { 0x14, 0x04 },
-            { 0x17, 0x04 },
-            { 0x1A, 0x04 },
-            { 0x1B, 0x04 },
-            { 0x1C, 0x04 },
-            { 0x1F, 0x04 },
-            { 0x22, 0x0C },
-            { 0x26, 0x1C }, //?? used with hurt spinny animation
-            { 0x27, 0x10 }, //?? used with ness up b hit
-            { 0x29, 0x04 },
-            { 0x2B, 0x04 },
-            { 0x33, 0x04 },
-            { 0x36, 0x0C },
-            { 0x37, 0x0C },
-            { 0x38, 0x08 },
-            { 0x3A, 0x10 },
+            new MeleeCMDAction(0x00, "EndOfScript", ""),
+            new MeleeCMDAction(0x01, "SynchronousTimer", "Frame|26"),
+            new MeleeCMDAction(0x02, "AsynchronousTimer", "Frame|26"),
+            new MeleeCMDAction(0x03, "SetLoop", "Count|26" ),
+            new MeleeCMDAction(0x04, "ExecuteLoop", ""),
+            new MeleeCMDAction(0x05, "Subroutine", "Target|26|Offset|x32"),
+            new MeleeCMDAction(0x06, "Return", ""),
+            new MeleeCMDAction(0x07, "GoTo", "Target|26|Offset|x32"),
+            new MeleeCMDAction(0x08, "SetTimerAnimation", ""),
+            new MeleeCMDAction(0x09, "Unknown0x09", ""),
+            new MeleeCMDAction(0x0A, "GraphicEffect", "Unk1|8|Unk2|18|GFXID|10|Boneid|6|Unk2|16|Z|16|Y|16|X|16|RangeZ|16|RangeY|16|RangeX|16"),
+            new MeleeCMDAction(0x0B, "CreateHitbox", "ID|3|Unk1|5|Bone|7|Unk2|2|Damage|9|Size|16|Z|16|Y|16|X|16|Angle|9|KBG|9|WeightSetKB|9|Unk3|3|HitboxInteraction|2|BKB|9|Element|5|Unk4|1|ShieldDamage|7|SoundEffect|8|HurtboxInteraction|2"),
+            new MeleeCMDAction(0x0C, "AdjustHitboxDamage", "HitboxID|3|Damage|23"),
+            new MeleeCMDAction(0x0D, "AdjustHitboxSize", "HitboxID|3|Size|23"),
+            new MeleeCMDAction(0x0E, "SetHitboxFlags", "HitboxID|24|Flags|2"),
+            new MeleeCMDAction(0x0F, "RemoveHitbox", ""),
+            new MeleeCMDAction(0x10, "ClearHitboxes", "None|26"), // Sound effect?
+            new MeleeCMDAction(0x11, "SoundEffect", "Unk1|32|Unk2|6|SFX|x20|Offset|x32"),
+            new MeleeCMDAction(0x12, "RandomSmashSFX", "Value|26" ),
+            new MeleeCMDAction(0x13, "Autocancel", "Flag|2|Value|24" ),
+            new MeleeCMDAction(0x14, "ReverseDirection", "" ),
+            new MeleeCMDAction(0x15, "Unknown0x15", "Value|x26" ), // set flag
+            new MeleeCMDAction(0x16, "Unknown0x16", "Value|x26" ), // set flag
+            new MeleeCMDAction(0x17, "AllowInterrupt", "Value|x26" ),
+            new MeleeCMDAction(0x18, "ProjectileFlag", "Value|x26" ),
+            new MeleeCMDAction(0x19, "Unknown0x19", "Value|x26" ), // related to ground air state
+            new MeleeCMDAction(0x1A, "SetBodyCollisionState", "Unknown|24|BodyState|2"),
+            new MeleeCMDAction(0x1B, "BodyCollisionStatus", "Unknown|x26"),
+            new MeleeCMDAction(0x1C, "SetBoneCollisionState", "BoneId|8|CollisionState|18"),
+            new MeleeCMDAction(0x1D, "EnableJapFollowup", ""),
+            new MeleeCMDAction(0x1E, "ToggleJabFollowUp", ""),
+            new MeleeCMDAction(0x1F, "ChangleModelState", "StructID|6|Unknown|12|ObjectID|8"),
+            new MeleeCMDAction(0x20, "RevertModels", ""),
+            new MeleeCMDAction(0x21, "RemoveModels", ""),
+            new MeleeCMDAction(0x22, "Throw", "Unknown|90"),
+            new MeleeCMDAction(0x23, "HeldItemInvisibility", "Unknown|x25|Flag|1"),
+            new MeleeCMDAction(0x24, "BodyArticleInvisibility", "Unknown|x25|Flag|1"),
+            new MeleeCMDAction(0x25, "CharacterInvisibility", "Unknown|x25|Flag|1"),
+            new MeleeCMDAction(0x26, "PseudoRandomSoundEffect", "Unknown|x218"),
+            new MeleeCMDAction(0x27, "Unknwon0x27", "Unknown|x122"),
+            new MeleeCMDAction(0x28, "AnimateTexture", "MaterialFlag|1|MaterialIndex|7|FrameFlag|Frame|17"),
+            new MeleeCMDAction(0x29, "AnimateModel", "BodyPart|10|State|4|Unk|12"),
+            new MeleeCMDAction(0x2A, "Unknown0x2A", "Unknown|26"),
+            new MeleeCMDAction(0x2B, "Rumble", "Unknown|26"),
+            new MeleeCMDAction(0x2C, "Unknown0x2A", "Unknown|25|Flag|1"), // set flag
+            new MeleeCMDAction(0x2D, "Body Aura", "Unknown|8|Duration|18"),
+            new MeleeCMDAction(0x2E, "RemoveColorOverlay", ""),
+            new MeleeCMDAction(0x2F, "Unknown0x2A", "Unknwon|26"),
+            new MeleeCMDAction(0x30, "SwordTrail", "BeamSword|1|Unknown|17|RenderStatus|8"),
+            new MeleeCMDAction(0x31, "EnableRagdoll", "BoneID|26"),
+            new MeleeCMDAction(0x32, "SelfDamage", "Unknown|10|Damage|16"),
+            new MeleeCMDAction(0x33, "ContinuationControl", "Unknown|26"),
+            new MeleeCMDAction(0x34, "Unknown0x34", "Unknown|26"), // set flag
+            new MeleeCMDAction(0x35, "FootstepEffect", "Unknown|x90"),
+            new MeleeCMDAction(0x36, "LandingEffect", "Unknown|x90"),
+            new MeleeCMDAction(0x37, "StartSmashCharge", "Unknown|2|ChargeFrames|8|ChargeRate|16|VisualEffect|8|Unknown|24"),
+            new MeleeCMDAction(0x38, "Unknown", "Unknown|26"),
+            new MeleeCMDAction(0x39, "AestheticWindEffect", "Unknown|x122"),
         };
 
-        private static Dictionary<byte, string> CMD_NAMES = new Dictionary<byte, string>()
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void PrintCommands()
         {
-            { 0x01, "SynchronousTimer" },
-            { 0x02, "AsynchronousTimer" },
-            { 0x03, "SetLoop" },
-            { 0x04, "ExecuteLoop" },
-            { 0x05, "Goto" },
-            { 0x06, "Return" },
-            { 0x07, "Subroutine" },
-            { 0x0A, "GraphicEffect" },
-            { 0x0B, "Hitbox" },
-            { 0x0F, "RemoveHitbox" },
-            { 0x10, "ClearHitboxes" },
-            { 0x11, "SoundEffect" },
-            { 0x12, "RandomSoundEffect" },
-            { 0x13, "Autocancel" },
-            { 0x14, "ReverseDirection" },
-            { 0x17, "IASA" },
-            { 0x1A, "SetBodyState" },
-            { 0x1B, "SetAllBones" },
-            { 0x1C, "SetBoneAt" },
-            { 0x1F, "ModelMod" },
-            { 0x22, "Throw" },
-            { 0x29, "AnimateBodypart" },
-            { 0x2B, "GenerateArticle" },
-            { 0x33, "SelfDamage" },
-            { 0x38, "StartSmashCharge" },
-            { 0x3A, "Unknown0x3A" },
-        };
-
-        public static int GetSize(byte flag)
-        {
-            if (CMD_SIZES.ContainsKey(flag))
-                return CMD_SIZES[flag];
-            return 4;
-        }
-
-        public static string GetActionName(byte flag)
-        {
-            if (CMD_NAMES.ContainsKey(flag))
-                return CMD_NAMES[flag];
-            return "Unknown0x" + flag.ToString("x");
-        }
-
-        public static byte GetFlag(string s)
-        {
-            foreach (byte b in CMD_NAMES.Keys)
+            foreach(var v in SubActions)
             {
-                if (CMD_NAMES[b].Equals(s))
-                {
-                    return b;
-                }
+                Console.WriteLine(v.Name + " " + v.BitSize + " " + v.ByteSize);
             }
-            if (Regex.Match(s, "Unknown0x[0-9]*").Success)
-            {
-                return (byte)Convert.ToUInt32(s.Split('x')[1], 16);
-            }
-            return 0;
         }
 
-        private static List<MeleeCMDAction> SubActions = new List<MeleeCMDAction>()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static MeleeCMDAction GetMeleeCMDAction(String name)
         {
-            new MeleeCMDAction(0x01, "Frame|26"),
-            new MeleeCMDAction(0x02, "Frame|26"),
-            new MeleeCMDAction(0x03, "Count|26" ),
-            new MeleeCMDAction(0x04, "None|26"), // return
-            new MeleeCMDAction(0x06, "None|26"),// Execute loop
-            new MeleeCMDAction(0x0A, "Unk1|8|Unk2|18|GFXID|10|Boneid|6|Unk2|16|Z|16|Y|16|X|16|RangeZ|16|RangeY|16|RangeX|16"),
-            new MeleeCMDAction(0x0B, "ID|3|Unk1|5|Bone|7|Unk2|2|Damage|9|Size|16|Z|16|Y|16|X|16|Angle|9|KBG|9|WeightSetKB|9|Unk3|3|HitboxInteraction|2|BKB|9|Element|5|Unk4|1|ShieldDamage|7|SoundEffect|8|HurtboxInteraction|2"),
-            new MeleeCMDAction(0x10, "None|26"),
-            new MeleeCMDAction(0x11, "Unk1|32|Unk2|4|SFX|x20|SomeOffset|x32"),
-            new MeleeCMDAction(0x13, "Flag|2|Value|24" ),
-            new MeleeCMDAction(0x17, "None|26"),
-            new MeleeCMDAction(0x1A, "State|26"),
-            new MeleeCMDAction(0x29, "BodyPart|10|State|4|Unk|12"),
-            new MeleeCMDAction(0x33, "Percent|33"),
-        };
+            return SubActions.Find(e => e.Name.ToLower() == name.ToLower());
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static MeleeCMDAction GetMeleeCMDAction(byte b)
         {
-            foreach (MeleeCMDAction a in SubActions)
-            {
-                if (a.Command == b) return a;
-            }
-            return null;
+            return SubActions.Find(e => e.Command == b);
         }
     }
 }

@@ -7,31 +7,21 @@ namespace HSDRaw.Tools.Melee
 {
     public class ActionDecompiler
     {
-        private static Dictionary<byte, List<string>> decompiledFunctions = new Dictionary<byte, List<string>>();
+        private Dictionary<HSDStruct, string> tempStructToName = new Dictionary<HSDStruct, string>();
 
-        public static void DumpDecompiledCommands()
-        {
-            foreach (var d in decompiledFunctions)
-            {
-                using (StreamWriter w = new StreamWriter(new FileStream("ScriptDump\\" + ActionCommon.GetActionName(d.Key) + ".txt", FileMode.Create)))
-                {
-                    foreach (var v in d.Value)
-                        w.WriteLine(v);
-                }
-            }
-        }
+        private Dictionary<HSDStruct, string> structToFunctionName = new Dictionary<HSDStruct, string>();
 
         /// <summary>
         /// Decompiles subaction byte code into script
         /// </summary>
         /// <param name="commanddata"></param>
         /// <returns></returns>
-        public static string Decompile(string name, HSDAccessor commanddata, ref Dictionary<HSDStruct, string> structToFunctionName)
+        public string Decompile(string name, HSDAccessor commanddata)
         {
             StringBuilder output = new StringBuilder();
 
             tempStructToName.Clear();
-            DecompileGroup(output, name, commanddata._s, ref structToFunctionName);
+            DecompileGroup(output, name, commanddata._s);
 
             if(output.ToString() == "")
             {
@@ -41,31 +31,36 @@ namespace HSDRaw.Tools.Melee
             return output.ToString();
         }
 
-        private static Dictionary<HSDStruct, string> tempStructToName = new Dictionary<HSDStruct, string>();
-        private static void DecompileGroup(StringBuilder output, string name, HSDStruct datas, ref Dictionary<HSDStruct, string> structToFunctionName)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="name"></param>
+        /// <param name="datas"></param>
+        /// <param name="structToFunctionName"></param>
+        private void DecompileGroup(StringBuilder output, string name, HSDStruct datas)
         {
             if (structToFunctionName.ContainsKey(datas))
                 return;
             structToFunctionName.Add(datas, name);
-
-
+            
             output.AppendLine(name);
             output.AppendLine("{");
             using (BinaryReaderExt r = new BinaryReaderExt(new MemoryStream(datas.GetData())))
             {
                 byte flag = (byte)(r.ReadByte() >> 2);
+
+                var cmd = ActionCommon.GetMeleeCMDAction(flag);
+
                 while (flag != 0)
                 {
                     r.BaseStream.Position -= 1;
-                    var size = ActionCommon.GetSize(flag);
+                    var size = cmd.ByteSize;
                     var command = r.GetSection(r.Position, size);
                     r.Skip((uint)size);
 
-#if DEBUG
-                    if (!decompiledFunctions.ContainsKey(flag))
-                        decompiledFunctions.Add(flag, new List<string>());
-                    decompiledFunctions[flag].Add(DecompileCommand(command));
-#endif
+                    Console.WriteLine(cmd.Name + " " + cmd.ByteSize);
+
                     if (flag == 5 || flag == 7) //goto
                     {
                         var re = datas.GetReference<HSDAccessor>((int)r.BaseStream.Position - 4);
@@ -88,21 +83,27 @@ namespace HSDRaw.Tools.Melee
                         break;
 
                     flag = (byte)(r.ReadByte() >> 2);
+                    cmd = ActionCommon.GetMeleeCMDAction(flag);
                 }
             }
             output.AppendLine("}");
 
             foreach (var re in datas.References)
             {
-                DecompileGroup(output, name + "_" + re.Key.ToString("X4"), re.Value, ref structToFunctionName);
+                DecompileGroup(output, name + "_" + re.Key.ToString("X4"), re.Value);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         private static string DecompileCommand(byte[] data)
         {
-            string o = ActionCommon.GetActionName((byte)(data[0] >> 2)) + "(";
-
             MeleeCMDAction act = ActionCommon.GetMeleeCMDAction((byte)(data[0] >> 2));
+
+            string o = act.Name + "(";
 
             if (act != null)
             {

@@ -133,7 +133,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 }
 
                                 // convert tobjs into proper strip
-                                var ib = new HSDRaw.HSDArrayAccessor<HSD_TexBuffer>();
+                                var ib = new HSDArrayAccessor<HSD_TexBuffer>();
                                 ib.Array = tobjs.ToArray();
 
                                 TextureAnim.ImageBuffers = ib;
@@ -144,6 +144,17 @@ namespace HSDRawViewer.Rendering.Renderers
                                     tb.Array = pals.ToArray();
 
                                     TextureAnim.TlutBuffers = tb;
+
+                                    if (TextureAnim?.AnimationObject?.FObjDesc?.List.Count < 2)
+                                        TextureAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc()
+                                        {
+                                            FOBJ = new HSD_FOBJ() { AnimationType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] }
+                                        };
+                                }
+                                else
+                                {
+                                    if (TextureAnim?.AnimationObject?.FObjDesc?.List.Count > 1)
+                                        TextureAnim.AnimationObject.FObjDesc.Next = null;
                                 }
 
                                 ((DataNode)Form1.SelectedDataNode.Parent).Refresh();

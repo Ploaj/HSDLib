@@ -91,9 +91,10 @@ namespace HSDRaw.Tools.Melee
                     if (cname == "Return")
                         returned = true;
 
-                    if (cname.Equals("Goto") || cname.Equals("Subroutine"))
+                    byte flag = ActionCommon.GetMeleeCMDAction(cname).Command;
+
+                    if (flag == 0x5 || flag == 0x7) //goto and subroutine
                     {
-                        byte flag = ActionCommon.GetFlag(cname);
                         structToOffsetToFunction[s].Add(output.Count + 4, cparameters[0]);
                         output.AddRange(new byte[] { (byte)(flag << 2), 0, 0, 0, 0, 0, 0, 0});
                     }
@@ -123,11 +124,10 @@ namespace HSDRaw.Tools.Melee
         {
             if (name.Equals(""))
                 return new byte[0];
+            
+            MeleeCMDAction action = ActionCommon.GetMeleeCMDAction(name);
 
-            byte flag = ActionCommon.GetFlag(name);
-
-            MeleeCMDAction action = ActionCommon.GetMeleeCMDAction(flag);
-            byte[] data;
+            byte[] data = new byte[] { (byte)(action.Command << 2), 0, 0, 0 };
             if (action != null)
             {
                 data = action.Compile(parameters);
@@ -135,19 +135,6 @@ namespace HSDRaw.Tools.Melee
                 {
                     //ErrorCode = CompileError.ParameterCount;
                     return null;
-                }
-            }
-            else
-            {
-                data = new byte[parameters.Length];
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    byte b = Convert.ToByte(parameters[i].Split('x')[1], 16);
-                    if (i == 0)
-                    {
-                        b |= (byte)(flag << 2);
-                    }
-                    data[i] = b;
                 }
             }
 

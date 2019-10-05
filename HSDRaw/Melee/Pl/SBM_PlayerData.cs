@@ -12,11 +12,11 @@ namespace HSDRaw.Melee.Pl
         
         public HSDAccessor UnknownNode { get => _s.GetReference<HSDAccessor>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSDAccessor SubActionTable { get => _s.GetReference<HSDAccessor>(0x0C); set => _s.SetReference(0x0C, value); }
+        public SBM_SubActionTable SubActionTable { get => _s.GetReference<SBM_SubActionTable>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public HSDAccessor Unknown0x10 { get => _s.GetReference<HSDAccessor>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSDAccessor WinSubAction { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
+        public SBM_SubActionTable WinSubAction { get => _s.GetReference<SBM_SubActionTable>(0x14); set => _s.SetReference(0x14, value); }
 
         public HSDAccessor Unknown0x18 { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
 

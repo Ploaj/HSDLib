@@ -42,9 +42,11 @@ namespace HSDRawViewer.Converters
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine(fobj.AnimationType.ToString());
+
             foreach(var v in fobj.GetDecodedKeys())
             {
-                sb.AppendLine($"{v.Frame} {v.Value} {v.Tan} {v.InterpolationType}");
+                sb.AppendLine($"{v.Frame},{v.Value},{v.Tan},{v.InterpolationType}");
             }
 
             return sb.ToString();
@@ -59,9 +61,15 @@ namespace HSDRawViewer.Converters
         {
             List<FOBJKey> keys = new List<FOBJKey>();
 
+            var animationType = JointTrackType.HSD_A_J_ROTX;
+
             foreach(var v in lines)
             {
-                var args = v.Split(' ');
+                var args = v.Trim().Split(',');
+
+                if (args.Length == 1 && Enum.TryParse<JointTrackType>(args[0], out animationType))
+                    continue;
+
                 if (args.Length < 4)
                     continue;
 
@@ -74,7 +82,7 @@ namespace HSDRawViewer.Converters
                 });
             }
 
-            fobj.SetKeys(keys, fobj.AnimationType);
+            fobj.SetKeys(keys, animationType);
 
             return fobj;
         }

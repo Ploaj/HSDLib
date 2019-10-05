@@ -9,6 +9,8 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Gr;
 using HSDRawViewer.Converters;
+using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI;
 
 namespace HSDRawViewer
 {
@@ -16,6 +18,7 @@ namespace HSDRawViewer
     {
         private ByteViewer _myByteViewer;
         private Viewport _Viewport;
+        private SubactionEditor _ScriptEditor;
 
         private HSDRawFile RawHSDFile = new HSDRawFile();
 
@@ -37,6 +40,9 @@ namespace HSDRawViewer
 
             _Viewport = new Viewport();
             _Viewport.Dock = DockStyle.Fill;
+
+            _ScriptEditor = new SubactionEditor();
+            _ScriptEditor.Dock = DockStyle.Fill;
 
             tabControl1.TabPages[0].Controls.Add(_myByteViewer);
             tabControl1.TabPages[2].Controls.Add(_Viewport);
@@ -125,6 +131,19 @@ namespace HSDRawViewer
                     _Viewport.SelectedAccessor = cast;
                 }
                 SelectedDataNode = n;
+
+                tabControl1.TabPages[2].Controls.Clear();
+
+                if (n.Accessor is SBM_SubActionTable)
+                {
+                    tabControl1.TabPages[2].Controls.Add(_ScriptEditor);
+                    _ScriptEditor.SetSubactionAccessor(n);
+                }
+                else
+                {
+                    tabControl1.TabPages[2].Controls.Add(_Viewport);
+                }
+
                 LocationLabel.Text = "Location: " + n.FullPath;
             }
         }
@@ -226,6 +245,26 @@ namespace HSDRawViewer
                 cm.MenuItems.Add(OpenAsAJ);
 
                 typeToContextMenu.Add(typeof(SBM_Map_Head), cm);
+            }
+
+
+            {
+                var cm = new ContextMenu();
+                AttachCommonMenus(cm);
+
+                MenuItem OpenAsAJ = new MenuItem("Add Texture Anim");
+                OpenAsAJ.Click += (sender, args) =>
+                {
+                    if (SelectedDataNode.Accessor is HSD_MatAnim matanim)
+                    {
+                        matanim.TextureAnimation = new HSD_TexAnim();
+                        matanim.TextureAnimation.AnimationObject = new HSD_AOBJ();
+                        matanim.TextureAnimation.AnimationObject.FObjDesc = new HSD_FOBJDesc();
+                    }
+                };
+                cm.MenuItems.Add(OpenAsAJ);
+
+                typeToContextMenu.Add(typeof(HSD_MatAnim), cm);
             }
 
             {

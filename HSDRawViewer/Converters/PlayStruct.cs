@@ -78,7 +78,7 @@ namespace HSDRawViewer.Converters
                     
                     f.Actions = new ActionGroup[val._s.Length / 0x18];
 
-                    Dictionary<HSDStruct, string> structToFunction = new Dictionary<HSDStruct, string>();
+                    var ActionDecompiler = new ActionDecompiler();
                     HashSet<string> ExportedAnimations = new HashSet<string>();
 
                     for (int i = 0; i < f.Actions.Length; i++)
@@ -102,7 +102,7 @@ namespace HSDRawViewer.Converters
                         ActionGroup g = new ActionGroup();
                         g.animation_name = subaction.Name;
                         g.flags = subaction.Flags;
-                        g.script = ActionDecompiler.Decompile("Func_" + i.ToString("X3"), subaction.SubAction, ref structToFunction);
+                        g.script = ActionDecompiler.Decompile("Func_" + i.ToString("X3"), subaction.SubAction);
                         //g.script = 
                         g.off = subaction.AnimationOffset;
                         g.size = subaction.AnimationSize;
@@ -258,16 +258,12 @@ namespace HSDRawViewer.Converters
 
                     }
                     
-                    ftData.SubActionTable = new HSDAccessor();
-                    ftData.SubActionTable._s.Resize(script.Actions.Length * 0x18);
+                    ftData.SubActionTable = new SBM_SubActionTable();
 
                     ActionCompiler.LinkStructs();
 
-                    for(int i = 0; i < SubActions.Count; i++)
-                    {
-                        SubActions[i].SubAction = new HSDAccessor() { _s = ActionCompiler.GetBinary(subActionToScript[SubActions[i]]) };
-                        ftData.SubActionTable._s.SetEmbededStruct(i * 0x18, SubActions[i]._s);
-                    }
+                    ftData.SubActionTable.Subactions = SubActions.ToArray();
+
                     Console.WriteLine("recompiled count " + ftData.SubActionTable._s.GetSubStructs().Count);
                 }
             }

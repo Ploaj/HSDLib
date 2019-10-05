@@ -4,6 +4,8 @@ namespace HSDRaw.Common.Animation
 {
     public class HSD_TexAnim : HSDListAccessor<HSD_TexAnim>
     {
+        public override int TrimmedSize => 0x18;
+
         public override HSD_TexAnim Next { get => _s.GetReference<HSD_TexAnim>(0x00); set => _s.SetReference(0x00, value); }
         
         public GXTexMapID GXTexMapID { get => (GXTexMapID)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
