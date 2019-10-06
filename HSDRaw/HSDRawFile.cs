@@ -9,6 +9,7 @@ using System.Linq;
 using System;
 using HSDRaw.AirRide.Vc;
 using HSDRaw.Melee.Ef;
+using HSDRaw.AirRide.Gr;
 
 namespace HSDRaw
 {
@@ -287,6 +288,20 @@ namespace HSDRaw
                         a = acc;
                     }
                     else
+                    if (rootStrings[i].StartsWith("grModelMotion"))
+                    {
+                        var acc = new KAR_grModelMotion();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].StartsWith("grModel"))
+                    {
+                        var acc = new KAR_grModel();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
                     if (rootStrings[i].EndsWith("_texg"))
                     {
                         var acc = new HSD_TEXGraphicBank();
@@ -404,6 +419,9 @@ namespace HSDRaw
         public void Save(Stream stream, bool bufferAlign = true)
         {
             // gather all structs--------------------------------------------------------------------------
+#if DEBUG
+            Console.WriteLine("Gathering structs...");
+#endif
             var allStructs = new List<HSDStruct>();
             foreach (var r in Roots)
             {
@@ -419,7 +437,9 @@ namespace HSDRaw
             }
 
             // struct cache cleanup
-
+#if DEBUG
+            Console.WriteLine("Cleaning structs...");
+#endif
             // remove unused structs--------------------------------------------------------------------------
             var unused = new List<HSDStruct>();
 
@@ -435,7 +455,9 @@ namespace HSDRaw
                 if(_structCache.Contains(s))
                     _structCache.Remove(s);
             }
-
+#if DEBUG
+            Console.WriteLine("Adding new structs...");
+#endif
             // add missing structs--------------------------------------------------------------------------
             foreach (var s in allStructs)
             {
@@ -450,6 +472,9 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
+#if DEBUG
+            Console.WriteLine("Removing duplicate buffers...");
+#endif
             RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------
