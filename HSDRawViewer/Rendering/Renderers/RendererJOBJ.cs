@@ -307,6 +307,7 @@ namespace HSDRawViewer.Rendering
                     for (int i = 0; i < g.Count; i++)
                     {
                         var pos = GXTranslator.toVector3(dl.Vertices[offset + i].POS);
+                        var nrm = GXTranslator.toVector3(dl.Vertices[offset + i].NRM);
                         var tx0 = GXTranslator.toVector2(dl.Vertices[offset + i].TEX0);
                         tx0.X *= wscale;
                         tx0.Y *= hscale;
@@ -328,24 +329,29 @@ namespace HSDRawViewer.Rendering
                                 {
                                     var t = jobjToWorldTransformCache[en.GetJOBJAt(0)];
                                     pos = Vector3.TransformPosition(pos, t);
+                                    nrm = Vector3.TransformNormal(nrm, t);
                                 }
                             }
                             else
                             if(p.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
                             {
                                 Vector3 bindpos = Vector3.Zero;
+                                Vector3 nrmpos = Vector3.Zero;
                                 for (int j = 0; j < en.EnvelopeCount; j++)
                                 {
                                     var inv = jobjToBindMatrixCache[en.GetJOBJAt(j)];
                                     var anim = jobjToWorldTransformCache[en.GetJOBJAt(j)];
                                     bindpos += Vector3.TransformPosition(pos, inv * anim) * en.GetWeightAt(j);
+                                    nrmpos += Vector3.TransformPosition(nrm, inv * anim) * en.GetWeightAt(j);
                                 }
                                 pos = bindpos;
+                                nrm = nrmpos;
                             }
                         }
 
-
+                        var colr = 0.2f + Math.Abs(Vector3.Dot(nrm, Vector3.UnitZ));
                         GL.TexCoord2(tx0);
+                        GL.Color3(colr, colr, colr);
                         GL.Vertex3(pos);
                     }
                     GL.End();

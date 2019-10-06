@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using HSDRawViewer.Rendering;
 using HSDRaw.Common.Animation;
 using System;
+using System.IO;
+using System.Text.RegularExpressions;
+using HSDRaw.Melee.Pl;
+using HSDRaw.Tools.Melee;
 
 namespace HSDRawViewer
 {
@@ -153,6 +157,36 @@ namespace HSDRawViewer
             Console.WriteLine(f1.Roots[0].Data._s.GetSubStructs().Count + " " + f2.Roots[0].Data._s.GetSubStructs().Count);
 
             CompareNode(f1.Roots[0].Data._s, f2.Roots[0].Data._s, new HashSet<HSDStruct>());
+        }
+
+        public static void DecompileAllPlDats(string path, string outputTxt)
+        {
+            using (StreamWriter w = new StreamWriter(new FileStream(outputTxt, FileMode.Create)))
+                foreach (var f in Directory.GetFiles(path))
+                {
+                    if (Regex.IsMatch(Path.GetFileName(f), @"Pl..\.dat"))
+                    {
+                        HSDRawFile hsd = new HSDRawFile(f);
+
+                        foreach (var r in hsd.Roots)
+                        {
+                            if (r.Data is SBM_PlayerData pl)
+                            {
+                                w.WriteLine(r.Name);
+
+                                ActionDecompiler d = new ActionDecompiler();
+
+                                var sa = pl.SubActionTable.Subactions;
+
+                                int index = 0;
+                                foreach (var v in sa)
+                                {
+                                    w.WriteLine(d.Decompile("Function_"+index++ + v.Name != null ? "_" + v.Name : "", v));
+                                }
+                            }
+                        }
+                    }
+                }
         }
 
         private static void CompareNode(HSDStruct s1, HSDStruct s2, HashSet<HSDStruct> done)

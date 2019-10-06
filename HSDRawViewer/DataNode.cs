@@ -46,8 +46,8 @@ namespace HSDRawViewer
                 SelectedImageKey = "known";
             }
 
-            // add dummy only if this node has references
-            //if(accessor._s.References.Count != 0)
+            // add dummy only if this node has references or if there is an array in the accessor's properties
+            if(accessor._s.References.Count != 0 || Accessor.GetType().GetProperties().ToList().Find(e=>e.PropertyType.IsArray) != null)
                 Nodes.Add(new TreeNode()); // dummy
         }
 

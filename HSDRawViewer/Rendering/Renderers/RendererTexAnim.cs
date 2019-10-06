@@ -158,7 +158,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                         TextureAnim.AnimationObject.FObjDesc.Next = null;
                                 }
 
-                                ((DataNode)Form1.SelectedDataNode.Parent).Refresh();
+                                ((DataNode)MainForm.SelectedDataNode.Parent).Refresh();
                             }
                         }
                     }
@@ -187,7 +187,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 TextureManager.ClearTextures();
 
                 Viewport.Frame = 0;
-                Viewport.MaxFrame = anim.ImageCount;
+                Viewport.MaxFrame = anim.ImageCount - 1;
                 Viewport.AnimSpeed = 30;
 
                 for (int i = 0; i < anim.ImageCount; i++)

@@ -178,7 +178,7 @@ namespace HSDRaw.Tools.Melee
             new MeleeCMDAction(0x25, "CharacterInvisibility", "Unknown|x25|Flag|1"),
             new MeleeCMDAction(0x26, "PseudoRandomSoundEffect", "Unknown|x218"),
             new MeleeCMDAction(0x27, "Unknwon0x27", "Unknown|x122"),
-            new MeleeCMDAction(0x28, "AnimateTexture", "MaterialFlag|1|MaterialIndex|7|FrameFlag|1|Frame|17"),
+            new MeleeCMDAction(0x28, "AnimateTexture", "MaterialFlag|1|MaterialIndex|7|FrameFlags|7|Frame|11"),
             new MeleeCMDAction(0x29, "AnimateModel", "BodyPart|10|State|4|Unk|12"),
             new MeleeCMDAction(0x2A, "Unknown0x2A", "Unknown|26"),
             new MeleeCMDAction(0x2B, "Rumble", "Unknown|26"),
@@ -191,11 +191,12 @@ namespace HSDRaw.Tools.Melee
             new MeleeCMDAction(0x32, "SelfDamage", "Unknown|10|Damage|16"),
             new MeleeCMDAction(0x33, "ContinuationControl", "Unknown|26"),
             new MeleeCMDAction(0x34, "Unknown0x34", "Unknown|26"), // set flag
-            new MeleeCMDAction(0x35, "FootstepEffect", "Unknown|x90"),
+            new MeleeCMDAction(0x35, "FootstepEffect", "Unknown|x58"),
             new MeleeCMDAction(0x36, "LandingEffect", "Unknown|x90"),
             new MeleeCMDAction(0x37, "StartSmashCharge", "Unknown|2|ChargeFrames|8|ChargeRate|16|VisualEffect|8|Unknown|24"),
             new MeleeCMDAction(0x38, "Unknown", "Unknown|26"),
             new MeleeCMDAction(0x39, "AestheticWindEffect", "Unknown|x122"),
+            new MeleeCMDAction(0x3A, "Unkown0x3A", "Unknown|x26"),
         };
 
         /// <summary>

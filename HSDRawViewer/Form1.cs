@@ -5,17 +5,20 @@ using System.ComponentModel.Design;
 using System.IO;
 using HSDRaw;
 using HSDRawViewer.Rendering;
-using HSDRaw.Common;
-using HSDRaw.Common.Animation;
-using HSDRaw.Melee.Gr;
-using HSDRawViewer.Converters;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI;
+using System.Linq;
+using HSDRawViewer.ContextMenus;
 
 namespace HSDRawViewer
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public static MainForm Instance { get; } = new MainForm();
+
         private ByteViewer _myByteViewer;
         private Viewport _Viewport;
         private SubactionEditor _ScriptEditor;
@@ -27,11 +30,11 @@ namespace HSDRawViewer
         public static DataNode SelectedDataNode { get; internal set; } = null;
 
         private Dictionary<Type, ContextMenu> typeToContextMenu = new Dictionary<Type, ContextMenu>();
-        private ContextMenu commonContextMenu = new ContextMenu();
+        private CommonContextMenu commonContextMenu = new CommonContextMenu();
 
         public static bool RefreshNode = false;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -44,8 +47,8 @@ namespace HSDRawViewer
             _ScriptEditor = new SubactionEditor();
             _ScriptEditor.Dock = DockStyle.Fill;
 
-            tabControl1.TabPages[0].Controls.Add(_myByteViewer);
-            tabControl1.TabPages[2].Controls.Add(_Viewport);
+            tabControl1.TabPages[1].Controls.Add(_myByteViewer);
+            tabControl1.TabPages[0].Controls.Add(_Viewport);
 
             ImageList myImageList = new ImageList();
             myImageList.ImageSize = new System.Drawing.Size(24, 24);
@@ -114,6 +117,10 @@ namespace HSDRawViewer
             GenerateContextMenus();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cast"></param>
         public void SelectNode(HSDAccessor cast)
         {
             if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode n)
@@ -132,22 +139,25 @@ namespace HSDRawViewer
                 }
                 SelectedDataNode = n;
 
-                tabControl1.TabPages[2].Controls.Clear();
+                tabControl1.TabPages[0].Controls.Clear();
 
                 if (n.Accessor is SBM_SubActionTable)
                 {
-                    tabControl1.TabPages[2].Controls.Add(_ScriptEditor);
+                    tabControl1.TabPages[0].Controls.Add(_ScriptEditor);
                     _ScriptEditor.SetSubactionAccessor(n);
                 }
                 else
                 {
-                    tabControl1.TabPages[2].Controls.Add(_Viewport);
+                    tabControl1.TabPages[0].Controls.Add(_Viewport);
                 }
 
                 LocationLabel.Text = "Location: " + n.FullPath;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void InitializeStructs()
         {
             if(File.Exists("Structs.txt"))
@@ -162,6 +172,10 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FilePath"></param>
         private void OpenFile(string FilePath)
         {
             treeView1.Nodes.Clear();
@@ -173,6 +187,11 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog d = new OpenFileDialog())
@@ -184,6 +203,11 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog d = new SaveFileDialog())
@@ -197,158 +221,30 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void GenerateContextMenus()
         {
+            var types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                         from assemblyType in domainAssembly.GetTypes()
+                         where typeof(CommonContextMenu).IsAssignableFrom(assemblyType)
+                         select assemblyType).ToArray();
+
+            foreach (var t in types)
             {
-                var cm = new ContextMenu();
-                AttachCommonMenus(cm);
-
-                MenuItem OpenAsJOBJ = new MenuItem("Open As JOBJ");
-                OpenAsJOBJ.Click += (sender, args) => SelectNode(new HSD_JOBJ());
-                cm.MenuItems.Add(OpenAsJOBJ);
-
-                MenuItem OpenAsAJ = new MenuItem("Open As AnimJoint");
-                OpenAsAJ.Click += (sender, args) => SelectNode(new HSD_AnimJoint());
-                cm.MenuItems.Add(OpenAsAJ);
-
-                //cm.MenuItems.Add(delete);
-
-                typeToContextMenu.Add(typeof(HSDAccessor), cm);
-            }
-
-            {
-                var cm = new ContextMenu();
-                AttachCommonMenus(cm);
-
-                MenuItem OpenAsAJ = new MenuItem("Export As SVG");
-                OpenAsAJ.Click += (sender, args) =>
+                if (t != typeof(CommonContextMenu))
                 {
-                    Converters.ConvSVG.CollDataToSVG("test.svg", SelectedDataNode.Accessor as SBM_Coll_Data);
-                };
-                cm.MenuItems.Add(OpenAsAJ);
+                    var ren = (CommonContextMenu)Activator.CreateInstance(t);
 
-                typeToContextMenu.Add(typeof(SBM_Coll_Data), cm);
-            }
-
-            {
-                var cm = new ContextMenu();
-                AttachCommonMenus(cm);
-
-                MenuItem OpenAsAJ = new MenuItem("Import Model Group");
-                OpenAsAJ.Click += (sender, args) =>
-                {
-                    if(SelectedDataNode.Accessor is SBM_Map_Head)
+                    foreach (var v in ren.SupportedTypes)
                     {
-                        SelectedDataNode.ImportModelGroup();
+                        typeToContextMenu.Add(v, ren);
                     }
-                };
-                cm.MenuItems.Add(OpenAsAJ);
-
-                typeToContextMenu.Add(typeof(SBM_Map_Head), cm);
+                }
             }
-
-
-            {
-                var cm = new ContextMenu();
-                AttachCommonMenus(cm);
-
-                MenuItem OpenAsAJ = new MenuItem("Add Texture Anim");
-                OpenAsAJ.Click += (sender, args) =>
-                {
-                    if (SelectedDataNode.Accessor is HSD_MatAnim matanim)
-                    {
-                        matanim.TextureAnimation = new HSD_TexAnim();
-                        matanim.TextureAnimation.AnimationObject = new HSD_AOBJ();
-                        matanim.TextureAnimation.AnimationObject.FObjDesc = new HSD_FOBJDesc();
-                    }
-                };
-                cm.MenuItems.Add(OpenAsAJ);
-
-                typeToContextMenu.Add(typeof(HSD_MatAnim), cm);
-            }
-
-            {
-                var cm = new ContextMenu();
-                AttachCommonMenus(cm);
-
-                MenuItem Export = new MenuItem("Export Frames TXT");
-                Export.Click += (sender, args) =>
-                {
-                    using (SaveFileDialog d = new SaveFileDialog())
-                    {
-                        d.Filter = "TXT (*.txt)|*.txt";
-
-                        if(d.ShowDialog() == DialogResult.OK)
-                        {
-                            if (SelectedDataNode.Accessor is HSD_FOBJ fobj)
-                                File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobj));
-
-                            if (SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
-                                File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobjdesc));
-                        }
-                    }
-                };
-                cm.MenuItems.Add(Export);
-
-                MenuItem Import = new MenuItem("Import Frames TXT");
-                Import.Click += (sender, args) =>
-                {
-                    using (OpenFileDialog d = new OpenFileDialog())
-                    {
-                        d.Filter = "TXT (*.txt)|*.txt";
-
-                        if (d.ShowDialog() == DialogResult.OK)
-                        {
-                            if (SelectedDataNode.Accessor is HSD_FOBJ fobj)
-                                ConvFOBJ.ImportKeys(fobj, File.ReadAllLines(d.FileName));
-
-                            if (SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
-                                ConvFOBJ.ImportKeys(fobjdesc, File.ReadAllLines(d.FileName));
-                        }
-                    }
-                };
-                cm.MenuItems.Add(Import);
-
-                typeToContextMenu.Add(typeof(HSD_FOBJ), cm);
-                typeToContextMenu.Add(typeof(HSD_FOBJDesc), cm);
-            }
-
-            AttachCommonMenus(commonContextMenu);
-
         }
-
-        private void AttachCommonMenus(ContextMenu menu)
-        {
-            MenuItem delete = new MenuItem("Delete");
-            delete.Click += (sender, args) =>
-            {
-                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
-                {
-                    node.Delete();
-                }
-            };
-            MenuItem export = new MenuItem("Export");
-            export.Click += (sender, args) =>
-            {
-                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
-                {
-                    node.Export();
-                }
-            };
-            MenuItem import = new MenuItem("Import");
-            import.Click += (sender, args) =>
-            {
-                if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode node)
-                {
-                    node.Import();
-                }
-            };
-
-            menu.MenuItems.Add(delete);
-            menu.MenuItems.Add(export);
-            menu.MenuItems.Add(import);
-        }
-
+        
         private void addRootFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog f = new OpenFileDialog())

@@ -58,6 +58,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContextMenus\CollDataContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\CommonContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\FOBJContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\MapHeadContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\MatAnimContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\UnidentifiedContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Converters\ConvFOBJ.cs" />
     <Compile Include="Converters\ConvSVG.cs" />
     <Compile Include="Converters\PlayStruct.cs" />

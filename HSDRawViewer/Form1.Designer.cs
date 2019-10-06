@@ -1,6 +1,6 @@
 ﻿namespace HSDRawViewer
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -113,14 +113,14 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(3, 3);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(690, 409);
+            this.propertyGrid1.Size = new System.Drawing.Size(470, 369);
             this.propertyGrid1.TabIndex = 2;
             // 
             // tabControl1
             // 
+            this.tabControl1.Controls.Add(this.renderTab);
             this.tabControl1.Controls.Add(this.hexViewTab);
             this.tabControl1.Controls.Add(this.propertyTab);
-            this.tabControl1.Controls.Add(this.renderTab);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(220, 40);
             this.tabControl1.Name = "tabControl1";
@@ -144,7 +144,7 @@
             this.propertyTab.Location = new System.Drawing.Point(4, 22);
             this.propertyTab.Name = "propertyTab";
             this.propertyTab.Padding = new System.Windows.Forms.Padding(3);
-            this.propertyTab.Size = new System.Drawing.Size(696, 415);
+            this.propertyTab.Size = new System.Drawing.Size(476, 375);
             this.propertyTab.TabIndex = 2;
             this.propertyTab.Text = "Property View";
             this.propertyTab.UseVisualStyleBackColor = true;
@@ -154,9 +154,9 @@
             this.renderTab.Location = new System.Drawing.Point(4, 22);
             this.renderTab.Name = "renderTab";
             this.renderTab.Padding = new System.Windows.Forms.Padding(3);
-            this.renderTab.Size = new System.Drawing.Size(696, 415);
+            this.renderTab.Size = new System.Drawing.Size(476, 375);
             this.renderTab.TabIndex = 1;
-            this.renderTab.Text = "Rendered";
+            this.renderTab.Text = "Render View";
             this.renderTab.UseVisualStyleBackColor = true;
             // 
             // LocationLabel

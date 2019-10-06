@@ -13,7 +13,7 @@ namespace HSDRawViewer.Rendering
     {
         private GroupBox _animationGroup;
         private Button _animationPlayButton;
-        private TrackBar _animationTrackBar;
+        private static TrackBar _animationTrackBar;
 
         private GLControl _glViewport;
 
@@ -158,8 +158,24 @@ namespace HSDRawViewer.Rendering
 
         // Animation Track
         public static int AnimSpeed = 1;
-        public static int MaxFrame { get; set; } = 0;
-        public static int Frame { get; set; } = 0;
+        public static int MaxFrame { get => _animationTrackBar.Maximum; set => _animationTrackBar.Maximum = value; }
+        public static int Frame
+        {
+            get
+            {
+                return _animationTrackBar.Value;
+            }
+            set
+            {
+                if (value < _animationTrackBar.Minimum)
+                    value = _animationTrackBar.Maximum;
+
+                if (value > _animationTrackBar.Maximum)
+                    value = _animationTrackBar.Minimum;
+
+                _animationTrackBar.Value = value;
+            }
+        }
         public static bool EnableAnimationTrack
         {
             get => _enableAnimationTrack;
@@ -214,8 +230,6 @@ namespace HSDRawViewer.Rendering
 
             _animationTrackBar = new TrackBar();
             _animationTrackBar.Dock = DockStyle.Top;
-            //_animationTrackBar.DataBindings.Add(new Binding("Value", this, "Frame"));
-            //DataBindings.Add("Frame", _animationTrackBar, "Value");
 
             _animationGroup.Controls.Add(_animationPlayButton);
             _animationGroup.Controls.Add(_animationTrackBar);
@@ -261,7 +275,6 @@ namespace HSDRawViewer.Rendering
             if (!_animationGroup.Visible && EnableAnimationTrack)
             {
                 _animationGroup.Visible = true;
-                _animationTrackBar.Maximum = MaxFrame;
                 _animationTrackBar.Minimum = 0;
             }
 
@@ -302,19 +315,11 @@ namespace HSDRawViewer.Rendering
         public static void IncrementFrame()
         {
             Frame++;
-            if (Frame >= MaxFrame)
-                Frame = 0;
-            if (Frame < 0)
-                Frame = MaxFrame - 1;
         }
 
         public static void DecrementFrame()
         {
             Frame--;
-            if (Frame >= MaxFrame)
-                Frame = 0;
-            if (Frame < 0)
-                Frame = MaxFrame - 1;
         }
         
         private void Viewport_Resize(object sender, EventArgs e)
@@ -326,7 +331,7 @@ namespace HSDRawViewer.Rendering
 
         private void Viewport_Loaded(object sender, EventArgs args)
         {
-            GL.ClearColor(Color.DarkSlateGray);
+            GL.ClearColor(Color.FromArgb((0xFF << 24) | 0x333333));
             Translation = Matrix4.CreateTranslation(_defaultTranslation);
             ReadyToRender = true;
         }

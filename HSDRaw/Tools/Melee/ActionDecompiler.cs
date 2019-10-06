@@ -18,6 +18,8 @@ namespace HSDRaw.Tools.Melee
         /// <returns></returns>
         public string Decompile(string name, HSDAccessor commanddata)
         {
+            if (commanddata == null)
+                return "";
             StringBuilder output = new StringBuilder();
 
             tempStructToName.Clear();
@@ -59,20 +61,21 @@ namespace HSDRaw.Tools.Melee
                     var command = r.GetSection(r.Position, size);
                     r.Skip((uint)size);
 
-                    Console.WriteLine(cmd.Name + " " + cmd.ByteSize);
-
                     if (flag == 5 || flag == 7) //goto
                     {
                         var re = datas.GetReference<HSDAccessor>((int)r.BaseStream.Position - 4);
-                        if (!tempStructToName.ContainsKey(re._s))
+                        if (re != null)
                         {
-                            if (structToFunctionName.ContainsKey(re._s))
-                                tempStructToName.Add(re._s, structToFunctionName[re._s]);
-                            else
-                                tempStructToName.Add(re._s, name + "_" + ((int)r.BaseStream.Position - 4).ToString("X4"));
+                            if (!tempStructToName.ContainsKey(re._s))
+                            {
+                                if (structToFunctionName.ContainsKey(re._s))
+                                    tempStructToName.Add(re._s, structToFunctionName[re._s]);
+                                else
+                                    tempStructToName.Add(re._s, name + "_" + ((int)r.BaseStream.Position - 4).ToString("X4"));
+                            }
+                            var funcname = tempStructToName[re._s];
+                            output.AppendLine("\t" + (flag == 5 ? "Goto" : "Subroutine") + "(" + funcname + ");");
                         }
-                        var funcname = tempStructToName[re._s];
-                        output.AppendLine("\t" + (flag == 5 ? "Goto" : "Subroutine") + "(" + funcname + ");");
                     }
                     else
                     {

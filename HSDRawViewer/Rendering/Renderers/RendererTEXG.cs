@@ -70,7 +70,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         }
                         bitmap.Save(d.FileName);
                         bitmap.Dispose();
-                        Form1.SelectedDataNode.Refresh();
+                        MainForm.SelectedDataNode.Refresh();
                     }
                 }
             };
@@ -103,7 +103,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 bmp.Dispose();
                                 ParticleGroup.SetFromTOBJs(images);
                                 ParticleGroup = null;
-                                Form1.SelectedDataNode.Refresh();
+                                MainForm.SelectedDataNode.Refresh();
                             }
                         }
                     }
@@ -126,7 +126,7 @@ namespace HSDRawViewer.Rendering.Renderers
             {
                 TextureManager.ClearTextures();
                 Viewport.Frame = 0;
-                Viewport.MaxFrame = particle.ImageCount;
+                Viewport.MaxFrame = particle.ImageCount - 1;
                 Viewport.EnableAnimationTrack = true;
                 Viewport.AnimSpeed = 30;
                 foreach(var v in particle.GetRGBAImageData())
