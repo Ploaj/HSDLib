@@ -1,5 +1,5 @@
-﻿using HSDRaw.Common;
-using System;
+﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace HSDRawViewer
@@ -14,6 +14,7 @@ namespace HSDRawViewer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             Application.Run(MainForm.Instance);
         }
     }

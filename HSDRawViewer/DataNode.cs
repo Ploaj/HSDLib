@@ -5,14 +5,13 @@ using System;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using System.Linq;
-using System.Collections;
 using HSDRaw.Melee.Gr;
 
 namespace HSDRawViewer
 {
     public class DataNode : TreeNode
     {
-        public bool ArrayMember { get; internal set; } = false;
+        public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }
         private int ArrayIndex { get; set; }
         public HSDAccessor Accessor { get; set; }
@@ -51,7 +50,7 @@ namespace HSDRawViewer
                 Nodes.Add(new TreeNode()); // dummy
         }
 
-        private void AddNext(HSDAccessor access)
+        private void AddNext(HSDAccessor access, int index)
         {
             foreach (var prop in access.GetType().GetProperties())
             {
@@ -60,8 +59,8 @@ namespace HSDRawViewer
                     var acc = (HSDAccessor)prop.GetValue(access);
                     if (acc != null)
                     {
-                        Nodes.Add(new DataNode(prop.PropertyType.Name, acc));
-                        AddNext(acc);
+                        Nodes.Add(new DataNode(prop.PropertyType.Name + "_" + index, acc));
+                        AddNext(acc, index+1);
                     }
                 }
 
@@ -72,7 +71,7 @@ namespace HSDRawViewer
         {
             if (Parent != null && Parent is DataNode parent)
             {
-                if (ArrayMember)
+                if (IsArrayMember)
                 {
                     var prop = parent.Accessor.GetType().GetProperty(ArrayName);
                     var arr = prop.GetValue(parent.Accessor) as HSDAccessor[];
@@ -110,14 +109,14 @@ namespace HSDRawViewer
                                 new DataNode
                                 (prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}:\t" + prop.PropertyType.Name), a)
                             {
-                                ArrayMember = true,
+                                IsArrayMember = true,
                                 ArrayName = prop.Name,
                                 ArrayIndex = index
                             });
                             // add substructs too so they don't get appended at the end
                             foreach (var ss in a._s.References)
                                 strucs.Add(ss.Value);
-                            AddNext(a);
+                            AddNext(a, 1);
                             index++;
                         }
                     }
@@ -126,13 +125,13 @@ namespace HSDRawViewer
                 if (prop.PropertyType.IsSubclassOf(typeof(HSDAccessor)))
                 {
                     var acc = prop.GetValue(Accessor) as HSDAccessor;
-                    if(acc != null)
+                    if (acc != null)
                     {
                         strucs.Add(acc._s);
                         if (prop.Name != "Next")
                         {
                             Nodes.Add(new DataNode(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : ":\t" + prop.PropertyType.Name), acc));
-                            AddNext(acc);
+                            AddNext(acc, 1);
                         }
                     }
                 }
@@ -205,7 +204,22 @@ namespace HSDRawViewer
         {
             if(Parent != null && Parent is DataNode parent)
             {
-                if (ArrayMember)
+                if (Accessor is HSD_DOBJ dobj)
+                {
+                    var current = new HSD_DOBJ();
+                    current._s = Accessor._s;
+                    
+                    if (PrevNode is DataNode prev && prev.Accessor is HSD_DOBJ next)
+                    {
+                        next.Next = current.Next;
+                    }
+                    else
+                    {
+                        parent.Accessor._s.ReplaceReferenceToStruct(Accessor._s, current.Next._s);
+                    }
+                }
+                else
+                if (IsArrayMember)
                 {
                     // this is a mess
                     var prop = parent.Accessor.GetType().GetProperty(ArrayName);
@@ -223,6 +237,11 @@ namespace HSDRawViewer
                 else
                 if(parent.Accessor._s.RemoveReferenceToStruct(Accessor._s))
                     parent.Nodes.Remove(this);
+                else 
+                if(PrevNode is DataNode prev)
+                {
+                    prev.Accessor._s.RemoveReferenceToStruct(Accessor._s);
+                }
 
 
                 parent.Refresh();

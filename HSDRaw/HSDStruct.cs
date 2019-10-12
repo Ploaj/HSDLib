@@ -202,6 +202,26 @@ namespace HSDRaw
         }
 
         /// <summary>
+        /// Replaces all references to given struct with another
+        /// </summary>
+        /// <param name="oldStruct"></param>
+        /// <param name="newStruct"></param>
+        /// <returns>true if at least one struct was replaced</returns>
+        public bool ReplaceReferenceToStruct(HSDStruct oldStruct, HSDStruct newStruct)
+        {
+            bool replaced = false;
+            foreach (var v in _references)
+            {
+                if (v.Value == oldStruct)
+                {
+                    SetReferenceStruct(v.Key, newStruct);
+                    replaced = true;
+                }
+            }
+            return replaced;
+        }
+
+        /// <summary>
         /// Creates a new struct from a struct embedded into this one
         /// </summary>
         /// <param name="loc"></param>

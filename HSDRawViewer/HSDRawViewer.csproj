@@ -64,6 +64,9 @@
     <Compile Include="ContextMenus\CommonContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\DOBJContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\FOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -87,6 +90,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\IntuitiveSubactionEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\IntuitiveSubactionEditor.Designer.cs">
+      <DependentUpon>IntuitiveSubactionEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\SubactionEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -106,6 +115,7 @@
     <Compile Include="Rendering\Math3D.cs" />
     <Compile Include="Rendering\Renderers\CollDataRenderer.cs" />
     <Compile Include="Rendering\Renderers\IRenderer.cs" />
+    <Compile Include="Rendering\Renderers\RendererGrCollision.cs" />
     <Compile Include="Rendering\Renderers\RendererTexAnim.cs" />
     <Compile Include="Rendering\Renderers\RendererTOBJ.cs" />
     <Compile Include="Rendering\Renderers\RendererTEXG.cs" />
@@ -120,8 +130,12 @@
     </Compile>
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
+    <Compile Include="Tools\FileIO.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\IntuitiveSubactionEditor.resx">
+      <DependentUpon>IntuitiveSubactionEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\SubactionEditor.resx">
       <DependentUpon>SubactionEditor.cs</DependentUpon>

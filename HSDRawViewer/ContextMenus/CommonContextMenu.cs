@@ -25,7 +25,7 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Export();
                 }
             };
-            MenuItem import = new MenuItem("Import");
+            MenuItem import = new MenuItem("Replace");
             import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)

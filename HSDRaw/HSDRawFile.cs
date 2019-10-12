@@ -10,6 +10,7 @@ using System;
 using HSDRaw.AirRide.Vc;
 using HSDRaw.Melee.Ef;
 using HSDRaw.AirRide.Gr;
+using HSDRaw.AirRide.Gr.Data;
 
 namespace HSDRaw
 {
@@ -298,6 +299,13 @@ namespace HSDRaw
                     if (rootStrings[i].StartsWith("grModel"))
                     {
                         var acc = new KAR_grModel();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].StartsWith("grData"))
+                    {
+                        var acc = new KAR_grData();
                         acc._s = str;
                         a = acc;
                     }
