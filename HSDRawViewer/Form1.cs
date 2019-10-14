@@ -53,6 +53,9 @@ namespace HSDRawViewer
             myImageList.ImageSize = new System.Drawing.Size(24, 24);
             myImageList.Images.Add("unknown", Properties.Resources.ico_unknown);
             myImageList.Images.Add("known", Properties.Resources.ico_known);
+            myImageList.Images.Add("folder", Properties.Resources.ico_folder);
+            myImageList.Images.Add("group", Properties.Resources.ico_group);
+            myImageList.Images.Add("table", Properties.Resources.ico_table);
             myImageList.Images.Add("jobj", Properties.Resources.ico_jobj);
             myImageList.Images.Add("dobj", Properties.Resources.ico_dobj);
             myImageList.Images.Add("pobj", Properties.Resources.ico_pobj);
@@ -64,6 +67,10 @@ namespace HSDRawViewer
             myImageList.Images.Add("iobj", Properties.Resources.ico_iobj);
             myImageList.Images.Add("lobj", Properties.Resources.ico_lobj);
             myImageList.Images.Add("sobj", Properties.Resources.ico_sobj);
+            myImageList.Images.Add("coll", Properties.Resources.ico_coll);
+            myImageList.Images.Add("anim_texture", Properties.Resources.ico_anim_texture);
+            myImageList.Images.Add("anim_material", Properties.Resources.ico_anim_material);
+            myImageList.Images.Add("anim_joint", Properties.Resources.ico_anim_joint);
 
             treeView1.ImageList = myImageList;
 
@@ -139,13 +146,9 @@ namespace HSDRawViewer
         /// <param name="FilePath"></param>
         private void OpenFile(string FilePath)
         {
-            treeView1.Nodes.Clear();
             RawHSDFile = new HSDRawFile();
             RawHSDFile.Open(FilePath);
-            foreach(var r in RawHSDFile.Roots)
-            {
-                treeView1.Nodes.Add(new DataNode(r.Name, r.Data));
-            }
+            RefreshTree();
         }
 
         /// <summary>
@@ -157,7 +160,7 @@ namespace HSDRawViewer
         {
             using (OpenFileDialog d = new OpenFileDialog())
             {
-                d.Filter = "HSD (*.dat)|*.dat;*.usd";
+                d.Filter = "HSD (*.dat,*.usd)|*.dat;*.usd";
 
                 if(d.ShowDialog() == DialogResult.OK)
                     OpenFile(d.FileName);
@@ -173,13 +176,28 @@ namespace HSDRawViewer
         {
             using (SaveFileDialog d = new SaveFileDialog())
             {
-                d.Filter = "HSD (*.dat)|*.dat;*.usd";
+                d.Filter = "HSD (*.dat,*.usd)|*.dat;*.usd";
 
                 if (d.ShowDialog() == DialogResult.OK)
                 {
                     RawHSDFile.Save(d.FileName);
+                    RefreshTree();
                 }
             }
+        }
+
+        /// <summary>
+        /// Reloads all the data nodes in the tree
+        /// </summary>
+        private void RefreshTree()
+        {
+            treeView1.Nodes.Clear();
+            foreach (var r in RawHSDFile.Roots)
+            {
+                treeView1.Nodes.Add(new DataNode(r.Name, r.Data));
+            }
+            if (treeView1.Nodes.Count > 0)
+                treeView1.SelectedNode = treeView1.Nodes[0];
         }
 
         /// <summary>

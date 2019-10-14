@@ -6,6 +6,8 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using System.Linq;
 using HSDRaw.Melee.Gr;
+using HSDRaw.AirRide.Gr.Data;
+using HSDRaw.Melee.Ef;
 
 namespace HSDRawViewer
 {
@@ -27,18 +29,57 @@ namespace HSDRawViewer
             { typeof(HSD_IOBJ), "iobj" },
             { typeof(HSD_SOBJ), "sobj" },
             { typeof(HSD_Camera), "cobj" },
-            { typeof(HSD_LOBJ), "lobj" }
+            { typeof(HSD_LOBJ), "lobj" },
+            { typeof(SBM_Coll_Data), "coll" },
+            { typeof(KAR_grCollisionNode), "coll" },
+            { typeof(HSD_AnimJoint), "anim_joint" },
+            { typeof(HSD_MatAnimJoint), "anim_material" },
+            { typeof(HSD_TEXGraphicBank), "group" },
+            { typeof(HSD_TexGraphic), "anim_texture" },
+            { typeof(HSD_TexAnim), "anim_texture" },
+            { typeof(SBM_Map_Head), "group" },
+            { typeof(SBM_GeneralPoints), "group" },
+            { typeof(SBM_Model_Group), "group" },
+            { typeof(SBM_EffectModel), "group" },
+            { typeof(SBM_EffectTable), "table" },
         };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        private bool CheckGenericType(HSDAccessor o)
+        {
+            if(o.GetType().IsGenericType)
+            {
+                if (o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDArrayAccessor<>))
+                    || o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDNullPointerArrayAccessor<>)))
+                {
+                    ImageKey = "folder";
+                    SelectedImageKey = "folder";
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public DataNode(string Text, HSDAccessor accessor)
         {
             this.Text = Text;
             Accessor = accessor;
+
             if (typeToImageKey.ContainsKey(accessor.GetType()))
             {
                 ImageKey = typeToImageKey[accessor.GetType()];
                 SelectedImageKey = typeToImageKey[accessor.GetType()];
-            } else
+            }
+            else
+            if (CheckGenericType(accessor))
+            {
+
+            }
+            else
             if(accessor.GetType() != typeof(HSDAccessor) )
             {
                 ImageKey = "known";

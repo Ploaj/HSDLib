@@ -63,6 +63,36 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ico_anim_joint {
+            get {
+                object obj = ResourceManager.GetObject("ico_anim_joint", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_anim_material {
+            get {
+                object obj = ResourceManager.GetObject("ico_anim_material", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_anim_texture {
+            get {
+                object obj = ResourceManager.GetObject("ico_anim_texture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ico_aobj {
             get {
                 object obj = ResourceManager.GetObject("ico_aobj", resourceCulture);
@@ -83,6 +113,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ico_coll {
+            get {
+                object obj = ResourceManager.GetObject("ico_coll", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ico_dobj {
             get {
                 object obj = ResourceManager.GetObject("ico_dobj", resourceCulture);
@@ -96,6 +136,26 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ico_fobj {
             get {
                 object obj = ResourceManager.GetObject("ico_fobj", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_folder {
+            get {
+                object obj = ResourceManager.GetObject("ico_folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_group {
+            get {
+                object obj = ResourceManager.GetObject("ico_group", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -166,6 +226,16 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ico_sobj {
             get {
                 object obj = ResourceManager.GetObject("ico_sobj", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_table {
+            get {
+                object obj = ResourceManager.GetObject("ico_table", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

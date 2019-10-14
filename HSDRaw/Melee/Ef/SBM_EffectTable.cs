@@ -11,7 +11,7 @@ namespace HSDRaw.Melee.Ef
 
         // Unknown at 0x08
 
-        public SBM_EffectModel[] Models { get => _s.GetEmbeddedAccessorArray<SBM_EffectModel>(0x0C, (_s.Length - 0x0C) / 0x14); set => _s.SetEmbeddedAccessorArray<SBM_EffectModel>(0x0C, value); }
+        public SBM_EffectModel[] Models { get => _s.GetEmbeddedAccessorArray<SBM_EffectModel>(0x0C, (_s.Length - 0x0C) / 0x14); set => _s.SetEmbeddedAccessorArray(0x0C, value); }
     }
 
     public class SBM_EffectModel : HSDAccessor
