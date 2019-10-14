@@ -37,7 +37,8 @@ namespace HSDRaw
         /// Trying to keep the order of structs intact if possible
         /// </summary>
         private List<HSDStruct> _structCache = new List<HSDStruct>();
-        
+        private Dictionary<HSDStruct, int> _structCacheToOffset = new Dictionary<HSDStruct, int>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -190,6 +191,7 @@ namespace HSDRaw
                     }
 
                     _structCache.Add(str.Value);
+                    _structCacheToOffset.Add(str.Value, str.Key);
                 }
 
                 // set roots
@@ -347,14 +349,19 @@ namespace HSDRaw
         {
             Save(new FileStream(fileName, FileMode.Create));
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public bool IsBuffer(HSDStruct a)
         {
             return a.References.Count == 0 && a.Length >= 0x50;
         }
 
         //https://stackoverflow.com/questions/16340/how-do-i-generate-a-hashcode-from-a-byte-array-in-c/16381
-        public static int ComputeHash(params byte[] data)
+        private static int ComputeHash(params byte[] data)
         {
             unchecked
             {
@@ -373,6 +380,11 @@ namespace HSDRaw
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         private bool IsRoot(HSDStruct s)
         {
             foreach (var v in Roots)
@@ -386,6 +398,9 @@ namespace HSDRaw
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void RemoveDuplicateBuffers()
         {
             Dictionary<int, HSDStruct> hashToStruct = new Dictionary<int, HSDStruct>();
@@ -420,6 +435,28 @@ namespace HSDRaw
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private List<HSDStruct> GetAllStructs()
+        {
+            var allStructs = new List<HSDStruct>();
+            foreach (var r in Roots)
+            {
+                foreach (var sub in r.Data._s.GetSubStructs())
+                    if (!allStructs.Contains(sub))
+                        allStructs.Add(sub);
+            }
+            foreach (var r in References)
+            {
+                foreach (var sub in r.Data._s.GetSubStructs())
+                    if (!allStructs.Contains(sub))
+                        allStructs.Add(sub);
+            }
+            return allStructs;
+        }
+
+        /// <summary>
         /// saves dat data to stream with optional alignment
         /// </summary>
         /// <param name="stream"></param>
@@ -430,19 +467,7 @@ namespace HSDRaw
 #if DEBUG
             Console.WriteLine("Gathering structs...");
 #endif
-            var allStructs = new List<HSDStruct>();
-            foreach (var r in Roots)
-            {
-                foreach(var sub in r.Data._s.GetSubStructs())
-                    if(!allStructs.Contains(sub))
-                        allStructs.Add(sub);
-            }
-            foreach (var r in References)
-            {
-                foreach (var sub in r.Data._s.GetSubStructs())
-                    if (!allStructs.Contains(sub))
-                        allStructs.Add(sub);
-            }
+            var allStructs = GetAllStructs();
 
             // struct cache cleanup
 #if DEBUG
@@ -565,5 +590,40 @@ namespace HSDRaw
             }
         }
 
+
+        /// <summary>
+        /// Returns the cached offset for <see cref="HSDStruct"/> for this file.
+        /// If struct is not cached then returns -1
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public int GetOffsetFromStruct(HSDStruct str)
+        {
+            if (_structCacheToOffset.ContainsKey(str))
+                return _structCacheToOffset[str];
+
+            return -1;
+        }
+
+
+        /// <summary>
+        /// Returns a list of all structs that reference the given struct
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public List<HSDStruct> GetAllStructsThatReference(HSDStruct str)
+        {
+            var structs = GetAllStructs();
+
+            var found = new List<HSDStruct>();
+
+            foreach(var v in structs)
+            {
+                if (v.References.ContainsValue(str))
+                    found.Add(v);
+            }
+
+            return found;
+        }
     }
 }

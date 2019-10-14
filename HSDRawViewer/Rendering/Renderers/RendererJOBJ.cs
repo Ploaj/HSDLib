@@ -351,7 +351,10 @@ namespace HSDRawViewer.Rendering
 
                         var colr = 0.2f + Math.Abs(Vector3.Dot(nrm, Vector3.UnitZ));
                         GL.TexCoord2(tx0);
-                        GL.Color3(colr, colr, colr);
+                        if(nrm == Vector3.Zero)
+                            GL.Color3(1f, 1f, 1f);
+                        else
+                            GL.Color3(colr, colr, colr);
                         GL.Vertex3(pos);
                     }
                     GL.End();

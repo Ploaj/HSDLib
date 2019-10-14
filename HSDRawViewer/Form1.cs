@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using System.ComponentModel.Design;
-using System.IO;
 using HSDRaw;
 using HSDRawViewer.Rendering;
-using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI;
 using System.Linq;
 using HSDRawViewer.ContextMenus;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer
 {
-    public partial class MainForm : Form
+    public partial class MainForm : DockContent
     {
         /// <summary>
         /// 
         /// </summary>
         public static MainForm Instance { get; } = new MainForm();
 
-        private ByteViewer _myByteViewer;
+        private PropertyView _nodePropertyViewer;
         private Viewport _Viewport;
         private SubactionEditor _ScriptEditor;
 
@@ -38,17 +36,18 @@ namespace HSDRawViewer
         {
             InitializeComponent();
 
-            _myByteViewer = new ByteViewer();
-            _myByteViewer.Dock = DockStyle.Fill;
+            IsMdiContainer = true;
+
+            _nodePropertyViewer = new PropertyView();
+            _nodePropertyViewer.Dock = DockStyle.Fill;
+            _nodePropertyViewer.Show(dockPanel);
 
             _Viewport = new Viewport();
             _Viewport.Dock = DockStyle.Fill;
+            _Viewport.Show(dockPanel);
 
             _ScriptEditor = new SubactionEditor();
             _ScriptEditor.Dock = DockStyle.Fill;
-
-            tabControl1.TabPages[1].Controls.Add(_myByteViewer);
-            tabControl1.TabPages[0].Controls.Add(_Viewport);
 
             ImageList myImageList = new ImageList();
             myImageList.ImageSize = new System.Drawing.Size(24, 24);
@@ -106,14 +105,6 @@ namespace HSDRawViewer
                 }
             };
 
-            propertyGrid1.PropertyValueChanged += (sneder, args) =>
-            {
-                if(SelectedDataNode != null)
-                _myByteViewer.SetBytes(SelectedDataNode.Accessor._s.GetData());
-            };
-
-            InitializeStructs();
-
             GenerateContextMenus();
         }
 
@@ -125,53 +116,23 @@ namespace HSDRawViewer
         {
             if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode n)
             {
-                _myByteViewer.SetBytes(n.Accessor._s.GetData());
-                if(cast == null)
+                if (cast == null)
                 {
-                    propertyGrid1.SelectedObject = n.Accessor;
+                    _nodePropertyViewer.SetAccessor(n.Accessor);
                     _Viewport.SelectedAccessor = n.Accessor;
                 }
                 else
                 {
                     cast._s = n.Accessor._s;
-                    propertyGrid1.SelectedObject = cast;
+                    _nodePropertyViewer.SetAccessor(cast);
                     _Viewport.SelectedAccessor = cast;
                 }
                 SelectedDataNode = n;
-
-                tabControl1.TabPages[0].Controls.Clear();
-
-                if (n.Accessor is SBM_SubActionTable)
-                {
-                    tabControl1.TabPages[0].Controls.Add(_ScriptEditor);
-                    _ScriptEditor.SetSubactionAccessor(n);
-                }
-                else
-                {
-                    tabControl1.TabPages[0].Controls.Add(_Viewport);
-                }
-
-                LocationLabel.Text = "Location: " + n.FullPath;
+                
+                LocationLabel.Text = "Location: 0x" + RawHSDFile.GetOffsetFromStruct(n.Accessor._s).ToString("X8") + " -> " + n.FullPath;
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void InitializeStructs()
-        {
-            if(File.Exists("Structs.txt"))
-            using (StreamReader r = new StreamReader(new FileStream("Structs.txt", FileMode.Open)))
-            {
-                while (!r.EndOfStream)
-                {
-                    StructData d = new StructData();
-                    d.Read(r);
-                    stringToStruct.Add(d.Name, d);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -245,6 +206,11 @@ namespace HSDRawViewer
             }
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addRootFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog f = new OpenFileDialog())
@@ -258,6 +224,54 @@ namespace HSDRawViewer
 
                     RawHSDFile.Roots.Add(file.Roots[0]);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        public void TryClose(Control c)
+        {
+            if(c == _nodePropertyViewer)
+            {
+                propertyViewToolStripMenuItem.Checked = false;
+            }
+            if(c == _Viewport)
+            {
+                viewportToolStripMenuItem.Checked = false;
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void propertyViewToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (propertyViewToolStripMenuItem.Checked)
+            {
+                if (_nodePropertyViewer.IsHidden)
+                    _nodePropertyViewer.Show();
+            }
+            else
+            {
+                _nodePropertyViewer.Hide();
+            }
+        }
+
+        private void viewportToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            if (viewportToolStripMenuItem.Checked)
+            {
+                if (_Viewport.IsHidden)
+                    _Viewport.Show();
+            }
+            else
+            {
+                _Viewport.Hide();
             }
         }
     }

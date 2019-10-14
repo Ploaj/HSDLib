@@ -6,10 +6,11 @@ using System.Drawing;
 using System.Windows.Forms;
 using HSDRaw;
 using HSDRaw.Common.Animation;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.Rendering
 {
-    public class Viewport : Panel
+    public class Viewport : DockContent
     {
         private GroupBox _animationGroup;
         private Button _animationPlayButton;
@@ -204,6 +205,8 @@ namespace HSDRawViewer.Rendering
         
         public Viewport()
         {
+            Text = "Viewport";
+
             _glViewport = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             _glViewport.Load += Viewport_Loaded;
             _glViewport.Resize += Viewport_Resize;
@@ -237,6 +240,15 @@ namespace HSDRawViewer.Rendering
             ClearControls();
 
             Application.Idle += RenderLoop;
+
+            FormClosing += (sender, args) =>
+            {
+                if (args.CloseReason == CloseReason.UserClosing)
+                {
+                    args.Cancel = true;
+                    MainForm.Instance.TryClose(this);
+                }
+            };
         }
 
         public void RenderLoop(object sender, EventArgs args)
