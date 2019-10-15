@@ -2,10 +2,13 @@
 using OpenTK;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
+using HSDRaw;
+using System;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
-    public class CollDataRenderer
+    public class CollDataRenderer : IRenderer
     {
         /// <summary>
         /// 
@@ -42,6 +45,10 @@ namespace HSDRawViewer.Rendering.Renderers
             { CollMaterial.GreatBay, new Vector3(1f, 0, 0) },
         };
 
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_Coll_Data) };
+
+        public ToolStrip ToolStrip => null;
+
         private static void RenderCollRegion(SBM_CollVertex[] vertices, SBM_CollLink[] links, int start, int count)
         {
             GL.Begin(PrimitiveType.Quads);
@@ -62,5 +69,15 @@ namespace HSDRawViewer.Rendering.Renderers
             GL.End();
         }
 
+        public void Clear()
+        {
+            Console.WriteLine("Clearing");
+        }
+
+        public void Render(HSDAccessor a, int windowWidth, int windowHeight)
+        {
+            RenderColl_Data(a as SBM_Coll_Data);
+            
+        }
     }
 }

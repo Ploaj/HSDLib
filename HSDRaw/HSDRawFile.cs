@@ -269,6 +269,13 @@ namespace HSDRaw
                         acc._s = str;
                         a = acc;
                     }
+                    /*else
+                    if (rootStrings[i].StartsWith("grGroundParam"))
+                    {
+                        var acc = new SBM_GroundParam();
+                        acc._s = str;
+                        a = acc;
+                    }*/
                     else
                     if (rootStrings[i].StartsWith("map_head"))
                     {
@@ -464,15 +471,9 @@ namespace HSDRaw
         public void Save(Stream stream, bool bufferAlign = true)
         {
             // gather all structs--------------------------------------------------------------------------
-#if DEBUG
-            Console.WriteLine("Gathering structs...");
-#endif
             var allStructs = GetAllStructs();
 
             // struct cache cleanup
-#if DEBUG
-            Console.WriteLine("Cleaning structs...");
-#endif
             // remove unused structs--------------------------------------------------------------------------
             var unused = new List<HSDStruct>();
 
@@ -488,9 +489,6 @@ namespace HSDRaw
                 if(_structCache.Contains(s))
                     _structCache.Remove(s);
             }
-#if DEBUG
-            Console.WriteLine("Adding new structs...");
-#endif
             // add missing structs--------------------------------------------------------------------------
             foreach (var s in allStructs)
             {
@@ -505,9 +503,6 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
-#if DEBUG
-            Console.WriteLine("Removing duplicate buffers...");
-#endif
             RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------

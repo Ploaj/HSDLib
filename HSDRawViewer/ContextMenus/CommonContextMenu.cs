@@ -37,6 +37,26 @@ namespace HSDRawViewer.ContextMenus
             MenuItems.Add(export);
             MenuItems.Add(import);
             MenuItems.Add(delete);
+
+            if(SupportedTypes != null)
+            foreach(var v in SupportedTypes)
+            {
+                if(PluginManager.HasEditor(v))
+                {
+                    MenuItem editor = new MenuItem("Open Editor");
+
+                    editor.Click += (sender, args) =>
+                    {
+                        if (MainForm.SelectedDataNode != null)
+                        {
+                            MainForm.Instance.OpenEditor();
+                        }
+                    };
+
+                    MenuItems.Add(editor);
+                    break;
+                }
+            }
         }
     }
 }

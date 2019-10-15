@@ -4,9 +4,8 @@ using System.Windows.Forms;
 using HSDRaw;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.GUI;
-using System.Linq;
-using HSDRawViewer.ContextMenus;
 using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Plugins;
 
 namespace HSDRawViewer
 {
@@ -15,7 +14,7 @@ namespace HSDRawViewer
         /// <summary>
         /// 
         /// </summary>
-        public static MainForm Instance { get; } = new MainForm();
+        public static MainForm Instance { get; internal set; }
 
         private PropertyView _nodePropertyViewer;
         private Viewport _Viewport;
@@ -26,17 +25,24 @@ namespace HSDRawViewer
         private Dictionary<string, StructData> stringToStruct = new Dictionary<string, StructData>();
 
         public static DataNode SelectedDataNode { get; internal set; } = null;
-
-        private Dictionary<Type, ContextMenu> typeToContextMenu = new Dictionary<Type, ContextMenu>();
-        private CommonContextMenu commonContextMenu = new CommonContextMenu();
-
+        
         public static bool RefreshNode = false;
+
+        private List<EditorBase> Editors = new List<EditorBase>();
+
+        public static void Init()
+        {
+            if(Instance == null)
+            Instance = new MainForm();
+        }
 
         public MainForm()
         {
             InitializeComponent();
 
             IsMdiContainer = true;
+
+            PluginManager.Init();
 
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
@@ -100,19 +106,9 @@ namespace HSDRawViewer
                 treeView1.SelectedNode = treeView1.GetNodeAt(args.Location);
                 if(args.Button == MouseButtons.Right && args.Node != null && args.Node is DataNode node)
                 {
-                    if (typeToContextMenu.ContainsKey(node.Accessor.GetType()))
-                    {
-                        var cm = typeToContextMenu[node.Accessor.GetType()];
-                        cm.Show(this, args.Location);
-                    }
-                    else
-                    {
-                        commonContextMenu.Show(this, args.Location);
-                    }
+                    PluginManager.GetContextMenuFromType(node.Accessor.GetType()).Show(this, args.Location);
                 }
             };
-
-            GenerateContextMenus();
         }
 
         /// <summary>
@@ -181,7 +177,7 @@ namespace HSDRawViewer
                 if (d.ShowDialog() == DialogResult.OK)
                 {
                     RawHSDFile.Save(d.FileName);
-                    RefreshTree();
+                    OpenFile(d.FileName);
                 }
             }
         }
@@ -198,30 +194,6 @@ namespace HSDRawViewer
             }
             if (treeView1.Nodes.Count > 0)
                 treeView1.SelectedNode = treeView1.Nodes[0];
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void GenerateContextMenus()
-        {
-            var types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                         from assemblyType in domainAssembly.GetTypes()
-                         where typeof(CommonContextMenu).IsAssignableFrom(assemblyType)
-                         select assemblyType).ToArray();
-
-            foreach (var t in types)
-            {
-                if (t != typeof(CommonContextMenu))
-                {
-                    var ren = (CommonContextMenu)Activator.CreateInstance(t);
-
-                    foreach (var v in ren.SupportedTypes)
-                    {
-                        typeToContextMenu.Add(v, ren);
-                    }
-                }
-            }
         }
         
         /// <summary>
@@ -242,6 +214,42 @@ namespace HSDRawViewer
 
                     RawHSDFile.Roots.Add(file.Roots[0]);
                 }
+            }
+        }
+        
+        /// <summary>
+        /// Returns true if node is currently open in editor
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public bool IsOpened(DataNode n)
+        {
+            foreach(var c in dockPanel.Contents)
+            {
+                if(c is EditorBase b && b.GetAccessor()._s == n.Accessor._s)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Opens editor for currently selected node if editor exists
+        /// </summary>
+        public void OpenEditor()
+        {
+            if (SelectedDataNode == null)
+                return;
+
+            var edit = PluginManager.GetEditorFromType(SelectedDataNode.Accessor.GetType());
+
+            if (!IsOpened(SelectedDataNode) && edit != null && edit is DockContent dc)
+            {
+                Editors.Add(edit);
+                edit.SetAccessor(SelectedDataNode.Accessor);
+                dc.Text = SelectedDataNode.Text;
+                dc.Show(dockPanel);
             }
         }
 

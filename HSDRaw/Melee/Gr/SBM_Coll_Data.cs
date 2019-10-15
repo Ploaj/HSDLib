@@ -13,10 +13,15 @@ namespace HSDRaw.Melee.Gr
         HeavyMetal  = 6,
         UnkFlatZone = 7,
         AlienGoop   = 8,
+        Unknown9    = 9,
         Water       = 10,
+        Unknown11   = 11,
         Glass       = 12,
         GreatBay    = 13,
+        Unknown14   = 14,
+        Unknown15   = 15,
         FlatZone    = 16,
+        Unknown17   = 17,
         Checkered   = 18
     }
 
