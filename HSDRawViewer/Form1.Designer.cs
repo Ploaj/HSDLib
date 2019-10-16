@@ -35,25 +35,29 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addRootFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertyViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.LocationLabel = new System.Windows.Forms.Label();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.contextKeeper = new OpenTK.GLControl();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.propertyViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showHideButton = new System.Windows.Forms.Button();
+            this.nodeBox = new System.Windows.Forms.GroupBox();
             this.menuStrip1.SuspendLayout();
+            this.nodeBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // treeView1
             // 
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Indent = 16;
             this.treeView1.ItemHeight = 24;
-            this.treeView1.Location = new System.Drawing.Point(0, 24);
+            this.treeView1.Location = new System.Drawing.Point(3, 16);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(220, 417);
+            this.treeView1.Size = new System.Drawing.Size(194, 398);
             this.treeView1.TabIndex = 0;
+            this.treeView1.DoubleClick += new System.EventHandler(this.treeView1_DoubleClick);
             // 
             // menuStrip1
             // 
@@ -107,36 +111,6 @@
             this.addRootFromFileToolStripMenuItem.Text = "Add Root From File";
             this.addRootFromFileToolStripMenuItem.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem_Click);
             // 
-            // LocationLabel
-            // 
-            this.LocationLabel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.LocationLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LocationLabel.Location = new System.Drawing.Point(220, 24);
-            this.LocationLabel.Name = "LocationLabel";
-            this.LocationLabel.Size = new System.Drawing.Size(484, 16);
-            this.LocationLabel.TabIndex = 5;
-            this.LocationLabel.Text = "Location:";
-            // 
-            // dockPanel
-            // 
-            this.dockPanel.ActiveAutoHideContent = null;
-            this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.World);
-            this.dockPanel.Location = new System.Drawing.Point(220, 40);
-            this.dockPanel.Name = "dockPanel";
-            this.dockPanel.Size = new System.Drawing.Size(484, 401);
-            this.dockPanel.TabIndex = 6;
-            // 
-            // contextKeeper
-            // 
-            this.contextKeeper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.contextKeeper.BackColor = System.Drawing.Color.Black;
-            this.contextKeeper.Location = new System.Drawing.Point(681, -1);
-            this.contextKeeper.Name = "contextKeeper";
-            this.contextKeeper.Size = new System.Drawing.Size(23, 25);
-            this.contextKeeper.TabIndex = 8;
-            this.contextKeeper.VSync = false;
-            // 
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -152,7 +126,7 @@
             this.propertyViewToolStripMenuItem.CheckOnClick = true;
             this.propertyViewToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.propertyViewToolStripMenuItem.Name = "propertyViewToolStripMenuItem";
-            this.propertyViewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.propertyViewToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.propertyViewToolStripMenuItem.Text = "Property View";
             this.propertyViewToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.propertyViewToolStripMenuItem_CheckStateChanged);
             // 
@@ -162,26 +136,83 @@
             this.viewportToolStripMenuItem.CheckOnClick = true;
             this.viewportToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.viewportToolStripMenuItem.Name = "viewportToolStripMenuItem";
-            this.viewportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.viewportToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.viewportToolStripMenuItem.Text = "Viewport";
             this.viewportToolStripMenuItem.CheckedChanged += new System.EventHandler(this.viewportToolStripMenuItem_CheckedChanged);
+            // 
+            // LocationLabel
+            // 
+            this.LocationLabel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.LocationLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LocationLabel.Location = new System.Drawing.Point(213, 24);
+            this.LocationLabel.Name = "LocationLabel";
+            this.LocationLabel.Size = new System.Drawing.Size(491, 16);
+            this.LocationLabel.TabIndex = 5;
+            this.LocationLabel.Text = "Location:";
+            // 
+            // dockPanel
+            // 
+            this.dockPanel.ActiveAutoHideContent = null;
+            this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.World);
+            this.dockPanel.Location = new System.Drawing.Point(213, 40);
+            this.dockPanel.Name = "dockPanel";
+            this.dockPanel.Size = new System.Drawing.Size(491, 401);
+            this.dockPanel.TabIndex = 6;
+            // 
+            // contextKeeper
+            // 
+            this.contextKeeper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.contextKeeper.BackColor = System.Drawing.Color.Black;
+            this.contextKeeper.Location = new System.Drawing.Point(681, -1);
+            this.contextKeeper.Name = "contextKeeper";
+            this.contextKeeper.Size = new System.Drawing.Size(23, 25);
+            this.contextKeeper.TabIndex = 8;
+            this.contextKeeper.VSync = false;
+            // 
+            // showHideButton
+            // 
+            this.showHideButton.BackColor = System.Drawing.SystemColors.Control;
+            this.showHideButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.showHideButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.showHideButton.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.showHideButton.Location = new System.Drawing.Point(200, 24);
+            this.showHideButton.Name = "showHideButton";
+            this.showHideButton.Size = new System.Drawing.Size(13, 417);
+            this.showHideButton.TabIndex = 10;
+            this.showHideButton.Text = "<";
+            this.showHideButton.UseVisualStyleBackColor = false;
+            this.showHideButton.Click += new System.EventHandler(this.showHideButton_Click);
+            // 
+            // nodeBox
+            // 
+            this.nodeBox.Controls.Add(this.treeView1);
+            this.nodeBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.nodeBox.Location = new System.Drawing.Point(0, 24);
+            this.nodeBox.Name = "nodeBox";
+            this.nodeBox.Size = new System.Drawing.Size(200, 417);
+            this.nodeBox.TabIndex = 11;
+            this.nodeBox.TabStop = false;
+            this.nodeBox.Text = "Nodes";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(704, 441);
-            this.Controls.Add(this.contextKeeper);
             this.Controls.Add(this.dockPanel);
             this.Controls.Add(this.LocationLabel);
-            this.Controls.Add(this.treeView1);
+            this.Controls.Add(this.showHideButton);
+            this.Controls.Add(this.contextKeeper);
+            this.Controls.Add(this.nodeBox);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
-            this.TabText = "Hal Dat Wizard";
-            this.Text = "Hal Dat Wizard";
+            this.TabText = "Hal DAT Browser";
+            this.Text = "Hal DAT Browser";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.nodeBox.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -203,6 +234,8 @@
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem propertyViewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewportToolStripMenuItem;
+        private System.Windows.Forms.Button showHideButton;
+        private System.Windows.Forms.GroupBox nodeBox;
     }
 }
 

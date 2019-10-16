@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using HSDRaw;
 using HSDRaw.AirRide.Gr.Data;
@@ -11,7 +7,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
-    public class RendererGrCollision : IRenderer
+    public class RendererGrCollision
     {
         public Type[] SupportedTypes => new Type[] { typeof(KAR_grCollisionNode) };
 

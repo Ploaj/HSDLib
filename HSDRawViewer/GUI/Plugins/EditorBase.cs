@@ -1,14 +1,11 @@
 ﻿using System;
-using HSDRaw;
 
 namespace HSDRawViewer.GUI.Plugins
 {
-    public interface EditorBase 
+    public interface EditorBase
     {
         Type[] SupportedTypes { get; }
 
-        HSDAccessor GetAccessor();
-
-        void SetAccessor(HSDAccessor a);
+        DataNode Node { get; set; }
     }
 }

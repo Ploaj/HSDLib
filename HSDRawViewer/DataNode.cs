@@ -129,6 +129,13 @@ namespace HSDRawViewer
 
         public void ExpandData()
         {
+            if (MainForm.Instance.IsOpened(this))
+            {
+                MessageBox.Show("Error: This node is currently open in an editor");
+                Collapse();
+                return;
+            }
+
             HashSet<HSDStruct> strucs = new HashSet<HSDStruct>();
 
             foreach(var prop in Accessor.GetType().GetProperties())
@@ -234,6 +241,11 @@ namespace HSDRawViewer
 
         public void Import()
         {
+            if (MainForm.Instance.IsOpened(this))
+            {
+                MessageBox.Show("Error: This node is currently open in an editor");
+                return;
+            }
             HSDRawFile file;
             if (OpenDAT(out file))
             {
@@ -243,7 +255,12 @@ namespace HSDRawViewer
 
         public void Delete()
         {
-            if(Parent != null && Parent is DataNode parent)
+            if (MainForm.Instance.IsOpened(this))
+            {
+                MessageBox.Show("Error: This node is currently open in an editor");
+                return;
+            }
+            if (Parent != null && Parent is DataNode parent)
             {
                 if (Accessor is HSD_DOBJ dobj)
                 {

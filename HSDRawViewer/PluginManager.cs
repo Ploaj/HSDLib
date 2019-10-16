@@ -1,4 +1,5 @@
 ﻿using HSDRawViewer.ContextMenus;
+using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.Plugins;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,19 @@ namespace HSDRawViewer
         private static Dictionary<Type, Type> typeToEditor;
 
         private static bool Initialized = false;
+
+        /// <summary>
+        /// Gets the shared viewport control
+        /// </summary>
+        /// <returns></returns>
+        public static ViewportControl GetCommonViewport()
+        {
+            if(MainForm.Instance != null)
+            {
+                return MainForm.Instance.Viewport.glViewport;
+            }
+            return null;
+        }
 
         /// <summary>
         /// 
@@ -113,6 +127,9 @@ namespace HSDRawViewer
                     {
                         typeToEditor.Add(v, t);
                     }
+
+                    if (ren is IDisposable dis)
+                        dis.Dispose();
                 }
             }
         }

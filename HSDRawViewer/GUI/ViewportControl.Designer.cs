@@ -1,4 +1,7 @@
-﻿namespace HSDRawViewer.GUI
+﻿using OpenTK;
+using OpenTK.Graphics;
+
+namespace HSDRawViewer.GUI
 {
     partial class ViewportControl
     {
@@ -28,7 +31,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new OpenTK.GLControl();
+            this.panel1 = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             this.animationGroup = new System.Windows.Forms.GroupBox();
             this.nudMaxFrame = new System.Windows.Forms.NumericUpDown();
             this.buttonPrevFrame = new System.Windows.Forms.Button();
@@ -56,6 +59,8 @@
             this.panel1.VSync = false;
             this.panel1.Load += new System.EventHandler(this.panel1_Load);
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.panel1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.panel1_KeyDown);
+            this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             this.panel1.Resize += new System.EventHandler(this.panel1_Resize);
             // 
             // animationGroup

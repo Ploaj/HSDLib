@@ -3,10 +3,9 @@ using System.Windows.Forms;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.Renderers;
 using System.Collections.Generic;
-using HSDRaw;
 using OpenTK;
+using System.Timers;
 
 namespace HSDRawViewer.GUI
 {
@@ -32,8 +31,7 @@ namespace HSDRawViewer.GUI
                 if (value < 0)
                     value = MaxFrame;
                 _frame = value;
-                nudFrame.Value = (decimal)value;
-                animationTrack.Value = (int)value;
+                UpdateFrame((decimal)_frame);
             }
         }
         private float _frame;
@@ -47,6 +45,8 @@ namespace HSDRawViewer.GUI
             set
             {
                 animationTrack.Maximum = (int)value;
+                nudFrame.Maximum = (decimal)value;
+                nudMaxFrame.Maximum = (decimal)value;
                 nudMaxFrame.Value = (decimal)value;
             }
         }
@@ -56,36 +56,140 @@ namespace HSDRawViewer.GUI
             set
             {
                 animationGroup.Visible = value;
+                if (!value)
+                {
+                    Frame = 0;
+                    buttonPlay.Text = "Play";
+                }
             }
         }
 
-        private List<Tuple<HSDAccessor, IRenderer>> Renderers { get; } = new List<Tuple<HSDAccessor, IRenderer>>();
+        /// <summary>
+        /// If set to try camera cannot be rotated in z direction
+        /// </summary>
+        public bool Lock2D { get; set; } = false;
+
+        private List<IDrawable> Drawables { get; } = new List<IDrawable>();
+
+        private ElapsedEventHandler RenderLoop;
+
+        private Vector2 prevPos;
+        private Vector2 deltaPos;
+
+        public bool EnableCrossHair = false;
+        private Vector3 CrossHair = new Vector3();
 
         public ViewportControl()
         {
             InitializeComponent();
-        }
 
-        ~ViewportControl()
-        {
-            if(Renderers != null)
-                foreach(var r in Renderers)
-                    r.Item2.Clear();
-        }
-
-        public void AddRenderer(HSDAccessor accessor, IRenderer r)
-        {
-            Renderers.Add(new Tuple<HSDAccessor, IRenderer>(accessor, r));
-        }
-
-        public void RemoveRenderer(HSDAccessor accessor)
-        {
-            var r = Renderers.Find(e => e.Item1 == accessor);
-            if(r != null)
+            RenderLoop = (sender, args) =>
             {
-                r.Item2.Clear();
-                Renderers.Remove(r);
+                var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+
+                if (prevPos == null)
+                    prevPos = pos;
+
+                deltaPos = prevPos - pos;
+
+                prevPos = pos;
+
+                if (_camera == null || !Visible)
+                    return;
+                
+                if (buttonPlay.Text == "Pause")
+                    Frame++;
+
+                panel1.Invalidate();
+            };
+
+            System.Timers.Timer timer = new System.Timers.Timer(30 / 1000d);
+            timer.Elapsed += RenderLoop;
+            timer.Start();
+
+            panel1.MouseClick += (sender, args) =>
+            {
+                foreach(var v in Drawables)
+                    if(v is IDrawableInterface inter)
+                        inter.ScreenClick(args.Button, GetScreenPosition());
+            };
+
+            panel1.DoubleClick += (sender, args) =>
+            {
+                foreach (var v in Drawables)
+                    if (v is IDrawableInterface inter)
+                        inter.ScreenDoubleClick(GetScreenPosition());
+            };
+
+            Disposed += (sender, args) =>
+            {
+                timer.Stop();
+                timer.Elapsed -= RenderLoop;
+                timer.Dispose();
+            };
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        private delegate void SafeUpdateFrame(decimal frame);
+        private void UpdateFrame(decimal frame)
+        {
+            if (nudFrame.InvokeRequired)
+            {
+                var d = new SafeUpdateFrame(UpdateFrame);
+                nudFrame.Invoke(d, new object[] { frame });
             }
+            else
+            {
+                nudFrame.Value = frame;
+                animationTrack.Value = (int)frame;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private PickInformation GetScreenPosition()
+        {
+            var point = panel1.PointToClient(Cursor.Position);
+
+            float x = (2.0f * point.X) / panel1.Width - 1.0f;
+            float y = 1.0f - (2.0f * point.Y) / panel1.Height;
+
+            var inv = _camera.Transform.Inverted();
+
+            Vector4 va = Vector4.Transform(new Vector4(x, y, -1.0f, 1.0f), inv);
+            Vector4 vb = Vector4.Transform(new Vector4(x, y, 1.0f, 1.0f), inv);
+
+            Vector3 p1 = va.Xyz / va.W;
+            Vector3 p2 = p1 - ((va - (va + vb)).Xyz / va.W) * 100;
+
+            CrossHair = p1;
+
+            PickInformation info = new PickInformation(new Vector2(point.X, point.Y), p1, p2);
+
+            return info;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearDrawables()
+        {
+            Drawables.Clear();
+        }
+
+        public void AddRenderer(IDrawable drawable)
+        {
+            Drawables.Add(drawable);
+        }
+
+        public void RemoveRenderer(IDrawable drawable)
+        {
+            Drawables.Remove(drawable);
         }
 
         private void nudFrame_ValueChanged(object sender, EventArgs e)
@@ -122,7 +226,10 @@ namespace HSDRawViewer.GUI
 
         private void buttonPlay_Click(object sender, EventArgs e)
         {
-
+            if (buttonPlay.Text == "Play")
+                buttonPlay.Text = "Pause";
+            else
+                buttonPlay.Text = "Play";
         }
 
         /// <summary>
@@ -149,14 +256,27 @@ namespace HSDRawViewer.GUI
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
             GL.MatrixMode(MatrixMode.Modelview);
             var v = _camera.Transform;
             GL.LoadMatrix(ref v);
 
-            foreach(var r in Renderers)
+            if (EnableCrossHair)
             {
-                r.Item2.Render(r.Item1, panel1.Width, panel1.Height);
+                GL.PointSize(5f);
+                GL.Color3(Color.Yellow);
+                GL.Begin(PrimitiveType.Points);
+                GL.Vertex3(CrossHair);
+                GL.End();
             }
+
+            foreach (var r in Drawables)
+            {
+                r.Draw(panel1.Width, panel1.Height);
+            }
+            
+            GL.PopAttrib();
             
             panel1.SwapBuffers();
         }
@@ -178,9 +298,15 @@ namespace HSDRawViewer.GUI
                 max.Y = Math.Max(max.Y, v.Y);
             }
 
-            //_camera.Z = Math.Max(max.X - min.X, max.Y - min.Y);
-            //_camera.X = (max.X + min.X) / 2;
-            //_camera.Y = (max.Y + min.Y) / 2;
+            if(_camera != null)
+            {
+                _camera.Z = -Math.Max(max.X - min.X, max.Y - min.Y);
+                _camera.X = (max.X + min.X) / 2;
+                _camera.Y = -(max.Y + min.Y) / 2;
+                _camera.XRotation = 0;
+                _camera.YRotation = 0;
+                _camera.ZRotation = 0;
+            }
         }
 
         /// <summary>
@@ -204,6 +330,41 @@ namespace HSDRawViewer.GUI
         {
             if (_camera != null)
                 _camera.SetViewSize(panel1.Width, panel1.Height);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void panel1_KeyDown(object sender, KeyEventArgs e)
+        {
+            var speed = 5;
+            if (e.KeyCode == Keys.W)
+                _camera.Z += speed;
+            if (e.KeyCode == Keys.S)
+                _camera.Z -= speed;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var speed = _camera.Translation.LengthFast / 16;
+
+                _camera.X -= deltaPos.X * speed / 20;
+                _camera.Y += deltaPos.Y * speed / 20;
+            }
+            if (e.Button == MouseButtons.Left && !Lock2D)
+            {
+                _camera.XRotation -= deltaPos.Y / 50;
+                _camera.YRotation -= deltaPos.X / 50;
+            }
         }
     }
 }

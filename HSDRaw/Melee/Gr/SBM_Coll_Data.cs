@@ -48,35 +48,35 @@ namespace HSDRaw.Melee.Gr
         public float Y { get => _s.GetFloat(4); set => _s.SetFloat(4, value); }
     }
 
-    public class SBM_CollLink : HSDAccessor
+    public class SBM_CollLine : HSDAccessor
     {
         public override int TrimmedSize => 0x10;
         public short VertexIndex1 { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
         public short VertexIndex2 { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
-        public short NextLink { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
-        public short PreviousLink { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
-        public short idxVertFromLink { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); } // -1
-        public short idxVertToLink { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); } // -1
+        public short NextLine { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
+        public short PreviousLine { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
+        public short idxVertFromLine { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); } // -1
+        public short idxVertToLine { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); } // -1
         public CollPhysics CollisionFlag { get => (CollPhysics)_s.GetInt16(0x0C); set => _s.SetInt16(0x0C, (byte)value); }
         public CollProperty Flag { get => (CollProperty)_s.GetByte(0x0E); set => _s.SetByte(0x0E, (byte)value); }
         public CollMaterial Material { get => (CollMaterial)_s.GetByte(0x0F); set => _s.SetByte(0x0F, (byte)value); }
     }
 
-    public class SBM_CollAreaTable : HSDAccessor
+    public class SBM_CollLineGroup : HSDAccessor
     {
         public override int TrimmedSize => 0x28;
 
-        public short TopLinkIndex { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
-        public short TopLinkCount { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
+        public short TopLineIndex { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
+        public short TopLineCount { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
 
-        public short BottomLinkIndex { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
-        public short BottomLinkCount { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
+        public short BottomLineIndex { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
+        public short BottomLineCount { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
 
-        public short RightLinkIndex { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); }
-        public short RightLinkCount { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); }
+        public short RightLineIndex { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); }
+        public short RightLineCount { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); }
 
-        public short LeftLinkIndex { get => _s.GetInt16(0x0C); set => _s.SetInt16(0x0C, value); }
-        public short LeftLinkCount { get => _s.GetInt16(0x0E); set => _s.SetInt16(0x0E, value); }
+        public short LeftLineIndex { get => _s.GetInt16(0x0C); set => _s.SetInt16(0x0C, value); }
+        public short LeftLineCount { get => _s.GetInt16(0x0E); set => _s.SetInt16(0x0E, value); }
 
         //public int Padding { get; set; }
 
@@ -118,11 +118,11 @@ namespace HSDRaw.Melee.Gr
             }
         }
 
-        public SBM_CollLink[] Links
+        public SBM_CollLine[] Links
         {
             get
             {
-                var re = _s.GetReference<HSDArrayAccessor<SBM_CollLink>>(0x08);
+                var re = _s.GetReference<HSDArrayAccessor<SBM_CollLine>>(0x08);
                 if (re == null)
                     return null;
                 return re.Array;
@@ -137,7 +137,7 @@ namespace HSDRaw.Melee.Gr
                 else
                 {
                     _s.SetInt32(0x0C, value.Length);
-                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_CollLink>>(0x08);
+                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_CollLine>>(0x08);
                     re.Array = value;
                 }
             }
@@ -154,11 +154,11 @@ namespace HSDRaw.Melee.Gr
         public short UnknownLinksOffset { get => _s.GetInt16(0x20); set => _s.SetInt16(0x20, value); }
         public short UnknownLinksCount { get => _s.GetInt16(0x22); set => _s.SetInt16(0x22, value); }
         
-        public SBM_CollAreaTable[] AreaTables
+        public SBM_CollLineGroup[] AreaTables
         {
             get
             {
-                var re = _s.GetReference<HSDArrayAccessor<SBM_CollAreaTable>>(0x24);
+                var re = _s.GetReference<HSDArrayAccessor<SBM_CollLineGroup>>(0x24);
                 if (re == null)
                     return null;
                 return re.Array;
@@ -173,7 +173,7 @@ namespace HSDRaw.Melee.Gr
                 else
                 {
                     _s.SetInt32(0x28, value.Length);
-                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_CollAreaTable>>(0x24);
+                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_CollLineGroup>>(0x24);
                     re.Array = value;
                 }
             }

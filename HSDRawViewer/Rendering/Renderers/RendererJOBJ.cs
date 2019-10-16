@@ -23,13 +23,15 @@ namespace HSDRawViewer.Rendering
         // Texture cache
         private Dictionary<byte[], int> imageBufferToTexture = new Dictionary<byte[], int>();
 
-        public void Render(HSD_JOBJ jobj)
+        private int BoneIndex = 0;
+
+        public void Render(HSD_JOBJ jobj, int frame)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
             BoneIndex = 0;
             jobjToDOBJList.Clear();
-            RenderJOBJ(jobj);
+            RenderJOBJ(jobj, frame);
 
             // Render DOBJs after JOBJ transforms have been calcuated
             foreach (var d in jobjToDOBJList)
@@ -62,12 +64,12 @@ namespace HSDRawViewer.Rendering
         /// Renders JOBJs
         /// </summary>
         /// <param name="jobj"></param>
-        private void RenderJOBJ(HSD_JOBJ jobj)
+        private void RenderJOBJ(HSD_JOBJ jobj, int frame)
         {
             GL.PointSize(5f);
 
             foreach (var list in jobj.List)
-                TreeRenderJOBJ(list, Matrix4.Identity, Matrix4.Identity);
+                TreeRenderJOBJ(list, Matrix4.Identity, Matrix4.Identity, frame);
         }
 
         /// <summary>
@@ -75,10 +77,10 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="jobj"></param>
         /// <param name="Transform"></param>
-        private void TreeRenderJOBJ(HSD_JOBJ jobj, Matrix4 Transform, Matrix4 bindTransform)
+        private void TreeRenderJOBJ(HSD_JOBJ jobj, Matrix4 Transform, Matrix4 bindTransform, int frame)
         {
-            var bind = CreateJOBJTransform(jobj, false) * bindTransform;
-            var transform = CreateJOBJTransform(jobj, true) * Transform;
+            var bind = CreateJOBJTransform(jobj, false, frame) * bindTransform;
+            var transform = CreateJOBJTransform(jobj, true, frame) * Transform;
 
             if (!jobjToWorldTransformCache.ContainsKey(jobj))
                 jobjToWorldTransformCache.Add(jobj, transform);
@@ -117,18 +119,16 @@ namespace HSDRawViewer.Rendering
             if (jobj.Child != null)
                 foreach (var child in jobj.Children)
                 {
-                    TreeRenderJOBJ(child, transform, bind);
+                    TreeRenderJOBJ(child, transform, bind, frame);
                 }
         }
-
-        private int BoneIndex = 0;
 
         /// <summary>
         /// Creates a Matrix4 from a HSD_JOBJ
         /// </summary>
         /// <param name="jobj"></param>
         /// <returns></returns>
-        private Matrix4 CreateJOBJTransform(HSD_JOBJ jobj, bool animated)
+        private Matrix4 CreateJOBJTransform(HSD_JOBJ jobj, bool animated, int frame)
         {
             float TX = jobj.TX;
             float TY = jobj.TY;
@@ -140,22 +140,22 @@ namespace HSDRawViewer.Rendering
             float SY = jobj.SY;
             float SZ = jobj.SZ;
 
-            if (animated && Viewport.Frame != -1 && Nodes.Count > BoneIndex)
+            if (animated && frame != -1 && Nodes.Count > BoneIndex)
             {
                 AnimNode node = Nodes[BoneIndex];
                 foreach (AnimTrack t in node.Tracks)
                 {
                     switch (t.TrackType)
                     {
-                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(Viewport.Frame); break;
-                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(Viewport.Frame); break;
+                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(frame); break;
                     }
                 }
                 BoneIndex++;
@@ -375,20 +375,18 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="joint"></param>
-        public void SetAnimJoint(HSD_AnimJoint joint)
+        public int SetAnimJoint(HSD_AnimJoint joint)
         {
-            Viewport.MaxFrame = 0;
-            Viewport.EnableAnimationTrack = true;
-            Viewport.AnimSpeed = 2;
             Nodes.Clear();
+            int max = 0;
             if (joint == null)
-                return;
+                return 0;
             foreach (var j in joint.DepthFirstList)
             {
                 AnimNode n = new AnimNode();
                 if (j.AOBJ != null)
                 {
-                    Viewport.MaxFrame = (int)Math.Max(Viewport.MaxFrame, j.AOBJ.EndFrame);
+                    max = (int)Math.Max(max, j.AOBJ.EndFrame);
 
                     foreach (var fdesc in j.AOBJ.FObjDesc.List)
                     {
@@ -401,6 +399,7 @@ namespace HSDRawViewer.Rendering
                 }
                 Nodes.Add(n);
             }
+            return max;
         }
 
         /// <summary>
@@ -411,9 +410,7 @@ namespace HSDRawViewer.Rendering
             Nodes.Clear();
             if (tree == null)
                 return;
-            Viewport.MaxFrame = (int)tree.FrameCount;
-            Viewport.EnableAnimationTrack = true;
-            Viewport.AnimSpeed = 2;
+
             foreach (var tracks in tree.Nodes)
             {
                 AnimNode n = new AnimNode();

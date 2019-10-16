@@ -6,6 +6,7 @@ using HSDRawViewer.Rendering;
 using HSDRawViewer.GUI;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Plugins;
+using HSDRaw.Common.Animation;
 
 namespace HSDRawViewer
 {
@@ -17,7 +18,7 @@ namespace HSDRawViewer
         public static MainForm Instance { get; internal set; }
 
         private PropertyView _nodePropertyViewer;
-        private Viewport _Viewport;
+        public CommonViewport Viewport { get; internal set; }
         private SubactionEditor _ScriptEditor;
 
         private HSDRawFile RawHSDFile = new HSDRawFile();
@@ -48,9 +49,9 @@ namespace HSDRawViewer
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
 
-            _Viewport = new Viewport();
-            _Viewport.Dock = DockStyle.Fill;
-            _Viewport.Show(dockPanel);
+            Viewport = new CommonViewport();
+            Viewport.Dock = DockStyle.Fill;
+            Viewport.Show(dockPanel);
 
             _ScriptEditor = new SubactionEditor();
             _ScriptEditor.Dock = DockStyle.Fill;
@@ -122,13 +123,13 @@ namespace HSDRawViewer
                 if (cast == null)
                 {
                     _nodePropertyViewer.SetAccessor(n.Accessor);
-                    _Viewport.SelectedAccessor = n.Accessor;
+                    //Viewport.SelectedAccessor = n.Accessor;
                 }
                 else
                 {
                     cast._s = n.Accessor._s;
                     _nodePropertyViewer.SetAccessor(cast);
-                    _Viewport.SelectedAccessor = cast;
+                    //Viewport.SelectedAccessor = cast;
                 }
                 SelectedDataNode = n;
                 
@@ -194,6 +195,8 @@ namespace HSDRawViewer
             }
             if (treeView1.Nodes.Count > 0)
                 treeView1.SelectedNode = treeView1.Nodes[0];
+
+            ClearWorkspace();
         }
         
         /// <summary>
@@ -226,12 +229,49 @@ namespace HSDRawViewer
         {
             foreach(var c in dockPanel.Contents)
             {
-                if(c is EditorBase b && b.GetAccessor()._s == n.Accessor._s)
+                if(c is EditorBase b && b.Node.Accessor._s == n.Accessor._s)
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public bool IsChildOpened(HSDStruct s)
+        {
+            var structs = s.GetSubStructs();
+            foreach (var c in dockPanel.Contents)
+            {
+                if (c is EditorBase b && structs.Contains(b.Node.Accessor._s))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public void ClearWorkspace()
+        {
+            List<DockContent> ToRemove = new List<DockContent>();
+            foreach (var c in dockPanel.Contents)
+            {
+                if (c is DockContent dc && c != Viewport && c != _nodePropertyViewer)
+                {
+                    ToRemove.Add(dc);
+                }
+            }
+            foreach (var v in ToRemove)
+                v.Close();
         }
 
         /// <summary>
@@ -244,12 +284,34 @@ namespace HSDRawViewer
 
             var edit = PluginManager.GetEditorFromType(SelectedDataNode.Accessor.GetType());
 
-            if (!IsOpened(SelectedDataNode) && edit != null && edit is DockContent dc)
+            // Special animation override
+            if(SelectedDataNode.Accessor is HSD_AnimJoint
+                || SelectedDataNode.Accessor is HSD_FigaTree)
+            {
+                foreach(var v in dockPanel.Contents)
+                {
+                    if(v is JOBJEditor jedit)
+                    {
+                        if (SelectedDataNode.Accessor is HSD_AnimJoint joint)
+                            jedit.LoadAnimation(joint);
+
+                        if (SelectedDataNode.Accessor is HSD_FigaTree tree)
+                            jedit.LoadAnimation(tree);
+                    }
+                }
+            }
+
+            if (!IsChildOpened(SelectedDataNode.Accessor._s) && !IsOpened(SelectedDataNode) && edit != null && edit is DockContent dc)
             {
                 Editors.Add(edit);
-                edit.SetAccessor(SelectedDataNode.Accessor);
-                dc.Text = SelectedDataNode.Text;
+                SelectedDataNode.Collapse();
+                edit.Node = SelectedDataNode;
                 dc.Show(dockPanel);
+                dc.Text = SelectedDataNode.Text;
+                dc.TabText = SelectedDataNode.Text;
+
+                if (dc is JOBJEditor jobj)
+                    jobj.DockState = DockState.DockLeft;
             }
         }
 
@@ -263,7 +325,7 @@ namespace HSDRawViewer
             {
                 propertyViewToolStripMenuItem.Checked = false;
             }
-            if(c == _Viewport)
+            if(c == Viewport)
             {
                 viewportToolStripMenuItem.Checked = false;
             }
@@ -292,12 +354,26 @@ namespace HSDRawViewer
         {
             if (viewportToolStripMenuItem.Checked)
             {
-                if (_Viewport.IsHidden)
-                    _Viewport.Show();
+                if (Viewport.IsHidden)
+                    Viewport.Show();
             }
             else
             {
-                _Viewport.Hide();
+                Viewport.Hide();
+            }
+        }
+
+        private void showHideButton_Click(object sender, EventArgs e)
+        {
+            nodeBox.Visible = !nodeBox.Visible;
+            showHideButton.Text = nodeBox.Visible ? "<" : ">";
+        }
+
+        private void treeView1_DoubleClick(object sender, EventArgs e)
+        {
+            if(treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode dn)
+            {
+                OpenEditor();
             }
         }
     }

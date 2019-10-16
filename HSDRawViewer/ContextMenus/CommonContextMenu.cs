@@ -34,10 +34,6 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
 
-            MenuItems.Add(export);
-            MenuItems.Add(import);
-            MenuItems.Add(delete);
-
             if(SupportedTypes != null)
             foreach(var v in SupportedTypes)
             {
@@ -57,6 +53,12 @@ namespace HSDRawViewer.ContextMenus
                     break;
                 }
             }
+
+
+            MenuItems.Add(export);
+            MenuItems.Add(import);
+            MenuItems.Add(delete);
+            MenuItems.Add("-");
         }
     }
 }

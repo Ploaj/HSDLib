@@ -37,10 +37,10 @@ namespace HSDRawViewer.Converters
             {
                 svgGroup g = new svgGroup();
                 List<svgShape> lines = new List<svgShape>();
-                lines.AddRange(AreaToList(colldata, area.TopLinkIndex, area.TopLinkCount).ToArray());
-                lines.AddRange(AreaToList(colldata, area.LeftLinkIndex, area.LeftLinkCount).ToArray());
-                lines.AddRange(AreaToList(colldata, area.RightLinkIndex, area.RightLinkCount).ToArray());
-                lines.AddRange(AreaToList(colldata, area.BottomLinkIndex, area.BottomLinkCount).ToArray());
+                lines.AddRange(AreaToList(colldata, area.TopLineIndex, area.TopLineCount).ToArray());
+                lines.AddRange(AreaToList(colldata, area.LeftLineIndex, area.LeftLineCount).ToArray());
+                lines.AddRange(AreaToList(colldata, area.RightLineIndex, area.RightLineCount).ToArray());
+                lines.AddRange(AreaToList(colldata, area.BottomLineIndex, area.BottomLineCount).ToArray());
                 g.shapes = lines.ToArray();
                 groups.Add(g);
             }
