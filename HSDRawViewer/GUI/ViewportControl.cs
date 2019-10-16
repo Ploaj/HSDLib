@@ -6,6 +6,7 @@ using HSDRawViewer.Rendering;
 using System.Collections.Generic;
 using OpenTK;
 using System.Timers;
+using System.Linq;
 
 namespace HSDRawViewer.GUI
 {
@@ -69,7 +70,7 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public bool Lock2D { get; set; } = false;
 
-        private List<IDrawable> Drawables { get; } = new List<IDrawable>();
+        private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
         private ElapsedEventHandler RenderLoop;
 
@@ -185,6 +186,8 @@ namespace HSDRawViewer.GUI
         public void AddRenderer(IDrawable drawable)
         {
             Drawables.Add(drawable);
+
+            Drawables = Drawables.OrderBy(x => (int)(x.DrawOrder)).ToList();
         }
 
         public void RemoveRenderer(IDrawable drawable)

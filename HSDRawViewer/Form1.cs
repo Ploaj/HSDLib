@@ -310,8 +310,8 @@ namespace HSDRawViewer
                 dc.Text = SelectedDataNode.Text;
                 dc.TabText = SelectedDataNode.Text;
 
-                if (dc is JOBJEditor jobj)
-                    jobj.DockState = DockState.DockLeft;
+                if (dc is EditorBase b)
+                    dc.DockState = b.DefaultDockState;
             }
         }
 

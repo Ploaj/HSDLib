@@ -6,6 +6,13 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering
 {
+    public enum DrawOrder
+    {
+        First,
+        Middle,
+        Last
+    }
+
     /// <summary>
     /// Extension of <see cref="IDrawable"/> that also implements interactive elements
     /// </summary>
@@ -25,6 +32,8 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public interface IDrawable
     {
+        DrawOrder DrawOrder { get; }
+
         void Draw(int windowWidth, int windowHeight);
     }
 
@@ -38,6 +47,8 @@ namespace HSDRawViewer.Rendering
         public float Radius { get; set; } = 1;
 
         public Color Color { get; set; } = Color.White;
+
+        public DrawOrder DrawOrder => DrawOrder.Middle;
 
         public DrawableCircle(float X, float Y, float Radius)
         {

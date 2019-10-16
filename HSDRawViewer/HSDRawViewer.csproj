@@ -173,6 +173,9 @@
     <EmbeddedResource Include="GUI\Plugins\CollDataEditor.resx">
       <DependentUpon>CollDataEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\JOBJEditor.resx">
+      <DependentUpon>JOBJEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\TextureAnimationEditor.resx">
       <DependentUpon>TextureAnimationEditor.cs</DependentUpon>
     </EmbeddedResource>

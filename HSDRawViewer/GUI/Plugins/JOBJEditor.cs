@@ -11,6 +11,10 @@ namespace HSDRawViewer.GUI.Plugins
     /// </summary>
     public partial class JOBJEditor : DockContent, EditorBase, IDrawable
     {
+        public DockState DefaultDockState => DockState.DockLeft;
+
+        public DrawOrder DrawOrder => DrawOrder.First;
+
         public JOBJEditor()
         {
             InitializeComponent();

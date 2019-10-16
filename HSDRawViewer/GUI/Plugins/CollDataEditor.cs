@@ -75,6 +75,11 @@ namespace HSDRawViewer.GUI.Plugins
                 LoadCollData();
             }
         }
+
+        public DockState DefaultDockState => DockState.DockLeft;
+
+        public DrawOrder DrawOrder => DrawOrder.Last;
+
         private DataNode _node;
 
         private SBM_Coll_Data CollData;
@@ -241,7 +246,10 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void Draw(int windowWidth, int windowHeight)
         {
-            GL.Disable(EnableCap.DepthTest);
+            // clear depth buffer to draw overtop of scene
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+
+            GL.Enable(EnableCap.DepthTest);
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);

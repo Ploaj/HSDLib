@@ -19,6 +19,10 @@ namespace HSDRawViewer.GUI.Plugins
     /// </summary>
     public partial class TextureAnimationEditor : DockContent, EditorBase, IDrawable
     {
+        public DockState DefaultDockState => DockState.Document;
+
+        public DrawOrder DrawOrder => DrawOrder.Last;
+
         public Type[] SupportedTypes => new Type[] { typeof(HSD_TexAnim), typeof(HSD_TexGraphic), typeof(HSD_TOBJ) };
         
         private HSD_TexAnim TexAnim;
