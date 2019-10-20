@@ -210,6 +210,7 @@
             this.Name = "MainForm";
             this.TabText = "Hal DAT Browser";
             this.Text = "Hal DAT Browser";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.nodeBox.ResumeLayout(false);

@@ -310,8 +310,14 @@ namespace HSDRawViewer
                 dc.Text = SelectedDataNode.Text;
                 dc.TabText = SelectedDataNode.Text;
 
-                if (dc is EditorBase b)
-                    dc.DockState = b.DefaultDockState;
+                try
+                {
+                    //if (dc is EditorBase b)
+                    //    dc.DockState = b.DefaultDockState;
+                }catch(Exception)
+                {
+
+                }
             }
         }
 
@@ -375,6 +381,11 @@ namespace HSDRawViewer
             {
                 OpenEditor();
             }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Maximized;
         }
     }
 }

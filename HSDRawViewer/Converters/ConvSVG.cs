@@ -33,7 +33,7 @@ namespace HSDRawViewer.Converters
             svg svg = new svg();
 
             var groups = new List<svgShape>();
-            foreach (var area in colldata.AreaTables)
+            foreach (var area in colldata.LineGroups)
             {
                 svgGroup g = new svgGroup();
                 List<svgShape> lines = new List<svgShape>();

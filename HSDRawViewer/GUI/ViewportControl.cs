@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using OpenTK;
 using System.Timers;
 using System.Linq;
+using OpenTK.Input;
 
 namespace HSDRawViewer.GUI
 {
@@ -74,6 +75,10 @@ namespace HSDRawViewer.GUI
 
         private ElapsedEventHandler RenderLoop;
 
+        private bool Selecting = false;
+        private Vector2 mouseStart;
+        private Vector2 mouseEnd;
+
         private Vector2 prevPos;
         private Vector2 deltaPos;
 
@@ -110,16 +115,53 @@ namespace HSDRawViewer.GUI
 
             panel1.MouseClick += (sender, args) =>
             {
-                foreach(var v in Drawables)
+                var point = new Vector2(panel1.PointToClient(Cursor.Position).X, panel1.PointToClient(Cursor.Position).Y);
+
+                foreach (var v in Drawables)
                     if(v is IDrawableInterface inter)
-                        inter.ScreenClick(args.Button, GetScreenPosition());
+                        inter.ScreenClick(args.Button, GetScreenPosition(point));
             };
 
             panel1.DoubleClick += (sender, args) =>
             {
+                var point = new Vector2(panel1.PointToClient(Cursor.Position).X, panel1.PointToClient(Cursor.Position).Y);
+
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                        inter.ScreenDoubleClick(GetScreenPosition());
+                        inter.ScreenDoubleClick(GetScreenPosition(point));
+            };
+
+            panel1.MouseDown += (sender, args) =>
+            {
+                var keyState = Keyboard.GetState();
+
+                if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
+                {
+                    Selecting = true;
+                }
+                mouseStart = new Vector2(args.X, args.Y);
+            };
+
+            panel1.MouseMove += (sender, args) =>
+            {
+                var p = panel1.PointToClient(Cursor.Position);
+                var point = new Vector2(p.X, p.Y);
+                
+                foreach (var v in Drawables)
+                    if (v is IDrawableInterface inter)
+                         inter.ScreenDrag(GetScreenPosition(point), deltaPos.X, deltaPos.Y);
+            };
+
+            panel1.MouseUp += (sender, args) =>
+            {
+                if (Selecting)
+                {
+                    foreach (var v in Drawables)
+                        if (v is IDrawableInterface inter)
+                            inter.ScreenSelectArea(GetScreenPosition(mouseStart), GetScreenPosition(mouseEnd));
+                }
+
+                Selecting = false;
             };
 
             Disposed += (sender, args) =>
@@ -153,10 +195,8 @@ namespace HSDRawViewer.GUI
         /// 
         /// </summary>
         /// <returns></returns>
-        private PickInformation GetScreenPosition()
+        private PickInformation GetScreenPosition(Vector2 point)
         {
-            var point = panel1.PointToClient(Cursor.Position);
-
             float x = (2.0f * point.X) / panel1.Width - 1.0f;
             float y = 1.0f - (2.0f * point.Y) / panel1.Height;
 
@@ -165,8 +205,11 @@ namespace HSDRawViewer.GUI
             Vector4 va = Vector4.Transform(new Vector4(x, y, -1.0f, 1.0f), inv);
             Vector4 vb = Vector4.Transform(new Vector4(x, y, 1.0f, 1.0f), inv);
 
-            Vector3 p1 = va.Xyz / va.W;
-            Vector3 p2 = p1 - ((va - (va + vb)).Xyz / va.W) * 100;
+            va.Xyz /= va.W;
+            vb.Xyz /= vb.W;
+
+            Vector3 p1 = va.Xyz;
+            Vector3 p2 = p1 - ((va - (va + vb)).Xyz) * 100;
 
             CrossHair = p1;
 
@@ -281,6 +324,26 @@ namespace HSDRawViewer.GUI
             
             GL.PopAttrib();
             
+            if(Selecting)
+            {
+                GL.MatrixMode(MatrixMode.Modelview);
+                GL.LoadIdentity();
+
+                var x1 = (mouseStart.X / panel1.Width) * 2 - 1f;
+                var y1 = 1f - (mouseStart.Y / panel1.Height) * 2;
+                var x2 = (mouseEnd.X / panel1.Width) * 2 - 1f;
+                var y2 = 1f - (mouseEnd.Y / panel1.Height) * 2;
+
+                GL.LineWidth(1f);
+                GL.Color3(1f, 1f, 1f);
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Vertex2(x1, y1);
+                GL.Vertex2(x2, y1);
+                GL.Vertex2(x2, y2);
+                GL.Vertex2(x1, y2);
+                GL.End();
+            }
+            
             panel1.SwapBuffers();
         }
 
@@ -354,19 +417,27 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        private void panel1_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                var speed = _camera.Translation.LengthFast / 16;
+            var keyState = Keyboard.GetState();
 
-                _camera.X -= deltaPos.X * speed / 20;
-                _camera.Y += deltaPos.Y * speed / 20;
-            }
-            if (e.Button == MouseButtons.Left && !Lock2D)
+            mouseEnd = new Vector2(e.X, e.Y);
+
+            if (!keyState.IsKeyDown(Key.ControlLeft) && !keyState.IsKeyDown(Key.ControlRight)
+              &&!keyState.IsKeyDown(Key.AltLeft) && !keyState.IsKeyDown(Key.AltRight))
             {
-                _camera.XRotation -= deltaPos.Y / 50;
-                _camera.YRotation -= deltaPos.X / 50;
+                if (e.Button == MouseButtons.Right)
+                {
+                    var speed = _camera.Translation.LengthFast / 16;
+
+                    _camera.X -= deltaPos.X * speed / 20;
+                    _camera.Y += deltaPos.Y * speed / 20;
+                }
+                if (e.Button == MouseButtons.Left && !Lock2D)
+                {
+                    _camera.XRotation -= deltaPos.Y / 50;
+                    _camera.YRotation -= deltaPos.X / 50;
+                }
             }
         }
     }

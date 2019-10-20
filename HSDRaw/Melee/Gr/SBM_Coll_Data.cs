@@ -28,10 +28,11 @@ namespace HSDRaw.Melee.Gr
     [Flags]
     public enum CollPhysics
     {
-        Bottom          = 1,
-        Top             = 2,
+        Top             = 1,
+        Bottom          = 2,
         Right           = 4,
         Left            = 8,
+        Disabled        = 16
     }
 
     [Flags]
@@ -39,6 +40,7 @@ namespace HSDRaw.Melee.Gr
     {
         DropThrough = 1,
         LedgeGrab   = 2,
+        Unknown     = 4
     }
 
     public class SBM_CollVertex : HSDAccessor
@@ -55,8 +57,8 @@ namespace HSDRaw.Melee.Gr
         public short VertexIndex2 { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
         public short NextLine { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
         public short PreviousLine { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
-        public short idxVertFromLine { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); } // -1
-        public short idxVertToLine { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); } // -1
+        public short NextLineAltGroup { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); } // -1
+        public short PreviousLineAltGroup { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); } // -1
         public CollPhysics CollisionFlag { get => (CollPhysics)_s.GetInt16(0x0C); set => _s.SetInt16(0x0C, (byte)value); }
         public CollProperty Flag { get => (CollProperty)_s.GetByte(0x0E); set => _s.SetByte(0x0E, (byte)value); }
         public CollMaterial Material { get => (CollMaterial)_s.GetByte(0x0F); set => _s.SetByte(0x0F, (byte)value); }
@@ -151,10 +153,10 @@ namespace HSDRaw.Melee.Gr
         public short RightLinksCount { get => _s.GetInt16(0x1A); set => _s.SetInt16(0x1A, value); }
         public short LeftLinksOffset { get => _s.GetInt16(0x1C); set => _s.SetInt16(0x1C, value); }
         public short LeftLinksCount { get => _s.GetInt16(0x1E); set => _s.SetInt16(0x1E, value); }
-        public short UnknownLinksOffset { get => _s.GetInt16(0x20); set => _s.SetInt16(0x20, value); }
-        public short UnknownLinksCount { get => _s.GetInt16(0x22); set => _s.SetInt16(0x22, value); }
+        public short GrouplessLinksOffset { get => _s.GetInt16(0x20); set => _s.SetInt16(0x20, value); }
+        public short GrouplessLinksCount { get => _s.GetInt16(0x22); set => _s.SetInt16(0x22, value); }
         
-        public SBM_CollLineGroup[] AreaTables
+        public SBM_CollLineGroup[] LineGroups
         {
             get
             {

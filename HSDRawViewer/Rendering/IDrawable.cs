@@ -22,7 +22,7 @@ namespace HSDRawViewer.Rendering
 
         void ScreenDoubleClick(PickInformation pick);
 
-        void ScreenDrag(float deltaX, float deltaY);
+        void ScreenDrag(PickInformation pick, float deltaX, float deltaY);
 
         void ScreenSelectArea(PickInformation start, PickInformation end);
     }

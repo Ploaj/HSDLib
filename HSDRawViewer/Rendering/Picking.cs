@@ -7,16 +7,22 @@ namespace HSDRawViewer.Rendering
     {
         public Vector2 ScreenPoint { get; internal set; }
 
-        public Vector3 Ray1 { get; internal set; }
-        public Vector3 Ray2 { get; internal set; }
+        public Vector3 Origin { get; internal set; }
+        public Vector3 End { get; internal set; }
 
-        public Vector3 Dir { get { return (Ray1 - Ray2).Normalized(); } }
+        public Vector3 Dir { get { return (Origin - End).Normalized(); } }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
         public PickInformation(Vector2 screenPoint, Vector3 p1, Vector3 p2)
         {
             ScreenPoint = screenPoint;
-            Ray1 = p1;
-            Ray2 = p2;
+            Origin = p1;
+            End = p2;
         }
 
         /// <summary>
@@ -69,6 +75,45 @@ namespace HSDRawViewer.Rendering
             return (float)Math.Sqrt(dx * dx + dy * dy);
         }
 
+
+        public bool IntersectsQuad(Vector3 P1, Vector3 P2, Vector3 P3, Vector3 P4)
+        {
+            Vector3 temp;
+            return IntersectsQuad(P1, P2, P3, P4, out temp);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="P1"></param>
+        /// <param name="P2"></param>
+        /// <param name="P3"></param>
+        /// <param name="P4"></param>
+        /// <returns></returns>
+        public bool IntersectsQuad(Vector3 P1, Vector3 P2, Vector3 P3, Vector3 P4, out Vector3 intersection)
+        {
+            var mid = (P1 + P2 + P3 + P4) / 4;
+
+            var nrm = Math3D.CalculateSurfaceNormal(P1, P2, P3);
+
+            intersection = GetPlaneIntersection(nrm, mid);
+            
+            Vector3 V1 = (P2 - P1).Normalized();
+            Vector3 V2 = (P3 - P2).Normalized();
+            Vector3 V3 = (P4 - P3).Normalized();
+            Vector3 V4 = (P1 - P4).Normalized();
+            Vector3 V5 = (intersection - P1).Normalized();
+            Vector3 V6 = (intersection - P2).Normalized();
+            Vector3 V7 = (intersection - P3).Normalized();
+            Vector3 V8 = (intersection - P4).Normalized();
+            if (Vector3.Dot(V1, V5) < 0.0) return false;
+            if (Vector3.Dot(V2, V6) < 0.0) return false;
+            if (Vector3.Dot(V3, V7) < 0.0) return false;
+            if (Vector3.Dot(V4, V8) < 0.0) return false;
+
+            return true;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -76,14 +121,14 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public Vector3 GetPlaneIntersection(Vector3 Norm, Vector3 Position)
         {
-            Vector3 rayP = Ray1;
+            Vector3 rayP = Origin;
             Vector3 rayD = Dir;
             Vector3 planeN = Norm;
             var d = Vector3.Dot(Position, -Norm);
             var t = -(d + rayP.Z * planeN.Z + rayP.Y * planeN.Y + rayP.X * planeN.X) / (rayD.Z * planeN.Z + rayD.Y * planeN.Y + rayD.X * planeN.X);
             return rayP + t * rayD;
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -93,18 +138,18 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public bool CheckSphereHit(Vector3 sphere, float rad, out Vector3 closest)
         {
-            Vector3 dirToSphere = sphere - Ray1;
-            Vector3 vLineDir = (Ray2 - Ray1).Normalized();
+            Vector3 dirToSphere = sphere - Origin;
+            Vector3 vLineDir = (End - Origin).Normalized();
             float fLineLength = 100;
 
             float t = Vector3.Dot(dirToSphere, vLineDir);
 
             if (t <= 0.0f)
-                closest = Ray1;
+                closest = Origin;
             else if (t >= fLineLength)
-                closest = Ray2;
+                closest = End;
             else
-                closest = Ray1 + vLineDir * t;
+                closest = Origin + vLineDir * t;
 
             return (Math.Pow(sphere.X - closest.X, 2)
                 + Math.Pow(sphere.Y - closest.Y, 2)
