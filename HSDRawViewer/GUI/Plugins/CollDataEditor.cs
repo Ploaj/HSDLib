@@ -760,7 +760,7 @@ namespace HSDRawViewer.GUI.Plugins
             int boff = 0, toff = 0, loff = 0, roff = 0, doff = 0;
             foreach (var g in LineGroups)
             {
-                var lines = Lines.Where(e => e.Group == g);
+                var lines = Lines.Where(e => e.Group == g).ToList();
                 var groupBottom = lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
                 var groupTop = lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
                 var groupRight = lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
@@ -782,23 +782,32 @@ namespace HSDRawViewer.GUI.Plugins
                 group.LeftLineCount = (short)groupLeft;
 
                 Dictionary<Line, SBM_CollLine> lineToCollLine = new Dictionary<Line, SBM_CollLine>();
-                Dictionary<Vector2, SBM_CollLine> nextPointToLine = new Dictionary<Vector2, SBM_CollLine>();
-                Dictionary<Vector2, SBM_CollLine> prevPointToLine = new Dictionary<Vector2, SBM_CollLine>();
+                Dictionary<Line, Line> nextPointToLine = new Dictionary<Line, Line>();
+                Dictionary<Line, Line> prevPointToLine = new Dictionary<Line, Line>();
                 List<Vector2> groupVertices = new List<Vector2>();
                 foreach (var l in lines)
                 {
                     var line = new SBM_CollLine();
 
+                    line.NextLineAltGroup = -1;
+                    line.NextLine = -1;
+                    line.PreviousLine = -1;
+                    line.PreviousLineAltGroup = -1;
+
                     var v1 = l.v1.ToVector2();
                     var v2 = l.v2.ToVector2();
-                    
-                    prevPointToLine.Add(v1, line);
-                    nextPointToLine.Add(v2, line);
+
+                    var prevPoint = lines.Find(e => e != l && e.v2 == l.v1);
+                    var nextPoint = lines.Find(e => e != l && e.v1 == l.v2);
+                    if(prevPoint != null)
+                    prevPointToLine.Add(l, prevPoint);
+                    if(nextPoint != null)
+                    nextPointToLine.Add(l, nextPoint);
 
                     if (l.AltNext != null && Lines.Contains(l.AltNext))
                         lineToAltNext.Add(line, l.AltNext);
 
-                    if (l.AltPrevious != null && Lines.Contains(l.AltNext))
+                    if (l.AltPrevious != null && Lines.Contains(l.AltPrevious))
                         lineToAltPrev.Add(line, l.AltPrevious);
 
                     // set vertices
@@ -846,16 +855,13 @@ namespace HSDRawViewer.GUI.Plugins
                 // Update Links
                 foreach (var l in lines)
                 {
-                    var v1 = l.v1.ToVector2();
-                    var v2 = l.v2.ToVector2();
-
                     var line = lineToCollLine[l];
 
-                    if (prevPointToLine.ContainsKey(v1))
-                        line.PreviousLine = (short)collLineToIndex[prevPointToLine[v1]];
+                    if (prevPointToLine.ContainsKey(l))
+                        line.PreviousLine = (short)collLineToIndex[lineToCollLine[prevPointToLine[l]]];
 
-                    if (nextPointToLine.ContainsKey(v2))
-                        line.NextLine = (short)collLineToIndex[nextPointToLine[v2]];
+                    if (nextPointToLine.ContainsKey(l))
+                        line.NextLine = (short)collLineToIndex[lineToCollLine[nextPointToLine[l]]];
                 }
 
                 group.VertexStart = (short)vertices.Count;

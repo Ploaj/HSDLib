@@ -146,6 +146,8 @@ namespace HSDRawViewer
             RawHSDFile = new HSDRawFile();
             RawHSDFile.Open(FilePath);
             RefreshTree();
+
+            //aJToolToolStripMenuItem.Enabled = (RawHSDFile.Roots.Find(e => e.Data is HSDRaw.Melee.Pl.SBM_PlayerData) != null);
         }
 
         /// <summary>
@@ -386,6 +388,19 @@ namespace HSDRawViewer
         private void MainForm_Load(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Maximized;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void aJToolToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (AJSplitDialog d = new AJSplitDialog())
+            {
+                d.ShowDialog();
+            }
         }
     }
 }

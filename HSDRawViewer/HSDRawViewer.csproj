@@ -93,6 +93,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\AJSplitDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\AJSplitDialog.Designer.cs">
+      <DependentUpon>AJSplitDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\IntuitiveSubactionEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -166,6 +172,9 @@
     <Compile Include="Tools\FileIO.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\AJSplitDialog.resx">
+      <DependentUpon>AJSplitDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\IntuitiveSubactionEditor.resx">
       <DependentUpon>IntuitiveSubactionEditor.cs</DependentUpon>

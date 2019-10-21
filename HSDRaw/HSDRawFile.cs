@@ -468,7 +468,7 @@ namespace HSDRaw
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="bufferAlign"></param>
-        public void Save(Stream stream, bool bufferAlign = true)
+        public void Save(Stream stream, bool bufferAlign = true, bool removeDuplicates = true)
         {
             // gather all structs--------------------------------------------------------------------------
             var allStructs = GetAllStructs();
@@ -485,7 +485,6 @@ namespace HSDRaw
             foreach(var s in unused)
             {
                 //TODO: this may be bugged?
-                //Console.WriteLine("removing 0x" + s.Length.ToString("X"));
                 if(_structCache.Contains(s))
                     _structCache.Remove(s);
             }
@@ -503,7 +502,8 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
-            RemoveDuplicateBuffers();
+            if(removeDuplicates && Roots.Count > 0 && !(Roots[0].Data is SBM_PlayerData))
+                RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------
             using (BinaryWriterExt writer = new BinaryWriterExt(stream))
