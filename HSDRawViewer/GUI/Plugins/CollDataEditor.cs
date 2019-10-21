@@ -728,10 +728,10 @@ namespace HSDRawViewer.GUI.Plugins
             var bottomCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
 
             // gather all rights
-            var leftCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
+            var leftCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
 
             // gather all lefts
-            var rightCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
+            var rightCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
 
             // gather all dynamic collisions
             var dynamicCount = Lines.Count(e => e.DynamicCollision);
@@ -846,7 +846,7 @@ namespace HSDRawViewer.GUI.Plugins
                             lineIndex = rightOffset + roff++;
                             break;
                     }
-
+                    
                     collLineToIndex.Add(line, lineIndex);
                     lineToCollLine.Add(l, line);
                     newLines[lineIndex] = line;
@@ -946,7 +946,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     v1 = vert,
                     v2 = v2,
-                    Group = SelectedLineGroup,
+                    Group = lines[0].Group,
                     CollisionFlag = lines[0].CollisionFlag,
                     Flag = lines[0].Flag,
                     Material = lines[0].Material
@@ -973,7 +973,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     v1 = new Vertex(-10, 0),
                     v2 = new Vertex(10, 0),
-                    Group = SelectedLineGroup
+                    Group = (LineGroup)propertyGrid1.SelectedObject
                 });
                 propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
             }
