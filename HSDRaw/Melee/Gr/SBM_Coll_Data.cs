@@ -80,7 +80,8 @@ namespace HSDRaw.Melee.Gr
         public short LeftLineIndex { get => _s.GetInt16(0x0C); set => _s.SetInt16(0x0C, value); }
         public short LeftLineCount { get => _s.GetInt16(0x0E); set => _s.SetInt16(0x0E, value); }
 
-        //public int Padding { get; set; }
+        public short DynamicLineIndex { get => _s.GetInt16(0x10); set => _s.SetInt16(0x10, value); }
+        public short DynamicLineCount { get => _s.GetInt16(0x12); set => _s.SetInt16(0x12, value); }
 
         public float XMin { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
         public float YMin { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
@@ -153,8 +154,8 @@ namespace HSDRaw.Melee.Gr
         public short RightLinksCount { get => _s.GetInt16(0x1A); set => _s.SetInt16(0x1A, value); }
         public short LeftLinksOffset { get => _s.GetInt16(0x1C); set => _s.SetInt16(0x1C, value); }
         public short LeftLinksCount { get => _s.GetInt16(0x1E); set => _s.SetInt16(0x1E, value); }
-        public short GrouplessLinksOffset { get => _s.GetInt16(0x20); set => _s.SetInt16(0x20, value); }
-        public short GrouplessLinksCount { get => _s.GetInt16(0x22); set => _s.SetInt16(0x22, value); }
+        public short DynamicLinksOffset { get => _s.GetInt16(0x20); set => _s.SetInt16(0x20, value); }
+        public short DynamicLinksCount { get => _s.GetInt16(0x22); set => _s.SetInt16(0x22, value); }
         
         public SBM_CollLineGroup[] LineGroups
         {

@@ -112,6 +112,12 @@
       <DependentUpon>CollDataEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\EditorBase.cs" />
+    <Compile Include="GUI\Plugins\GeneralPointEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\GeneralPointEditor.Designer.cs">
+      <DependentUpon>GeneralPointEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\JOBJEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,6 +162,7 @@
     <Compile Include="Rendering\DrawShape.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />
+    <Compile Include="Rendering\JOBJRenderer.cs" />
     <Compile Include="Rendering\Math3D.cs" />
     <Compile Include="Rendering\Picking.cs" />
     <Compile Include="Rendering\Renderers\RendererGrCollision.cs" />
@@ -181,6 +188,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\CollDataEditor.resx">
       <DependentUpon>CollDataEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\GeneralPointEditor.resx">
+      <DependentUpon>GeneralPointEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\JOBJEditor.resx">
       <DependentUpon>JOBJEditor.cs</DependentUpon>

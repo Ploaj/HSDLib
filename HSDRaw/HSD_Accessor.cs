@@ -156,6 +156,18 @@ namespace HSDRaw
                 Enqueue(Child, Que);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="t"></param>
+        public void AddChild(T t)
+        {
+            if (Child == null)
+                Child = t;
+            else
+                Child.Add(t);
+        }
     }
 
     /// <summary>
@@ -182,6 +194,10 @@ namespace HSDRaw
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="t"></param>
         public void Add(T t)
         {
             if(Next == null)

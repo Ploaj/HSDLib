@@ -666,7 +666,7 @@ namespace HSDRawViewer.GUI.Plugins
                     Material = line.Material,
                     Flag = line.Flag,
                     CollisionFlag = line.CollisionFlag,
-                    DynamicCollision = lineIndex >= CollData.GrouplessLinksOffset && lineIndex < CollData.GrouplessLinksOffset + CollData.GrouplessLinksCount
+                    DynamicCollision = lineIndex >= CollData.DynamicLinksOffset && lineIndex < CollData.DynamicLinksOffset + CollData.DynamicLinksCount
                 });
             }
 
@@ -751,6 +751,7 @@ namespace HSDRawViewer.GUI.Plugins
             List<SBM_CollVertex> vertices = new List<SBM_CollVertex>();
 
             // cache
+            Dictionary<Line, SBM_CollLine> lineToCollLine = new Dictionary<Line, SBM_CollLine>();
             Dictionary<SBM_CollLine, int> collLineToIndex = new Dictionary<SBM_CollLine, int>();
             Dictionary<SBM_CollLine, Line> lineToAltNext = new Dictionary<SBM_CollLine, Line>();
             Dictionary<SBM_CollLine, Line> lineToAltPrev = new Dictionary<SBM_CollLine, Line>();
@@ -765,6 +766,7 @@ namespace HSDRawViewer.GUI.Plugins
                 var groupTop = lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
                 var groupRight = lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
                 var groupLeft = lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
+                var groupDynamic = lines.Count(e => e.DynamicCollision);
 
                 var group = new SBM_CollLineGroup();
                 group.XMin = g.Range.X;
@@ -772,16 +774,23 @@ namespace HSDRawViewer.GUI.Plugins
                 group.XMax = g.Range.Z;
                 group.YMax = g.Range.W;
                 groups.Add(group);
-                group.TopLineIndex = (short)(topOffset + toff);
-                group.TopLineCount = (short)groupTop;
-                group.BottomLineIndex = (short)(bottomOffset + boff);
-                group.BottomLineCount = (short)groupBottom;
-                group.RightLineIndex = (short)(rightOffset + roff);
-                group.RightLineCount = (short)groupRight;
-                group.LeftLineIndex = (short)(leftOffset + loff);
-                group.LeftLineCount = (short)groupLeft;
 
-                Dictionary<Line, SBM_CollLine> lineToCollLine = new Dictionary<Line, SBM_CollLine>();
+                if(groupTop > 0)
+                    group.TopLineIndex = (short)(topOffset + toff);
+                group.TopLineCount = (short)groupTop;
+                if (groupBottom > 0)
+                    group.BottomLineIndex = (short)(bottomOffset + boff);
+                group.BottomLineCount = (short)groupBottom;
+                if (groupRight > 0)
+                    group.RightLineIndex = (short)(rightOffset + roff);
+                group.RightLineCount = (short)groupRight;
+                if (groupLeft > 0)
+                    group.LeftLineIndex = (short)(leftOffset + loff);
+                group.LeftLineCount = (short)groupLeft;
+                if (groupDynamic > 0)
+                    group.DynamicLineIndex = (short)(dynamicOffset + doff);
+                group.DynamicLineCount = (short)groupDynamic;
+
                 Dictionary<Line, Line> nextPointToLine = new Dictionary<Line, Line>();
                 Dictionary<Line, Line> prevPointToLine = new Dictionary<Line, Line>();
                 List<Vector2> groupVertices = new List<Vector2>();
@@ -800,9 +809,9 @@ namespace HSDRawViewer.GUI.Plugins
                     var prevPoint = lines.Find(e => e != l && e.v1 == l.v2);
                     var nextPoint = lines.Find(e => e != l && e.v2 == l.v1);
                     if(prevPoint != null)
-                    prevPointToLine.Add(l, prevPoint);
+                        prevPointToLine.Add(l, prevPoint);
                     if(nextPoint != null)
-                    nextPointToLine.Add(l, nextPoint);
+                        nextPointToLine.Add(l, nextPoint);
 
                     if (l.AltNext != null && Lines.Contains(l.AltNext))
                         lineToAltNext.Add(line, l.AltNext);
@@ -875,10 +884,10 @@ namespace HSDRawViewer.GUI.Plugins
             foreach (var v in newLines)
             {
                 if (lineToAltNext.ContainsKey(v))
-                    v.NextLineAltGroup = (short)collLineToIndex[v];
+                    v.NextLineAltGroup = (short)collLineToIndex[lineToCollLine[lineToAltNext[v]]];
 
                 if (lineToAltPrev.ContainsKey(v))
-                    v.PreviousLineAltGroup = (short)collLineToIndex[v];
+                    v.PreviousLineAltGroup = (short)collLineToIndex[lineToCollLine[lineToAltPrev[v]]];
             }
 
             // dump to file
@@ -905,8 +914,8 @@ namespace HSDRawViewer.GUI.Plugins
             }
             if (dynamicCount != 0)
             {
-                CollData.GrouplessLinksOffset = (short)dynamicOffset;
-                CollData.GrouplessLinksCount = (short)dynamicCount;
+                CollData.DynamicLinksOffset = (short)dynamicOffset;
+                CollData.DynamicLinksCount = (short)dynamicCount;
             }
 
             CollData.Vertices = vertices.ToArray();
