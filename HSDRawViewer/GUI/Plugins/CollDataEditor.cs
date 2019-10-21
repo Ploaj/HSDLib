@@ -797,8 +797,8 @@ namespace HSDRawViewer.GUI.Plugins
                     var v1 = l.v1.ToVector2();
                     var v2 = l.v2.ToVector2();
 
-                    var prevPoint = lines.Find(e => e != l && e.v2 == l.v1);
-                    var nextPoint = lines.Find(e => e != l && e.v1 == l.v2);
+                    var prevPoint = lines.Find(e => e != l && e.v1 == l.v2);
+                    var nextPoint = lines.Find(e => e != l && e.v2 == l.v1);
                     if(prevPoint != null)
                     prevPointToLine.Add(l, prevPoint);
                     if(nextPoint != null)
