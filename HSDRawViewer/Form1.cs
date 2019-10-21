@@ -7,6 +7,7 @@ using HSDRawViewer.GUI;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Plugins;
 using HSDRaw.Common.Animation;
+using HSDRaw.Melee.Pl;
 
 namespace HSDRawViewer
 {
@@ -147,7 +148,7 @@ namespace HSDRawViewer
             RawHSDFile.Open(FilePath);
             RefreshTree();
 
-            //aJToolToolStripMenuItem.Enabled = (RawHSDFile.Roots.Find(e => e.Data is HSDRaw.Melee.Pl.SBM_PlayerData) != null);
+            aJToolToolStripMenuItem.Enabled = (RawHSDFile.Roots.Find(e => e.Data is HSDRaw.Melee.Pl.SBM_PlayerData) != null);
         }
 
         /// <summary>
@@ -397,9 +398,16 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void aJToolToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (AJSplitDialog d = new AJSplitDialog())
+            var root = RawHSDFile.Roots.Find(r => r.Data is SBM_PlayerData);
+
+            if(root != null)
             {
-                d.ShowDialog();
+                treeView1.CollapseAll();
+
+                using (AJSplitDialog d = new AJSplitDialog((SBM_PlayerData)root.Data))
+                {
+                    d.ShowDialog();
+                }
             }
         }
     }
