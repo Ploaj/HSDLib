@@ -38,6 +38,9 @@
             this.fuseSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editLineMenu = new System.Windows.Forms.ToolStripDropDownButton();
+            this.addToSelectedGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cbSelectType = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
@@ -49,8 +52,6 @@
             this.cbShowAllGroups = new System.Windows.Forms.CheckBox();
             this.cbRenderModes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.editLineMenu = new System.Windows.Forms.ToolStripDropDownButton();
-            this.addToSelectedGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -147,6 +148,33 @@
             this.removeSelectedToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.removeSelectedToolStripMenuItem.Text = "Remove Selected";
             this.removeSelectedToolStripMenuItem.Click += new System.EventHandler(this.removeSelectedToolStripMenuItem_Click);
+            // 
+            // editLineMenu
+            // 
+            this.editLineMenu.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.editLineMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addToSelectedGroupToolStripMenuItem,
+            this.splitLineToolStripMenuItem});
+            this.editLineMenu.Enabled = false;
+            this.editLineMenu.Image = ((System.Drawing.Image)(resources.GetObject("editLineMenu.Image")));
+            this.editLineMenu.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.editLineMenu.Name = "editLineMenu";
+            this.editLineMenu.Size = new System.Drawing.Size(65, 22);
+            this.editLineMenu.Text = "Edit Line";
+            // 
+            // addToSelectedGroupToolStripMenuItem
+            // 
+            this.addToSelectedGroupToolStripMenuItem.Name = "addToSelectedGroupToolStripMenuItem";
+            this.addToSelectedGroupToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.addToSelectedGroupToolStripMenuItem.Text = "Add to Selected Group";
+            this.addToSelectedGroupToolStripMenuItem.Click += new System.EventHandler(this.addToSelectedGroupToolStripMenuItem_Click);
+            // 
+            // splitLineToolStripMenuItem
+            // 
+            this.splitLineToolStripMenuItem.Name = "splitLineToolStripMenuItem";
+            this.splitLineToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
+            this.splitLineToolStripMenuItem.Text = "Split Line";
+            this.splitLineToolStripMenuItem.Click += new System.EventHandler(this.splitLineToolStripMenuItem_Click);
             // 
             // cbSelectType
             // 
@@ -272,25 +300,6 @@
             this.label2.TabIndex = 10;
             this.label2.Text = "Render: ";
             // 
-            // editLineMenu
-            // 
-            this.editLineMenu.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.editLineMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addToSelectedGroupToolStripMenuItem});
-            this.editLineMenu.Enabled = false;
-            this.editLineMenu.Image = ((System.Drawing.Image)(resources.GetObject("editLineMenu.Image")));
-            this.editLineMenu.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.editLineMenu.Name = "editLineMenu";
-            this.editLineMenu.Size = new System.Drawing.Size(65, 22);
-            this.editLineMenu.Text = "Edit Line";
-            // 
-            // addToSelectedGroupToolStripMenuItem
-            // 
-            this.addToSelectedGroupToolStripMenuItem.Name = "addToSelectedGroupToolStripMenuItem";
-            this.addToSelectedGroupToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
-            this.addToSelectedGroupToolStripMenuItem.Text = "Add to Selected Group";
-            this.addToSelectedGroupToolStripMenuItem.Click += new System.EventHandler(this.addToSelectedGroupToolStripMenuItem_Click);
-            // 
             // CollDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -336,5 +345,6 @@
         private System.Windows.Forms.ToolStripMenuItem removeSelectedToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton editLineMenu;
         private System.Windows.Forms.ToolStripMenuItem addToSelectedGroupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem splitLineToolStripMenuItem;
     }
 }

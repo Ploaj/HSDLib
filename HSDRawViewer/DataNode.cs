@@ -304,6 +304,10 @@ namespace HSDRawViewer
 
                 parent.Refresh();
             }
+            else
+            {
+                MainForm.DeleteRoot(this);
+            }
         }
 
 

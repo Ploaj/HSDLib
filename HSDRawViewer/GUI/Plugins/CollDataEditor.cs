@@ -931,25 +931,12 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void newLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is Line line)
-            {
-                Lines.Add(new Line()
-                {
-                    v1 = line.v2,
-                    v2 = new Vertex(line.v2.X + 10, line.v2.Y),
-                    Material = line.Material,
-                    CollisionFlag = line.CollisionFlag,
-                    Flag = line.Flag,
-                    Group = line.Group
-                });
-                propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
-            }
             if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is Vertex vert)
             {
                 var lines = Lines.Where(r => r.v2 == vert).ToList();
                 var v2 = new Vertex(vert.X + 10, vert.Y);
 
-                if(lines.Count > 0)
+                if (lines.Count > 0)
                 {
                     v2 = new Vertex((vert.X + lines[0].v1.X) / 2, (vert.Y + lines[0].v1.Y) / 2);
                     lines[0].v2 = v2;
@@ -959,7 +946,24 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     v1 = vert,
                     v2 = v2,
-                    Group = SelectedLineGroup
+                    Group = SelectedLineGroup,
+                    CollisionFlag = lines[0].CollisionFlag,
+                    Flag = lines[0].Flag,
+                    Material = lines[0].Material
+                });
+                propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
+            }
+            else
+            if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is Line line)
+            {
+                Lines.Add(new Line()
+                {
+                    v1 = line.v2,
+                    v2 = new Vertex(line.v2.X + 10, line.v2.Y),
+                    Material = line.Material,
+                    CollisionFlag = line.CollisionFlag,
+                    Flag = line.Flag,
+                    Group = line.Group
                 });
                 propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
             }
@@ -973,6 +977,37 @@ namespace HSDRawViewer.GUI.Plugins
                 });
                 propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
             }
+        }
+
+        /// <summary>
+        /// Removes the vertex but fuses the link
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void removeSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (Vertex v in propertyGrid1.SelectedObjects)
+            {
+                var linesv1 = Lines.Where(l => l.v1 == v).ToList();
+                var linesv2 = Lines.Where(l => l.v2 == v).ToList();
+
+                if (linesv1.Count > 1)
+                    foreach (var l in linesv1)
+                        Lines.Remove(l);
+
+                if (linesv2.Count > 1)
+                    foreach (var l in linesv2)
+                        Lines.Remove(l);
+
+                if(linesv1.Count == 1 && linesv2.Count == 1)
+                {
+                    linesv1[0].v1 = linesv2[0].v1;
+                    Lines.Remove(linesv2[0]);
+                }
+            }
+
+            // just select nothing after the removal
+            propertyGrid1.SelectedObject = null;
         }
 
         /// <summary>
@@ -1042,44 +1077,6 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         /// <summary>
-        /// Removes the vertex but fuses the link
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void removeSelectedToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (Vertex v in propertyGrid1.SelectedObjects)
-            {
-                var linesV1 = Lines.Where(l => l.v1 == v).ToList();
-                var linesV2 = Lines.Where(l => l.v2 == v).ToList();
-
-                // if only one line has this vertex, just delete that line
-                if (linesV1.Count > 0 && linesV2.Count == 0)
-                    foreach(var l in linesV1)
-                        Lines.Remove(l);
-                else
-                if (linesV1.Count == 0 && linesV2.Count > 0)
-                    foreach (var l in linesV2)
-                        Lines.Remove(l);
-                else
-                {
-                    // if multiple lines have references, then fuse
-
-                    var endVert = linesV2[0].v1;
-
-                    foreach (var l in linesV1)
-                        l.v1 = endVert;
-
-                    foreach (var l in linesV2)
-                        Lines.Remove(l);
-                }
-            }
-
-            // just select nothing after the removal
-            propertyGrid1.SelectedObject = null;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
@@ -1090,6 +1087,31 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 l.Group = SelectedLineGroup;
             }
+        }
+
+        private void splitLineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach(var p in propertyGrid1.SelectedObjects)
+            {
+                if(p is Line line)
+                {
+                    var v2 = new Vertex((line.v1.X + line.v2.X) / 2, (line.v1.Y + line.v2.Y) / 2);
+
+                    Lines.Add(new Line()
+                    {
+                        v1 = v2,
+                        v2 = line.v2,
+                        Group = line.Group,
+                        Material = line.Material,
+                        CollisionFlag = line.CollisionFlag,
+                        Flag = line.Flag
+                    });
+
+                    line.v2 = v2;
+                }
+            }
+
+            propertyGrid1.SelectedObject = null;
         }
     }
 }

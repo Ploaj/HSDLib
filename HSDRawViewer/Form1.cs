@@ -138,6 +138,16 @@ namespace HSDRawViewer
             }
         }
         
+        public static void DeleteRoot(DataNode root)
+        {
+            var toDel = Instance.RawHSDFile.Roots.Find(r=>r.Data == root.Accessor);
+            if (toDel != null)
+            {
+                Instance.RawHSDFile.Roots.Remove(toDel);
+                Instance.treeView1.Nodes.Remove(root);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -219,6 +229,8 @@ namespace HSDRawViewer
                     var file = new HSDRawFile(f.FileName);
 
                     RawHSDFile.Roots.Add(file.Roots[0]);
+
+                    RefreshTree();
                 }
             }
         }
