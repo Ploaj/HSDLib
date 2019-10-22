@@ -107,7 +107,8 @@ namespace HSDRaw.Tools
                                 Vertex.CLR0.G = ig.Clr0[1] / 255f;
                                 Vertex.CLR0.B = ig.Clr0[2] / 255f;
                                 Vertex.CLR0.A = ig.Clr0[3] / 255f;
-                            }else
+                            }
+                            else
                             {
                                 f = ReadClr(accessor, attribute, index);
                                 Vertex.CLR0.R = f[0];

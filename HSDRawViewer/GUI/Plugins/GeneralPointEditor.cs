@@ -175,6 +175,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void ScreenDoubleClick(PickInformation pick)
         {
+            var selected = false;
             var Picked = pick.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
             foreach(var v in PointLinks)
             {
@@ -186,8 +187,11 @@ namespace HSDRawViewer.GUI.Plugins
                 if(Math3D.FastDistance(point, Picked, RenderSize))
                 {
                     propertyGrid1.SelectedObject = v;
+                    selected = true;
                 }
             }
+            if (!selected)
+                propertyGrid1.SelectedObject = null;
         }
 
         public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
@@ -209,7 +213,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void LoadData()
         {
-            var jobj = GeneralPoints.JOBJReference.DepthFirstList;
+            var jobj = GeneralPoints.JOBJReference.BreathFirstSearch;
 
             foreach(var v in GeneralPoints.Points)
             {
@@ -225,7 +229,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void SavePointChanges()
         {
             SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[PointLinks.Count];
-            var jobjs = GeneralPoints.JOBJReference.DepthFirstList;
+            var jobjs = GeneralPoints.JOBJReference.BreathFirstSearch;
 
             for(int i = 0; i < p.Length; i++)
             {

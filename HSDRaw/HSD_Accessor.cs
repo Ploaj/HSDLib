@@ -131,7 +131,7 @@ namespace HSDRaw
             }
         }
 
-        public List<T> DepthFirstList
+        public List<T> BreathFirstSearch
         {
             get
             {

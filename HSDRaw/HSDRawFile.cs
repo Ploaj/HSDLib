@@ -482,6 +482,7 @@ namespace HSDRaw
                 if (!allStructs.Contains(s))
                     unused.Add(s);
             }
+            if(optimize)
             foreach(var s in unused)
             {
                 //TODO: this may be bugged?

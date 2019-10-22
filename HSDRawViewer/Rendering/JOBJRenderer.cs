@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDRaw;
 using HSDRaw.Common;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using HSDRaw.Common.Animation;
 
 namespace HSDRawViewer.Rendering
 {
-
     /// <summary>
     /// 
     /// </summary>
@@ -18,15 +14,21 @@ namespace HSDRawViewer.Rendering
     {
         #region Settings
 
-        public bool RenderBones { get; set; }
+        public bool RenderBones { get; set; } = true;
 
-        public bool RenderObjects { get; set; }
+        public bool RenderObjects { get; set; } = true;
 
-        public bool RenderMaterials { get; set; }
+        public bool RenderMaterials { get; set; } = true;
+
+        public HSD_JOBJ SelectetedJOBJ = null;
 
         #endregion
 
+        public float Frame { get; set; }
+
         private HSD_JOBJ RootJOBJ { get; set; }
+
+        public DOBJManager DOBJManager = new DOBJManager();
 
         // caches
         private class JOBJCache
@@ -35,8 +37,12 @@ namespace HSDRawViewer.Rendering
 
             public Matrix4 LocalTransform;
             public Matrix4 WorldTransform;
+            public Matrix4 InvertedTransform;
             public Matrix4 BindTransform;
+
+            public int Index;
         }
+
         private Dictionary<HSD_JOBJ, JOBJCache> jobjToCache = new Dictionary<HSD_JOBJ, JOBJCache>();
 
         /// <summary>
@@ -55,9 +61,23 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public Matrix4 GetBindTransform(HSD_JOBJ jobj)
+        {
+            if (jobjToCache.ContainsKey(jobj))
+                return jobjToCache[jobj].BindTransform;
+            else
+                return Matrix4.Identity;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void ClearRenderingCache()
         {
             jobjToCache.Clear();
+            DOBJManager.ClearRenderingCache();
         }
 
         /// <summary>
@@ -68,6 +88,7 @@ namespace HSDRawViewer.Rendering
         {
             ClearRenderingCache();
             RootJOBJ = root;
+            UpdateNoRender();
         }
 
         /// <summary>
@@ -77,13 +98,28 @@ namespace HSDRawViewer.Rendering
         {
             UpdateTransforms(RootJOBJ);
             
-            foreach(var b in jobjToCache)
+            GL.Enable(EnableCap.DepthTest);
+            // Render DOBJS
+            if (RenderObjects)
+            foreach (var b in jobjToCache)
             {
-                if(b.Value.Parent != null)
-                    RenderBone(b.Value.WorldTransform, b.Value.Parent.WorldTransform);
-                else
-                    RenderBone(b.Value.WorldTransform, b.Value.WorldTransform);
+                if(b.Key.Dobj != null)
+                {
+                    foreach (var dobj in b.Key.Dobj.List)
+                    {
+                        DOBJManager.RenderDOBJ(dobj, b.Key, this);
+                    }
+                }
             }
+
+            GL.Disable(EnableCap.Texture2D);
+            GL.Disable(EnableCap.DepthTest);
+            // Render Bones
+            if (RenderBones)
+                foreach (var b in jobjToCache)
+                {
+                    RenderBone(b.Value, b.Key.Equals(SelectetedJOBJ));
+                }
         }
 
         /// <summary>
@@ -99,21 +135,36 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="transform"></param>
         /// <param name="parentTransform"></param>
-        private void RenderBone(Matrix4 transform, Matrix4 parentTransform)
+        private void RenderBone(JOBJCache jobj, bool selected)
         {
+            Matrix4 transform = jobj.WorldTransform;
             var bonePosition = Vector3.TransformPosition(Vector3.Zero, transform);
-            var parentPosition = Vector3.TransformPosition(Vector3.Zero, parentTransform);
 
-            GL.LineWidth(1f);
-            GL.Begin(PrimitiveType.Lines);
-            GL.Color3(0f, 1f, 0f);
-            GL.Vertex3(parentPosition);
-            GL.Color3(0f, 0f, 1f);
-            GL.Vertex3(bonePosition);
-            GL.End();
+            if (jobj.Parent != null)
+            {
+                Matrix4 parentTransform = jobj.Parent.WorldTransform;
 
-            GL.Color3(1f, 0f, 0f);
-            GL.PointSize(5f);
+                var parentPosition = Vector3.TransformPosition(Vector3.Zero, parentTransform);
+
+                GL.LineWidth(1f);
+                GL.Begin(PrimitiveType.Lines);
+                GL.Color3(0f, 1f, 0f);
+                GL.Vertex3(parentPosition);
+                GL.Color3(0f, 0f, 1f);
+                GL.Vertex3(bonePosition);
+                GL.End();
+            }
+
+            if (selected)
+            {
+                GL.Color3(1f, 1f, 0f);
+                GL.PointSize(7f);
+            }
+            else
+            {
+                GL.Color3(1f, 0f, 0f);
+                GL.PointSize(5f);
+            }
             GL.Begin(PrimitiveType.Points);
             GL.Vertex3(bonePosition);
             GL.End();
@@ -128,27 +179,33 @@ namespace HSDRawViewer.Rendering
             if (root == null)
                 return;
 
-            var local = CreateLocalTransform(root);
+            var index = -1;
+            if(jobjToCache.ContainsKey(root))
+                index = jobjToCache[root].Index;
+
+            var local = CreateLocalTransform(root, index);
             var world = local;
             if (parent != null)
                 world = local * parent.WorldTransform;
-
-            var cache = new JOBJCache()
-            {
-                LocalTransform = local,
-                WorldTransform = world,
-                BindTransform = world,
-                Parent = parent
-            };
-
+            
             if(!jobjToCache.ContainsKey(root))
+            {
+                var cache = new JOBJCache()
+                {
+                    Parent = parent,
+                    Index = jobjToCache.Count,
+                    InvertedTransform = world
+                };
                 jobjToCache.Add(root, cache);
-
-            jobjToCache[root] = cache;
+            }
+            
+            jobjToCache[root].LocalTransform = local;
+            jobjToCache[root].WorldTransform = world;
+            jobjToCache[root].BindTransform = jobjToCache[root].InvertedTransform * world;
 
             foreach (var child in root.Children)
             {
-                UpdateTransforms(child, cache);
+                UpdateTransforms(child, jobjToCache[root]);
             }
         }
 
@@ -157,7 +214,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="jobj"></param>
         /// <returns></returns>
-        private Matrix4 CreateLocalTransform(HSD_JOBJ jobj)
+        private Matrix4 CreateLocalTransform(HSD_JOBJ jobj, int animatedBoneIndex = -1)
         {
             float TX = jobj.TX;
             float TY = jobj.TY;
@@ -168,7 +225,28 @@ namespace HSDRawViewer.Rendering
             float SX = jobj.SX;
             float SY = jobj.SY;
             float SZ = jobj.SZ;
-            
+
+            if (animatedBoneIndex != -1 && animatedBoneIndex < Nodes.Count)
+            {
+                AnimNode node = Nodes[animatedBoneIndex];
+                foreach (AnimTrack t in node.Tracks)
+                {
+                    switch (t.TrackType)
+                    {
+                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(Frame); break;
+                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(Frame); break;
+                    }
+                }
+                animatedBoneIndex++;
+            }
+
             Matrix4 Transform = Matrix4.CreateScale(SX, SY, SZ) *
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
                 Matrix4.CreateTranslation(TX, TY, TZ);
@@ -187,7 +265,7 @@ namespace HSDRawViewer.Rendering
             HSD_JOBJ next = null;
             HSD_JOBJ parent = null;
 
-            foreach (var v in RootJOBJ.DepthFirstList)
+            foreach (var v in RootJOBJ.BreathFirstSearch)
             {
                 if (v.Next == jobj)
                     next = v;
@@ -206,5 +284,65 @@ namespace HSDRawViewer.Rendering
 
             ClearRenderingCache();
         }
+
+        #region Animation Loader
+
+        private List<AnimNode> Nodes = new List<AnimNode>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public int SetAnimJoint(HSD_AnimJoint joint)
+        {
+            Nodes.Clear();
+            int max = 0;
+            if (joint == null)
+                return 0;
+            foreach (var j in joint.BreathFirstSearch)
+            {
+                AnimNode n = new AnimNode();
+                if (j.AOBJ != null)
+                {
+                    max = (int)Math.Max(max, j.AOBJ.EndFrame);
+
+                    foreach (var fdesc in j.AOBJ.FObjDesc.List)
+                    {
+                        var fobj = fdesc.FOBJ;
+                        AnimTrack track = new AnimTrack();
+                        track.TrackType = fobj.AnimationType;
+                        track.Keys = fobj.GetDecodedKeys();
+                        n.Tracks.Add(track);
+                    }
+                }
+                Nodes.Add(n);
+            }
+            return max;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetFigaTree(HSD_FigaTree tree)
+        {
+            Nodes.Clear();
+            if (tree == null)
+                return;
+
+            foreach (var tracks in tree.Nodes)
+            {
+                AnimNode n = new AnimNode();
+                foreach (HSD_Track t in tracks.Tracks)
+                {
+                    AnimTrack track = new AnimTrack();
+                    track.TrackType = t.FOBJ.AnimationType;
+                    track.Keys = t.GetKeys();
+                    n.Tracks.Add(track);
+                }
+                Nodes.Add(n);
+            }
+        }
+
+        #endregion
     }
 }

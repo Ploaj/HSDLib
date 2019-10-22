@@ -1,6 +1,5 @@
 ﻿using System.Windows.Forms;
 using HSDRaw;
-using HSDRaw.Common.Animation;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI;
 
@@ -8,10 +7,6 @@ namespace HSDRawViewer.Rendering
 {
     public class CommonViewport : DockContent
     {
-        private GroupBox _animationGroup;
-        private Button _animationPlayButton;
-        private static TrackBar _animationTrackBar;
-
         public ViewportControl glViewport;
 
         public int ViewportWidth => glViewport.Width;

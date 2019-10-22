@@ -110,7 +110,7 @@
             // newLineToolStripMenuItem
             // 
             this.newLineToolStripMenuItem.Name = "newLineToolStripMenuItem";
-            this.newLineToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newLineToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.newLineToolStripMenuItem.Text = "Line/Point";
             this.newLineToolStripMenuItem.Click += new System.EventHandler(this.newLineToolStripMenuItem_Click);
             // 
@@ -281,6 +281,7 @@
             // 
             this.cbRenderModes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbRenderModes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbRenderModes.FormattingEnabled = true;
             this.cbRenderModes.Items.AddRange(new object[] {
             "Material Type",

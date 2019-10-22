@@ -209,7 +209,7 @@ namespace HSDRawViewer
 
                 if (d.ShowDialog() == DialogResult.OK)
                 {
-                    RawHSDFile.Save(d.FileName, optimize: false);
+                    RawHSDFile.Save(d.FileName, false, false);
                     OpenFile(d.FileName);
                 }
             }

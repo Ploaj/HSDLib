@@ -159,6 +159,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawHSD.cs" />
     <Compile Include="Rendering\Camera.cs" />
+    <Compile Include="Rendering\DOBJRenderer.cs" />
     <Compile Include="Rendering\DrawShape.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />
@@ -167,7 +168,6 @@
     <Compile Include="Rendering\Picking.cs" />
     <Compile Include="Rendering\Renderers\RendererGrCollision.cs" />
     <Compile Include="Rendering\Animation.cs" />
-    <Compile Include="Rendering\Renderers\RendererJOBJ.cs" />
     <Compile Include="Rendering\Shader.cs" />
     <Compile Include="Rendering\TextureManager.cs" />
     <Compile Include="Rendering\TriangleConverter.cs" />

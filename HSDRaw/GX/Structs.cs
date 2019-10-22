@@ -6,6 +6,11 @@
         public float Y { get; set; }
         public float Z { get; set; }
         public float W { get; set; }
+
+        public override string ToString()
+        {
+            return $"({X}, {Y}, {Z}, {W})";
+        }
     }
 
     public struct GXColor4
@@ -18,6 +23,11 @@
             G = g;
             B = b;
             A = a;
+        }
+
+        public override string ToString()
+        {
+            return $"({R}, {G}, {B}, {A})";
         }
     }
 
