@@ -38,14 +38,15 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.LocationLabel = new System.Windows.Forms.Label();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.contextKeeper = new OpenTK.GLControl();
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
-            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsUnoptimizedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -78,7 +79,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
-            this.saveToolStripMenuItem});
+            this.saveToolStripMenuItem,
+            this.saveAsUnoptimizedToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -87,7 +89,7 @@
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -95,8 +97,8 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.saveToolStripMenuItem.Text = "Save As";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
@@ -142,6 +144,22 @@
             this.viewportToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.viewportToolStripMenuItem.Text = "Viewport";
             this.viewportToolStripMenuItem.CheckedChanged += new System.EventHandler(this.viewportToolStripMenuItem_CheckedChanged);
+            // 
+            // toolsToolStripMenuItem
+            // 
+            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aJToolToolStripMenuItem});
+            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // aJToolToolStripMenuItem
+            // 
+            this.aJToolToolStripMenuItem.Enabled = false;
+            this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.aJToolToolStripMenuItem.Text = "AJ Tool";
+            this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
             // 
             // LocationLabel
             // 
@@ -198,21 +216,12 @@
             this.nodeBox.TabStop = false;
             this.nodeBox.Text = "Nodes";
             // 
-            // toolsToolStripMenuItem
+            // saveAsUnoptimizedToolStripMenuItem
             // 
-            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aJToolToolStripMenuItem});
-            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
-            this.toolsToolStripMenuItem.Text = "Tools";
-            // 
-            // aJToolToolStripMenuItem
-            // 
-            this.aJToolToolStripMenuItem.Enabled = false;
-            this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.aJToolToolStripMenuItem.Text = "AJ Tool";
-            this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
+            this.saveAsUnoptimizedToolStripMenuItem.Name = "saveAsUnoptimizedToolStripMenuItem";
+            this.saveAsUnoptimizedToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.saveAsUnoptimizedToolStripMenuItem.Text = "Save As (No Optimize)";
+            this.saveAsUnoptimizedToolStripMenuItem.Click += new System.EventHandler(this.saveAsUnoptimizedToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -258,6 +267,7 @@
         private System.Windows.Forms.GroupBox nodeBox;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aJToolToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsUnoptimizedToolStripMenuItem;
     }
 }
 

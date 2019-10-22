@@ -84,7 +84,17 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void Draw(int windowWidth, int windowHeight)
         {
+            // draw overtop
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+
             Renderer.UpdateNoRender();
+
+            Vector3 MinCam = Vector3.Zero, MaxCam = Vector3.Zero;
+            Vector3 MinDeath = Vector3.Zero, MaxDeath = Vector3.Zero;
+            bool CamSelected = false, DeathSelected = false;
 
             foreach(var v in PointLinks)
             {
@@ -95,6 +105,50 @@ namespace HSDRawViewer.GUI.Plugins
 
                 switch (v.Type)
                 {
+                    case PointType.TopLeftBoundary:
+                        if(selected)
+                            CamSelected = true;
+                        MinCam = point;
+                        break;
+                    case PointType.BottomRightBoundary:
+                        if (selected)
+                            CamSelected = true;
+                        MaxCam = point;
+                        break;
+                    case PointType.TopLeftBlastZone:
+                        if (selected)
+                            DeathSelected = true;
+                        MinDeath = point;
+                        break;
+                    case PointType.BottomRightBlastZone:
+                        if (selected)
+                            DeathSelected = true;
+                        MaxDeath = point;
+                        break;
+                    case PointType.ItemSpawn1:
+                    case PointType.ItemSpawn2:
+                    case PointType.ItemSpawn3:
+                    case PointType.ItemSpawn4:
+                    case PointType.ItemSpawn5:
+                    case PointType.ItemSpawn6:
+                    case PointType.ItemSpawn7:
+                    case PointType.ItemSpawn8:
+                    case PointType.ItemSpawn9:
+                    case PointType.ItemSpawn10:
+                        RenderItem(point, selected);
+                        break;
+                    case PointType.Target1:
+                    case PointType.Target2:
+                    case PointType.Target3:
+                    case PointType.Target4:
+                    case PointType.Target5:
+                    case PointType.Target6:
+                    case PointType.Target7:
+                    case PointType.Target8:
+                    case PointType.Target9:
+                    case PointType.Target10:
+                        RenderTarget(point, selected);
+                        break;
                     case PointType.Player1Spawn:
                     case PointType.Player2Spawn:
                     case PointType.Player3Spawn:
@@ -103,17 +157,16 @@ namespace HSDRawViewer.GUI.Plugins
                         RenderSpawn(point, selected);
                         break;
                     default:
-                        if(selected)
-                            GL.Color3(1f, 1f, 0f);
-                        else
-                            GL.Color3(1f, 1f, 1f);
-                        GL.PointSize(7f);
-                        GL.Begin(PrimitiveType.Points);
-                        GL.Vertex3(point);
-                        GL.End();
+                        RenderPoint(point, selected);
                         break;
                 }
             }
+
+            if(MinCam != Vector3.Zero && MaxCam != Vector3.Zero)
+                RenderBounds(MinCam, MaxCam, new Vector3(0.5f, 0.75f, 0.75f), CamSelected);
+
+            if (MinDeath != Vector3.Zero && MaxDeath != Vector3.Zero)
+                RenderBounds(MinDeath, MaxDeath, new Vector3(1f, 1f, 0.75f), DeathSelected);
         }
 
         public void ScreenClick(MouseButtons button, PickInformation pick)
@@ -122,7 +175,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void ScreenDoubleClick(PickInformation pick)
         {
-            float closest = float.MaxValue;
+            var Picked = pick.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
             foreach(var v in PointLinks)
             {
                 var t = Renderer.GetWorldTransform(v.JOBJ);
@@ -130,15 +183,9 @@ namespace HSDRawViewer.GUI.Plugins
 
                 var close = Vector3.Zero;
 
-                if(pick.CheckSphereHit(point, 15, out close))
+                if(Math3D.FastDistance(point, Picked, RenderSize))
                 {
-                    var dis = Math3D.DistanceSquared(close, pick.Origin);
-
-                    if(dis < closest)
-                    {
-                        closest = dis;
-                        propertyGrid1.SelectedObject = v;
-                    }
+                    propertyGrid1.SelectedObject = v;
                 }
             }
         }
@@ -223,10 +270,73 @@ namespace HSDRawViewer.GUI.Plugins
 
         #region Shapes
 
+        private DrawableCircle circle = new DrawableCircle(0, 0, 1);
+
+        private float RenderSize = 10;
+
+        private void RenderBounds(Vector3 start, Vector3 end, Vector3 color, bool selected)
+        {
+            RenderPoint(start, selected);
+            RenderPoint(end, selected);
+
+            if (selected)
+                GL.Color3(1f, 1f, 0.75f);
+            else
+                GL.Color3(color);
+
+            GL.LineWidth(1f);
+            GL.Begin(PrimitiveType.LineLoop);
+            GL.Vertex3(start.X, start.Y, start.Z);
+            GL.Vertex3(end.X, start.Y, start.Z);
+            GL.Vertex3(end.X, end.Y, end.Z);
+            GL.Vertex3(start.X, end.Y, end.Z);
+            GL.End();
+        }
+
+        private void RenderPoint(Vector3 position, bool selected)
+        {
+            if (selected)
+                circle.Color = System.Drawing.Color.Yellow;
+            else
+                circle.Color = System.Drawing.Color.MediumPurple;
+            circle.Position = position;
+            circle.Radius = RenderSize / 4;
+            circle.Draw(0, 0);
+        }
+
+        private void RenderItem(Vector3 position, bool selected)
+        {
+            if(selected)
+                GL.Color3(1f, 1f, 0f);
+            else
+                GL.Color3(0.5f, 0.5f, 1f);
+            GL.Begin(PrimitiveType.LineLoop);
+            GL.Vertex3(position + new Vector3(0, -RenderSize / 2, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 2, 0, 0));
+            GL.End();
+        }
+
+        private void RenderTarget(Vector3 position, bool selected)
+        {
+            circle.Position = position;
+            circle.Color = selected ? System.Drawing.Color.Yellow : System.Drawing.Color.Red;
+            circle.Radius = RenderSize / 2;
+            circle.Draw(0, 0);
+
+            circle.Position = position + new Vector3(0, 0, 0.1f);
+            circle.Color = selected ? System.Drawing.Color.Black : System.Drawing.Color.White;
+            circle.Radius = RenderSize / 3;
+            circle.Draw(0, 0);
+
+            circle.Position = position + new Vector3(0, 0, 0.2f);
+            circle.Color = selected ? System.Drawing.Color.Yellow : System.Drawing.Color.Red;
+            circle.Radius = RenderSize / 6;
+            circle.Draw(0, 0);
+        }
+
         private void RenderSpawn(Vector3 position, bool selected)
         {
-            float size = 7;
-
             // player
             if (selected)
                 GL.Color3(1f, 1f, 0f);
@@ -234,10 +344,10 @@ namespace HSDRawViewer.GUI.Plugins
                 GL.Color3(0.5f, 0.5f, 1f);
             GL.Begin(PrimitiveType.Quads);
 
-            GL.Vertex3(position + new Vector3(-size / 3, 0, 0));
-            GL.Vertex3(position + new Vector3(size / 3, 0, 0));
-            GL.Vertex3(position + new Vector3(size / 3, size, 0));
-            GL.Vertex3(position + new Vector3(-size / 3, size, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 3, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 3, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 3, RenderSize, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 3, RenderSize, 0));
 
             GL.End();
 
@@ -245,17 +355,17 @@ namespace HSDRawViewer.GUI.Plugins
             GL.Color3(0, 0, 0);
             GL.Begin(PrimitiveType.Lines);
 
-            GL.Vertex3(position + new Vector3(-size / 3, 0, 0));
-            GL.Vertex3(position + new Vector3(size / 3, 0, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 3, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 3, 0, 0));
 
-            GL.Vertex3(position + new Vector3(size / 3, size, 0));
-            GL.Vertex3(position + new Vector3(-size / 3, size, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 3, RenderSize, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 3, RenderSize, 0));
 
-            GL.Vertex3(position + new Vector3(-size / 3, 0, 0));
-            GL.Vertex3(position + new Vector3(-size / 3, size, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 3, 0, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 3, RenderSize, 0));
 
-            GL.Vertex3(position + new Vector3(size / 3, 0, 0));
-            GL.Vertex3(position + new Vector3(size / 3, size, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 3, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 3, RenderSize, 0));
 
             GL.End();
 
@@ -266,37 +376,34 @@ namespace HSDRawViewer.GUI.Plugins
             else
                 GL.Color3(0.5f, 0.5f, 0.5f);
             GL.Begin(PrimitiveType.Triangles);
-            GL.Vertex3(position + new Vector3(size / 2, 0, 0));
-            GL.Vertex3(position + new Vector3(0, 0, size / 2));
-            GL.Vertex3(position + new Vector3(-size / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(0, 0, RenderSize / 2));
+            GL.Vertex3(position + new Vector3(-RenderSize / 2, 0, 0));
 
-            GL.Vertex3(position + new Vector3(-size / 2, 0, 0));
-            GL.Vertex3(position + new Vector3(0, 0, -size / 2));
-            GL.Vertex3(position + new Vector3(size / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(0, 0, -RenderSize / 2));
+            GL.Vertex3(position + new Vector3(RenderSize / 2, 0, 0));
 
             // front
-            GL.Vertex3(position + new Vector3(0, -size / 2, 0));
-            GL.Vertex3(position + new Vector3(-size / 2, 0, 0));
-            GL.Vertex3(position + new Vector3(size / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(0, -RenderSize / 2, 0));
+            GL.Vertex3(position + new Vector3(-RenderSize / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(RenderSize / 2, 0, 0));
 
             // back
-            GL.Vertex3(position + new Vector3(0, -size / 2, 0));
-            GL.Vertex3(position + new Vector3(0, 0, -size / 2));
-            GL.Vertex3(position + new Vector3(0, 0, size / 2));
+            GL.Vertex3(position + new Vector3(0, -RenderSize / 2, 0));
+            GL.Vertex3(position + new Vector3(0, 0, -RenderSize / 2));
+            GL.Vertex3(position + new Vector3(0, 0, RenderSize / 2));
 
             // sides
-            GL.Vertex3(position + new Vector3(0, -size / 2, 0));
-            GL.Vertex3(position + new Vector3(0, 0, -size / 2));
-            GL.Vertex3(position + new Vector3(size / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(0, -RenderSize / 2, 0));
+            GL.Vertex3(position + new Vector3(0, 0, -RenderSize / 2));
+            GL.Vertex3(position + new Vector3(RenderSize / 2, 0, 0));
 
-            GL.Vertex3(position + new Vector3(0, -size / 2, 0));
-            GL.Vertex3(position + new Vector3(0, 0, size / 2));
-            GL.Vertex3(position + new Vector3(-size / 2, 0, 0));
+            GL.Vertex3(position + new Vector3(0, -RenderSize / 2, 0));
+            GL.Vertex3(position + new Vector3(0, 0, RenderSize / 2));
+            GL.Vertex3(position + new Vector3(-RenderSize / 2, 0, 0));
 
             GL.End();
-
-            
-
         }
 
         #endregion

@@ -352,9 +352,9 @@ namespace HSDRaw
         /// Saves dat data to filepath
         /// </summary>
         /// <param name="fileName"></param>
-        public void Save(string fileName)
+        public void Save(string fileName, bool bufferAlign = true, bool optimize = true)
         {
-            Save(new FileStream(fileName, FileMode.Create));
+            Save(new FileStream(fileName, FileMode.Create), bufferAlign, optimize);
         }
         
         /// <summary>
@@ -468,7 +468,7 @@ namespace HSDRaw
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="bufferAlign"></param>
-        public void Save(Stream stream, bool bufferAlign = true, bool removeDuplicates = true)
+        public void Save(Stream stream, bool bufferAlign = true, bool optimize = true)
         {
             // gather all structs--------------------------------------------------------------------------
             var allStructs = GetAllStructs();
@@ -502,7 +502,7 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
-            if(removeDuplicates && Roots.Count > 0 && !(Roots[0].Data is SBM_PlayerData))
+            if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_PlayerData))
                 RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------

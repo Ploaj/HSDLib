@@ -197,6 +197,25 @@ namespace HSDRawViewer
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog d = new SaveFileDialog())
+            {
+                d.Filter = "HSD (*.dat,*.usd)|*.dat;*.usd";
+
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    RawHSDFile.Save(d.FileName, optimize: false);
+                    OpenFile(d.FileName);
+                }
+            }
+        }
+
+        /// <summary>
         /// Reloads all the data nodes in the tree
         /// </summary>
         private void RefreshTree()

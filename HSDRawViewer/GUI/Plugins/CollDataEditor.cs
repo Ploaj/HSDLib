@@ -469,15 +469,17 @@ namespace HSDRawViewer.GUI.Plugins
                         else
                             switch (line.CollisionFlag)
                             {
-                                case CollPhysics.Bottom:
-                                    GL.Color4(0f, 0f, 1f, alpha);
-                                    break;
                                 case CollPhysics.Top:
-                                    GL.Color4(1f, 0f, 0f, alpha);
+                                    GL.Color4(0.75f, 0.75f, 0.75f, alpha);
+                                    break;
+                                case CollPhysics.Bottom:
+                                    GL.Color4(0.75f, 0.5f, 0.5f, alpha);
                                     break;
                                 case CollPhysics.Left:
+                                    GL.Color4(0.5f, 0.5f, 0.75f, alpha);
+                                    break;
                                 case CollPhysics.Right:
-                                    GL.Color4(0f, 1f, 0f, alpha);
+                                    GL.Color4(0.5f, 0.75f, 0.5f, alpha);
                                     break;
                             }
                     }
