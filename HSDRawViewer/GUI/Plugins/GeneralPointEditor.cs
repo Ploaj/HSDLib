@@ -186,7 +186,8 @@ namespace HSDRawViewer.GUI.Plugins
 
                 if(Math3D.FastDistance(point, Picked, RenderSize))
                 {
-                    propertyGrid1.SelectedObject = v;
+                    PointList.SelectedItem = v;
+                    //propertyGrid1.SelectedObject = v;
                     selected = true;
                 }
             }
