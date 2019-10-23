@@ -28,11 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsUnoptimizedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addRootFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,7 +48,7 @@
             this.contextKeeper = new OpenTK.GLControl();
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
-            this.saveAsUnoptimizedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -101,6 +103,13 @@
             this.saveToolStripMenuItem.Text = "Save As";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
+            // saveAsUnoptimizedToolStripMenuItem
+            // 
+            this.saveAsUnoptimizedToolStripMenuItem.Name = "saveAsUnoptimizedToolStripMenuItem";
+            this.saveAsUnoptimizedToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.saveAsUnoptimizedToolStripMenuItem.Text = "Save As (No Optimize)";
+            this.saveAsUnoptimizedToolStripMenuItem.Click += new System.EventHandler(this.saveAsUnoptimizedToolStripMenuItem_Click);
+            // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -148,7 +157,8 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aJToolToolStripMenuItem});
+            this.aJToolToolStripMenuItem,
+            this.sSMEditorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -157,7 +167,7 @@
             // 
             this.aJToolToolStripMenuItem.Enabled = false;
             this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aJToolToolStripMenuItem.Text = "AJ Tool";
             this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
             // 
@@ -216,12 +226,12 @@
             this.nodeBox.TabStop = false;
             this.nodeBox.Text = "Nodes";
             // 
-            // saveAsUnoptimizedToolStripMenuItem
+            // sSMEditorToolStripMenuItem
             // 
-            this.saveAsUnoptimizedToolStripMenuItem.Name = "saveAsUnoptimizedToolStripMenuItem";
-            this.saveAsUnoptimizedToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.saveAsUnoptimizedToolStripMenuItem.Text = "Save As (No Optimize)";
-            this.saveAsUnoptimizedToolStripMenuItem.Click += new System.EventHandler(this.saveAsUnoptimizedToolStripMenuItem_Click);
+            this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
+            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
+            this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -234,6 +244,7 @@
             this.Controls.Add(this.contextKeeper);
             this.Controls.Add(this.nodeBox);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.TabText = "Hal DAT Browser";
@@ -268,6 +279,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aJToolToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsUnoptimizedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sSMEditorToolStripMenuItem;
     }
 }
 

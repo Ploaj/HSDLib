@@ -8,6 +8,7 @@ using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Plugins;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI.Extra;
 
 namespace HSDRawViewer
 {
@@ -440,6 +441,13 @@ namespace HSDRawViewer
                     d.ShowDialog();
                 }
             }
+        }
+
+        private SSMTool ssmTool = new SSMTool();
+
+        private void sSMEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ssmTool.Show();
         }
     }
 }
