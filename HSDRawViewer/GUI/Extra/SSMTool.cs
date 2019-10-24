@@ -250,12 +250,12 @@ namespace HSDRawViewer.GUI.Extra
                 foreach (var v in channel.COEF)
                     w.Write(v);
                 w.Write(channel.Gain);
-                w.Write(channel.InitPs);
-                w.Write(channel.InitSh1);
-                w.Write(channel.InitSh2);
-                w.Write(channel.Loopps);
-                w.Write(channel.Loopsh1);
-                w.Write(channel.Loopsh2);
+                w.Write(channel.InitialPredictorScale);
+                w.Write(channel.InitialSampleHistory1);
+                w.Write(channel.InitialSampleHistory2);
+                w.Write(channel.LoopPredictorScale);
+                w.Write(channel.LoopSampleHistory1);
+                w.Write(channel.LoopSampleHistory2);
                 w.Write((short)0);
 
                 w.Write(new byte[0x14]);
@@ -285,22 +285,23 @@ namespace HSDRawViewer.GUI.Extra
 
                 channel.LoopFlag = r.ReadInt16();
                 channel.Format = r.ReadInt16();
-                channel.SA = r.ReadInt32();
-                channel.EA = r.ReadInt32();
-                channel.CA = r.ReadInt32();
+                var LoopStartOffset = r.ReadInt32();
+                var LoopEndOffset = r.ReadInt32();
+                var CurrentAddress = r.ReadInt32();
                 for (int k = 0; k < 0x10; k++)
                     channel.COEF[k] = r.ReadInt16();
                 channel.Gain = r.ReadInt16();
-                channel.InitPs = r.ReadInt16();
-                channel.InitSh1 = r.ReadInt16();
-                channel.InitSh2 = r.ReadInt16();
-                channel.Loopps = r.ReadInt16();
-                channel.Loopsh1 = r.ReadInt16();
-                channel.Loopsh2 = r.ReadInt16();
+                channel.InitialPredictorScale = r.ReadInt16();
+                channel.InitialSampleHistory1 = r.ReadInt16();
+                channel.InitialSampleHistory2 = r.ReadInt16();
+                channel.LoopPredictorScale = r.ReadInt16();
+                channel.LoopSampleHistory1 = r.ReadInt16();
+                channel.LoopSampleHistory2 = r.ReadInt16();
                 r.ReadInt16(); //  padding
 
                 r.Seek(0x60);
                 channel.NibbleCount = nibbleCount;
+                channel.LoopStart = LoopStartOffset - CurrentAddress;
                 channel.Data = r.ReadBytes((int)Math.Ceiling(nibbleCount / 2d));
 
                 dsp.Channels.Add(channel);
@@ -353,7 +354,7 @@ namespace HSDRawViewer.GUI.Extra
             {
                 r.BigEndian = true;
 
-                var headerLength = r.ReadInt32();
+                var headerLength = r.ReadInt32() + 0x10;
                 var dataOff = r.ReadInt32();
                 var soundCount = r.ReadInt32();
                 Unknown = r.ReadInt32();
@@ -371,36 +372,29 @@ namespace HSDRawViewer.GUI.Extra
 
                         channel.LoopFlag = r.ReadInt16();
                         channel.Format = r.ReadInt16();
-                        channel.SA = r.ReadInt32();
-                        channel.EA = r.ReadInt32();
-                        channel.CA = r.ReadInt32();
+                        var LoopStartOffset = r.ReadInt32();
+                        var LoopEndOffset = r.ReadInt32();
+                        var CurrentAddress = r.ReadInt32();
                         for (int k = 0; k < 0x10; k++)
                             channel.COEF[k] = r.ReadInt16();
                         channel.Gain = r.ReadInt16();
-                        channel.InitPs = r.ReadInt16();
-                        channel.InitSh1 = r.ReadInt16();
-                        channel.InitSh2 = r.ReadInt16();
-                        channel.Loopps = r.ReadInt16();
-                        channel.Loopsh1 = r.ReadInt16();
-                        channel.Loopsh2 = r.ReadInt16();
+                        channel.InitialPredictorScale = r.ReadInt16();
+                        channel.InitialSampleHistory1 = r.ReadInt16();
+                        channel.InitialSampleHistory2 = r.ReadInt16();
+                        channel.LoopPredictorScale = r.ReadInt16();
+                        channel.LoopSampleHistory1 = r.ReadInt16();
+                        channel.LoopSampleHistory2 = r.ReadInt16();
                         r.ReadInt16(); //  padding
 
-                        channel.NibbleCount = channel.EA - channel.SA;
-
+                        channel.NibbleCount = LoopEndOffset - CurrentAddress;
+                        channel.LoopStart = LoopStartOffset - CurrentAddress;
+                        
                         sound.Channels.Add(channel);
 
-                        var DataOffset = (headerLength + 0x18 + (int)Math.Ceiling(channel.SA / 2d));
-                        DataOffset += DataOffset % 0x08 != 0 ? 0x08 - DataOffset % 0x08 : 0;
-
-                        Console.WriteLine(DataOffset.ToString("X"));
-
-                        // note: some dsps have data past their nibble count
-                        // this may be garbage from when they were created
-                        // if we want to get all of it including garbage:
-                        // DataOffset + channel.NibbleCount
-                        // then align to 0x08
+                        var DataOffset = headerLength + (int)Math.Ceiling(CurrentAddress / 2d) - 1;
 
                         channel.Data = r.GetSection((uint)DataOffset, (int)Math.Ceiling(channel.NibbleCount / 2d) + 1);
+                        
                     }
 
                     Sounds.Add(sound);
@@ -448,27 +442,22 @@ namespace HSDRawViewer.GUI.Extra
 
                         w.Write(channel.LoopFlag);
                         w.Write(channel.Format);
-                        w.Write(sa);
+                        w.Write(sa + channel.LoopStart);
                         w.Write(en);
                         w.Write(sa);
                         foreach (var v in channel.COEF)
                             w.Write(v);
                         w.Write(channel.Gain);
-                        w.Write(channel.InitPs);
-                        w.Write(channel.InitSh1);
-                        w.Write(channel.InitSh2);
-                        w.Write(channel.Loopps);
-                        w.Write(channel.Loopsh1);
-                        w.Write(channel.Loopsh2);
+                        w.Write(channel.InitialPredictorScale);
+                        w.Write(channel.InitialSampleHistory1);
+                        w.Write(channel.InitialSampleHistory2);
+                        w.Write(channel.LoopPredictorScale);
+                        w.Write(channel.LoopSampleHistory1);
+                        w.Write(channel.LoopSampleHistory2);
                         w.Write((short)0);
                     }
 
                 }
-
-                w.Write(0);
-                w.Write(0);
-                w.Write(0);
-                w.Write(0);
 
                 var start = w.BaseStream.Position;
                 foreach (var s in Sounds)

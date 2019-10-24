@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSDRaw;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -11,20 +12,18 @@ namespace HSDRawViewer.GUI.Extra
     {
         public short LoopFlag { get; set; }
         public short Format { get; set; }
-        public int SA;
-        public int EA;
-        public int CA;
         public short[] COEF = new short[0x10];
         public short Gain { get; set; }
-        public short InitPs { get; set; }
-        public short InitSh1 { get; set; }
-        public short InitSh2 { get; set; }
-        public short Loopps { get; set; }
-        public short Loopsh1 { get; set; }
-        public short Loopsh2 { get; set; }
+        public short InitialPredictorScale { get; set; }
+        public short InitialSampleHistory1 { get; set; }
+        public short InitialSampleHistory2 { get; set; }
+        public short LoopPredictorScale { get; set; }
+        public short LoopSampleHistory1 { get; set; }
+        public short LoopSampleHistory2 { get; set; }
 
         public byte[] Data;
 
+        public int LoopStart = 0;
         public int NibbleCount = 0;
 
         public override string ToString()
@@ -52,6 +51,57 @@ namespace HSDRawViewer.GUI.Extra
         }
 
         public BindingList<DSPChannel> Channels = new BindingList<DSPChannel>();
+
+        /*public void FromHPS(byte[] data)
+        {
+            using (BinaryReaderExt r = new BinaryReaderExt(new MemoryStream(data)))
+            {
+                r.BigEndian = true;
+
+                if (new string(r.ReadChars(7)) != " HALPST")
+                    throw new NotSupportedException("Invalid HPS file");
+                r.ReadByte();
+
+                Frequency = r.ReadInt32();
+
+                var channelCount = r.ReadInt32();
+
+                for(int i = 0; i < channelCount; i++)
+                {
+                    var channel = new DSPChannel();
+
+                    r.PrintPosition();
+
+                    channel.LoopFlag = r.ReadInt16();
+                    channel.Format = r.ReadInt16();
+                    channel.SA = r.ReadInt32();
+                    channel.EA = r.ReadInt32();
+                    channel.CA = r.ReadInt32();
+                    for (int k = 0; k < 0x10; k++)
+                        channel.COEF[k] = r.ReadInt16();
+                    channel.Gain = r.ReadInt16();
+                    channel.Loopps = r.ReadInt16();
+                    channel.Loopsh1 = r.ReadInt16();
+                    channel.Loopsh2 = r.ReadInt16();
+                    
+                    Console.WriteLine((0x80 + (uint)Math.Ceiling(channel.SA / 2d) + 1).ToString("X") + " " + channel.NibbleCount.ToString("X"));
+                    var dataOffset = 0x80 + (uint)Math.Ceiling(channel.SA / 2d) + 1;
+
+                    channel.NibbleCount = channel.EA - channel.SA;
+                    channel.Data = r.GetSection(0x80, 16 * 8000);
+
+                    Console.WriteLine(channel.Data.Length + " " + channel.NibbleCount * 2);
+
+                    Channels.Add(channel);
+                    break;
+                }
+            }
+        }
+
+        public void ToHPS()
+        {
+
+        }*/
 
         public void FromWAVE(byte[] wavFile)
         {
@@ -93,8 +143,17 @@ namespace HSDRawViewer.GUI.Extra
                 foreach (var data in channels)
                 {
                     var c = new DSPChannel();
-                    c.Data = Tools.DSPEncoder.EncodeDSP(data.ToArray(), out c.COEF);
+
+                    var ss = data.ToArray();
+
+                    c.COEF = GcAdpcmCoefficients.CalculateCoefficients(ss);
+
+                    c.Data = GcAdpcmEncoder.Encode(ss, c.COEF);
+
                     c.NibbleCount = c.Data.Length * 2;
+
+                    c.InitialPredictorScale = c.Data[0];
+
                     Channels.Add(c);
                 }
 

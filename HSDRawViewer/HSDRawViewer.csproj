@@ -189,7 +189,6 @@
     </Compile>
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
-    <Compile Include="Tools\DSPEncoder.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
