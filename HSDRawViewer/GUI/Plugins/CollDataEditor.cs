@@ -1124,5 +1124,25 @@ namespace HSDRawViewer.GUI.Plugins
 
             propertyGrid1.SelectedObject = null;
         }
+
+        private void createLineFromSelectedToolStripMenuItem_Click(object sender, EventArgs args)
+        {
+            if(propertyGrid1.SelectedObjects.Length == 2)
+            {
+                if(propertyGrid1.SelectedObjects[0] is Vertex v1 && propertyGrid1.SelectedObjects[1] is Vertex v2)
+                {
+                    // only create a new line if one does not already exist
+                    var dup = Lines.Find(e => (e.v1 == v1 && e.v2 == v2) || (e.v1 == v2 && e.v2 == v1));
+
+                    if(dup == null)
+                    Lines.Add(new Line()
+                    {
+                        Group = SelectedLineGroup,
+                        v1 = v1,
+                        v2 = v2
+                    });
+                }
+            }
+        }
     }
 }

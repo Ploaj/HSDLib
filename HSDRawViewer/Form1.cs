@@ -171,10 +171,19 @@ namespace HSDRawViewer
         {
             using (OpenFileDialog d = new OpenFileDialog())
             {
-                d.Filter = "HSD (*.dat,*.usd)|*.dat;*.usd";
+                d.Filter = "HSD (*.dat,*.usd,*.ssm)|*.dat;*.usd;*.ssm";
 
                 if(d.ShowDialog() == DialogResult.OK)
-                    OpenFile(d.FileName);
+                {
+                    if(d.FileName.ToLower().EndsWith(".ssm"))
+                    {
+                        ssmTool.Show();
+                        ssmTool.OpenFile(d.FileName);
+                        ssmTool.BringToFront();
+                    }
+                    else
+                        OpenFile(d.FileName);
+                }
             }
         }
 

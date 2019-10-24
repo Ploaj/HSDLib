@@ -52,6 +52,7 @@
             this.cbShowAllGroups = new System.Windows.Forms.CheckBox();
             this.cbRenderModes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.createLineFromSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -120,7 +121,8 @@
             this.editVertexMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fuseSelectedToolStripMenuItem,
             this.splitSelectedToolStripMenuItem,
-            this.removeSelectedToolStripMenuItem});
+            this.removeSelectedToolStripMenuItem,
+            this.createLineFromSelectedToolStripMenuItem});
             this.editVertexMenu.Enabled = false;
             this.editVertexMenu.Image = ((System.Drawing.Image)(resources.GetObject("editVertexMenu.Image")));
             this.editVertexMenu.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -131,21 +133,21 @@
             // fuseSelectedToolStripMenuItem
             // 
             this.fuseSelectedToolStripMenuItem.Name = "fuseSelectedToolStripMenuItem";
-            this.fuseSelectedToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.fuseSelectedToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.fuseSelectedToolStripMenuItem.Text = "Fuse Selected";
             this.fuseSelectedToolStripMenuItem.Click += new System.EventHandler(this.fuseSelectedToolStripMenuItem_Click);
             // 
             // splitSelectedToolStripMenuItem
             // 
             this.splitSelectedToolStripMenuItem.Name = "splitSelectedToolStripMenuItem";
-            this.splitSelectedToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.splitSelectedToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.splitSelectedToolStripMenuItem.Text = "Split Selected";
             this.splitSelectedToolStripMenuItem.Click += new System.EventHandler(this.splitSelectedToolStripMenuItem_Click);
             // 
             // removeSelectedToolStripMenuItem
             // 
             this.removeSelectedToolStripMenuItem.Name = "removeSelectedToolStripMenuItem";
-            this.removeSelectedToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.removeSelectedToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.removeSelectedToolStripMenuItem.Text = "Remove Selected";
             this.removeSelectedToolStripMenuItem.Click += new System.EventHandler(this.removeSelectedToolStripMenuItem_Click);
             // 
@@ -301,6 +303,13 @@
             this.label2.TabIndex = 10;
             this.label2.Text = "Render: ";
             // 
+            // createLineFromSelectedToolStripMenuItem
+            // 
+            this.createLineFromSelectedToolStripMenuItem.Name = "createLineFromSelectedToolStripMenuItem";
+            this.createLineFromSelectedToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.createLineFromSelectedToolStripMenuItem.Text = "Create Line from Selected";
+            this.createLineFromSelectedToolStripMenuItem.Click += new System.EventHandler(this.createLineFromSelectedToolStripMenuItem_Click);
+            // 
             // CollDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -347,5 +356,6 @@
         private System.Windows.Forms.ToolStripDropDownButton editLineMenu;
         private System.Windows.Forms.ToolStripMenuItem addToSelectedGroupToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem splitLineToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createLineFromSelectedToolStripMenuItem;
     }
 }
