@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using VGAudio.Codecs.GcAdpcm;
 
 namespace HSDRawViewer.GUI.Extra
@@ -35,6 +34,18 @@ namespace HSDRawViewer.GUI.Extra
     public class DSP
     {
         public int Frequency { get; set; }
+        
+        public string Length
+        {
+            get
+            {
+                if (Channels.Count == 0)
+                    return "0:00";
+                var decodedLength = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF).Length;
+                var sec = (int)Math.Ceiling( decodedLength / (double)Frequency);
+                return $"{sec / 60}:{sec % 60}";
+            }
+        }
 
         public string ChannelType
         {
@@ -52,7 +63,7 @@ namespace HSDRawViewer.GUI.Extra
 
         public BindingList<DSPChannel> Channels = new BindingList<DSPChannel>();
 
-        /*public void FromHPS(byte[] data)
+        public void FromHPS(byte[] data)
         {
             using (BinaryReaderExt r = new BinaryReaderExt(new MemoryStream(data)))
             {
@@ -66,7 +77,10 @@ namespace HSDRawViewer.GUI.Extra
 
                 var channelCount = r.ReadInt32();
 
-                for(int i = 0; i < channelCount; i++)
+                if(channelCount != 2)
+                    throw new NotSupportedException("Only HPS with 2 channels are currently supported");
+
+                for (int i = 0; i < channelCount; i++)
                 {
                     var channel = new DSPChannel();
 
@@ -74,31 +88,70 @@ namespace HSDRawViewer.GUI.Extra
 
                     channel.LoopFlag = r.ReadInt16();
                     channel.Format = r.ReadInt16();
-                    channel.SA = r.ReadInt32();
-                    channel.EA = r.ReadInt32();
-                    channel.CA = r.ReadInt32();
+                    var SA = r.ReadInt32();
+                    var EA = r.ReadInt32();
+                    var CA = r.ReadInt32();
                     for (int k = 0; k < 0x10; k++)
                         channel.COEF[k] = r.ReadInt16();
                     channel.Gain = r.ReadInt16();
-                    channel.Loopps = r.ReadInt16();
-                    channel.Loopsh1 = r.ReadInt16();
-                    channel.Loopsh2 = r.ReadInt16();
+                    channel.InitialPredictorScale = r.ReadInt16();
+                    channel.InitialSampleHistory1 = r.ReadInt16();
+                    channel.InitialSampleHistory1 = r.ReadInt16();
                     
-                    Console.WriteLine((0x80 + (uint)Math.Ceiling(channel.SA / 2d) + 1).ToString("X") + " " + channel.NibbleCount.ToString("X"));
-                    var dataOffset = 0x80 + (uint)Math.Ceiling(channel.SA / 2d) + 1;
-
-                    channel.NibbleCount = channel.EA - channel.SA;
-                    channel.Data = r.GetSection(0x80, 16 * 8000);
-
-                    Console.WriteLine(channel.Data.Length + " " + channel.NibbleCount * 2);
+                    channel.NibbleCount = EA - CA;
+                    channel.LoopStart = SA - CA;
 
                     Channels.Add(channel);
-                    break;
                 }
+
+                // read blocks
+                r.Position = 0x80;
+
+                Dictionary<uint, int> OffsetToLoopPosition = new Dictionary<uint, int>();
+                List<byte> channelData1 = new List<byte>();
+                List<byte> channelData2 = new List<byte>();
+                while (true)
+                {
+                    var pos = r.Position;
+                    var length = r.ReadInt32();
+                    var lengthMinusOne = r.ReadInt32();
+                    var next = r.ReadUInt32();
+                    {
+                        var initPS = r.ReadInt16();
+                        var initsh1 = r.ReadInt16();
+                        var initsh2 = r.ReadInt16();
+                        r.ReadInt16();
+                    }
+                    {
+                        var initPS = r.ReadInt16();
+                        var initsh1 = r.ReadInt16();
+                        var initsh2 = r.ReadInt16();
+                        r.ReadInt16();
+                    }
+                    r.ReadInt32();
+
+                    OffsetToLoopPosition.Add(pos, channelData1.Count * 2);
+                    channelData1.AddRange(r.ReadBytes(length / 2));
+                    channelData2.AddRange(r.ReadBytes(length / 2));
+
+                    if (next < r.Position)
+                    {
+                        foreach(var c in Channels)
+                        {
+                            c.LoopStart = OffsetToLoopPosition[next];
+                        }
+                        break;
+                    }
+                    else
+                        r.Position = next;
+                }
+
+                Channels[0].Data = channelData1.ToArray();
+                Channels[1].Data = channelData2.ToArray();
             }
         }
 
-        public void ToHPS()
+        /*public void ToHPS()
         {
 
         }*/

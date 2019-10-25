@@ -3,12 +3,51 @@ using System.Collections.Generic;
 
 namespace HSDRaw.Tools.Melee
 {
+    public class Bitreader
+    {
+        private byte[] bytes;
+        private int i = 0;
+        public Bitreader(byte[] b)
+        {
+            this.bytes = b;
+        }
+        public int Read(int size)
+        {
+            int o = 0;
+            for (int j = 0; j < size; j++)
+            {
+                o |= ((bytes[i / 8] >> (7 - (i % 8))) & 0x1) << (size - j - 1);
+                i++;
+            }
+            return o;
+        }
+        public void Skip(int size)
+        {
+            i += size;
+        }
+    }
+
+    public class BitWriter
+    {
+        public List<byte> Bytes = new List<byte>();
+        int i = 0;
+        public void Write(int b, int size)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                if (i / 8 >= Bytes.Count) Bytes.Add(0);
+                Bytes[i / 8] |= (byte)(((b >> (size - 1 - j)) & 0x1) << (7 - i % 8));
+                i++;
+            }
+        }
+    }
+
     public class MeleeCMDAction
     {
         public class Bitmapper
         {
-            public int Count;
             public string Name;
+            public int Count;
             public bool Hex = false;
         }
 
@@ -16,6 +55,8 @@ namespace HSDRaw.Tools.Melee
         public byte Command { get; internal set; }
         public List<Bitmapper> BMap = new List<Bitmapper>();
         private int ParamCount = 0;
+
+        public bool HasPointer { get; internal set; } = false;
 
         public int BitSize { get; internal set; }
         public int ByteSize { get => BitSize / 8; }
@@ -44,49 +85,13 @@ namespace HSDRaw.Tools.Melee
 
                     if (!map.Name.Equals("None"))
                         ParamCount++;
+
+                    if (map.Name.Equals("Pointer"))
+                        HasPointer = true;
                 }
 
             if (BitSize == 6)
                 BitSize = 32;
-        }
-
-        private class Bitreader
-        {
-            private byte[] bytes;
-            private int i = 0;
-            public Bitreader(byte[] b)
-            {
-                this.bytes = b;
-            }
-            public int Read(int size)
-            {
-                int o = 0;
-                for (int j = 0; j < size; j++)
-                {
-                    o |= ((bytes[i / 8] >> (7 - (i % 8))) & 0x1) << (size - j - 1);
-                    i++;
-                }
-                return o;
-            }
-            public void Skip(int size)
-            {
-                i += size;
-            }
-        }
-
-        public class BitWriter
-        {
-            public List<byte> Bytes = new List<byte>();
-            int i = 0;
-            public void Write(int b, int size)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    if (i / 8 >= Bytes.Count) Bytes.Add(0);
-                    Bytes[i / 8] |= (byte)(((b >> (size - 1 - j)) & 0x1) << (7 - i % 8));
-                    i++;
-                }
-            }
         }
 
         public string Decompile(byte[] b)
@@ -146,7 +151,7 @@ namespace HSDRaw.Tools.Melee
             new MeleeCMDAction(0x06, "Return", ""),
             new MeleeCMDAction(0x07, "GoTo", "Target|26|Pointer|x32"),
             new MeleeCMDAction(0x08, "SetTimerAnimation", ""),
-            new MeleeCMDAction(0x09, "Unknown0x09", ""),
+            new MeleeCMDAction(0x09, "Unknown0x09", "Unknown|26"),
             new MeleeCMDAction(0x0A, "GraphicEffect", "Unk1|8|Unk2|18|GFXID|10|Boneid|6|Unk2|16|Z|16|Y|16|X|16|RangeZ|16|RangeY|16|RangeX|16"),
             new MeleeCMDAction(0x0B, "CreateHitbox", "ID|3|Unk1|5|Bone|7|Unk2|2|Damage|9|Size|16|Z|16|Y|16|X|16|Angle|9|KBG|9|WeightSetKB|9|Unk3|3|HitboxInteraction|2|BKB|9|Element|5|Unk4|1|ShieldDamage|7|SoundEffect|8|HurtboxInteraction|2"),
             new MeleeCMDAction(0x0C, "AdjustHitboxDamage", "HitboxID|3|Damage|23"),
@@ -195,7 +200,7 @@ namespace HSDRaw.Tools.Melee
             new MeleeCMDAction(0x37, "StartSmashCharge", "Unknown|2|ChargeFrames|8|ChargeRate|16|VisualEffect|8|Unknown|24"),
             new MeleeCMDAction(0x38, "Unknown", "Unknown|26"),
             new MeleeCMDAction(0x39, "AestheticWindEffect", "Unknown|x122"),
-            new MeleeCMDAction(0x3A, "Unkown0x3A", "Unknown|x26"),
+            new MeleeCMDAction(0x3A, "Unknown0x3A", "Unknown|x26"),
         };
 
         /// <summary>

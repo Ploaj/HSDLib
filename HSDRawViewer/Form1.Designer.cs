@@ -42,13 +42,12 @@
             this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.LocationLabel = new System.Windows.Forms.Label();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
-            this.contextKeeper = new OpenTK.GLControl();
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
-            this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -167,9 +166,16 @@
             // 
             this.aJToolToolStripMenuItem.Enabled = false;
             this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.aJToolToolStripMenuItem.Text = "AJ Tool";
             this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
+            // 
+            // sSMEditorToolStripMenuItem
+            // 
+            this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
+            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
+            this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
             // 
             // LocationLabel
             // 
@@ -190,16 +196,6 @@
             this.dockPanel.Name = "dockPanel";
             this.dockPanel.Size = new System.Drawing.Size(491, 401);
             this.dockPanel.TabIndex = 6;
-            // 
-            // contextKeeper
-            // 
-            this.contextKeeper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.contextKeeper.BackColor = System.Drawing.Color.Black;
-            this.contextKeeper.Location = new System.Drawing.Point(681, -1);
-            this.contextKeeper.Name = "contextKeeper";
-            this.contextKeeper.Size = new System.Drawing.Size(23, 25);
-            this.contextKeeper.TabIndex = 8;
-            this.contextKeeper.VSync = false;
             // 
             // showHideButton
             // 
@@ -226,13 +222,6 @@
             this.nodeBox.TabStop = false;
             this.nodeBox.Text = "Nodes";
             // 
-            // sSMEditorToolStripMenuItem
-            // 
-            this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
-            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
-            this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -241,7 +230,6 @@
             this.Controls.Add(this.dockPanel);
             this.Controls.Add(this.LocationLabel);
             this.Controls.Add(this.showHideButton);
-            this.Controls.Add(this.contextKeeper);
             this.Controls.Add(this.nodeBox);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -270,7 +258,6 @@
         private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem;
         private System.Windows.Forms.Label LocationLabel;
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
-        private OpenTK.GLControl contextKeeper;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem propertyViewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewportToolStripMenuItem;

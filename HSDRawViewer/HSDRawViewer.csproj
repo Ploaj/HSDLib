@@ -137,6 +137,12 @@
     <Compile Include="GUI\Plugins\JOBJEditor.Designer.cs">
       <DependentUpon>JOBJEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Plugins\SubActionPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\SubActionPanel.Designer.cs">
+      <DependentUpon>SubActionPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\TextureAnimationEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -149,10 +155,10 @@
     <Compile Include="GUI\PropertyView.Designer.cs">
       <DependentUpon>PropertyView.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\SubactionEditor.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="GUI\Plugins\SubactionEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\SubactionEditor.Designer.cs">
+    <Compile Include="GUI\Plugins\SubactionEditor.Designer.cs">
       <DependentUpon>SubactionEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\TextureImportDialog.cs">
@@ -178,6 +184,7 @@
     <Compile Include="Rendering\IDrawable.cs" />
     <Compile Include="Rendering\JOBJRenderer.cs" />
     <Compile Include="Rendering\Math3D.cs" />
+    <Compile Include="Rendering\OpenTKResources.cs" />
     <Compile Include="Rendering\Picking.cs" />
     <Compile Include="Rendering\Renderers\RendererGrCollision.cs" />
     <Compile Include="Rendering\Animation.cs" />
@@ -190,6 +197,8 @@
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Tools\FileIO.cs" />
+    <None Include="Resources\ts_stop.png" />
+    <None Include="Resources\ts_play.png" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -211,13 +220,16 @@
     <EmbeddedResource Include="GUI\Plugins\JOBJEditor.resx">
       <DependentUpon>JOBJEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\SubActionPanel.resx">
+      <DependentUpon>SubActionPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\TextureAnimationEditor.resx">
       <DependentUpon>TextureAnimationEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\PropertyView.resx">
       <DependentUpon>PropertyView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\SubactionEditor.resx">
+    <EmbeddedResource Include="GUI\Plugins\SubactionEditor.resx">
       <DependentUpon>SubactionEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\TextureImportDialog.resx">

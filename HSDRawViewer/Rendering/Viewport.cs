@@ -33,7 +33,7 @@ namespace HSDRawViewer.Rendering
                 if (args.CloseReason == CloseReason.UserClosing)
                 {
                     args.Cancel = true;
-                    MainForm.Instance.TryClose(this);
+                    //MainForm.Instance.TryClose(this);
                 }
             };
         }

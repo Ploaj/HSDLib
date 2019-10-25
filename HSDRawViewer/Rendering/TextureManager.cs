@@ -19,6 +19,8 @@ namespace HSDRawViewer.Rendering
 
         public void Add(byte[] rgba, int width, int height)
         {
+            OpenTKResources.MakeCurrentDummy();
+
             int texid;
             GL.GenTextures(1, out texid);
 

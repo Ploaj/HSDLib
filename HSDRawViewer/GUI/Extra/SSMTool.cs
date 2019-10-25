@@ -31,6 +31,8 @@ namespace HSDRawViewer.GUI.Extra
             {
                 if (args.CloseReason == CloseReason.UserClosing)
                 {
+                    if (SoundPlayer != null)
+                        SoundPlayer.Stop();
                     args.Cancel = true;
                     Hide();
                 }
@@ -55,15 +57,13 @@ namespace HSDRawViewer.GUI.Extra
 
             if (listBox1.SelectedItem != null && listBox1.SelectedItem is DSP dsp)
             {
-                buttonPlay.Enabled = true;
-                buttonReplace.Enabled = true;
-                buttonExport.Enabled = true;
-                buttonDelete.Enabled = true;
+                toolStrip1.Enabled = true;
 
                 listBox2.DataSource = dsp.Channels;
             }
             else
             {
+                toolStrip1.Enabled = false;
                 listBox2.DataSource = null;
                 propertyGrid1.SelectedObject = null;
             }
@@ -106,7 +106,7 @@ namespace HSDRawViewer.GUI.Extra
 
         private void importDSPToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var files = Tools.FileIO.OpenFiles("DSP (*.dsp*.wav)|*.dsp;*.wav");
+            var files = Tools.FileIO.OpenFiles("DSP (*.dsp*.wav)|*.dsp;*.wav;*.hps");
 
             if (files != null)
             {
@@ -121,6 +121,12 @@ namespace HSDRawViewer.GUI.Extra
                     {
                         var dsp = new DSP();
                         dsp.FromWAVE(File.ReadAllBytes(file));
+                        Sounds.Add(dsp);
+                    }
+                    if (file.ToLower().EndsWith(".hps"))
+                    {
+                        var dsp = new DSP();
+                        dsp.FromHPS(File.ReadAllBytes(file));
                         Sounds.Add(dsp);
                     }
                 }
@@ -153,8 +159,7 @@ namespace HSDRawViewer.GUI.Extra
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedItem is DSP dsp)
-                Sounds.Remove(dsp);
+
         }
 
 
@@ -481,6 +486,12 @@ namespace HSDRawViewer.GUI.Extra
                 w.Write(headerSize);
                 w.Write((int)DataSize);
             }
+        }
+
+        private void stopButton_Click(object sender, EventArgs e)
+        {
+            if (SoundPlayer != null)
+                SoundPlayer.Stop();
         }
     }
 }

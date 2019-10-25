@@ -1,6 +1,9 @@
 ﻿using HSDRawViewer.ContextMenus;
 using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.Plugins;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Platform;
 using System;
 using System.Collections.Generic;
 using System.Linq;

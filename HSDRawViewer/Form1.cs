@@ -46,6 +46,7 @@ namespace HSDRawViewer
             IsMdiContainer = true;
 
             PluginManager.Init();
+            OpenTKResources.Init();
 
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
@@ -82,7 +83,12 @@ namespace HSDRawViewer
             myImageList.Images.Add("anim_joint", Properties.Resources.ico_anim_joint);
 
             treeView1.ImageList = myImageList;
-
+            
+            treeView1.BeforeExpand += (sender, args) =>
+            {
+                //args.Cancel = true;
+            };
+            
             treeView1.AfterExpand += (sender, args) =>
             {
                 args.Node.Nodes.Clear();
@@ -112,6 +118,7 @@ namespace HSDRawViewer
                     PluginManager.GetContextMenuFromType(node.Accessor.GetType()).Show(this, args.Location);
                 }
             };
+
         }
 
         /// <summary>
@@ -459,4 +466,5 @@ namespace HSDRawViewer
             ssmTool.Show();
         }
     }
+    
 }

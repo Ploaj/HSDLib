@@ -6,6 +6,7 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using System.Linq;
 using HSDRaw.Melee.Gr;
+using HSDRaw.Melee.Pl;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Melee.Ef;
 
@@ -42,6 +43,7 @@ namespace HSDRawViewer
             { typeof(SBM_Model_Group), "group" },
             { typeof(SBM_EffectModel), "group" },
             { typeof(SBM_EffectTable), "table" },
+            { typeof(SBM_SubActionTable), "table" },
         };
 
         /// <summary>
