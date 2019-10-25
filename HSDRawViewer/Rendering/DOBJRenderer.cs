@@ -141,7 +141,9 @@ namespace HSDRawViewer.Rendering
                         {
                             if (dl.Vertices[offset + i].PNMTXIDX / 3 >= envelopeWeights.Length)
                                 throw new Exception((dl.Vertices[offset + i].PNMTXIDX / 3) + " " + envelopeWeights.Length);
+
                             var en = envelopeWeights[dl.Vertices[offset + i].PNMTXIDX / 3];
+
                             if (en.EnvelopeCount == 0)
                             {
 

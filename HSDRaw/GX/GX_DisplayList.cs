@@ -31,7 +31,7 @@ namespace HSDRaw.GX
 
             Open(pobj.DisplayListBuffer);
             
-            Vertices.AddRange(GX_VertexAttributeAccessor.GetDecodedVertices(this, pobj));
+            Vertices.AddRange(GX_VertexAccessor.GetDecodedVertices(this, pobj));
 
             if(pobj.EnvelopeWeights != null)
                 Envelopes.AddRange(pobj.EnvelopeWeights);

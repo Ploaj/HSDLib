@@ -190,18 +190,20 @@ namespace HSDRawViewer.Rendering
             
             if(!jobjToCache.ContainsKey(root))
             {
-                var cache = new JOBJCache()
+                var jcache = new JOBJCache()
                 {
                     Parent = parent,
                     Index = jobjToCache.Count,
-                    InvertedTransform = world
+                    InvertedTransform = world.Inverted()
                 };
-                jobjToCache.Add(root, cache);
+                jobjToCache.Add(root, jcache);
             }
-            
-            jobjToCache[root].LocalTransform = local;
-            jobjToCache[root].WorldTransform = world;
-            jobjToCache[root].BindTransform = jobjToCache[root].InvertedTransform * world;
+
+            var cache = jobjToCache[root];
+
+            cache.LocalTransform = local;
+            cache.WorldTransform = world;
+            cache.BindTransform = cache.InvertedTransform * world;
 
             foreach (var child in root.Children)
             {
