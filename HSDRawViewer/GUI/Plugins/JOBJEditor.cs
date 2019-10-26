@@ -6,6 +6,7 @@ using WeifenLuo.WinFormsUI.Docking;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Collections.Generic;
+using HSDRawViewer.GUI.Extra;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -89,7 +90,7 @@ namespace HSDRawViewer.GUI.Plugins
             public HSD_JOBJ ParentJOBJ;
             public HSD_DOBJ DOBJ;
 
-            public int PolygonCount { get => DOBJ.Pobj.List.Count; }
+            public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
 
             public bool HasPixelProcessing { get => DOBJ.Mobj?.PixelProcessing != null; }
 
@@ -202,6 +203,16 @@ namespace HSDRawViewer.GUI.Plugins
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             JOBJManager.RenderBones = toolStripButton1.Checked;
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            using (MOBJEditor m = new MOBJEditor())
+            {
+                m.SetMOBJ((listDOBJ.SelectedItem as DOBJContainer).DOBJ.Mobj);
+
+                m.ShowDialog();
+            }
         }
     }
 }
