@@ -60,6 +60,10 @@ namespace HSDRaw
             _data = data;
         }
 
+        /// <summary>
+        /// Sets the contents of this struct to the contents of another
+        /// </summary>
+        /// <param name="str"></param>
         public void SetFromStruct(HSDStruct str)
         {
             _data = str._data;

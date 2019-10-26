@@ -40,7 +40,7 @@ namespace HSDRawViewer.GUI.Plugins
             listDOBJ.SelectedIndexChanged += (sender, args) => {
                 propertyGrid1.SelectedObject = listDOBJ.SelectedItem;
                 if(SelectDOBJ)
-                    JOBJManager.DOBJManager.SelectedDOBJ = (listDOBJ.SelectedItem as DOBJContainer).DOBJ;
+                    JOBJManager.DOBJManager.SelectedDOBJ = (listDOBJ.SelectedItem as DOBJContainer)?.DOBJ;
             };
 
             propertyGrid1.PropertyValueChanged += (sender, args) =>
@@ -92,13 +92,18 @@ namespace HSDRawViewer.GUI.Plugins
 
             public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
 
-            public bool HasPixelProcessing { get => DOBJ.Mobj?.PixelProcessing != null; }
+            public int TextureCount { get => DOBJ.Mobj.Textures != null ? DOBJ.Mobj.Textures.List.Count : 0; }
+
+            public bool HasPixelProcessing { get => DOBJ.Mobj?.PEDesc != null; }
 
             public bool HasMaterialColor { get => DOBJ.Mobj?.MaterialColor != null; }
 
+            public RENDER_MODE MOBJFlags { get => DOBJ.Mobj.RenderFlags; set => DOBJ.Mobj.RenderFlags = value; }
+
             public override string ToString()
             {
-                return $"JOBJ {JOBJIndex} : DOBJ {Index} : POBJs {PolygonCount}";
+                return $"JOBJ {JOBJIndex} : DOBJ {Index} : POBJs {PolygonCount} : TOBJS {TextureCount} : PP {HasPixelProcessing}" +
+                    $"";
             }
         }
 
@@ -211,7 +216,10 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 m.SetMOBJ((listDOBJ.SelectedItem as DOBJContainer).DOBJ.Mobj);
 
-                m.ShowDialog();
+                if (m.ShowDialog() != DialogResult.OK)
+                {
+                    dobjList[listDOBJ.SelectedIndex] = dobjList[listDOBJ.SelectedIndex];
+                }
             }
         }
     }

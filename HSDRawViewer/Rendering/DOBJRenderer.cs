@@ -204,7 +204,7 @@ namespace HSDRawViewer.Rendering
             if (mobj == null)
                 return;
 
-            var pp = mobj.PixelProcessing;
+            var pp = mobj.PEDesc;
             if (pp != null)
             {
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));

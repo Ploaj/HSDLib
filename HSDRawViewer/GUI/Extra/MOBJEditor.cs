@@ -77,7 +77,7 @@ namespace HSDRawViewer.GUI.Extra
             tbAlpha.Text = mc.Alpha.ToString();
 
             // load pixel processing
-            if(mobj.PixelProcessing != null)
+            if(mobj.PEDesc != null)
             {
                 cbEnablePP.Checked = true;
             }
@@ -87,21 +87,27 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (cbEnablePP.Checked)
             {
-                if(_mobj.PixelProcessing == null)
+                if(_mobj.PEDesc == null)
                 {
-                    _mobj.PixelProcessing = new HSD_PixelProcessing()
+                    _mobj.PEDesc = new HSD_PEDesc()
                     {
+                        AlphaComp0 = HSDRaw.GX.GXCompareType.Always,
+                        AlphaComp1 = HSDRaw.GX.GXCompareType.Always,
+                        BlendMode = HSDRaw.GX.GXBlendMode.GX_BLEND,
+                        BlendOp = HSDRaw.GX.GXLogicOp.GX_LO_SET,
+                        DepthFunction = HSDRaw.GX.GXCompareType.LEqual,
                         SrcFactor = HSDRaw.GX.GXBlendFactor.GX_BL_SRCALPHA,
-                        DstFactor = HSDRaw.GX.GXBlendFactor.GX_BL_INVSRCCLR
+                        DstFactor = HSDRaw.GX.GXBlendFactor.GX_BL_INVSRCALPHA,
+                        Flags = (PIXEL_PROCESS_ENABLE)25
                     };
 
                 }
-                propertyPixel.SelectedObject = _mobj.PixelProcessing;
+                propertyPixel.SelectedObject = _mobj.PEDesc;
                 propertyPixel.Enabled = true;
             }
             else
             {
-                _mobj.PixelProcessing = null;
+                _mobj.PEDesc = null;
                 propertyPixel.SelectedObject = null;
                 propertyPixel.Enabled = false;
             }
@@ -189,6 +195,7 @@ namespace HSDRawViewer.GUI.Extra
         private void UpdateTextureFlags()
         {
             TextureContainer prev = null;
+            _mobj.Textures = null;
 
             var index = 0;
             foreach(TextureContainer c in listTexture.Items)
@@ -201,11 +208,15 @@ namespace HSDRawViewer.GUI.Extra
                 {
                     prev.TOBJ.Next = c.TOBJ;
                 }
-
+                
+                c.TOBJ.GXTexGenSrc = 4 + index;
                 c.TOBJ.TexMapID = HSDRaw.GX.GXTexMapID.GX_TEXMAP0 + index++;
 
                 prev = c;
             }
+
+            if(prev != null)
+                prev.TOBJ.Next = null;
         }
 
         private void moveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -214,12 +225,12 @@ namespace HSDRawViewer.GUI.Extra
             {
                 var index = listTexture.SelectedIndices[0] - 1;
 
-                if (index < 0)
-                    index = listTexture.Items.Count - 2;
-
                 listTexture.Items.Remove(con);
 
-                listTexture.Items.Insert(index, con);
+                if (index < 0)
+                    listTexture.Items.Add(con);
+                else
+                    listTexture.Items.Insert(index, con);
 
                 UpdateTextureFlags();
             }
@@ -230,13 +241,14 @@ namespace HSDRawViewer.GUI.Extra
             if (listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
             {
                 var index = listTexture.SelectedIndices[0] + 1;
-                
-                if (index > listTexture.Items.Count - 2)
-                    index = 0;
 
                 listTexture.Items.Remove(con);
 
-                listTexture.Items.Insert(index, con);
+                if (index > listTexture.Items.Count)
+                    listTexture.Items.Insert(0, con);
+                else
+                    listTexture.Items.Insert(index, con);
+
 
                 UpdateTextureFlags();
             }
@@ -246,9 +258,100 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
             {
+                // remove texture
                 listTexture.Items.Remove(con);
 
+                // fix images
+                for (int i = 0; i < listTexture.Items.Count; i++)
+                {
+                    if (listTexture.Items[i].ImageIndex > con.ImageIndex)
+                        listTexture.Items[i].ImageIndex -= 1;
+                }
+
+                // remove image from texture list
+                var index = TextureList.Images[con.ImageIndex];
+
+                TextureList.Images.RemoveAt(con.ImageIndex);
+
+                index.Dispose();
+
+                // update flags
                 UpdateTextureFlags();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            var tobj = TOBJConverter.ImportTOBJFromFile();
+
+            if(tobj != null)
+            {
+                var bmp = TOBJConverter.RgbaToImage(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
+
+                listTexture.Items.Add(new TextureContainer(tobj)
+                {
+                    ImageIndex = TextureList.Images.Count,
+                });
+
+                TextureList.Images.Add(bmp);
+
+                // update flags
+                UpdateTextureFlags();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonReplace_Click(object sender, EventArgs e)
+        {
+            if (listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
+            {
+                var tobj = TOBJConverter.ImportTOBJFromFile();
+
+                if (tobj != null)
+                {
+                    // replace tobj
+                    con.TOBJ._s.SetFromStruct(tobj._s);
+                    
+                    // replace image in list
+                    var image = TextureList.Images[con.ImageIndex];
+                    image.Dispose();
+
+                    var newImage = TOBJConverter.RgbaToImage(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
+
+                    TextureList.Images[con.ImageIndex] = newImage;
+                    
+                    // update flags
+                    UpdateTextureFlags();
+                    
+                    // refresh
+                    listTexture.Items[listTexture.SelectedIndices[0]] = listTexture.Items[listTexture.SelectedIndices[0]];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update label
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        private void propertyTexture_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            // refresh
+            if(listTexture.SelectedIndices.Count > 0)
+            {
+                var tc = (listTexture.SelectedItems[0] as TextureContainer);
+                tc.Text = tc.TOBJ.Flags.ToString();
+                listTexture.Items[listTexture.SelectedIndices[0]] = listTexture.Items[listTexture.SelectedIndices[0]];
+
             }
         }
     }

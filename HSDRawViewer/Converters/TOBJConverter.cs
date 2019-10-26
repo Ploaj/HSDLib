@@ -3,6 +3,10 @@ using HSDRaw.GX;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using DirectXTexNet;
+using System.Windows.Forms;
+using HSDRawViewer.GUI;
+using System.IO;
+using System;
 
 namespace HSDRawViewer.Converters
 {
@@ -18,6 +22,42 @@ namespace HSDRawViewer.Converters
             var rgba = tobj.GetDecodedImageData();
 
             return RgbaToImage(rgba, tobj.ImageData.Width, tobj.ImageData.Height);
+        }
+
+        /// <summary>
+        /// Import TOBJ from PNG file 
+        /// </summary>
+        /// <returns></returns>
+        public static HSD_TOBJ ImportTOBJFromFile()
+        {
+            var TOBJ = new HSD_TOBJ()
+            {
+                MagFilter = GXTexFilter.GX_LINEAR,
+                HScale = 1,
+                WScale = 1,
+                WrapS = GXWrapMode.CLAMP,
+                WrapT = GXWrapMode.CLAMP,
+                SX = 1,
+                SY = 1,
+                SZ = 1,
+                GXTexGenSrc = 4,
+                Blending = 1
+            };
+
+            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
+            if (f != null)
+            {
+                using (TextureImportDialog settings = new TextureImportDialog())
+                {
+                    if (settings.ShowDialog() == DialogResult.OK)
+                    {
+                        InjectBitmap(TOBJ, f, settings.TextureFormat, settings.PaletteFormat);
+                        return TOBJ;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -57,9 +97,18 @@ namespace HSDRawViewer.Converters
             }
             else
             {
-                var temp = System.IO.Path.GetTempFileName() + ".png";
-                bmp.Save(temp);
-                using (var origImage = TexHelper.Instance.LoadFromWICFile(temp, WIC_FLAGS.NONE))
+                MemoryStream stream = new MemoryStream();
+
+                bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+
+                byte[] bytes = stream.ToArray();
+                stream.Close();
+                stream.Dispose();
+
+                IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytes.Length);
+                Marshal.Copy(bytes, 0, unmanagedPointer, bytes.Length);
+
+                using (var origImage = TexHelper.Instance.LoadFromWICMemory(unmanagedPointer, bytes.Length, WIC_FLAGS.NONE))
                 {
                     var scratch = origImage.Compress(0, DXGI_FORMAT.BC1_UNORM_SRGB, TEX_COMPRESS_FLAGS.DEFAULT, 1);
                     var ptr = scratch.GetPixels();
@@ -72,7 +121,9 @@ namespace HSDRawViewer.Converters
 
                     tobj.EncodeImageData(data, bmp.Width, bmp.Height, GXTexFmt.CMP, GXTlutFmt.IA8);
                 }
-                System.IO.File.Delete(temp);
+
+                // Call unmanaged code
+                Marshal.FreeHGlobal(unmanagedPointer);
             }
         }
 

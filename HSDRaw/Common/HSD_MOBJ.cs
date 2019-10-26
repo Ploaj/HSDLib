@@ -58,18 +58,18 @@ namespace HSDRaw.Common
 
         public HSD_TOBJ Textures { get => _s.GetReference<HSD_TOBJ>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSD_MCOBJ MaterialColor { get => _s.GetReference<HSD_MCOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSD_Material MaterialColor { get => _s.GetReference<HSD_Material>(0x0C); set => _s.SetReference(0x0C, value); }
 
         //public uint UnusedRenderOffset { get; set; }
 
-        public HSD_PixelProcessing PixelProcessing { get => _s.GetReference<HSD_PixelProcessing>(0x14); set => _s.SetReference(0x14, value); }
+        public HSD_PEDesc PEDesc { get => _s.GetReference<HSD_PEDesc>(0x14); set => _s.SetReference(0x14, value); }
     }
 
     /// <summary>
     /// Material Color Object
     /// Contains Ambient, Diffuse, and Specular Color as well as alpha and shinyness of a material
     /// </summary>
-    public class HSD_MCOBJ : HSDAccessor
+    public class HSD_Material : HSDAccessor
     {
         public override int TrimmedSize { get; } = 0x14;
 
@@ -97,11 +97,11 @@ namespace HSDRaw.Common
         public float Shininess { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
     }
 
-    public class HSD_PixelProcessing : HSDAccessor
+    public class HSD_PEDesc : HSDAccessor
     {
         public override int TrimmedSize { get; } = 0xC;
 
-        public byte Flags { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+        public PIXEL_PROCESS_ENABLE Flags { get => (PIXEL_PROCESS_ENABLE)_s.GetByte(0x00); set => _s.SetByte(0x00, (byte)value); }
 
         public byte AlphaRef0 { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
