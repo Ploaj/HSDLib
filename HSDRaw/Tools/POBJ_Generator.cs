@@ -12,8 +12,9 @@ namespace HSDRaw.Tools
     /// </summary>
     public class POBJ_Generator
     {
+        private Dictionary<GXAttribName, Dictionary<int, int>> nameToIndexHash = new Dictionary<GXAttribName, Dictionary<int, int>>();
         private Dictionary<GXAttribName, GX_Attribute> nameToAttr = new Dictionary<GXAttribName, GX_Attribute>();
-        private Dictionary<GX_Attribute, List<double[]>> attrToNewData = new Dictionary<GX_Attribute, List<double[]>>();
+        private Dictionary<GX_Attribute, List<float[]>> attrToNewData = new Dictionary<GX_Attribute, List<float[]>>();
         
         private List<HSD_POBJ> CreatedPOBJs = new List<HSD_POBJ>();
 
@@ -57,6 +58,17 @@ namespace HSDRaw.Tools
 
             for (int i = 0; i < names.Length; i++)
             {
+                if(!nameToAttr.ContainsKey(names[i]))
+                {
+                    nameToAttr.Add(names[i], new GX_Attribute()
+                    {
+                        AttributeName = names[i],
+                        AttributeType = GXAttribType.GX_DIRECT,
+                        CompType = GXCompType.RGB8,
+                        Stride = 4,
+                        CompCount = GXCompCnt.ClrRGB
+                    });
+                }
                 attrs[i] = nameToAttr[names[i]];
             }
 
@@ -73,24 +85,33 @@ namespace HSDRaw.Tools
         /// <param name="v"></param>
         /// <param name="o"></param>
         /// <returns></returns>
-        private ushort GetIndex(GXAttribName attributeName, double[] o)
+        private ushort GetIndex(GXAttribName attributeName, float[] o)
         {
             if (!nameToAttr.ContainsKey(attributeName))
             {
                 GX_Attribute a = new GX_Attribute();
                 a.AttributeName = attributeName;
+                nameToIndexHash.Add(attributeName, new Dictionary<int, int>());
                 nameToAttr.Add(attributeName, a);
-                attrToNewData.Add(a, new List<double[]>());
+                attrToNewData.Add(a, new List<float[]>());
             }
 
-            var vals = attrToNewData[nameToAttr[attributeName]];
+            var hashToIndex = nameToIndexHash[attributeName];
 
-            var index = vals.FindIndex(e => e.SequenceEqual(o));
+            var index = 0;
 
-            if(index == -1)
+            var hash = string.Join("", o).GetHashCode();// ((IStructuralEquatable)o).GetHashCode(EqualityComparer<float>.Default);
+            
+            if (hashToIndex.ContainsKey(hash))
             {
+                index = hashToIndex[hash];
+            }
+            else
+            {
+                var vals = attrToNewData[nameToAttr[attributeName]];
                 index = vals.Count;
                 vals.Add(o);
+                hashToIndex.Add(hash, index);
             }
             
             return (ushort)index;
@@ -178,6 +199,19 @@ namespace HSDRaw.Tools
             TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(true, 100, 3, true);
             int pointCount, faceCount;
 
+            HSD_JOBJ singleBind = null;
+            
+            bool HasPositionNormalMatrix = attributes.Contains(GXAttribName.GX_VA_PNMTXIDX);
+
+            // Optimize single bind
+            if (weights != null && weights.Count == 1 && weights[0].EnvelopeCount == 1)
+            {
+                singleBind = weights[0].GetJOBJAt(0);
+                var al = attributes.ToList();
+                al.Remove(GXAttribName.GX_VA_PNMTXIDX);
+                attributes = al.ToArray();
+            }
+
             var groups = converter.GroupPrimitives(triList.ToArray(), out pointCount, out faceCount);
 
             HSD_POBJ rootPOBJ = null;
@@ -188,10 +222,13 @@ namespace HSDRaw.Tools
                 var jobjweights = new List<HSD_Envelope>();
                 var pmidToNewID = new Dictionary<ushort, ushort>();
 
-                foreach (var n in g._nodes)
+                if (HasPositionNormalMatrix)
                 {
-                    pmidToNewID.Add(n, (ushort)(jobjweights.Count * 3));
-                    jobjweights.Add(weights[n / 3]);
+                    foreach (var n in g._nodes)
+                    {
+                        pmidToNewID.Add(n, (ushort)(jobjweights.Count * 3));
+                        jobjweights.Add(weights[n / 3]);
+                    }
                 }
 
                 GX_DisplayList newdl = new GX_DisplayList();
@@ -202,7 +239,8 @@ namespace HSDRaw.Tools
                     for (int p = 0; p < t.Points.Count; p++)
                     {
                         var point = t.Points[p];
-                        point.PNMTXIDX = pmidToNewID[point.PNMTXIDX];
+                        if (HasPositionNormalMatrix)
+                            point.PNMTXIDX = pmidToNewID[point.PNMTXIDX];
                         t.Points[p] = point;
                         newVert.Add(point);
                     }
@@ -215,17 +253,23 @@ namespace HSDRaw.Tools
                     for (int p = 0; p < t.Points.Count; p++)
                     {
                         var point = t.Points[p];
-                        point.PNMTXIDX = pmidToNewID[point.PNMTXIDX];
+                        if (HasPositionNormalMatrix)
+                            point.PNMTXIDX = pmidToNewID[point.PNMTXIDX];
                         t.Points[p] = point;
                         newVert.Add(point);
                     }
                     newdl.Primitives.Add(Compress(GXPrimitiveType.TriangleStrip, newVert.ToArray(), attributes));
                 }
 
-                newdl.Envelopes = jobjweights;
+                if(singleBind == null)
+                    newdl.Envelopes = jobjweights;
 
                 var newpobj = new HSD_POBJ();
                 CreatedPOBJs.Add(newpobj);
+
+                if(singleBind != null)
+                    newpobj.SingleBoundJOBJ = singleBind;
+
                 pobjToDisplayList.Add(newpobj, newdl);
                 pobjToAttributes.Add(newpobj, attributes);
 
@@ -270,6 +314,7 @@ namespace HSDRaw.Tools
                     switch (b)
                     {
                         case GXAttribName.GX_VA_CLR0:
+                            //ig.Indices[i] = GetIndex(b, new float[] { v.CLR0.R, v.CLR0.G, v.CLR0.B, v.CLR0.A });
                             ig.Clr0 = new byte[] { (byte)(v.CLR0.R * 0xFF), (byte)(v.CLR0.G * 0xFF), (byte)(v.CLR0.B * 0xFF), (byte)(v.CLR0.A * 0xFF) };
                             break;
                         case GXAttribName.GX_VA_CLR1:
@@ -282,10 +327,10 @@ namespace HSDRaw.Tools
                             ig.Indices[i] = v.TEX0MTXIDX;
                             break;
                         case GXAttribName.GX_VA_NULL: break;
-                        case GXAttribName.GX_VA_POS: ig.Indices[i] = GetIndex(b, new double[] { v.POS.X, v.POS.Y, v.POS.Z }); break;
-                        case GXAttribName.GX_VA_NRM: ig.Indices[i] = GetIndex(b, new double[] { v.NRM.X, v.NRM.Y, v.NRM.Z }); break;
-                        case GXAttribName.GX_VA_TEX0: ig.Indices[i] = GetIndex(b, new double[] { v.TEX0.X, v.TEX0.Y }); break;
-                        case GXAttribName.GX_VA_TEX1: ig.Indices[i] = GetIndex(b, new double[] { v.TEX1.X, v.TEX1.Y }); break;
+                        case GXAttribName.GX_VA_POS: ig.Indices[i] = GetIndex(b, new float[] { v.POS.X, v.POS.Y, v.POS.Z }); break;
+                        case GXAttribName.GX_VA_NRM: ig.Indices[i] = GetIndex(b, new float[] { v.NRM.X, v.NRM.Y, v.NRM.Z }); break;
+                        case GXAttribName.GX_VA_TEX0: ig.Indices[i] = GetIndex(b, new float[] { v.TEX0.X, v.TEX0.Y }); break;
+                        case GXAttribName.GX_VA_TEX1: ig.Indices[i] = GetIndex(b, new float[] { v.TEX1.X, v.TEX1.Y }); break;
                         //case GXAttribName.GX_VA_CLR0: ig.Indices[i] = GetIndex(b, v.CLR0); break;
                         default:
                             throw new Exception("Error Building " + b);

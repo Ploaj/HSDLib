@@ -38,6 +38,9 @@
     <ApplicationIcon>dogg.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet, Version=4.1.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
+      <HintPath>..\packages\AssimpNet.4.1.0\lib\net40\AssimpNet.dll</HintPath>
+    </Reference>
     <Reference Include="DirectXTexNet, Version=1.0.0.4, Culture=neutral, PublicKeyToken=67e4f5ed452a4f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\DirectXTexNet.1.0.0-rc4\lib\netstandard2.0\DirectXTexNet.dll</HintPath>
     </Reference>
@@ -79,6 +82,9 @@
     <Compile Include="ContextMenus\FOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\JOBJContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\MapHeadContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -90,6 +96,7 @@
     </Compile>
     <Compile Include="Converters\ConvFOBJ.cs" />
     <Compile Include="Converters\ConvSVG.cs" />
+    <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
@@ -154,6 +161,12 @@
     </Compile>
     <Compile Include="GUI\Plugins\TextureAnimationEditor.Designer.cs">
       <DependentUpon>TextureAnimationEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\PropertyDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\PropertyDialog.Designer.cs">
+      <DependentUpon>PropertyDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\PropertyView.cs">
       <SubType>Form</SubType>
@@ -234,6 +247,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\TextureAnimationEditor.resx">
       <DependentUpon>TextureAnimationEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\PropertyDialog.resx">
+      <DependentUpon>PropertyDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\PropertyView.resx">
       <DependentUpon>PropertyView.cs</DependentUpon>
@@ -334,5 +350,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\DirectXTexNet.1.0.0-rc4\build\DirectXTexNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DirectXTexNet.1.0.0-rc4\build\DirectXTexNet.targets'))" />
+    <Error Condition="!Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssimpNet.4.1.0\build\AssimpNet.targets'))" />
   </Target>
+  <Import Project="..\packages\AssimpNet.4.1.0\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.4.1.0\build\AssimpNet.targets')" />
 </Project>

@@ -10,6 +10,12 @@
         public GXColor4 CLR1;
         public GXVector2 TEX0;
         public GXVector2 TEX1;
+        public GXVector2 TEX2;
+        public GXVector2 TEX3;
+        public GXVector2 TEX4;
+        public GXVector2 TEX5;
+        public GXVector2 TEX6;
+        public GXVector2 TEX7;
 
         public static bool operator ==(GX_Vertex x, GX_Vertex y)
         {

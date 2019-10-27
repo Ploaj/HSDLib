@@ -24,6 +24,32 @@ namespace HSDRawViewer.Converters
             return RgbaToImage(rgba, tobj.ImageData.Width, tobj.ImageData.Height);
         }
 
+
+        /// <summary>
+        /// Import TOBJ from PNG file 
+        /// </summary>
+        /// <returns></returns>
+        public static HSD_TOBJ ImportTOBJFromFile(string filePath, GXTexFmt imgFmt, GXTlutFmt tlutFmt)
+        {
+            var TOBJ = new HSD_TOBJ()
+            {
+                MagFilter = GXTexFilter.GX_LINEAR,
+                HScale = 1,
+                WScale = 1,
+                WrapS = GXWrapMode.CLAMP,
+                WrapT = GXWrapMode.CLAMP,
+                SX = 1,
+                SY = 1,
+                SZ = 1,
+                GXTexGenSrc = 4,
+                Blending = 1
+            };
+
+            InjectBitmap(TOBJ, filePath, imgFmt, tlutFmt);
+
+            return TOBJ;
+        }
+
         /// <summary>
         /// Import TOBJ from PNG file 
         /// </summary>

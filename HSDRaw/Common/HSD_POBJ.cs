@@ -70,7 +70,7 @@ namespace HSDRaw.Common
             }
         }
 
-        public POBJ_FLAG Flags { get => (POBJ_FLAG)_s.GetInt16(0x0C); set => _s.SetInt16(0x0C, (short)value); }
+        public POBJ_FLAG Flags { get => (POBJ_FLAG)_s.GetUInt16(0x0C); set => _s.SetUInt16(0x0C, (ushort)value); }
 
         public int DisplayListSize { get => _s.GetInt16(0x0E) * 32; internal set => _s.SetInt16(0x0E, (short)(value / 32)); }
         
@@ -101,12 +101,11 @@ namespace HSDRaw.Common
             {
                 Flags = Flags & ~POBJ_FLAG.SKIN;
                 Flags = Flags & ~POBJ_FLAG.ENVELOPE;
-                _s.SetData(new byte[4]);
                 if (value != null)
                 {
                     Flags = Flags | POBJ_FLAG.SKIN;
                 }
-                _s.SetReference(0, value);
+                _s.SetReference(0x14, value);
             }
         }
 
@@ -133,7 +132,8 @@ namespace HSDRaw.Common
                     _s.GetCreateReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14).Array = value;
                 }
                 else
-                    _s.SetReference(0x14, null);
+                    if(!Flags.HasFlag(POBJ_FLAG.SKIN))
+                        _s.SetReference(0x14, null);
             }
         }
         
@@ -151,8 +151,10 @@ namespace HSDRaw.Common
             {
                 Attributes = value.Attributes.ToArray();
                 DisplayListBuffer = value.ToBuffer();
-                if(value.Attributes.Find(e=>e.AttributeName == GXAttribName.GX_VA_PNMTXIDX) != null)
+                if (value.Attributes.Find(e => e.AttributeName == GXAttribName.GX_VA_PNMTXIDX) != null)
                     EnvelopeWeights = value.Envelopes.ToArray();
+                else
+                    EnvelopeWeights = null;
             }
         }
 

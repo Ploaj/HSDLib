@@ -55,6 +55,47 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+
+        /// <summary>
+        /// Converts quaternion into euler angles in ZYX order
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public static Vector3 ToEulerAngles(Quaternion q)
+        {
+            Matrix4 mat = Matrix4.CreateFromQuaternion(q);
+            float x, y, z;
+
+            y = (float)Math.Asin(-Clamp(mat.M31, -1, 1));
+
+            if (Math.Abs(mat.M31) < 0.99999)
+            {
+                x = (float)Math.Atan2(mat.M32, mat.M33);
+                z = (float)Math.Atan2(mat.M21, mat.M11);
+            }
+            else
+            {
+                x = 0;
+                z = (float)Math.Atan2(-mat.M12, mat.M22);
+            }
+            return new Vector3(x, y, z);
+        }
+
+
+        /// <summary>
+        /// Clamps value between a minimum and maximum value
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static float Clamp(float v, float min, float max)
+        {
+            if (v < min) return min;
+            if (v > max) return max;
+            return v;
+        }
+
         /// <summary>
         /// 
         /// </summary>

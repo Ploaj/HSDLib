@@ -391,6 +391,16 @@ namespace HSDRaw
             SetBytes(loc, EndianFix(BitConverter.GetBytes(value)));
         }
 
+        public ushort GetUInt16(int loc)
+        {
+            return BitConverter.ToUInt16(EndianFix(GetBytes(loc, 2)), 0);
+        }
+
+        public void SetUInt16(int loc, ushort value)
+        {
+            SetBytes(loc, EndianFix(BitConverter.GetBytes(value)));
+        }
+
         public byte GetByte(int loc)
         {
             return _data[loc];

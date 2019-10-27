@@ -113,6 +113,8 @@ namespace HSDRawViewer.Rendering
 
                 var envelopeWeights = p.EnvelopeWeights;
 
+                var single = p.SingleBoundJOBJ;
+
                 int offset = 0;
                 foreach (var g in dl.Primitives)
                 {
@@ -137,6 +139,12 @@ namespace HSDRawViewer.Rendering
                             tx0.Y += 1;
 
                         // skinning
+                        if(single != null)
+                        {
+                            var t = jobjManager.GetWorldTransform(single);
+                            pos = Vector3.TransformPosition(pos, t);
+                            nrm = Vector3.TransformNormal(nrm, t);
+                        }
                         if (envelopeWeights != null && jobjManager != null)
                         {
                             if (dl.Vertices[offset + i].PNMTXIDX / 3 >= envelopeWeights.Length)
@@ -164,7 +172,7 @@ namespace HSDRawViewer.Rendering
                                 {
                                     var bind = jobjManager.GetBindTransform(en.GetJOBJAt(j));
                                     bindpos += Vector3.TransformPosition(pos, bind) * en.GetWeightAt(j);
-                                    nrmpos += Vector3.TransformPosition(nrm, bind) * en.GetWeightAt(j);
+                                    nrmpos += Vector3.TransformNormal(nrm, bind) * en.GetWeightAt(j);
                                 }
                                 pos = bindpos;
                                 nrm = nrmpos;
@@ -177,6 +185,8 @@ namespace HSDRawViewer.Rendering
                             colr = 1;
 
                         var finalColor = new Vector4(colr, colr, colr, 1) * color;
+
+                        //finalColor.W = 1;
                         
                         GL.TexCoord2(tx0);
                         GL.Color4(finalColor);
@@ -212,7 +222,7 @@ namespace HSDRawViewer.Rendering
                 GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
             }
 
-            var color = mobj.MaterialColor;
+            var color = mobj.Material;
             if (color != null)
             {
             }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace HSDRaw.Common
 {
@@ -63,18 +62,9 @@ namespace HSDRaw.Common
         public float TY { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
         public float TZ { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
 
-        // matrix
+        public HSD_Matrix4x3 InverseWorldTransform { get => _s.GetReference<HSD_Matrix4x3>(0x38); set => _s.SetReference(0x38, value); }
 
         // robj
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        
     }
 }

@@ -43,9 +43,9 @@ namespace HSDRaw.GX
                     {
                         case GXAttribType.GX_DIRECT:
                             if (att.AttributeName == GXAttribName.GX_VA_CLR0)
-                                g.Clr0 = ReadGXClr(Reader, (int)att.CompType);
+                                g.Clr0 = ReadDirectGXColor(Reader, (int)att.CompType);
                             else if (att.AttributeName == GXAttribName.GX_VA_CLR1)
-                                g.Clr1 = ReadGXClr(Reader, (int)att.CompType);
+                                g.Clr1 = ReadDirectGXColor(Reader, (int)att.CompType);
                             else
                                 g.Indices[i] = Reader.ReadByte();
                             break;
@@ -96,9 +96,9 @@ namespace HSDRaw.GX
             }
         }
 
-        private static byte[] ReadGXClr(BinaryReaderExt Reader, int CompType)
+        private static byte[] ReadDirectGXColor(BinaryReaderExt Reader, int CompType)
         {
-            byte[] clr = new byte[] { 1, 1, 1, 1 };
+            byte[] clr = new byte[] { 255, 255, 255, 255 };
             int b;
 
             switch (CompType)
@@ -108,17 +108,19 @@ namespace HSDRaw.GX
                     clr[0] = (byte)((((b >> 11) & 0x1F) << 3) | (((b >> 11) & 0x1F) >> 2));
                     clr[1] = (byte)((((b >> 5) & 0x3F) << 2) | (((b >> 5) & 0x3F) >> 4));
                     clr[2] = (byte)((((b) & 0x1F) << 3) | (((b) & 0x1F) >> 2));
+                    clr[3] = 255;
                     break;
                 case 1: // GX_RGB888
                     clr[0] = Reader.ReadByte();
                     clr[1] = Reader.ReadByte();
                     clr[2] = Reader.ReadByte();
+                    clr[3] = 255;
                     break;
                 case 2: // GX_RGBX888
                     clr[0] = Reader.ReadByte();
                     clr[1] = Reader.ReadByte();
                     clr[2] = Reader.ReadByte();
-                    Reader.ReadByte();
+                    clr[3] = Reader.ReadByte();
                     break;
                 case 3: // GX_RGBA4
                     b = Reader.ReadUInt16();
@@ -149,33 +151,33 @@ namespace HSDRaw.GX
         
         private static void WriteGXClr(byte[] clr, BinaryWriterExt d, GXCompType type)
         {
-            switch ((int)type)
+            switch (type)
             {
-                case 0: // GX_RGB565
+                case GXCompType.RGB565: // GX_RGB565
                     d.Write((short)ClrTo565(clr));
                     break;
-                case 1: // GX_RGB888
+                case GXCompType.RGB8: // GX_RGB888
                     d.Write(clr[0]);
                     d.Write(clr[1]);
                     d.Write(clr[2]);
                     break;
-                case 2: // GX_RGBX888
+                case GXCompType.RGBX8: // GX_RGBX888
                     d.Write(clr[0]);
                     d.Write(clr[1]);
                     d.Write(clr[2]);
-                    d.Write(0);
+                    d.Write(clr[3]);
                     break;
-                case 3: // GX_RGBA4
+                case GXCompType.RGBA4: // GX_RGBA4
                     short s = (short)((((clr[0] >> 4) & 0xF) << 12) | (((clr[1] >> 4) & 0xF) << 8) | (((clr[2] >> 4) & 0xF) << 4) | (((clr[3] >> 4) & 0xF)));
                     d.Write((ushort)s);
                     break;
-                case 4: // GX_RGBA6
+                case GXCompType.RGBA6: // GX_RGBA6
                     int three = (((clr[0] >> 2) << 18) | ((clr[1] >> 2) << 12) | ((clr[2] >> 2) << 6) | (clr[3] >> 2));
                     d.Write((byte)((three >> 16) & 0xFF));
                     d.Write((byte)((three >> 8) & 0xFF));
                     d.Write((byte)((three) & 0xFF));
                     break;
-                case 5: // GX_RGBX888
+                case GXCompType.RGBA8: // GX_RGBa888
                     d.Write(clr[0]);
                     d.Write(clr[1]);
                     d.Write(clr[2]);

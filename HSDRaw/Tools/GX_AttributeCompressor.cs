@@ -14,7 +14,7 @@ namespace HSDRaw.Tools
         /// </summary>
         /// <param name="Attribute"></param>
         /// <param name="Values"></param>
-        public static void GenerateBuffer(GX_Attribute Attribute, List<double[]> Values)
+        public static void GenerateBuffer(GX_Attribute Attribute, List<float[]> Values)
         {
             switch (Attribute.AttributeName)
             {
@@ -33,7 +33,7 @@ namespace HSDRaw.Tools
             using (BinaryWriterExt Writer = new BinaryWriterExt(o))
             {
                 Writer.BigEndian = true;
-                foreach (double[] ob in Values)
+                foreach (float[] ob in Values)
                 {
                     foreach (var v in ob)
                     {
@@ -53,7 +53,7 @@ namespace HSDRaw.Tools
 
         /// <summary>
         /// </summary>
-        private static void OptimizeCompression(GX_Attribute attr, List<double[]> values)
+        private static void OptimizeCompression(GX_Attribute attr, List<float[]> values)
         {
             // no need to optimize direct
             if (attr.AttributeType == GXAttribType.GX_DIRECT)
@@ -77,6 +77,10 @@ namespace HSDRaw.Tools
                 case GXAttribName.GX_VA_TEX7:
                     attr.CompCount = GXCompCnt.TexST;
                     break;
+                case GXAttribName.GX_VA_CLR0:
+                case GXAttribName.GX_VA_CLR1:
+                    attr.CompCount = GXCompCnt.ClrRGB;
+                    break;
                 default:
                     throw new NotSupportedException($"{attr.AttributeName} not supported for optimizing");
             }
@@ -84,7 +88,7 @@ namespace HSDRaw.Tools
             // get normalized value range
             double max = 0;
             bool signed = false;
-            foreach (double[] v in values)
+            foreach (float[] v in values)
             {
                 foreach(var val in v)
                 {
@@ -261,6 +265,17 @@ namespace HSDRaw.Tools
                             return 1;
                     }
                     break;
+                case GXAttribName.GX_VA_CLR0:
+                case GXAttribName.GX_VA_CLR1:
+                    if(cc == GXCompCnt.ClrRGBA)
+                    {
+                        return 4;
+                    }
+                    if (cc == GXCompCnt.ClrRGB)
+                    {
+                        return 3;
+                    }
+                    break;
             }
 
             return 0;
@@ -274,9 +289,9 @@ namespace HSDRaw.Tools
         /// <param name="Value"></param>
         /// <param name="Type"></param>
         /// <param name="Scale"></param>
-        private static void WriteData(BinaryWriterExt Writer, double Value, GXCompType Type, float Scale)
+        private static void WriteData(BinaryWriterExt Writer, float Value, GXCompType Type, float Scale)
         {
-            double Scaled = Value * (double)Math.Pow(2, Scale);
+            double Scaled = Value * Math.Pow(2, Scale);
             switch (Type)
             {
                 case GXCompType.UInt8:

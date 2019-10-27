@@ -58,7 +58,7 @@ namespace HSDRaw.Common
 
         public HSD_TOBJ Textures { get => _s.GetReference<HSD_TOBJ>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSD_Material MaterialColor { get => _s.GetReference<HSD_Material>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSD_Material Material { get => _s.GetReference<HSD_Material>(0x0C); set => _s.SetReference(0x0C, value); }
 
         //public uint UnusedRenderOffset { get; set; }
 
@@ -88,9 +88,9 @@ namespace HSDRaw.Common
         public byte SPC_B { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
         public byte SPC_A { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
 
-        public uint AmbientColorABGR { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
-        public uint DiffuseColorABGR { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
-        public uint SpecularColorABGR { get => (uint)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
+        public uint AmbientColorRGBA { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
+        public uint DiffuseColorRGBA { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
+        public uint SpecularColorRGBA { get => (uint)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
         
         public float Alpha { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
 

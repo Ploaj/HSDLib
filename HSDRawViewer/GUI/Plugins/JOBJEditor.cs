@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Collections.Generic;
 using HSDRawViewer.GUI.Extra;
+using HSDRawViewer.Converters;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -96,7 +97,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             public bool HasPixelProcessing { get => DOBJ.Mobj?.PEDesc != null; }
 
-            public bool HasMaterialColor { get => DOBJ.Mobj?.MaterialColor != null; }
+            public bool HasMaterialColor { get => DOBJ.Mobj?.Material != null; }
 
             public RENDER_MODE MOBJFlags { get => DOBJ.Mobj.RenderFlags; set => DOBJ.Mobj.RenderFlags = value; }
 
@@ -221,6 +222,16 @@ namespace HSDRawViewer.GUI.Plugins
                     dobjList[listDOBJ.SelectedIndex] = dobjList[listDOBJ.SelectedIndex];
                 }
             }
+        }
+
+        private void vertexColorsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            JOBJManager.DOBJManager.RenderVertexColor = vertexColorsToolStripMenuItem.Checked;
+        }
+
+        private void importModelFromFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModelImporter.ReplaceModelFromFile(root);
         }
     }
 }

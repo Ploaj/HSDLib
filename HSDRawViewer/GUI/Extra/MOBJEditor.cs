@@ -69,7 +69,7 @@ namespace HSDRawViewer.GUI.Extra
             }
 
             // load material color
-            var mc = mobj.MaterialColor;
+            var mc = mobj.Material;
             buttonAmbient.BackColor = Color.FromArgb(mc.AMB_A, mc.AMB_R, mc.AMB_G, mc.AMB_B);
             buttonDiffuse.BackColor = Color.FromArgb(mc.DIF_A, mc.DIF_R, mc.DIF_G, mc.DIF_B);
             buttonSpecular.BackColor = Color.FromArgb(mc.SPC_A, mc.SPC_R, mc.SPC_G, mc.SPC_B);
@@ -117,7 +117,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             var col = GetColor(buttonAmbient.BackColor);
 
-            _mobj.MaterialColor.AmbientColorABGR = ColorToABGR(col);
+            _mobj.Material.AmbientColorRGBA = ColorToRGBA(col);
 
             buttonAmbient.BackColor = col;
         }
@@ -126,7 +126,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             var col = GetColor(buttonDiffuse.BackColor);
 
-            _mobj.MaterialColor.DiffuseColorABGR = ColorToABGR(col);
+            _mobj.Material.DiffuseColorRGBA = ColorToRGBA(col);
 
             buttonDiffuse.BackColor = col;
         }
@@ -135,14 +135,14 @@ namespace HSDRawViewer.GUI.Extra
         {
             var col = GetColor(buttonSpecular.BackColor);
 
-            _mobj.MaterialColor.SpecularColorABGR = ColorToABGR(col);
+            _mobj.Material.SpecularColorRGBA = ColorToRGBA(col);
 
             buttonSpecular.BackColor = col;
         }
 
-        private uint ColorToABGR(Color col)
+        private uint ColorToRGBA(Color col)
         {
-            return (uint)((col.A << 24) | (col.B << 16) | (col.G << 8) | (col.R));
+            return (uint)((col.R << 24) | (col.G << 16) | (col.B << 8) | (col.A));
         }
 
         private Color GetColor(Color defaultColor)
@@ -162,10 +162,10 @@ namespace HSDRawViewer.GUI.Extra
             float val;
             if(float.TryParse(tbAlpha.Text, out val))
             {
-                _mobj.MaterialColor.Alpha = val;
+                _mobj.Material.Alpha = val;
             }
             else
-                tbAlpha.Text = _mobj.MaterialColor.Alpha.ToString();
+                tbAlpha.Text = _mobj.Material.Alpha.ToString();
         }
 
         private void tbShine_TextChanged(object sender, EventArgs e)
@@ -173,10 +173,10 @@ namespace HSDRawViewer.GUI.Extra
             float val;
             if (float.TryParse(tbShine.Text, out val))
             {
-                _mobj.MaterialColor.Shininess = val;
+                _mobj.Material.Shininess = val;
             }
             else
-                tbShine.Text = _mobj.MaterialColor.Shininess.ToString();
+                tbShine.Text = _mobj.Material.Shininess.ToString();
         }
 
         private void listTexture_SelectedIndexChanged(object sender, EventArgs e)
