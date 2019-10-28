@@ -13,7 +13,6 @@ using HSDRawViewer.GUI;
 
 namespace HSDRawViewer.Converters
 {
-
     public enum ShadingType
     {
         None,
@@ -91,7 +90,6 @@ namespace HSDRawViewer.Converters
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -150,7 +148,12 @@ namespace HSDRawViewer.Converters
 
             // get root of skeleton
             rootjobj = rootjobj.Child;
+
             rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;
+
+            // no need for excess nodes
+            if (filePath.ToLower().EndsWith(".obj"))
+                rootjobj.Next = null;
 
             // process mesh
             foreach (var mesh in cache.MeshNodes)

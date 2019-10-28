@@ -1,0 +1,514 @@
+﻿- code: 0
+  name: End Of Script
+
+- code: 1
+  name: Synchronous Timer
+  parameters:
+  - name: Frame
+    bitCount: 26
+
+- code: 2
+  name: Asynchronous Timer
+  parameters:
+  - name: Frame
+    bitCount: 26
+
+- code: 3
+  name: Set Loop
+  parameters:
+  - name: Count
+    bitCount: 26
+
+- code: 4
+  name: Execute Loop
+
+- code: 5
+  name: Subroutine
+  parameters:
+  - name: Target
+    bitCount: 26
+  - name: Pointer
+    bitCount: 32
+    hex: true
+
+- code: 6
+  name: Return
+
+- code: 7
+  name: Go To
+  parameters:
+  - name: Target
+    bitCount: 26
+  - name: Pointer
+    bitCount: 32
+    hex: true
+
+- code: 8
+  name: Set Timer Animation
+
+- code: 9
+  name: Unknown0x09
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 10
+  name: Graphic Effect
+  parameters:
+  - name: Unk1
+    bitCount: 8
+  - name: Unk2
+    bitCount: 18
+  - name: GFXID
+    bitCount: 10
+  - name: Boneid
+    bitCount: 6
+  - name: Unk2
+    bitCount: 16
+  - name: Z
+    bitCount: 16
+  - name: Y
+    bitCount: 16
+  - name: X
+    bitCount: 16
+  - name: Range Z
+    bitCount: 16
+  - name: Range Y
+    bitCount: 16
+  - name: Range X
+    bitCount: 16
+
+- code: 11
+  name: Create Hitbox
+  parameters:
+  - name: ID
+    bitCount: 3
+  - name: Unk1
+    bitCount: 5
+  - name: Bone
+    bitCount: 7
+  - name: Unk2
+    bitCount: 2
+  - name: Damage
+    bitCount: 9
+  - name: Size
+    bitCount: 16
+  - name: Z
+    bitCount: 16
+  - name: Y
+    bitCount: 16
+  - name: X
+    bitCount: 16
+  - name: Angle
+    bitCount: 9
+  - name: KBG
+    bitCount: 9
+  - name: Weight Set KB
+    bitCount: 9
+  - name: Unk3
+    bitCount: 3
+  - name: Hitbox Interaction
+    bitCount: 2
+  - name: BKB
+    bitCount: 9
+  - name: Element
+    bitCount: 5
+  - name: Unk4
+    bitCount: 1
+  - name: Shield Damage
+    bitCount: 7
+  - name: Sound Effect
+    bitCount: 8
+  - name: Hurtbox Interaction
+    bitCount: 2
+    enums:
+    - Test1
+    - Test2
+    - Test3
+    - Test4
+
+- code: 12
+  name: Adjust Hitbox Damage
+  parameters:
+  - name: Hitbox ID
+    bitCount: 3
+  - name: Damage
+    bitCount: 23
+
+- code: 13
+  name: Adjust Hitbox Size
+  parameters:
+  - name: Hitbox ID
+    bitCount: 3
+  - name: Size
+    bitCount: 23
+
+- code: 14
+  name: Set Hitbox Flags
+  parameters:
+  - name: Hitbox ID
+    bitCount: 24
+  - name: Flags
+    bitCount: 2
+
+- code: 15
+  name: Remove Hitbox
+
+- code: 16
+  name: Clear Hitboxes
+  parameters:
+  - name: None
+    bitCount: 26
+
+- code: 17
+  name: Sound Effect
+  parameters:
+  - name: Unk1
+    bitCount: 32
+  - name: Unk2
+    bitCount: 6
+  - name: SFX
+    bitCount: 20
+    hex: true
+  - name: Offset
+    bitCount: 32
+    hex: true
+
+- code: 18
+  name: Random Smash SFX
+  parameters:
+  - name: Value
+    bitCount: 26
+
+- code: 19
+  name: Autocancel
+  parameters:
+  - name: Flag
+    bitCount: 2
+  - name: Value
+    bitCount: 24
+
+- code: 20
+  name: Reverse Direction
+
+- code: 21
+  name: Unknown0x15
+  parameters:
+  - name: Value
+    bitCount: 26
+    hex: true
+
+- code: 22
+  name: Unknown0x16
+  parameters:
+  - name: Value
+    bitCount: 26
+    hex: true
+
+- code: 23
+  name: Allow Interrupt
+  parameters:
+  - name: Value
+    bitCount: 26
+    hex: true
+
+- code: 24
+  name: Projectile Flag
+  parameters:
+  - name: Value
+    bitCount: 26
+    hex: true
+
+- code: 25
+  name: Unknown0x19
+  parameters:
+  - name: Value
+    bitCount: 26
+    hex: true
+
+- code: 26
+  name: Set Body Collision State
+  parameters:
+  - name: Unknown
+    bitCount: 24
+  - name: Body State
+    bitCount: 2
+
+- code: 27
+  name: Body Collision Status
+  parameters:
+  - name: Unknown
+    bitCount: 26
+    hex: true
+
+- code: 28
+  name: Set Bone Collision State
+  parameters:
+  - name: Bone Id
+    bitCount: 8
+  - name: Collision State
+    bitCount: 18
+
+- code: 29
+  name: Enable Jab Followup
+
+- code: 30
+  name: Toggle Jab Follow Up
+
+- code: 31
+  name: Change Model State
+  parameters:
+  - name: Struct ID
+    bitCount: 6
+  - name: Unknown
+    bitCount: 12
+  - name: Object ID
+    bitCount: 8
+
+- code: 32
+  name: Revert Models
+
+- code: 33
+  name: Remove Models
+
+- code: 34
+  name: Throw
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+    hex: true
+  - name: Unknown2
+    bitCount: 32
+    hex: true
+  - name: Unknown3
+    bitCount: 32
+    hex: true
+
+- code: 35
+  name: Held Item Invisibility
+  parameters:
+  - name: Unknown
+    bitCount: 25
+    hex: true
+  - name: Flag
+    bitCount: 1
+
+- code: 36
+  name: Body Article Invisibility
+  parameters:
+  - name: Unknown
+    bitCount: 25
+    hex: true
+  - name: Flag
+    bitCount: 1
+
+- code: 37
+  name: Character Invisibility
+  parameters:
+  - name: Unknown
+    bitCount: 25
+    hex: true
+  - name: Flag
+    bitCount: 1
+
+- code: 38
+  name: Pseudo Random Sound Effect
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+    hex: true
+  - name: Unknown2
+    bitCount: 32
+    hex: true
+  - name: Unknown3
+    bitCount: 32
+    hex: true
+  - name: Unknown4
+    bitCount: 32
+    hex: true
+  - name: Unknown5
+    bitCount: 32
+    hex: true
+  - name: Unknown6
+    bitCount: 32
+    hex: true
+  - name: Unknown7
+    bitCount: 32
+    hex: true
+
+- code: 39
+  name: Unknwon0x27
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+    hex: true
+  - name: Unknown2
+    bitCount: 32
+    hex: true
+  - name: Unknown3
+    bitCount: 32
+    hex: true
+  - name: Unknown4
+    bitCount: 32
+    hex: true
+
+- code: 40
+  name: Animate Texture
+  parameters:
+  - name: Material Flag
+    bitCount: 1
+  - name: Material Index
+    bitCount: 7
+  - name: Frame Flags
+    bitCount: 7
+  - name: Frame
+    bitCount: 11
+
+- code: 41
+  name: Animate Model
+  parameters:
+  - name: Body Part
+    bitCount: 10
+  - name: State
+    bitCount: 4
+  - name: Unk
+    bitCount: 12
+
+- code: 42
+  name: Unknown0x2A
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 43
+  name: Rumble
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 44
+  name: Unknown0x2A
+  parameters:
+  - name: Unknown
+    bitCount: 25
+  - name: Flag
+    bitCount: 1
+
+- code: 45
+  name: Body Aura
+  parameters:
+  - name: Unknown
+    bitCount: 8
+  - name: Duration
+    bitCount: 18
+
+- code: 46
+  name: Remove Color Overlay
+
+- code: 47
+  name: Unknown0x2A
+  parameters:
+  - name: Unknwon
+    bitCount: 26
+
+- code: 48
+  name: Sword Trail
+  parameters:
+  - name: Beam Sword
+    bitCount: 1
+  - name: Unknown
+    bitCount: 17
+  - name: Render Status
+    bitCount: 8
+
+- code: 49
+  name: Enable Ragdoll
+  parameters:
+  - name: Bone ID
+    bitCount: 26
+
+- code: 50
+  name: Self Damage
+  parameters:
+  - name: Unknown
+    bitCount: 10
+  - name: Damage
+    bitCount: 16
+
+- code: 51
+  name: Continuation Control
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 52
+  name: Unknown0x34
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 53
+  name: Footstep Effect
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+    hex: true
+  - name: Unknown2
+    bitCount: 32
+    hex: true
+
+- code: 54
+  name: Landing Effect
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+    hex: true
+  - name: Unknown2
+    bitCount: 32
+    hex: true
+  - name: Unknown3
+    bitCount: 32
+    hex: true
+
+- code: 55
+  name: Start Smash Charge
+  parameters:
+  - name: Unknown
+    bitCount: 2
+  - name: Charge Frames
+    bitCount: 8
+  - name: Charge Rate
+    bitCount: 16
+  - name: Visual Effect
+    bitCount: 8
+  - name: Unknown
+    bitCount: 24
+
+- code: 56
+  name: Unknown
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 57
+  name: Aesthetic Wind Effect
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+    hex: true
+  - name: Unknown2
+    bitCount: 32
+    hex: true
+  - name: Unknown3
+    bitCount: 32
+    hex: true
+  - name: Unknown4
+    bitCount: 32
+    hex: true
+
+- code: 58
+  name: Unknown0x3A
+  parameters:
+  - name: Unknown
+    bitCount: 26
+    hex: true

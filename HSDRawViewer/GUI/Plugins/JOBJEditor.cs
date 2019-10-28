@@ -116,6 +116,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             treeJOBJ.Nodes.Clear();
             dobjList.Clear();
+            jobjToIndex.Clear();
 
             LoadJOBJ(root);
 

@@ -68,6 +68,9 @@
     <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.1.6643.41644, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WeifenLuo.WinFormsUI.Docking.2.1.0\lib\net20\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
+    <Reference Include="YamlDotNet, Version=8.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.8.0.0\lib\net45\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContextMenus\CollDataContextMenu.cs">
@@ -216,6 +219,17 @@
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Tools\FileIO.cs" />
+    <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\ts_subtract.png" />
+    <None Include="Resources\ts_add.png" />
+    <None Include="Resources\ts_up.png" />
+    <None Include="Resources\ts_down.png" />
+    <None Include="Melee\subactions.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Melee\subactions_custom.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\ts_stop.png" />
     <None Include="Resources\ts_play.png" />
     <EmbeddedResource Include="Form1.resx">

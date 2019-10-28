@@ -7,12 +7,17 @@ namespace HSDRaw.Tools.Melee
     {
         private byte[] bytes;
         private int i = 0;
+
         public Bitreader(byte[] b)
         {
             this.bytes = b;
         }
+
         public int Read(int size)
         {
+            if (size > 32)
+                throw new OutOfMemoryException("Cannot read values great than " + int.MaxValue.ToString());
+
             int o = 0;
             for (int j = 0; j < size; j++)
             {
@@ -30,8 +35,10 @@ namespace HSDRaw.Tools.Melee
     public class BitWriter
     {
         public List<byte> Bytes = new List<byte>();
+
         int i = 0;
-        public void Write(int b, int size)
+
+        public void Write(long b, int size)
         {
             for (int j = 0; j < size; j++)
             {

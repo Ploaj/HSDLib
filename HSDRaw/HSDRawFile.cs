@@ -187,7 +187,8 @@ namespace HSDRaw
                     var innerOffsets = offsetToInnerOffsets[str.Key];
                     for(int i = 0; i < offsets.Count; i++)
                     {
-                        str.Value.SetReferenceStruct(innerOffsets[i] - str.Key, offsetToStruct[offsets[i]]);
+                        if(offsetToStruct.ContainsKey(offsets[i]))
+                            str.Value.SetReferenceStruct(innerOffsets[i] - str.Key, offsetToStruct[offsets[i]]);
                     }
 
                     _structCache.Add(str.Value);

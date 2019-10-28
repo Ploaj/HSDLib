@@ -273,6 +273,26 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ts_add {
+            get {
+                object obj = ResourceManager.GetObject("ts_add", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_down {
+            get {
+                object obj = ResourceManager.GetObject("ts_down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ts_play {
             get {
                 object obj = ResourceManager.GetObject("ts_play", resourceCulture);
@@ -286,6 +306,26 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ts_stop {
             get {
                 object obj = ResourceManager.GetObject("ts_stop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_subtract {
+            get {
+                object obj = ResourceManager.GetObject("ts_subtract", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_up {
+            get {
+                object obj = ResourceManager.GetObject("ts_up", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Windows.Forms;
 using HSDRaw;
-using HSDRaw.Tools.Melee;
 using System.Collections.Generic;
 using HSDRaw.Melee.Pl;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Plugins;
 using System.Drawing;
 using System.Text;
+using HSDRawViewer.Tools;
+using HSDRaw.Tools.Melee;
+using System.Linq;
 
 namespace HSDRawViewer.GUI
 {
@@ -21,7 +23,7 @@ namespace HSDRawViewer.GUI
 
             public override string ToString()
             {
-                return Text;
+                return System.Text.RegularExpressions.Regex.Replace(Text.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "");
             }
         }
 
@@ -37,7 +39,7 @@ namespace HSDRawViewer.GUI
                 {
                     Bitreader r = new Bitreader(data);
 
-                    var sa = ActionCommon.GetMeleeCMDAction((byte)r.Read(6));
+                    var sa = SubactionManager.GetSubaction((byte)r.Read(6));
 
                     return sa.Name;
                 }
@@ -49,31 +51,42 @@ namespace HSDRawViewer.GUI
                 {
                     Bitreader r = new Bitreader(data);
 
-                    var sa = ActionCommon.GetMeleeCMDAction((byte)r.Read(6));
+                    var sa = SubactionManager.GetSubaction((byte)r.Read(6));
 
                     StringBuilder sb = new StringBuilder();
 
-                    for (int i = 0; i < sa.BMap.Count; i++)
+                    for (int i = 0; i < sa.Parameters.Length; i++)
                     {
-                        if (sa.BMap[i].Name.Contains("None"))
+                        var param = sa.Parameters[i];
+
+                        if (param.Name.Contains("None"))
                             continue;
 
-                        var value = r.Read(sa.BMap[i].Count);
+                        var value = r.Read(param.BitCount);
 
-                        if (sa.BMap[i].Name.Contains("Pointer"))
+                        if (param.IsPointer)
                             sb.Append("\tPOINTER->(Edit To View)");
                         else
                             sb.Append("\t" + 
-                                sa.BMap[i].Name + 
+                                param.Name + 
                                 " : " + 
-                                (sa.BMap[i].Hex ? value.ToString("X") : value.ToString()));
+                                (param.Hex ? value.ToString("X") : value.ToString()));
 
-                        if (i != sa.BMap.Count - 1)
+                        if (i != sa.Parameters.Length - 1)
                             sb.AppendLine("");
                     }
 
                     return sb.ToString();
                 }
+            }
+
+            public SubActionScript Clone()
+            {
+                return new SubActionScript()
+                {
+                    data = (byte[])data.Clone(),
+                    Reference = Reference
+                };
             }
 
             public override string ToString()
@@ -201,7 +214,7 @@ namespace HSDRawViewer.GUI
             subActionList.Items.Clear();
             for (int i = 0; i < data.Length;)
             {
-                var sa = ActionCommon.GetMeleeCMDAction((byte)(data[i] >> 2));
+                var sa = SubactionManager.GetSubaction((byte)(data[i] >> 2));
 
                 var sas = new SubActionScript();
                 
@@ -286,47 +299,6 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void subActionList_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (subActionList.SelectedItem == null || e.Clicks == 2) return;
-            subActionList.DoDragDrop(subActionList.SelectedItem, DragDropEffects.Move);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void subActionList_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effect = DragDropEffects.Move;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void subActionList_DragDrop(object sender, DragEventArgs e)
-        {
-            Point point = subActionList.PointToClient(new Point(e.X, e.Y));
-            int index = subActionList.IndexFromPoint(point);
-            if (index < 0) index = subActionList.Items.Count - 1;
-            object data = subActionList.SelectedItem;
-            if(subActionList.Items.IndexOf(data) != index)
-            {
-                subActionList.Items.Remove(data);
-                subActionList.Items.Insert(index, data);
-
-                SaveSubactionChanges();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             var data = new byte[] { 0x18, 0, 0, 0 };
@@ -349,6 +321,8 @@ namespace HSDRawViewer.GUI
         private void subActionList_SelectedIndexChanged(object sender, EventArgs e)
         {
             //buttonRemove.Enabled = subActionList.SelectedIndex != -1;
+            //buttonUp.Enabled = subActionList.SelectedIndex != -1;
+            //buttonDown.Enabled = subActionList.SelectedIndex != -1;
         }
 
         /// <summary>
@@ -373,8 +347,16 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonRemove_Click(object sender, EventArgs e)
         {
-            if(subActionList.SelectedItem != null)
-                subActionList.Items.Remove(subActionList.SelectedItem);
+            subActionList.BeginUpdate();
+            if (subActionList.SelectedItems.Count != 0)
+            {
+                var list = new List<object>();
+                foreach (var v in subActionList.SelectedItems)
+                    list.Add(v);
+                foreach(var v in list)
+                    subActionList.Items.Remove(v);
+            }
+            subActionList.EndUpdate();
 
             SaveSubactionChanges();
         }
@@ -403,7 +385,7 @@ namespace HSDRawViewer.GUI
                     {
                         sa.data = p.Data;
 
-                        if (sa.data.Length > 0 && ActionCommon.GetMeleeCMDAction((byte)(sa.data[0] >> 2)).HasPointer)
+                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0] >> 2)).HasPointer)
                             sa.Reference = p.Reference;
                         else
                             sa.Reference = null;
@@ -454,6 +436,71 @@ namespace HSDRawViewer.GUI
                     e.Graphics.DrawString(subActionList.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
 
             }
+        }
+
+        // move up
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            subActionList.BeginUpdate();
+            int[] indexes = subActionList.SelectedIndices.Cast<int>().ToArray();
+            if (indexes.Length > 0 && indexes[0] > 0)
+            {
+                for (int i = 0; i < subActionList.Items.Count; ++i)
+                {
+                    if (indexes.Contains(i))
+                    {
+                        object moveItem = subActionList.Items[i];
+                        subActionList.Items.Remove(moveItem);
+                        subActionList.Items.Insert(i - 1, moveItem);
+                        subActionList.SetSelected(i - 1, true);
+                    }
+                }
+            }
+            subActionList.EndUpdate();
+            SaveSubactionChanges();
+        }
+
+        private void buttonDown_Click(object sender, EventArgs e)
+        {
+            subActionList.BeginUpdate();
+            int[] indexes = subActionList.SelectedIndices.Cast<int>().ToArray();
+            if (indexes.Length > 0 && indexes[indexes.Length - 1] < subActionList.Items.Count - 1)
+            {
+                for (int i = subActionList.Items.Count - 1; i > -1; --i)
+                {
+                    if (indexes.Contains(i))
+                    {
+                        object moveItem = subActionList.Items[i];
+                        subActionList.Items.Remove(moveItem);
+                        subActionList.Items.Insert(i + 1, moveItem);
+                        subActionList.SetSelected(i + 1, true);
+                    }
+                }
+            }
+            subActionList.EndUpdate();
+            SaveSubactionChanges();
+        }
+
+        private List<SubActionScript> CopiedScripts = new List<SubActionScript>();
+
+        private void buttonCopy_Click(object sender, EventArgs e)
+        {
+            CopiedScripts.Clear();
+            foreach (SubActionScript scr in subActionList.SelectedItems)
+                CopiedScripts.Add(scr);
+            CopiedScripts.Reverse();
+        }
+
+        private void buttonPaste_Click(object sender, EventArgs e)
+        {
+            var index = subActionList.SelectedIndex + 1;
+            if (index == -1)
+                index = 0;
+            foreach (var v in CopiedScripts)
+            {
+                subActionList.Items.Insert(index, v.Clone());
+            }
+            SaveSubactionChanges();
         }
     }
 }
