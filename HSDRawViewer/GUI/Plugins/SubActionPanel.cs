@@ -21,8 +21,6 @@ namespace HSDRawViewer.GUI.Plugins
 
             InitializeComponent();
 
-            CenterToScreen();
-
             foreach(var v in ActionCommon.SubActions)
             {
                 comboBox1.Items.Add(v.Name);
@@ -68,6 +66,10 @@ namespace HSDRawViewer.GUI.Plugins
 
                 (panel1.Controls[sa.BMap.Count - 1 - i].Controls[0] as NumericUpDown).Value = value;
             }
+
+            Height = panel1.Controls.Count * 24 + 120;
+            
+            CenterToScreen();
         }
 
         private void CreateParamEditor(MeleeCMDAction action)
@@ -89,7 +91,7 @@ namespace HSDRawViewer.GUI.Plugins
                 group.Height = 24;
 
                 NumericUpDown nud = new NumericUpDown();
-                nud.Maximum = ((1L << p.Count) - 1);
+                nud.Maximum = ((1L << p.Count) - 1L);
                 nud.Minimum = 0;
                 nud.Dock = DockStyle.Fill;
 

@@ -9,6 +9,8 @@ namespace HSDRawViewer.GUI
         {
             InitializeComponent();
 
+            CenterToScreen();
+
             Text = name;
             propertyGrid1.SelectedObject = propertyObject;
         }

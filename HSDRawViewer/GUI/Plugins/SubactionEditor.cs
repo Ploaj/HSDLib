@@ -7,6 +7,7 @@ using HSDRaw.Melee.Pl;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Plugins;
 using System.Drawing;
+using System.Text;
 
 namespace HSDRawViewer.GUI
 {
@@ -30,7 +31,7 @@ namespace HSDRawViewer.GUI
 
             public HSDStruct Reference;
 
-            public string Text
+            public string Name
             {
                 get
                 {
@@ -38,32 +39,46 @@ namespace HSDRawViewer.GUI
 
                     var sa = ActionCommon.GetMeleeCMDAction((byte)r.Read(6));
 
-                    string name = sa.Name + "(";
+                    return sa.Name;
+                }
+            }
+            
+            public string Parameters
+            {
+                get
+                {
+                    Bitreader r = new Bitreader(data);
+
+                    var sa = ActionCommon.GetMeleeCMDAction((byte)r.Read(6));
+
+                    StringBuilder sb = new StringBuilder();
 
                     for (int i = 0; i < sa.BMap.Count; i++)
                     {
                         if (sa.BMap[i].Name.Contains("None"))
                             continue;
+
                         var value = r.Read(sa.BMap[i].Count);
 
                         if (sa.BMap[i].Name.Contains("Pointer"))
-                        {
-                            name += "POINTER";
-                        }
+                            sb.Append("\tPOINTER->(Edit To View)");
                         else
-                            name += sa.BMap[i].Name + "=" + (sa.BMap[i].Hex ? value.ToString("X") : value.ToString());
+                            sb.Append("\t" + 
+                                sa.BMap[i].Name + 
+                                " : " + 
+                                (sa.BMap[i].Hex ? value.ToString("X") : value.ToString()));
 
                         if (i != sa.BMap.Count - 1)
-                            name += ", ";
+                            sb.AppendLine("");
                     }
 
-                    return name + ")";
+                    return sb.ToString();
                 }
             }
 
             public override string ToString()
             {
-                return Text;
+                return Parameters;
             }
         }
 
@@ -412,6 +427,32 @@ namespace HSDRawViewer.GUI
             {
                 Console.WriteLine(a.Text + " " + actionList.Items.IndexOf(a));
                 actionList.SelectedIndex = actionList.Items.IndexOf(a);
+            }
+        }
+
+        private void subActionList_MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            if(e.Index != -1 && subActionList.Items[e.Index] is SubActionScript script)
+            {
+                var length = script.Parameters.Split('\n').Length;
+                e.ItemHeight = subActionList.Font.Height * (script.Parameters.Equals("") ? 1 : length + 1);
+            }
+        }
+
+        private void subActionList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            if(e.Index != -1)
+            {
+                if(subActionList.Items[e.Index] is SubActionScript script)
+                {
+                    e.Graphics.DrawString(e.Index + ". " + script.Name, e.Font, new SolidBrush(Color.DarkBlue), e.Bounds);
+                    var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height), new Size(e.Bounds.Width, e.Bounds.Height));
+                    e.Graphics.DrawString(script.Parameters, e.Font, new SolidBrush(e.ForeColor), bottomRect);
+                }
+                else
+                    e.Graphics.DrawString(subActionList.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
+
             }
         }
     }

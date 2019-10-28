@@ -71,6 +71,9 @@ namespace HSDRawViewer
             this.Text = Text;
             Accessor = accessor;
 
+            if (Accessor is HSD_JOBJ jobj && jobj.ClassName != null)
+                Text = jobj.ClassName + ":" + Text;
+
             if (typeToImageKey.ContainsKey(accessor.GetType()))
             {
                 ImageKey = typeToImageKey[accessor.GetType()];

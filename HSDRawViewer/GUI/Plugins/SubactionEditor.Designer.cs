@@ -78,13 +78,17 @@
             // 
             this.subActionList.AllowDrop = true;
             this.subActionList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.subActionList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.subActionList.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.subActionList.FormattingEnabled = true;
+            this.subActionList.HorizontalScrollbar = true;
             this.subActionList.ItemHeight = 16;
             this.subActionList.Location = new System.Drawing.Point(3, 70);
             this.subActionList.Name = "subActionList";
             this.subActionList.Size = new System.Drawing.Size(355, 243);
             this.subActionList.TabIndex = 0;
+            this.subActionList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.subActionList_DrawItem);
+            this.subActionList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.subActionList_MeasureItem);
             this.subActionList.SelectedIndexChanged += new System.EventHandler(this.subActionList_SelectedIndexChanged);
             this.subActionList.DragDrop += new System.Windows.Forms.DragEventHandler(this.subActionList_DragDrop);
             this.subActionList.DragOver += new System.Windows.Forms.DragEventHandler(this.subActionList_DragOver);

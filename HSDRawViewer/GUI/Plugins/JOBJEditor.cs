@@ -232,6 +232,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void importModelFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ModelImporter.ReplaceModelFromFile(root);
+            RefreshGUI();
         }
     }
 }
