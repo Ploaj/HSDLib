@@ -83,10 +83,18 @@ namespace HSDRawViewer
             myImageList.Images.Add("anim_joint", Properties.Resources.ico_anim_joint);
 
             treeView1.ImageList = myImageList;
+
+            bool dc = false;
             
             treeView1.BeforeExpand += (sender, args) =>
             {
-                //args.Cancel = true;
+                args.Cancel = dc;
+                dc = false;
+            };
+
+            treeView1.MouseDown += (sender, args) =>
+            {
+                dc = args.Clicks > 1;
             };
             
             treeView1.AfterExpand += (sender, args) =>
@@ -181,8 +189,6 @@ namespace HSDRawViewer
             RefreshTree();
 
             Text = "HSD DAT Browser - " + FilePath;
-
-            aJToolToolStripMenuItem.Enabled = (RawHSDFile.Roots.Find(e => e.Data is SBM_PlayerData) != null);
         }
 
         /// <summary>
@@ -462,16 +468,9 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void aJToolToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var root = RawHSDFile.Roots.Find(r => r.Data is SBM_PlayerData);
-
-            if(root != null)
+            using (AJSplitDialog d = new AJSplitDialog())
             {
-                treeView1.CollapseAll();
-
-                using (AJSplitDialog d = new AJSplitDialog((SBM_PlayerData)root.Data))
-                {
-                    d.ShowDialog();
-                }
+                d.ShowDialog();
             }
         }
 

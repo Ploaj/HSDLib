@@ -219,6 +219,9 @@
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Tools\FileIO.cs" />
+    <Compile Include="Tools\OpenFolderDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Tools\SubactionManager.cs" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />

@@ -63,11 +63,21 @@ namespace HSDRawViewer.GUI.Plugins
             public Line AltNext = null;
             public Line AltPrevious = null;
 
+            public float X1 { get => v1.X; set => v1.X = value; }
+            public float Y1 { get => v1.Y; set => v1.Y = value; }
+            public float X2 { get => v2.X; set => v2.X = value; }
+            public float Y2 { get => v2.Y; set => v2.Y = value; }
+
             public bool DynamicCollision { get; set; } = false;
 
             public CollPhysics CollisionFlag { get; set; } = CollPhysics.Bottom;
             public CollProperty Flag { get; set; } = 0;
             public CollMaterial Material { get; set; } = CollMaterial.Basic;
+
+            public override string ToString()
+            {
+                return $"Line: ({v1.X}, {v1.Y}) ({v2.X}, {v2.Y})";
+            }
         }
 
         private class Vertex
@@ -112,10 +122,21 @@ namespace HSDRawViewer.GUI.Plugins
 
         private BindingList<LineGroup> LineGroups = new BindingList<LineGroup>();
 
-        private List<Line> Lines
+        private IEnumerable<Line> SelectedLines
+        {
+            get
+            {
+                foreach(Line l in listBox1.SelectedItems)
+                {
+                    yield return l;
+                }
+            }
+        }
+
+        private BindingList<Line> Lines
         {
             get; set;
-        } = new List<Line>();
+        } = new BindingList<Line>();
 
         private LineGroup SelectedLineGroup
         {
@@ -185,6 +206,8 @@ namespace HSDRawViewer.GUI.Plugins
             cbSelectType.SelectedIndex = 0;
             cbRenderModes.SelectedIndex = 0;
 
+            listLines.DataSource = Lines;
+
             PluginManager.GetCommonViewport()?.AddRenderer(this);
             
             listBox1.SelectedIndexChanged += (sender, args) =>
@@ -193,9 +216,31 @@ namespace HSDRawViewer.GUI.Plugins
                 propertyGrid1.SelectedObject = SelectedLineGroup;
             };
 
-            deleteButton.Enabled = false;
+            bool updateList = false;
+
+            listLines.SelectedIndexChanged += (sender, args) =>
+            {
+                if (!updateList)
+                {
+                    var sel = new Line[listLines.SelectedItems.Count];
+                    for (int i = 0; i < sel.Length; i++)
+                        sel[i] = listLines.SelectedItems[i] as Line;
+                    propertyGrid1.SelectedObjects = sel;
+                }
+            };
+
             propertyGrid1.SelectedObjectsChanged += (sender, args) =>
             {
+                updateList = true;
+                listLines.SelectedItem = null;
+                foreach (var ob in propertyGrid1.SelectedObjects)
+                    if (ob is Line l)
+                    {
+                        var index = Lines.IndexOf(l);
+                        listLines.SetSelected(index, true);
+                    }
+                updateList = false;
+
                 deleteButton.Enabled = (propertyGrid1.SelectedObjects.Length != 0);
 
                 editVertexMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is Vertex);
@@ -292,12 +337,14 @@ namespace HSDRawViewer.GUI.Plugins
             var keyState = Keyboard.GetState();
             bool drag = keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
 
+            HashSet<Vector2> moved = new HashSet<Vector2>();
+
             if (drag && mouseState.IsButtonDown(MouseButton.Left))
             {
                 var pick2D = pick.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
                 foreach (var v in propertyGrid1.SelectedObjects)
                 {
-                    if (v is Vertex vert)
+                    if (v is Vertex vert && !moved.Contains(vert.ToVector2()))
                     {
                         if(propertyGrid1.SelectedObjects.Length == 1)
                         {
@@ -309,6 +356,7 @@ namespace HSDRawViewer.GUI.Plugins
                             vert.X -= Xdelta;
                             vert.Y += Ydelta;
                         }
+                        moved.Add(vert.ToVector2());
                     }
                     if (v is Line line)
                     {
@@ -744,7 +792,9 @@ namespace HSDRawViewer.GUI.Plugins
             //TODO: Optimize
 
             // remove fake lines
-            Lines.RemoveAll(e=>e.CollisionFlag == 0);
+            var fake = Lines.Where(e => e.CollisionFlag == 0).ToArray();
+            foreach(var v in fake)
+                Lines.Remove(v);
 
             // gather all tops
             var topCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
@@ -1175,15 +1225,15 @@ namespace HSDRawViewer.GUI.Plugins
                 if(propertyGrid1.SelectedObjects[0] is Vertex v1 && propertyGrid1.SelectedObjects[1] is Vertex v2)
                 {
                     // only create a new line if one does not already exist
-                    var dup = Lines.Find(e => (e.v1 == v1 && e.v2 == v2) || (e.v1 == v2 && e.v2 == v1));
+                    var dup = Lines.Where(e => (e.v1 == v1 && e.v2 == v2) || (e.v1 == v2 && e.v2 == v1));
 
-                    if(dup == null)
-                    Lines.Add(new Line()
-                    {
-                        Group = SelectedLineGroup,
-                        v1 = v1,
-                        v2 = v2
-                    });
+                    if (dup == null || dup.Count() == 0)
+                        Lines.Add(new Line()
+                        {
+                            Group = SelectedLineGroup,
+                            v1 = v1,
+                            v2 = v2
+                        });
                 }
             }
         }

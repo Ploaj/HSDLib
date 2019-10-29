@@ -48,6 +48,7 @@
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -59,7 +60,7 @@
             this.treeView1.ItemHeight = 24;
             this.treeView1.Location = new System.Drawing.Point(3, 16);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(194, 398);
+            this.treeView1.Size = new System.Drawing.Size(194, 382);
             this.treeView1.TabIndex = 0;
             this.treeView1.DoubleClick += new System.EventHandler(this.treeView1_DoubleClick);
             // 
@@ -164,16 +165,15 @@
             // 
             // aJToolToolStripMenuItem
             // 
-            this.aJToolToolStripMenuItem.Enabled = false;
             this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aJToolToolStripMenuItem.Text = "AJ Tool";
             this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
             // 
             // sSMEditorToolStripMenuItem
             // 
             this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
-            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
             this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
             // 
@@ -181,9 +181,9 @@
             // 
             this.LocationLabel.Dock = System.Windows.Forms.DockStyle.Top;
             this.LocationLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LocationLabel.Location = new System.Drawing.Point(213, 24);
+            this.LocationLabel.Location = new System.Drawing.Point(0, 24);
             this.LocationLabel.Name = "LocationLabel";
-            this.LocationLabel.Size = new System.Drawing.Size(491, 16);
+            this.LocationLabel.Size = new System.Drawing.Size(704, 16);
             this.LocationLabel.TabIndex = 5;
             this.LocationLabel.Text = "Location:";
             // 
@@ -192,9 +192,9 @@
             this.dockPanel.ActiveAutoHideContent = null;
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.World);
-            this.dockPanel.Location = new System.Drawing.Point(213, 40);
+            this.dockPanel.Location = new System.Drawing.Point(216, 40);
             this.dockPanel.Name = "dockPanel";
-            this.dockPanel.Size = new System.Drawing.Size(491, 401);
+            this.dockPanel.Size = new System.Drawing.Size(488, 401);
             this.dockPanel.TabIndex = 6;
             // 
             // showHideButton
@@ -203,9 +203,9 @@
             this.showHideButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.showHideButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.showHideButton.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.showHideButton.Location = new System.Drawing.Point(200, 24);
+            this.showHideButton.Location = new System.Drawing.Point(203, 40);
             this.showHideButton.Name = "showHideButton";
-            this.showHideButton.Size = new System.Drawing.Size(13, 417);
+            this.showHideButton.Size = new System.Drawing.Size(13, 401);
             this.showHideButton.TabIndex = 10;
             this.showHideButton.Text = "<";
             this.showHideButton.UseVisualStyleBackColor = false;
@@ -215,12 +215,20 @@
             // 
             this.nodeBox.Controls.Add(this.treeView1);
             this.nodeBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.nodeBox.Location = new System.Drawing.Point(0, 24);
+            this.nodeBox.Location = new System.Drawing.Point(0, 40);
             this.nodeBox.Name = "nodeBox";
-            this.nodeBox.Size = new System.Drawing.Size(200, 417);
+            this.nodeBox.Size = new System.Drawing.Size(200, 401);
             this.nodeBox.TabIndex = 11;
             this.nodeBox.TabStop = false;
             this.nodeBox.Text = "Nodes";
+            // 
+            // splitter1
+            // 
+            this.splitter1.Location = new System.Drawing.Point(200, 40);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(3, 401);
+            this.splitter1.TabIndex = 12;
+            this.splitter1.TabStop = false;
             // 
             // MainForm
             // 
@@ -228,9 +236,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(704, 441);
             this.Controls.Add(this.dockPanel);
-            this.Controls.Add(this.LocationLabel);
             this.Controls.Add(this.showHideButton);
+            this.Controls.Add(this.splitter1);
             this.Controls.Add(this.nodeBox);
+            this.Controls.Add(this.LocationLabel);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
@@ -267,6 +276,7 @@
         private System.Windows.Forms.ToolStripMenuItem aJToolToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsUnoptimizedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sSMEditorToolStripMenuItem;
+        private System.Windows.Forms.Splitter splitter1;
     }
 }
 

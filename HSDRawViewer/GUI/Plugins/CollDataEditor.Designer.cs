@@ -38,6 +38,7 @@
             this.fuseSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createLineFromSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editLineMenu = new System.Windows.Forms.ToolStripDropDownButton();
             this.addToSelectedGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,15 +48,19 @@
             this.buttonAddGroup = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.buttonCalculateRange = new System.Windows.Forms.Button();
             this.cbShowAllGroups = new System.Windows.Forms.CheckBox();
             this.cbRenderModes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.createLineFromSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.Groups = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.listLines = new System.Windows.Forms.ListBox();
             this.toolBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.Groups.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolBox
@@ -67,9 +72,9 @@
             this.toolBox.Controls.Add(this.cbSelectType);
             this.toolBox.Controls.Add(this.label1);
             this.toolBox.Controls.Add(this.propertyGrid1);
-            this.toolBox.Location = new System.Drawing.Point(0, 154);
+            this.toolBox.Location = new System.Drawing.Point(0, 180);
             this.toolBox.Name = "toolBox";
-            this.toolBox.Size = new System.Drawing.Size(276, 209);
+            this.toolBox.Size = new System.Drawing.Size(276, 253);
             this.toolBox.TabIndex = 1;
             this.toolBox.TabStop = false;
             this.toolBox.Text = "Selected";
@@ -151,6 +156,13 @@
             this.removeSelectedToolStripMenuItem.Text = "Remove Selected";
             this.removeSelectedToolStripMenuItem.Click += new System.EventHandler(this.removeSelectedToolStripMenuItem_Click);
             // 
+            // createLineFromSelectedToolStripMenuItem
+            // 
+            this.createLineFromSelectedToolStripMenuItem.Name = "createLineFromSelectedToolStripMenuItem";
+            this.createLineFromSelectedToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.createLineFromSelectedToolStripMenuItem.Text = "Create Line from Selected";
+            this.createLineFromSelectedToolStripMenuItem.Click += new System.EventHandler(this.createLineFromSelectedToolStripMenuItem_Click);
+            // 
             // editLineMenu
             // 
             this.editLineMenu.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -209,12 +221,12 @@
             this.propertyGrid1.Location = new System.Drawing.Point(6, 75);
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGrid1.Size = new System.Drawing.Size(264, 134);
+            this.propertyGrid1.Size = new System.Drawing.Size(264, 178);
             this.propertyGrid1.TabIndex = 4;
             // 
             // buttonAddGroup
             // 
-            this.buttonAddGroup.Location = new System.Drawing.Point(6, 19);
+            this.buttonAddGroup.Location = new System.Drawing.Point(3, 4);
             this.buttonAddGroup.Name = "buttonAddGroup";
             this.buttonAddGroup.Size = new System.Drawing.Size(37, 23);
             this.buttonAddGroup.TabIndex = 5;
@@ -237,29 +249,14 @@
             this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(6, 48);
+            this.listBox1.Location = new System.Drawing.Point(0, 33);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(264, 56);
+            this.listBox1.Size = new System.Drawing.Size(259, 82);
             this.listBox1.TabIndex = 0;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.buttonCalculateRange);
-            this.groupBox1.Controls.Add(this.cbShowAllGroups);
-            this.groupBox1.Controls.Add(this.buttonAddGroup);
-            this.groupBox1.Controls.Add(this.listBox1);
-            this.groupBox1.Location = new System.Drawing.Point(0, 33);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(276, 115);
-            this.groupBox1.TabIndex = 7;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Groups";
             // 
             // buttonCalculateRange
             // 
-            this.buttonCalculateRange.Location = new System.Drawing.Point(49, 19);
+            this.buttonCalculateRange.Location = new System.Drawing.Point(46, 4);
             this.buttonCalculateRange.Name = "buttonCalculateRange";
             this.buttonCalculateRange.Size = new System.Drawing.Size(95, 23);
             this.buttonCalculateRange.TabIndex = 6;
@@ -272,7 +269,7 @@
             this.cbShowAllGroups.AutoSize = true;
             this.cbShowAllGroups.Checked = true;
             this.cbShowAllGroups.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbShowAllGroups.Location = new System.Drawing.Point(150, 23);
+            this.cbShowAllGroups.Location = new System.Drawing.Point(147, 10);
             this.cbShowAllGroups.Name = "cbShowAllGroups";
             this.cbShowAllGroups.Size = new System.Drawing.Size(67, 17);
             this.cbShowAllGroups.TabIndex = 8;
@@ -303,30 +300,72 @@
             this.label2.TabIndex = 10;
             this.label2.Text = "Render: ";
             // 
-            // createLineFromSelectedToolStripMenuItem
+            // tabControl1
             // 
-            this.createLineFromSelectedToolStripMenuItem.Name = "createLineFromSelectedToolStripMenuItem";
-            this.createLineFromSelectedToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
-            this.createLineFromSelectedToolStripMenuItem.Text = "Create Line from Selected";
-            this.createLineFromSelectedToolStripMenuItem.Click += new System.EventHandler(this.createLineFromSelectedToolStripMenuItem_Click);
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.Groups);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(6, 33);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(267, 141);
+            this.tabControl1.TabIndex = 9;
+            // 
+            // Groups
+            // 
+            this.Groups.Controls.Add(this.buttonCalculateRange);
+            this.Groups.Controls.Add(this.buttonAddGroup);
+            this.Groups.Controls.Add(this.cbShowAllGroups);
+            this.Groups.Controls.Add(this.listBox1);
+            this.Groups.Location = new System.Drawing.Point(4, 22);
+            this.Groups.Name = "Groups";
+            this.Groups.Padding = new System.Windows.Forms.Padding(3);
+            this.Groups.Size = new System.Drawing.Size(259, 115);
+            this.Groups.TabIndex = 0;
+            this.Groups.Text = "Groups";
+            this.Groups.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.listLines);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(259, 115);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Lines";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // listLines
+            // 
+            this.listLines.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listLines.FormattingEnabled = true;
+            this.listLines.Location = new System.Drawing.Point(3, 3);
+            this.listLines.Name = "listLines";
+            this.listLines.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listLines.Size = new System.Drawing.Size(253, 109);
+            this.listLines.TabIndex = 0;
             // 
             // CollDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(276, 375);
+            this.ClientSize = new System.Drawing.Size(276, 445);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cbRenderModes);
             this.Controls.Add(this.toolBox);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.saveButton);
             this.Name = "CollDataEditor";
             this.toolBox.ResumeLayout(false);
             this.toolBox.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.Groups.ResumeLayout(false);
+            this.Groups.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -340,7 +379,6 @@
         private System.Windows.Forms.ComboBox cbSelectType;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.Button buttonAddGroup;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button buttonCalculateRange;
         private System.Windows.Forms.CheckBox cbShowAllGroups;
         private System.Windows.Forms.ComboBox cbRenderModes;
@@ -357,5 +395,9 @@
         private System.Windows.Forms.ToolStripMenuItem addToSelectedGroupToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem splitLineToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createLineFromSelectedToolStripMenuItem;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage Groups;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.ListBox listLines;
     }
 }

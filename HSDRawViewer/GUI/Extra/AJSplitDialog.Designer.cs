@@ -28,123 +28,193 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.buttonAJ = new System.Windows.Forms.Button();
-            this.buttonFolder = new System.Windows.Forms.Button();
-            this.labelAJ = new System.Windows.Forms.Label();
-            this.labelFolder = new System.Windows.Forms.Label();
-            this.buttonExport = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.buttonImport = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1.SuspendLayout();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AJSplitDialog));
+            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openPldatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openPlAJdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openGmRstMdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.exportSelected = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttonReplace = new System.Windows.Forms.ToolStripButton();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttonReplaceAll = new System.Windows.Forms.ToolStripButton();
+            this.menuStrip1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // buttonAJ
+            // listBox1
             // 
-            this.buttonAJ.Location = new System.Drawing.Point(3, 3);
-            this.buttonAJ.Name = "buttonAJ";
-            this.buttonAJ.Size = new System.Drawing.Size(75, 41);
-            this.buttonAJ.TabIndex = 0;
-            this.buttonAJ.Text = "Select Pl**AJ.dat";
-            this.buttonAJ.UseVisualStyleBackColor = true;
-            this.buttonAJ.Click += new System.EventHandler(this.buttonAJ_Click);
+            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(3, 41);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(298, 264);
+            this.listBox1.TabIndex = 10;
             // 
-            // buttonFolder
+            // menuStrip1
             // 
-            this.buttonFolder.Location = new System.Drawing.Point(3, 53);
-            this.buttonFolder.Name = "buttonFolder";
-            this.buttonFolder.Size = new System.Drawing.Size(75, 49);
-            this.buttonFolder.TabIndex = 1;
-            this.buttonFolder.Text = "Select Folder";
-            this.buttonFolder.UseVisualStyleBackColor = true;
-            this.buttonFolder.Click += new System.EventHandler(this.buttonFolder_Click);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(310, 24);
+            this.menuStrip1.TabIndex = 11;
+            this.menuStrip1.Text = "menuStrip1";
             // 
-            // labelAJ
+            // fileToolStripMenuItem
             // 
-            this.labelAJ.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.labelAJ.AutoSize = true;
-            this.labelAJ.Location = new System.Drawing.Point(97, 18);
-            this.labelAJ.Name = "labelAJ";
-            this.labelAJ.Size = new System.Drawing.Size(35, 13);
-            this.labelAJ.TabIndex = 2;
-            this.labelAJ.Text = "label1";
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openPldatToolStripMenuItem,
+            this.openPlAJdatToolStripMenuItem,
+            this.openGmRstMdatToolStripMenuItem,
+            this.exportToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
             // 
-            // labelFolder
+            // openPldatToolStripMenuItem
             // 
-            this.labelFolder.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.labelFolder.AutoSize = true;
-            this.labelFolder.Location = new System.Drawing.Point(97, 73);
-            this.labelFolder.Name = "labelFolder";
-            this.labelFolder.Size = new System.Drawing.Size(35, 13);
-            this.labelFolder.TabIndex = 3;
-            this.labelFolder.Text = "label2";
+            this.openPldatToolStripMenuItem.Name = "openPldatToolStripMenuItem";
+            this.openPldatToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.openPldatToolStripMenuItem.Text = "Open Pl**.dat";
+            this.openPldatToolStripMenuItem.Click += new System.EventHandler(this.openPldatToolStripMenuItem_Click);
             // 
-            // buttonExport
+            // openPlAJdatToolStripMenuItem
             // 
-            this.buttonExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExport.Location = new System.Drawing.Point(13, 130);
-            this.buttonExport.Name = "buttonExport";
-            this.buttonExport.Size = new System.Drawing.Size(507, 23);
-            this.buttonExport.TabIndex = 4;
-            this.buttonExport.Text = "Export Animation To Folder";
-            this.buttonExport.UseVisualStyleBackColor = true;
-            this.buttonExport.Click += new System.EventHandler(this.buttonExport_Click);
+            this.openPlAJdatToolStripMenuItem.Enabled = false;
+            this.openPlAJdatToolStripMenuItem.Name = "openPlAJdatToolStripMenuItem";
+            this.openPlAJdatToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.openPlAJdatToolStripMenuItem.Text = "Open Pl**AJ.dat";
+            this.openPlAJdatToolStripMenuItem.Click += new System.EventHandler(this.openPlAJdatToolStripMenuItem_Click);
             // 
-            // tableLayoutPanel1
+            // openGmRstMdatToolStripMenuItem
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 94F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.Controls.Add(this.buttonAJ, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.buttonFolder, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.labelAJ, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.labelFolder, 1, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(508, 110);
-            this.tableLayoutPanel1.TabIndex = 8;
+            this.openGmRstMdatToolStripMenuItem.Enabled = false;
+            this.openGmRstMdatToolStripMenuItem.Name = "openGmRstMdatToolStripMenuItem";
+            this.openGmRstMdatToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.openGmRstMdatToolStripMenuItem.Text = "Open GmRstM**.dat";
+            this.openGmRstMdatToolStripMenuItem.Click += new System.EventHandler(this.openGmRstMdatToolStripMenuItem_Click);
             // 
-            // buttonImport
+            // groupBox1
             // 
-            this.buttonImport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonImport.Location = new System.Drawing.Point(15, 159);
-            this.buttonImport.Name = "buttonImport";
-            this.buttonImport.Size = new System.Drawing.Size(505, 23);
-            this.buttonImport.TabIndex = 9;
-            this.buttonImport.Text = "Inject Animations into Pl**AJ file";
-            this.buttonImport.UseVisualStyleBackColor = true;
-            this.buttonImport.Click += new System.EventHandler(this.buttonImport_Click);
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.listBox1);
+            this.groupBox1.Controls.Add(this.toolStrip1);
+            this.groupBox1.Location = new System.Drawing.Point(0, 27);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(304, 308);
+            this.groupBox1.TabIndex = 12;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Animations";
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDropDownButton1,
+            this.buttonReplace,
+            this.buttonReplaceAll});
+            this.toolStrip1.Location = new System.Drawing.Point(3, 16);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(298, 25);
+            this.toolStrip1.TabIndex = 11;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportAllToolStripMenuItem,
+            this.exportSelected});
+            this.toolStripDropDownButton1.Image = global::HSDRawViewer.Properties.Resources.ico_save;
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(70, 22);
+            this.toolStripDropDownButton1.Text = "Export";
+            // 
+            // exportSelected
+            // 
+            this.exportSelected.Name = "exportSelected";
+            this.exportSelected.Size = new System.Drawing.Size(152, 22);
+            this.exportSelected.Text = "Selected";
+            this.exportSelected.Click += new System.EventHandler(this.exportSelected_Click);
+            // 
+            // exportAllToolStripMenuItem
+            // 
+            this.exportAllToolStripMenuItem.Name = "exportAllToolStripMenuItem";
+            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportAllToolStripMenuItem.Text = "All";
+            this.exportAllToolStripMenuItem.Click += new System.EventHandler(this.exportAllToolStripMenuItem_Click);
+            // 
+            // buttonReplace
+            // 
+            this.buttonReplace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonReplace.Image = ((System.Drawing.Image)(resources.GetObject("buttonReplace.Image")));
+            this.buttonReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonReplace.Name = "buttonReplace";
+            this.buttonReplace.Size = new System.Drawing.Size(52, 22);
+            this.buttonReplace.Text = "Replace";
+            this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.Enabled = false;
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.exportToolStripMenuItem.Text = "Export DATs";
+            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
+            // 
+            // buttonReplaceAll
+            // 
+            this.buttonReplaceAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonReplaceAll.Image = ((System.Drawing.Image)(resources.GetObject("buttonReplaceAll.Image")));
+            this.buttonReplaceAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonReplaceAll.Name = "buttonReplaceAll";
+            this.buttonReplaceAll.Size = new System.Drawing.Size(69, 22);
+            this.buttonReplaceAll.Text = "Replace All";
+            this.buttonReplaceAll.Click += new System.EventHandler(this.buttonReplaceAll_Click);
             // 
             // AJSplitDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(532, 190);
-            this.Controls.Add(this.buttonImport);
-            this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.buttonExport);
+            this.ClientSize = new System.Drawing.Size(310, 336);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "AJSplitDialog";
             this.Text = "AJ Split";
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button buttonAJ;
-        private System.Windows.Forms.Button buttonFolder;
-        private System.Windows.Forms.Label labelAJ;
-        private System.Windows.Forms.Label labelFolder;
-        private System.Windows.Forms.Button buttonExport;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Button buttonImport;
+        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openPldatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openPlAJdatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openGmRstMdatToolStripMenuItem;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem exportSelected;
+        private System.Windows.Forms.ToolStripMenuItem exportAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton buttonReplace;
+        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton buttonReplaceAll;
     }
 }

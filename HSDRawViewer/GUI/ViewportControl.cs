@@ -169,7 +169,19 @@ namespace HSDRawViewer.GUI
 
             panel1.MouseWheel += (sender, args) =>
             {
-                 _camera.Z += args.Delta / 5;
+                var zoomMultiplier = 1;
+                try
+                {
+                    var ks = Keyboard.GetState();
+
+                    if (ks.IsKeyDown(Key.ShiftLeft) || ks.IsKeyDown(Key.ShiftRight))
+                        zoomMultiplier = 4;
+                }
+                catch (Exception)
+                {
+
+                }
+                 _camera.Z += (args.Delta / 5) * zoomMultiplier;
             };
 
             Disposed += (sender, args) =>
@@ -414,6 +426,8 @@ namespace HSDRawViewer.GUI
         private void panel1_KeyDown(object sender, KeyEventArgs e)
         {
             var speed = 5;
+            if (e.Shift)
+                speed *= 4;
             if (e.KeyCode == Keys.W)
                 _camera.Z += speed;
             if (e.KeyCode == Keys.S)
@@ -436,7 +450,7 @@ namespace HSDRawViewer.GUI
             {
                 if (e.Button == MouseButtons.Right)
                 {
-                    var speed = _camera.Translation.LengthFast / 8;
+                    var speed = _camera.Translation.LengthFast / 4;
 
                     _camera.X -= deltaPos.X * speed;
                     _camera.Y += deltaPos.Y * speed;
