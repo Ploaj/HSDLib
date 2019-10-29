@@ -110,7 +110,12 @@ namespace HSDRawViewer.Rendering
         {
             get
             {
-                return Matrix4.CreatePerspectiveFieldOfView(1f, Width / Height, 0.1f, 10000);
+                var aspect = 1f;
+                if(Height != 0)
+                    aspect = Width / Height;
+                if (aspect == 0)
+                    aspect = 1f;
+                return Matrix4.CreatePerspectiveFieldOfView(1f, aspect, 0.1f, 10000);
             }
         }
 

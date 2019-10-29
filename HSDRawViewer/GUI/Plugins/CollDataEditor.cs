@@ -568,17 +568,32 @@ namespace HSDRawViewer.GUI.Plugins
 
         #region Buttons
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveButton_Click(object sender, EventArgs e)
         {
             SaveCollData();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonAddGroup_Click(object sender, EventArgs e)
         {
             LineGroups.Add(new LineGroup());
             ClearSelection();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonDeleteGroup_Click(object sender, EventArgs e)
         {
             if(listBox1.SelectedItem != null)
@@ -588,6 +603,11 @@ namespace HSDRawViewer.GUI.Plugins
             ClearSelection();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             var selected = propertyGrid1.SelectedObjects;
@@ -723,6 +743,9 @@ namespace HSDRawViewer.GUI.Plugins
         {
             //TODO: Optimize
 
+            // remove fake lines
+            Lines.RemoveAll(e=>e.CollisionFlag == 0);
+
             // gather all tops
             var topCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
 
@@ -744,7 +767,7 @@ namespace HSDRawViewer.GUI.Plugins
             int leftOffset = rightOffset + rightCount;
             int dynamicOffset = leftOffset + leftCount;
             int totalLines = dynamicOffset + dynamicCount;
-
+            
             // create each group creating vertices and links as necessary
 
             // TODO: 
@@ -927,6 +950,11 @@ namespace HSDRawViewer.GUI.Plugins
 
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonCalculateRange_Click(object sender, EventArgs e)
         {
             var verts = new List<Vertex>();
@@ -939,7 +967,12 @@ namespace HSDRawViewer.GUI.Plugins
 
             SelectedLineGroup.CalcuateRange(verts);
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void newLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is Vertex vert)
@@ -1100,6 +1133,11 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void splitLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach(var p in propertyGrid1.SelectedObjects)
@@ -1125,6 +1163,11 @@ namespace HSDRawViewer.GUI.Plugins
             propertyGrid1.SelectedObject = null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void createLineFromSelectedToolStripMenuItem_Click(object sender, EventArgs args)
         {
             if(propertyGrid1.SelectedObjects.Length == 2)

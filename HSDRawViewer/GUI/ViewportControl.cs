@@ -96,9 +96,12 @@ namespace HSDRawViewer.GUI
                 if (prevPos == null)
                     prevPos = pos;
 
-                deltaPos = prevPos - pos;
+                deltaPos = (prevPos - pos) * new Vector2(1f/panel1.Width, 1f/panel1.Height);
 
                 prevPos = pos;
+
+                if (MainForm.Instance == null || MainForm.Instance.WindowState == FormWindowState.Minimized)
+                    return;
 
                 if (_camera == null || !Visible)
                     return;
@@ -149,7 +152,7 @@ namespace HSDRawViewer.GUI
                 
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                         inter.ScreenDrag(GetScreenPosition(point), deltaPos.X, deltaPos.Y);
+                         inter.ScreenDrag(GetScreenPosition(point), deltaPos.X * 40, deltaPos.Y * 40);
             };
 
             panel1.MouseUp += (sender, args) =>
@@ -162,6 +165,11 @@ namespace HSDRawViewer.GUI
                 }
 
                 Selecting = false;
+            };
+
+            panel1.MouseWheel += (sender, args) =>
+            {
+                 _camera.Z += args.Delta / 5;
             };
 
             Disposed += (sender, args) =>
@@ -428,15 +436,15 @@ namespace HSDRawViewer.GUI
             {
                 if (e.Button == MouseButtons.Right)
                 {
-                    var speed = _camera.Translation.LengthFast / 16;
+                    var speed = _camera.Translation.LengthFast / 8;
 
-                    _camera.X -= deltaPos.X * speed / 20;
-                    _camera.Y += deltaPos.Y * speed / 20;
+                    _camera.X -= deltaPos.X * speed;
+                    _camera.Y += deltaPos.Y * speed;
                 }
                 if (e.Button == MouseButtons.Left && !Lock2D)
                 {
-                    _camera.XRotation -= deltaPos.Y / 50;
-                    _camera.YRotation -= deltaPos.X / 50;
+                    _camera.XRotation -= deltaPos.Y * 3;
+                    _camera.YRotation -= deltaPos.X * 3;
                 }
             }
         }

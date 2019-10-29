@@ -45,7 +45,7 @@ namespace HSDRawViewer.GUI
                 }
             }
             
-            public string Parameters
+            public IEnumerable<string> Parameters
             {
                 get
                 {
@@ -65,18 +65,13 @@ namespace HSDRawViewer.GUI
                         var value = r.Read(param.BitCount);
 
                         if (param.IsPointer)
-                            sb.Append("\tPOINTER->(Edit To View)");
+                            yield return ("POINTER->(Edit To View)");
                         else
-                            sb.Append("\t" + 
-                                param.Name + 
+                            yield return (param.Name + 
                                 " : " + 
                                 (param.Hex ? value.ToString("X") : value.ToString()));
-
-                        if (i != sa.Parameters.Length - 1)
-                            sb.AppendLine("");
+                        
                     }
-
-                    return sb.ToString();
                 }
             }
 
@@ -87,11 +82,6 @@ namespace HSDRawViewer.GUI
                     data = (byte[])data.Clone(),
                     Reference = Reference
                 };
-            }
-
-            public override string ToString()
-            {
-                return Parameters;
             }
         }
 
@@ -456,7 +446,6 @@ namespace HSDRawViewer.GUI
         {
             if(cbReference.SelectedItem is Action a)
             {
-                Console.WriteLine(a.Text + " " + actionList.Items.IndexOf(a));
                 actionList.SelectedIndex = actionList.Items.IndexOf(a);
             }
         }
@@ -465,7 +454,7 @@ namespace HSDRawViewer.GUI
         {
             if(e.Index != -1 && subActionList.Items[e.Index] is SubActionScript script)
             {
-                var length = script.Parameters.Split('\n').Length;
+                var length = script.Parameters.Count();
                 e.ItemHeight = subActionList.Font.Height * (script.Parameters.Equals("") ? 1 : length + 1);
             }
         }
@@ -478,8 +467,13 @@ namespace HSDRawViewer.GUI
                 if(subActionList.Items[e.Index] is SubActionScript script)
                 {
                     e.Graphics.DrawString(e.Index + ". " + script.Name, e.Font, new SolidBrush(Color.DarkBlue), e.Bounds);
-                    var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height), new Size(e.Bounds.Width, e.Bounds.Height));
-                    e.Graphics.DrawString(script.Parameters, e.Font, new SolidBrush(e.ForeColor), bottomRect);
+                    int i = 1;
+                    foreach(var v in script.Parameters)
+                    {
+                        var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height * i), new Size(e.Bounds.Width, e.Bounds.Height));
+                        e.Graphics.DrawString("\t" + v, e.Font, new SolidBrush(e.ForeColor), bottomRect);
+                        i++;
+                    }
                 }
                 else
                     e.Graphics.DrawString(subActionList.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);

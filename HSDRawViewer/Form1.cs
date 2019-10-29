@@ -224,7 +224,7 @@ namespace HSDRawViewer
                 if (d.ShowDialog() == DialogResult.OK)
                 {
                     RawHSDFile.Save(d.FileName);
-                    OpenFile(d.FileName);
+                    //OpenFile(d.FileName);
                 }
             }
         }
