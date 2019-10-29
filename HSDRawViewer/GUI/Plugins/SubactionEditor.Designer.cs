@@ -49,6 +49,7 @@
             this.buttonCopy = new System.Windows.Forms.ToolStripButton();
             this.buttonPaste = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.buttonCut = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -96,6 +97,7 @@
             this.subActionList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.subActionList_MeasureItem);
             this.subActionList.SelectedIndexChanged += new System.EventHandler(this.subActionList_SelectedIndexChanged);
             this.subActionList.DoubleClick += new System.EventHandler(this.subActionList_DoubleClick);
+            this.subActionList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.subActionList_KeyDown);
             // 
             // toolStrip2
             // 
@@ -105,6 +107,7 @@
             this.buttonUp,
             this.buttonDown,
             this.buttonEdit,
+            this.buttonCut,
             this.buttonCopy,
             this.buttonPaste});
             this.toolStrip2.Location = new System.Drawing.Point(3, 45);
@@ -278,6 +281,16 @@
             this.toolStripButton1.Text = "Create New Subroutine";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
+            // buttonCut
+            // 
+            this.buttonCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonCut.Image = ((System.Drawing.Image)(resources.GetObject("buttonCut.Image")));
+            this.buttonCut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonCut.Name = "buttonCut";
+            this.buttonCut.Size = new System.Drawing.Size(30, 22);
+            this.buttonCut.Text = "Cut";
+            this.buttonCut.Click += new System.EventHandler(this.buttonCut_Click);
+            // 
             // SubactionEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -322,5 +335,6 @@
         private System.Windows.Forms.ToolStripButton buttonDown;
         private System.Windows.Forms.ToolStripButton buttonCopy;
         private System.Windows.Forms.ToolStripButton buttonPaste;
+        private System.Windows.Forms.ToolStripButton buttonCut;
     }
 }

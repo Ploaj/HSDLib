@@ -147,6 +147,7 @@ namespace HSDRawViewer
             {
                 if (prop.Name.Equals("Item") || prop.Name.Equals("Children"))
                     continue;
+
                 if (prop.PropertyType.IsArray)
                 {
                     var acc = prop.GetValue(Accessor) as HSDAccessor[];
@@ -178,7 +179,8 @@ namespace HSDRawViewer
                 if (prop.PropertyType.IsSubclassOf(typeof(HSDAccessor)))
                 {
                     var acc = prop.GetValue(Accessor) as HSDAccessor;
-                    if (acc != null)
+                    
+                    if (acc != null && acc._s != Accessor._s)
                     {
                         strucs.Add(acc._s);
                         if (prop.Name != "Next")

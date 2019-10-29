@@ -27,6 +27,8 @@ namespace HSDRawViewer.GUI.Extra
 
             listBox1.ContextMenu = CMenu;
 
+            Text = "SSM Editor";
+
             FormClosing += (sender, args) =>
             {
                 if (args.CloseReason == CloseReason.UserClosing)
@@ -353,6 +355,8 @@ namespace HSDRawViewer.GUI.Extra
 
         public void OpenFile(string filePath)
         {
+            Text = "SSM Editor - " + filePath;
+
             Sounds.Clear();
             FilePath = filePath;
             using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))

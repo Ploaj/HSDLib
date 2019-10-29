@@ -194,6 +194,8 @@ namespace HSDRawViewer.GUI
         /// <param name="script"></param>
         private void SelectAction(Action script)
         {
+            ClearUndoStack();
+
             // gather all references to this script
             var references = AllScripts.FindAll(e=>e._struct.References.ContainsValue(script._struct));
 
@@ -207,8 +209,12 @@ namespace HSDRawViewer.GUI
 
             if (cbReference.Items.Count > 0)
                 cbReference.SelectedIndex = 0;
+            
+            RefreshSubactionList(script);
+        }
 
-            // decode data
+        private void RefreshSubactionList(Action script)
+        {
             var data = script._struct.GetData();
 
             subActionList.Items.Clear();
@@ -217,7 +223,7 @@ namespace HSDRawViewer.GUI
                 var sa = SubactionManager.GetSubaction((byte)(data[i] >> 2));
 
                 var sas = new SubActionScript();
-                
+
                 foreach (var r in script._struct.References)
                 {
                     if (r.Key >= i && r.Key < i + sa.ByteSize)
@@ -226,10 +232,10 @@ namespace HSDRawViewer.GUI
                         else
                             sas.Reference = r.Value;
                 }
-                
+
                 var sub = new byte[sa.ByteSize];
 
-                for(int j = 0; j < sub.Length; j++)
+                for (int j = 0; j < sub.Length; j++)
                 {
                     sub[j] = data[i + j];
                 }
@@ -242,6 +248,42 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        private Stack<byte[]> UndoDataStack = new Stack<byte[]>();
+        private Stack<Dictionary<int, HSDStruct>> UndoReferenceStack = new Stack<Dictionary<int, HSDStruct>>();
+
+        private void ClearUndoStack()
+        {
+            UndoDataStack.Clear();
+            UndoReferenceStack.Clear();
+        }
+
+        private void AddActionToUndo()
+        {
+            if (actionList.SelectedItem is Action a)
+            {
+                UndoDataStack.Push(a._struct.GetData());
+                UndoReferenceStack.Push(new Dictionary<int, HSDStruct>(a._struct.References));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void Undo()
+        {
+            if (UndoDataStack.Count > 0 && actionList.SelectedItem is Action a)
+            {
+                a._struct.SetData(UndoDataStack.Pop());
+                
+                a._struct.References.Clear();
+                var prevRef = UndoReferenceStack.Pop();
+                foreach (var v in prevRef)
+                    a._struct.References.Add(v.Key, v.Value);
+
+                RefreshSubactionList(a);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -249,6 +291,8 @@ namespace HSDRawViewer.GUI
         {
             if (actionList.SelectedItem is Action a)
             {
+                AddActionToUndo();
+
                 a._struct.References.Clear();
 
                 List<byte> scriptData = new List<byte>();
@@ -320,9 +364,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void subActionList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //buttonRemove.Enabled = subActionList.SelectedIndex != -1;
-            //buttonUp.Enabled = subActionList.SelectedIndex != -1;
-            //buttonDown.Enabled = subActionList.SelectedIndex != -1;
+            //buttonRemove.Visible = subActionList.SelectedIndex != -1;
+            //buttonUp.Visible = subActionList.SelectedIndex != -1;
+            //buttonDown.Visible = subActionList.SelectedIndex != -1;
         }
 
         /// <summary>
@@ -347,13 +391,18 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonRemove_Click(object sender, EventArgs e)
         {
+            RemoveSelected();
+        }
+
+        private void RemoveSelected()
+        {
             subActionList.BeginUpdate();
             if (subActionList.SelectedItems.Count != 0)
             {
                 var list = new List<object>();
                 foreach (var v in subActionList.SelectedItems)
                     list.Add(v);
-                foreach(var v in list)
+                foreach (var v in list)
                     subActionList.Items.Remove(v);
             }
             subActionList.EndUpdate();
@@ -485,13 +534,23 @@ namespace HSDRawViewer.GUI
 
         private void buttonCopy_Click(object sender, EventArgs e)
         {
+            CopySelected();
+        }
+
+        private void buttonPaste_Click(object sender, EventArgs e)
+        {
+            Paste();
+        }
+
+        private void CopySelected()
+        {
             CopiedScripts.Clear();
             foreach (SubActionScript scr in subActionList.SelectedItems)
                 CopiedScripts.Add(scr);
             CopiedScripts.Reverse();
         }
 
-        private void buttonPaste_Click(object sender, EventArgs e)
+        private void Paste()
         {
             var index = subActionList.SelectedIndex + 1;
             if (index == -1)
@@ -501,6 +560,33 @@ namespace HSDRawViewer.GUI
                 subActionList.Items.Insert(index, v.Clone());
             }
             SaveSubactionChanges();
+        }
+
+        private void subActionList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Control)
+            {
+                if (e.KeyCode == Keys.X)
+                {
+                    CopySelected();
+                    RemoveSelected();
+                }
+
+                if (e.KeyCode == Keys.C)
+                    CopySelected();
+
+                if (e.KeyCode == Keys.V)
+                    Paste();
+
+                if (e.KeyCode == Keys.Z)
+                    Undo();
+            }
+        }
+
+        private void buttonCut_Click(object sender, EventArgs e)
+        {
+            CopySelected();
+            RemoveSelected();
         }
     }
 }
