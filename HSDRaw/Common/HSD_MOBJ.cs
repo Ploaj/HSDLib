@@ -44,13 +44,31 @@ namespace HSDRaw.Common
         DITHER = (1 << 6)
     }
 
+    public enum MATERIAL_ANIM_TYPE
+    {
+        HSD_A_M_AMBIENT_R = 1,  /* アンビエントカラー */
+        HSD_A_M_AMBIENT_G = 2,  /* アンビエントカラー */
+        HSD_A_M_AMBIENT_B = 3,  /* アンビエントカラー */
+        HSD_A_M_DIFFUSE_R = 4,  /* ディフューズカラー */
+        HSD_A_M_DIFFUSE_G = 5,  /* ディフューズカラー */
+        HSD_A_M_DIFFUSE_B = 6,  /* ディフューズカラー */
+        HSD_A_M_SPECULAR_R = 7,     /* スペキュラカラー */
+        HSD_A_M_SPECULAR_G = 8, /* スペキュラカラー */
+        HSD_A_M_SPECULAR_B = 9,     /* スペキュラカラー */
+        HSD_A_M_ALPHA = 10, /* トランスペアレンシー */
+                            /* PEシェーダを使用したアニメーション */
+        HSD_A_M_PE_REF0 = 11,   /*  */
+        HSD_A_M_PE_REF1 = 12,   /*  */
+        HSD_A_M_PE_DSTALPHA = 13,	/*  */
+    }
+
     /// <summary>
     /// Material Object
     /// Contains material rendering information such as textures, colors, and pixel processing
     /// </summary>
     public class HSD_MOBJ : HSDAccessor
     {
-        public override int TrimmedSize { get; } = 0x18;
+        public override int TrimmedSize { get; } = 0x18; // 0x38
 
         //public uint NameOffset { get; set; }
 

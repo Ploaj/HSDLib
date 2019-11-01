@@ -312,7 +312,7 @@ namespace HSDRawViewer.GUI
             if (AJLoaded)
                 using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
                 {
-                    PlayerData.WinSubAction.Subactions = CreateAnimationFile(w, PlayerData.WinSubAction.Subactions);
+                    PlayerData.SubActionTable.Subactions = CreateAnimationFile(w, PlayerData.SubActionTable.Subactions);
                 }
 
             if (ResultLoaded)
