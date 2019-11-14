@@ -136,6 +136,7 @@ namespace HSDRawViewer.Converters
             if (settings.FlipUVs)
                 processFlags |= PostProcessSteps.FlipUVs;
 
+            System.Diagnostics.Debug.WriteLine("Importing Model...");
             // import
             AssimpContext importer = new AssimpContext();
             if(settings.SmoothNormals)
@@ -143,6 +144,7 @@ namespace HSDRawViewer.Converters
             importer.SetConfig(new VertexBoneWeightLimitConfig(3));
             var importmodel = importer.ImportFile(filePath, processFlags);
 
+            System.Diagnostics.Debug.WriteLine("Processing Nodes...");
             // process nodes
             var rootjobj = RecursiveProcess(cache, settings, importmodel, importmodel.RootNode);
 
@@ -156,6 +158,7 @@ namespace HSDRawViewer.Converters
                 rootjobj.Next = null;
 
             // process mesh
+            System.Diagnostics.Debug.WriteLine("Processing Mesh...");
             foreach (var mesh in cache.MeshNodes)
             {
                 var Dobj = GetMeshes(cache, settings, importmodel, mesh);
@@ -164,6 +167,8 @@ namespace HSDRawViewer.Converters
                     rootjobj.Dobj = Dobj;
                 else
                     rootjobj.Dobj.Add(Dobj);
+
+                System.Diagnostics.Debug.WriteLine($"Processing Mesh {rootjobj.Dobj.List.Count} {cache.MeshNodes.Count + 1}...");
 
                 rootjobj.Flags |= JOBJ_FLAG.OPA;
 
@@ -190,7 +195,10 @@ namespace HSDRawViewer.Converters
             }
 
             // SAVE POBJ buffers
+            System.Diagnostics.Debug.WriteLine("Saving Changes...");
             cache.POBJGen.SaveChanges();
+
+            System.Diagnostics.Debug.WriteLine("Done!");
 
             // done
             return rootjobj;
@@ -562,7 +570,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="mat"></param>
         /// <returns></returns>
-        private static Matrix4 FromMatrix(Matrix4x4 mat)
+        public static Matrix4 FromMatrix(Matrix4x4 mat)
         {
             Matrix4 m = new Matrix4();
             m.M11 = mat.A1;

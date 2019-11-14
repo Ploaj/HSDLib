@@ -1,0 +1,647 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Assimp;
+using HSDRaw.Common;
+using HSDRawViewer.GUI;
+using OpenTK;
+using HSDRawViewer.Rendering;
+using HSDRaw.GX;
+using System.Windows.Forms;
+using System.Drawing;
+using Assimp.Unmanaged;
+
+namespace HSDRawViewer.Converters
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ModelExportSettings
+    {
+        public bool Optimize { get; set; } = true;
+
+        public bool FlipUVs { get; set; } = false;
+
+        public string Directory;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ModelExporter
+    {
+        public static readonly string[] SupportedFormats = { ".dae" };
+
+        public static void ExportFile(HSD_JOBJ rootJOBJ)
+        {
+            StringBuilder sup = new StringBuilder();
+
+            AssimpContext importer = new AssimpContext();
+            var length = importer.GetSupportedExportFormats().Length;
+            var index = 0;
+            foreach (var v in importer.GetSupportedExportFormats())
+            {
+                sup.Append($"{v.Description} (*.{v.FileExtension})|*.{v.FileExtension};");
+                index++;
+                if (index != length)
+                    sup.Append("|");
+            }
+
+            var f = Tools.FileIO.SaveFile(sup.ToString());
+
+            if (f != null)
+            {
+                var settings = new ModelExportSettings();
+                using (PropertyDialog d = new PropertyDialog("Model Import Options", settings))
+                {
+                    if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        ExportFile(f, rootJOBJ, settings);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="rootJOBJ"></param>
+        public static void ExportFile(string filePath, HSD_JOBJ rootJOBJ, ModelExportSettings settings = null)
+        {
+            ModelExporter mex = new ModelExporter();
+            AssimpContext importer = new AssimpContext();
+
+            Dictionary<string, string> extToId = new Dictionary<string, string>();
+
+            foreach (var v in importer.GetSupportedExportFormats())
+                if(!extToId.ContainsKey("." + v.FileExtension))
+                    extToId.Add("." + v.FileExtension, v.FormatId);
+
+            PostProcessSteps postProcess = PostProcessSteps.FlipWindingOrder | PostProcessSteps.FixInFacingNormals;
+
+            if (settings.Optimize)
+                postProcess |= PostProcessSteps.JoinIdenticalVertices;
+
+            if (settings.FlipUVs)
+                postProcess |= PostProcessSteps.FlipUVs;
+
+            settings.Directory = System.IO.Path.GetDirectoryName(filePath) + "\\";
+            
+            if(System.IO.Path.GetExtension(filePath).ToLower() == ".dae")
+            {
+                var sc = mex.WriteRootNode(rootJOBJ, settings);
+                /*var scn = Scene.ToUnmanagedScene(sc);
+                scn = AssimpLibrary.Instance.ApplyPostProcessing(scn, postProcess);
+                var scene = Scene.FromUnmanagedScene(scn);
+                Scene.FreeUnmanagedScene(scn);*/
+                ExportCustomDAE(filePath, sc, settings);
+            }
+            else
+                importer.ExportFile(mex.WriteRootNode(rootJOBJ, settings), filePath, extToId[System.IO.Path.GetExtension(filePath)], postProcess);
+
+            importer.Dispose();
+        }
+
+        private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings)
+        {
+            using (DAEWriter writer = new DAEWriter(filePath, true))
+            {
+                var path = System.IO.Path.GetDirectoryName(filePath) + '\\';
+
+                writer.WriteAsset();
+
+                //DialogResult dialogResult = MessageBox.Show("Export Materials and Textures?", "DAE Exporter", MessageBoxButtons.YesNo);
+                //if (dialogResult == DialogResult.Yes)
+                {
+                    List<string> TextureNames = new List<string>();
+
+                    foreach (var tex in scene.Materials)
+                    {
+                        if(!TextureNames.Contains(tex.TextureDiffuse.FilePath))
+                            TextureNames.Add(tex.TextureDiffuse.FilePath);
+                    }
+
+                    writer.WriteLibraryImages(TextureNames.ToArray(), ".png");
+
+                    writer.StartMaterialSection();
+                    foreach (var mat in scene.Materials)
+                    {
+                        writer.WriteMaterial(mat.Name);
+                    }
+                    writer.EndMaterialSection();
+
+                    writer.StartEffectSection();
+                    foreach (var mat in scene.Materials)
+                    {
+                        writer.WriteEffect(mat.Name, mat.TextureDiffuse.FilePath);
+                    }
+                    writer.EndEffectSection();
+
+                }
+                //else
+                //    writer.WriteLibraryImages();
+
+                var rootSkeleton = scene.RootNode.Children[0];
+
+                RecursivlyWriteDAEJoints(writer, rootSkeleton, "", Matrix4.Identity);
+
+                writer.StartGeometrySection();
+                for(int i = 1; i < scene.RootNode.Children.Count; i++)
+                {
+                    var node = scene.RootNode.Children[i];
+
+                    foreach(var meshIndex in node.MeshIndices)
+                    {
+                        var mesh = scene.Meshes[meshIndex];
+
+                        writer.StartGeometryMesh(mesh.Name);
+
+                        if(scene.Materials.Count != 0)
+                            writer.CurrentMaterial = scene.Materials[mesh.MaterialIndex].Name;
+                        
+                        uint[] triangles = new uint[mesh.FaceCount * 3];
+                        if (mesh.HasFaces)
+                        {
+                            var f = 0;
+                            foreach(var face in mesh.Faces)
+                            {
+                                for(var k = 0; k < 3; k++)
+                                    triangles[f++] = (uint)face.Indices[2 - k];
+                            }
+                        }
+
+                        if (mesh.HasVertices)
+                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.POSITION, ToFloatArray(mesh.Vertices), triangles);
+
+                        if (mesh.HasNormals)
+                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.NORMAL, ToFloatArray(mesh.Normals), triangles);
+
+                        if (mesh.HasTextureCoords(0))
+                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.TEXCOORD, ToUVFloatArray(mesh.TextureCoordinateChannels[0], settings.FlipUVs), triangles, 0);
+
+                        if (mesh.HasTextureCoords(1))
+                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.TEXCOORD, ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs), triangles, 1);
+
+                        if (mesh.HasVertexColors(0))
+                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.COLOR, ToFloatArray(mesh.VertexColorChannels[0]), triangles, 0);
+
+                        if (mesh.HasVertexColors(1))
+                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.COLOR, ToFloatArray(mesh.VertexColorChannels[1]), triangles, 1);
+
+                        List<List<int>> BoneIndicies = new List<List<int>>();
+                        List<List<float>> BoneWeights = new List<List<float>>();
+                        if (mesh.HasBones)
+                        {
+                            for (int v = 0; v < mesh.VertexCount; v++)
+                            {
+                                BoneIndicies.Add(new List<int>());
+                                BoneWeights.Add(new List<float>());
+                            }
+
+                            foreach (var bone in mesh.Bones)
+                            {
+                                if (bone.HasVertexWeights)
+                                {
+                                    foreach(var w in bone.VertexWeights)
+                                    {
+                                        BoneIndicies[w.VertexID].Add(writer.GetJointIndex(bone.Name));
+                                        BoneWeights[w.VertexID].Add(w.Weight);
+                                    }
+                                }
+                            }
+                        }
+
+                        writer.AttachGeometryController(BoneIndicies, BoneWeights);
+
+                        writer.EndGeometryMesh();
+                    }
+
+                   
+                }
+                writer.EndGeometrySection();
+            }
+        }
+
+        private static float[] ToUVFloatArray(List<Vector3D> list, bool flip)
+        {
+            float[] f = new float[list.Count * 2];
+
+            var i = 0;
+            foreach (var v in list)
+            {
+                f[i++] = v.X;
+                f[i++] = flip ? 1 - v.Y : v.Y;
+            }
+
+            return f;
+        }
+
+        private static float[] ToFloatArray(List<Color4D> list)
+        {
+            float[] f = new float[list.Count * 4];
+
+            var i = 0;
+            foreach (var v in list)
+            {
+                f[i++] = v.R;
+                f[i++] = v.G;
+                f[i++] = v.B;
+                f[i++] = v.A;
+            }
+
+            return f;
+        }
+
+        private static float[] ToFloatArray(List<Vector3D> list)
+        {
+            float[] f = new float[list.Count * 3];
+
+            var i = 0;
+            foreach (var v in list)
+            {
+                f[i++] = v.X;
+                f[i++] = v.Y;
+                f[i++] = v.Z;
+            }
+
+            return f;
+        }
+
+        private static void RecursivlyWriteDAEJoints(DAEWriter writer, Node joint, string parentName, Matrix4 parentTransform)
+        {
+            var transform = ModelImporter.FromMatrix(joint.Transform);
+            float[] Transform = new float[] { transform.M11, transform.M21, transform.M31, transform.M41,
+                    transform.M12, transform.M22, transform.M32, transform.M42,
+                    transform.M13, transform.M23, transform.M33, transform.M43,
+                    transform.M14, transform.M24, transform.M34, transform.M44 };
+
+            Matrix4 InvWorldTransform = (transform * parentTransform).Inverted();
+            float[] InvTransform = new float[] { InvWorldTransform.M11, InvWorldTransform.M21, InvWorldTransform.M31, InvWorldTransform.M41,
+                    InvWorldTransform.M12, InvWorldTransform.M22, InvWorldTransform.M32, InvWorldTransform.M42,
+                    InvWorldTransform.M13, InvWorldTransform.M23, InvWorldTransform.M33, InvWorldTransform.M43,
+                    InvWorldTransform.M14, InvWorldTransform.M24, InvWorldTransform.M34, InvWorldTransform.M44 };
+
+            writer.AddJoint(joint.Name, parentName, Transform, InvTransform);
+
+            foreach (var child in joint.Children)
+                RecursivlyWriteDAEJoints(writer, child, joint.Name, transform * parentTransform);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        private static Matrix4x4 Matrix4ToMatrix4x4(Matrix4 m)
+        {
+            return new Matrix4x4()
+            {
+                A1 = m.M11,
+                A2 = m.M12,
+                A3 = m.M13,
+                A4 = m.M14,
+                B1 = m.M21,
+                B2 = m.M22,
+                B3 = m.M23,
+                B4 = m.M24,
+                C1 = m.M31,
+                C2 = m.M32,
+                C3 = m.M33,
+                C4 = m.M34,
+                D1 = m.M41,
+                D2 = m.M42,
+                D3 = m.M43,
+                D4 = m.M44,
+            };
+        }
+
+        private Dictionary<HSD_JOBJ, int> jobjToIndex = new Dictionary<HSD_JOBJ, int>();
+        private List<HSD_JOBJ> Jobjs = new List<HSD_JOBJ>();
+        private List<Matrix4> WorldTransforms = new List<Matrix4>();
+        private List<Node> JobjNodes = new List<Node>();
+        private Scene Scene = new Scene();
+        private Node RootNode = new Node() { Name = "Root" };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        private Scene WriteRootNode(HSD_JOBJ root, ModelExportSettings settings)
+        {
+            Scene.RootNode = RootNode;
+
+            RecursiveExport(root, RootNode, Matrix4.Identity);
+
+            WriteDOBJNodes(settings);
+
+            return Scene;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RecursiveExport(HSD_JOBJ jobj, Node parent, Matrix4 parentTransform)
+        {
+            Node root = new Node();
+            root.Name = "JOBJ_" + Jobjs.Count;
+            jobjToIndex.Add(jobj, Jobjs.Count);
+            
+            Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
+                Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
+
+            var worldTransform = Transform * parentTransform;
+            
+            JobjNodes.Add(root);
+            Jobjs.Add(jobj);
+            WorldTransforms.Add(worldTransform);
+
+            root.Transform = Matrix4ToMatrix4x4(Transform);
+
+            parent.Children.Add(root);
+
+            foreach (var c in jobj.Children)
+            {
+                RecursiveExport(c, root, worldTransform);
+            }
+        }
+
+        Dictionary<byte[], string> imageToName = new Dictionary<byte[], string>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void WriteDOBJNodes(ModelExportSettings settings)
+        {
+            var jIndex = 0;
+            foreach(var j in Jobjs)
+            {
+                var dIndex = 0;
+                if(j.Dobj != null)
+                {
+                    foreach(var dobj in j.Dobj.List)
+                    {
+                        Node dobjNode = new Node();
+                        dobjNode.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}";
+
+                        if (dobj.Pobj != null)
+                        {
+                            foreach (var pobj in dobj.Pobj.List)
+                            {
+                                dobjNode.MeshIndices.Add(Scene.Meshes.Count);
+                                var mesh = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ);
+                                mesh.MaterialIndex = Scene.MaterialCount;
+                                Scene.Meshes.Add(mesh);
+                            }
+                        }
+
+                        // process and export textures
+                        
+                        Material m = new Material();
+                        m.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}_MOBJ_{dIndex}";
+
+                        if (dobj.Mobj.Textures != null)
+                        {
+                            foreach(var t in dobj.Mobj.Textures.List)
+                            {
+                                if(t.ImageData != null && t.ImageData.ImageData != null && !imageToName.ContainsKey(t.ImageData.ImageData))
+                                {
+                                    var name = $"TOBJ_{imageToName.Count}";
+                                    using (Bitmap img = TOBJConverter.ToBitmap(t))
+                                        img.Save(settings.Directory + name + ".png");
+                                    imageToName.Add(t.ImageData.ImageData, name);
+                                }
+                            }
+
+                            var dif = new TextureSlot();
+                            dif.TextureType = TextureType.Diffuse;
+                            dif.UVIndex = 0;
+                            dif.FilePath = imageToName[dobj.Mobj.Textures.ImageData.ImageData];
+                            m.TextureDiffuse = dif;
+                        }
+                        Scene.Materials.Add(m);
+
+                        RootNode.Children.Add(dobjNode);
+                        dIndex++;
+                    }
+                }
+                jIndex++;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pobj"></param>
+        private Mesh ProcessPOBJ(HSD_POBJ pobj, HSD_JOBJ parent, HSD_JOBJ singleBind)
+        {
+            Mesh m = new Mesh();
+            m.Name = "pobj";
+            m.PrimitiveType = PrimitiveType.Triangle;
+
+            m.MaterialIndex = 0;
+
+            var dl = pobj.ToDisplayList();
+            var envelopes = pobj.EnvelopeWeights;
+
+            var parentTransform = Matrix4.Identity;
+            if(parent != null)
+                parentTransform = WorldTransforms[jobjToIndex[parent]];
+
+            var singleBindTransform = Matrix4.Identity;
+            if (singleBind != null)
+                singleBindTransform = WorldTransforms[jobjToIndex[singleBind]];
+
+            Dictionary<HSD_JOBJ, Bone> jobjToBone = new Dictionary<HSD_JOBJ, Bone>();
+
+            if (envelopes != null)
+            {
+                foreach(var jobj in Jobjs)
+                {
+                    var bone = new Bone();
+                    bone.Name = JobjNodes[jobjToIndex[jobj]].Name;
+                    bone.OffsetMatrix = Matrix4ToMatrix4x4(WorldTransforms[jobjToIndex[jobj]].Inverted());
+                    m.Bones.Add(bone);
+                    jobjToBone.Add(jobj, bone);
+                }
+            }
+                /*foreach (var en in envelopes)
+                {
+                    foreach (var jobj in en.JOBJs)
+                    {
+                        if (!jobjToBone.ContainsKey(jobj))
+                        {
+                            var bone = new Bone();
+                            bone.Name = JobjNodes[jobjToIndex[jobj]].Name;
+                            bone.OffsetMatrix = Matrix4ToMatrix4x4(WorldTransforms[jobjToIndex[jobj]].Inverted());
+                            m.Bones.Add(bone);
+                            jobjToBone.Add(jobj, bone);
+                        }
+                    }
+                }*/
+
+
+            if (singleBind != null && !jobjToBone.ContainsKey(singleBind))
+            {
+                var bone = new Bone();
+                bone.Name = JobjNodes[jobjToIndex[singleBind]].Name;
+                bone.OffsetMatrix = Matrix4ToMatrix4x4(WorldTransforms[jobjToIndex[singleBind]].Inverted());
+                m.Bones.Add(bone);
+                jobjToBone.Add(singleBind, bone);
+            }
+
+            int offset = 0;
+            var vIndex = -1;
+            foreach (var prim in dl.Primitives)
+            {
+                var verts = dl.Vertices.GetRange(offset, prim.Count);
+                offset += prim.Count;
+
+                switch (prim.PrimitiveType)
+                {
+                    case GXPrimitiveType.Quads:
+                        verts = QuadToList(verts);
+                        break;
+                    case GXPrimitiveType.TriangleStrip:
+                        verts = StripToList(verts);
+                        break;
+                    case GXPrimitiveType.Triangles:
+                        break;
+                    default:
+                        Console.WriteLine(prim.PrimitiveType);
+                        break;
+                }
+
+                for (int i = m.VertexCount; i < m.VertexCount + verts.Count; i += 3)
+                {
+                    var f = new Face();
+                    f.Indices.Add(i);
+                    f.Indices.Add(i + 1);
+                    f.Indices.Add(i + 2);
+                    m.Faces.Add(f);
+                }
+
+                foreach (var v in verts)
+                {
+                    vIndex++;
+                    if (singleBind != null)
+                    {
+                        var vertexWeight = new VertexWeight();
+                        vertexWeight.VertexID = vIndex;
+                        vertexWeight.Weight = 1;
+                        jobjToBone[singleBind].VertexWeights.Add(vertexWeight);
+                    }
+                    Matrix4 weight = Matrix4.Identity;
+                    foreach (var a in pobj.Attributes)
+                    {
+                        switch (a.AttributeName)
+                        {
+                            case GXAttribName.GX_VA_PNMTXIDX:
+
+                                var en = envelopes[v.PNMTXIDX / 3];
+                                for (int w = 0; w < en.EnvelopeCount; w++)
+                                {
+                                    var vertexWeight = new VertexWeight();
+                                    vertexWeight.VertexID = vIndex;
+                                    vertexWeight.Weight = en.Weights[w];
+                                    jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
+                                }
+
+                                if (en.EnvelopeCount == 1)
+                                    weight = WorldTransforms[jobjToIndex[en.JOBJs[0]]];
+
+                                break;
+                            case GXAttribName.GX_VA_POS:
+                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), parentTransform);
+                                vert = Vector3.TransformPosition(vert, weight);
+                                vert = Vector3.TransformPosition(vert, singleBindTransform);
+                                m.Vertices.Add(new Vector3D(vert.X, vert.Y, vert.Z));
+                                break;
+                            case GXAttribName.GX_VA_NRM:
+                                var nrm = Vector3.TransformNormal(GXTranslator.toVector3(v.NRM), parentTransform);
+                                nrm = Vector3.TransformNormal(nrm, weight);
+                                nrm = Vector3.TransformNormal(nrm, singleBindTransform);
+                                m.Normals.Add(new Vector3D(v.NRM.X, v.NRM.Y, v.NRM.Z));
+                                break;
+                            case GXAttribName.GX_VA_CLR0:
+                                m.VertexColorChannels[0].Add(new Color4D(v.CLR0.R, v.CLR0.G, v.CLR0.B, v.CLR0.A));
+                                break;
+                            case GXAttribName.GX_VA_CLR1:
+                                m.VertexColorChannels[1].Add(new Color4D(v.CLR1.R, v.CLR1.G, v.CLR1.B, v.CLR1.A));
+                                break;
+                            case GXAttribName.GX_VA_TEX0:
+                                m.TextureCoordinateChannels[0].Add(new Vector3D(v.TEX0.X, v.TEX0.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX1:
+                                m.TextureCoordinateChannels[1].Add(new Vector3D(v.TEX1.X, v.TEX1.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX2:
+                                m.TextureCoordinateChannels[2].Add(new Vector3D(v.TEX2.X, v.TEX2.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX3:
+                                m.TextureCoordinateChannels[3].Add(new Vector3D(v.TEX3.X, v.TEX3.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX4:
+                                m.TextureCoordinateChannels[4].Add(new Vector3D(v.TEX4.X, v.TEX4.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX5:
+                                m.TextureCoordinateChannels[5].Add(new Vector3D(v.TEX5.X, v.TEX5.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX6:
+                                m.TextureCoordinateChannels[6].Add(new Vector3D(v.TEX6.X, v.TEX6.Y, 1));
+                                break;
+                            case GXAttribName.GX_VA_TEX7:
+                                m.TextureCoordinateChannels[7].Add(new Vector3D(v.TEX7.X, v.TEX7.Y, 1));
+                                break;
+                        }
+                    }
+                }
+            }
+
+            return m;
+        }
+
+        private List<GX_Vertex> QuadToList(List<GX_Vertex> input)
+        {
+            var output = new List<GX_Vertex>();
+
+            for(int i = 0; i < input.Count; i+= 4)
+            {
+                output.Add(input[i]);
+                output.Add(input[i + 1]);
+                output.Add(input[i + 2]);
+
+                output.Add(input[i + 2]);
+                output.Add(input[i + 3]);
+                output.Add(input[i]);
+            }
+
+            return output;
+        }
+
+        private List<GX_Vertex> StripToList(List<GX_Vertex> input)
+        {
+            var output = new List<GX_Vertex>();
+            
+            for (int index = 2; index < input.Count; index++)
+            {
+                bool isEven = (index % 2 != 1);
+
+                var vert1 = input[index - 2];
+                var vert2 = isEven ? input[index] : input[index - 1];
+                var vert3 = isEven ? input[index - 1] : input[index];
+
+                if (!vert1.POS.Equals(vert2.POS) && !vert2.POS.Equals(vert3.POS) && !vert3.POS.Equals(vert1.POS))
+                {
+                    output.Add(vert3);
+                    output.Add(vert2);
+                    output.Add(vert1);
+                }
+            }
+
+            return output;
+        }
+    }
+}

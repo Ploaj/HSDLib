@@ -450,7 +450,7 @@ namespace HSDRawViewer.GUI
             {
                 if (e.Button == MouseButtons.Right)
                 {
-                    var speed = _camera.Translation.LengthFast / 4;
+                    var speed = 5;
 
                     _camera.X -= deltaPos.X * speed;
                     _camera.Y += deltaPos.Y * speed;

@@ -99,6 +99,8 @@
     </Compile>
     <Compile Include="Converters\ConvFOBJ.cs" />
     <Compile Include="Converters\ConvSVG.cs" />
+    <Compile Include="Converters\DAEWriter.cs" />
+    <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />

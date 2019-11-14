@@ -29,6 +29,25 @@ namespace HSDRawViewer.Rendering
             return new Vector3(v.X, v.Y, v.Z);
         }
 
+        public static GXColor4 fromColor4(Vector4 v)
+        {
+            return new GXColor4(v.X, v.Y, v.Z, v.W);
+        }
+
+        public static GXVector4 fromVector4(Vector4 v)
+        {
+            return new GXVector4(v.X, v.Y, v.Z, v.W);
+        }
+
+        public static GXVector2 fromVector2(Vector2 v)
+        {
+            return new GXVector2(v.X, v.Y);
+        }
+
+        public static GXVector3 fromVector3(Vector3 v)
+        {
+            return new GXVector3(v.X, v.Y, v.Z);
+        }
         /// <summary>
         /// 
         /// </summary>

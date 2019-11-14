@@ -40,13 +40,14 @@
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.vertexColorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -172,6 +173,27 @@
             this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.vertexColorsToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(49, 22);
+            this.toolStripDropDownButton1.Text = "Show";
+            // 
+            // vertexColorsToolStripMenuItem
+            // 
+            this.vertexColorsToolStripMenuItem.Checked = true;
+            this.vertexColorsToolStripMenuItem.CheckOnClick = true;
+            this.vertexColorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.vertexColorsToolStripMenuItem.Name = "vertexColorsToolStripMenuItem";
+            this.vertexColorsToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.vertexColorsToolStripMenuItem.Text = "Vertex Colors";
+            this.vertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -197,42 +219,12 @@
             this.toolStrip1.TabIndex = 2;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripButton2
-            // 
-            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(77, 22);
-            this.toolStripButton2.Text = "Edit Material";
-            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // toolStripDropDownButton1
-            // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.vertexColorsToolStripMenuItem});
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(49, 22);
-            this.toolStripDropDownButton1.Text = "Show";
-            // 
-            // vertexColorsToolStripMenuItem
-            // 
-            this.vertexColorsToolStripMenuItem.Checked = true;
-            this.vertexColorsToolStripMenuItem.CheckOnClick = true;
-            this.vertexColorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.vertexColorsToolStripMenuItem.Name = "vertexColorsToolStripMenuItem";
-            this.vertexColorsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.vertexColorsToolStripMenuItem.Text = "Vertex Colors";
-            this.vertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
-            // 
             // toolStripDropDownButton2
             // 
             this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importModelFromFileToolStripMenuItem});
+            this.importModelFromFileToolStripMenuItem,
+            this.exportModelToFileToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
@@ -245,6 +237,23 @@
             this.importModelFromFileToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.importModelFromFileToolStripMenuItem.Text = "Import Model From File";
             this.importModelFromFileToolStripMenuItem.Click += new System.EventHandler(this.importModelFromFileToolStripMenuItem_Click);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(77, 22);
+            this.toolStripButton2.Text = "Edit Material";
+            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
+            // exportModelToFileToolStripMenuItem
+            // 
+            this.exportModelToFileToolStripMenuItem.Name = "exportModelToFileToolStripMenuItem";
+            this.exportModelToFileToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.exportModelToFileToolStripMenuItem.Text = "Export Model To File";
+            this.exportModelToFileToolStripMenuItem.Click += new System.EventHandler(this.exportModelToFileToolStripMenuItem_Click);
             // 
             // JOBJEditor
             // 
@@ -293,5 +302,6 @@
         private System.Windows.Forms.ToolStripMenuItem vertexColorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
         private System.Windows.Forms.ToolStripMenuItem importModelFromFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportModelToFileToolStripMenuItem;
     }
 }

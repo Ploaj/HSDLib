@@ -2,6 +2,14 @@
 {
     public struct GXVector4
     {
+        public GXVector4(float x, float y, float z, float w) : this()
+        {
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
+        }
+
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }

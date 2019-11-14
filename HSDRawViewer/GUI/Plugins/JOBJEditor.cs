@@ -235,5 +235,10 @@ namespace HSDRawViewer.GUI.Plugins
             ModelImporter.ReplaceModelFromFile(root);
             RefreshGUI();
         }
+
+        private void exportModelToFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModelExporter.ExportFile(root);
+        }
     }
 }
