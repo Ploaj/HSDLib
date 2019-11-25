@@ -448,17 +448,16 @@ namespace HSDRawViewer.GUI
             if (!keyState.IsKeyDown(Key.ControlLeft) && !keyState.IsKeyDown(Key.ControlRight)
               &&!keyState.IsKeyDown(Key.AltLeft) && !keyState.IsKeyDown(Key.AltRight))
             {
+                var speed = 20;
                 if (e.Button == MouseButtons.Right)
                 {
-                    var speed = 5;
-
                     _camera.X -= deltaPos.X * speed;
                     _camera.Y += deltaPos.Y * speed;
                 }
                 if (e.Button == MouseButtons.Left && !Lock2D)
                 {
-                    _camera.XRotation -= deltaPos.Y * 3;
-                    _camera.YRotation -= deltaPos.X * 3;
+                    _camera.XRotation -= deltaPos.Y * speed;
+                    _camera.YRotation -= deltaPos.X * speed;
                 }
             }
         }

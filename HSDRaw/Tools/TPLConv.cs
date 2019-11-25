@@ -191,6 +191,12 @@ namespace HSDRaw.Tools
 
         public static int GetImageSize(GXTexFmt format, int width, int height)
         {
+            if (width % 4 != 0)
+                width += 4 - (width % 4);
+
+            //if (height % 4 != 0)
+            //    height += 4 - (height % 4);
+
             int size = width * height;
             switch (format)
             {
@@ -866,6 +872,9 @@ namespace HSDRaw.Tools
                     {
                         for (int x1 = x; x1 < x + 8; x1 += 2)
                         {
+                            if (i >= tpl.Length)
+                                continue;
+
                             byte pixel = tpl[i++];
 
                             if (y1 >= height || x1 >= width)
@@ -898,10 +907,14 @@ namespace HSDRaw.Tools
                     {
                         for (int x1 = x; x1 < x + 8; x1++)
                         {
+                            if (i >= tpl.Length)
+                                continue;
+
                             ushort pixel = tpl[i++];
 
                             if (y1 >= height || x1 >= width)
                                 continue;
+
                             if (pixel < paletteData.Length)
                                 output[y1 * width + x1] = paletteData[pixel];
                         }

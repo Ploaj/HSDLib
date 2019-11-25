@@ -26,9 +26,7 @@ namespace HSDRawViewer.GUI.Plugins
         public Type[] SupportedTypes => new Type[] { typeof(HSD_TexAnim), typeof(HSD_TexGraphic), typeof(HSD_TOBJ) };
         
         private HSD_TexAnim TexAnim;
-
         private HSD_TexGraphic TEXG;
-
         private HSD_TOBJ TOBJ;
 
         private TextureManager TextureManager = new TextureManager();
@@ -217,7 +215,7 @@ namespace HSDRawViewer.GUI.Plugins
                 bitmap.Save(f);
                 bitmap.Dispose();
 
-                Node.Refresh();
+                Node = Node;
             }
         }
 
@@ -246,8 +244,7 @@ namespace HSDRawViewer.GUI.Plugins
                         bmp.Dispose();
                         TEXG.SetFromTOBJs(images);
 
-                        Node.Refresh();
-                        ReloadTextures();
+                        Node = Node;
                     }
                 }
             }
@@ -353,8 +350,7 @@ namespace HSDRawViewer.GUI.Plugins
                                 TexAnim.AnimationObject.FObjDesc.Next = null;
                         }
 
-                        Node.Refresh();
-                        ReloadTextures();
+                        Node = Node;
                     }
                 }
             }

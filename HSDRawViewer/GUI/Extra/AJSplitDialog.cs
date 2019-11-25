@@ -307,8 +307,7 @@ namespace HSDRawViewer.GUI
         {
             var AJPath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath) + "_AJ.dat");
             var resultPath = Path.Combine(Path.GetDirectoryName(filePath), "GrRstM" + Path.GetFileNameWithoutExtension(filePath) + ".dat");
-           
-
+            
             if (AJLoaded)
                 using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
                 {
@@ -328,7 +327,7 @@ namespace HSDRawViewer.GUI
                 res.Save(resultPath);
             }
 
-            PlayerFile.Save(filePath);
+            PlayerFile.Save(filePath, true, false);
         }
 
         private SBM_FighterSubAction[] CreateAnimationFile(BinaryWriter w, SBM_FighterSubAction[] subs)

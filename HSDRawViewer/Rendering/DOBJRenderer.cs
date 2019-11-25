@@ -186,7 +186,7 @@ namespace HSDRawViewer.Rendering
 
                         var finalColor = new Vector4(colr, colr, colr, 1) * color;
 
-                        //finalColor.W = 1;
+                        finalColor.W = mobj.Material.Alpha;
                         
                         GL.TexCoord2(tx0);
                         GL.Color4(finalColor);

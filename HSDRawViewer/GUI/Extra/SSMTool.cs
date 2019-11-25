@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 using HSDRaw;
 using System.Media;
+using System.IO.Compression;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -45,7 +46,7 @@ namespace HSDRawViewer.GUI.Extra
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var file = Tools.FileIO.OpenFile("SSM (*.ssm)|*.ssm");
+            var file = Tools.FileIO.OpenFile("SSM (*.ssm, *.sdi)|*.ssm;*.sdi");
 
             if (file != null)
             {
@@ -346,11 +347,15 @@ namespace HSDRawViewer.GUI.Extra
 
         private void buttonPlay_Click(object sender, EventArgs e)
         {
+            PlaySound();
+        }
+
+        private void PlaySound()
+        {
             if (listBox1.SelectedItem is DSP dsp)
             {
                 PlaySound(dsp);
             }
-
         }
 
         public void OpenFile(string filePath)
@@ -359,6 +364,83 @@ namespace HSDRawViewer.GUI.Extra
 
             Sounds.Clear();
             FilePath = filePath;
+
+            if(Path.GetExtension(filePath).ToLower() == ".ssm")
+                OpenSSM(filePath);
+
+            if (Path.GetExtension(filePath).ToLower() == ".sdi")
+                OpenSDI(filePath);
+
+            if (listBox1.Items.Count > 0)
+                listBox1.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        /// Used in Eighting Engine Games
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void OpenSDI(string filePath)
+        {
+            var sam = filePath.Replace(".sdi", ".sam");
+            if (!File.Exists(sam))
+                return;
+
+            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
+            using (BinaryReaderExt d = new BinaryReaderExt(new FileStream(sam, FileMode.Open)))
+            {
+                r.BigEndian = true;
+                
+                while(true)
+                {
+                    var id = r.ReadInt32();
+                    if (id == -1)
+                        break;
+                    var dataoffset = r.ReadUInt32();
+                    var padding = r.ReadInt32();
+                    var flags = r.ReadInt16();
+                    var frequency = r.ReadInt16();
+                    var value = r.ReadInt32();
+                    r.Skip(8); // unknown
+                    uint coefOffset = r.ReadUInt32();
+
+                    DSP dsp = new DSP();
+                    dsp.Frequency = frequency;
+
+                    DSPChannel channel = new DSPChannel();
+                    channel.NibbleCount = value;
+
+                    var temp = r.Position;
+                    var end = (uint)d.Length;
+                    if(r.ReadInt32() != -1)
+                        end = r.ReadUInt32();
+
+                    r.Seek(coefOffset);
+                    r.ReadInt32();
+                    r.ReadInt32();
+
+                    for (int i = 0; i < 0x10; i++)
+                        channel.COEF[i] = r.ReadInt16();
+
+                    r.Seek(temp);
+
+                    d.Seek(dataoffset);
+                    byte[] data = d.ReadBytes((int)(end - dataoffset));
+
+                    channel.Data = data;
+                    channel.InitialPredictorScale = data[0];
+                    dsp.Channels.Add(channel);
+
+                    Sounds.Add(dsp);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Melee's sound format
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void OpenSSM(string filePath)
+        {
             using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
             {
                 r.BigEndian = true;
@@ -397,20 +479,18 @@ namespace HSDRawViewer.GUI.Extra
 
                         channel.NibbleCount = LoopEndOffset - CurrentAddress;
                         channel.LoopStart = LoopStartOffset - CurrentAddress;
-                        
+
                         sound.Channels.Add(channel);
 
                         var DataOffset = headerLength + (int)Math.Ceiling(CurrentAddress / 2d) - 1;
 
                         channel.Data = r.GetSection((uint)DataOffset, (int)Math.Ceiling(channel.NibbleCount / 2d) + 1);
-                        
+
                     }
 
                     Sounds.Add(sound);
                 }
             }
-            if (listBox1.Items.Count > 0)
-                listBox1.SelectedIndex = 0;
         }
 
 
@@ -496,6 +576,25 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (SoundPlayer != null)
                 SoundPlayer.Stop();
+        }
+
+        private void listBox1_DoubleClick(object sender, EventArgs e)
+        {
+            PlaySound();
+        }
+
+        private void exportAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var folder = Tools.FileIO.OpenFolder();
+
+            if(folder != null)
+            {
+                var sIndex = 0;
+                foreach(var s in Sounds)
+                {
+                    File.WriteAllBytes(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav", s.ToWAVE());
+                }
+            }
         }
     }
 }

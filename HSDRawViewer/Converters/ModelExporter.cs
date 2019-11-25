@@ -78,7 +78,7 @@ namespace HSDRawViewer.Converters
                 if(!extToId.ContainsKey("." + v.FileExtension))
                     extToId.Add("." + v.FileExtension, v.FormatId);
 
-            PostProcessSteps postProcess = PostProcessSteps.FlipWindingOrder | PostProcessSteps.FixInFacingNormals;
+            PostProcessSteps postProcess = PostProcessSteps.FlipWindingOrder;
 
             if (settings.Optimize)
                 postProcess |= PostProcessSteps.JoinIdenticalVertices;
@@ -151,46 +151,37 @@ namespace HSDRawViewer.Converters
                 {
                     var node = scene.RootNode.Children[i];
 
-                    foreach(var meshIndex in node.MeshIndices)
+                    writer.StartGeometryMesh(node.Name);
+
+                    List<uint> triangles = new List<uint>();
+                    List<float> vertices = new List<float>();
+                    List<float> nrm = new List<float>();
+                    List<float> uv0 = new List<float>();
+                    List<float> uv1 = new List<float>();
+                    List<float> clr0 = new List<float>();
+                    List<float> clr1 = new List<float>();
+
+                    List<List<int>> BoneIndicies = new List<List<int>>();
+                    List<List<float>> BoneWeights = new List<List<float>>();
+
+                    foreach (var meshIndex in node.MeshIndices)
                     {
+                        var vertexOffset = vertices.Count / 3;
+
                         var mesh = scene.Meshes[meshIndex];
 
-                        writer.StartGeometryMesh(mesh.Name);
-
+                        if (!mesh.HasFaces || !mesh.HasVertices)
+                            continue;
+                        
                         if(scene.Materials.Count != 0)
                             writer.CurrentMaterial = scene.Materials[mesh.MaterialIndex].Name;
-                        
-                        uint[] triangles = new uint[mesh.FaceCount * 3];
-                        if (mesh.HasFaces)
+
+                        foreach (var face in mesh.Faces)
                         {
-                            var f = 0;
-                            foreach(var face in mesh.Faces)
-                            {
-                                for(var k = 0; k < 3; k++)
-                                    triangles[f++] = (uint)face.Indices[2 - k];
-                            }
+                            for (var k = 0; k < 3; k++)
+                                triangles.Add((uint)(vertexOffset + face.Indices[2 - k]));
                         }
 
-                        if (mesh.HasVertices)
-                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.POSITION, ToFloatArray(mesh.Vertices), triangles);
-
-                        if (mesh.HasNormals)
-                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.NORMAL, ToFloatArray(mesh.Normals), triangles);
-
-                        if (mesh.HasTextureCoords(0))
-                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.TEXCOORD, ToUVFloatArray(mesh.TextureCoordinateChannels[0], settings.FlipUVs), triangles, 0);
-
-                        if (mesh.HasTextureCoords(1))
-                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.TEXCOORD, ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs), triangles, 1);
-
-                        if (mesh.HasVertexColors(0))
-                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.COLOR, ToFloatArray(mesh.VertexColorChannels[0]), triangles, 0);
-
-                        if (mesh.HasVertexColors(1))
-                            writer.WriteGeometrySource(mesh.Name, DAEWriter.VERTEX_SEMANTIC.COLOR, ToFloatArray(mesh.VertexColorChannels[1]), triangles, 1);
-
-                        List<List<int>> BoneIndicies = new List<List<int>>();
-                        List<List<float>> BoneWeights = new List<List<float>>();
                         if (mesh.HasBones)
                         {
                             for (int v = 0; v < mesh.VertexCount; v++)
@@ -205,19 +196,55 @@ namespace HSDRawViewer.Converters
                                 {
                                     foreach(var w in bone.VertexWeights)
                                     {
-                                        BoneIndicies[w.VertexID].Add(writer.GetJointIndex(bone.Name));
-                                        BoneWeights[w.VertexID].Add(w.Weight);
+                                        BoneIndicies[w.VertexID + vertexOffset].Add(writer.GetJointIndex(bone.Name));
+                                        BoneWeights[w.VertexID + vertexOffset].Add(w.Weight);
                                     }
                                 }
                             }
                         }
 
-                        writer.AttachGeometryController(BoneIndicies, BoneWeights);
+                        vertices.AddRange(ToFloatArray(mesh.Vertices));
 
-                        writer.EndGeometryMesh();
+                        if (mesh.HasNormals)
+                            nrm.AddRange(ToFloatArray(mesh.Normals));
+
+                        if (mesh.HasTextureCoords(0))
+                            uv0.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[0], settings.FlipUVs));
+
+                        if (mesh.HasTextureCoords(1))
+                            uv0.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs));
+
+                        if (mesh.HasVertexColors(0))
+                            clr0.AddRange(ToFloatArray(mesh.VertexColorChannels[0]));
+
+                        if (mesh.HasVertexColors(1))
+                            clr0.AddRange(ToFloatArray(mesh.VertexColorChannels[1]));
+
                     }
 
-                   
+                    var triArr = triangles.ToArray();
+                    
+                    writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.POSITION, vertices.ToArray(), triArr);
+
+                    if (nrm.Count > 0)
+                        writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.NORMAL, nrm.ToArray(), triArr);
+
+                    if (uv0.Count > 0)
+                        writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.TEXCOORD, uv0.ToArray(), triArr, 0);
+
+                    if (uv1.Count > 0)
+                        writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.TEXCOORD, uv1.ToArray(), triArr, 1);
+
+                    if (clr0.Count > 0)
+                        writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.COLOR, clr0.ToArray(), triArr, 0);
+
+                    if (clr1.Count > 0)
+                        writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.COLOR, clr0.ToArray(), triArr, 1);
+
+                    writer.AttachGeometryController(BoneIndicies, BoneWeights);
+
+                    writer.EndGeometryMesh();
+
                 }
                 writer.EndGeometrySection();
             }
@@ -388,10 +415,12 @@ namespace HSDRawViewer.Converters
 
                         if (dobj.Pobj != null)
                         {
+                            var pindex = 0;
                             foreach (var pobj in dobj.Pobj.List)
                             {
                                 dobjNode.MeshIndices.Add(Scene.Meshes.Count);
                                 var mesh = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ);
+                                mesh.Name = dobjNode.Name + "_POBJ_" + pindex++;
                                 mesh.MaterialIndex = Scene.MaterialCount;
                                 Scene.Meshes.Add(mesh);
                             }
@@ -401,6 +430,8 @@ namespace HSDRawViewer.Converters
                         
                         Material m = new Material();
                         m.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}_MOBJ_{dIndex}";
+                        m.Shininess = dobj.Mobj.Material.Shininess;
+                        m.Opacity = dobj.Mobj.Material.Alpha;
 
                         if (dobj.Mobj.Textures != null)
                         {
@@ -563,7 +594,7 @@ namespace HSDRawViewer.Converters
                                 var nrm = Vector3.TransformNormal(GXTranslator.toVector3(v.NRM), parentTransform);
                                 nrm = Vector3.TransformNormal(nrm, weight);
                                 nrm = Vector3.TransformNormal(nrm, singleBindTransform);
-                                m.Normals.Add(new Vector3D(v.NRM.X, v.NRM.Y, v.NRM.Z));
+                                m.Normals.Add(new Vector3D(nrm.X, nrm.Y, nrm.Z));
                                 break;
                             case GXAttribName.GX_VA_CLR0:
                                 m.VertexColorChannels[0].Add(new Color4D(v.CLR0.R, v.CLR0.G, v.CLR0.B, v.CLR0.A));

@@ -124,6 +124,8 @@ namespace HSDRawViewer.GUI
             int Index = 0;
             foreach (var v in Subactions)
             {
+                if (v.SubAction == null)
+                    continue;
                 if (!aHash.Contains(v.SubAction._s))
                 {
                     aHash.Add(v.SubAction._s);
