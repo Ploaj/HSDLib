@@ -115,7 +115,7 @@ namespace HSDRawViewer
 
             treeView1.AfterSelect += (sender, args) =>
             {
-                SelectNode(null);
+                SelectNode<HSDAccessor>();
             };
 
             treeView1.NodeMouseClick += (sender, args) =>
@@ -147,23 +147,23 @@ namespace HSDRawViewer
         /// 
         /// </summary>
         /// <param name="cast"></param>
-        public void SelectNode(HSDAccessor cast)
+        public void SelectNode<T>(T cast = null) where T: HSDAccessor
         {
             if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode n)
             {
                 if (cast == null)
                 {
                     _nodePropertyViewer.SetAccessor(n.Accessor);
-                    //Viewport.SelectedAccessor = n.Accessor;
                 }
                 else
                 {
                     cast._s = n.Accessor._s;
+                    n.Accessor = cast;
                     _nodePropertyViewer.SetAccessor(cast);
-                    //Viewport.SelectedAccessor = cast;
                 }
                 SelectedDataNode = n;
-                
+                OpenEditor();
+
                 LocationLabel.Text = "Location: 0x" + RawHSDFile.GetOffsetFromStruct(n.Accessor._s).ToString("X8") + " -> " + n.FullPath;
             }
         }
