@@ -12,9 +12,9 @@ namespace HSDRaw.Melee.Gr
             set => _s.SetArray(0x00, 0x04, value);
         }
 
-        public SBM_Model_Group[] ModelGroups
+        public Map_GOBJ[] ModelGroups
         {
-            get => _s.GetArray<SBM_Model_Group>(0x08);
+            get => _s.GetArray<Map_GOBJ>(0x08);
             set => _s.SetArray(0x08, 0x0C, value);
         }
 

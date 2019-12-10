@@ -85,7 +85,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        public DockState DefaultDockState => DockState.DockTop;
+        public DockState DefaultDockState => DockState.Document;
 
         public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable) };
 

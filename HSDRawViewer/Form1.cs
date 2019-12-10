@@ -86,17 +86,24 @@ namespace HSDRawViewer
 
             bool dc = false;
             
-            treeView1.BeforeExpand += (sender, args) =>
-            {
-                args.Cancel = dc;
-                dc = false;
-            };
-
             treeView1.MouseDown += (sender, args) =>
             {
                 dc = args.Clicks > 1;
             };
-            
+
+            treeView1.BeforeExpand += (sender, args) =>
+            {
+                args.Cancel = dc;
+
+                if (args.Node is DataNode node && Instance.IsOpened(node) && !dc)
+                {
+                    MessageBox.Show("Error: This node is currently open in an editor\nPlease close it first to expand");
+                    args.Cancel = true;
+                }
+
+                dc = false;
+            };
+
             treeView1.AfterExpand += (sender, args) =>
             {
                 args.Node.Nodes.Clear();
@@ -127,13 +134,13 @@ namespace HSDRawViewer
                 }
                 try
                 {
-                    var kb = OpenTK.Input.Keyboard.GetState();
+                    /*var kb = OpenTK.Input.Keyboard.GetState();
                     if (kb.IsKeyDown(OpenTK.Input.Key.ShiftLeft) || kb.IsKeyDown(OpenTK.Input.Key.ShiftRight))
                     {
                         treeView1.BeginUpdate();
                         treeView1.SelectedNode.ExpandAll();
                         treeView1.EndUpdate();
-                    }
+                    }*/
                 }
                 catch (Exception)
                 {
@@ -162,12 +169,15 @@ namespace HSDRawViewer
                     _nodePropertyViewer.SetAccessor(cast);
                 }
                 SelectedDataNode = n;
-                OpenEditor();
 
                 LocationLabel.Text = "Location: 0x" + RawHSDFile.GetOffsetFromStruct(n.Accessor._s).ToString("X8") + " -> " + n.FullPath;
             }
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
         public static void DeleteRoot(DataNode root)
         {
             var toDel = Instance.RawHSDFile.Roots.Find(r=>r.Data == root.Accessor);
@@ -292,7 +302,38 @@ namespace HSDRawViewer
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Closes any editors that are using the given node
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns>true if editor was successfully closed</returns>
+        public bool CloseEditor(DataNode n)
+        {
+            List<Form> toClose = GetEditors(n);
+            foreach (var c in toClose)
+                c.Close();
+            return toClose.Count > 0;
+        }
+
+        /// <summary>
+        /// Gets editors using given node
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns>Editors that are using this node</returns>
+        public List<Form> GetEditors(DataNode n)
+        {
+            List<Form> editors = new List<Form>();
+            foreach (var c in dockPanel.Contents)
+            {
+                if (c is EditorBase b && b.Node.Accessor._s == n.Accessor._s && c is Form form)
+                {
+                    editors.Add(form);
+                }
+            }
+            return editors;
+        }
+
         /// <summary>
         /// Returns true if node is currently open in editor
         /// </summary>
@@ -374,23 +415,25 @@ namespace HSDRawViewer
                 }
             }
 
-            if (!IsChildOpened(SelectedDataNode.Accessor._s) && !IsOpened(SelectedDataNode) && edit != null && edit is DockContent dc)
+            if (IsOpened(SelectedDataNode))
+            {
+                var editor = GetEditors(SelectedDataNode);
+                editor[0].BringToFront();
+            }else
+            if (!IsChildOpened(SelectedDataNode.Accessor._s) && 
+                edit != null && 
+                edit is DockContent dc)
             {
                 Editors.Add(edit);
                 SelectedDataNode.Collapse();
                 edit.Node = SelectedDataNode;
+
                 dc.Show(dockPanel);
+
                 dc.Text = SelectedDataNode.Text;
                 dc.TabText = SelectedDataNode.Text;
-
-                try
-                {
-                    //if (dc is EditorBase b)
-                    //    dc.DockState = b.DefaultDockState;
-                }catch(Exception)
-                {
-
-                }
+                if (dc is EditorBase b)
+                    dc.DockState = b.DefaultDockState;
             }
         }
 

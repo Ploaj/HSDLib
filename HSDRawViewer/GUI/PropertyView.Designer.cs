@@ -34,12 +34,14 @@ namespace HSDRawViewer.GUI
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.panel1 = new System.ComponentModel.Design.ByteViewer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ByteBox = new System.Windows.Forms.TextBox();
             this.Int16Box = new System.Windows.Forms.TextBox();
             this.Int32Box = new System.Windows.Forms.TextBox();
             this.floatBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.offsetBox = new System.Windows.Forms.MaskedTextBox();
+            this.buttonByte = new System.Windows.Forms.Button();
             this.buttonInt16 = new System.Windows.Forms.Button();
             this.buttonInt32 = new System.Windows.Forms.Button();
             this.buttonFloat = new System.Windows.Forms.Button();
@@ -77,6 +79,8 @@ namespace HSDRawViewer.GUI
             this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.panel1.Location = new System.Drawing.Point(118, 19);
             this.panel1.Name = "panel1";
             this.panel1.RowCount = 1;
@@ -86,17 +90,21 @@ namespace HSDRawViewer.GUI
             this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.Size = new System.Drawing.Size(634, 241);
+            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.panel1.Size = new System.Drawing.Size(634, 283);
             this.panel1.TabIndex = 2;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.ByteBox);
             this.groupBox1.Controls.Add(this.Int16Box);
             this.groupBox1.Controls.Add(this.Int32Box);
             this.groupBox1.Controls.Add(this.floatBox);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.offsetBox);
+            this.groupBox1.Controls.Add(this.buttonByte);
             this.groupBox1.Controls.Add(this.buttonInt16);
             this.groupBox1.Controls.Add(this.buttonInt32);
             this.groupBox1.Controls.Add(this.buttonFloat);
@@ -104,10 +112,19 @@ namespace HSDRawViewer.GUI
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 224);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(756, 266);
+            this.groupBox1.Size = new System.Drawing.Size(756, 329);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Hex View";
+            // 
+            // ByteBox
+            // 
+            this.ByteBox.Location = new System.Drawing.Point(6, 289);
+            this.ByteBox.MaxLength = 3;
+            this.ByteBox.Name = "ByteBox";
+            this.ByteBox.Size = new System.Drawing.Size(109, 20);
+            this.ByteBox.TabIndex = 6;
+            this.ByteBox.TextChanged += new System.EventHandler(this.ByteBox_TextChanged);
             // 
             // Int16Box
             // 
@@ -161,6 +178,17 @@ namespace HSDRawViewer.GUI
             this.offsetBox.TabIndex = 4;
             this.offsetBox.TextChanged += new System.EventHandler(this.offsetBox_TextChanged);
             // 
+            // buttonByte
+            // 
+            this.buttonByte.Enabled = false;
+            this.buttonByte.Location = new System.Drawing.Point(6, 260);
+            this.buttonByte.Name = "buttonByte";
+            this.buttonByte.Size = new System.Drawing.Size(109, 23);
+            this.buttonByte.TabIndex = 3;
+            this.buttonByte.Text = "Set Byte";
+            this.buttonByte.UseVisualStyleBackColor = true;
+            this.buttonByte.Click += new System.EventHandler(this.buttonByte_Click);
+            // 
             // buttonInt16
             // 
             this.buttonInt16.Location = new System.Drawing.Point(6, 205);
@@ -193,7 +221,7 @@ namespace HSDRawViewer.GUI
             // 
             // PropertyView
             // 
-            this.ClientSize = new System.Drawing.Size(756, 490);
+            this.ClientSize = new System.Drawing.Size(756, 553);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.propertyGrid1);
@@ -219,5 +247,7 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.TextBox Int16Box;
         private System.Windows.Forms.Button buttonInt16;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox ByteBox;
+        private System.Windows.Forms.Button buttonByte;
     }
 }

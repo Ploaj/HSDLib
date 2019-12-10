@@ -3,7 +3,7 @@ using HSDRaw.Common.Animation;
 
 namespace HSDRaw.Melee.Gr
 {
-    public class SBM_Model_Group : HSDAccessor
+    public class Map_GOBJ : HSDAccessor
     {
         public override int TrimmedSize => 0x34;
 

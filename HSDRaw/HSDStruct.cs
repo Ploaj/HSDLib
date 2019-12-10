@@ -339,6 +339,40 @@ namespace HSDRaw
         /// <typeparam name="T"></typeparam>
         /// <param name="loc"></param>
         /// <returns></returns>
+        public T[] GetNullPointerArray<T>(int loc) where T : HSDAccessor
+        {
+            var re = GetReference<HSDNullPointerArrayAccessor<T>>(loc);
+            if (re == null)
+                return null;
+            return re.Array;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="loc">location of array pointer</param>
+        /// <param name="countLoc">location of count</param>
+        /// <param name="value"></param>
+        public void SetNullPointerArray<T>(int loc, T[] value) where T : HSDAccessor
+        {
+            if (value == null || value.Length == 0)
+            {
+                SetReference(loc, null);
+            }
+            else
+            {
+                var re = GetCreateReference<HSDArrayAccessor<T>>(loc);
+                re.Array = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="loc"></param>
+        /// <returns></returns>
         public T[] GetArray<T>(int loc) where T : HSDAccessor
         {
             var re = GetReference<HSDArrayAccessor<T>>(loc);
@@ -351,21 +385,21 @@ namespace HSDRaw
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="loc"></param>
-        /// <param name="locCount"></param>
+        /// <param name="loc">location of array pointer</param>
+        /// <param name="countLoc">location of count</param>
         /// <param name="value"></param>
-        public void SetArray<T>(int loc, int locCount, T[] value) where T : HSDAccessor
+        public void SetArray<T>(int loc, int countLoc, T[] value) where T : HSDAccessor
         {
             if (value == null || value.Length == 0)
             {
-                if(locCount != -1)
-                    SetInt32(locCount, 0);
+                if(countLoc != -1)
+                    SetInt32(countLoc, 0);
                 SetReference(loc, null);
             }
             else
             {
-                if (locCount != -1)
-                    SetInt32(locCount, value.Length);
+                if (countLoc != -1)
+                    SetInt32(countLoc, value.Length);
                 var re = GetCreateReference<HSDArrayAccessor<T>>(loc);
                 re.Array = value;
             }

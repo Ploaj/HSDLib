@@ -33,6 +33,14 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.subActionList = new System.Windows.Forms.ListBox();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.buttonAdd = new System.Windows.Forms.ToolStripButton();
+            this.buttonRemove = new System.Windows.Forms.ToolStripButton();
+            this.buttonUp = new System.Windows.Forms.ToolStripButton();
+            this.buttonDown = new System.Windows.Forms.ToolStripButton();
+            this.buttonEdit = new System.Windows.Forms.ToolStripButton();
+            this.buttonCut = new System.Windows.Forms.ToolStripButton();
+            this.buttonCopy = new System.Windows.Forms.ToolStripButton();
+            this.buttonPaste = new System.Windows.Forms.ToolStripButton();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonGoto = new System.Windows.Forms.Button();
@@ -41,15 +49,7 @@
             this.actionList = new System.Windows.Forms.ListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.buttonAdd = new System.Windows.Forms.ToolStripButton();
-            this.buttonRemove = new System.Windows.Forms.ToolStripButton();
-            this.buttonEdit = new System.Windows.Forms.ToolStripButton();
-            this.buttonUp = new System.Windows.Forms.ToolStripButton();
-            this.buttonDown = new System.Windows.Forms.ToolStripButton();
-            this.buttonCopy = new System.Windows.Forms.ToolStripButton();
-            this.buttonPaste = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.buttonCut = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -86,6 +86,7 @@
             this.subActionList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.subActionList.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.subActionList.FormattingEnabled = true;
+            this.subActionList.HorizontalExtent = 1000;
             this.subActionList.HorizontalScrollbar = true;
             this.subActionList.ItemHeight = 16;
             this.subActionList.Location = new System.Drawing.Point(3, 70);
@@ -115,6 +116,86 @@
             this.toolStrip2.Size = new System.Drawing.Size(492, 25);
             this.toolStrip2.TabIndex = 1;
             this.toolStrip2.Text = "toolStrip2";
+            // 
+            // buttonAdd
+            // 
+            this.buttonAdd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonAdd.Image = global::HSDRawViewer.Properties.Resources.ts_add;
+            this.buttonAdd.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(23, 22);
+            this.buttonAdd.Text = "Add";
+            this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
+            // 
+            // buttonRemove
+            // 
+            this.buttonRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonRemove.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
+            this.buttonRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonRemove.Name = "buttonRemove";
+            this.buttonRemove.Size = new System.Drawing.Size(23, 22);
+            this.buttonRemove.Text = "Remove";
+            this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
+            // 
+            // buttonUp
+            // 
+            this.buttonUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonUp.Image = global::HSDRawViewer.Properties.Resources.ts_up;
+            this.buttonUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonUp.Name = "buttonUp";
+            this.buttonUp.Size = new System.Drawing.Size(23, 22);
+            this.buttonUp.Text = "Move Up";
+            this.buttonUp.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
+            // buttonDown
+            // 
+            this.buttonDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDown.Image = global::HSDRawViewer.Properties.Resources.ts_down;
+            this.buttonDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDown.Name = "buttonDown";
+            this.buttonDown.Size = new System.Drawing.Size(23, 22);
+            this.buttonDown.Text = "Move Down";
+            this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
+            // 
+            // buttonEdit
+            // 
+            this.buttonEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonEdit.Image = ((System.Drawing.Image)(resources.GetObject("buttonEdit.Image")));
+            this.buttonEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonEdit.Name = "buttonEdit";
+            this.buttonEdit.Size = new System.Drawing.Size(31, 22);
+            this.buttonEdit.Text = "Edit";
+            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
+            // 
+            // buttonCut
+            // 
+            this.buttonCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonCut.Image = ((System.Drawing.Image)(resources.GetObject("buttonCut.Image")));
+            this.buttonCut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonCut.Name = "buttonCut";
+            this.buttonCut.Size = new System.Drawing.Size(30, 22);
+            this.buttonCut.Text = "Cut";
+            this.buttonCut.Click += new System.EventHandler(this.buttonCut_Click);
+            // 
+            // buttonCopy
+            // 
+            this.buttonCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonCopy.Image = ((System.Drawing.Image)(resources.GetObject("buttonCopy.Image")));
+            this.buttonCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonCopy.Name = "buttonCopy";
+            this.buttonCopy.Size = new System.Drawing.Size(39, 22);
+            this.buttonCopy.Text = "Copy";
+            this.buttonCopy.Click += new System.EventHandler(this.buttonCopy_Click);
+            // 
+            // buttonPaste
+            // 
+            this.buttonPaste.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonPaste.Image = ((System.Drawing.Image)(resources.GetObject("buttonPaste.Image")));
+            this.buttonPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonPaste.Name = "buttonPaste";
+            this.buttonPaste.Size = new System.Drawing.Size(39, 22);
+            this.buttonPaste.Text = "Paste";
+            this.buttonPaste.Click += new System.EventHandler(this.buttonPaste_Click);
             // 
             // label1
             // 
@@ -201,76 +282,6 @@
             this.toolStrip1.TabIndex = 6;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // buttonAdd
-            // 
-            this.buttonAdd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonAdd.Image = global::HSDRawViewer.Properties.Resources.ts_add;
-            this.buttonAdd.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(23, 22);
-            this.buttonAdd.Text = "Add";
-            this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
-            // 
-            // buttonRemove
-            // 
-            this.buttonRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonRemove.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
-            this.buttonRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(23, 22);
-            this.buttonRemove.Text = "Remove";
-            this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
-            // 
-            // buttonEdit
-            // 
-            this.buttonEdit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonEdit.Image = ((System.Drawing.Image)(resources.GetObject("buttonEdit.Image")));
-            this.buttonEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonEdit.Name = "buttonEdit";
-            this.buttonEdit.Size = new System.Drawing.Size(31, 22);
-            this.buttonEdit.Text = "Edit";
-            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
-            // 
-            // buttonUp
-            // 
-            this.buttonUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonUp.Image = global::HSDRawViewer.Properties.Resources.ts_up;
-            this.buttonUp.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonUp.Name = "buttonUp";
-            this.buttonUp.Size = new System.Drawing.Size(23, 22);
-            this.buttonUp.Text = "Move Up";
-            this.buttonUp.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // buttonDown
-            // 
-            this.buttonDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonDown.Image = global::HSDRawViewer.Properties.Resources.ts_down;
-            this.buttonDown.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonDown.Name = "buttonDown";
-            this.buttonDown.Size = new System.Drawing.Size(23, 22);
-            this.buttonDown.Text = "Move Down";
-            this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
-            // 
-            // buttonCopy
-            // 
-            this.buttonCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonCopy.Image = ((System.Drawing.Image)(resources.GetObject("buttonCopy.Image")));
-            this.buttonCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonCopy.Name = "buttonCopy";
-            this.buttonCopy.Size = new System.Drawing.Size(39, 22);
-            this.buttonCopy.Text = "Copy";
-            this.buttonCopy.Click += new System.EventHandler(this.buttonCopy_Click);
-            // 
-            // buttonPaste
-            // 
-            this.buttonPaste.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonPaste.Image = ((System.Drawing.Image)(resources.GetObject("buttonPaste.Image")));
-            this.buttonPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonPaste.Name = "buttonPaste";
-            this.buttonPaste.Size = new System.Drawing.Size(39, 22);
-            this.buttonPaste.Text = "Paste";
-            this.buttonPaste.Click += new System.EventHandler(this.buttonPaste_Click);
-            // 
             // toolStripButton1
             // 
             this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -280,16 +291,6 @@
             this.toolStripButton1.Size = new System.Drawing.Size(133, 22);
             this.toolStripButton1.Text = "Create New Subroutine";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
-            // 
-            // buttonCut
-            // 
-            this.buttonCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonCut.Image = ((System.Drawing.Image)(resources.GetObject("buttonCut.Image")));
-            this.buttonCut.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonCut.Name = "buttonCut";
-            this.buttonCut.Size = new System.Drawing.Size(30, 22);
-            this.buttonCut.Text = "Cut";
-            this.buttonCut.Click += new System.EventHandler(this.buttonCut_Click);
             // 
             // SubactionEditor
             // 

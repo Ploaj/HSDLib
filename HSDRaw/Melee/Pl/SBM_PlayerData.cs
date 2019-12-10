@@ -10,7 +10,7 @@ namespace HSDRaw.Melee.Pl
 
         public HSDAccessor Attributes2 { get => _s.GetReference<HSDAccessor>(0x04); set => _s.SetReference(0x04, value); }
         
-        public HSDAccessor UnknownNode { get => _s.GetReference<HSDAccessor>(0x08); set => _s.SetReference(0x08, value); }
+        public SBM_PlayerModelLookupTables ModelLookupTables { get => _s.GetReference<SBM_PlayerModelLookupTables>(0x08); set => _s.SetReference(0x08, value); }
 
         public SBM_SubActionTable SubActionTable { get => _s.GetReference<SBM_SubActionTable>(0x0C); set => _s.SetReference(0x0C, value); }
 

@@ -40,10 +40,11 @@ namespace HSDRawViewer
             { typeof(HSD_TexAnim), "anim_texture" },
             { typeof(SBM_Map_Head), "group" },
             { typeof(SBM_GeneralPoints), "group" },
-            { typeof(SBM_Model_Group), "group" },
+            { typeof(Map_GOBJ), "group" },
             { typeof(SBM_EffectModel), "group" },
             { typeof(SBM_EffectTable), "table" },
             { typeof(SBM_SubActionTable), "table" },
+            { typeof(SBM_PlayerModelLookupTables), "table" },
         };
 
         /// <summary>
@@ -65,7 +66,12 @@ namespace HSDRawViewer
             }
             return false;
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <param name="accessor"></param>
         public DataNode(string Text, HSDAccessor accessor)
         {
             this.Text = Text;
@@ -96,6 +102,11 @@ namespace HSDRawViewer
                 Nodes.Add(new TreeNode()); // dummy
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="access"></param>
+        /// <param name="index"></param>
         private void AddNext(HSDAccessor access, int index)
         {
             foreach (var prop in access.GetType().GetProperties())
@@ -113,6 +124,9 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Refresh()
         {
             if (Parent != null && Parent is DataNode parent)
@@ -132,15 +146,11 @@ namespace HSDRawViewer
             Expand();
         }
 
+        /// <summary>
+        /// Expands node to contain sub structures
+        /// </summary>
         public void ExpandData()
         {
-            if (MainForm.Instance.IsOpened(this))
-            {
-                MessageBox.Show("Error: This node is currently open in an editor");
-                Collapse();
-                return;
-            }
-
             HashSet<HSDStruct> strucs = new HashSet<HSDStruct>();
 
             foreach(var prop in Accessor.GetType().GetProperties())
@@ -200,6 +210,9 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Export()
         {
             using (SaveFileDialog f = new SaveFileDialog())
@@ -219,6 +232,11 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         private bool OpenDAT(out HSDRawFile file)
         {
             file = null;
@@ -236,6 +254,10 @@ namespace HSDRawViewer
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newStruct"></param>
         private void ReplaceMe(HSDAccessor newStruct)
         {
             Accessor._s.SetData(newStruct._s.GetData());
@@ -246,27 +268,45 @@ namespace HSDRawViewer
             }
         }
 
-        public void Import()
+        /// <summary>
+        /// Returns true if this node can be safely modified
+        /// </summary>
+        /// <returns>return true is success</returns>
+        private bool CanEdit()
         {
             if (MainForm.Instance.IsOpened(this))
             {
-                MessageBox.Show("Error: This node is currently open in an editor");
-                return;
+                if (MessageBox.Show("Node is open in editor\nClose Editor?", "Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    MainForm.Instance.CloseEditor(this);
+                else
+                    return false;
             }
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Import()
+        {
+            if (!CanEdit())
+                return;
+
             HSDRawFile file;
             if (OpenDAT(out file))
             {
                 ReplaceMe(file.Roots[0].Data);
             }
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public void Delete()
         {
-            if (MainForm.Instance.IsOpened(this))
-            {
-                MessageBox.Show("Error: This node is currently open in an editor");
+            if (!CanEdit())
                 return;
-            }
+
             if (Parent != null && Parent is DataNode parent)
             {
                 if (Accessor is HSD_DOBJ dobj)
@@ -321,7 +361,7 @@ namespace HSDRawViewer
 #region Special
 
         /// <summary>
-        /// Opens a <see cref="SBM_Model_Group"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
+        /// Opens a <see cref="Map_GOBJ"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
         /// </summary>
         public void ImportModelGroup()
         {
@@ -330,7 +370,7 @@ namespace HSDRawViewer
             {
                 var group = head.ModelGroups.ToList();
 
-                group.Add(new SBM_Model_Group() { _s = file.Roots[0].Data._s });
+                group.Add(new Map_GOBJ() { _s = file.Roots[0].Data._s });
 
                 head.ModelGroups = group.ToArray();
 

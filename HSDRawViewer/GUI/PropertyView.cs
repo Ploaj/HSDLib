@@ -99,11 +99,18 @@ namespace HSDRawViewer.GUI
             buttonFloat.Enabled = false;
 
             floatBox.Text = "0";
+            ByteBox.Text = "0";
             Int16Box.Text = "0";
             Int32Box.Text = "0";
 
             if (accessor == null || CurrentOffset < 0)
                 return;
+
+            if (CurrentOffset + 1 >= accessor._s.Length || IsReference(CurrentOffset, 1))
+                return;
+
+            buttonByte.Enabled = true;
+            buttonByte.Text = accessor._s.GetByte((int)CurrentOffset).ToString();
 
             if (CurrentOffset + 2 >= accessor._s.Length || IsReference(CurrentOffset, 2))
                 return;
@@ -181,6 +188,28 @@ namespace HSDRawViewer.GUI
             if (accessor != null)
             {
                 accessor._s.SetInt16((int)CurrentOffset, short.Parse(Int16Box.Text));
+                SetAccessor(accessor);
+                UpdateValues();
+            }
+        }
+
+        private string prevByte = "";
+        private void ByteBox_TextChanged(object sender, System.EventArgs e)
+        {
+            byte f;
+            if (byte.TryParse(ByteBox.Text, out f))
+            {
+                prevByte = ByteBox.Text;
+            }
+            else
+                ByteBox.Text = prevByte;
+        }
+
+        private void buttonByte_Click(object sender, System.EventArgs e)
+        {
+            if (accessor != null)
+            {
+                accessor._s.SetByte((int)CurrentOffset, byte.Parse(ByteBox.Text));
                 SetAccessor(accessor);
                 UpdateValues();
             }

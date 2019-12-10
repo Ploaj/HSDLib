@@ -106,7 +106,14 @@ namespace HSDRaw
                     var temp = r.BaseStream.Position;
 
                     r.BaseStream.Position = offset;
+
                     var objectOff = r.ReadInt32() + 0x20;
+                    
+                    if(objectOff < 0)
+                    {
+                        r.BaseStream.Position = temp;
+                        continue;
+                    }
 
                     relocOffsets.Add(offset, objectOff);
 
@@ -187,7 +194,7 @@ namespace HSDRaw
                     var innerOffsets = offsetToInnerOffsets[str.Key];
                     for(int i = 0; i < offsets.Count; i++)
                     {
-                        if(offsetToStruct.ContainsKey(offsets[i]))
+                        if(offsetToStruct.ContainsKey(offsets[i]) && str.Value.Length >= innerOffsets[i] - str.Key + 4)
                             str.Value.SetReferenceStruct(innerOffsets[i] - str.Key, offsetToStruct[offsets[i]]);
                     }
 
