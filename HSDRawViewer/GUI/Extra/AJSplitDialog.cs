@@ -320,34 +320,36 @@ namespace HSDRawViewer.GUI
         private void ExportFiles()
         {
             var filePath = Tools.FileIO.SaveFile("Pl**.dat (*.dat)|*.dat", "Pl" + FighterName + ".dat");
-            if(filePath != null)
-                PlayerFile.Save(filePath, false, false);
-
-            if (AJLoaded)
+            if (filePath != null)
             {
-                var AJPath = Tools.FileIO.SaveFile("Pl**AJ.dat (*.dat)|*.dat", "Pl" + FighterName + "AJ.dat");
-                if(AJPath != null)
-                using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
+                if (AJLoaded)
                 {
-                    PlayerData.SubActionTable.Subactions = CreateAnimationFile(w, PlayerData.SubActionTable.Subactions, FightingAnimations);
+                    var AJPath = Tools.FileIO.SaveFile("Pl**AJ.dat (*.dat)|*.dat", "Pl" + FighterName + "AJ.dat");
+                    if (AJPath != null)
+                        using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
+                        {
+                            PlayerData.SubActionTable.Subactions = CreateAnimationFile(w, PlayerData.SubActionTable.Subactions, FightingAnimations);
+                        }
                 }
-            }
 
-            if (ResultLoaded)
-            {
-                var resultPath = Tools.FileIO.SaveFile("GrRstM**.dat (*.dat)|*.dat", "GrRstM"+FighterName+".dat");
-                if(resultPath != null)
+                if (ResultLoaded)
                 {
-                    HSDRawFile res = new HSDRawFile();
-                    res.Roots.Add(new HSDRootNode() { Name = "ftDemoResultMotionFile" + FighterName, Data = new HSDAccessor() });
-                    using (BinaryWriter w = new BinaryWriter(new MemoryStream()))
+                    var resultPath = Tools.FileIO.SaveFile("GrRstM**.dat (*.dat)|*.dat", "GrRstM" + FighterName + ".dat");
+                    if (resultPath != null)
                     {
-                        PlayerData.WinSubAction.Subactions = CreateAnimationFile(w, PlayerData.WinSubAction.Subactions, ResultAnimations);
+                        HSDRawFile res = new HSDRawFile();
+                        res.Roots.Add(new HSDRootNode() { Name = "ftDemoResultMotionFile" + FighterName, Data = new HSDAccessor() });
+                        using (BinaryWriter w = new BinaryWriter(new MemoryStream()))
+                        {
+                            PlayerData.WinSubAction.Subactions = CreateAnimationFile(w, PlayerData.WinSubAction.Subactions, ResultAnimations);
 
-                        res.Roots[0].Data._s.SetData(((MemoryStream)w.BaseStream).ToArray());
+                            res.Roots[0].Data._s.SetData(((MemoryStream)w.BaseStream).ToArray());
+                        }
+                        res.Save(resultPath);
                     }
-                    res.Save(resultPath);
                 }
+
+                PlayerFile.Save(filePath, false, false);
             }
         }
 

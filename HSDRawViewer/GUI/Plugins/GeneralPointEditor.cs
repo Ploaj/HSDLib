@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRaw.Melee.Gr;
 using HSDRaw.Common;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using OpenTK.Input;
+using System.Collections.Generic;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -229,15 +231,17 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void SavePointChanges()
         {
-            SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[PointLinks.Count];
-            var jobjs = GeneralPoints.JOBJReference.BreathFirstSearch;
+            var list = PointLinks;// new List<PointLink>(PointLinks.ToList().OrderBy(e => e.Type));
 
+            SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[list.Count];
+            var jobjs = GeneralPoints.JOBJReference.BreathFirstSearch;
+            
             for(int i = 0; i < p.Length; i++)
             {
                 p[i] = new SBM_GeneralPointInfo()
                 {
-                    Type = PointLinks[i].Type,
-                    JOBJIndex = (short)jobjs.IndexOf(PointLinks[i].JOBJ)
+                    Type = list[i].Type,
+                    JOBJIndex = (short)jobjs.IndexOf(list[i].JOBJ)
                 };
             }
             GeneralPoints.Points = p;
@@ -263,6 +267,7 @@ namespace HSDRawViewer.GUI.Plugins
             var jobj = new HSD_JOBJ();
 
             GeneralPoints.JOBJReference.AddChild(jobj);
+
             PointLinks.Add(new PointLink()
             {
                 JOBJ = jobj
@@ -272,6 +277,41 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
 
+        private void buttonUp_Click(object sender, EventArgs e)
+        {
+            var index = PointList.SelectedIndex;
+            if (index == -1)
+                return;
+            var item = PointLinks[index];
+
+            PointLinks.RemoveAt(index);
+            index -= 1;
+            if (index < 0)
+                index = PointLinks.Count;
+            PointLinks.Insert(index, item);
+
+            PointList.SelectedIndex = index;
+
+            SavePointChanges();
+        }
+
+        private void buttonDown_Click(object sender, EventArgs e)
+        {
+            var index = PointList.SelectedIndex;
+            if (index == -1)
+                return;
+            var item = PointLinks[index];
+
+            PointLinks.RemoveAt(index);
+            index += 1;
+            if (index >= PointLinks.Count)
+                index = 0;
+            PointLinks.Insert(index, item);
+
+            PointList.SelectedIndex = index;
+
+            SavePointChanges();
+        }
 
         #region Shapes
 
@@ -412,5 +452,6 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         #endregion
+
     }
 }

@@ -490,13 +490,15 @@ namespace HSDRaw
                 if (!allStructs.Contains(s))
                     unused.Add(s);
             }
-            if(optimize)
-            foreach(var s in unused)
-            {
-                //TODO: this may be bugged?
-                if(_structCache.Contains(s))
-                    _structCache.Remove(s);
-            }
+            if (optimize)
+                foreach (var s in unused)
+                {
+                    //TODO: this may be bugged?
+                    if (_structCache.Contains(s))
+                    {
+                        _structCache.Remove(s);
+                    }
+                }
             // add missing structs--------------------------------------------------------------------------
             foreach (var s in allStructs)
             {
