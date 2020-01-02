@@ -30,7 +30,8 @@ namespace HSDRawViewer.GUI
 
         private bool ResultLoaded = false;
 
-        private BindingList<Animation> Animations = new BindingList<Animation>();
+        private BindingList<Animation> FightingAnimations = new BindingList<Animation>();
+        private BindingList<Animation> ResultAnimations = new BindingList<Animation>();
 
         private SBM_PlayerData PlayerData;
 
@@ -38,14 +39,23 @@ namespace HSDRawViewer.GUI
         {
             InitializeComponent();
 
-            listBox1.DataSource = Animations;
+            lbFighting.DataSource = FightingAnimations;
+            lbResult.DataSource = ResultAnimations;
 
             CenterToScreen();
         }
 
+        /// <summary>
+        /// Returns true if animation of given name is already loaded
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private bool AnimationLoaded(string name)
         {
-            foreach (var a in Animations)
+            foreach (var a in FightingAnimations)
+                if (a.Name == name)
+                    return true;
+            foreach (var a in ResultAnimations)
                 if (a.Name == name)
                     return true;
             return false;
@@ -62,7 +72,8 @@ namespace HSDRawViewer.GUI
 
             if (f != null)
             {
-                Animations.Clear();
+                ResultAnimations.Clear();
+                FightingAnimations.Clear();
                 PlayerFile = null;
                 PlayerData = null;
                 AJLoaded = false;
@@ -78,9 +89,9 @@ namespace HSDRawViewer.GUI
                         PlayerData = plData;
                         FighterName = root.Name.Replace("ftData", "");
                         Text = "AJ Split - " + FighterName;
-                        openPlAJdatToolStripMenuItem.Enabled = true;
-                        openGmRstMdatToolStripMenuItem.Enabled = true;
-                        exportToolStripMenuItem.Enabled = true;
+                        buttonLoadAnims.Enabled = true;
+                        buttonLoadResult.Enabled = true;
+                        exportDATsToolStripMenuItem.Enabled = true;
                     }
                 }
             }
@@ -93,7 +104,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void openPlAJdatToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("Player Animation DAT (Pl**AJ.dat)|*.dat");
+            var f = Tools.FileIO.OpenFile("Player Animations (Pl**AJ.dat)|*.dat");
 
             if (f != null)
                 LoadAJ(f);
@@ -130,7 +141,7 @@ namespace HSDRawViewer.GUI
                     return;
             }
 
-            listBox1.BeginUpdate();
+            lbFighting.BeginUpdate();
             using (BinaryReader r = new BinaryReader(new FileStream(filePath, FileMode.Open)))
             {
                 var subs = PlayerData.SubActionTable.Subactions;
@@ -142,11 +153,11 @@ namespace HSDRawViewer.GUI
                     {
                         r.BaseStream.Position = v.AnimationOffset;
 
-                        Animations.Add(new Animation() { Name = v.Name, Data = r.ReadBytes(v.AnimationSize) });
+                        FightingAnimations.Add(new Animation() { Name = v.Name, Data = r.ReadBytes(v.AnimationSize) });
                     }
                 }
             }
-            listBox1.EndUpdate();
+            lbFighting.EndUpdate();
 
             AJLoaded = true;
         }
@@ -170,7 +181,7 @@ namespace HSDRawViewer.GUI
                     return;
             }
 
-            listBox1.BeginUpdate();
+            lbResult.BeginUpdate();
             using (BinaryReader r = new BinaryReader(new MemoryStream(gmDat.Roots[0].Data._s.GetData())))
             {
                 var winsubs = PlayerData.WinSubAction.Subactions;
@@ -180,12 +191,25 @@ namespace HSDRawViewer.GUI
                     if (v.Name != null && !AnimationLoaded(v.Name))
                     {
                         r.BaseStream.Position = v.AnimationOffset;
+                        var data = r.ReadBytes(v.AnimationSize);
 
-                        Animations.Add(new Animation() { Name = v.Name, Data = r.ReadBytes(v.AnimationSize) });
+                        try
+                        {
+                            HSDRawFile file = new HSDRawFile(data);
+
+                            if (file.Roots[0].Name != v.Name)
+                                continue;
+
+                            ResultAnimations.Add(new Animation() { Name = v.Name, Data = data });
+                        } catch(Exception)
+                        {
+
+                        }
+
                     }
                 }
             }
-            listBox1.EndUpdate();
+            lbResult.EndUpdate();
 
             ResultLoaded = true;
         }
@@ -197,7 +221,11 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void exportSelected_Click(object sender, EventArgs e)
         {
-            if(listBox1.SelectedItem is Animation a)
+            ListBox box = lbFighting;
+            if (tabControl1.SelectedIndex == 1)
+                box = lbResult;
+
+            if(box.SelectedItem is Animation a)
             {
                 var f = Tools.FileIO.SaveFile("FigaTree DAT (*.dat)|*.dat", a.Name + ".dat");
 
@@ -213,7 +241,10 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonReplace_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedItem is Animation a)
+            ListBox box = lbFighting;
+            if (tabControl1.SelectedIndex == 1)
+                box = lbResult;
+            if (box.SelectedItem is Animation a)
             {
                 var f = Tools.FileIO.OpenFile("FigaTree DAT (*_figatree.dat)|*.dat");
 
@@ -233,6 +264,10 @@ namespace HSDRawViewer.GUI
 
             if(f != null)
             {
+                var Animations = FightingAnimations;
+                if (tabControl1.SelectedIndex == 1)
+                    Animations = ResultAnimations;
+
                 foreach(var a in Animations)
                 {
                     File.WriteAllBytes(Path.Combine(f, a.Name + ".dat"), a.Data);
@@ -254,7 +289,11 @@ namespace HSDRawViewer.GUI
                 foreach (var file in Directory.GetFiles(f))
                 {
                     var fname = Path.GetFileNameWithoutExtension(file);
-                    
+
+                    var Animations = FightingAnimations;
+                    if (tabControl1.SelectedIndex == 1)
+                        Animations = ResultAnimations;
+
                     foreach (var a in Animations)
                     {
                         if (a.Name == fname)
@@ -271,66 +310,68 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // no animations loaded
-            if(Animations.Count == 0)
-            {
-                MessageBox.Show("Please load an Animation file Pl**AJ.dat or GmRstM**.dat");
-                return;
-            }
-
-            var f = Tools.FileIO.SaveFile("Player Animation DAT (Pl**AJ.dat)|*.dat");
-
-            if (f != null)
-            {
-                ExportFiles(f);
-            }
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private Animation GetAnimationByName(string Name)
-        {
-            foreach (var a in Animations)
-                if (a.Name == Name)
-                    return a;
-
-            return Animations[0];
+            ExportFiles();
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        private void ExportFiles(string filePath)
+        private void ExportFiles()
         {
-            var AJPath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath) + "_AJ.dat");
-            var resultPath = Path.Combine(Path.GetDirectoryName(filePath), "GrRstM" + Path.GetFileNameWithoutExtension(filePath) + ".dat");
-            
+            var filePath = Tools.FileIO.SaveFile("Pl**.dat (*.dat)|*.dat", "Pl" + FighterName + ".dat");
+            if(filePath != null)
+                PlayerFile.Save(filePath, false, false);
+
             if (AJLoaded)
+            {
+                var AJPath = Tools.FileIO.SaveFile("Pl**AJ.dat (*.dat)|*.dat", "Pl" + FighterName + "AJ.dat");
+                if(AJPath != null)
                 using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
                 {
-                    PlayerData.SubActionTable.Subactions = CreateAnimationFile(w, PlayerData.SubActionTable.Subactions);
+                    PlayerData.SubActionTable.Subactions = CreateAnimationFile(w, PlayerData.SubActionTable.Subactions, FightingAnimations);
                 }
+            }
 
             if (ResultLoaded)
             {
-                HSDRawFile res = new HSDRawFile();
-                res.Roots.Add(new HSDRootNode() { Name = "ftDemoResultMotionFile" + FighterName, Data = new HSDAccessor() });
-                using (BinaryWriter w = new BinaryWriter(new MemoryStream()))
+                var resultPath = Tools.FileIO.SaveFile("GrRstM**.dat (*.dat)|*.dat", "GrRstM"+FighterName+".dat");
+                if(resultPath != null)
                 {
-                    PlayerData.WinSubAction.Subactions = CreateAnimationFile(w, PlayerData.WinSubAction.Subactions);
+                    HSDRawFile res = new HSDRawFile();
+                    res.Roots.Add(new HSDRootNode() { Name = "ftDemoResultMotionFile" + FighterName, Data = new HSDAccessor() });
+                    using (BinaryWriter w = new BinaryWriter(new MemoryStream()))
+                    {
+                        PlayerData.WinSubAction.Subactions = CreateAnimationFile(w, PlayerData.WinSubAction.Subactions, ResultAnimations);
 
-                    res.Roots[0].Data._s.SetData(((MemoryStream)w.BaseStream).ToArray());
+                        res.Roots[0].Data._s.SetData(((MemoryStream)w.BaseStream).ToArray());
+                    }
+                    res.Save(resultPath);
                 }
-                res.Save(resultPath);
             }
-
-            PlayerFile.Save(filePath, true, false);
         }
 
-        private SBM_FighterSubAction[] CreateAnimationFile(BinaryWriter w, SBM_FighterSubAction[] subs)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private Animation GetAnimationByName(string Name, BindingList<Animation> anims)
+        {
+            foreach (var a in anims)
+                if (a.Name == Name)
+                    return a;
+
+            return null;
+        }
+        
+        /// <summary>
+        /// Creates a new animation file and returns the adjusted subactions
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="subs"></param>
+        /// <returns></returns>
+        private SBM_FighterSubAction[] CreateAnimationFile(BinaryWriter w, SBM_FighterSubAction[] subs, BindingList<Animation> anims)
         {
             Dictionary<string, Tuple<int, int>> animToOffset = new Dictionary<string, Tuple<int, int>>();
 
@@ -340,19 +381,25 @@ namespace HSDRawViewer.GUI
                 {
                     if (!animToOffset.ContainsKey(v.Name))
                     {
-                        var a = GetAnimationByName(v.Name);
+                        var a = GetAnimationByName(v.Name, anims);
 
-                        animToOffset.Add(a.Name, new Tuple<int, int>((int)w.BaseStream.Position, a.Data.Length));
-                        w.Write(a.Data);
+                        if (a != null)
+                        {
+                            animToOffset.Add(a.Name, new Tuple<int, int>((int)w.BaseStream.Position, a.Data.Length));
+                            w.Write(a.Data);
 
-                        while (w.BaseStream.Position % 0x20 != 0)
-                            w.Write((byte)0xFF);
+                            while (w.BaseStream.Position % 0x20 != 0)
+                                w.Write((byte)0xFF);
+                        }
                     }
 
-                    var off = animToOffset[v.Name];
+                    if (animToOffset.ContainsKey(v.Name))
+                    {
+                        var off = animToOffset[v.Name];
 
-                    v.AnimationOffset = off.Item1;
-                    v.AnimationSize = off.Item2;
+                        v.AnimationOffset = off.Item1;
+                        v.AnimationSize = off.Item2;
+                    }
                 }
             }
 

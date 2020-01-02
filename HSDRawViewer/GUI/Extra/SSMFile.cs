@@ -84,8 +84,6 @@ namespace HSDRawViewer.GUI.Extra
                 {
                     var channel = new DSPChannel();
 
-                    r.PrintPosition();
-
                     channel.LoopFlag = r.ReadInt16();
                     channel.Format = r.ReadInt16();
                     var SA = r.ReadInt32();
@@ -107,7 +105,7 @@ namespace HSDRawViewer.GUI.Extra
                 // read blocks
                 r.Position = 0x80;
 
-                Dictionary<uint, int> OffsetToLoopPosition = new Dictionary<uint, int>();
+                Dictionary<int, int> OffsetToLoopPosition = new Dictionary<int, int>();
                 List<byte> channelData1 = new List<byte>();
                 List<byte> channelData2 = new List<byte>();
                 while (true)
@@ -115,7 +113,7 @@ namespace HSDRawViewer.GUI.Extra
                     var pos = r.Position;
                     var length = r.ReadInt32();
                     var lengthMinusOne = r.ReadInt32();
-                    var next = r.ReadUInt32();
+                    var next = r.ReadInt32();
                     {
                         var initPS = r.ReadInt16();
                         var initsh1 = r.ReadInt16();
@@ -130,20 +128,23 @@ namespace HSDRawViewer.GUI.Extra
                     }
                     r.ReadInt32();
 
-                    OffsetToLoopPosition.Add(pos, channelData1.Count * 2);
+                    OffsetToLoopPosition.Add((int)pos, channelData1.Count * 2);
                     channelData1.AddRange(r.ReadBytes(length / 2));
                     channelData2.AddRange(r.ReadBytes(length / 2));
 
-                    if (next < r.Position)
+                    if (next < r.Position || next == -1)
                     {
-                        foreach(var c in Channels)
+                        if (next != -1)
                         {
-                            c.LoopStart = OffsetToLoopPosition[next];
+                            foreach (var c in Channels)
+                            {
+                                c.LoopStart = OffsetToLoopPosition[next];
+                            }
                         }
                         break;
                     }
                     else
-                        r.Position = next;
+                        r.Position = (uint)next;
                 }
 
                 Channels[0].Data = channelData1.ToArray();

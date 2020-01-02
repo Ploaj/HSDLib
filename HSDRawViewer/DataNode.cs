@@ -17,7 +17,18 @@ namespace HSDRawViewer
         public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }
         private int ArrayIndex { get; set; }
-        public HSDAccessor Accessor { get; set; }
+
+        public HSDAccessor Accessor { get => _accessor;
+            set
+            {
+                if (PluginManager.HasEditor(value.GetType()))
+                    ForeColor = System.Drawing.Color.DarkSlateBlue;
+                if(value.GetType() == typeof(HSDAccessor))
+                    ForeColor = System.Drawing.Color.Gray;
+                _accessor = value;
+            }
+        }
+        private HSDAccessor _accessor;
 
         private static Dictionary<Type, string> typeToImageKey = new Dictionary<Type, string>()
         {

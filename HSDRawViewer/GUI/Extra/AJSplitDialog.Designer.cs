@@ -28,101 +28,129 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AJSplitDialog));
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openPldatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openPlAJdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openGmRstMdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lbFighting = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.buttonLoadAnims = new System.Windows.Forms.Button();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lbResult = new System.Windows.Forms.ListBox();
+            this.buttonLoadResult = new System.Windows.Forms.Button();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.exportSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.buttonReplace = new System.Windows.Forms.ToolStripButton();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.buttonReplaceAll = new System.Windows.Forms.ToolStripButton();
-            this.menuStrip1.SuspendLayout();
+            this.exportSelected = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.openPldatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportDATsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // listBox1
+            // lbFighting
             // 
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(3, 41);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(298, 264);
-            this.listBox1.TabIndex = 10;
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(310, 24);
-            this.menuStrip1.TabIndex = 11;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openPldatToolStripMenuItem,
-            this.openPlAJdatToolStripMenuItem,
-            this.openGmRstMdatToolStripMenuItem,
-            this.exportToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "File";
-            // 
-            // openPldatToolStripMenuItem
-            // 
-            this.openPldatToolStripMenuItem.Name = "openPldatToolStripMenuItem";
-            this.openPldatToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.openPldatToolStripMenuItem.Text = "Open Pl**.dat";
-            this.openPldatToolStripMenuItem.Click += new System.EventHandler(this.openPldatToolStripMenuItem_Click);
-            // 
-            // openPlAJdatToolStripMenuItem
-            // 
-            this.openPlAJdatToolStripMenuItem.Enabled = false;
-            this.openPlAJdatToolStripMenuItem.Name = "openPlAJdatToolStripMenuItem";
-            this.openPlAJdatToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.openPlAJdatToolStripMenuItem.Text = "Open Pl**AJ.dat";
-            this.openPlAJdatToolStripMenuItem.Click += new System.EventHandler(this.openPlAJdatToolStripMenuItem_Click);
-            // 
-            // openGmRstMdatToolStripMenuItem
-            // 
-            this.openGmRstMdatToolStripMenuItem.Enabled = false;
-            this.openGmRstMdatToolStripMenuItem.Name = "openGmRstMdatToolStripMenuItem";
-            this.openGmRstMdatToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.openGmRstMdatToolStripMenuItem.Text = "Open GmRstM**.dat";
-            this.openGmRstMdatToolStripMenuItem.Click += new System.EventHandler(this.openGmRstMdatToolStripMenuItem_Click);
+            this.lbFighting.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbFighting.FormattingEnabled = true;
+            this.lbFighting.Location = new System.Drawing.Point(3, 26);
+            this.lbFighting.Name = "lbFighting";
+            this.lbFighting.Size = new System.Drawing.Size(511, 201);
+            this.lbFighting.TabIndex = 10;
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox1.Controls.Add(this.listBox1);
+            this.groupBox1.Controls.Add(this.tabControl1);
             this.groupBox1.Controls.Add(this.toolStrip1);
-            this.groupBox1.Location = new System.Drawing.Point(0, 27);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(304, 308);
+            this.groupBox1.Size = new System.Drawing.Size(531, 300);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Animations";
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(3, 41);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(525, 256);
+            this.tabControl1.TabIndex = 12;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.lbFighting);
+            this.tabPage1.Controls.Add(this.buttonLoadAnims);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(517, 230);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Fighting Animations";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // buttonLoadAnims
+            // 
+            this.buttonLoadAnims.Dock = System.Windows.Forms.DockStyle.Top;
+            this.buttonLoadAnims.Enabled = false;
+            this.buttonLoadAnims.Location = new System.Drawing.Point(3, 3);
+            this.buttonLoadAnims.Name = "buttonLoadAnims";
+            this.buttonLoadAnims.Size = new System.Drawing.Size(511, 23);
+            this.buttonLoadAnims.TabIndex = 11;
+            this.buttonLoadAnims.Text = "Load Pl**AJ.dat";
+            this.buttonLoadAnims.UseVisualStyleBackColor = true;
+            this.buttonLoadAnims.Click += new System.EventHandler(this.openPlAJdatToolStripMenuItem_Click);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.lbResult);
+            this.tabPage2.Controls.Add(this.buttonLoadResult);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(517, 230);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Result Animations";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // lbResult
+            // 
+            this.lbResult.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lbResult.FormattingEnabled = true;
+            this.lbResult.Location = new System.Drawing.Point(3, 26);
+            this.lbResult.Name = "lbResult";
+            this.lbResult.Size = new System.Drawing.Size(511, 201);
+            this.lbResult.TabIndex = 11;
+            // 
+            // buttonLoadResult
+            // 
+            this.buttonLoadResult.Dock = System.Windows.Forms.DockStyle.Top;
+            this.buttonLoadResult.Enabled = false;
+            this.buttonLoadResult.Location = new System.Drawing.Point(3, 3);
+            this.buttonLoadResult.Name = "buttonLoadResult";
+            this.buttonLoadResult.Size = new System.Drawing.Size(511, 23);
+            this.buttonLoadResult.TabIndex = 12;
+            this.buttonLoadResult.Text = "Load GmRstM**.dat";
+            this.buttonLoadResult.UseVisualStyleBackColor = true;
+            this.buttonLoadResult.Click += new System.EventHandler(this.openGmRstMdatToolStripMenuItem_Click);
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDropDownButton3,
             this.toolStripDropDownButton1,
-            this.buttonReplace,
-            this.buttonReplaceAll});
+            this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 16);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(298, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(525, 25);
             this.toolStrip1.TabIndex = 11;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -137,84 +165,109 @@
             this.toolStripDropDownButton1.Size = new System.Drawing.Size(70, 22);
             this.toolStripDropDownButton1.Text = "Export";
             // 
-            // exportSelected
-            // 
-            this.exportSelected.Name = "exportSelected";
-            this.exportSelected.Size = new System.Drawing.Size(152, 22);
-            this.exportSelected.Text = "Selected";
-            this.exportSelected.Click += new System.EventHandler(this.exportSelected_Click);
-            // 
             // exportAllToolStripMenuItem
             // 
             this.exportAllToolStripMenuItem.Name = "exportAllToolStripMenuItem";
-            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.exportAllToolStripMenuItem.Text = "All";
             this.exportAllToolStripMenuItem.Click += new System.EventHandler(this.exportAllToolStripMenuItem_Click);
             // 
-            // buttonReplace
+            // exportSelected
             // 
-            this.buttonReplace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonReplace.Image = ((System.Drawing.Image)(resources.GetObject("buttonReplace.Image")));
-            this.buttonReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonReplace.Name = "buttonReplace";
-            this.buttonReplace.Size = new System.Drawing.Size(52, 22);
-            this.buttonReplace.Text = "Replace";
-            this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
+            this.exportSelected.Name = "exportSelected";
+            this.exportSelected.Size = new System.Drawing.Size(118, 22);
+            this.exportSelected.Text = "Selected";
+            this.exportSelected.Click += new System.EventHandler(this.exportSelected_Click);
             // 
-            // exportToolStripMenuItem
+            // toolStripDropDownButton2
             // 
-            this.exportToolStripMenuItem.Enabled = false;
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
-            this.exportToolStripMenuItem.Text = "Export DATs";
-            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
+            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.allToolStripMenuItem,
+            this.selectedToolStripMenuItem});
+            this.toolStripDropDownButton2.Image = global::HSDRawViewer.Properties.Resources.ico_replace;
+            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            this.toolStripDropDownButton2.Size = new System.Drawing.Size(77, 22);
+            this.toolStripDropDownButton2.Text = "Replace";
             // 
-            // buttonReplaceAll
+            // allToolStripMenuItem
             // 
-            this.buttonReplaceAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonReplaceAll.Image = ((System.Drawing.Image)(resources.GetObject("buttonReplaceAll.Image")));
-            this.buttonReplaceAll.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonReplaceAll.Name = "buttonReplaceAll";
-            this.buttonReplaceAll.Size = new System.Drawing.Size(69, 22);
-            this.buttonReplaceAll.Text = "Replace All";
-            this.buttonReplaceAll.Click += new System.EventHandler(this.buttonReplaceAll_Click);
+            this.allToolStripMenuItem.Name = "allToolStripMenuItem";
+            this.allToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.allToolStripMenuItem.Text = "All";
+            this.allToolStripMenuItem.Click += new System.EventHandler(this.buttonReplaceAll_Click);
+            // 
+            // selectedToolStripMenuItem
+            // 
+            this.selectedToolStripMenuItem.Name = "selectedToolStripMenuItem";
+            this.selectedToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.selectedToolStripMenuItem.Text = "Selected";
+            this.selectedToolStripMenuItem.Click += new System.EventHandler(this.buttonReplace_Click);
+            // 
+            // toolStripDropDownButton3
+            // 
+            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openPldatToolStripMenuItem1,
+            this.exportDATsToolStripMenuItem});
+            this.toolStripDropDownButton3.Image = global::HSDRawViewer.Properties.Resources.ico_folder;
+            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
+            this.toolStripDropDownButton3.Size = new System.Drawing.Size(54, 22);
+            this.toolStripDropDownButton3.Text = "File";
+            // 
+            // openPldatToolStripMenuItem1
+            // 
+            this.openPldatToolStripMenuItem1.Name = "openPldatToolStripMenuItem1";
+            this.openPldatToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.openPldatToolStripMenuItem1.Text = "Open Pl**.dat";
+            this.openPldatToolStripMenuItem1.Click += new System.EventHandler(this.openPldatToolStripMenuItem_Click);
+            // 
+            // exportDATsToolStripMenuItem
+            // 
+            this.exportDATsToolStripMenuItem.Enabled = false;
+            this.exportDATsToolStripMenuItem.Name = "exportDATsToolStripMenuItem";
+            this.exportDATsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportDATsToolStripMenuItem.Text = "Export DATs";
+            this.exportDATsToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
             // AJSplitDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(310, 336);
+            this.ClientSize = new System.Drawing.Size(531, 300);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
             this.Name = "AJSplitDialog";
             this.Text = "AJ Split";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem openPldatToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem openPlAJdatToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem openGmRstMdatToolStripMenuItem;
+        private System.Windows.Forms.ListBox lbFighting;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem exportSelected;
         private System.Windows.Forms.ToolStripMenuItem exportAllToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton buttonReplace;
-        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton buttonReplaceAll;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Button buttonLoadAnims;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.ListBox lbResult;
+        private System.Windows.Forms.Button buttonLoadResult;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
+        private System.Windows.Forms.ToolStripMenuItem allToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton3;
+        private System.Windows.Forms.ToolStripMenuItem openPldatToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem exportDATsToolStripMenuItem;
     }
 }
