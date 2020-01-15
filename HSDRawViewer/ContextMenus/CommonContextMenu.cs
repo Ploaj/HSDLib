@@ -34,25 +34,25 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
 
-            if(SupportedTypes != null)
-            foreach(var v in SupportedTypes)
-            {
-                if(PluginManager.HasEditor(v))
+            if (SupportedTypes != null)
+                foreach (var v in SupportedTypes)
                 {
-                    MenuItem editor = new MenuItem("Open Editor");
-
-                    editor.Click += (sender, args) =>
+                    if (PluginManager.HasEditor(v))
                     {
-                        if (MainForm.SelectedDataNode != null)
-                        {
-                            MainForm.Instance.OpenEditor();
-                        }
-                    };
+                        MenuItem editor = new MenuItem("Open Editor");
 
-                    MenuItems.Add(editor);
-                    break;
+                        editor.Click += (sender, args) =>
+                        {
+                            if (MainForm.SelectedDataNode != null)
+                            {
+                                MainForm.Instance.OpenEditor();
+                            }
+                        };
+
+                        MenuItems.Add(editor);
+                        break;
+                    }
                 }
-            }
 
 
             MenuItems.Add(export);

@@ -5,12 +5,15 @@ using HSDRaw.Tools;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using HSDRaw.GX;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -30,8 +33,26 @@ namespace HSDRawViewer.GUI.Plugins
         private HSD_TOBJ TOBJ;
 
         private TextureManager TextureManager = new TextureManager();
+        private ImageList BitmapList = new ImageList();
 
         private ViewportControl viewport;
+
+        private int TextureCount
+        {
+            get
+            {
+                if (TexAnim != null)
+                    return TexAnim.ImageCount;
+
+                if (TEXG != null)
+                    return TEXG.ImageCount;
+
+                if (TOBJ != null)
+                    return 1;
+
+                return 0;
+            }
+        }
 
         private int TextureWidth
         {
@@ -49,6 +70,7 @@ namespace HSDRawViewer.GUI.Plugins
                 return 0;
             }
         }
+
         private int TextureHeight
         {
             get
@@ -82,35 +104,28 @@ namespace HSDRawViewer.GUI.Plugins
                 if (a is HSD_TOBJ tobj)
                 {
                     TOBJ = tobj;
-                    exportStripToolStripMenuItem1.Visible = false;
-                    importStripToolStripMenuItem1.Visible = false;
-                    exportFramesToolStripMenuItem.Visible = false;
-                    importFramesToolStripMenuItem.Visible = false;
 
-                    viewport.AnimationTrackEnabled = false;
-                    viewport.MaxFrame = 0;
+                    buttonLeft.Visible = false;
+                    buttonRight.Visible = false;
+                    buttonAdd.Visible = false;
+                    buttonRemove.Visible = false;
+
+                    textureList.Visible = false;
+
+                    //viewport.AnimationTrackEnabled = false;
+                    //viewport.MaxFrame = 0;
                 }
 
                 if (a is HSD_TexAnim ta)
                 {
                     TexAnim = ta;
-                    exportStripToolStripMenuItem1.Visible = false;
-                    importStripToolStripMenuItem1.Visible = false;
-                    exportPNGToolStripMenuItem.Visible = false;
-                    importPNGToolStripMenuItem.Visible = false;
-                    
-                    viewport.MaxFrame = TexAnim.ImageCount - 1;
+                    //viewport.MaxFrame = TexAnim.ImageCount - 1;
                 }
 
                 if (a is HSD_TexGraphic tgb)
                 {
                     TEXG = tgb;
-                    exportFramesToolStripMenuItem.Visible = false;
-                    importFramesToolStripMenuItem.Visible = false;
-                    exportPNGToolStripMenuItem.Visible = false;
-                    importPNGToolStripMenuItem.Visible = false;
-                    
-                    viewport.MaxFrame = TEXG.ImageCount - 1;
+                    //viewport.MaxFrame = TEXG.ImageCount - 1;
                 }
 
                 ReloadTextures();
@@ -124,18 +139,49 @@ namespace HSDRawViewer.GUI.Plugins
 
             viewport = new ViewportControl();
             viewport.Dock = DockStyle.Fill;
-            viewport.AnimationTrackEnabled = true;
+            viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
             Controls.Add(viewport);
             viewport.BringToFront();
 
             toolStripComboBox1.SelectedIndex = 0;
 
+            BitmapList.ImageSize = new Size(64, 64);
+            BitmapList.ColorDepth = ColorDepth.Depth32Bit;
+            textureList.LargeImageList = BitmapList;
+
+            toolStripComboBox1.SelectedIndex = 4;
+            
             FormClosing += (sender, args) =>
             {
+                BitmapList.Dispose();
                 viewport.Dispose();
-                TextureManager.ClearTextures();
+                ReleaseResource();
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadTexture(byte[] data, int width, int height)
+        {
+            var id = TextureManager.TextureCount;
+            TextureManager.Add(data, width, height);
+            var image = TOBJConverter.RgbaToImage(data, width, height);
+            BitmapList.Images.Add(image);
+            textureList.Items.Add(new ListViewItem() { ImageIndex = id, Text = "Image_" + id });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ReleaseResource()
+        {
+            TextureManager.ClearTextures();
+            textureList.Clear();
+            foreach (Bitmap bmp in BitmapList.Images)
+                bmp.Dispose();
+            BitmapList.Images.Clear();
         }
 
         /// <summary>
@@ -143,13 +189,28 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private void ReloadTextures()
         {
-            TextureManager.ClearTextures();
-            
-            if(TOBJ != null)
+            ReleaseResource();
+
+            var tobjs = GetTOBJs();
+
+            foreach(var tobj in tobjs)
             {
-                TextureManager.Add(TOBJ.GetDecodedImageData(), TOBJ.ImageData.Width, TOBJ.ImageData.Height);
+                LoadTexture(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
             }
-            if(TexAnim != null)
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private HSD_TOBJ[] GetTOBJs()
+        {
+            HSD_TOBJ[] tobjs = new HSD_TOBJ[TextureCount];
+            
+            if (TOBJ != null)
+                tobjs[0] = TOBJ;
+
+            if (TexAnim != null)
             {
                 for (int i = 0; i < TexAnim.ImageCount; i++)
                 {
@@ -166,33 +227,414 @@ namespace HSDRawViewer.GUI.Plugins
                     if (pal != null)
                         tobj.TlutData = pal.Data;
 
-                    TextureManager.Add(tobj.GetDecodedImageData(), v.Data.Width, v.Data.Height);
+                    tobjs[i] = tobj;
                 }
             }
-            if(TEXG != null)
+
+            if (TEXG != null)
+                tobjs = TEXG.ConvertToTOBJs();
+
+            return tobjs;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name=""></param>
+        private void SetTOBJs(HSD_TOBJ[] tobjs)
+        {
+            if (TOBJ != null)
+                TOBJ = tobjs[0];
+
+            if (TexAnim != null)
             {
-                foreach (var v in TEXG.GetRGBAImageData())
+                var imgs = new List<HSD_TexBuffer>();
+                var pals = new List<HSD_TlutBuffer>();
+
+                foreach(var tobj in tobjs)
                 {
-                    TextureManager.Add(v, TEXG.Width, TEXG.Height);
+                    HSD_TexBuffer buf = new HSD_TexBuffer();
+                    buf.Data = tobj.ImageData;
+                    imgs.Add(buf);
+
+                    if (TPLConv.IsPalettedFormat(tobj.ImageData.Format))
+                    {
+                        HSD_TlutBuffer palbuf = new HSD_TlutBuffer();
+                        palbuf.Data = tobj.TlutData;
+                        pals.Add(palbuf);
+                    }
+                }
+
+                // convert tobjs into proper strip
+                var ib = new HSDArrayAccessor<HSD_TexBuffer>();
+                ib.Array = imgs.ToArray();
+
+                TexAnim.ImageBuffers = ib;
+
+                if (TPLConv.IsPalettedFormat(tobjs[0].ImageData.Format))
+                {
+                    var tb = new HSDRaw.HSDArrayAccessor<HSD_TlutBuffer>();
+                    tb.Array = pals.ToArray();
+
+                    TexAnim.TlutBuffers = tb;
+
+                    if (TexAnim?.AnimationObject?.FObjDesc?.List.Count < 2)
+                        TexAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc()
+                        {
+                            FOBJ = new HSD_FOBJ() { AnimationType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] }
+                        };
+                }
+                else
+                {
+                    TexAnim.TlutBuffers = null;
+                    if (TexAnim?.AnimationObject?.FObjDesc?.List.Count > 1)
+                        TexAnim.AnimationObject.FObjDesc.Next = null;
+                }
+            }
+
+            if (TEXG != null)
+                TEXG.SetFromTOBJs(tobjs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
+        public void Draw(int windowWidth, int windowHeight)
+        {
+            TextureManager.RenderCheckerBack(windowWidth, windowHeight);
+
+            var selectedIndex = -1;
+
+            if (textureList.SelectedItems != null && textureList.SelectedItems.Count > 0)
+                selectedIndex = textureList.SelectedItems[0].ImageIndex;
+
+            if (TextureCount == 1)
+                selectedIndex = 0;
+
+            if (selectedIndex == -1)
+                return;
+
+            switch (toolStripComboBox1.SelectedIndex)
+            {
+                case 0: // fill
+                    TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, false);
+                    break;
+                case 1: //300
+                    TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, true, TextureWidth * 2 * 3, TextureHeight * 2 * 3);
+                    break;
+                case 2: //200
+                    TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, true, TextureWidth * 2 * 2, TextureHeight * 2 * 2);
+                    break;
+                case 3: //150
+                    TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, true, (int)(TextureWidth * 2 * 1.5f), (int)(TextureHeight * 2 * 1.5f));
+                    break;
+                case 4: //100
+                    TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, true, TextureWidth * 2, TextureHeight * 2);
+                    break;
+                case 5: //50
+                    TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, true, TextureWidth, TextureHeight);
+                    break;
+            }
+        }
+
+        #region Controls
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonReplace_Click(object sender, EventArgs e)
+        {
+            if ((textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0) && TOBJ == null)
+                return;
+
+            var index = 0;
+            if(TOBJ == null)
+                index = textureList.SelectedIndices[0];
+
+            var tobjs = GetTOBJs();
+
+            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
+            if (f != null)
+            {
+                if (tobjs.Length == 1)
+                {
+                    using (TextureImportDialog settings = new TextureImportDialog())
+                    {
+                        if (settings.ShowDialog() == DialogResult.OK)
+                        {
+                            TOBJConverter.InjectBitmap(tobjs[index], f, settings.TextureFormat, settings.PaletteFormat);
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    var beforeH = tobjs[index].ImageData.Height;
+                    var beforeW = tobjs[index].ImageData.Width;
+
+                    var bmp = new Bitmap(f);
+
+                    if (beforeW != bmp.Width || beforeH != bmp.Height)
+                    {
+                        MessageBox.Show($"Error the texture size does not match\n{beforeW}x{beforeH} -> {bmp.Width}x{bmp.Height}");
+                        return;
+                    }
+
+                    bmp.Dispose();
+
+                    TOBJConverter.InjectBitmap(tobjs[index], f, tobjs[index].ImageData.Format, tobjs[index].TlutData != null ? tobjs[index].TlutData.Format : GXTlutFmt.IA8);
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            SetTOBJs(tobjs);
+
+            ReloadTextures();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static T[] InsertAt<T>(T[] source, T item, int index)
+        {
+            T[] dest = new T[source.Length];
+            if (index > 0)
+                Array.Copy(source, 0, dest, 0, index);
+
+            dest[index] = item;
+
+            if (index < source.Length - 1)
+                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
+
+            return dest;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+                return;
+
+            var index = textureList.SelectedIndices[0];
+
+            var tobjs = GetTOBJs();
+
+            var tobj = new HSD_TOBJ();
+            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
+            if (f != null)
+            {
+                GXTexFmt texFormat = GXTexFmt.CMP;
+                GXTlutFmt palFormat = GXTlutFmt.IA8;
+                if(tobjs.Length == 0)
+                {
+                    using (TextureImportDialog settings = new TextureImportDialog())
+                    {
+                        if (settings.ShowDialog() == DialogResult.OK)
+                        {
+                            texFormat = settings.TextureFormat;
+                            palFormat = settings.PaletteFormat;
+                            TOBJConverter.InjectBitmap(tobj, f, texFormat, palFormat);
+                            tobjs = new HSD_TOBJ[] { tobj };
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    texFormat = tobjs[0].ImageData.Format;
+                    if (tobjs[0].TlutData != null)
+                        palFormat = tobjs[0].TlutData.Format;
+
+                    TOBJConverter.InjectBitmap(tobj, f, texFormat, palFormat);
+
+                    if(tobj.ImageData.Width != tobjs[0].ImageData.Width || tobj.ImageData.Height != tobjs[0].ImageData.Height)
+                    {
+                        MessageBox.Show($"Error the texture size does not match\n{tobj.ImageData.Width}x{tobj.ImageData.Height} -> {tobjs[0].ImageData.Width}x{tobjs[0].ImageData.Height}");
+                        return;
+                    }
+
+                    tobjs = InsertAt(tobjs, tobj, index);
+                }
+            }
+            else
+            {
+                return;
+            }
+            
+            SetTOBJs(tobjs);
+
+            ReloadTextures();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static T[] RemoveAt<T>(T[] source, int index)
+        {
+            T[] dest = new T[source.Length - 1];
+            if (index > 0)
+                Array.Copy(source, 0, dest, 0, index);
+
+            if (index < source.Length - 1)
+                Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
+
+            return dest;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonRemove_Click(object sender, EventArgs e)
+        {
+            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+                return;
+
+            var index = textureList.SelectedIndices[0];
+            
+            var tobjs = GetTOBJs();
+
+            tobjs = RemoveAt(tobjs, index);
+
+            SetTOBJs(tobjs);
+
+            ReloadTextures();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonRight_Click(object sender, EventArgs e)
+        {
+            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+                return;
+
+            var index = textureList.SelectedIndices[0];
+
+            if (index == textureList.Items.Count - 1)
+                return;
+            
+            Swap(index, index + 1);
+
+            textureList.Items[index].Selected = false;
+            textureList.Items[index + 1].Selected = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonLeft_Click(object sender, EventArgs e)
+        {
+            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+                return;
+
+            var index = textureList.SelectedIndices[0];
+
+            if (index == 0)
+                return;
+
+            Swap(index, index - 1);
+
+            textureList.Items[index].Selected = false;
+            textureList.Items[index - 1].Selected = true;
+        }
+
+        /// <summary>
+        /// Swaps two images
+        /// </summary>
+        /// <param name="index1"></param>
+        /// <param name="index2"></param>
+        private void Swap(int index1, int index2)
+        {
+            var tobjs = GetTOBJs();
+
+            var temp = tobjs[index1];
+            tobjs[index1] = tobjs[index2];
+            tobjs[index2] = temp;
+
+            SetTOBJs(tobjs);
+
+            TextureManager.Swap(index1, index2);
+
+            var t = BitmapList.Images[index1];
+            BitmapList.Images[index1] = BitmapList.Images[index2];
+            BitmapList.Images[index2] = t;
+
+            textureList.Invalidate();
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+                return;
+
+            var f = Tools.FileIO.SaveFile("PNG (.png)|*.png");
+            if (f != null)
+            {
+                var bmp = TOBJConverter.ToBitmap(GetTOBJs()[textureList.SelectedIndices[0]]);
+                bmp.Save(f);
+                bmp.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.SaveFile("PNG (*.png)|*.png");
+            if (f != null)
+            {
+                var i = 0;
+                foreach(var tobj in GetTOBJs())
+                {
+                    var frame = TOBJConverter.RgbaToImage(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
+                    frame.Save(Path.GetDirectoryName(f) + "\\" + Path.GetFileNameWithoutExtension(f) + "_" + i.ToString() + Path.GetExtension(f));
+                    frame.Dispose();
+                    i++;
                 }
             }
         }
 
-        public void Draw(int windowWidth, int windowHeight)
-        {
-            switch(toolStripComboBox1.SelectedIndex)
-            {
-                case 0:
-                    TextureManager.RenderTexture((int)viewport.Frame, windowWidth, windowHeight, false);
-                    break;
-                case 1:
-                    TextureManager.RenderTexture((int)viewport.Frame, windowWidth, windowHeight, true, TextureWidth * 2, TextureHeight * 2);
-                    break;
-                case 2:
-                    TextureManager.RenderTexture((int)viewport.Frame, windowWidth, windowHeight, true);
-                    break;
-            }
-        }
+        #endregion
+
 
         private void exportStripToolStripMenuItem1_Click(object sender, EventArgs e)
         {
@@ -355,35 +797,7 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
         }
+        
 
-        private void exportPNGToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (TOBJ == null)
-                return;
-            var f = Tools.FileIO.SaveFile("PNG (.png)|*.png");
-            if (f != null)
-            {
-                var bmp = TOBJConverter.ToBitmap(TOBJ);
-                bmp.Save(f);
-                bmp.Dispose();
-            }
-        }
-
-        private void importPNGToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (TOBJ == null)
-                return;
-            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
-            if (f != null)
-            {
-                using (TextureImportDialog settings = new TextureImportDialog())
-                {
-                    if (settings.ShowDialog() == DialogResult.OK)
-                    {
-                        TOBJConverter.InjectBitmap(TOBJ, f, settings.TextureFormat, settings.PaletteFormat);
-                    }
-                }
-            }
-        }
     }
 }

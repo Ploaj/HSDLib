@@ -123,10 +123,14 @@ namespace HSDRawViewer.GUI.Plugins
             treeJOBJ.ExpandAll();
         }
 
+        private int index = 0;
+
         private void LoadJOBJ(HSD_JOBJ jobj, TreeNode parent = null)
         {
+            if (parent == null)
+                index = 0;
             TreeNode tree = new TreeNode();
-            tree.Text = "JOBJ";
+            tree.Text = "JOBJ_" + index++;
             tree.Tag = jobj;
 
             jobjToIndex.Add(jobj, jobjToIndex.Count);

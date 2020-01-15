@@ -1,41 +1,25 @@
-﻿using HSDRaw.Common;
-using HSDRawViewer.Converters;
+﻿using HSDRaw.Common.Animation;
 using System;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
 {
-    public class JOBJContextMenu : CommonContextMenu
+    public class MatAnimJointContextMenu : CommonContextMenu
     {
-        public override Type[] SupportedTypes { get; } = new Type[] { typeof(HSD_JOBJ) };
+        public override Type[] SupportedTypes { get; } = new Type[] { typeof(HSD_MatAnimJoint) };
 
-        public JOBJContextMenu() : base()
+        public MatAnimJointContextMenu() : base()
         {
-            MenuItem Import = new MenuItem("Import Model From File");
-            Import.Click += (sender, args) =>
-            {
-                if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
-                {
-                    MainForm.SelectedDataNode.Collapse();
-                    ModelImporter.ReplaceModelFromFile(root);
-                }
-            };
-            MenuItems.Add(Import);
-
             MenuItem addChild = new MenuItem("Add Child");
             MenuItems.Add(addChild);
 
             MenuItem createJOBJ = new MenuItem("From Scratch");
             createJOBJ.Click += (sender, args) =>
             {
-                if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
+                if (MainForm.SelectedDataNode.Accessor is HSD_MatAnimJoint root)
                 {
-                    root.AddChild(new HSD_JOBJ()
+                    root.AddChild(new HSD_MatAnimJoint()
                     {
-                        SX = 1,
-                        SY = 1,
-                        SZ = 1,
-                        Flags = JOBJ_FLAG.CLASSICAL_SCALING | JOBJ_FLAG.ROOT_XLU
                     });
                     MainForm.SelectedDataNode.Refresh();
                 }
@@ -46,15 +30,15 @@ namespace HSDRawViewer.ContextMenus
             MenuItem createJOBJFromFile = new MenuItem("From File");
             createJOBJFromFile.Click += (sender, args) =>
             {
-                if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
+                if (MainForm.SelectedDataNode.Accessor is HSD_MatAnimJoint root)
                 {
                     var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
-                    if(f != null)
+                    if (f != null)
                     {
                         HSDRaw.HSDRawFile file = new HSDRaw.HSDRawFile(f);
 
                         var node = file.Roots[0].Data;
-                        if (node is HSD_JOBJ newchild)
+                        if (node is HSD_MatAnimJoint newchild)
                             root.AddChild(newchild);
                     }
                     MainForm.SelectedDataNode.Refresh();

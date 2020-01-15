@@ -94,7 +94,7 @@
             this.buttonAdd.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonAdd.Name = "buttonAdd";
             this.buttonAdd.Size = new System.Drawing.Size(23, 22);
-            this.buttonAdd.Text = "toolStripButton1";
+            this.buttonAdd.Text = "Add Point";
             this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
             // 
             // buttonRemove
@@ -104,7 +104,7 @@
             this.buttonRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonRemove.Name = "buttonRemove";
             this.buttonRemove.Size = new System.Drawing.Size(23, 22);
-            this.buttonRemove.Text = "toolStripButton2";
+            this.buttonRemove.Text = "Remove Point";
             this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
             // 
             // buttonUp
@@ -114,7 +114,7 @@
             this.buttonUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonUp.Name = "buttonUp";
             this.buttonUp.Size = new System.Drawing.Size(23, 22);
-            this.buttonUp.Text = "toolStripButton3";
+            this.buttonUp.Text = "Move Point Up";
             this.buttonUp.Click += new System.EventHandler(this.buttonUp_Click);
             // 
             // buttonDown
@@ -124,7 +124,7 @@
             this.buttonDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonDown.Name = "buttonDown";
             this.buttonDown.Size = new System.Drawing.Size(23, 22);
-            this.buttonDown.Text = "toolStripButton4";
+            this.buttonDown.Text = "Move Point Down";
             this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
             // 
             // GeneralPointEditor

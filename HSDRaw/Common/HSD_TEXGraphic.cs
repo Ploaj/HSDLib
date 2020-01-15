@@ -131,6 +131,47 @@ namespace HSDRaw.Common
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public HSD_TOBJ[] ConvertToTOBJs()
+        {
+            HSD_TOBJ[] tobjs = new HSD_TOBJ[ImageCount];
+
+            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
+            int imageSize = TPLConv.GetImageSize(ImageFormat, Width, Height);
+            int paletteSize = 0x200;
+
+            for (int i = 0; i < ImageCount; i++)
+            {
+                tobjs[i] = new HSD_TOBJ();
+
+                var offset = _s.GetInt32(i * 4 + 0x18);
+
+                var imageData = _s.GetBytes(offset, imageSize);
+
+                tobjs[i].ImageData = new HSD_Image();
+                tobjs[i].ImageData.Width = (short)Width;
+                tobjs[i].ImageData.Height = (short)Height;
+                tobjs[i].ImageData.Format = ImageFormat;
+                tobjs[i].ImageData.ImageData = imageData;
+
+                if (isPaletted)
+                {
+                    var paloffset = _s.GetInt32((i + ImageCount) * 4 + 0x18);
+                    var palData = _s.GetBytes(paloffset, paletteSize);
+
+                    tobjs[i].TlutData = new HSD_Tlut();
+                    tobjs[i].TlutData.ColorCount = 0x100;
+                    tobjs[i].TlutData.Format = PaletteFormat;
+                    tobjs[i].TlutData.TlutData = palData;
+                }
+            }
+
+            return tobjs;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="tobjs"></param>
         public void SetFromTOBJs(HSD_TOBJ[] tobjs)
         {

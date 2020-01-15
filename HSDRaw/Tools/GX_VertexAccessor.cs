@@ -75,9 +75,12 @@ namespace HSDRaw.Tools
 
                             if (attribute.AttributeType != GXAttribType.GX_DIRECT)
                             {
-                                Vertex.POS.X = f[0];
-                                Vertex.POS.Y = f[1];
-                                Vertex.POS.Z = f[2];
+                                if (f.Length > 0)
+                                    Vertex.POS.X = f[0];
+                                if (f.Length > 1)
+                                    Vertex.POS.Y = f[1];
+                                if(f.Length > 2)
+                                    Vertex.POS.Z = f[2];
                             }
                             break;
                         case GXAttribName.GX_VA_NRM:

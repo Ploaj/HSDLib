@@ -17,6 +17,13 @@ namespace HSDRawViewer.Rendering
             return Textures[index];
         }
 
+        public void Swap(int index1, int index2)
+        {
+            var t = Textures[index1];
+            Textures[index1] = Textures[index2];
+            Textures[index2] = t;
+        }
+
         public void Add(byte[] rgba, int width, int height)
         {
             OpenTKResources.MakeCurrentDummy();
@@ -74,15 +81,23 @@ namespace HSDRawViewer.Rendering
             RenderTexture(index, windowWidth, windowHeight, actualSize, (int)TextureSizes[index].X, (int)TextureSizes[index].Y);
         }
         
-        public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize, int actualWidth, int actualHeight)
+        public static void RenderCheckerBack(int windowWidth, int windowHeight)
         {
             GL.PushMatrix();
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
             RenderCheckerBack(64, windowWidth, windowHeight);
+        }
+
+        public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize, int actualWidth, int actualHeight)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
 
             GL.Enable(EnableCap.Texture2D);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, Get(index));
@@ -123,6 +138,7 @@ namespace HSDRawViewer.Rendering
             GL.End();
 
             GL.PopMatrix();
+            GL.PopAttrib();
         }
     }
 }

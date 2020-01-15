@@ -73,6 +73,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationSettings.cs" />
     <Compile Include="ContextMenus\CollDataContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -92,6 +93,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\MatAnimContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\MatAnimJointContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\UnidentifiedContextMenu.cs">
@@ -225,6 +229,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\ico_right.png" />
+    <None Include="Resources\ico_left.png" />
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />

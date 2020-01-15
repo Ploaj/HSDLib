@@ -193,6 +193,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ico_left {
+            get {
+                object obj = ResourceManager.GetObject("ico_left", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ico_lobj {
             get {
                 object obj = ResourceManager.GetObject("ico_lobj", resourceCulture);
@@ -226,6 +236,16 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ico_replace {
             get {
                 object obj = ResourceManager.GetObject("ico_replace", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_right {
+            get {
+                object obj = ResourceManager.GetObject("ico_right", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

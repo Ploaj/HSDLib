@@ -56,6 +56,7 @@
             // treeView1
             // 
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.HideSelection = false;
             this.treeView1.Indent = 16;
             this.treeView1.ItemHeight = 24;
             this.treeView1.Location = new System.Drawing.Point(3, 16);
@@ -166,14 +167,14 @@
             // aJToolToolStripMenuItem
             // 
             this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.aJToolToolStripMenuItem.Text = "AJ Tool";
             this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
             // 
             // sSMEditorToolStripMenuItem
             // 
             this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
-            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
             this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
             // 
