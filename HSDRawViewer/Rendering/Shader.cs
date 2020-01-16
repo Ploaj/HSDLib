@@ -38,6 +38,11 @@ namespace HSDRawViewer.Rendering
             //errorLog.AppendHardwareAndVersionInfo();
         }
 
+        public void Delete()
+        {
+            GL.DeleteProgram(programId);
+        }
+
         public int GetUniformBlockIndex(string name)
         {
             return GL.GetUniformBlockIndex(programId, name);

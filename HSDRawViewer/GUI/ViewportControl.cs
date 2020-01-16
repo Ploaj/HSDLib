@@ -11,6 +11,7 @@ using OpenTK.Input;
 
 namespace HSDRawViewer.GUI
 {
+    ///new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
     /// <summary>
     /// 
     /// </summary>
@@ -73,7 +74,7 @@ namespace HSDRawViewer.GUI
 
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
-        private ElapsedEventHandler RenderLoop;
+        private EventHandler RenderLoop;
 
         private bool Selecting = false;
         private Vector2 mouseStart;
@@ -84,6 +85,8 @@ namespace HSDRawViewer.GUI
 
         public bool EnableCrossHair = false;
         private Vector3 CrossHair = new Vector3();
+
+        public bool EnableFloor { get; set; } = false;
 
         public ViewportControl()
         {
@@ -96,7 +99,7 @@ namespace HSDRawViewer.GUI
                 if (prevPos == null)
                     prevPos = pos;
 
-                deltaPos = (prevPos - pos) * new Vector2(1f/panel1.Width, 1f/panel1.Height);
+                deltaPos = prevPos - pos;
 
                 prevPos = pos;
 
@@ -108,13 +111,14 @@ namespace HSDRawViewer.GUI
                 
                 if (buttonPlay.Text == "Pause")
                     Frame++;
-
+                
                 panel1.Invalidate();
             };
 
-            System.Timers.Timer timer = new System.Timers.Timer(30 / 1000d);
-            timer.Elapsed += RenderLoop;
-            timer.Start();
+            Application.Idle += RenderLoop;
+            //System.Timers.Timer timer = new System.Timers.Timer(30 / 1000d);
+            /*timer.Elapsed += RenderLoop;
+            timer.Start();*/
 
             panel1.MouseClick += (sender, args) =>
             {
@@ -181,14 +185,17 @@ namespace HSDRawViewer.GUI
                 {
 
                 }
-                 _camera.Z += (args.Delta / 5) * zoomMultiplier;
+                _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
             };
+
+            panel1.VSync = false;
 
             Disposed += (sender, args) =>
             {
-                timer.Stop();
-                timer.Elapsed -= RenderLoop;
-                timer.Dispose();
+                //timer.Stop();
+                Application.Idle -= RenderLoop;
+                //timer.Elapsed -= RenderLoop;
+                //timer.Dispose();
             };
         }
         
@@ -220,7 +227,7 @@ namespace HSDRawViewer.GUI
             float x = (2.0f * point.X) / panel1.Width - 1.0f;
             float y = 1.0f - (2.0f * point.Y) / panel1.Height;
 
-            var inv = _camera.Transform.Inverted();
+            var inv = _camera.MvpMatrix.Inverted();
 
             Vector4 va = Vector4.Transform(new Vector4(x, y, -1.0f, 1.0f), inv);
             Vector4 vb = Vector4.Transform(new Vector4(x, y, 1.0f, 1.0f), inv);
@@ -325,7 +332,7 @@ namespace HSDRawViewer.GUI
             GL.PushAttrib(AttribMask.AllAttribBits);
 
             GL.MatrixMode(MatrixMode.Modelview);
-            var v = _camera.Transform;
+            var v = _camera.MvpMatrix;
             GL.LoadMatrix(ref v);
 
             if (EnableCrossHair)
@@ -337,9 +344,14 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
+            if (EnableFloor)
+            {
+                DrawShape.Floor();
+            }
+
             foreach (var r in Drawables)
             {
-                r.Draw(panel1.Width, panel1.Height);
+                r.Draw(_camera, panel1.Width, panel1.Height);
             }
             
             GL.PopAttrib();
@@ -386,12 +398,7 @@ namespace HSDRawViewer.GUI
 
             if(_camera != null)
             {
-                _camera.Z = -Math.Max(max.X - min.X, max.Y - min.Y);
-                _camera.X = (max.X + min.X) / 2;
-                _camera.Y = -(max.Y + min.Y) / 2;
-                _camera.XRotation = 0;
-                _camera.YRotation = 0;
-                _camera.ZRotation = 0;
+                //_camera.FrameBoundingSphere(new Vector3((max.X + min.X) / 2, (max.Y + min.Y) / 2, 0), Math.Max(max.X - min.X, max.Y - min.Y), 0);
             }
         }
 
@@ -403,7 +410,10 @@ namespace HSDRawViewer.GUI
         private void panel1_Load(object sender, EventArgs e)
         {
             GL.ClearColor(Color.FromArgb((0xFF << 24) | 0x333333));
-            _camera = new Camera(panel1.Width, panel1.Height);
+            _camera = new Camera();
+            _camera.RenderWidth = panel1.Width;
+            _camera.RenderHeight = panel1.Height;
+            _camera.Translation = new Vector3(0, 10, -80);
             ReadyToRender = true;
         }
 
@@ -414,8 +424,19 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_Resize(object sender, EventArgs e)
         {
+            RefreshSize();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void RefreshSize()
+        {
             if (_camera != null)
-                _camera.SetViewSize(panel1.Width, panel1.Height);
+            {
+                _camera.RenderWidth = panel1.Width;
+                _camera.RenderHeight = panel1.Height;
+            }
         }
 
         /// <summary>
@@ -425,13 +446,13 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_KeyDown(object sender, KeyEventArgs e)
         {
-            var speed = 5;
+            var speed = 0.1f;
             if (e.Shift)
                 speed *= 4;
             if (e.KeyCode == Keys.W)
-                _camera.Z += speed;
+                _camera.Zoom(speed, true);
             if (e.KeyCode == Keys.S)
-                _camera.Z -= speed;
+                _camera.Zoom(-speed, true);
         }
 
         /// <summary>
@@ -448,16 +469,15 @@ namespace HSDRawViewer.GUI
             if (!keyState.IsKeyDown(Key.ControlLeft) && !keyState.IsKeyDown(Key.ControlRight)
               &&!keyState.IsKeyDown(Key.AltLeft) && !keyState.IsKeyDown(Key.AltRight))
             {
-                var speed = 20;
+                var speed = 0.10f;
                 if (e.Button == MouseButtons.Right)
                 {
-                    _camera.X -= deltaPos.X * speed;
-                    _camera.Y += deltaPos.Y * speed;
+                    _camera.Pan(-deltaPos.X * speed, -deltaPos.Y * speed);
                 }
                 if (e.Button == MouseButtons.Left && !Lock2D)
                 {
-                    _camera.XRotation -= deltaPos.Y * speed;
-                    _camera.YRotation -= deltaPos.X * speed;
+                    _camera.RotationXDegrees -= deltaPos.Y * speed;
+                    _camera.RotationYDegrees -= deltaPos.X * speed;
                 }
             }
         }

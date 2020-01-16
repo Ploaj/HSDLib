@@ -448,7 +448,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private bool Blink { get => BlinkTimer < 15; }
 
-        public void Draw(int windowWidth, int windowHeight)
+        public void Draw(Camera camera, int windowWidth, int windowHeight)
         {
             // clear depth buffer to draw overtop of scene
             GL.Clear(ClearBufferMask.DepthBufferBit);

@@ -34,7 +34,7 @@ namespace HSDRawViewer.Rendering
     {
         DrawOrder DrawOrder { get; }
 
-        void Draw(int windowWidth, int windowHeight);
+        void Draw(Camera cam, int windowWidth, int windowHeight);
     }
 
     /// <summary>
@@ -57,6 +57,11 @@ namespace HSDRawViewer.Rendering
         }
 
         public void Draw(int windowWidth, int windowHeight)
+        {
+            Draw(null, windowWidth, windowHeight);
+        }
+
+        public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             GL.Begin(PrimitiveType.TriangleFan);
 

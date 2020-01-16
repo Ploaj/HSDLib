@@ -74,6 +74,34 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public int IndexOf(HSD_JOBJ jobj)
+        {
+            if (jobjToCache.ContainsKey(jobj))
+                return jobjToCache[jobj].Index;
+            else
+                return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Matrix4[] GetBindTransforms()
+        {
+            Matrix4[] mat = new Matrix4[jobjToCache.Count];
+
+            int i = 0;
+            foreach(var v in jobjToCache)
+                mat[i++] = v.Value.WorldTransform;
+
+            return mat;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void ClearRenderingCache()
         {
             jobjToCache.Clear();
@@ -94,7 +122,7 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void Render()
+        public void Render(Camera cam)
         {
             UpdateTransforms(RootJOBJ);
             
@@ -107,7 +135,8 @@ namespace HSDRawViewer.Rendering
                 {
                     foreach (var dobj in b.Key.Dobj.List)
                     {
-                        DOBJManager.RenderDOBJ(dobj, b.Key, this);
+                        DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
+                        //DOBJManager.RenderDOBJ(dobj, b.Key, this);
                     }
                 }
             }

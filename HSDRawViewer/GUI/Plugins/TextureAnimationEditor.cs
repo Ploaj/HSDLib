@@ -301,7 +301,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
-        public void Draw(int windowWidth, int windowHeight)
+        public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             TextureManager.RenderCheckerBack(windowWidth, windowHeight);
 

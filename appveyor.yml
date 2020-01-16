@@ -31,6 +31,7 @@ after_build:
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRawViewer.exe.config"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\OpenTK.dll.config"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\lib"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\Shader"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\x64"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\x86"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\runtimes"

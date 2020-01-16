@@ -17,6 +17,8 @@
         public GXVector2 TEX6;
         public GXVector2 TEX7;
 
+        public static int Stride = (1 + 3 + 3 + 4 + 4 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2) * 4;
+
         public static bool operator ==(GX_Vertex x, GX_Vertex y)
         {
             return x.POS == y.POS && x.NRM == y.NRM && x.PNMTXIDX == y.PNMTXIDX && x.TEX0MTXIDX == y.TEX0MTXIDX;

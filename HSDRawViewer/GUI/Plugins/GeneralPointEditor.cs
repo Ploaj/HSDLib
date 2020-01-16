@@ -84,7 +84,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private JOBJManager Renderer = new JOBJManager();
 
-        public void Draw(int windowWidth, int windowHeight)
+        public void Draw(Camera camera, int windowWidth, int windowHeight)
         {
             // draw overtop
             GL.Clear(ClearBufferMask.DepthBufferBit);

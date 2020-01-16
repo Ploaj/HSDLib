@@ -43,11 +43,15 @@
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.vertexColorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.previewBox = new System.Windows.Forms.GroupBox();
+            this.splitter2 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.splitter1 = new System.Windows.Forms.Splitter();
+            this.mainRender = new System.Windows.Forms.ToolStripButton();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -63,7 +67,7 @@
             this.listDOBJ.FormattingEnabled = true;
             this.listDOBJ.Location = new System.Drawing.Point(3, 28);
             this.listDOBJ.Name = "listDOBJ";
-            this.listDOBJ.Size = new System.Drawing.Size(266, 132);
+            this.listDOBJ.Size = new System.Drawing.Size(316, 126);
             this.listDOBJ.TabIndex = 0;
             // 
             // propertyGrid1
@@ -71,21 +75,20 @@
             this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.propertyGrid1.Location = new System.Drawing.Point(11, 44);
+            this.propertyGrid1.Location = new System.Drawing.Point(11, 19);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(260, 127);
+            this.propertyGrid1.Size = new System.Drawing.Size(600, 237);
             this.propertyGrid1.TabIndex = 1;
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(1, 2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.tabControl1.Location = new System.Drawing.Point(0, 25);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(280, 189);
+            this.tabControl1.Size = new System.Drawing.Size(330, 157);
             this.tabControl1.TabIndex = 2;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -96,7 +99,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(272, 163);
+            this.tabPage1.Size = new System.Drawing.Size(322, 131);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "JOBJs";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -106,7 +109,7 @@
             this.treeJOBJ.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeJOBJ.Location = new System.Drawing.Point(3, 28);
             this.treeJOBJ.Name = "treeJOBJ";
-            this.treeJOBJ.Size = new System.Drawing.Size(266, 132);
+            this.treeJOBJ.Size = new System.Drawing.Size(316, 100);
             this.treeJOBJ.TabIndex = 0;
             // 
             // toolStrip3
@@ -115,7 +118,7 @@
             this.toolStripButton1});
             this.toolStrip3.Location = new System.Drawing.Point(3, 3);
             this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(266, 25);
+            this.toolStrip3.Size = new System.Drawing.Size(316, 25);
             this.toolStrip3.TabIndex = 1;
             this.toolStrip3.Text = "toolStrip3";
             // 
@@ -139,7 +142,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(272, 163);
+            this.tabPage2.Size = new System.Drawing.Size(322, 157);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "DOBJs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -152,7 +155,7 @@
             this.toolStripDropDownButton1});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(266, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(316, 25);
             this.toolStrip2.TabIndex = 1;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -190,33 +193,50 @@
             this.vertexColorsToolStripMenuItem.CheckOnClick = true;
             this.vertexColorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.vertexColorsToolStripMenuItem.Name = "vertexColorsToolStripMenuItem";
-            this.vertexColorsToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.vertexColorsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.vertexColorsToolStripMenuItem.Text = "Vertex Colors";
             this.vertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.toolStrip1);
             this.groupBox1.Controls.Add(this.propertyGrid1);
-            this.groupBox1.Location = new System.Drawing.Point(1, 193);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.groupBox1.Location = new System.Drawing.Point(0, 185);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(280, 149);
+            this.groupBox1.Size = new System.Drawing.Size(620, 262);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
+            // 
+            // previewBox
+            // 
+            this.previewBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.previewBox.Location = new System.Drawing.Point(330, 25);
+            this.previewBox.Margin = new System.Windows.Forms.Padding(5);
+            this.previewBox.Name = "previewBox";
+            this.previewBox.Size = new System.Drawing.Size(290, 157);
+            this.previewBox.TabIndex = 4;
+            this.previewBox.TabStop = false;
+            this.previewBox.Text = "Preview";
+            // 
+            // splitter2
+            // 
+            this.splitter2.Location = new System.Drawing.Point(330, 25);
+            this.splitter2.Name = "splitter2";
+            this.splitter2.Size = new System.Drawing.Size(3, 157);
+            this.splitter2.TabIndex = 6;
+            this.splitter2.TabStop = false;
             // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton2,
-            this.toolStripButton2});
-            this.toolStrip1.Location = new System.Drawing.Point(3, 16);
+            this.toolStripButton2,
+            this.mainRender});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(274, 25);
-            this.toolStrip1.TabIndex = 2;
+            this.toolStrip1.Size = new System.Drawing.Size(620, 25);
+            this.toolStrip1.TabIndex = 7;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton2
@@ -238,6 +258,13 @@
             this.importModelFromFileToolStripMenuItem.Text = "Import Model From File";
             this.importModelFromFileToolStripMenuItem.Click += new System.EventHandler(this.importModelFromFileToolStripMenuItem_Click);
             // 
+            // exportModelToFileToolStripMenuItem
+            // 
+            this.exportModelToFileToolStripMenuItem.Name = "exportModelToFileToolStripMenuItem";
+            this.exportModelToFileToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.exportModelToFileToolStripMenuItem.Text = "Export Model To File";
+            this.exportModelToFileToolStripMenuItem.Click += new System.EventHandler(this.exportModelToFileToolStripMenuItem_Click);
+            // 
             // toolStripButton2
             // 
             this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -248,20 +275,37 @@
             this.toolStripButton2.Text = "Edit Material";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
-            // exportModelToFileToolStripMenuItem
+            // splitter1
             // 
-            this.exportModelToFileToolStripMenuItem.Name = "exportModelToFileToolStripMenuItem";
-            this.exportModelToFileToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.exportModelToFileToolStripMenuItem.Text = "Export Model To File";
-            this.exportModelToFileToolStripMenuItem.Click += new System.EventHandler(this.exportModelToFileToolStripMenuItem_Click);
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter1.Location = new System.Drawing.Point(0, 182);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(620, 3);
+            this.splitter1.TabIndex = 8;
+            this.splitter1.TabStop = false;
+            // 
+            // mainRender
+            // 
+            this.mainRender.CheckOnClick = true;
+            this.mainRender.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.mainRender.Image = ((System.Drawing.Image)(resources.GetObject("mainRender.Image")));
+            this.mainRender.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mainRender.Name = "mainRender";
+            this.mainRender.Size = new System.Drawing.Size(111, 22);
+            this.mainRender.Text = "Render In Viewport";
+            this.mainRender.CheckStateChanged += new System.EventHandler(this.mainRender_CheckStateChanged);
             // 
             // JOBJEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 376);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(620, 447);
+            this.Controls.Add(this.splitter2);
+            this.Controls.Add(this.previewBox);
             this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.splitter1);
+            this.Controls.Add(this.groupBox1);
             this.Name = "JOBJEditor";
             this.TabText = "JOBJEditor";
             this.Text = "JOBJEditor";
@@ -275,10 +319,10 @@
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -290,18 +334,22 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.TreeView treeJOBJ;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem vertexColorsToolStripMenuItem;
+        private System.Windows.Forms.GroupBox previewBox;
+        private System.Windows.Forms.Splitter splitter2;
+        private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
         private System.Windows.Forms.ToolStripMenuItem importModelFromFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportModelToFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.Splitter splitter1;
+        private System.Windows.Forms.ToolStripButton mainRender;
     }
 }

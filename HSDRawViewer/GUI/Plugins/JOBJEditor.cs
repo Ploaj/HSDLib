@@ -22,6 +22,8 @@ namespace HSDRawViewer.GUI.Plugins
 
         private bool SelectDOBJ { get => (toolStripComboBox1.SelectedIndex == 1); }
 
+        private ViewportControl viewport;
+
         public JOBJEditor()
         {
             InitializeComponent();
@@ -50,15 +52,26 @@ namespace HSDRawViewer.GUI.Plugins
                 listDOBJ.SelectedItem = listDOBJ.SelectedItem;
             };
 
-            if(PluginManager.GetCommonViewport() != null)
-                PluginManager.GetCommonViewport().AddRenderer(this);
+
+            viewport = new ViewportControl();
+            viewport.Dock = DockStyle.Fill;
+            viewport.AnimationTrackEnabled = false;
+            viewport.AddRenderer(this);
+            viewport.EnableFloor = true;
+            previewBox.Controls.Add(viewport);
+            viewport.RefreshSize();
+            viewport.BringToFront();
 
             FormClosing += (sender, args) =>
             {
                 if (PluginManager.GetCommonViewport() != null)
                 {
-                    PluginManager.GetCommonViewport().AnimationTrackEnabled = false;
-                    PluginManager.GetCommonViewport().RemoveRenderer(this);
+                    if (PluginManager.GetCommonViewport() != null)
+                    {
+                        PluginManager.GetCommonViewport().AnimationTrackEnabled = false;
+                        PluginManager.GetCommonViewport().RemoveRenderer(this);
+                    }
+                    viewport.Dispose();
                     JOBJManager.ClearRenderingCache();
                 }
             };
@@ -180,10 +193,10 @@ namespace HSDRawViewer.GUI.Plugins
             vp.MaxFrame = JOBJManager.SetAnimJoint(joint);
         }
 
-        public void Draw(int windowWidth, int windowHeight)
+        public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             JOBJManager.Frame = PluginManager.GetCommonViewport().Frame;
-            JOBJManager.Render();
+            JOBJManager.Render(cam);
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
@@ -243,6 +256,18 @@ namespace HSDRawViewer.GUI.Plugins
         private void exportModelToFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ModelExporter.ExportFile(root);
+        }
+        
+        private void mainRender_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (mainRender.Checked)
+            {
+                PluginManager.GetCommonViewport().AddRenderer(this);
+            }
+            else
+            {
+                PluginManager.GetCommonViewport().RemoveRenderer(this);
+            }
         }
     }
 }

@@ -246,7 +246,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.TabText = "Hal DAT Browser";
-            this.Text = "Hal DAT Browser";
+            this.Text = "HSDraw";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

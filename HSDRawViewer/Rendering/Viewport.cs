@@ -5,7 +5,7 @@ using HSDRawViewer.GUI;
 
 namespace HSDRawViewer.Rendering
 {
-    public class CommonViewport : DockContent, IDrawable
+    public class CommonViewport : DockContent
     {
         public ViewportControl glViewport;
 
@@ -27,7 +27,7 @@ namespace HSDRawViewer.Rendering
             //_glViewport = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             glViewport = new ViewportControl();
             glViewport.Dock = DockStyle.Fill;
-            glViewport.AddRenderer(this);
+            glViewport.EnableFloor = true;
 
             Controls.Add(glViewport);
             
@@ -39,11 +39,6 @@ namespace HSDRawViewer.Rendering
                     //MainForm.Instance.TryClose(this);
                 }
             };
-        }
-
-        public void Draw(int windowWidth, int windowHeight)
-        {
-            DrawShape.Floor();
         }
     }
 }

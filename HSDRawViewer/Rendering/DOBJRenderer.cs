@@ -7,6 +7,10 @@ using OpenTK.Graphics.OpenGL;
 
 namespace HSDRawViewer.Rendering
 {
+    // TODO: shader cache rendering would be much faster
+    /// <summary>
+    /// 
+    /// </summary>
     public class DOBJManager
     {
         public bool RenderTextures { get; set; } = true;
@@ -14,13 +18,38 @@ namespace HSDRawViewer.Rendering
         public bool RenderVertexColor { get; set; } = true;
 
         public HSD_DOBJ SelectedDOBJ = null;
-
-
+        
         private Dictionary<HSD_POBJ, GX_DisplayList> pobjToDisplayList = new Dictionary<HSD_POBJ, GX_DisplayList>();
 
         private Dictionary<byte[], int> imageBufferTextureIndex = new Dictionary<byte[], int>();
 
         private TextureManager TextureManager = new TextureManager();
+
+
+        // Shader
+        private Shader GXShader;
+
+        private Dictionary<HSD_DOBJ, int> DOBJtoBuffer = new Dictionary<HSD_DOBJ, int>();
+        private Dictionary<HSD_DOBJ, List<CachedPOBJ>> DOBJtoPOBJCache = new Dictionary<HSD_DOBJ, List<CachedPOBJ>>();
+
+        public class CachedPOBJ
+        {
+            public Vector4[] Envelopes = new Vector4[10];
+            public Vector4[] Weights = new Vector4[10];
+
+            public List<CachedDL> DisplayLists = new List<CachedDL>();
+        }
+
+        public class CachedDL
+        {
+            public PrimitiveType PrimType;
+
+            public int Offset;
+
+            public int Count;
+        }
+
+        // END Shader
 
         /// <summary>
         /// 
@@ -30,6 +59,175 @@ namespace HSDRawViewer.Rendering
             TextureManager.ClearTextures();
             imageBufferTextureIndex.Clear();
             pobjToDisplayList.Clear();
+
+            if(GXShader != null)
+                GXShader.Delete();
+            GXShader = null;
+
+            foreach(var v in DOBJtoBuffer)
+                    GL.DeleteBuffer(v.Value);
+            DOBJtoBuffer.Clear();
+
+            DOBJtoPOBJCache.Clear();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="dobj"></param>
+        /// <param name="parentJOBJ"></param>
+        /// <param name="jobjManager"></param>
+        public void RenderDOBJShader(Camera camera, HSD_DOBJ dobj, HSD_JOBJ parentJOBJ, JOBJManager jobjManager)
+        {
+            if (dobj.Pobj == null)
+                return;
+
+            if (SelectedDOBJ != null && !SelectedDOBJ.Equals(dobj))
+                return;
+
+            var selected = SelectedDOBJ == dobj;
+            var mobj = dobj.Mobj;
+            var pobjs = dobj.Pobj.List;
+
+            if(!DOBJtoBuffer.ContainsKey(dobj))
+                LoadDOBJ(dobj, jobjManager);
+            
+            if (!DOBJtoBuffer.ContainsKey(dobj))
+                return;
+
+            if (GXShader == null)
+            {
+                GXShader = new Shader();
+                GXShader.LoadShader(@"Shader\gx.vert");
+                GXShader.LoadShader(@"Shader\gx.frag");
+            }
+
+            GL.UseProgram(GXShader.programId);
+
+            var mvp = camera.MvpMatrix;
+            GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
+
+            Matrix4 single = Matrix4.Identity;
+            if (parentJOBJ != null && jobjManager != null)
+                single = jobjManager.GetWorldTransform(parentJOBJ);
+            GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
+
+            var t = jobjManager.GetBindTransforms();
+            if (t.Length > 0)
+                GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("transforms"), t.Length, false, ref t[0].Row0.X);
+
+            GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("tex0"), 0);
+            
+            float wscale = 1;
+            float hscale = 1;
+            bool mirrorX = false;
+            bool mirrorY = false;
+            if (mobj != null)
+                BindMOBJ(mobj, out wscale, out hscale, out mirrorX, out mirrorY);
+
+            GL.Uniform2(GXShader.GetVertexAttributeUniformLocation("UVScale"), wscale, hscale);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, DOBJtoBuffer[dobj]);
+
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"), 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
+
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 4);
+
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 16);
+
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 60);
+
+
+
+            foreach (var p in DOBJtoPOBJCache[dobj])
+            {
+                var en = p.Envelopes;
+                GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("envelopeIndex"), p.Envelopes.Length, ref p.Envelopes[0].X);
+
+                var we = p.Weights;
+                GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
+
+                foreach (var dl in p.DisplayLists)
+                    GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
+            }
+
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+            GL.UseProgram(0);
+        }
+
+        /// <summary>
+        /// Prepares DOBJ for rendering by loading relevant information into a cache
+        /// </summary>
+        private void LoadDOBJ(HSD_DOBJ dobj, JOBJManager jobjManager)
+        {
+            if(DOBJtoBuffer.ContainsKey(dobj))
+            {
+                GL.DeleteBuffer(DOBJtoBuffer[dobj]);
+                DOBJtoBuffer.Remove(dobj);
+            }
+
+            List<CachedPOBJ> pobjs = new List<CachedPOBJ>();
+            List<GX_Vertex> vertices = new List<GX_Vertex>();
+            int off = 0;
+            foreach(var pobj in dobj.Pobj.List)
+            {
+                var dl = pobj.ToDisplayList();
+
+                vertices.AddRange(dl.Vertices);
+
+                var pobjCache = new CachedPOBJ();
+
+                // build envelopes
+                int eni = 0;
+                foreach(var v in dl.Envelopes)
+                {
+                    Vector4 b = new Vector4();
+                    Vector4 w = new Vector4();
+                    for(int i = 0; i < v.EnvelopeCount; i++)
+                    {
+                        w[i] = v.GetWeightAt(i);
+                        b[i] = jobjManager.IndexOf(v.GetJOBJAt(i));
+                    }
+                    pobjCache.Weights[eni] = w;
+                    pobjCache.Envelopes[eni] = b;
+                    eni++;
+                }
+
+                // load display list
+                foreach (var v in dl.Primitives)
+                {
+                    pobjCache.DisplayLists.Add(new CachedDL()
+                    {
+                        Offset = off,
+                        Count = v.Count,
+                        PrimType = GXTranslator.toPrimitiveType(v.PrimitiveType)
+                    });
+                    off += v.Count;
+                }
+
+                pobjs.Add(pobjCache);
+            }
+            
+            var arr = vertices.ToArray();
+
+            int buf;
+            GL.GenBuffers(1, out buf);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buf);
+            GL.BufferData(BufferTarget.ArrayBuffer, arr.Length * GX_Vertex.Stride, arr, BufferUsageHint.StaticDraw);
+
+            DOBJtoBuffer.Add(dobj, buf);
+            DOBJtoPOBJCache.Add(dobj, pobjs);
         }
 
         /// <summary>
