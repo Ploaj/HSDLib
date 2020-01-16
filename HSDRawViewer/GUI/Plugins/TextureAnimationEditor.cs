@@ -600,7 +600,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void exportSelectedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+            if ((textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0) && TOBJ == null)
                 return;
 
             var f = Tools.FileIO.SaveFile("PNG (.png)|*.png");

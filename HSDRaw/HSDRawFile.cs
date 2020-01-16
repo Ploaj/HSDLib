@@ -264,7 +264,7 @@ namespace HSDRaw
                         a = acc;
                     }
                     else
-                    if (rootStrings[i].StartsWith("Sc"))
+                    if (rootStrings[i].StartsWith("Sc") && str.Length == 0x10)
                     {
                         var acc = new HSD_SOBJ();
                         acc._s = str;
