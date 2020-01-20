@@ -204,13 +204,13 @@ namespace HSDRaw.Tools
             bool HasPositionNormalMatrix = attributes.Contains(GXAttribName.GX_VA_PNMTXIDX);
 
             // Optimize single bind
-            if (weights != null && weights.Count == 1 && weights[0].EnvelopeCount == 1)
+            /*if (weights != null && weights.Count == 1 && weights[0].EnvelopeCount == 1)
             {
                 singleBind = weights[0].GetJOBJAt(0);
                 var al = attributes.ToList();
                 al.Remove(GXAttribName.GX_VA_PNMTXIDX);
                 attributes = al.ToArray();
-            }
+            }*/
 
             var groups = converter.GroupPrimitives(triList.ToArray(), out pointCount, out faceCount);
 

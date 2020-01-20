@@ -214,11 +214,13 @@ namespace HSDRaw
         public bool ReplaceReferenceToStruct(HSDStruct oldStruct, HSDStruct newStruct)
         {
             bool replaced = false;
-            foreach (var v in _references)
+            var keys = _references.Keys.ToArray();
+            foreach (var k in keys)
             {
-                if (v.Value == oldStruct)
+                var v = _references[k];
+                if (v == oldStruct)
                 {
-                    SetReferenceStruct(v.Key, newStruct);
+                    SetReferenceStruct(k, newStruct);
                     replaced = true;
                 }
             }

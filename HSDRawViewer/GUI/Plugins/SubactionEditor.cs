@@ -584,5 +584,29 @@ namespace HSDRawViewer.GUI
             CopySelected();
             RemoveSelected();
         }
+
+        #region special functions
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void clearAllActionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult dialogResult = MessageBox.Show("Are you sure?\nThis operation cannot be undone", "Clear All Scripts", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                foreach(var script in AllScripts)
+                {
+                    script._struct.References.Clear();
+                    script._struct.SetData(new byte[4]);
+                }
+
+                actionList.SelectedIndex = 0;
+            }
+        }
+
+        #endregion
     }
 }

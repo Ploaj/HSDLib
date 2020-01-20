@@ -50,6 +50,8 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
+            this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -59,7 +61,7 @@
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(194, 0);
+            this.splitter1.Location = new System.Drawing.Point(197, 0);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(3, 316);
             this.splitter1.TabIndex = 3;
@@ -72,9 +74,9 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.panel1);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(197, 0);
+            this.groupBox1.Location = new System.Drawing.Point(200, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(498, 316);
+            this.groupBox1.Size = new System.Drawing.Size(495, 316);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Subaction";
@@ -92,7 +94,7 @@
             this.subActionList.Location = new System.Drawing.Point(3, 70);
             this.subActionList.Name = "subActionList";
             this.subActionList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.subActionList.Size = new System.Drawing.Size(492, 243);
+            this.subActionList.Size = new System.Drawing.Size(489, 243);
             this.subActionList.TabIndex = 0;
             this.subActionList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.subActionList_DrawItem);
             this.subActionList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.subActionList_MeasureItem);
@@ -113,7 +115,7 @@
             this.buttonPaste});
             this.toolStrip2.Location = new System.Drawing.Point(3, 45);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(492, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(489, 25);
             this.toolStrip2.TabIndex = 1;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -216,13 +218,13 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(3, 16);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(492, 29);
+            this.panel1.Size = new System.Drawing.Size(489, 29);
             this.panel1.TabIndex = 6;
             // 
             // buttonGoto
             // 
             this.buttonGoto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonGoto.Location = new System.Drawing.Point(414, 3);
+            this.buttonGoto.Location = new System.Drawing.Point(411, 3);
             this.buttonGoto.Name = "buttonGoto";
             this.buttonGoto.Size = new System.Drawing.Size(75, 23);
             this.buttonGoto.TabIndex = 5;
@@ -247,7 +249,7 @@
             this.cbReference.FormattingEnabled = true;
             this.cbReference.Location = new System.Drawing.Point(90, 4);
             this.cbReference.Name = "cbReference";
-            this.cbReference.Size = new System.Drawing.Size(318, 21);
+            this.cbReference.Size = new System.Drawing.Size(315, 21);
             this.cbReference.TabIndex = 4;
             // 
             // actionList
@@ -256,7 +258,7 @@
             this.actionList.FormattingEnabled = true;
             this.actionList.Location = new System.Drawing.Point(3, 41);
             this.actionList.Name = "actionList";
-            this.actionList.Size = new System.Drawing.Size(188, 272);
+            this.actionList.Size = new System.Drawing.Size(191, 272);
             this.actionList.TabIndex = 5;
             this.actionList.SelectedIndexChanged += new System.EventHandler(this.actionList_SelectedIndexChanged);
             // 
@@ -267,7 +269,7 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(194, 316);
+            this.groupBox2.Size = new System.Drawing.Size(197, 316);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Action List";
@@ -275,10 +277,11 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editDropDown,
             this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(3, 16);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(188, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(191, 25);
             this.toolStrip1.TabIndex = 6;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -291,6 +294,24 @@
             this.toolStripButton1.Size = new System.Drawing.Size(133, 22);
             this.toolStripButton1.Text = "Create New Subroutine";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // editDropDown
+            // 
+            this.editDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.editDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearAllActionsToolStripMenuItem});
+            this.editDropDown.Image = ((System.Drawing.Image)(resources.GetObject("editDropDown.Image")));
+            this.editDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.editDropDown.Name = "editDropDown";
+            this.editDropDown.Size = new System.Drawing.Size(29, 22);
+            this.editDropDown.Text = "Edit";
+            // 
+            // clearAllActionsToolStripMenuItem
+            // 
+            this.clearAllActionsToolStripMenuItem.Name = "clearAllActionsToolStripMenuItem";
+            this.clearAllActionsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.clearAllActionsToolStripMenuItem.Text = "Clear All Action\'s Scripts";
+            this.clearAllActionsToolStripMenuItem.Click += new System.EventHandler(this.clearAllActionsToolStripMenuItem_Click);
             // 
             // SubactionEditor
             // 
@@ -337,5 +358,7 @@
         private System.Windows.Forms.ToolStripButton buttonCopy;
         private System.Windows.Forms.ToolStripButton buttonPaste;
         private System.Windows.Forms.ToolStripButton buttonCut;
+        private System.Windows.Forms.ToolStripDropDownButton editDropDown;
+        private System.Windows.Forms.ToolStripMenuItem clearAllActionsToolStripMenuItem;
     }
 }

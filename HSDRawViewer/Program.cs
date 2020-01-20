@@ -18,6 +18,5 @@ namespace HSDRawViewer
             MainForm.Init();
             Application.Run(MainForm.Instance);
         }
-
     }
 }

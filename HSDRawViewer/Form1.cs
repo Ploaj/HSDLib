@@ -208,21 +208,17 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog d = new OpenFileDialog())
+            var f = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm)|*.dat;*.usd;*.ssm");
+            if (f != null)
             {
-                d.Filter = "HSD (*.dat,*.usd,*.ssm)|*.dat;*.usd;*.ssm";
-
-                if(d.ShowDialog() == DialogResult.OK)
+                if (f.ToLower().EndsWith(".ssm"))
                 {
-                    if(d.FileName.ToLower().EndsWith(".ssm"))
-                    {
-                        ssmTool.Show();
-                        ssmTool.OpenFile(d.FileName);
-                        ssmTool.BringToFront();
-                    }
-                    else
-                        OpenFile(d.FileName);
+                    ssmTool.Show();
+                    ssmTool.OpenFile(f);
+                    ssmTool.BringToFront();
                 }
+                else
+                    OpenFile(f);
             }
         }
 
@@ -233,15 +229,11 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog d = new SaveFileDialog())
+            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd");
+            if (f != null)
             {
-                d.Filter = "HSD (*.dat,*.usd)|*.dat;*.usd";
-
-                if (d.ShowDialog() == DialogResult.OK)
-                {
-                    RawHSDFile.Save(d.FileName);
-                    //OpenFile(d.FileName);
-                }
+                RawHSDFile.Save(f);
+                OpenFile(f);
             }
         }
 
@@ -252,15 +244,11 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog d = new SaveFileDialog())
+            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd");
+            if (f != null)
             {
-                d.Filter = "HSD (*.dat,*.usd)|*.dat;*.usd";
-
-                if (d.ShowDialog() == DialogResult.OK)
-                {
-                    RawHSDFile.Save(d.FileName, false, false);
-                    OpenFile(d.FileName);
-                }
+                RawHSDFile.Save(f, false, false);
+                OpenFile(f);
             }
         }
 
@@ -273,6 +261,10 @@ namespace HSDRawViewer
             foreach (var r in RawHSDFile.Roots)
             {
                 treeView1.Nodes.Add(new DataNode(r.Name, r.Data));
+            }
+            foreach (var r in RawHSDFile.References)
+            {
+                treeView1.Nodes.Add(new DataNode(r.Name, r.Data, true));
             }
             if (treeView1.Nodes.Count > 0)
                 treeView1.SelectedNode = treeView1.Nodes[0];
@@ -287,19 +279,14 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void addRootFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog f = new OpenFileDialog())
+            var f = Tools.FileIO.OpenFile("HSD (*.dat)|*.dat");
+            if (f != null)
             {
-                f.Filter = "HSD (*.dat)|*.dat";
-                f.FileName = Text;
+                var file = new HSDRawFile(f);
 
-                if (f.ShowDialog() == DialogResult.OK)
-                {
-                    var file = new HSDRawFile(f.FileName);
+                RawHSDFile.Roots.Add(file.Roots[0]);
 
-                    RawHSDFile.Roots.Add(file.Roots[0]);
-
-                    RefreshTree();
-                }
+                RefreshTree();
             }
         }
 

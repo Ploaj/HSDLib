@@ -196,6 +196,8 @@ namespace HSDRawViewer.Rendering
                     Vector4 w = new Vector4();
                     for(int i = 0; i < v.EnvelopeCount; i++)
                     {
+                        if (i >= 4)
+                            break;
                         w[i] = v.GetWeightAt(i);
                         b[i] = jobjManager.IndexOf(v.GetJOBJAt(i));
                     }

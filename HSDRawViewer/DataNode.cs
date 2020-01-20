@@ -14,6 +14,8 @@ namespace HSDRawViewer
 {
     public class DataNode : TreeNode
     {
+        private bool ReferenceNode = false;
+
         public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }
         private int ArrayIndex { get; set; }
@@ -25,6 +27,8 @@ namespace HSDRawViewer
                     ForeColor = System.Drawing.Color.DarkSlateBlue;
                 if(value.GetType() == typeof(HSDAccessor))
                     ForeColor = System.Drawing.Color.Gray;
+                if (ReferenceNode)
+                    ForeColor = System.Drawing.Color.DarkRed;
                 _accessor = value;
 
                 if (typeToImageKey.ContainsKey(value.GetType()))
@@ -100,8 +104,9 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="Text"></param>
         /// <param name="accessor"></param>
-        public DataNode(string Text, HSDAccessor accessor)
+        public DataNode(string Text, HSDAccessor accessor, bool referenceNode = false)
         {
+            ReferenceNode = referenceNode;
             this.Text = Text;
             Accessor = accessor;
 
@@ -227,20 +232,15 @@ namespace HSDRawViewer
         /// </summary>
         public void Export()
         {
-            using (SaveFileDialog f = new SaveFileDialog())
+            var f = Tools.FileIO.SaveFile("HSD (*.dat)|*.dat");
+            if (f != null)
             {
-                f.Filter = "HSD (*.dat)|*.dat";
-                f.FileName = Text;
-
-                if(f.ShowDialog() == DialogResult.OK)
-                {
-                    HSDRawFile r = new HSDRawFile();
-                    HSDRootNode root = new HSDRootNode();
-                    root.Data = Accessor;
-                    root.Name = System.IO.Path.GetFileNameWithoutExtension(f.FileName);
-                    r.Roots.Add(root);
-                    r.Save(f.FileName);
-                }
+                HSDRawFile r = new HSDRawFile();
+                HSDRootNode root = new HSDRootNode();
+                root.Data = Accessor;
+                root.Name = System.IO.Path.GetFileNameWithoutExtension(f);
+                r.Roots.Add(root);
+                r.Save(f);
             }
         }
 
@@ -252,16 +252,11 @@ namespace HSDRawViewer
         private bool OpenDAT(out HSDRawFile file)
         {
             file = null;
-            using (OpenFileDialog f = new OpenFileDialog())
+            var f = Tools.FileIO.SaveFile("HSD (*.dat)|*.dat");
+            if (f != null)
             {
-                f.Filter = "HSD (*.dat)|*.dat";
-                f.FileName = Text;
-
-                if (f.ShowDialog() == DialogResult.OK)
-                {
-                    file = new HSDRawFile(f.FileName);
-                    return true;
-                }
+                file = new HSDRawFile(f);
+                return true;
             }
             return false;
         }
@@ -332,7 +327,7 @@ namespace HSDRawViewer
                     }
                     else
                     {
-                        parent.Accessor._s.ReplaceReferenceToStruct(Accessor._s, current.Next._s);
+                        parent.Accessor._s.ReplaceReferenceToStruct(Accessor._s, current.Next?._s);
                     }
                 }
                 else
@@ -365,7 +360,8 @@ namespace HSDRawViewer
             }
             else
             {
-                MainForm.DeleteRoot(this);
+                if(!ReferenceNode)
+                    MainForm.DeleteRoot(this);
             }
         }
 

@@ -10,6 +10,7 @@ using HSDRaw.Tools;
 using HSDRaw.GX;
 using System.ComponentModel;
 using HSDRawViewer.GUI;
+using System.Linq;
 
 namespace HSDRawViewer.Converters
 {
@@ -60,6 +61,10 @@ namespace HSDRawViewer.Converters
 
         [Category("Texture Options")]
         public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB565;
+
+
+        [Category("Misc")]
+        public bool ZeroOutRotationsAndApplyFighterTransforms { get; set; } = false;
     }
 
     /// <summary>
@@ -73,7 +78,7 @@ namespace HSDRawViewer.Converters
         /// <param name="toReplace"></param>
         public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
         {
-            var f = Tools.FileIO.OpenFile("Supported Formats (*.dae, *.obj)|*.dae;*.obj");
+            var f = Tools.FileIO.OpenFile("Supported Formats (*.dae, *.obj)|*.dae;*.obj;*.fbx");
 
             if(f != null)
             {
@@ -104,7 +109,7 @@ namespace HSDRawViewer.Converters
             // cache the jobj names to their respective jobj
             public Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
 
-            // Single bound vertices need to be inverted by their parent bone
+            // SingleBoundJOBJ bound vertices need to be inverted by their parent bone
             public Dictionary<HSD_JOBJ, Matrix4> jobjToInverseTransform = new Dictionary<HSD_JOBJ, Matrix4>();
             public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
 
@@ -141,12 +146,16 @@ namespace HSDRawViewer.Converters
             AssimpContext importer = new AssimpContext();
             if(settings.SmoothNormals)
                 importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
-            importer.SetConfig(new VertexBoneWeightLimitConfig(3));
+            importer.SetConfig(new VertexBoneWeightLimitConfig(4));
             var importmodel = importer.ImportFile(filePath, processFlags);
 
             System.Diagnostics.Debug.WriteLine("Processing Nodes...");
             // process nodes
             var rootjobj = RecursiveProcess(cache, settings, importmodel, importmodel.RootNode);
+
+            // Clear rotations
+            if(settings.ZeroOutRotationsAndApplyFighterTransforms)
+                ZeroOutRotations(cache, rootjobj);
 
             // get root of skeleton
             rootjobj = rootjobj.Child;
@@ -154,7 +163,7 @@ namespace HSDRawViewer.Converters
             rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;
 
             // no need for excess nodes
-            if (filePath.ToLower().EndsWith(".obj"))
+            //if (filePath.ToLower().EndsWith(".obj"))
                 rootjobj.Next = null;
 
             // process mesh
@@ -204,22 +213,157 @@ namespace HSDRawViewer.Converters
             return rootjobj;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         private static HSD_Matrix4x3 Matrix4ToHSDMatrix(Matrix4 t)
         {
             var o = new HSD_Matrix4x3();
             o.M11 = t.M11;
-            o.M12 = t.M12;
-            o.M13 = t.M13;
-            o.M14 = t.M14;
-            o.M21 = t.M21;
+            o.M12 = t.M21;
+            o.M13 = t.M31;
+            o.M14 = t.M41;
+            o.M21 = t.M12;
             o.M22 = t.M22;
-            o.M23 = t.M23;
-            o.M24 = t.M24;
-            o.M31 = t.M31;
-            o.M32 = t.M32;
+            o.M23 = t.M32;
+            o.M24 = t.M42;
+            o.M31 = t.M13;
+            o.M32 = t.M23;
             o.M33 = t.M33;
-            o.M34 = t.M34;
+            o.M34 = t.M43;
             return o;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void ZeroOutRotations(ProcessingCache cache, HSD_JOBJ root)
+        {
+            Dictionary<HSD_JOBJ, Matrix4> newWorldMatrices = new Dictionary<HSD_JOBJ, Matrix4>();
+
+            ZeroOutRotations(cache, newWorldMatrices, root, Matrix4.Identity, Matrix4.Identity);
+
+            cache.jobjToWorldTransform = newWorldMatrices;
+            cache.jobjToInverseTransform.Clear();
+            foreach(var v in newWorldMatrices)
+                cache.jobjToInverseTransform.Add(v.Key, v.Value.Inverted());
+        }
+
+        private static Dictionary<string, Vector3> FighterDefaults = new Dictionary<string, Vector3>() { { "TopN", new Vector3(0, 0, 0) },
+{ "TransN", new Vector3(0, 0, 0) },
+{ "XRotN", new Vector3(0, 0, 0) },
+{ "YRotN", new Vector3(0, 0, 0) },
+{ "HipN", new Vector3(0, 0, 0) },
+{ "WaistN", new Vector3(0, 0, 0) },
+{ "LLegJA", new Vector3(-1.570796f, 0, -1.570796f) },
+{ "LLegJ", new Vector3(-0.0001849213f, -0.007395464f, 0.01190592f) },
+{ "LKneeJ", new Vector3(0, 0, 0.01745588f) },
+{ "LFootJA", new Vector3(0, 0, -1.570796f) },
+{ "LFootJ", new Vector3(-0.01625728f, -0.003122046f, 0.04150072f) },
+{ "RLegJA", new Vector3(-1.570796f, 0, -1.570796f) },
+{ "RLegJ", new Vector3(-0.0003749531f, 0.01237885f, 0.01931265f) },
+{ "RKneeJ", new Vector3(0, 0, 0.01745588f) },
+{ "RFootJA", new Vector3(0, 0, -1.570796f) },
+{ "RFootJ", new Vector3(0.04340675f, 0.006765825f, 0.03351802f) },
+{ "BustN", new Vector3(0, 0, 0) },
+{ "LShoulderN", new Vector3(0, 0, 0) },
+{ "LShoulderJA", new Vector3(-1.570796f, 0, 0) },
+{ "LShoulderJ", new Vector3(-0.0008534141f, -0.0001975292f, 0.0004313609f) },
+{ "LArmJ", new Vector3(0, 0, -0.01745588f) },
+{ "LHandN", new Vector3(0, 0, -0.001827065f) },
+{ "L1stNa", new Vector3(0, -0.0299967f, 0) },
+{ "L1stNb", new Vector3(0, 0, 0) },
+{ "L2ndNa", new Vector3(0, -0.0299967f, 0) },
+{ "L2ndNb", new Vector3(0, 0, 0) },
+{ "L3rdNa", new Vector3(0, -0.0299967f, 0) },
+{ "L3rdNb", new Vector3(0, 0, 0) },
+{ "L4thNa", new Vector3(0, -0.0299967f, 0) },
+{ "L4thNb", new Vector3(0, 0, 0) },
+{ "LHaveN", new Vector3(0, 0, -0.001827065f) },
+{ "LThumbNa", new Vector3(0.02769301f, 0.03113901f, -0.3017421f) },
+{ "LThumbNb", new Vector3(0, 0, 0.159777f) },
+{ "NeckN", new Vector3(0, 0, 0) },
+{ "HeadN", new Vector3(0, 0, 0) },
+{ "RShoulderN", new Vector3(0, 0, 0) },
+{ "RShoulderJA", new Vector3(-1.570796f, 0, 3.141592f) },
+{ "RShoulderJ", new Vector3(-0.0001569438f, -0.008347717f, 0.01229164f) },
+{ "RArmJ", new Vector3(0, 0, -0.0213731f) },
+{ "RHandN", new Vector3(0, 0, 0) },
+{ "R1stNa", new Vector3(0, 0, 0) },
+{ "R1stNb", new Vector3(0, 0, 0) },
+{ "R2ndNa", new Vector3(0, 0, 0) },
+{ "R2ndNb", new Vector3(0, 0, 0) },
+{ "R3rdNa", new Vector3(0, 0, 0) },
+{ "R3rdNb", new Vector3(0, 0, 0) },
+{ "R4thNa", new Vector3(0, 0, 0) },
+{ "R4thNb", new Vector3(0, 0, 0) },
+{ "RHaveN", new Vector3(0, -1.570796f, 3.127518f) },
+{ "RThumbNa", new Vector3(-0.006011998f, -0.006951f, -0.3686029f) },
+{ "RThumbNb", new Vector3(0, 0, 0.1282514f) },
+{ "ThrowN", new Vector3(0, 0, 0) },
+{ "Extra", new Vector3(0, 0, 0) }};
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <param name="newWorldMatrices"></param>
+        /// <param name="root"></param>
+        /// <param name="parentTransform"></param>
+        private static void ZeroOutRotations(ProcessingCache cache, Dictionary<HSD_JOBJ, Matrix4> newWorldMatrices, HSD_JOBJ root, Matrix4 oldParent, Matrix4 parentTransform)
+        {
+            var targetPoint = Vector3.TransformPosition(Vector3.Zero, cache.jobjToWorldTransform[root]);
+
+            //targetPoint -= Vector3.TransformPosition(Vector3.Zero, oldParent);
+               
+            
+            if (FighterDefaults.ContainsKey(root.ClassName))
+            {
+                root.TX = 0;
+                root.TY = 0;
+                root.TZ = 0;
+                root.RX = FighterDefaults[root.ClassName].X;
+                root.RY = FighterDefaults[root.ClassName].Y;
+                root.RZ = FighterDefaults[root.ClassName].Z;
+                root.SX = 1;
+                root.SY = 1;
+                root.SZ = 1;
+            }
+            else
+            {
+                root.TX = 0;
+                root.TY = 0;
+                root.TZ = 0;
+                root.RX = 0;
+                root.RY = 0;
+                root.RZ = 0;
+                root.SX = 1;
+                root.SY = 1;
+                root.SZ = 1;
+            }
+
+            Matrix4 currentTransform =
+                Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(root.RZ, root.RY, root.RX)) *
+                parentTransform;
+            
+            var relPoint = Vector3.TransformPosition(targetPoint, parentTransform.Inverted());
+
+            root.TX = relPoint.X;
+            root.TY = relPoint.Y;
+            root.TZ = relPoint.Z;
+
+            var finalTransform = 
+                Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(root.RZ, root.RY, root.RX)) *
+                Matrix4.CreateTranslation(root.TX, root.TY, root.TZ) * parentTransform;
+
+            newWorldMatrices.Add(root, finalTransform);
+
+            foreach (var c in root.Children)
+                ZeroOutRotations(cache, newWorldMatrices, c, cache.jobjToWorldTransform[root], finalTransform);
         }
 
         /// <summary>
@@ -230,6 +374,8 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private static HSD_JOBJ RecursiveProcess(ProcessingCache cache, ModelImportSettings settings, Scene scene, Node node)
         {
+            if (node.Name.EndsWith("_end"))
+                return null;
 
             // node transform's translation is bugged
             Vector3D tr, s;
@@ -253,6 +399,7 @@ namespace HSDRawViewer.Converters
             cache.jobjToWorldTransform.Add(jobj, t);
             cache.jobjToInverseTransform.Add(jobj, t.Inverted());
 
+            jobj.ClassName = node.Name;
             jobj.Flags = JOBJ_FLAG.CLASSICAL_SCALING;
             jobj.TX = translation.X;
             jobj.TY = translation.Y;
@@ -344,8 +491,11 @@ namespace HSDRawViewer.Converters
 
                 if (mesh.HasNormals && settings.ShadingType == ShadingType.Material)
                     Attributes.Add(GXAttribName.GX_VA_NRM);
+                
+                // reflective mobjs do not use uvs
+                var reflective = (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) && dobj.Mobj.Textures.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION));
 
-                if (mesh.HasTextureCoords(0))
+                if (mesh.HasTextureCoords(0) && !reflective)
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
                 //if (mesh.HasTextureCoords(1))
@@ -395,7 +545,7 @@ namespace HSDRawViewer.Converters
                             var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z);
                             var tknrm = new Vector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
 
-                            if(jobjs[indicie].Count == 1)
+                            if(jobjs[indicie].Count == 1 || weights[indicie][0] == 1)
                             {
                                 tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[jobjs[indicie][0]]);
                                 tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[jobjs[indicie][0]]);
@@ -507,6 +657,14 @@ namespace HSDRawViewer.Converters
                 {
                     var texturePath = Path.Combine(cache.FolderPath, material.TextureDiffuse.FilePath);
 
+                    /// special mobj loading
+                    if(Path.GetExtension(texturePath).ToLower() == ".mobj")
+                    {
+                        var dat = new HSDRaw.HSDRawFile(texturePath);
+                        Mobj._s = dat.Roots[0].Data._s;
+                        return Mobj;
+                    }
+                    else
                     if (File.Exists(texturePath))
                     {
                         Mobj.RenderFlags |= RENDER_MODE.TEX0;

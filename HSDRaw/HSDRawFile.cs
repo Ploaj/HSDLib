@@ -139,8 +139,36 @@ namespace HSDRaw
                 }
                 for (int i = 0; i < refCount; i++)
                 {
-                    refOffsets.Add(r.ReadInt32() + 0x20);
+                    var refp = r.ReadInt32() + 0x20;
+                    refOffsets.Add(refp);
                     refStrings.Add(r.ReadString((int)stringStart + r.ReadInt32(), -1));
+
+                    var temp = r.Position;
+
+                    var special = refp;
+                    while (true)
+                    {
+                        r.Seek((uint)special);
+                        special = r.ReadInt32();
+
+                        if (special == 0 || special == -1 )
+                            break;
+
+                        special += 0x20;
+
+                        relocOffsets.Add(refp, special);
+
+                        refp = special;
+
+                        if (!OffsetContain.Contains(special))
+                        {
+                            OffsetContain.Add(special);
+                            Offsets.Add(special);
+                        }
+                    }
+
+                    r.Seek(temp);
+
                 }
                 foreach (var v in rootOffsets)
                     if (!OffsetContain.Contains(v))
@@ -470,6 +498,26 @@ namespace HSDRaw
             }
             return allStructs;
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private List<HSDStruct> GetReferenceStructs()
+        {
+            var allStructs = new List<HSDStruct>();
+            foreach (var r in References)
+            {
+                var s = r.Data._s;
+                allStructs.Add(s);
+                while(s.GetReference<HSDAccessor>(0) != null)
+                {
+                    s = s.GetReference<HSDAccessor>(0)._s;
+                    allStructs.Add(s);
+                }
+            }
+            return allStructs;
+        }
 
         /// <summary>
         /// saves dat data to stream with optional alignment
@@ -547,13 +595,16 @@ namespace HSDRaw
 
                 List<int> relocationOffsets = new List<int>();
 
+                var refStructs = GetReferenceStructs();
+
                 // fix references
                 foreach (var s in _structCache)
                 {
                     var offset = structToOffset[s];
                     foreach(var v in s.References)
                     {
-                        relocationOffsets.Add(offset + v.Key);
+                        if(!refStructs.Contains(s) || (refStructs.Contains(s) && v.Key != 0))
+                            relocationOffsets.Add(offset + v.Key);
                         writer.Seek(offset + v.Key + 0x20, SeekOrigin.Begin);
                         writer.Write(structToOffset[v.Value]);
                     }
@@ -568,22 +619,39 @@ namespace HSDRaw
 
                 // write root and reference node info
                 MemoryStream stringstream = new MemoryStream();
+                Dictionary<string, uint> stringToOffset = new Dictionary<string, uint>();
+                List<string> strings = new List<string>();
+
+                foreach (var root in Roots)
+                    strings.Add(root.Name);
+                foreach (var root in References)
+                    strings.Add(root.Name);
+
+                //strings.Sort();
+
+                byte[] stringbuf;
                 using (BinaryWriterExt stringWriter = new BinaryWriterExt(stringstream))
                 {
-                    foreach(var root in Roots)
+                    foreach(var s in strings)
                     {
-                        writer.Write(structToOffset[root.Data._s]);
-                        writer.Write((uint)stringstream.Position);
-                        stringWriter.Write(root.Name);
+                        stringToOffset.Add(s, (uint)stringstream.Position);
+                        stringWriter.Write(s);
                     }
-                    foreach (var root in References)
-                    {
-                        writer.Write(structToOffset[root.Data._s]);
-                        writer.Write((uint)stringstream.Position);
-                        stringWriter.Write(root.Name);
-                    }
-                    writer.Write(stringstream.ToArray());
+                    stringbuf = (stringstream.ToArray());
                 }
+
+                foreach (var root in Roots)
+                {
+                    writer.Write(structToOffset[root.Data._s]);
+                    writer.Write(stringToOffset[root.Name]);
+                }
+                foreach (var root in References)
+                {
+                    writer.Write(structToOffset[root.Data._s]);
+                    writer.Write(stringToOffset[root.Name]);
+                }
+
+                writer.Write(stringbuf);
 
                 // finalize
                 writer.Seek(0, SeekOrigin.Begin);

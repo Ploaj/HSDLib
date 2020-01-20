@@ -1,9 +1,14 @@
-﻿using System.Windows.Forms;
+﻿using System.IO;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Tools
 {
     public class FileIO
     {
+        private static string PrevSaveLocation = null;
+
+        private static string PrevOpenLocation = null;
+        
         /// <summary>
         /// 
         /// </summary>
@@ -32,8 +37,14 @@ namespace HSDRawViewer.Tools
             {
                 d.Filter = filter;
 
+                if (PrevOpenLocation != null)
+                {
+                    d.InitialDirectory = PrevOpenLocation;
+                }
+
                 if(d.ShowDialog() == DialogResult.OK)
                 {
+                    PrevOpenLocation = Path.GetDirectoryName(d.FileName);
                     return d.FileName;
                 }
             }
@@ -83,8 +94,14 @@ namespace HSDRawViewer.Tools
 
                 d.FileName = defaultName;
 
+                if (PrevSaveLocation != null)
+                {
+                    d.InitialDirectory = PrevSaveLocation;
+                }
+
                 if (d.ShowDialog() == DialogResult.OK)
                 {
+                    PrevSaveLocation = Path.GetDirectoryName(d.FileName);
                     return d.FileName;
                 }
             }
