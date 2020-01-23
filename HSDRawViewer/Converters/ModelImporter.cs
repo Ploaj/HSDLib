@@ -41,7 +41,10 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options")]
         public bool ImportTexture { get; set; } = true;
-        
+
+        [Category("Importing Options")]
+        public float Scale { get; set; } = 1;
+
         //[Category("Importing Options"), Description("Attempts to keep JOBJ and DOBJ matching original model")]
         //public bool TryToUseExistingStructure { get; set; } = true;
 
@@ -136,7 +139,8 @@ namespace HSDRawViewer.Converters
 
             var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
                 | PostProcessSteps.Triangulate
-                | PostProcessSteps.LimitBoneWeights;
+                | PostProcessSteps.LimitBoneWeights
+                | PostProcessSteps.FlipWindingOrder;
 
             if (settings.FlipUVs)
                 processFlags |= PostProcessSteps.FlipUVs;
@@ -151,6 +155,7 @@ namespace HSDRawViewer.Converters
 
             System.Diagnostics.Debug.WriteLine("Processing Nodes...");
             // process nodes
+            var rootNode = importmodel.RootNode;
             var rootjobj = RecursiveProcess(cache, settings, importmodel, importmodel.RootNode);
 
             // Clear rotations
@@ -317,16 +322,16 @@ namespace HSDRawViewer.Converters
             var targetPoint = Vector3.TransformPosition(Vector3.Zero, cache.jobjToWorldTransform[root]);
 
             //targetPoint -= Vector3.TransformPosition(Vector3.Zero, oldParent);
-               
+            var trimName = root.ClassName.Replace("Armature_", "");
             
-            if (FighterDefaults.ContainsKey(root.ClassName))
+            if (FighterDefaults.ContainsKey(trimName))
             {
                 root.TX = 0;
                 root.TY = 0;
                 root.TZ = 0;
-                root.RX = FighterDefaults[root.ClassName].X;
-                root.RY = FighterDefaults[root.ClassName].Y;
-                root.RZ = FighterDefaults[root.ClassName].Z;
+                root.RX = FighterDefaults[trimName].X;
+                root.RY = FighterDefaults[trimName].Y;
+                root.RZ = FighterDefaults[trimName].Z;
                 root.SX = 1;
                 root.SY = 1;
                 root.SZ = 1;
@@ -354,6 +359,13 @@ namespace HSDRawViewer.Converters
             root.TX = relPoint.X;
             root.TY = relPoint.Y;
             root.TZ = relPoint.Z;
+            
+            if (trimName.Equals("TransN")) // special case
+            {
+                root.TX = 0;
+                root.TY = 0;
+                root.TZ = 0;
+            }
 
             var finalTransform = 
                 Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
@@ -384,6 +396,8 @@ namespace HSDRawViewer.Converters
             var translation = new Vector3(tr.X, tr.Y, tr.Z);
             var scale = new Vector3(s.X, s.Y, s.Z);
             var rotation = Math3D.ToEulerAngles(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W).Inverted());
+
+            translation *= settings.Scale;
 
             var t = Matrix4.CreateScale(scale) 
                 * Matrix4.CreateFromQuaternion(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W)) 
@@ -474,11 +488,20 @@ namespace HSDRawViewer.Converters
                                     jobjs[vw.VertexID] = new List<HSD_JOBJ>();
                                 if (weights[vw.VertexID] == null)
                                     weights[vw.VertexID] = new List<float>();
-                                jobjs[vw.VertexID].Add(jobj);
-                                weights[vw.VertexID].Add(vw.Weight);
+                                if(vw.Weight > 0)
+                                {
+                                    jobjs[vw.VertexID].Add(jobj);
+                                    weights[vw.VertexID].Add(vw.Weight);
+                                }
                             }
                     }
                 }
+
+                // reflective mobjs do not use uvs
+                var reflective = (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) && dobj.Mobj.Textures.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION));
+                
+                if (reflective)
+                    Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
                 if (mesh.HasVertices)
                     Attributes.Add(GXAttribName.GX_VA_POS);
@@ -492,9 +515,6 @@ namespace HSDRawViewer.Converters
                 if (mesh.HasNormals && settings.ShadingType == ShadingType.Material)
                     Attributes.Add(GXAttribName.GX_VA_NRM);
                 
-                // reflective mobjs do not use uvs
-                var reflective = (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) && dobj.Mobj.Textures.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION));
-
                 if (mesh.HasTextureCoords(0) && !reflective)
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
@@ -536,13 +556,15 @@ namespace HSDRawViewer.Converters
 
                         GX_Vertex vertex = new GX_Vertex();
 
+                        vertex.TEX0MTXIDX = 51;
+
                         if (mesh.HasBones)
                         {
                             jobjList.Add(jobjs[indicie].ToArray());
                             wList.Add(weights[indicie].ToArray());
 
                             // Single Binds Get Inverted
-                            var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z);
+                            var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z) * settings.Scale;
                             var tknrm = new Vector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
 
                             if(jobjs[indicie].Count == 1 || weights[indicie][0] == 1)
@@ -557,7 +579,7 @@ namespace HSDRawViewer.Converters
                         else
                         {
                             if (mesh.HasVertices)
-                                vertex.POS = new GXVector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z);
+                                vertex.POS = new GXVector3(mesh.Vertices[indicie].X * settings.Scale, mesh.Vertices[indicie].Y * settings.Scale, mesh.Vertices[indicie].Z * settings.Scale) ;
                             
                             if (mesh.HasNormals)
                                 vertex.NRM = new GXVector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);

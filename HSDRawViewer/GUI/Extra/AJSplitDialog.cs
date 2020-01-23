@@ -42,7 +42,59 @@ namespace HSDRawViewer.GUI
             lbFighting.DataSource = FightingAnimations;
             lbResult.DataSource = ResultAnimations;
 
+            lbFighting.AllowDrop = true;
+            lbFighting.DragDrop += listBox_DragDrop;
+            lbFighting.DragEnter += listBox_DragEnter;
+            lbResult.AllowDrop = true;
+            lbResult.DragDrop += listBox_DragDrop;
+            lbResult.DragEnter += listBox_DragEnter;
+
             CenterToScreen();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listBox_DragEnter(object sender, System.Windows.Forms.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listBox_DragDrop(object sender, System.Windows.Forms.DragEventArgs e)
+        {
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            int i;
+            for (i = 0; i < s.Length; i++)
+            {
+                if (s[i].ToLower().EndsWith(".dat"))
+                {
+                    var name = Path.GetFileNameWithoutExtension(s[i]);
+                    var d = File.ReadAllBytes(s[i]);
+
+                    foreach (Animation v in lbFighting.Items)
+                        if (v.Name.Equals(name))
+                        {
+                            if (MessageBox.Show($"Replace {v.Name}?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                v.Data = d;
+                        }
+                    foreach (Animation v in lbResult.Items)
+                        if (v.Name.Equals(name))
+                        {
+                            if (MessageBox.Show($"Replace {v.Name}?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                v.Data = d;
+                        }
+                }
+            }
         }
 
         /// <summary>
@@ -225,12 +277,23 @@ namespace HSDRawViewer.GUI
             if (tabControl1.SelectedIndex == 1)
                 box = lbResult;
 
-            if(box.SelectedItem is Animation a)
+            if (box.SelectedItems.Count > 1)
             {
-                var f = Tools.FileIO.SaveFile("FigaTree DAT (*.dat)|*.dat", a.Name + ".dat");
-
+                var f = Tools.FileIO.OpenFolder();
                 if (f != null)
-                    File.WriteAllBytes(f, a.Data);
+                    foreach (var v in box.SelectedItems)
+                        if (v is Animation a)
+                            File.WriteAllBytes(f + "\\" + a.Name + ".dat", a.Data);
+            }
+            else
+            {
+                if (box.SelectedItem is Animation a)
+                {
+                    var f = Tools.FileIO.SaveFile("FigaTree DAT (*.dat)|*.dat", a.Name + ".dat");
+
+                    if (f != null)
+                        File.WriteAllBytes(f, a.Data);
+                }
             }
         }
 
@@ -244,12 +307,14 @@ namespace HSDRawViewer.GUI
             ListBox box = lbFighting;
             if (tabControl1.SelectedIndex == 1)
                 box = lbResult;
-            if (box.SelectedItem is Animation a)
+            if (box.SelectedItems.Count > 0)
             {
                 var f = Tools.FileIO.OpenFile("FigaTree DAT (*_figatree.dat)|*.dat");
 
-                if (f != null)
-                    a.Data = File.ReadAllBytes(f);
+                foreach(var v in box.SelectedItems)
+                    if(v is Animation anim)
+                        if (f != null)
+                            anim.Data = File.ReadAllBytes(f);
             }
         }
 

@@ -23,6 +23,8 @@ namespace HSDRawViewer
         public CommonViewport Viewport { get; internal set; }
         private SubactionEditor _ScriptEditor;
 
+        private string FilePath;
+
         private HSDRawFile RawHSDFile = new HSDRawFile();
 
         private Dictionary<string, StructData> stringToStruct = new Dictionary<string, StructData>();
@@ -191,14 +193,16 @@ namespace HSDRawViewer
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="FilePath"></param>
-        private void OpenFile(string FilePath)
+        /// <param name="filePath"></param>
+        private void OpenFile(string filePath)
         {
+            FilePath = filePath;
+
             RawHSDFile = new HSDRawFile();
-            RawHSDFile.Open(FilePath);
+            RawHSDFile.Open(filePath);
             RefreshTree();
 
-            Text = "HSD DAT Browser - " + FilePath;
+            Text = "HSD DAT Browser - " + filePath;
         }
 
         /// <summary>
@@ -509,6 +513,48 @@ namespace HSDRawViewer
         private void sSMEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ssmTool.Show();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+            if (RawHSDFile.Roots.Count == 0 || MessageBox.Show("Current unsaved changes will be lost", "Open File?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+                if (s.Length > 0)
+                    OpenFile(s[0]);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (FilePath == null)
+                FilePath = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            
+            if (FilePath != null)
+                RawHSDFile.Save(FilePath);
         }
     }
     

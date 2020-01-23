@@ -37,15 +37,15 @@
             this.lbResult = new System.Windows.Forms.ListBox();
             this.buttonLoadResult = new System.Windows.Forms.Button();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.openPldatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportDATsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.openPldatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportDATsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -59,6 +59,7 @@
             this.lbFighting.FormattingEnabled = true;
             this.lbFighting.Location = new System.Drawing.Point(3, 26);
             this.lbFighting.Name = "lbFighting";
+            this.lbFighting.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lbFighting.Size = new System.Drawing.Size(511, 201);
             this.lbFighting.TabIndex = 10;
             // 
@@ -127,6 +128,7 @@
             this.lbResult.FormattingEnabled = true;
             this.lbResult.Location = new System.Drawing.Point(3, 26);
             this.lbResult.Name = "lbResult";
+            this.lbResult.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lbResult.Size = new System.Drawing.Size(511, 201);
             this.lbResult.TabIndex = 11;
             // 
@@ -153,6 +155,32 @@
             this.toolStrip1.Size = new System.Drawing.Size(525, 25);
             this.toolStrip1.TabIndex = 11;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripDropDownButton3
+            // 
+            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openPldatToolStripMenuItem1,
+            this.exportDATsToolStripMenuItem});
+            this.toolStripDropDownButton3.Image = global::HSDRawViewer.Properties.Resources.ico_folder;
+            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
+            this.toolStripDropDownButton3.Size = new System.Drawing.Size(54, 22);
+            this.toolStripDropDownButton3.Text = "File";
+            // 
+            // openPldatToolStripMenuItem1
+            // 
+            this.openPldatToolStripMenuItem1.Name = "openPldatToolStripMenuItem1";
+            this.openPldatToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
+            this.openPldatToolStripMenuItem1.Text = "Open Pl**.dat";
+            this.openPldatToolStripMenuItem1.Click += new System.EventHandler(this.openPldatToolStripMenuItem_Click);
+            // 
+            // exportDATsToolStripMenuItem
+            // 
+            this.exportDATsToolStripMenuItem.Enabled = false;
+            this.exportDATsToolStripMenuItem.Name = "exportDATsToolStripMenuItem";
+            this.exportDATsToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.exportDATsToolStripMenuItem.Text = "Export DATs";
+            this.exportDATsToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton1
             // 
@@ -203,32 +231,6 @@
             this.selectedToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.selectedToolStripMenuItem.Text = "Selected";
             this.selectedToolStripMenuItem.Click += new System.EventHandler(this.buttonReplace_Click);
-            // 
-            // toolStripDropDownButton3
-            // 
-            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openPldatToolStripMenuItem1,
-            this.exportDATsToolStripMenuItem});
-            this.toolStripDropDownButton3.Image = global::HSDRawViewer.Properties.Resources.ico_folder;
-            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
-            this.toolStripDropDownButton3.Size = new System.Drawing.Size(54, 22);
-            this.toolStripDropDownButton3.Text = "File";
-            // 
-            // openPldatToolStripMenuItem1
-            // 
-            this.openPldatToolStripMenuItem1.Name = "openPldatToolStripMenuItem1";
-            this.openPldatToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
-            this.openPldatToolStripMenuItem1.Text = "Open Pl**.dat";
-            this.openPldatToolStripMenuItem1.Click += new System.EventHandler(this.openPldatToolStripMenuItem_Click);
-            // 
-            // exportDATsToolStripMenuItem
-            // 
-            this.exportDATsToolStripMenuItem.Enabled = false;
-            this.exportDATsToolStripMenuItem.Name = "exportDATsToolStripMenuItem";
-            this.exportDATsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.exportDATsToolStripMenuItem.Text = "Export DATs";
-            this.exportDATsToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
             // AJSplitDialog
             // 
