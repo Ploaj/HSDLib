@@ -73,7 +73,7 @@ namespace HSDRaw.Common.Animation
         private byte TangentFlag { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
 
         public byte[] Buffer {
-            get => _s.GetReference<HSDAccessor>(0x04)._s.GetData();
+            get => _s.GetReference<HSDAccessor>(0x04)?._s.GetData();
             set
             {
                 if(value == null)

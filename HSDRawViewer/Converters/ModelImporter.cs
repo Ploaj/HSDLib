@@ -28,10 +28,16 @@ namespace HSDRawViewer.Converters
     {
         // Options
         [Category("Importing Options")]
-        public bool FlipUVs { get; set; } = true;
+        public bool FlipUVs { get; set; } = false;
 
         [Category("Importing Options")]
         public bool SmoothNormals { get; set; } = false;
+
+        [Category("Importing Options")]
+        public bool InvertNormals { get; set; } = false;
+
+        [Category("Importing Options")]
+        public bool SetScaleToOne { get; set; } = false;
 
         [Category("Importing Options")]
         public ShadingType ShadingType{ get; set; } = ShadingType.Material;
@@ -140,7 +146,8 @@ namespace HSDRawViewer.Converters
             var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
                 | PostProcessSteps.Triangulate
                 | PostProcessSteps.LimitBoneWeights
-                | PostProcessSteps.FlipWindingOrder;
+                | PostProcessSteps.FlipWindingOrder
+                | PostProcessSteps.CalculateTangentSpace;
 
             if (settings.FlipUVs)
                 processFlags |= PostProcessSteps.FlipUVs;
@@ -397,6 +404,9 @@ namespace HSDRawViewer.Converters
             var scale = new Vector3(s.X, s.Y, s.Z);
             var rotation = Math3D.ToEulerAngles(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W).Inverted());
 
+            if (settings.SetScaleToOne)
+                scale = Vector3.One;
+
             translation *= settings.Scale;
 
             var t = Matrix4.CreateScale(scale) 
@@ -464,6 +474,24 @@ namespace HSDRawViewer.Converters
                 // Assessment
                 if (!mesh.HasFaces)
                     continue;
+                
+                // Assess needed attributes based on the material MOBJ
+
+                // reflective mobjs do not use uvs
+                var hasReflection = false;
+                // bump maps need tangents and bitangents
+                var hasBump = false;
+
+                if (dobj.Mobj.Textures != null)
+                {
+                    foreach (var t in dobj.Mobj.Textures.List)
+                    {
+                        if (t.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
+                            hasReflection = true;
+                        if (t.Flags.HasFlag(TOBJ_FLAGS.BUMP))
+                            hasBump = true;
+                    }
+                }
 
                 List<GXAttribName> Attributes = new List<GXAttribName>();
 
@@ -497,10 +525,7 @@ namespace HSDRawViewer.Converters
                     }
                 }
 
-                // reflective mobjs do not use uvs
-                var reflective = (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) && dobj.Mobj.Textures.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION));
-                
-                if (reflective)
+                if (hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
                 if (mesh.HasVertices)
@@ -512,10 +537,13 @@ namespace HSDRawViewer.Converters
                 //if (mesh.HasVertexColors(1) && settings.ImportVertexColors)
                 //    Attributes.Add(GXAttribName.GX_VA_CLR1);
 
-                if (mesh.HasNormals && settings.ShadingType == ShadingType.Material)
+                if (!hasBump && mesh.HasNormals && settings.ShadingType == ShadingType.Material)
                     Attributes.Add(GXAttribName.GX_VA_NRM);
-                
-                if (mesh.HasTextureCoords(0) && !reflective)
+
+                if(hasBump)
+                    Attributes.Add(GXAttribName.GX_VA_NBT);
+
+                if (mesh.HasTextureCoords(0) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
                 //if (mesh.HasTextureCoords(1))
@@ -556,8 +584,6 @@ namespace HSDRawViewer.Converters
 
                         GX_Vertex vertex = new GX_Vertex();
 
-                        vertex.TEX0MTXIDX = 51;
-
                         if (mesh.HasBones)
                         {
                             jobjList.Add(jobjs[indicie].ToArray());
@@ -567,14 +593,31 @@ namespace HSDRawViewer.Converters
                             var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z) * settings.Scale;
                             var tknrm = new Vector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
 
-                            if(jobjs[indicie].Count == 1 || weights[indicie][0] == 1)
+                            Vector3 tktan = Vector3.Zero;
+                            Vector3 tkbitan = Vector3.Zero;
+
+                            if (mesh.HasTangentBasis)
+                            {
+                                tktan = new Vector3(mesh.Tangents[indicie].X, mesh.Tangents[indicie].Y, mesh.Tangents[indicie].Z);
+                                tkbitan = new Vector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
+                            }
+
+                            if (jobjs[indicie].Count == 1 || weights[indicie][0] == 1)
                             {
                                 tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[jobjs[indicie][0]]);
                                 tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[jobjs[indicie][0]]);
+                                
+                                if (mesh.HasTangentBasis)
+                                {
+                                    tktan = Vector3.TransformNormal(tktan, cache.jobjToInverseTransform[jobjs[indicie][0]]);
+                                    tkbitan = Vector3.TransformNormal(tkbitan, cache.jobjToInverseTransform[jobjs[indicie][0]]);
+                                }
                             }
 
-                            vertex.POS = new GXVector3(tkvert.X, tkvert.Y, tkvert.Z);
-                            vertex.NRM = new GXVector3(tknrm.X, tknrm.Y, tknrm.Z);
+                            vertex.POS = GXTranslator.fromVector3(tkvert);
+                            vertex.NRM = GXTranslator.fromVector3(tknrm);
+                            vertex.TAN = GXTranslator.fromVector3(tktan);
+                            vertex.BITAN = GXTranslator.fromVector3(tkbitan);
                         }
                         else
                         {
@@ -583,8 +626,21 @@ namespace HSDRawViewer.Converters
                             
                             if (mesh.HasNormals)
                                 vertex.NRM = new GXVector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
+
+                            if (mesh.HasTangentBasis)
+                            {
+                                vertex.TAN = new GXVector3(mesh.Tangents[indicie].X, mesh.Tangents[indicie].Y, mesh.Tangents[indicie].Z);
+                                vertex.BITAN = new GXVector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
+                            }
                         }
 
+                        if (settings.InvertNormals)
+                        {
+                            vertex.NRM.X *= -1;
+                            vertex.NRM.Y *= -1;
+                            vertex.NRM.Z *= -1;
+                        }
+                        
                         if (mesh.HasTextureCoords(0))
                             vertex.TEX0 = new GXVector2(
                                 mesh.TextureCoordinateChannels[0][indicie].X,

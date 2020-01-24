@@ -313,8 +313,10 @@ namespace HSDRawViewer.GUI
 
                 foreach(var v in box.SelectedItems)
                     if(v is Animation anim)
+                    {
                         if (f != null)
                             anim.Data = File.ReadAllBytes(f);
+                    }
             }
         }
 

@@ -565,6 +565,14 @@ namespace HSDRawViewer.GUI.Extra
                     w.Write(new byte[0x20 - w.BaseStream.Position % 0x20]);
 
                 var DataSize = w.BaseStream.Position - start;
+                
+                if (DataSize % 0x20 != 0)
+                {
+                    w.Write(new byte[0x20 - DataSize % 0x20]);
+                    w.Write(0);
+                    w.Write(0);
+                    DataSize += 0x20 - DataSize % 0x20;
+                }
 
                 w.Seek(0);
                 w.Write(headerSize);

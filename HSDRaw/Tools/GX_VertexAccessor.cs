@@ -71,6 +71,10 @@ namespace HSDRaw.Tools
                             if (attribute.AttributeType == GXAttribType.GX_DIRECT)
                                 Vertex.TEX0MTXIDX = (ushort)index;
                             break;
+                        case GXAttribName.GX_VA_TEX1MTXIDX:
+                            if (attribute.AttributeType == GXAttribType.GX_DIRECT)
+                                Vertex.TEX1MTXIDX = (ushort)index;
+                            break;
                         case GXAttribName.GX_VA_POS:
 
                             if (attribute.AttributeType != GXAttribType.GX_DIRECT)
@@ -89,6 +93,20 @@ namespace HSDRaw.Tools
                                 Vertex.NRM.X = f[0];
                                 Vertex.NRM.Y = f[1];
                                 Vertex.NRM.Z = f[2];
+                            }
+                            break;
+                        case GXAttribName.GX_VA_NBT:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.NRM.X = f[0];
+                                Vertex.NRM.Y = f[1];
+                                Vertex.NRM.Z = f[2];
+                                Vertex.BITAN.X = f[3];
+                                Vertex.BITAN.Y = f[4];
+                                Vertex.BITAN.Z = f[5];
+                                Vertex.TAN.X = f[6];
+                                Vertex.TAN.Y = f[7];
+                                Vertex.TAN.Z = f[8];
                             }
                             break;
                         case GXAttribName.GX_VA_TEX0:

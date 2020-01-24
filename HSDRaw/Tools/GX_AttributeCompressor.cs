@@ -20,6 +20,13 @@ namespace HSDRaw.Tools
             {
                 case GXAttribName.GX_VA_PNMTXIDX:
                 case GXAttribName.GX_VA_TEX0MTXIDX:
+                case GXAttribName.GX_VA_TEX1MTXIDX:
+                case GXAttribName.GX_VA_TEX2MTXIDX:
+                case GXAttribName.GX_VA_TEX3MTXIDX:
+                case GXAttribName.GX_VA_TEX4MTXIDX:
+                case GXAttribName.GX_VA_TEX5MTXIDX:
+                case GXAttribName.GX_VA_TEX6MTXIDX:
+                case GXAttribName.GX_VA_TEX7MTXIDX:
                 case GXAttribName.GX_VA_CLR0:
                 case GXAttribName.GX_VA_CLR1:
                     Attribute.AttributeType = GXAttribType.GX_DIRECT;
@@ -66,6 +73,9 @@ namespace HSDRaw.Tools
                     break;
                 case GXAttribName.GX_VA_NRM:
                     attr.CompCount = GXCompCnt.NrmXYZ;
+                    break;
+                case GXAttribName.GX_VA_NBT:
+                    attr.CompCount = GXCompCnt.NrmNBT;
                     break;
                 case GXAttribName.GX_VA_TEX0:
                 case GXAttribName.GX_VA_TEX1:
@@ -247,6 +257,15 @@ namespace HSDRaw.Tools
                             return 3;
                         case GXCompCnt.NrmNBT3: // ??
                             return 3;
+                    }
+                    break;
+                case GXAttribName.GX_VA_NBT:
+                    switch (cc)
+                    {
+                        case GXCompCnt.NrmNBT:
+                            return 9;
+                        case GXCompCnt.NrmNBT3:
+                            return 9;
                     }
                     break;
                 case GXAttribName.GX_VA_TEX0:

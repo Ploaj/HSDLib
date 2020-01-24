@@ -271,7 +271,7 @@ namespace HSDRawViewer.GUI.Plugins
 
                 TexAnim.ImageBuffers = ib;
 
-                if (TPLConv.IsPalettedFormat(tobjs[0].ImageData.Format))
+                if (tobjs.Length > 0 && TPLConv.IsPalettedFormat(tobjs[0].ImageData.Format))
                 {
                     var tb = new HSDRaw.HSDArrayAccessor<HSD_TlutBuffer>();
                     tb.Array = pals.ToArray();
@@ -281,7 +281,7 @@ namespace HSDRawViewer.GUI.Plugins
                     if (TexAnim?.AnimationObject?.FObjDesc?.List.Count < 2)
                         TexAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc()
                         {
-                            FOBJ = new HSD_FOBJ() { AnimationType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] }
+                            FOBJ = new HSD_FOBJ() { AnimationType = JointTrackType.HSD_A_J_SCAZ, Buffer = new byte[0] }
                         };
                 }
                 else
@@ -411,7 +411,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <returns></returns>
         public static T[] InsertAt<T>(T[] source, T item, int index)
         {
-            T[] dest = new T[source.Length];
+            T[] dest = new T[source.Length + 1];
             if (index > 0)
                 Array.Copy(source, 0, dest, 0, index);
 
@@ -430,10 +430,10 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
-                return;
+            //if (textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0)
+            //    return;
 
-            var index = textureList.SelectedIndices[0];
+            //var index = textureList.SelectedIndices[0];
 
             var tobjs = GetTOBJs();
 
@@ -474,7 +474,7 @@ namespace HSDRawViewer.GUI.Plugins
                         return;
                     }
 
-                    tobjs = InsertAt(tobjs, tobj, index);
+                    tobjs = InsertAt(tobjs, tobj, tobjs.Length);
                 }
             }
             else

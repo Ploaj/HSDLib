@@ -1,4 +1,6 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
 using System;
 using System.Windows.Forms;
@@ -21,6 +23,26 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(Import);
+
+
+            MenuItem GenerateMatAnimJoint = new MenuItem("Generate and Export MatAnimJoint Structure");
+            GenerateMatAnimJoint.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
+                {
+                    var file = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "matanim_joint.dat");
+                    if(file != null)
+                    {
+                        HSDRawFile f = new HSDRawFile();
+                        HSDRootNode r = new HSDRootNode();
+                        r.Name = "matanim_joint";
+                        r.Data = GenerateMatAnimJointFromJOBJ(root);
+                        f.Roots.Add(r);
+                        f.Save(file);
+                    }
+                }
+            };
+            MenuItems.Add(GenerateMatAnimJoint);
 
             MenuItem addChild = new MenuItem("Add Child");
             MenuItems.Add(addChild);
@@ -61,6 +83,32 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             addChild.MenuItems.Add(createJOBJFromFile);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private static HSD_MatAnimJoint GenerateMatAnimJointFromJOBJ(HSD_JOBJ node)
+        {
+            HSD_MatAnimJoint joint = new HSD_MatAnimJoint();
+
+            if (node.Dobj != null)
+                foreach (var v in node.Dobj.List)
+                {
+                    if (joint.MaterialAnimation == null)
+                        joint.MaterialAnimation = new HSD_MatAnim();
+                    else
+                        joint.MaterialAnimation.Add(new HSD_MatAnim() { });
+                }
+
+            foreach(var v in node.Children)
+            {
+                joint.AddChild(GenerateMatAnimJointFromJOBJ(v));
+            }
+
+            return joint;
         }
     }
 }

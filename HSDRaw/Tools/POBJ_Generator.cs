@@ -240,7 +240,11 @@ namespace HSDRaw.Tools
                     {
                         var point = t.Points[p];
                         if (HasPositionNormalMatrix)
+                        {
                             point.PNMTXIDX = pmidToNewID[point.PNMTXIDX];
+                            point.TEX0MTXIDX = (ushort)(point.PNMTXIDX + 30);
+                            point.TEX1MTXIDX = point.TEX0MTXIDX;
+                        }
                         t.Points[p] = point;
                         newVert.Add(point);
                     }
@@ -254,7 +258,11 @@ namespace HSDRaw.Tools
                     {
                         var point = t.Points[p];
                         if (HasPositionNormalMatrix)
+                        {
                             point.PNMTXIDX = pmidToNewID[point.PNMTXIDX];
+                            point.TEX0MTXIDX = (ushort)(point.PNMTXIDX + 30);
+                            point.TEX1MTXIDX = point.TEX0MTXIDX;
+                        }
                         t.Points[p] = point;
                         newVert.Add(point);
                     }
@@ -326,9 +334,13 @@ namespace HSDRaw.Tools
                         case GXAttribName.GX_VA_TEX0MTXIDX:
                             ig.Indices[i] = v.TEX0MTXIDX;
                             break;
+                        case GXAttribName.GX_VA_TEX1MTXIDX:
+                            ig.Indices[i] = v.TEX1MTXIDX;
+                            break;
                         case GXAttribName.GX_VA_NULL: break;
                         case GXAttribName.GX_VA_POS: ig.Indices[i] = GetIndex(b, new float[] { v.POS.X, v.POS.Y, v.POS.Z }); break;
                         case GXAttribName.GX_VA_NRM: ig.Indices[i] = GetIndex(b, new float[] { v.NRM.X, v.NRM.Y, v.NRM.Z }); break;
+                        case GXAttribName.GX_VA_NBT: ig.Indices[i] = GetIndex(b, new float[] { v.NRM.X, v.NRM.Y, v.NRM.Z, v.BITAN.X, v.BITAN.Y, v.BITAN.Z, v.TAN.X, v.TAN.Y, v.TAN.Z }); break;
                         case GXAttribName.GX_VA_TEX0: ig.Indices[i] = GetIndex(b, new float[] { v.TEX0.X, v.TEX0.Y }); break;
                         case GXAttribName.GX_VA_TEX1: ig.Indices[i] = GetIndex(b, new float[] { v.TEX1.X, v.TEX1.Y }); break;
                         //case GXAttribName.GX_VA_CLR0: ig.Indices[i] = GetIndex(b, v.CLR0); break;

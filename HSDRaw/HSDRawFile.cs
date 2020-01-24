@@ -28,7 +28,7 @@ namespace HSDRaw
     /// </summary>
     public class HSDRawFile
     {
-        private char[] UnknownChars = new char[4];
+        private char[] VersionChars = new char[4];
 
         public List<HSDRootNode> Roots = new List<HSDRootNode>();
         public List<HSDRootNode> References = new List<HSDRootNode>();
@@ -85,18 +85,19 @@ namespace HSDRaw
                 r.BigEndian = true;
 
                 // Parse Header -----------------------------
-                r.ReadInt32(); // dat size
+                var fsize = r.ReadInt32(); // dat size
                 int relocOffset = r.ReadInt32() + 0x20;
                 int relocCount = r.ReadInt32();
                 int rootCount = r.ReadInt32();
                 int refCount = r.ReadInt32();
-                UnknownChars = r.ReadChars(4);
+                VersionChars = r.ReadChars(4);
                 
                 // Parse Relocation Table -----------------------------
                 List<int> Offsets = new List<int>();
                 HashSet<int> OffsetContain = new HashSet<int>();
                 Dictionary<int, int> relocOffsets = new Dictionary<int, int>();
                 Offsets.Add(relocOffset);
+                Offsets.Add(fsize);
 
                 r.BaseStream.Position = relocOffset;
                 for (int i = 0; i < relocCount; i++)
@@ -660,7 +661,7 @@ namespace HSDRaw
                 writer.Write(relocationOffsets.Count);
                 writer.Write(Roots.Count);
                 writer.Write(References.Count);
-                writer.Write(UnknownChars);
+                writer.Write(VersionChars);
             }
         }
 

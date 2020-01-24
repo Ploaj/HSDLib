@@ -252,7 +252,7 @@ namespace HSDRawViewer
         private bool OpenDAT(out HSDRawFile file)
         {
             file = null;
-            var f = Tools.FileIO.SaveFile("HSD (*.dat)|*.dat");
+            var f = Tools.FileIO.OpenFile("HSD (*.dat)|*.dat");
             if (f != null)
             {
                 file = new HSDRawFile(f);
