@@ -74,6 +74,7 @@ namespace HSDRawViewer.GUI
         {
             string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
             int i;
+            bool replaceAll = s.Length == 1 ? true : (MessageBox.Show($"Replace All?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes);
             for (i = 0; i < s.Length; i++)
             {
                 if (s[i].ToLower().EndsWith(".dat"))
@@ -84,13 +85,13 @@ namespace HSDRawViewer.GUI
                     foreach (Animation v in lbFighting.Items)
                         if (v.Name.Equals(name))
                         {
-                            if (MessageBox.Show($"Replace {v.Name}?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            if (replaceAll || MessageBox.Show($"Replace {v.Name}?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
                                 v.Data = d;
                         }
                     foreach (Animation v in lbResult.Items)
                         if (v.Name.Equals(name))
                         {
-                            if (MessageBox.Show($"Replace {v.Name}?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            if (replaceAll || MessageBox.Show($"Replace {v.Name}?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
                                 v.Data = d;
                         }
                 }
@@ -249,8 +250,8 @@ namespace HSDRawViewer.GUI
                         {
                             HSDRawFile file = new HSDRawFile(data);
 
-                            if (file.Roots[0].Name != v.Name)
-                                continue;
+                            //if (file.Roots[0].Name != v.Name)
+                            //    continue;
 
                             ResultAnimations.Add(new Animation() { Name = v.Name, Data = data });
                         } catch(Exception)

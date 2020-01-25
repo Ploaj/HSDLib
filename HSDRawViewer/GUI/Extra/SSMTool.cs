@@ -30,6 +30,8 @@ namespace HSDRawViewer.GUI.Extra
 
             Text = "SSM Editor";
 
+            CenterToScreen();
+
             FormClosing += (sender, args) =>
             {
                 if (args.CloseReason == CloseReason.UserClosing)
@@ -453,6 +455,7 @@ namespace HSDRawViewer.GUI.Extra
                 for (int i = 0; i < soundCount; i++)
                 {
                     var sound = new DSP();
+                    sound.Index = i;
                     var ChannelCount = r.ReadInt32();
                     sound.Frequency = r.ReadInt32();
 

@@ -270,9 +270,11 @@ namespace HSDRawViewer.GUI.Extra
             return stream.ToArray();
         }
 
+        public int Index { get; set; }
+
         public override string ToString()
         {
-            return $"DSP : Channels {Channels.Count} : Frequency {Frequency}Hz";
+            return $"DSP_{Index} : Channels {Channels.Count} : Frequency {Frequency}Hz";
         }
     }
 }

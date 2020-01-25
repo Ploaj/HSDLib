@@ -556,6 +556,19 @@ namespace HSDRawViewer
             if (FilePath != null)
                 RawHSDFile.Save(FilePath);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void sEMEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SEMEditor d = new SEMEditor();
+            {
+                d.Show();
+            }
+        }
     }
     
 }

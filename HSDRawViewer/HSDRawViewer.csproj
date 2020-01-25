@@ -130,6 +130,12 @@
     <Compile Include="GUI\Extra\MOBJEditor.Designer.cs">
       <DependentUpon>MOBJEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Extra\SEMEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\SEMEditor.Designer.cs">
+      <DependentUpon>SEMEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\SSMFile.cs" />
     <Compile Include="GUI\Extra\SSMTool.cs">
       <SubType>Form</SubType>
@@ -261,6 +267,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\MOBJEditor.resx">
       <DependentUpon>MOBJEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\SEMEditor.resx">
+      <DependentUpon>SEMEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\SSMTool.resx">
       <DependentUpon>SSMTool.cs</DependentUpon>

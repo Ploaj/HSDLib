@@ -436,6 +436,12 @@ namespace HSDRawViewer.GUI
                         SaveSubactionChanges();
                     }
                 }
+
+                // redraw item
+                var item = subActionList.SelectedItem;
+                var itempos = subActionList.SelectedIndex;
+                subActionList.Items.Remove(item);
+                subActionList.Items.Insert(itempos, item);
             }
         }
 

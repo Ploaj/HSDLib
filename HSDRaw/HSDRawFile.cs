@@ -97,7 +97,6 @@ namespace HSDRaw
                 HashSet<int> OffsetContain = new HashSet<int>();
                 Dictionary<int, int> relocOffsets = new Dictionary<int, int>();
                 Offsets.Add(relocOffset);
-                Offsets.Add(fsize);
 
                 r.BaseStream.Position = relocOffset;
                 for (int i = 0; i < relocCount; i++)
@@ -109,8 +108,14 @@ namespace HSDRaw
                     r.BaseStream.Position = offset;
 
                     var objectOff = r.ReadInt32() + 0x20;
-                    
-                    if(objectOff < 0)
+
+                    // if we need to read past end of file then we need to include filesize as an offset
+                    // this fixes files that had previously been manually relocated to end of file
+                    if(objectOff > relocOffset && !Offsets.Contains(fsize))
+                        Offsets.Add(fsize);
+
+                    //
+                    if (objectOff < 0)
                     {
                         r.BaseStream.Position = temp;
                         continue;
