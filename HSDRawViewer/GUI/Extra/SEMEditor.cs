@@ -1,5 +1,6 @@
 ﻿using HSDRaw;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.IO;
@@ -8,41 +9,19 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
 {
-    public enum AXCMD
-    {
-        CMD_SETUP = 0x00,
-        CMD_DL_AND_VOL_MIX = 0x01,
-        CMD_PB_ADDR = 0x02,
-        CMD_PROCESS = 0x03,
-        CMD_MIX_AUXA = 0x04,
-        CMD_MIX_AUXB = 0x05,
-        CMD_UPLOAD_LRS = 0x06,
-        CMD_SET_LR = 0x07,
-        CMD_UNK_08 = 0x08,
-        CMD_MIX_AUXB_NOWRITE = 0x09,
-        CMD_COMPRESSOR_TABLE_ADDR = 0x0A,
-        CMD_UNK_0B = 0x0B,
-        CMD_UNK_0C = 0x0C,
-        CMD_MORE = 0x0D,
-        CMD_OUTPUT = 0x0E,
-        CMD_END = 0x0F,
-        CMD_MIX_AUXB_LR = 0x10,
-        CMD_SET_OPPOSITE_LR = 0x11,
-        CMD_UNK_12 = 0x12,
-        CMD_SEND_AUX_AND_MIX = 0x13,
-    };
-
     public partial class SEMEditor : Form
     {
         public class SEMEntry
         {
             public BindingList<SEMSound> Sounds = new BindingList<SEMSound>();
 
+            public int UniqueCount { get; set; }
+
             public int Index { get; set; }
 
             public override string ToString()
             {
-                return $"Entry_{Index} : Count {Sounds.Count + 1}";
+                return $"Entry_{Index} : Count {Sounds.Count} - {UniqueCount}";
             }
         }
 
@@ -104,8 +83,8 @@ namespace HSDRawViewer.GUI.Extra
                 var entryCount = r.ReadInt32();
 
                 var offsetTableStart = r.Position + (entryCount + 1) * 4;
-
-                for(uint i = 0; i < entryCount; i++)
+                
+                for (uint i = 0; i < entryCount; i++)
                 {
                     SEMEntry e = new SEMEntry();
                     e.Index = (int)i;
@@ -115,7 +94,8 @@ namespace HSDRawViewer.GUI.Extra
                     var startIndex = r.ReadInt32();
                     var endIndex = r.ReadInt32();
 
-                    
+                    HashSet<int> UniqueEntries = new HashSet<int>();
+                    int largestEntry = 0;
                     for(uint j = 0; j < endIndex - startIndex; j++)
                     {
                         SEMSound s = new SEMSound();
@@ -130,7 +110,59 @@ namespace HSDRawViewer.GUI.Extra
                         r.Seek(dataOffsetStart);
                         s.CommandData = r.ReadBytes((int)(dataOffsetEnd - dataOffsetStart));
                         e.Sounds.Add(s);
+
+                        var entryId = ((s.CommandData[1] & 0xFF) << 16)
+                            | ((s.CommandData[2] & 0xFF) << 8)
+                            | ((s.CommandData[3] & 0xFF));
+
+                        if (!UniqueEntries.Contains(entryId))
+                            UniqueEntries.Add(entryId);
+
                     }
+                    e.UniqueCount = UniqueEntries.Count;
+                    e.UniqueCount = largestEntry;
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DumpUniqueCommands(string path)
+        {
+            Dictionary<byte, List<int>> commands = new Dictionary<byte, List<int>>();
+
+            foreach(var e in Entries)
+            {
+                foreach (var s in e.Sounds)
+                {
+                    int p = 0;
+                    while (p < s.CommandData.Length)
+                    {
+                        var cmd = s.CommandData[p++];
+                        var value = ((s.CommandData[p++] & 0xFF) << 16)
+                        | ((s.CommandData[p++] & 0xFF) << 8)
+                        | ((s.CommandData[p++] & 0xFF));
+
+                        if (!commands.ContainsKey(cmd))
+                            commands.Add(cmd, new List<int>());
+
+                        if (!commands[cmd].Contains(value))
+                            commands[cmd].Add(value);
+                    }
+                }
+            }
+            
+
+            // Dump command Info
+            foreach (var k in commands)
+            {
+                using (StreamWriter w = new StreamWriter(new FileStream(path + "\\" + k.Key.ToString("X2") + ".txt", FileMode.Create)))
+                {
+                    k.Value.Sort();
+                    foreach (var v in k.Value)
+                        w.WriteLine(v);
                 }
             }
         }

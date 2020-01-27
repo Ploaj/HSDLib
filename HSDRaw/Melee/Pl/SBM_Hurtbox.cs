@@ -28,13 +28,18 @@
         }
     }
 
+    public enum HurtboxPositionType
+    {
+        Low, Mid, High
+    }
+
     public class SBM_Hurtbox : HSDAccessor
     {
         public override int TrimmedSize => 0x28;
 
         public int BoneIndex { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
-        public int Unknown { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public HurtboxPositionType Type { get => (HurtboxPositionType)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
 
         public int Grabbable { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
@@ -45,5 +50,10 @@
         public float Y2 { get => _s.GetFloat(0x1C); set => _s.SetFloat(0x1C, value); }
         public float Z2 { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
         public float Size { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
+
+        public override string ToString()
+        {
+            return $"JOBJ_{BoneIndex} R: {Size} ({X1}, {Y1}, {Z1}) ({X2}, {Y2}, {Z2}) Grabbable: {Grabbable}";
+        }
     }
 }

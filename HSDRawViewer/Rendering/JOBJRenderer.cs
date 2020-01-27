@@ -46,6 +46,21 @@ namespace HSDRawViewer.Rendering
         private Dictionary<HSD_JOBJ, JOBJCache> jobjToCache = new Dictionary<HSD_JOBJ, JOBJCache>();
 
         /// <summary>
+        /// Gets the world transform from the bone index
+        /// Can be slow
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public Matrix4 GetWorldTransform(int index)
+        {
+            foreach (var v in jobjToCache)
+                if (v.Value.Index == index)
+                    return v.Value.WorldTransform;
+
+            return Matrix4.Identity;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="jobj"></param>

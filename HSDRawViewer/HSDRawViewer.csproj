@@ -118,6 +118,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\ArrayMemberEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\ArrayMemberEditor.Designer.cs">
+      <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\AJSplitDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -173,6 +179,12 @@
     </Compile>
     <Compile Include="GUI\Plugins\JOBJEditor.Designer.cs">
       <DependentUpon>JOBJEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.Designer.cs">
+      <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\SubActionPanel.cs">
       <SubType>Form</SubType>
@@ -232,6 +244,7 @@
     <Compile Include="Rendering\Renderers\RendererGrCollision.cs" />
     <Compile Include="Rendering\Animation.cs" />
     <Compile Include="Rendering\Shader.cs" />
+    <Compile Include="Rendering\Shapes\Capsule.cs" />
     <Compile Include="Rendering\TextureManager.cs" />
     <Compile Include="Rendering\TriangleConverter.cs" />
     <Compile Include="Rendering\Viewport.cs">
@@ -262,6 +275,9 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\ArrayMemberEditor.resx">
+      <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\AJSplitDialog.resx">
       <DependentUpon>AJSplitDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -288,6 +304,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\JOBJEditor.resx">
       <DependentUpon>JOBJEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\Melee\HurtBoxEditor.resx">
+      <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\SubActionPanel.resx">
       <DependentUpon>SubActionPanel.cs</DependentUpon>

@@ -5,7 +5,7 @@ using HSDRawViewer.GUI;
 
 namespace HSDRawViewer.Rendering
 {
-    public class CommonViewport : DockContent
+    public class CommonViewport : DockContent, IDrawable
     {
         public ViewportControl glViewport;
 
@@ -29,6 +29,8 @@ namespace HSDRawViewer.Rendering
             glViewport.Dock = DockStyle.Fill;
             glViewport.EnableFloor = true;
 
+            glViewport.AddRenderer(this);
+
             Controls.Add(glViewport);
             
             FormClosing += (sender, args) =>
@@ -39,6 +41,10 @@ namespace HSDRawViewer.Rendering
                     //MainForm.Instance.TryClose(this);
                 }
             };
+        }
+        
+        public void Draw(Camera cam, int windowWidth, int windowHeight)
+        {
         }
     }
 }
