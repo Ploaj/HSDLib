@@ -106,19 +106,19 @@ namespace HSDRawViewer.GUI
             if (accessor == null || CurrentOffset < 0)
                 return;
 
-            if (CurrentOffset + 1 >= accessor._s.Length || IsReference(CurrentOffset, 1))
+            if (CurrentOffset + 1 > accessor._s.Length || IsReference(CurrentOffset, 1))
                 return;
 
             buttonByte.Enabled = true;
-            buttonByte.Text = accessor._s.GetByte((int)CurrentOffset).ToString();
+            ByteBox.Text = accessor._s.GetByte((int)CurrentOffset).ToString();
 
-            if (CurrentOffset + 2 >= accessor._s.Length || IsReference(CurrentOffset, 2))
+            if (CurrentOffset + 2 > accessor._s.Length || IsReference(CurrentOffset, 2))
                 return;
 
             buttonInt16.Enabled = true;
             Int16Box.Text = accessor._s.GetInt16((int)CurrentOffset).ToString();
 
-            if (CurrentOffset + 4 >= accessor._s.Length || IsReference(CurrentOffset, 4))
+            if (CurrentOffset + 4 > accessor._s.Length || IsReference(CurrentOffset, 4))
                 return;
 
             buttonInt32.Enabled = true;

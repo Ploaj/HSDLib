@@ -45,6 +45,9 @@
 
 - code: 8
   name: Set Timer Animation
+  parameters:
+  - name: Unknown
+    bitCount: 26
 
 - code: 9
   name: Unknown0x09
@@ -153,6 +156,9 @@
 
 - code: 15
   name: Remove Hitbox
+  parameters:
+  - name: Index
+    bitCount: 26
 
 - code: 16
   name: Clear Hitboxes
@@ -337,7 +343,7 @@
     hex: true
 
 - code: 39
-  name: Unknwon0x27
+  name: Unknown0x27
   parameters:
   - name: Unknown1
     bitCount: 26

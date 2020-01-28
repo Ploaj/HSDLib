@@ -45,6 +45,7 @@ namespace HSDRawViewer.Rendering
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
+            GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
             GL.MultMatrix(ref t);
 

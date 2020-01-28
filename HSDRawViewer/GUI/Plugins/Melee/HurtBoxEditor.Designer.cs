@@ -39,9 +39,9 @@
             // 
             this.previewPanel.Controls.Add(this.buttonLoadModel);
             this.previewPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.previewPanel.Location = new System.Drawing.Point(203, 0);
+            this.previewPanel.Location = new System.Drawing.Point(307, 0);
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.Size = new System.Drawing.Size(354, 325);
+            this.previewPanel.Size = new System.Drawing.Size(250, 325);
             this.previewPanel.TabIndex = 4;
             this.previewPanel.TabStop = false;
             this.previewPanel.Text = "Preview";
@@ -51,7 +51,7 @@
             this.buttonLoadModel.Dock = System.Windows.Forms.DockStyle.Top;
             this.buttonLoadModel.Location = new System.Drawing.Point(3, 16);
             this.buttonLoadModel.Name = "buttonLoadModel";
-            this.buttonLoadModel.Size = new System.Drawing.Size(348, 23);
+            this.buttonLoadModel.Size = new System.Drawing.Size(244, 23);
             this.buttonLoadModel.TabIndex = 5;
             this.buttonLoadModel.Text = "Load Model";
             this.buttonLoadModel.UseVisualStyleBackColor = true;
@@ -62,14 +62,14 @@
             this.hurtboxPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.hurtboxPanel.Location = new System.Drawing.Point(0, 0);
             this.hurtboxPanel.Name = "hurtboxPanel";
-            this.hurtboxPanel.Size = new System.Drawing.Size(200, 325);
+            this.hurtboxPanel.Size = new System.Drawing.Size(304, 325);
             this.hurtboxPanel.TabIndex = 6;
             this.hurtboxPanel.TabStop = false;
             this.hurtboxPanel.Text = "Hurtboxes";
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(200, 0);
+            this.splitter1.Location = new System.Drawing.Point(304, 0);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(3, 325);
             this.splitter1.TabIndex = 7;

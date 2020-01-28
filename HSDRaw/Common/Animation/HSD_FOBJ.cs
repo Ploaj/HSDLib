@@ -6,11 +6,11 @@ namespace HSDRaw.Common.Animation
 {
     public enum GXAnimDataFormat
     {
-        Float = 0x00,
-        Short = 0x20,
-        UShort = 0x40,
-        SByte = 0x60,
-        Byte = 0x80
+        HSD_A_FRAC_FLOAT = 0x00,
+        HSD_A_FRAC_S16 = 0x20,
+        HSD_A_FRAC_U16 = 0x40,
+        HSD_A_FRAC_S8 = 0x60,
+        HSD_A_FRAC_U8 = 0x80
     }
 
     public enum JointTrackType
@@ -51,12 +51,13 @@ namespace HSDRaw.Common.Animation
 
     public enum GXInterpolationType
     {
-        Step            = 0x01,
-        Linear          = 0x02,
-        HermiteValue    = 0x03,
-        Hermite         = 0x04,
-        HermiteCurve    = 0x05,
-        Constant        = 0x06
+        HSD_A_OP_NONE = 0,
+        HSD_A_OP_CON  = 0x01,
+        HSD_A_OP_LIN  = 0x02,
+        HSD_A_OP_SPL0 = 0x03,
+        HSD_A_OP_SPL  = 0x04,
+        HSD_A_OP_SLP  = 0x05,
+        HSD_A_OP_KEY  = 0x06
     }
 
     /// <summary>
@@ -97,7 +98,7 @@ namespace HSDRaw.Common.Animation
         {
             get
             {
-                return (uint)Math.Pow(2, ValueFlag & 0x1F);
+                return (uint)(1 << (ValueFlag & 0x1F));
             }
             set
             {
@@ -109,7 +110,7 @@ namespace HSDRaw.Common.Animation
         {
             get
             {
-                return (uint)Math.Pow(2, TangentFlag & 0x1F);
+                return (uint)(1 << (TangentFlag & 0x1F));
             }
             set
             {

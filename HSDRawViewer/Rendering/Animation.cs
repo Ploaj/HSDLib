@@ -12,74 +12,91 @@ namespace HSDRawViewer.Rendering
         public float GetValue(float Frame)
         {
             // register
-            float ValueLeft = 0;
-            float ValueRight = 0;
-            float TanLeft = 0;
-            float TanRight = 0;
-            float FrameLeft = 0;
-            float FrameRight = 0;
-            GXInterpolationType CurrentInterpolation = GXInterpolationType.Constant;
+            float p0 = 0;
+            float p1 = 0;
+            float d0 = 0;
+            float d1 = 0;
+            float t0 = 0;
+            float t1 = 0;
+            GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
+            GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
 
             // get current frame state
             for (int i = 0; i < Keys.Count; i++)
             {
-                switch (Keys[i].InterpolationType)
+                op_intrp = op;
+                op = Keys[i].InterpolationType;
+                
+                switch (op)
                 {
-                    case GXInterpolationType.Constant:
-                        ValueRight = Keys[i].Value;
-                        ValueLeft = ValueRight;
+                    case GXInterpolationType.HSD_A_OP_CON:
+                        p0 = p1;
+                        p1 = Keys[i].Value;
+                        if(op_intrp != GXInterpolationType.HSD_A_OP_SLP)
+                        {
+                            d0 = d1;
+                            d1 = 0;
+                        }
+                        t0 = t1;
+                        t1 = Keys[i].Frame;
                         break;
-                    case GXInterpolationType.Linear:
-                        ValueLeft = ValueRight;
-                        FrameLeft = FrameRight;
-                        ValueRight = Keys[i].Value;
-                        FrameRight = Keys[i].Frame;
+                    case GXInterpolationType.HSD_A_OP_LIN:
+                        p0 = p1;
+                        p1 = Keys[i].Value;
+                        if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
+                        {
+                            d0 = d1;
+                            d1 = 0;
+                        }
+                        t0 = t1;
+                        t1 = Keys[i].Frame;
                         break;
-                    case GXInterpolationType.Step:
-                        ValueLeft = ValueRight;
-                        FrameLeft = FrameRight;
-                        ValueRight = Keys[i].Value;
-                        FrameRight = Keys[i].Frame;
+                    case GXInterpolationType.HSD_A_OP_SPL0:
+                        p0 = p1;
+                        d0 = d1;
+                        p1 = Keys[i].Value;
+                        d1 = 0;
+                        t0 = t1;
+                        t1 = Keys[i].Frame;
                         break;
-                    case GXInterpolationType.Hermite:
-                        ValueLeft = ValueRight;
-                        FrameLeft = FrameRight;
-                        TanLeft = TanRight;
-                        ValueRight = Keys[i].Value;
-                        FrameRight = Keys[i].Frame;
-                        TanRight = Keys[i].Tan;
+                    case GXInterpolationType.HSD_A_OP_SPL:
+                        p0 = p1;
+                        p1 = Keys[i].Value;
+                        d0 = d1;
+                        d1 = Keys[i].Tan;
+                        t0 = t1;
+                        t1 = Keys[i].Frame;
                         break;
-                    case GXInterpolationType.HermiteCurve:
-                        TanRight = Keys[i].Tan;
+                    case GXInterpolationType.HSD_A_OP_SLP:
+                        d0 = d1;
+                        d1 = Keys[i].Tan;
                         break;
-                    case GXInterpolationType.HermiteValue:
-                        ValueLeft = ValueRight;
-                        FrameLeft = FrameRight;
-                        ValueRight = Keys[i].Value;
-                        FrameRight = Keys[i].Frame;
+                    case GXInterpolationType.HSD_A_OP_KEY:
+                        p1 = Keys[i].Value;
+                        p0 = Keys[i].Value;
                         break;
                 }
 
-                if (FrameRight > Frame && Keys[i].InterpolationType != GXInterpolationType.HermiteCurve)
+                if (t1 > Frame && Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
                     break;
 
-                CurrentInterpolation = Keys[i].InterpolationType;
+                op_intrp = Keys[i].InterpolationType;
             }
 
 
-            if (FrameLeft == FrameRight || CurrentInterpolation == GXInterpolationType.Step || CurrentInterpolation == GXInterpolationType.Constant)
-                return ValueLeft;
+            if (t0 == t1 || op_intrp == GXInterpolationType.HSD_A_OP_CON || op_intrp == GXInterpolationType.HSD_A_OP_KEY)
+                return p0;
 
-            float FrameDiff = Frame - FrameLeft;
-            float Weight = FrameDiff / (FrameRight - FrameLeft);
+            float FrameDiff = Frame - t0;
+            float Weight = FrameDiff / (t1 - t0);
 
-            if (CurrentInterpolation == GXInterpolationType.Linear)
-                return AnimationHelperInterpolation.Lerp(ValueLeft, ValueRight, Weight);
+            if (op_intrp == GXInterpolationType.HSD_A_OP_LIN)
+                return AnimationHelperInterpolation.Lerp(p0, p1, Weight);
 
-            if (CurrentInterpolation == GXInterpolationType.Hermite || CurrentInterpolation == GXInterpolationType.HermiteValue || CurrentInterpolation == GXInterpolationType.HermiteCurve)
-                return AnimationHelperInterpolation.Herp(ValueLeft, ValueRight, TanLeft, TanRight, FrameDiff, Weight);
+            if (op_intrp == GXInterpolationType.HSD_A_OP_SPL || op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || op_intrp == GXInterpolationType.HSD_A_OP_SLP)
+                return  AnimationHelperInterpolation.Herp(p0, p1, d0, d1, FrameDiff, Weight);
 
-            return ValueLeft;
+            return p0;
         }
     }
 
@@ -98,6 +115,21 @@ namespace HSDRawViewer.Rendering
             Result += (Diff * (Weight - 1)) * (LS * (Weight - 1) + RS * Weight);
 
             return Result;
+        }
+
+        public static float splGetHermite(float fterm, float time, float p0, float p1, float d0, float d1)
+        {
+            float fVar1;
+            float fVar2;
+            float fVar3;
+            float fVar4;
+
+            fVar1 = time * time;
+            fVar2 = fterm * fterm * fVar1 * time;
+            fVar3 = 3.0f * fVar1 * fterm * fterm;
+            fVar4 = fVar2 - fVar1 * fterm;
+            fVar2 = 2.0f * fVar2 * fterm;
+            return d1 * fVar4 + d0 * (time + (fVar4 - fVar1 * fterm)) + p0 * (1.0f + (fVar2 - fVar3)) + p1 * (-fVar2 + fVar3);
         }
     }
 

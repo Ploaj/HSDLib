@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSDRaw.Tools.Melee;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,6 +48,32 @@ namespace HSDRawViewer.Tools
                         return true;
                 return false;
             }
+        }
+
+        public int[] GetParameters(byte[] data)
+        {
+            Bitreader r = new Bitreader(data);
+
+            r.Read(6);
+
+            List<int> param = new List<int>();
+
+            for (int i = 0; i < Parameters.Length; i++)
+            {
+                var p = Parameters[i];
+
+                if (p.Name.Contains("None"))
+                    continue;
+
+                var value = r.Read(p.BitCount);
+
+                if (p.IsPointer)
+                    continue;
+
+                param.Add(value);
+            }
+
+            return param.ToArray();
         }
     }
 

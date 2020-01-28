@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SubactionEditor));
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.splitter2 = new System.Windows.Forms.Splitter();
             this.subActionList = new System.Windows.Forms.ListBox();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.buttonAdd = new System.Windows.Forms.ToolStripButton();
@@ -46,12 +47,15 @@
             this.buttonGoto = new System.Windows.Forms.Button();
             this.referenceLabel = new System.Windows.Forms.Label();
             this.cbReference = new System.Windows.Forms.ComboBox();
+            this.previewBox = new System.Windows.Forms.GroupBox();
             this.actionList = new System.Windows.Forms.ListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.renderHitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -63,23 +67,34 @@
             // 
             this.splitter1.Location = new System.Drawing.Point(197, 0);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 316);
+            this.splitter1.Size = new System.Drawing.Size(3, 439);
             this.splitter1.TabIndex = 3;
             this.splitter1.TabStop = false;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.splitter2);
             this.groupBox1.Controls.Add(this.subActionList);
             this.groupBox1.Controls.Add(this.toolStrip2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.panel1);
+            this.groupBox1.Controls.Add(this.previewBox);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(200, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(495, 316);
+            this.groupBox1.Size = new System.Drawing.Size(495, 439);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Subaction";
+            // 
+            // splitter2
+            // 
+            this.splitter2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter2.Location = new System.Drawing.Point(3, 113);
+            this.splitter2.Name = "splitter2";
+            this.splitter2.Size = new System.Drawing.Size(489, 3);
+            this.splitter2.TabIndex = 8;
+            this.splitter2.TabStop = false;
             // 
             // subActionList
             // 
@@ -94,7 +109,7 @@
             this.subActionList.Location = new System.Drawing.Point(3, 70);
             this.subActionList.Name = "subActionList";
             this.subActionList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.subActionList.Size = new System.Drawing.Size(489, 243);
+            this.subActionList.Size = new System.Drawing.Size(489, 46);
             this.subActionList.TabIndex = 0;
             this.subActionList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.subActionList_DrawItem);
             this.subActionList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.subActionList_MeasureItem);
@@ -252,13 +267,24 @@
             this.cbReference.Size = new System.Drawing.Size(315, 21);
             this.cbReference.TabIndex = 4;
             // 
+            // previewBox
+            // 
+            this.previewBox.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.previewBox.Location = new System.Drawing.Point(3, 116);
+            this.previewBox.Name = "previewBox";
+            this.previewBox.Size = new System.Drawing.Size(489, 320);
+            this.previewBox.TabIndex = 7;
+            this.previewBox.TabStop = false;
+            this.previewBox.Text = "Preview";
+            this.previewBox.Visible = false;
+            // 
             // actionList
             // 
             this.actionList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.actionList.FormattingEnabled = true;
             this.actionList.Location = new System.Drawing.Point(3, 41);
             this.actionList.Name = "actionList";
-            this.actionList.Size = new System.Drawing.Size(191, 272);
+            this.actionList.Size = new System.Drawing.Size(191, 395);
             this.actionList.TabIndex = 5;
             this.actionList.SelectedIndexChanged += new System.EventHandler(this.actionList_SelectedIndexChanged);
             // 
@@ -269,7 +295,7 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(197, 316);
+            this.groupBox2.Size = new System.Drawing.Size(197, 439);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Action List";
@@ -289,6 +315,8 @@
             // 
             this.editDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.editDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadPlayerFilesToolStripMenuItem,
+            this.renderHitboxInterpolationToolStripMenuItem,
             this.clearAllActionsToolStripMenuItem});
             this.editDropDown.Image = ((System.Drawing.Image)(resources.GetObject("editDropDown.Image")));
             this.editDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -299,9 +327,16 @@
             // clearAllActionsToolStripMenuItem
             // 
             this.clearAllActionsToolStripMenuItem.Name = "clearAllActionsToolStripMenuItem";
-            this.clearAllActionsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.clearAllActionsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
             this.clearAllActionsToolStripMenuItem.Text = "Clear All Action\'s Scripts";
             this.clearAllActionsToolStripMenuItem.Click += new System.EventHandler(this.clearAllActionsToolStripMenuItem_Click);
+            // 
+            // loadPlayerFilesToolStripMenuItem
+            // 
+            this.loadPlayerFilesToolStripMenuItem.Name = "loadPlayerFilesToolStripMenuItem";
+            this.loadPlayerFilesToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Files";
+            this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
             // 
             // toolStripButton1
             // 
@@ -313,11 +348,18 @@
             this.toolStripButton1.Text = "Create New Subroutine";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
+            // renderHitboxInterpolationToolStripMenuItem
+            // 
+            this.renderHitboxInterpolationToolStripMenuItem.CheckOnClick = true;
+            this.renderHitboxInterpolationToolStripMenuItem.Name = "renderHitboxInterpolationToolStripMenuItem";
+            this.renderHitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.renderHitboxInterpolationToolStripMenuItem.Text = "Render Hitbox Interpolation";
+            // 
             // SubactionEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(695, 316);
+            this.ClientSize = new System.Drawing.Size(695, 439);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.groupBox2);
@@ -360,5 +402,9 @@
         private System.Windows.Forms.ToolStripButton buttonCut;
         private System.Windows.Forms.ToolStripDropDownButton editDropDown;
         private System.Windows.Forms.ToolStripMenuItem clearAllActionsToolStripMenuItem;
+        private System.Windows.Forms.GroupBox previewBox;
+        private System.Windows.Forms.ToolStripMenuItem loadPlayerFilesToolStripMenuItem;
+        private System.Windows.Forms.Splitter splitter2;
+        private System.Windows.Forms.ToolStripMenuItem renderHitboxInterpolationToolStripMenuItem;
     }
 }

@@ -83,6 +83,9 @@
     <Compile Include="ContextMenus\DOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\FigatreeContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\FOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -155,12 +158,6 @@
     <Compile Include="GUI\HSDTypeDialog.Designer.cs">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\IntuitiveSubactionEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="GUI\IntuitiveSubactionEditor.Designer.cs">
-      <DependentUpon>IntuitiveSubactionEditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\Plugins\CollDataEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -186,6 +183,7 @@
     <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.Designer.cs">
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
     <Compile Include="GUI\Plugins\SubActionPanel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -234,7 +232,7 @@
     <Compile Include="RawHSD.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DOBJRenderer.cs" />
-    <Compile Include="Rendering\DrawShape.cs" />
+    <Compile Include="Rendering\Shapes\DrawShape.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />
     <Compile Include="Rendering\JOBJRenderer.cs" />
@@ -292,9 +290,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\HSDTypeDialog.resx">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\IntuitiveSubactionEditor.resx">
-      <DependentUpon>IntuitiveSubactionEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\CollDataEditor.resx">
       <DependentUpon>CollDataEditor.cs</DependentUpon>

@@ -47,7 +47,7 @@ namespace HSDRaw.Tools
             Reader.Seek(0);
             while (Reader.Position < Reader.BaseStream.Length)
             {
-                int type = Reader.ExtendedByte();
+                int type = Reader.ReadPacked();
                 GXInterpolationType interpolation = (GXInterpolationType)((type) & 0x0F);
                 int numOfKey = ((type >> 4)) + 1;
                 if (interpolation == 0) break;
@@ -59,28 +59,28 @@ namespace HSDRaw.Tools
                     int time = 0;
                     switch (interpolation)
                     {
-                        case GXInterpolationType.Step:
-                            value = ReadVal(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
-                            time = Reader.ExtendedByte();
+                        case GXInterpolationType.HSD_A_OP_CON:
+                            value = ParseFloat(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
+                            time = Reader.ReadPacked();
                             break;
-                        case GXInterpolationType.Linear:
-                            value = ReadVal(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
-                            time = Reader.ExtendedByte();
+                        case GXInterpolationType.HSD_A_OP_LIN:
+                            value = ParseFloat(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
+                            time = Reader.ReadPacked();
                             break;
-                        case GXInterpolationType.HermiteValue:
-                            value = ReadVal(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
-                            time = Reader.ExtendedByte();
+                        case GXInterpolationType.HSD_A_OP_SPL0:
+                            value = ParseFloat(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
+                            time = Reader.ReadPacked();
                             break;
-                        case GXInterpolationType.Hermite:
-                            value = ReadVal(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
-                            tan = ReadVal(Reader, FOBJ.TanFormat, FOBJ.TanScale);
-                            time = Reader.ExtendedByte();
+                        case GXInterpolationType.HSD_A_OP_SPL:
+                            value = ParseFloat(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
+                            tan = ParseFloat(Reader, FOBJ.TanFormat, FOBJ.TanScale);
+                            time = Reader.ReadPacked();
                             break;
-                        case GXInterpolationType.HermiteCurve:
-                            tan = ReadVal(Reader, FOBJ.TanFormat, FOBJ.TanScale);
+                        case GXInterpolationType.HSD_A_OP_SLP:
+                            tan = ParseFloat(Reader, FOBJ.TanFormat, FOBJ.TanScale);
                             break;
-                        case GXInterpolationType.Constant:
-                            value = ReadVal(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
+                        case GXInterpolationType.HSD_A_OP_KEY:
+                            value = ParseFloat(Reader, FOBJ.ValueFormat, FOBJ.ValueScale);
                             break;
                         default:
                             throw new Exception("Unknown Interpolation Type " + interpolation.ToString("X"));
@@ -98,20 +98,20 @@ namespace HSDRaw.Tools
             return Keys;
         }
 
-        private static double ReadVal(BinaryReaderExt d, GXAnimDataFormat Format, float Scale)
+        private static double ParseFloat(BinaryReaderExt d, GXAnimDataFormat Format, float Scale)
         {
             d.BigEndian = false;
             switch (Format)
             {
-                case GXAnimDataFormat.Float:
+                case GXAnimDataFormat.HSD_A_FRAC_FLOAT:
                     return d.ReadSingle();
-                case GXAnimDataFormat.Short:
+                case GXAnimDataFormat.HSD_A_FRAC_S16:
                     return d.ReadInt16() / (double)Scale;
-                case GXAnimDataFormat.UShort:
+                case GXAnimDataFormat.HSD_A_FRAC_U16:
                     return d.ReadUInt16() / (double)Scale;
-                case GXAnimDataFormat.SByte:
+                case GXAnimDataFormat.HSD_A_FRAC_S8:
                     return d.ReadSByte() / (double)Scale;
-                case GXAnimDataFormat.Byte:
+                case GXAnimDataFormat.HSD_A_FRAC_U8:
                     return d.ReadByte() / (double)Scale;
                 default:
                     return 0;

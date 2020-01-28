@@ -12,7 +12,7 @@ namespace HSDRaw.Tools
         private float MaxValue = float.MinValue;
         private bool ValueSigned = false;
         private int ValueScale = 0;
-        private GXAnimDataFormat ValueType = GXAnimDataFormat.Float;
+        private GXAnimDataFormat ValueType = GXAnimDataFormat.HSD_A_FRAC_FLOAT;
         private bool Quantanized = false;
         public float Error { get; set; } = 0.0001f;
         private List<float> Values = new List<float>();
@@ -44,13 +44,13 @@ namespace HSDRaw.Tools
         {
             switch (format)
             {
-                case GXAnimDataFormat.Byte:
+                case GXAnimDataFormat.HSD_A_FRAC_U8:
                     return Clamp((byte)(scale * value), byte.MinValue, byte.MaxValue);
-                case GXAnimDataFormat.SByte:
+                case GXAnimDataFormat.HSD_A_FRAC_S8:
                     return Clamp((sbyte)(scale * value), sbyte.MinValue, sbyte.MaxValue);
-                case GXAnimDataFormat.Short:
+                case GXAnimDataFormat.HSD_A_FRAC_S16:
                     return Clamp((short)(scale * value), short.MinValue, short.MaxValue);
-                case GXAnimDataFormat.UShort:
+                case GXAnimDataFormat.HSD_A_FRAC_U16:
                     return Clamp((ushort)(scale * value), ushort.MinValue, ushort.MaxValue);
             }
             return 0;
@@ -63,19 +63,19 @@ namespace HSDRaw.Tools
                 var value = Math.Pow(2, scale) * v;
                 switch (format)
                 {
-                    case GXAnimDataFormat.Byte:
+                    case GXAnimDataFormat.HSD_A_FRAC_U8:
                         if (v > byte.MaxValue)
                             return false;
                         break;
-                    case GXAnimDataFormat.SByte:
+                    case GXAnimDataFormat.HSD_A_FRAC_S8:
                         if (v > sbyte.MaxValue)
                             return false;
                         break;
-                    case GXAnimDataFormat.Short:
+                    case GXAnimDataFormat.HSD_A_FRAC_S16:
                         if (v > short.MaxValue)
                             return false;
                         break;
-                    case GXAnimDataFormat.UShort:
+                    case GXAnimDataFormat.HSD_A_FRAC_U16:
                         if (v > ushort.MaxValue)
                             return false;
                         break;
@@ -93,13 +93,13 @@ namespace HSDRaw.Tools
         {
             if (ValueSigned)
             {
-                ValueType = GXAnimDataFormat.SByte;
+                ValueType = GXAnimDataFormat.HSD_A_FRAC_S8;
                 for (int i = 0; i < 0x1F; i++)
                 {
                     if (IsAcceptable(ValueType, i))
                         return (int)Math.Pow(2, i);
                 }
-                ValueType = GXAnimDataFormat.Short;
+                ValueType = GXAnimDataFormat.HSD_A_FRAC_S16;
                 for (int i = 0; i < 0x1F; i++)
                 {
                     if (IsAcceptable(ValueType, i))
@@ -108,20 +108,20 @@ namespace HSDRaw.Tools
             }
             else
             {
-                ValueType = GXAnimDataFormat.Byte;
+                ValueType = GXAnimDataFormat.HSD_A_FRAC_U8;
                 for (int i = 0; i < 0x1F; i++)
                 {
                     if (IsAcceptable(ValueType, i))
                         return (int)Math.Pow(2, i);
                 }
-                ValueType = GXAnimDataFormat.UShort;
+                ValueType = GXAnimDataFormat.HSD_A_FRAC_U16;
                 for (int i = 0; i < 0x1F; i++)
                 {
                     if (IsAcceptable(ValueType, i))
                         return (int)Math.Pow(2, i);
                 }
             }
-            ValueType = GXAnimDataFormat.Float;
+            ValueType = GXAnimDataFormat.HSD_A_FRAC_FLOAT;
             return (int)Math.Pow(2, 0);
         }
 
@@ -161,19 +161,19 @@ namespace HSDRaw.Tools
 
             switch (ValueType)
             {
-                case GXAnimDataFormat.Float:
+                case GXAnimDataFormat.HSD_A_FRAC_FLOAT:
                     d.Write(Value * ValueScale);
                     break;
-                case GXAnimDataFormat.Short:
+                case GXAnimDataFormat.HSD_A_FRAC_S16:
                     d.Write((short)(Quantanize(Value, ValueType, ValueScale)));
                     break;
-                case GXAnimDataFormat.UShort:
+                case GXAnimDataFormat.HSD_A_FRAC_U16:
                     d.Write((ushort)(Quantanize(Value, ValueType, ValueScale)));
                     break;
-                case GXAnimDataFormat.SByte:
+                case GXAnimDataFormat.HSD_A_FRAC_S8:
                     d.Write((sbyte)(Quantanize(Value, ValueType, ValueScale)));
                     break;
-                case GXAnimDataFormat.Byte:
+                case GXAnimDataFormat.HSD_A_FRAC_U8:
                     d.Write((byte)(Quantanize(Value, ValueType, ValueScale)));
                     break;
                 default:

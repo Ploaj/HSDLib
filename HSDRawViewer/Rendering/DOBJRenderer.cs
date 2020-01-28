@@ -37,6 +37,8 @@ namespace HSDRawViewer.Rendering
             public Vector4[] Envelopes = new Vector4[10];
             public Vector4[] Weights = new Vector4[10];
 
+            public bool HasWeighting = false;
+
             public List<CachedDL> DisplayLists = new List<CachedDL>();
         }
 
@@ -113,12 +115,16 @@ namespace HSDRawViewer.Rendering
                 single = jobjManager.GetWorldTransform(parentJOBJ);
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
 
-            var t = jobjManager.GetBindTransforms();
+            var t = jobjManager.GetWorldTransforms();
             if (t.Length > 0)
                 GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("transforms"), t.Length, false, ref t[0].Row0.X);
-
-            GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("tex0"), 0);
             
+            var tb = jobjManager.GetBindTransforms();
+            if (tb.Length > 0)
+                GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("bindTransforms"), tb.Length, false, ref tb[0].Row0.X);
+            
+            GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("tex0"), 0);
+
             float wscale = 1;
             float hscale = 1;
             bool mirrorX = false;
@@ -149,6 +155,8 @@ namespace HSDRawViewer.Rendering
 
                 var we = p.Weights;
                 GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
+                
+                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("hasEnvelopes"), p.HasWeighting ? 1 : 0);
 
                 foreach (var dl in p.DisplayLists)
                     GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
@@ -202,6 +210,7 @@ namespace HSDRawViewer.Rendering
                     pobjCache.Weights[eni] = w;
                     pobjCache.Envelopes[eni] = b;
                     eni++;
+                    pobjCache.HasWeighting = v.EnvelopeCount > 0;
                 }
 
                 // load display list

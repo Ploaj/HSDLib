@@ -240,7 +240,7 @@ namespace HSDRaw
         }
 
 
-        public int ExtendedByte()
+        public int ReadPacked()
         {
             int type = ReadByte();
             int i = type;

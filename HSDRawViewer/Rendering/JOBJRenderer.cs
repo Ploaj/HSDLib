@@ -103,13 +103,28 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <returns></returns>
-        public Matrix4[] GetBindTransforms()
+        public Matrix4[] GetWorldTransforms()
         {
             Matrix4[] mat = new Matrix4[jobjToCache.Count];
 
             int i = 0;
             foreach(var v in jobjToCache)
                 mat[i++] = v.Value.WorldTransform;
+
+            return mat;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Matrix4[] GetBindTransforms()
+        {
+            Matrix4[] mat = new Matrix4[jobjToCache.Count];
+
+            int i = 0;
+            foreach (var v in jobjToCache)
+                mat[i++] = v.Value.InvertedTransform * v.Value.WorldTransform;
 
             return mat;
         }

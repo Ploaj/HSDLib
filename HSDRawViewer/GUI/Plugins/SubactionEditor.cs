@@ -10,16 +10,25 @@ using System.Text;
 using HSDRawViewer.Tools;
 using HSDRaw.Tools.Melee;
 using System.Linq;
+using HSDRawViewer.Rendering;
+using HSDRaw.Common;
+using HSDRaw.Common.Animation;
+using HSDRawViewer.GUI.Plugins.Melee;
+using HSDRawViewer.Rendering.Shapes;
+using OpenTK;
 
 namespace HSDRawViewer.GUI
 {
-    public partial class SubactionEditor : DockContent, EditorBase
+    public partial class SubactionEditor : DockContent, EditorBase, IDrawable
     {
         public class Action
         {
             public HSDStruct _struct;
 
             public string Text;
+
+            public int AnimOffset;
+            public int AnimSize;
 
             public override string ToString()
             {
@@ -114,8 +123,27 @@ namespace HSDRawViewer.GUI
             InitializeComponent();
 
             panel1.Visible = false;
+
+            viewport = new ViewportControl();
+            viewport.Dock = DockStyle.Fill;
+            viewport.AnimationTrackEnabled = true;
+            viewport.AddRenderer(this);
+            viewport.EnableFloor = true;
+            previewBox.Controls.Add(viewport);
+            viewport.RefreshSize();
+            viewport.BringToFront();
+
+            FormClosing += (sender, args) =>
+            {
+                JOBJManager.ClearRenderingCache();
+                viewport.Dispose();
+            };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Subactions"></param>
         private void LoadActions(SBM_FighterSubAction[] Subactions)
         {
             HashSet<HSDStruct> aHash = new HashSet<HSDStruct>();
@@ -132,6 +160,8 @@ namespace HSDRawViewer.GUI
                     AllScripts.Add(new Action()
                     {
                         _struct = v.SubAction._s,
+                        AnimOffset = v.AnimationOffset,
+                        AnimSize = v.AnimationSize,
                         Text = v.Name == null ? "Func_" + Index.ToString("X") : v.Name
                     });
                 }
@@ -203,11 +233,19 @@ namespace HSDRawViewer.GUI
                 cbReference.SelectedIndex = 0;
             
             RefreshSubactionList(script);
+
+            LoadAnimation(script.AnimOffset, script.AnimSize);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="script"></param>
         private void RefreshSubactionList(Action script)
         {
             var data = script._struct.GetData();
+
+            SubactionProcess.SetStruct(script._struct);
 
             subActionList.Items.Clear();
             for (int i = 0; i < data.Length;)
@@ -240,6 +278,8 @@ namespace HSDRawViewer.GUI
             }
         }
 
+
+        #region Undo
         private Stack<byte[]> UndoDataStack = new Stack<byte[]>();
         private Stack<Dictionary<int, HSDStruct>> UndoReferenceStack = new Stack<Dictionary<int, HSDStruct>>();
 
@@ -276,6 +316,8 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -299,6 +341,7 @@ namespace HSDRawViewer.GUI
                 }
                 
                 a._struct.SetData(scriptData.ToArray());
+                SubactionProcess.SetStruct(a._struct);
             }
         }
 
@@ -444,6 +487,8 @@ namespace HSDRawViewer.GUI
                 subActionList.Items.Insert(itempos, item);
             }
         }
+
+        #region ToolStrip
 
         /// <summary>
         /// 
@@ -591,7 +636,9 @@ namespace HSDRawViewer.GUI
             RemoveSelected();
         }
 
-        #region special functions
+# endregion
+
+        #region Special Functions
 
         /// <summary>
         /// 
@@ -610,6 +657,128 @@ namespace HSDRawViewer.GUI
                 }
 
                 actionList.SelectedIndex = 0;
+            }
+        }
+
+        #endregion
+        
+        #region Rendering
+        
+        private ViewportControl viewport;
+
+        private JOBJManager JOBJManager = new JOBJManager();
+
+        public DrawOrder DrawOrder => DrawOrder.Last;
+
+        private byte[] AJBuffer;
+
+        private SubactionProcessor SubactionProcess = new SubactionProcessor();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void loadPlayerFilesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var cFile = FileIO.OpenFile("Fighter Costume (Pl**Nr.dat)|*.dat");
+            if (cFile == null)
+                return;
+            var aFile = FileIO.OpenFile("Fighter Animation (Pl**AJ.dat)|*.dat");
+            if (aFile == null)
+                return;
+
+            var modelFile = new HSDRawFile(cFile);
+            if (modelFile.Roots[0].Data is HSD_JOBJ jobj)
+                JOBJManager.SetJOBJ(jobj);
+            else
+                return;
+
+            AJBuffer = System.IO.File.ReadAllBytes(aFile);
+
+            JOBJManager.RenderBones = false;
+
+            previewBox.Visible = true;
+        }
+
+        /// <summary>
+        /// Calcuates the previous state hitboxes positions and returns them as a dictionary
+        /// </summary>
+        /// <returns></returns>
+        private Dictionary<int, Vector3> CalculatePreviousState()
+        {
+            if (viewport.Frame == 0 || !renderHitboxInterpolationToolStripMenuItem.Checked)
+                return null;
+
+            Dictionary<int, Vector3> previousPosition = new Dictionary<int, Vector3>();
+
+            JOBJManager.Frame = viewport.Frame - 1;
+            JOBJManager.UpdateNoRender();
+            SubactionProcess.SetFrame(viewport.Frame - 1);
+
+            foreach (var hb in SubactionProcess.Hitboxes)
+            {
+                var transform = Matrix4.CreateTranslation(hb.Point1.Zyx / 2) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+                previousPosition.Add(hb.ID, pos);
+            }
+
+            return previousPosition;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
+        public void Draw(Camera cam, int windowWidth, int windowHeight)
+        {
+            Dictionary<int, Vector3> previousPosition = CalculatePreviousState();
+
+            JOBJManager.Frame = viewport.Frame;
+            JOBJManager.Render(cam);
+
+            SubactionProcess.SetFrame(viewport.Frame);
+            
+            foreach (var hb in SubactionProcess.Hitboxes)
+            {
+                var transform = Matrix4.CreateTranslation(hb.Point1.Zyx/2) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                
+                // drawing a capsule takes more processing power, so only draw it if necessary
+                if(renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition.ContainsKey(hb.ID))
+                {
+                    var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+                    var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size / 2);
+                    cap.Draw(Matrix4.Identity, new Vector4(1, 0, 0, 0.4f));
+                }
+                else
+                {
+                    DrawShape.DrawSphere(transform, hb.Size / 2, 16, 16, Vector3.UnitX, 0.4f);
+                }
+            }
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="size"></param>
+        private void LoadAnimation(int offset, int size)
+        {
+            JOBJManager.SetFigaTree(null);
+
+            if (size == 0 || AJBuffer == null || offset + size > AJBuffer.Length)
+                return;
+
+            var f = new byte[size];
+            Array.Copy(AJBuffer, offset, f, 0, size);
+            var anim = new HSDRawFile(f);
+            if(anim.Roots[0].Data is HSD_FigaTree tree)
+            {
+                JOBJManager.SetFigaTree(tree);
+                viewport.MaxFrame = tree.FrameCount;
             }
         }
 

@@ -120,7 +120,7 @@ namespace HSDRawViewer.GUI.Extra
 
                     }
                     e.UniqueCount = UniqueEntries.Count;
-                    e.UniqueCount = largestEntry;
+                    //e.UniqueCount = largestEntry;
                 }
 
             }

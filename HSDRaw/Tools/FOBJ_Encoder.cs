@@ -67,34 +67,34 @@ namespace HSDRaw.Tools
 
                         switch (ip)
                         {
-                            case GXInterpolationType.Step:
+                            case GXInterpolationType.HSD_A_OP_CON:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 Writer.ExtendedByte(DeltaTime);
                                 break;
-                            case GXInterpolationType.Linear:
+                            case GXInterpolationType.HSD_A_OP_LIN:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 Writer.ExtendedByte(DeltaTime);
                                 break;
-                            case GXInterpolationType.HermiteValue:
+                            case GXInterpolationType.HSD_A_OP_SPL0:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 Writer.ExtendedByte(DeltaTime);
                                 break;
-                            case GXInterpolationType.Hermite:
+                            case GXInterpolationType.HSD_A_OP_SPL:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 tangentQ.WriteValue(Writer, Keys[k].Tan);
                                 Writer.ExtendedByte(DeltaTime);
                                 break;
-                            case GXInterpolationType.HermiteCurve:
+                            case GXInterpolationType.HSD_A_OP_SLP:
                                 tangentQ.WriteValue(Writer, Keys[k].Tan);
                                 break;
-                            case GXInterpolationType.Constant:
+                            case GXInterpolationType.HSD_A_OP_KEY:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 break;
                             default:
                                 throw new Exception("end");
                         }
 
-                        if (ip != GXInterpolationType.HermiteCurve)
+                        if (ip != GXInterpolationType.HSD_A_OP_SLP)
                             time = (int)Keys[k].Frame;
                     }
 
