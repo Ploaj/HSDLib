@@ -263,6 +263,13 @@ namespace HSDRaw
                         a = jobj;
                     }
                     else
+                    if (rootStrings[i].EndsWith("_texanim"))
+                    {
+                        var jobj = new HSD_TexAnim();
+                        jobj._s = str;
+                        a = jobj;
+                    }
+                    else
                     if (rootStrings[i].EndsWith("_figatree"))
                     {
                         var jobj = new HSD_FigaTree();

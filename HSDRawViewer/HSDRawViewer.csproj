@@ -158,6 +158,18 @@
     <Compile Include="GUI\HSDTypeDialog.Designer.cs">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\KeyEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\KeyEditor.Designer.cs">
+      <DependentUpon>KeyEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\AOBJEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\AOBJEditor.Designer.cs">
+      <DependentUpon>AOBJEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\CollDataEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -290,6 +302,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\HSDTypeDialog.resx">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\KeyEditor.resx">
+      <DependentUpon>KeyEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\AOBJEditor.resx">
+      <DependentUpon>AOBJEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\CollDataEditor.resx">
       <DependentUpon>CollDataEditor.cs</DependentUpon>

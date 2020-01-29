@@ -26,6 +26,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public List<Hitbox> Hitboxes { get; internal set; } = new List<Hitbox>();
 
+        public Vector3 OverlayColor { get; internal set; } = Vector3.One;
+
+        public bool CharacterInvisibility { get; internal set; } = false;
+
         private HSDStruct Struct;
 
         /// <summary>
@@ -35,13 +39,25 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ResetState()
+        {
+            OverlayColor = Vector3.One;
+            CharacterInvisibility = false;
+        }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
         public void SetStruct(HSDStruct str)
         {
             Struct = str;
-
             Commands = GetCommands(Struct);
-
+            ResetState();
             SetFrame(0);
         }
 
@@ -96,10 +112,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             return Commands;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
         public void SetFrame(float frame)
         {
             Hitboxes.Clear();
+            if (frame == 0)
+                ResetState();
             SetFrame(frame, 0, Commands);
         }
 
@@ -167,6 +188,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 16:
                         Hitboxes.Clear();
+                        break;
+                    case 37:
+                        CharacterInvisibility = cmd.Parameters[1] == 1;
+                        break;
+                    case 46: //overlay color
+                        if(cmd.Parameters[0] == 1)
+                        {
+                            OverlayColor = new Vector3(cmd.Parameters[1] / 255f, cmd.Parameters[2] / 255f, cmd.Parameters[3] / 255f);
+                        }
                         break;
                 }
 

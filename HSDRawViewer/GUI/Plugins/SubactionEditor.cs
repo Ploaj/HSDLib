@@ -736,10 +736,15 @@ namespace HSDRawViewer.GUI
         {
             Dictionary<int, Vector3> previousPosition = CalculatePreviousState();
 
-            JOBJManager.Frame = viewport.Frame;
-            JOBJManager.Render(cam);
-
             SubactionProcess.SetFrame(viewport.Frame);
+
+            JOBJManager.DOBJManager.OverlayColor = SubactionProcess.OverlayColor;
+
+            JOBJManager.Frame = viewport.Frame;
+            if (SubactionProcess.CharacterInvisibility)
+                JOBJManager.UpdateNoRender();
+            else
+                JOBJManager.Render(cam);
             
             foreach (var hb in SubactionProcess.Hitboxes)
             {

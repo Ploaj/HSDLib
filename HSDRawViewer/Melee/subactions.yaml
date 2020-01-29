@@ -226,7 +226,7 @@
     hex: true
 
 - code: 25
-  name: Unknown0x19
+  name: Snap to Previous Surface
   parameters:
   - name: Value
     bitCount: 26
@@ -275,7 +275,12 @@
   name: Revert Models
 
 - code: 33
-  name: Remove Models
+  name: Self Damage
+  parameters:
+  - name: Unknown
+    bitCount: 10
+  - name: Damage
+    bitCount: 16
 
 - code: 34
   name: Throw
@@ -393,7 +398,7 @@
     bitCount: 26
 
 - code: 44
-  name: Unknown0x2A
+  name: Unknown0x2C
   parameters:
   - name: Unknown
     bitCount: 25
@@ -409,10 +414,19 @@
     bitCount: 18
 
 - code: 46
-  name: Remove Color Overlay
+  name: Color Overlay
+  parameters:
+  - name: Flag
+    bitCount: 2
+  - name: Red
+    bitCount: 8
+  - name: Green
+    bitCount: 8
+  - name: Blue
+    bitCount: 8
 
 - code: 47
-  name: Unknown0x2A
+  name: Unknown0x2F
   parameters:
   - name: Unknwon
     bitCount: 26
@@ -434,12 +448,10 @@
     bitCount: 26
 
 - code: 50
-  name: Self Damage
+  name: Unknown0x32
   parameters:
   - name: Unknown
-    bitCount: 10
-  - name: Damage
-    bitCount: 16
+    bitCount: 26
 
 - code: 51
   name: Continuation Control
@@ -491,7 +503,7 @@
     bitCount: 24
 
 - code: 56
-  name: Unknown
+  name: Smash Charge
   parameters:
   - name: Unknown
     bitCount: 26

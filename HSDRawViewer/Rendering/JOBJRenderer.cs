@@ -369,10 +369,9 @@ namespace HSDRawViewer.Rendering
 
                     foreach (var fdesc in j.AOBJ.FObjDesc.List)
                     {
-                        var fobj = fdesc.FOBJ;
                         AnimTrack track = new AnimTrack();
-                        track.TrackType = fobj.AnimationType;
-                        track.Keys = fobj.GetDecodedKeys();
+                        track.TrackType = fdesc.AnimationType;
+                        track.Keys = fdesc.GetDecodedKeys();
                         n.Tracks.Add(track);
                     }
                 }

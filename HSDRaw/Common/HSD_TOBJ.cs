@@ -179,7 +179,7 @@ namespace HSDRaw.Common
 
     public class HSD_Tlut : HSDAccessor
     {
-        public override int TrimmedSize { get; } = 0x10;// actually 0xE, but it's padded to 4 anyway...
+        public override int TrimmedSize { get; } = 0x20;// actually 0xE, but it's padded to 4 anyway...
 
         public byte[] TlutData { get => _s.GetBuffer(0x00); set => _s.SetBuffer(0x00, value); }
         

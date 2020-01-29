@@ -32,6 +32,11 @@ namespace HSDRawViewer.Rendering
         private Dictionary<HSD_DOBJ, int> DOBJtoBuffer = new Dictionary<HSD_DOBJ, int>();
         private Dictionary<HSD_DOBJ, List<CachedPOBJ>> DOBJtoPOBJCache = new Dictionary<HSD_DOBJ, List<CachedPOBJ>>();
 
+
+        // Attributes
+        public Vector3 OverlayColor = Vector3.One;
+
+
         public class CachedPOBJ
         {
             public Vector4[] Envelopes = new Vector4[10];
@@ -124,6 +129,8 @@ namespace HSDRawViewer.Rendering
                 GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("bindTransforms"), tb.Length, false, ref tb[0].Row0.X);
             
             GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("tex0"), 0);
+
+            GL.Uniform3(GXShader.GetVertexAttributeUniformLocation("overlayColor"), OverlayColor);
 
             float wscale = 1;
             float hscale = 1;

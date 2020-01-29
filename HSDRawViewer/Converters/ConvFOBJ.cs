@@ -15,7 +15,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static string ToString(HSD_FOBJDesc desc)
         {
-            return ToString(desc.FOBJ);
+            return ToString(desc.ToFOBJ());
         }
 
         /// <summary>
@@ -25,12 +25,7 @@ namespace HSDRawViewer.Converters
         /// <param name="lines"></param>
         public static void ImportKeys(HSD_FOBJDesc desc, string[] lines)
         {
-            if (desc.FOBJ == null)
-                desc.FOBJ = new HSD_FOBJ();
-            
-            desc.FOBJ = ImportKeys(desc.FOBJ, lines);
-
-            desc.DataLength = desc.FOBJ.Buffer.Length;
+            desc.FromFOBJ(ImportKeys(desc.ToFOBJ(), lines));
         }
 
         /// <summary>
