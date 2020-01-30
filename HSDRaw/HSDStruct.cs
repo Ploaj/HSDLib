@@ -12,6 +12,8 @@ namespace HSDRaw
     {
         private byte[] _data = new byte[0];
 
+        public bool IsTextureBuffer = false;
+
         public Dictionary<int, HSDStruct> References { get => _references; }
         private Dictionary<int, HSDStruct> _references = new Dictionary<int, HSDStruct>();
 
@@ -115,11 +117,12 @@ namespace HSDRaw
             if (_references.ContainsKey(loc))
             {
                 var reference = _references[loc];
+                reference.IsTextureBuffer = true;
                 reference.SetData(data);
             }
             else
             {
-                _references.Add(loc, new HSDStruct(data));
+                _references.Add(loc, new HSDStruct(data) { IsTextureBuffer = true });
             }
         }
 

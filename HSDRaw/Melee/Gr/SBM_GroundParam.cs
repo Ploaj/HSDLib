@@ -111,7 +111,7 @@
 
         public float BubbleColorBottomLeft { get => _s.GetFloat(0xD0); set => _s.SetFloat(0xD0, value); }
 
-        public float BubbleColorBottomMiddle { get => _s.GetFloat(0xD4); set => _s.SetSetFloatInt32(0xD4, value); }
+        public float BubbleColorBottomMiddle { get => _s.GetFloat(0xD4); set => _s.SetFloat(0xD4, value); }
 
         public float BubbleColorBottomRight { get => _s.GetFloat(0xD8); set => _s.SetFloat(0xD8, value); }
     }

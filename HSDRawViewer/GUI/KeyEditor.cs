@@ -113,7 +113,7 @@ namespace HSDRawViewer.GUI
         private void dataGridView1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
             var grid = sender as DataGridView;
-            var rowIdx = (e.RowIndex + 1).ToString();
+            var rowIdx = (e.RowIndex).ToString();
 
             var centerFormat = new StringFormat()
             {
