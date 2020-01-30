@@ -83,5 +83,64 @@ namespace HSDRawViewer.GUI.Plugins
                 treeView1.SelectedNode.Text = desc.AnimationType.ToString();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+            var FOBJDesc = new HSD_FOBJDesc();
+            FOBJDesc.SetKeys(new System.Collections.Generic.List<HSDRaw.Tools.FOBJKey>()
+            {
+                new HSDRaw.Tools.FOBJKey()
+                {
+                    Frame = 0,
+                    InterpolationType = GXInterpolationType.HSD_A_OP_CON
+                },
+                new HSDRaw.Tools.FOBJKey()
+                {
+                    Frame = aobj.EndFrame,
+                    InterpolationType = GXInterpolationType.HSD_A_OP_CON
+                }
+            }, JointTrackType.HSD_A_J_NODE);
+
+            if (aobj.FObjDesc == null)
+                aobj.FObjDesc = FOBJDesc;
+            else
+                aobj.FObjDesc.Add(FOBJDesc);
+
+            RefreshList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonRemove_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode == null)
+                return;
+
+            var selected = treeView1.SelectedNode.Tag as HSD_FOBJDesc;
+
+            if (aobj.FObjDesc == selected)
+                aobj.FObjDesc = selected.Next;
+            else
+            {
+                foreach (var v in aobj.FObjDesc.List)
+                {
+                    if (v.Next == selected)
+                    {
+                        v.Next = selected.Next;
+                        break;
+                    }
+                }
+            }
+
+            RefreshList();
+        }
     }
 }

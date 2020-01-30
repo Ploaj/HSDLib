@@ -437,8 +437,8 @@ namespace HSDRawViewer.GUI.Plugins
 
             var tobjs = GetTOBJs();
 
-            var tobj = new HSD_TOBJ();
-            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
+            HSD_TOBJ tobj;
+            var f = Tools.FileIO.OpenFiles("PNG (.png)|*.png");
             if (f != null)
             {
                 GXTexFmt texFormat = GXTexFmt.CMP;
@@ -451,8 +451,15 @@ namespace HSDRawViewer.GUI.Plugins
                         {
                             texFormat = settings.TextureFormat;
                             palFormat = settings.PaletteFormat;
-                            TOBJConverter.InjectBitmap(tobj, f, texFormat, palFormat);
-                            tobjs = new HSD_TOBJ[] { tobj };
+                            tobjs = new HSD_TOBJ[f.Length];
+
+                            int ti = 0;
+                            foreach(var fi in f)
+                            {
+                                tobj = new HSD_TOBJ();
+                                TOBJConverter.InjectBitmap(tobj, fi, texFormat, palFormat);
+                                tobjs[ti++] = tobj;
+                            }
                         }
                         else
                         {
@@ -466,15 +473,19 @@ namespace HSDRawViewer.GUI.Plugins
                     if (tobjs[0].TlutData != null)
                         palFormat = tobjs[0].TlutData.Format;
 
-                    TOBJConverter.InjectBitmap(tobj, f, texFormat, palFormat);
-
-                    if(tobj.ImageData.Width != tobjs[0].ImageData.Width || tobj.ImageData.Height != tobjs[0].ImageData.Height)
+                    foreach(var fi in f)
                     {
-                        MessageBox.Show($"Error the texture size does not match\n{tobj.ImageData.Width}x{tobj.ImageData.Height} -> {tobjs[0].ImageData.Width}x{tobjs[0].ImageData.Height}");
-                        return;
-                    }
+                        tobj = new HSD_TOBJ();
+                        TOBJConverter.InjectBitmap(tobj, fi, texFormat, palFormat);
 
-                    tobjs = InsertAt(tobjs, tobj, tobjs.Length);
+                        if (tobj.ImageData.Width != tobjs[0].ImageData.Width || tobj.ImageData.Height != tobjs[0].ImageData.Height)
+                        {
+                            MessageBox.Show($"Error the texture size does not match\n{tobj.ImageData.Width}x{tobj.ImageData.Height} -> {tobjs[0].ImageData.Width}x{tobjs[0].ImageData.Height}");
+                            return;
+                        }
+
+                        tobjs = InsertAt(tobjs, tobj, tobjs.Length);
+                    }
                 }
             }
             else

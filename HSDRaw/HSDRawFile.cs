@@ -242,6 +242,13 @@ namespace HSDRaw
                     HSDStruct str = offsetToStruct[rootOffsets[i]];
                     HSDAccessor a = new HSDAccessor();
                     a._s = str;
+                    if (rootStrings[i].EndsWith("shapeanim_joint"))
+                    {
+                        var acc = new HSDAccessor();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
                     if (rootStrings[i].EndsWith("matanim_joint"))
                     {
                         var acc = new HSD_MatAnimJoint();
@@ -277,6 +284,17 @@ namespace HSDRaw
                         a = jobj;
                     }
                     else
+                    if (rootStrings[i].EndsWith("_scene_models") ||
+                        rootStrings[i].Equals("Stc_rarwmdls") ||
+                        rootStrings[i].Equals("Stc_scemdls") ||
+                        rootStrings[i].Equals("lupe") ||
+                        rootStrings[i].Equals("tdsce"))
+                    {
+                        var jobj = new HSDNullPointerArrayAccessor<HSD_JOBJDesc>();
+                        jobj._s = str;
+                        a = jobj;
+                    }
+                    else
                     if (rootStrings[i].StartsWith("ftData"))
                     {
                         var acc = new SBM_PlayerData();
@@ -305,7 +323,10 @@ namespace HSDRaw
                         a = acc;
                     }
                     else
-                    if (rootStrings[i].StartsWith("Sc") && str.Length == 0x10)
+                    if (rootStrings[i].EndsWith("scene_data") || 
+                        rootStrings[i].Equals("pnlsce") ||
+                        rootStrings[i].Equals("flmsce") ||
+                        (rootStrings[i].StartsWith("Sc") && str.Length == 0x10))
                     {
                         var acc = new HSD_SOBJ();
                         acc._s = str;
@@ -329,6 +350,13 @@ namespace HSDRaw
                     if (rootStrings[i].StartsWith("map_head"))
                     {
                         var acc = new SBM_Map_Head();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].StartsWith("grGroundParam"))
+                    {
+                        var acc = new SBM_GroundParam();
                         acc._s = str;
                         a = acc;
                     }
@@ -371,6 +399,13 @@ namespace HSDRaw
                     if (rootStrings[i].EndsWith("_texg"))
                     {
                         var acc = new HSD_TEXGraphicBank();
+                        acc._s = str;
+                        a = acc;
+                    }
+                    else
+                    if (rootStrings[i].EndsWith("_ptcl"))
+                    {
+                        var acc = new HSD_ParticleGroup();
                         acc._s = str;
                         a = acc;
                     }

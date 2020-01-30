@@ -90,8 +90,6 @@ namespace HSDRaw.Tools
                             case GXInterpolationType.HSD_A_OP_KEY:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 break;
-                            default:
-                                throw new Exception("end");
                         }
 
                         if (ip != GXInterpolationType.HSD_A_OP_SLP)
