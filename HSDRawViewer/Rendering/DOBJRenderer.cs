@@ -17,7 +17,11 @@ namespace HSDRawViewer.Rendering
 
         public bool RenderVertexColor { get; set; } = true;
 
-        public HSD_DOBJ SelectedDOBJ = null;
+        public bool OnlyRenderSelected = false;
+
+        public HSD_DOBJ SelectedDOBJ;
+
+        public List<HSD_DOBJ> HiddenDOBJs { get; internal set; } = new List<HSD_DOBJ>();
         
         private Dictionary<HSD_POBJ, GX_DisplayList> pobjToDisplayList = new Dictionary<HSD_POBJ, GX_DisplayList>();
 
@@ -85,15 +89,17 @@ namespace HSDRawViewer.Rendering
         /// <param name="dobj"></param>
         /// <param name="parentJOBJ"></param>
         /// <param name="jobjManager"></param>
-        public void RenderDOBJShader(Camera camera, HSD_DOBJ dobj, HSD_JOBJ parentJOBJ, JOBJManager jobjManager)
+        public void RenderDOBJShader(Camera camera, HSD_DOBJ dobj, HSD_JOBJ parentJOBJ, JOBJManager jobjManager, bool selected = false)
         {
             if (dobj.Pobj == null)
                 return;
 
-            if (SelectedDOBJ != null && !SelectedDOBJ.Equals(dobj))
+            if (HiddenDOBJs.Contains(dobj) || (selected && OnlyRenderSelected))
                 return;
 
-            var selected = SelectedDOBJ == dobj;
+            if (OnlyRenderSelected && SelectedDOBJ._s != dobj._s)
+                return;
+            
             var mobj = dobj.Mobj;
             var pobjs = dobj.Pobj.List;
 
@@ -155,6 +161,17 @@ namespace HSDRawViewer.Rendering
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
             
+            if(selected)
+            {
+                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("colorOverride"), 1);
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            }
+            else
+            {
+                GL.PolygonMode(MaterialFace.Back, PolygonMode.Fill);
+                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("colorOverride"), 0);
+            }
+
             foreach (var p in DOBJtoPOBJCache[dobj])
             {
                 var en = p.Envelopes;
@@ -168,7 +185,7 @@ namespace HSDRawViewer.Rendering
                 foreach (var dl in p.DisplayLists)
                     GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
             }
-
+            
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
@@ -296,10 +313,10 @@ namespace HSDRawViewer.Rendering
             if (dobj.Pobj == null)
                 return;
 
-            if (SelectedDOBJ != null && !SelectedDOBJ.Equals(dobj))
+            if (SelectedDOBJ!= null && SelectedDOBJ != (dobj))
                 return;
 
-            var selected = SelectedDOBJ == dobj;
+            //var selected = SelectedDOBJ == dobj;
             var mobj = dobj.Mobj;
             var pobjs = dobj.Pobj.List;
 

@@ -42,8 +42,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             listDOBJ.SelectedIndexChanged += (sender, args) => {
                 propertyGrid1.SelectedObject = listDOBJ.SelectedItem;
-                if(SelectDOBJ)
-                    JOBJManager.DOBJManager.SelectedDOBJ = (listDOBJ.SelectedItem as DOBJContainer)?.DOBJ;
+                JOBJManager.DOBJManager.SelectedDOBJ = ((listDOBJ.SelectedItem as DOBJContainer)?.DOBJ);
             };
 
             propertyGrid1.PropertyValueChanged += (sender, args) =>
@@ -208,19 +207,17 @@ namespace HSDRawViewer.GUI.Plugins
             if(toolStripComboBox1.SelectedIndex == 0)
             {
                 JOBJManager.RenderObjects = true;
-                JOBJManager.DOBJManager.SelectedDOBJ = null;
+                JOBJManager.DOBJManager.OnlyRenderSelected = false;
             }
             if (toolStripComboBox1.SelectedIndex == 1)
             {
                 JOBJManager.RenderObjects = true;
-                if (listDOBJ.SelectedItem != null)
-                    JOBJManager.DOBJManager.SelectedDOBJ = (listDOBJ.SelectedItem as DOBJContainer).DOBJ;
+                JOBJManager.DOBJManager.OnlyRenderSelected = true;
             }
             if (toolStripComboBox1.SelectedIndex == 2)
             {
                 JOBJManager.RenderObjects = false;
-                if (listDOBJ.SelectedItem != null)
-                    JOBJManager.DOBJManager.SelectedDOBJ = (listDOBJ.SelectedItem as DOBJContainer).DOBJ;
+                JOBJManager.DOBJManager.OnlyRenderSelected = false;
             }
         }
 
@@ -267,6 +264,48 @@ namespace HSDRawViewer.GUI.Plugins
             else
             {
                 PluginManager.GetCommonViewport().RemoveRenderer(this);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listDOBJ_BindingContextChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < listDOBJ.Items.Count; i++)
+            {
+                listDOBJ.SetItemChecked(i, true);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListDOBJ_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            List<DOBJContainer> checkedItems = new List<DOBJContainer>();
+
+            foreach (object item in listDOBJ.Items)
+            {
+                if (!listDOBJ.CheckedItems.Contains(item))
+                {
+                    checkedItems.Add(item as DOBJContainer);
+                }
+            }
+
+            if (e.NewValue != CheckState.Checked)
+                checkedItems.Add(listDOBJ.Items[e.Index] as DOBJContainer);
+            else
+                checkedItems.Remove(listDOBJ.Items[e.Index] as DOBJContainer);
+            
+            JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+            foreach(var i in checkedItems)
+            {
+                JOBJManager.DOBJManager.HiddenDOBJs.Add(i.DOBJ);
             }
         }
     }

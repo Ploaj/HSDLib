@@ -300,7 +300,13 @@ namespace HSDRawViewer.Rendering
             // Get the name of the shader. 
             string[] parts = shaderFile.Split('\\');
             string shaderName = parts[parts.Length - 1];
-            Console.WriteLine(GL.GetProgramInfoLog(programId));
+            
+            var error = GL.GetShaderInfoLog(id);
+            if(!string.IsNullOrEmpty(error))
+            {
+                MessageBox.Show("Shader Compile Error: " + error);
+                File.WriteAllText(shaderName + "_error.txt", error);
+            }
             //errorLog.AppendShaderInfoLog(shaderName, id, type);
         }
 

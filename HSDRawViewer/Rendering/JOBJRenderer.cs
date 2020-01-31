@@ -155,19 +155,34 @@ namespace HSDRawViewer.Rendering
         public void Render(Camera cam)
         {
             UpdateTransforms(RootJOBJ);
-            
+
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Front);
+
             GL.Enable(EnableCap.DepthTest);
             // Render DOBJS
             if (RenderObjects)
-            foreach (var b in jobjToCache)
             {
-                if(b.Key.Dobj != null)
+                HSD_JOBJ parent = null;
+                foreach (var b in jobjToCache)
                 {
-                    foreach (var dobj in b.Key.Dobj.List)
+                    if (b.Key.Dobj != null)
                     {
-                        DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
-                        //DOBJManager.RenderDOBJ(dobj, b.Key, this);
+                        foreach (var dobj in b.Key.Dobj.List)
+                        {
+                            if (dobj == DOBJManager.SelectedDOBJ)
+                                parent = b.Key;
+                            DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
+                            //DOBJManager.RenderDOBJ(dobj, b.Key, this);
+                        }
                     }
+                }
+
+                GL.Disable(EnableCap.DepthTest);
+
+                if (DOBJManager.SelectedDOBJ != null)
+                {
+                    DOBJManager.RenderDOBJShader(cam, DOBJManager.SelectedDOBJ, parent, this, true);
                 }
             }
 

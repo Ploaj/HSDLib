@@ -44,7 +44,8 @@ void main()
 	{
 		vec3 skinnedPos = vec3(0);
 		vec3 skinnedNrm = vec3(0);
-		for(int i = 0; i < 4 ; i+=1)
+		int i = 0;
+		for(i = 0; i < 4 ; i+=1)
 		{
 			if(weights[matrixIndex][i] > 0)
 			{

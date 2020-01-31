@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JOBJEditor));
-            this.listDOBJ = new System.Windows.Forms.ListBox();
+            this.listDOBJ = new System.Windows.Forms.CheckedListBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -50,8 +50,8 @@
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.splitter1 = new System.Windows.Forms.Splitter();
             this.mainRender = new System.Windows.Forms.ToolStripButton();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -64,11 +64,12 @@
             // listDOBJ
             // 
             this.listDOBJ.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listDOBJ.FormattingEnabled = true;
             this.listDOBJ.Location = new System.Drawing.Point(3, 28);
             this.listDOBJ.Name = "listDOBJ";
-            this.listDOBJ.Size = new System.Drawing.Size(316, 126);
+            this.listDOBJ.Size = new System.Drawing.Size(316, 100);
             this.listDOBJ.TabIndex = 0;
+            this.listDOBJ.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListDOBJ_ItemCheck);
+            this.listDOBJ.BindingContextChanged += new System.EventHandler(this.listDOBJ_BindingContextChanged);
             // 
             // propertyGrid1
             // 
@@ -142,7 +143,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(322, 157);
+            this.tabPage2.Size = new System.Drawing.Size(322, 131);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "DOBJs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -193,7 +194,7 @@
             this.vertexColorsToolStripMenuItem.CheckOnClick = true;
             this.vertexColorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.vertexColorsToolStripMenuItem.Name = "vertexColorsToolStripMenuItem";
-            this.vertexColorsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.vertexColorsToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.vertexColorsToolStripMenuItem.Text = "Vertex Colors";
             this.vertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
             // 
@@ -275,15 +276,6 @@
             this.toolStripButton2.Text = "Edit Material";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
-            // splitter1
-            // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter1.Location = new System.Drawing.Point(0, 182);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(620, 3);
-            this.splitter1.TabIndex = 8;
-            this.splitter1.TabStop = false;
-            // 
             // mainRender
             // 
             this.mainRender.CheckOnClick = true;
@@ -294,6 +286,15 @@
             this.mainRender.Size = new System.Drawing.Size(111, 22);
             this.mainRender.Text = "Render In Viewport";
             this.mainRender.CheckStateChanged += new System.EventHandler(this.mainRender_CheckStateChanged);
+            // 
+            // splitter1
+            // 
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter1.Location = new System.Drawing.Point(0, 182);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(620, 3);
+            this.splitter1.TabIndex = 8;
+            this.splitter1.TabStop = false;
             // 
             // JOBJEditor
             // 
@@ -328,7 +329,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox listDOBJ;
+        private System.Windows.Forms.CheckedListBox listDOBJ;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
