@@ -133,6 +133,8 @@ namespace HSDRawViewer.GUI.Plugins
             LoadJOBJ(root);
 
             treeJOBJ.ExpandAll();
+
+            listDOBJ.DataSource = dobjList;
         }
 
         private int index = 0;
@@ -307,6 +309,31 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 JOBJManager.DOBJManager.HiddenDOBJs.Add(i.DOBJ);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void addDummyDOBJToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            root.Dobj.Add(new HSD_DOBJ()
+            {
+                Mobj = new HSD_MOBJ()
+                {
+                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT,
+                    Material = new HSD_Material()
+                    {
+                        DiffuseColorRGBA = 0xFFFFFFFF,
+                        SpecularColorRGBA = 0xFFFFFFFF,
+                        AmbientColorRGBA = 0xFFFFFFFF,
+                        Shininess = 50
+                    }
+                }
+            });
+
+            RefreshGUI();
         }
     }
 }

@@ -52,6 +52,8 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.mainRender = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -151,6 +153,7 @@
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDropDownButton3,
             this.toolStripLabel1,
             this.toolStripComboBox1,
             this.toolStripDropDownButton1});
@@ -296,6 +299,24 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
+            // toolStripDropDownButton3
+            // 
+            this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addDummyDOBJToolStripMenuItem});
+            this.toolStripDropDownButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton3.Image")));
+            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
+            this.toolStripDropDownButton3.Size = new System.Drawing.Size(62, 22);
+            this.toolStripDropDownButton3.Text = "Options";
+            // 
+            // addDummyDOBJToolStripMenuItem
+            // 
+            this.addDummyDOBJToolStripMenuItem.Name = "addDummyDOBJToolStripMenuItem";
+            this.addDummyDOBJToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            this.addDummyDOBJToolStripMenuItem.Text = "Add Dummy DOBJ";
+            this.addDummyDOBJToolStripMenuItem.Click += new System.EventHandler(this.addDummyDOBJToolStripMenuItem_Click);
+            // 
             // JOBJEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -352,5 +373,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.ToolStripButton mainRender;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton3;
+        private System.Windows.Forms.ToolStripMenuItem addDummyDOBJToolStripMenuItem;
     }
 }
