@@ -735,6 +735,9 @@ namespace HSDRawViewer.Converters
                 {
                     var texturePath = Path.Combine(cache.FolderPath, material.TextureDiffuse.FilePath);
 
+                    if (File.Exists(material.TextureDiffuse.FilePath))
+                        texturePath = material.TextureDiffuse.FilePath;
+
                     /// special mobj loading
                     if(Path.GetExtension(texturePath).ToLower() == ".mobj")
                     {
