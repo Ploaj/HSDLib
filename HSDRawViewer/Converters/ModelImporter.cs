@@ -72,8 +72,11 @@ namespace HSDRawViewer.Converters
         public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB565;
 
 
-        [Category("Misc")]
+        [Category("Misc"), Description("Applies fighter transforms for use with Super Smash Bros. Melee")]
         public bool ZeroOutRotationsAndApplyFighterTransforms { get; set; } = false;
+        
+        [Category("Misc"), Description("Applys Material Style used in Naruto Clash of Ninja games")]
+        public bool ApplyNarutoMaterials { get; set; } = false;
     }
 
     /// <summary>
@@ -215,6 +218,11 @@ namespace HSDRawViewer.Converters
                 jobj.InverseWorldTransform = Matrix4ToHSDMatrix(cache.jobjToInverseTransform[jobj]);
             }
 
+            if (settings.ApplyNarutoMaterials)
+            {
+                ApplyNarutoMaterials(rootjobj);
+            }
+
             // SAVE POBJ buffers
             System.Diagnostics.Debug.WriteLine("Saving Changes...");
             cache.POBJGen.SaveChanges();
@@ -223,6 +231,40 @@ namespace HSDRawViewer.Converters
 
             // done
             return rootjobj;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rootjobj"></param>
+        private static void ApplyNarutoMaterials(HSD_JOBJ rootjobj)
+        {
+            rootjobj.Flags = JOBJ_FLAG.SKELETON_ROOT | JOBJ_FLAG.ENVELOPE_MODEL | JOBJ_FLAG.LIGHTING | JOBJ_FLAG.OPA | JOBJ_FLAG.ROOT_OPA;
+
+            foreach (var j in rootjobj.BreathFirstSearch)
+            {
+                if (j.Dobj != null)
+                    foreach (var d in j.Dobj.List)
+                    {
+                        d.Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE;
+                        if (d.Mobj.Textures != null)
+                            d.Mobj.RenderFlags |= RENDER_MODE.TEX0;
+
+                        d.Mobj.Material.SPC_A = 255;
+                        d.Mobj.Material.SPC_B = 0;
+                        d.Mobj.Material.SPC_G = 0;
+                        d.Mobj.Material.SPC_R = 0;
+                        d.Mobj.Material.Shininess = 50;
+
+                        if (d.Mobj.Textures != null)
+                        {
+                            foreach (var t in d.Mobj.Textures.List)
+                            {
+                                t.Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_BLEND;
+                            }
+                        }
+                    }
+            }
         }
 
         /// <summary>
