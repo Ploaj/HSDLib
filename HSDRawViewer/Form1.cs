@@ -283,12 +283,26 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void addRootFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("HSD (*.dat)|*.dat");
+            var f = Tools.FileIO.OpenFile("HSD (*.dat;*.txg)|*.dat;*.txg");
             if (f != null)
             {
-                var file = new HSDRawFile(f);
+                if(f.ToLower().EndsWith(".dat"))
+                {
+                    var file = new HSDRawFile(f);
 
-                RawHSDFile.Roots.Add(file.Roots[0]);
+                    RawHSDFile.Roots.Add(file.Roots[0]);
+                }
+                if (f.ToLower().EndsWith(".txg"))
+                {
+                    var str = new HSDStruct();
+                    str.SetData(System.IO.File.ReadAllBytes(f));
+
+                    RawHSDFile.Roots.Add(new HSDRootNode()
+                    {
+                        Name = "TextureGraphic",
+                        Data = new HSDRaw.Common.HSD_TEXGraphicBank() { _s = str }
+                    });
+                }
 
                 RefreshTree();
             }

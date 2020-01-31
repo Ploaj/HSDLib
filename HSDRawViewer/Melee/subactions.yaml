@@ -112,10 +112,33 @@
     bitCount: 3
   - name: Hitbox Interaction
     bitCount: 2
+    enums:
+    - ?
+    - Normal Doesn't Clank
+    - Can Clank
+    - Normal Can Clank
   - name: BKB
     bitCount: 9
   - name: Element
     bitCount: 5
+    enums:
+    - Normal
+    - Fire
+    - Electric
+    - Slash
+    - Coin
+    - Ice
+    - Sleep(103 Frames)
+    - Sleep(412 Frames)
+    - Grounded
+    - Grounded(97 Frames)
+    - Cape
+    - Empty
+    - Disable
+    - Darkness
+    - Screw Attack
+    - Poison Flower
+    - Nothing
   - name: Unk4
     bitCount: 1
   - name: Shield Damage
@@ -125,10 +148,10 @@
   - name: Hurtbox Interaction
     bitCount: 2
     enums:
-    - Test1
-    - Test2
-    - Test3
-    - Test4
+    - Nothing
+    - Aerial Only
+    - Grounded Only
+    - Both
 
 - code: 12
   name: Adjust Hitbox Damage

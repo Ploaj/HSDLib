@@ -89,6 +89,8 @@ namespace HSDRawViewer.Tools
 
         public bool Hex = false;
 
+        public bool IsFloat = false;
+
         public bool IsPointer => Name.Equals("Pointer");
 
         public bool HasEnums => Enums != null && Enums.Length > 0;

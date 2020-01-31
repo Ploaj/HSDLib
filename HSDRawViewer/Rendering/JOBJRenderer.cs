@@ -86,6 +86,28 @@ namespace HSDRawViewer.Rendering
                 return Matrix4.Identity;
         }
 
+        private Matrix4[] ShaderMatricies = new Matrix4[200];
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public Matrix4[] GetShaderMatrices()
+        {
+            int i = 0;
+            foreach (var v in jobjToCache)
+            {
+                ShaderMatricies[i] = v.Value.WorldTransform;
+                //ShaderMatricies[i + 200] = v.Value.InvertedTransform * v.Value.WorldTransform;
+                i++;
+                if (i > 200)
+                    break;
+            }
+
+            return ShaderMatricies;
+        }
+
         /// <summary>
         /// 
         /// </summary>

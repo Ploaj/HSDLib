@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using HSDRawViewer.Tools;
 using HSDRaw.Tools.Melee;
 using System.Globalization;
+using System;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -95,6 +96,12 @@ namespace HSDRawViewer.GUI.Plugins
                 group.Dock = DockStyle.Top;
                 group.Height = 24;
 
+                if (p.IsFloat)
+                {
+                    SAFloatEditor editor = new SAFloatEditor();
+                    group.Controls.Add(editor);
+                }
+                else
                 if (p.IsPointer)
                 {
                     if (Reference == null)
@@ -207,6 +214,50 @@ namespace HSDRawViewer.GUI.Plugins
             return (long)Value;
         }
     }
+
+
+    // Int Editor
+    public class SAFloatEditor : TextBox, SubactionValueEditor
+    {
+        private float FloatValue = 0;
+
+        public SAFloatEditor()
+        {
+            Dock = DockStyle.Fill;
+            TextChanged += (sender, args) =>
+            {
+                // Filter text
+                float val;
+                if (float.TryParse(Text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                {
+                    FloatValue = val;
+                }
+                else
+                {
+                    Text = FloatValue.ToString();
+                }
+            };
+        }
+
+        public void SetBitSize(int bitCount)
+        {
+            //Maximum = ((1L << bitCount) - 1L);
+            //Minimum = 0;
+            if (bitCount != 32)
+                throw new Exception("Float Parameter is larger than 32 bits");
+        }
+
+        public void SetValue(int value)
+        {
+            Text = BitConverter.ToSingle(BitConverter.GetBytes(value), 0).ToString();
+        }
+
+        public long GetValue()
+        {
+            return BitConverter.ToInt32(BitConverter.GetBytes(FloatValue), 0);
+        }
+    }
+
 
     // Enum Editor
     public class SAEnumEditor : ComboBox, SubactionValueEditor

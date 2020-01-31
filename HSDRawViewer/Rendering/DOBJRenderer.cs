@@ -31,7 +31,7 @@ namespace HSDRawViewer.Rendering
 
 
         // Shader
-        private Shader GXShader;
+        private static Shader GXShader;
 
         private Dictionary<HSD_DOBJ, int> DOBJtoBuffer = new Dictionary<HSD_DOBJ, int>();
         private Dictionary<HSD_DOBJ, List<CachedPOBJ>> DOBJtoPOBJCache = new Dictionary<HSD_DOBJ, List<CachedPOBJ>>();
@@ -97,7 +97,7 @@ namespace HSDRawViewer.Rendering
             if (HiddenDOBJs.Contains(dobj) || (selected && OnlyRenderSelected))
                 return;
 
-            if (OnlyRenderSelected && SelectedDOBJ._s != dobj._s)
+            if (OnlyRenderSelected && SelectedDOBJ != null && SelectedDOBJ._s != dobj._s)
                 return;
             
             var mobj = dobj.Mobj;
@@ -126,14 +126,14 @@ namespace HSDRawViewer.Rendering
                 single = jobjManager.GetWorldTransform(parentJOBJ);
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
 
-            var t = jobjManager.GetWorldTransforms();
-            if (t.Length > 0)
-                GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("transforms"), t.Length, false, ref t[0].Row0.X);
-            
+            //var t = jobjManager.GetShaderMatrices();
+            GXShader.SetWorldTransformBones(jobjManager.GetWorldTransforms());
+            //GXShader.SetBindTransformBones(jobjManager.GetBindTransforms());
+
             var tb = jobjManager.GetBindTransforms();
             if (tb.Length > 0)
-                GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("bindTransforms"), tb.Length, false, ref tb[0].Row0.X);
-            
+                GXShader.SetMatrix4x4("binds", tb);
+
             GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("tex0"), 0);
 
             GL.Uniform3(GXShader.GetVertexAttributeUniformLocation("overlayColor"), OverlayColor);

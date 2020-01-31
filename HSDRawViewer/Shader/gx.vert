@@ -16,8 +16,12 @@ uniform mat4 singleBind;
 
 uniform int hasEnvelopes;
 
-uniform mat4 transforms[200];
-uniform mat4 bindTransforms[200];
+uniform BoneTransforms
+{
+    mat4 transforms[200];
+} ;
+
+uniform mat4 binds[200];
 
 uniform vec4 envelopeIndex[10];
 uniform vec4 weights[10];
@@ -49,7 +53,7 @@ void main()
 		{
 			if(weights[matrixIndex][i] > 0)
 			{
-				mat4 transform = bindTransforms[int(envelopeIndex[matrixIndex][i])];
+				mat4 transform = binds[int(envelopeIndex[matrixIndex][i])];
 				skinnedPos += (transform * vec4(pos.xyz, 1) * weights[matrixIndex][i]).xyz;
 				skinnedNrm += (inverse(transpose(transform)) * vec4(normal, 1) * weights[matrixIndex][i]).xyz;
 			}

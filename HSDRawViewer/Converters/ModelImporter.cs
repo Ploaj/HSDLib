@@ -48,6 +48,9 @@ namespace HSDRawViewer.Converters
         [Category("Importing Options")]
         public bool ImportTexture { get; set; } = true;
 
+        [Category("Importing Options"), Description("Merges DOBJs that share a texture. Reduces number of DOBJs")]
+        public bool GroupMeshByTexture { get; set; } = false;
+
         [Category("Importing Options")]
         public float Scale { get; set; } = 1;
 
@@ -72,10 +75,10 @@ namespace HSDRawViewer.Converters
         public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB565;
 
 
-        [Category("Misc"), Description("Applies fighter transforms for use with Super Smash Bros. Melee")]
+        [DisplayName("Apply Fighter Transform (Melee Fighter Only)"), Category("Misc"), Description("Applies fighter transforms for use with Super Smash Bros. Melee")]
         public bool ZeroOutRotationsAndApplyFighterTransforms { get; set; } = false;
         
-        [Category("Misc"), Description("Applys Material Style used in Naruto Clash of Ninja games")]
+        [DisplayName("Apply Naruto GNT Materials"), Category("Misc"), Description("Applys Material Style used in Naruto Clash of Ninja games")]
         public bool ApplyNarutoMaterials { get; set; } = false;
     }
 
@@ -90,7 +93,7 @@ namespace HSDRawViewer.Converters
         /// <param name="toReplace"></param>
         public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
         {
-            var f = Tools.FileIO.OpenFile("Supported Formats (*.dae, *.obj)|*.dae;*.obj;*.fbx");
+            var f = Tools.FileIO.OpenFile("Supported Formats (*.dae, *.obj)|*.dae;*.obj;*.fbx;*.smd");
 
             if(f != null)
             {
@@ -130,6 +133,9 @@ namespace HSDRawViewer.Converters
 
             // Indicates jobjs that need the SKELETON flag set along with inverted transform
             public List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
+
+            // keeps matches texture path to dobj for better grouping options
+            public Dictionary<string, HSD_DOBJ> TextureToDOBJ = new Dictionary<string, HSD_DOBJ>();
         }
 
         /// <summary>
@@ -231,6 +237,30 @@ namespace HSDRawViewer.Converters
 
             // done
             return rootjobj;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static int ComputeHash(params byte[] data)
+        {
+            unchecked
+            {
+                const int p = 16777619;
+                int hash = (int)2166136261;
+
+                for (int i = 0; i < data.Length; i++)
+                    hash = (hash ^ data[i]) * p;
+
+                hash += hash << 13;
+                hash ^= hash >> 7;
+                hash += hash << 3;
+                hash ^= hash >> 17;
+                hash += hash << 5;
+                return hash;
+            }
         }
 
         /// <summary>
@@ -482,6 +512,7 @@ namespace HSDRawViewer.Converters
 
             foreach (var child in node.Children)
             {
+                Console.WriteLine(child.Name);
                 jobj.AddChild(RecursiveProcess(cache, settings, scene, child));
             }
 
@@ -502,16 +533,32 @@ namespace HSDRawViewer.Converters
                 Mesh mesh = scene.Meshes[index];
                 var material = scene.Materials[mesh.MaterialIndex];
 
+                Console.WriteLine(mesh.Name + " " + material.Name);
+
                 // Generate DOBJ
                 HSD_DOBJ dobj = new HSD_DOBJ();
 
-                if (root == null)
-                    root = dobj;
+                // hack to make dobjs merged by texture
+                if (settings.ImportTexture && 
+                    settings.GroupMeshByTexture &&
+                    material.HasTextureDiffuse &&
+                    cache.TextureToDOBJ.ContainsKey(material.TextureDiffuse.FilePath))
+                {
+                    dobj = cache.TextureToDOBJ[material.TextureDiffuse.FilePath];
+                }
                 else
-                    prev.Next = dobj;
-                prev = dobj;
+                {
+                    if (root == null)
+                        root = dobj;
+                    else
+                        prev.Next = dobj;
+                    prev = dobj;
+                    
+                    dobj.Mobj = GenerateMaterial(cache, settings, material);
+                    if(material.HasTextureDiffuse && settings.ImportTexture)
+                        cache.TextureToDOBJ.Add(material.TextureDiffuse.FilePath, dobj);
+                }
 
-                dobj.Mobj = GenerateMaterial(cache, settings, material);
 
                 // Assessment
                 if (!mesh.HasFaces)
@@ -712,12 +759,20 @@ namespace HSDRawViewer.Converters
 
                 }
 
+                HSD_POBJ pobj = null;
                 if (mesh.HasBones)
                 {
-                    dobj.Pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, wList);
+                    pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, wList);
                 }
                 else
-                    dobj.Pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
+                    pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
+                if(pobj != null)
+                {
+                    if (dobj.Pobj == null)
+                        dobj.Pobj = pobj;
+                    else
+                        dobj.Pobj.Add(pobj);
+                }
 
             }
 

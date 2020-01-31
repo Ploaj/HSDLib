@@ -22,6 +22,9 @@ namespace HSDRawViewer.Rendering
         private bool hasCheckedProgramCreation = false;
         public bool HasCheckedCompilation { get { return hasCheckedProgramCreation; } }
 
+        private int BoneBufferID;
+        private int BindBufferID;
+
         //private ShaderLog errorLog = new ShaderLog();
 
         // Vertex Attributes and Uniforms
@@ -35,12 +38,40 @@ namespace HSDRawViewer.Rendering
         public Shader()
         {
             programId = GL.CreateProgram();
+            GL.GenBuffers(1, out BoneBufferID);
+            GL.GenBuffers(1, out BindBufferID);
             //errorLog.AppendHardwareAndVersionInfo();
+
+            int dataSize = 200 * Vector4.SizeInBytes * 4;
+
+            GL.BindBuffer(BufferTarget.UniformBuffer, BoneBufferID);
+            GL.BufferData(BufferTarget.UniformBuffer, (IntPtr)(dataSize), IntPtr.Zero, BufferUsageHint.DynamicDraw);
+            GL.BindBuffer(BufferTarget.UniformBuffer, 0);
+        }
+
+        public void SetWorldTransformBones(Matrix4[] f)
+        {
+            GL.BindBuffer(BufferTarget.UniformBuffer, BoneBufferID);
+            GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, (IntPtr)(f.Length * Vector4.SizeInBytes * 4), f);
+
+            var blockIndex = GL.GetUniformBlockIndex(programId, "BoneTransforms");
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, blockIndex, BoneBufferID);
+        }
+
+        public void SetBindTransformBones(Matrix4[] f)
+        {
+            GL.BindBuffer(BufferTarget.UniformBuffer, BindBufferID);
+            GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, (IntPtr)(f.Length * Vector4.SizeInBytes * 4), f);
+
+            var blockIndex = GL.GetUniformBlockIndex(programId, "BindTransforms");
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, blockIndex, BindBufferID);
         }
 
         public void Delete()
         {
             GL.DeleteProgram(programId);
+            GL.DeleteBuffer(BoneBufferID);
+            GL.DeleteBuffer(BindBufferID);
         }
 
         public int GetUniformBlockIndex(string name)
@@ -150,6 +181,17 @@ namespace HSDRawViewer.Rendering
             }
 
             GL.UniformMatrix4(GetVertexAttributeUniformLocation(uniformName), false, ref value);
+        }
+
+        public void SetMatrix4x4(string uniformName, Matrix4[] value)
+        {
+            if (!vertexAttributeAndUniformLocations.ContainsKey(uniformName) && !invalidUniformNames.Contains(uniformName))
+            {
+                invalidUniformNames.Add(uniformName);
+                return;
+            }
+
+            GL.UniformMatrix4(GetVertexAttributeUniformLocation(uniformName), value.Length, false, ref value[0].Row0.X);
         }
 
         public int GetVertexAttributeUniformLocation(string name)

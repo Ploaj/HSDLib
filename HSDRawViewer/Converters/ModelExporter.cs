@@ -32,7 +32,7 @@ namespace HSDRawViewer.Converters
     {
         public static readonly string[] SupportedFormats = { ".dae" };
 
-        public static void ExportFile(HSD_JOBJ rootJOBJ)
+        public static void ExportFile(HSD_JOBJ rootJOBJ, Dictionary<int, string> boneLabels = null)
         {
             StringBuilder sup = new StringBuilder();
 
@@ -56,7 +56,7 @@ namespace HSDRawViewer.Converters
                 {
                     if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        ExportFile(f, rootJOBJ, settings);
+                        ExportFile(f, rootJOBJ, settings, boneLabels);
                     }
                 }
             }
@@ -67,7 +67,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="rootJOBJ"></param>
-        public static void ExportFile(string filePath, HSD_JOBJ rootJOBJ, ModelExportSettings settings = null)
+        public static void ExportFile(string filePath, HSD_JOBJ rootJOBJ, ModelExportSettings settings = null, Dictionary<int, string> boneLabels = null)
         {
             ModelExporter mex = new ModelExporter();
             AssimpContext importer = new AssimpContext();
@@ -90,7 +90,7 @@ namespace HSDRawViewer.Converters
             
             if(System.IO.Path.GetExtension(filePath).ToLower() == ".dae")
             {
-                var sc = mex.WriteRootNode(rootJOBJ, settings);
+                var sc = mex.WriteRootNode(rootJOBJ, settings, boneLabels);
                 /*var scn = Scene.ToUnmanagedScene(sc);
                 scn = AssimpLibrary.Instance.ApplyPostProcessing(scn, postProcess);
                 var scene = Scene.FromUnmanagedScene(scn);
@@ -98,7 +98,7 @@ namespace HSDRawViewer.Converters
                 ExportCustomDAE(filePath, sc, settings);
             }
             else
-                importer.ExportFile(mex.WriteRootNode(rootJOBJ, settings), filePath, extToId[System.IO.Path.GetExtension(filePath)], postProcess);
+                importer.ExportFile(mex.WriteRootNode(rootJOBJ, settings, boneLabels), filePath, extToId[System.IO.Path.GetExtension(filePath)], postProcess);
 
             importer.Dispose();
         }
@@ -355,11 +355,11 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        private Scene WriteRootNode(HSD_JOBJ root, ModelExportSettings settings)
+        private Scene WriteRootNode(HSD_JOBJ root, ModelExportSettings settings, Dictionary<int, string> boneLabels)
         {
             Scene.RootNode = RootNode;
 
-            RecursiveExport(root, RootNode, Matrix4.Identity);
+            RecursiveExport(root, RootNode, Matrix4.Identity, boneLabels);
 
             WriteDOBJNodes(settings);
 
@@ -369,10 +369,15 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        private void RecursiveExport(HSD_JOBJ jobj, Node parent, Matrix4 parentTransform)
+        private void RecursiveExport(HSD_JOBJ jobj, Node parent, Matrix4 parentTransform, Dictionary<int, string> indexToName)
         {
             Node root = new Node();
             root.Name = "JOBJ_" + Jobjs.Count;
+            if (indexToName.ContainsKey(Jobjs.Count))
+                root.Name = indexToName[Jobjs.Count];
+            else
+            if (!string.IsNullOrEmpty(jobj.ClassName))
+                root.Name = jobj.ClassName;
             jobjToIndex.Add(jobj, Jobjs.Count);
             
             Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
@@ -391,7 +396,7 @@ namespace HSDRawViewer.Converters
 
             foreach (var c in jobj.Children)
             {
-                RecursiveExport(c, root, worldTransform);
+                RecursiveExport(c, root, worldTransform, indexToName);
             }
         }
 

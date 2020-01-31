@@ -466,7 +466,7 @@ namespace HSDRaw
                 throw new InvalidOperationException("Tried to get data out of struct range");
 
             byte[] bytes = new byte[length];
-            for (int i = loc; i < loc + bytes.Length; i++)
+            for (int i = loc; i < Math.Min(_data.Length, loc + bytes.Length); i++)
                 bytes[i - loc] = _data[i];
 
             return bytes;

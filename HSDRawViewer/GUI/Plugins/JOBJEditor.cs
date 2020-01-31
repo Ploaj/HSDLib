@@ -8,6 +8,9 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Converters;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -21,6 +24,8 @@ namespace HSDRawViewer.GUI.Plugins
         public DrawOrder DrawOrder => DrawOrder.First;
 
         private bool SelectDOBJ { get => (toolStripComboBox1.SelectedIndex == 1); }
+
+        private Dictionary<int, string> BoneLabelMap = new Dictionary<int, string>();
 
         private ViewportControl viewport;
 
@@ -124,17 +129,25 @@ namespace HSDRawViewer.GUI.Plugins
 
         private JOBJManager JOBJManager;
 
+        /// <summary>
+        /// Refreshes and reloads the jobj data
+        /// </summary>
         private void RefreshGUI()
         {
             treeJOBJ.Nodes.Clear();
             dobjList.Clear();
             jobjToIndex.Clear();
 
+            listDOBJ.BeginUpdate();
+            treeJOBJ.BeginUpdate();
             LoadJOBJ(root);
+            listDOBJ.EndUpdate();
+            treeJOBJ.EndUpdate();
 
             treeJOBJ.ExpandAll();
 
-            listDOBJ.DataSource = dobjList;
+            JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+            CheckAll();
         }
 
         private int index = 0;
@@ -144,7 +157,15 @@ namespace HSDRawViewer.GUI.Plugins
             if (parent == null)
                 index = 0;
             TreeNode tree = new TreeNode();
-            tree.Text = "JOBJ_" + index++;
+
+            if (BoneLabelMap.ContainsKey(index))
+                tree.Text = BoneLabelMap[index];
+            else
+            if (!string.IsNullOrEmpty(jobj.ClassName))
+                tree.Text = $"(JOBJ_{index})" + jobj.ClassName;
+            else
+                tree.Text = "JOBJ_" + index;
+            index++;
             tree.Tag = jobj;
 
             jobjToIndex.Add(jobj, jobjToIndex.Count);
@@ -241,22 +262,44 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void vertexColorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJManager.DOBJManager.RenderVertexColor = vertexColorsToolStripMenuItem.Checked;
+            JOBJManager.DOBJManager.RenderVertexColor = renderVertexColorsToolStripMenuItem.Checked;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importModelFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ModelImporter.ReplaceModelFromFile(root);
+            JOBJManager.ClearRenderingCache();
+            BoneLabelMap.Clear();
             RefreshGUI();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void exportModelToFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ModelExporter.ExportFile(root);
+            ModelExporter.ExportFile(root, BoneLabelMap);
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mainRender_CheckStateChanged(object sender, EventArgs e)
         {
             if (mainRender.Checked)
@@ -275,6 +318,14 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void listDOBJ_BindingContextChanged(object sender, EventArgs e)
+        {
+            CheckAll();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void CheckAll()
         {
             for (int i = 0; i < listDOBJ.Items.Count; i++)
             {
@@ -332,6 +383,118 @@ namespace HSDRawViewer.GUI.Plugins
                     }
                 }
             });
+
+            RefreshGUI();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonMoveDown_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            {
+                if (con.DOBJ.Next == null)
+                    return;
+
+                var newIndex = listDOBJ.SelectedIndex + 1;
+
+                HSD_DOBJ prev = null;
+                foreach(var dobj in con.ParentJOBJ.Dobj?.List)
+                {
+                    if(dobj._s == con.DOBJ._s)
+                    {
+                        // totally not confusing
+                        if (prev == null)
+                            con.ParentJOBJ.Dobj = con.DOBJ.Next;
+                        else
+                            prev.Next = con.DOBJ.Next;
+                        var newNext = con.DOBJ.Next.Next;
+                        con.DOBJ.Next.Next = con.DOBJ;
+                        con.DOBJ.Next = newNext;
+                        break;
+                    }
+                    prev = dobj;
+                }
+
+                RefreshGUI();
+                listDOBJ.SelectedIndex = newIndex;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonMoveUp_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            {
+                var newIndex = listDOBJ.SelectedIndex - 1;
+
+                HSD_DOBJ prev = null;
+                HSD_DOBJ prevprev = null;
+                foreach (var dobj in con.ParentJOBJ.Dobj?.List)
+                {
+                    if (dobj._s == con.DOBJ._s)
+                    {
+                        if (prev == null)
+                            break;
+                        
+                        // totally not confusing
+                        if (prevprev == null)
+                            con.ParentJOBJ.Dobj = con.DOBJ;
+                        else
+                            prevprev.Next = con.DOBJ;
+                        prev.Next = con.DOBJ.Next;
+                        con.DOBJ.Next = prev;
+                        break;
+                    }
+                    prevprev = prev;
+                    prev = dobj;
+                }
+
+                RefreshGUI();
+                listDOBJ.SelectedIndex = newIndex;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importBoneLabelINIToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BoneLabelMap.Clear();
+
+            var f = Tools.FileIO.OpenFile("Label INI (*.ini)|*.ini");
+
+            if(f != null)
+            {
+                var text = File.ReadAllText(f);
+                text = Regex.Replace(text, @"\#.*", "");
+
+                var lines = text.Split('\n');
+
+                foreach(var r in lines)
+                {
+                    var args = r.Split('=');
+
+                    if(args.Length == 2)
+                    {
+                        var name = args[1].Trim();
+                        var i = 0;
+                        if(int.TryParse(new string(args[0].Where(c => char.IsDigit(c)).ToArray()), out i))
+                        {
+                            BoneLabelMap.Add(i, name);
+                        }
+                    }
+                }
+            }
 
             RefreshGUI();
         }
