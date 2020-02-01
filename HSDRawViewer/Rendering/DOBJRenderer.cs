@@ -131,7 +131,10 @@ namespace HSDRawViewer.Rendering
             if (parentJOBJ != null && jobjManager != null)
                 single = jobjManager.GetWorldTransform(parentJOBJ);
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
-            
+
+            var rootJOBJ = jobjManager.GetJOBJ(0);
+            GXShader.SetBoolToInt("isRootBound", parentJOBJ?._s == rootJOBJ?._s);
+
             GXShader.SetWorldTransformBones(jobjManager.GetWorldTransforms());
             //GXShader.SetBindTransformBones(jobjManager.GetBindTransforms());
 
@@ -458,9 +461,18 @@ namespace HSDRawViewer.Rendering
             var pp = mobj.PEDesc;
             if (pp != null)
             {
+                GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
-
                 GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
+
+                GL.Enable(EnableCap.AlphaTest);
+                GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp0), pp.AlphaRef0 / 255f);
+                //GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp1), pp.AlphaRef1 / 255f);
+            }
+            else
+            {
+                GL.Disable(EnableCap.Blend);
+                GL.Disable(EnableCap.AlphaTest);
             }
 
             var color = mobj.Material;

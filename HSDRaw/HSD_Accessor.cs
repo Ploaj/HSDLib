@@ -29,6 +29,20 @@ namespace HSDRaw
                 _s = new HSDStruct(new byte[0]);
         }
 
+        public static bool operator ==(HSDAccessor obj1, HSDAccessor obj2)
+        {
+            if ((object)obj1 == null && (object)obj2 == null)
+                return true;
+            if ((object)obj1 == null || (object)obj2 == null)
+                return false;
+            return obj1.Equals(obj2);
+        }
+
+        public static bool operator !=(HSDAccessor obj1, HSDAccessor obj2)
+        {
+            return !(obj1 == obj2);
+        }
+        
         public override bool Equals(object obj)
         {
             if (obj is HSDAccessor acc)

@@ -51,6 +51,21 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="jobj"></param>
         /// <returns></returns>
+        public HSD_JOBJ GetJOBJ(int index)
+        {
+            foreach (var v in jobjToCache)
+                if (v.Value.Index == index)
+                    return v.Key;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the world transform from the bone index
+        /// Can be slow
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
         public Matrix4 GetWorldTransform(int index)
         {
             foreach (var v in jobjToCache)
@@ -195,7 +210,6 @@ namespace HSDRawViewer.Rendering
                             if (dobj == DOBJManager.SelectedDOBJ)
                                 parent = b.Key;
                             DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
-                            //DOBJManager.RenderDOBJ(dobj, b.Key, this);
                         }
                     }
                 }

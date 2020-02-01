@@ -71,18 +71,23 @@ vec4 ColorMapDiffusePass(vec3 N, vec3 V)
 ///
 /// basic lambert diffuse
 ///
-vec3 DiffusePass(vec3 N, vec3 V)
+vec4 DiffusePass(vec3 N, vec3 V)
 {
-	vec3 colorPass = ColorMapDiffusePass(N, V).rgb;
+	vec4 diffuseTerm = vec4(1);
+
+	vec4 colorPass = ColorMapDiffusePass(N, V);
 
     float lambert = clamp(dot(N, V), 0, 1);
 	
-    vec3 diffuseTerm = colorPass * lambert;
+    diffuseTerm.rgb = colorPass.rgb * lambert;
+	diffuseTerm.a = colorPass.a;
 	
-	diffuseTerm = clamp(diffuseTerm, ambientColor.rgb * colorPass, vec3(1));
+	if(enableMaterial)
+	{
+		diffuseTerm.rgb = clamp(diffuseTerm.rgb, ambientColor.rgb * colorPass.rgb, vec3(1));
 	
-    if (enableDiffuse == 0)
-		diffuseTerm *= diffuseColor.rgb;
+		diffuseTerm.rgb *= diffuseColor.rgb;
+	}
 
 	return diffuseTerm;
 }
@@ -114,16 +119,16 @@ void main()
 
 	fragColor = vec4(0, 0, 0, 1);
 
+	vec4 diffusePass = DiffusePass(N, V);
 
-	fragColor.rgb += DiffusePass(N, V) * enableDiffuse;
+	fragColor.rgb += diffusePass.rgb * enableDiffuse;
 
-
-	fragColor.a *= alpha;
+	fragColor.a *= alpha * diffusePass.a;
 
 
 	fragColor.xyz *= overlayColor;
 
-
 	if(colorOverride == 1)
 		fragColor = vec4(1, 1, 1, 1);
+
 }

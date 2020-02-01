@@ -485,7 +485,7 @@ namespace HSDRawViewer.Converters
             var parentTransform = Matrix4.Identity;
             if(parent != null)
                 parentTransform = WorldTransforms[jobjToIndex[parent]];
-
+            
             var singleBindTransform = Matrix4.Identity;
             if (singleBind != null)
                 singleBindTransform = WorldTransforms[jobjToIndex[singleBind]];
@@ -585,7 +585,7 @@ namespace HSDRawViewer.Converters
                                     jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
                                 }
 
-                                if (en.EnvelopeCount == 1)
+                                if (en.EnvelopeCount == 1 && jobjToIndex[parent] == 0)
                                     weight = WorldTransforms[jobjToIndex[en.JOBJs[0]]];
 
                                 break;
