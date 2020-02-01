@@ -113,8 +113,8 @@
   - name: Hitbox Interaction
     bitCount: 2
     enums:
-    - ?
-    - Normal Doesn't Clank
+    - Unknown
+    - Normal Does not Clank
     - Can Clank
     - Normal Can Clank
   - name: BKB

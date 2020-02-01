@@ -11,6 +11,8 @@ using HSDRawViewer.Converters;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
+using HSDRaw.Tools;
+using HSDRaw.GX;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -497,6 +499,110 @@ namespace HSDRawViewer.GUI.Plugins
             }
 
             RefreshGUI();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createOutlineMeshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            {
+                var pobjGen = new POBJ_Generator();
+
+                var newDOBJ = new HSD_DOBJ();
+                newDOBJ.Mobj = new HSD_MOBJ()
+                {
+                    Material = new HSD_Material()
+                    {
+                        AmbientColorRGBA = 0,
+                        SpecularColorRGBA = 0,
+                        DiffuseColorRGBA = 0,
+                        DIF_A = 255,
+                        SPC_A = 255,
+                        AMB_A = 255,
+                        Shininess = 50,
+                        Alpha = 1
+                    },
+                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT
+                };
+
+                foreach(var pobj in con.DOBJ.Pobj.List)
+                {
+                    var dl = pobj.ToDisplayList();
+
+                    var vertices = dl.Vertices;
+
+                    GXAttribName[] attrs = new GXAttribName[dl.Attributes.Count];
+
+                    for (int i = 0; i < attrs.Length; i++)
+                    {
+                        attrs[i] = dl.Attributes[i].AttributeName;
+                    }
+
+                    List<GX_Vertex> newVerties = new List<GX_Vertex>();
+
+                    var offset = 0;
+                    foreach(var prim in dl.Primitives)
+                    {
+                        var verts = vertices.GetRange(offset, prim.Count);
+                        offset += prim.Count;
+
+                        switch (prim.PrimitiveType)
+                        {
+                            case GXPrimitiveType.Quads:
+                                verts = TriangleConverter.QuadToList(verts);
+                                break;
+                            case GXPrimitiveType.TriangleStrip:
+                                verts = TriangleConverter.StripToList(verts);
+                                break;
+                            case GXPrimitiveType.Triangles:
+                                break;
+                            default:
+                                Console.WriteLine(prim.PrimitiveType);
+                                break;
+                        }
+
+                        newVerties.AddRange(verts);
+                    }
+
+                    // extrude
+                    for(int i = 0; i < newVerties.Count; i++)
+                    {
+                        var v = newVerties[i];
+                        v.POS.X += v.NRM.X * 0.075f;
+                        v.POS.Y += v.NRM.Y * 0.075f;
+                        v.POS.Z += v.NRM.Z * 0.075f;
+                        v.NRM.X *= -1;
+                        v.NRM.Y *= -1;
+                        v.NRM.Z *= -1;
+                        newVerties[i] = v;
+                    }
+                    
+                    // invert faces
+                    for(int i = 0; i < newVerties.Count; i += 3)
+                    {
+                        var temp = newVerties[i];
+                        newVerties[i] = newVerties[i + 2];
+                        newVerties[i + 2] = temp;
+                    }
+
+                    var newpobj = pobjGen.CreatePOBJsFromTriangleList(newVerties, attrs, dl.Envelopes);
+
+                    if (newDOBJ.Pobj == null)
+                        newDOBJ.Pobj = newpobj;
+                    else
+                        newDOBJ.Pobj.Add(newpobj);
+                }
+
+                pobjGen.SaveChanges();
+
+                con.ParentJOBJ.Dobj.Add(newDOBJ);
+
+                RefreshGUI();
+            }
         }
     }
 }

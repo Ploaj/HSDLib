@@ -116,17 +116,22 @@ namespace HSDRawViewer.Rendering
                 GXShader.LoadShader(@"Shader\gx.frag");
             }
 
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
             GL.UseProgram(GXShader.programId);
 
             var mvp = camera.MvpMatrix;
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
 
+            Vector3 camPos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
+            GXShader.SetVector3("cameraPos", camPos);
+
             Matrix4 single = Matrix4.Identity;
             if (parentJOBJ != null && jobjManager != null)
                 single = jobjManager.GetWorldTransform(parentJOBJ);
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
-
-            //var t = jobjManager.GetShaderMatrices();
+            
             GXShader.SetWorldTransformBones(jobjManager.GetWorldTransforms());
             //GXShader.SetBindTransformBones(jobjManager.GetBindTransforms());
 
@@ -138,14 +143,19 @@ namespace HSDRawViewer.Rendering
 
             GL.Uniform3(GXShader.GetVertexAttributeUniformLocation("overlayColor"), OverlayColor);
 
+            Matrix4 sphereMatrix = camera.ModelViewMatrix;
+            sphereMatrix.Invert();
+            sphereMatrix.Transpose();
+            GXShader.SetMatrix4x4("sphereMatrix", ref sphereMatrix);
+
             float wscale = 1;
             float hscale = 1;
             bool mirrorX = false;
             bool mirrorY = false;
             if (mobj != null)
-                BindMOBJ(mobj, out wscale, out hscale, out mirrorX, out mirrorY);
+                BindMOBJ(GXShader, mobj, out wscale, out hscale, out mirrorX, out mirrorY);
 
-            GL.Uniform2(GXShader.GetVertexAttributeUniformLocation("UVScale"), wscale, hscale);
+            GL.Uniform2(GXShader.GetVertexAttributeUniformLocation("diffuseUVScale"), wscale, hscale);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, DOBJtoBuffer[dobj]);
 
@@ -326,7 +336,7 @@ namespace HSDRawViewer.Rendering
             bool mirrorY = false;
 
             if(mobj != null)
-                BindMOBJ(mobj, out wscale, out hscale, out mirrorX, out mirrorY);
+                BindMOBJ(null, mobj, out wscale, out hscale, out mirrorX, out mirrorY);
             
             for(int po = 0; po < pobjs.Count; po++)
             {
@@ -436,7 +446,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="mobj"></param>
-        private void BindMOBJ(HSD_MOBJ mobj, out float wscale, out float hscale, out bool mirrorX, out bool mirrorY)
+        private void BindMOBJ(Shader shader, HSD_MOBJ mobj, out float wscale, out float hscale, out bool mirrorX, out bool mirrorY)
         {
             wscale = 1;
             hscale = 1;
@@ -456,12 +466,25 @@ namespace HSDRawViewer.Rendering
             var color = mobj.Material;
             if (color != null)
             {
+                shader.SetVector4("ambientColor", color.AMB_R / 255f, color.AMB_G / 255f, color.AMB_B / 255f, color.AMB_A / 255f);
+                shader.SetVector4("diffuseColor", color.DIF_R / 255f, color.DIF_G / 255f, color.DIF_B / 255f, color.DIF_A / 255f);
+                shader.SetVector4("specularColor", color.SPC_R / 255f, color.SPC_G / 255f, color.SPC_B / 255f, color.SPC_A / 255f);
+                shader.SetFloat("shinniness", color.Shininess);
+                shader.SetFloat("alpha", color.Alpha);
             }
+
+            shader.SetBoolToInt("enableTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0));
+            shader.SetBoolToInt("enableMaterial", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_MAT));
+            shader.SetBoolToInt("enableSpecular", mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
+            shader.SetBoolToInt("enableDiffuse", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
+
+            shader.SetInt("diffuseCoordType", 0);
 
             // Bind Textures
             if (mobj.Textures != null)
             {
                 GL.Enable(EnableCap.Texture2D);
+
                 foreach (var tex in mobj.Textures.List)
                 {
                     if (tex.ImageData == null)
@@ -486,6 +509,8 @@ namespace HSDRawViewer.Rendering
 
                     mirrorX = tex.WrapS == GXWrapMode.MIRROR;
                     mirrorY = tex.WrapT == GXWrapMode.MIRROR;
+
+                    break;
                 }
             }
             else

@@ -5,10 +5,8 @@ using System.Drawing;
 using HSDRawViewer.Rendering;
 using System.Collections.Generic;
 using OpenTK;
-using System.Timers;
 using System.Linq;
 using OpenTK.Input;
-using System.Diagnostics;
 
 namespace HSDRawViewer.GUI
 {
@@ -93,8 +91,7 @@ namespace HSDRawViewer.GUI
         {
             InitializeComponent();
 
-            var sw = new Stopwatch();
-            sw.Start();
+            DateTime meansure = DateTime.Now;
 
             RenderLoop = (sender, args) =>
             {
@@ -110,15 +107,20 @@ namespace HSDRawViewer.GUI
                 if (MainForm.Instance == null || MainForm.Instance.WindowState == FormWindowState.Minimized)
                     return;
 
-                if (_camera == null || !Visible || sw.ElapsedMilliseconds < 1000f / 60)
+                if (_camera == null || !Visible)
                     return;
                 
-                if (buttonPlay.Text == "Pause")
-                    Frame++;
-                
-                panel1.Invalidate();
+                var el = DateTime.Now;
+                var elapsed = el - meansure;
+                if (elapsed.Milliseconds > 16)
+                {
+                    if (buttonPlay.Text == "Pause")
+                        Frame++;
 
-                sw.Restart();
+                    panel1.Invalidate();
+
+                    meansure = el;
+                }
             };
 
             Application.Idle += RenderLoop;
@@ -198,7 +200,6 @@ namespace HSDRawViewer.GUI
 
             Disposed += (sender, args) =>
             {
-                sw.Stop();
                 //timer.Stop();
                 Application.Idle -= RenderLoop;
                 //timer.Elapsed -= RenderLoop;

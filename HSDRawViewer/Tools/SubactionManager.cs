@@ -129,7 +129,11 @@ namespace HSDRawViewer.Tools
 
             _subactions = new List<Subaction>();
             if (subs != null && subs.Length != 0)
+            {
+                //foreach (var s in subs)
+                //    s.Code <<= 2;
                 _subactions.AddRange(subs);
+            }
             if(customsubs != null && customsubs.Length != 0)
                 _subactions.AddRange(customsubs);
         }
