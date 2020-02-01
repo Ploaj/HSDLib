@@ -145,7 +145,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             var sa = SubactionManager.Subactions[comboBox1.SelectedIndex];
 
-            w.Write(sa.Code >> 2, 6);
+            w.Write(sa.Code, 6);
             for(int i = 0; i < sa.Parameters.Length; i++)
             {
                 var bm = sa.Parameters[i];

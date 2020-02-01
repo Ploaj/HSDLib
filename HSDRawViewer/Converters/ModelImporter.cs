@@ -21,6 +21,13 @@ namespace HSDRawViewer.Converters
         VertexColor
     }
 
+    public enum ForceGroupModes
+    {
+        None,
+        Texture,
+        MeshGroup
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -47,9 +54,9 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options")]
         public bool ImportTexture { get; set; } = true;
-
-        [Category("Importing Options"), Description("Merges DOBJs that share a texture. Reduces number of DOBJs")]
-        public bool GroupMeshByTexture { get; set; } = false;
+        
+        [DisplayName("Force Merge Objects"), Category("Importing Options"), Description("Reduces number of DOBJs by forces mesh groups to use one material")]
+        public ForceGroupModes ForceMergeObjects { get; set; } = ForceGroupModes.None;
 
         [Category("Importing Options")]
         public float Scale { get; set; } = 1;
@@ -528,6 +535,8 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
 
+            Console.WriteLine("Processing " + node.Name);
+
             foreach (int index in node.MeshIndices)
             {
                 Mesh mesh = scene.Meshes[index];
@@ -540,7 +549,7 @@ namespace HSDRawViewer.Converters
 
                 // hack to make dobjs merged by texture
                 if (settings.ImportTexture && 
-                    settings.GroupMeshByTexture &&
+                    settings.ForceMergeObjects == ForceGroupModes.Texture &&
                     material.HasTextureDiffuse &&
                     cache.TextureToDOBJ.ContainsKey(material.TextureDiffuse.FilePath))
                 {
@@ -555,10 +564,14 @@ namespace HSDRawViewer.Converters
                     prev = dobj;
                     
                     dobj.Mobj = GenerateMaterial(cache, settings, material);
-                    if(material.HasTextureDiffuse && settings.ImportTexture)
+                    if(settings.ForceMergeObjects == ForceGroupModes.Texture &&
+                        material.HasTextureDiffuse && 
+                        settings.ImportTexture)
                         cache.TextureToDOBJ.Add(material.TextureDiffuse.FilePath, dobj);
                 }
-
+                
+                if (root != null && settings.ForceMergeObjects == ForceGroupModes.MeshGroup)
+                    dobj = root;
 
                 // Assessment
                 if (!mesh.HasFaces)

@@ -82,7 +82,7 @@ vec4 DiffusePass(vec3 N, vec3 V)
     diffuseTerm.rgb = colorPass.rgb * lambert;
 	diffuseTerm.a = colorPass.a;
 	
-	if(enableMaterial)
+	if(enableMaterial == 1)
 	{
 		diffuseTerm.rgb = clamp(diffuseTerm.rgb, ambientColor.rgb * colorPass.rgb, vec3(1));
 	

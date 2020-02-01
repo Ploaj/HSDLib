@@ -112,7 +112,7 @@ namespace HSDRawViewer.GUI
                 
                 var el = DateTime.Now;
                 var elapsed = el - meansure;
-                if (elapsed.Milliseconds > 16)
+                if (ApplicationSettings.UnlockedViewport || elapsed.Milliseconds >= 16)
                 {
                     if (buttonPlay.Text == "Pause")
                         Frame++;
