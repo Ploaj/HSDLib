@@ -40,7 +40,7 @@ namespace HSDRawViewer.GUI
             this.buttonNextFrame = new System.Windows.Forms.Button();
             this.buttonPlay = new System.Windows.Forms.Button();
             this.nudFrame = new System.Windows.Forms.NumericUpDown();
-            this.animationTrack = new System.Windows.Forms.TrackBar();
+            this.animationTrack = new System.Windows.Forms.CustomPaintTrackBar();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.animationGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).BeginInit();
@@ -211,7 +211,7 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.GroupBox animationGroup;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.NumericUpDown nudFrame;
-        private System.Windows.Forms.TrackBar animationTrack;
+        private System.Windows.Forms.CustomPaintTrackBar animationTrack;
         private System.Windows.Forms.Button buttonPrevFrame;
         private System.Windows.Forms.Button buttonSeekStart;
         private System.Windows.Forms.Button buttonSeekEnd;

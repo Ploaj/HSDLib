@@ -16,6 +16,7 @@ using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Plugins.Melee;
 using HSDRawViewer.Rendering.Shapes;
 using OpenTK;
+using HSDRawViewer.Rendering.Renderers;
 
 namespace HSDRawViewer.GUI
 {
@@ -73,6 +74,11 @@ namespace HSDRawViewer.GUI
 
                         var value = r.Read(param.BitCount);
 
+                        if(param.HasEnums && value < param.Enums.Length)
+                            yield return (param.Name +
+                                " : " +
+                                param.Enums[value]);
+                        else
                         if (param.IsPointer)
                             yield return ("POINTER->(Edit To View)");
                         else
@@ -107,6 +113,33 @@ namespace HSDRawViewer.GUI
                 SubactionTable = _node.Accessor as SBM_SubActionTable;
                 LoadActions(SubactionTable.Subactions);
                 RefreshActionList();
+                
+                if(Node.Parent is DataNode parent)
+                {
+                    if(parent.Accessor is SBM_PlayerData plDat)
+                    {
+                        if(plDat.Hurtboxes != null)
+                            Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
+
+                        if (plDat.ModelLookupTables != null)
+                        {
+                            var lowpolyStruct = plDat.ModelLookupTables
+                                ?._s.GetReference<HSDAccessor>(0x04)
+                                ?._s.GetReference<HSDAccessor>(0x04)
+                                ?._s.GetReference<HSDAccessor>(0x04)?._s;
+
+                            var tab = lowpolyStruct?.GetReference <HSDAccessor>(0x04)?._s;
+
+                            if(lowpolyStruct != null && tab != null)
+                            {
+                                for (int i = 0; i < lowpolyStruct.GetInt32(0); i++)
+                                {
+                                    HiddenDOBJIndices.Add(tab.GetByte(i));
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -488,6 +521,20 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RedrawActionItems()
+        {
+            var items = new List<object>();
+            foreach (var i in subActionList.Items)
+                items.Add(i);
+
+            subActionList.Items.Clear();
+            foreach(var i in items)
+                subActionList.Items.Add(i);
+        }
+
         #region ToolStrip
 
         /// <summary>
@@ -508,7 +555,10 @@ namespace HSDRawViewer.GUI
             if(e.Index != -1 && subActionList.Items[e.Index] is SubActionScript script)
             {
                 var length = script.Parameters.Count();
-                e.ItemHeight = subActionList.Font.Height * (script.Parameters.Equals("") ? 1 : length + 1);
+                e.ItemHeight = subActionList.Font.Height *
+                    (simpleScriptViewToolStripMenuItem.Checked
+                    ? 1 :
+                    (script.Parameters.Equals("") ? 1 : length + 1));
             }
         }
 
@@ -521,6 +571,7 @@ namespace HSDRawViewer.GUI
                 {
                     e.Graphics.DrawString(e.Index + ". " + script.Name, e.Font, new SolidBrush(Color.DarkBlue), e.Bounds);
                     int i = 1;
+                    if(!simpleScriptViewToolStripMenuItem.Checked)
                     foreach(var v in script.Parameters)
                     {
                         var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height * i), new Size(e.Bounds.Width, e.Bounds.Height));
@@ -636,7 +687,12 @@ namespace HSDRawViewer.GUI
             RemoveSelected();
         }
 
-# endregion
+        private void simpleScriptViewToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            RedrawActionItems();
+        }
+
+        #endregion
 
         #region Special Functions
 
@@ -674,6 +730,12 @@ namespace HSDRawViewer.GUI
 
         private SubactionProcessor SubactionProcess = new SubactionProcessor();
 
+        private List<SBM_Hurtbox> Hurtboxes = new List<SBM_Hurtbox>();
+
+        private HurtboxRenderer HurtboxRenderer = new HurtboxRenderer();
+
+        private List<int> HiddenDOBJIndices = new List<int>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -693,6 +755,9 @@ namespace HSDRawViewer.GUI
                 JOBJManager.SetJOBJ(jobj);
             else
                 return;
+
+            JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+            JOBJManager.HideDOBJs(HiddenDOBJIndices);
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
 
@@ -745,6 +810,9 @@ namespace HSDRawViewer.GUI
                 JOBJManager.UpdateNoRender();
             else
                 JOBJManager.Render(cam);
+
+            if(renderHurtboxsToolStripMenuItem.Checked)
+                HurtboxRenderer.Render(JOBJManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
             
             foreach (var hb in SubactionProcess.Hitboxes)
             {
@@ -788,5 +856,6 @@ namespace HSDRawViewer.GUI
         }
 
         #endregion
+
     }
 }

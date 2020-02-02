@@ -52,10 +52,14 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
-            this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.renderHitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renderHurtboxsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.simpleScriptViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -303,8 +307,7 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editDropDown,
-            this.toolStripButton1});
+            this.editDropDown});
             this.toolStrip1.Location = new System.Drawing.Point(3, 16);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(191, 25);
@@ -313,16 +316,35 @@
             // 
             // editDropDown
             // 
-            this.editDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.editDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.editDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadPlayerFilesToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.simpleScriptViewToolStripMenuItem,
             this.renderHitboxInterpolationToolStripMenuItem,
+            this.renderHurtboxsToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.createNewSubroutineToolStripMenuItem,
             this.clearAllActionsToolStripMenuItem});
             this.editDropDown.Image = ((System.Drawing.Image)(resources.GetObject("editDropDown.Image")));
             this.editDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.editDropDown.Name = "editDropDown";
-            this.editDropDown.Size = new System.Drawing.Size(29, 22);
-            this.editDropDown.Text = "Edit";
+            this.editDropDown.Size = new System.Drawing.Size(62, 22);
+            this.editDropDown.Text = "Options";
+            // 
+            // loadPlayerFilesToolStripMenuItem
+            // 
+            this.loadPlayerFilesToolStripMenuItem.Name = "loadPlayerFilesToolStripMenuItem";
+            this.loadPlayerFilesToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Model Files";
+            this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
+            // 
+            // renderHitboxInterpolationToolStripMenuItem
+            // 
+            this.renderHitboxInterpolationToolStripMenuItem.CheckOnClick = true;
+            this.renderHitboxInterpolationToolStripMenuItem.Name = "renderHitboxInterpolationToolStripMenuItem";
+            this.renderHitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.renderHitboxInterpolationToolStripMenuItem.Text = "Render Hitbox Interpolation";
             // 
             // clearAllActionsToolStripMenuItem
             // 
@@ -331,29 +353,37 @@
             this.clearAllActionsToolStripMenuItem.Text = "Clear All Action\'s Scripts";
             this.clearAllActionsToolStripMenuItem.Click += new System.EventHandler(this.clearAllActionsToolStripMenuItem_Click);
             // 
-            // loadPlayerFilesToolStripMenuItem
+            // renderHurtboxsToolStripMenuItem
             // 
-            this.loadPlayerFilesToolStripMenuItem.Name = "loadPlayerFilesToolStripMenuItem";
-            this.loadPlayerFilesToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Files";
-            this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
+            this.renderHurtboxsToolStripMenuItem.CheckOnClick = true;
+            this.renderHurtboxsToolStripMenuItem.Name = "renderHurtboxsToolStripMenuItem";
+            this.renderHurtboxsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.renderHurtboxsToolStripMenuItem.Text = "Render Hurtboxes";
             // 
-            // toolStripButton1
+            // createNewSubroutineToolStripMenuItem
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(133, 22);
-            this.toolStripButton1.Text = "Create New Subroutine";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.createNewSubroutineToolStripMenuItem.Name = "createNewSubroutineToolStripMenuItem";
+            this.createNewSubroutineToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.createNewSubroutineToolStripMenuItem.Text = "Create New Subroutine";
+            this.createNewSubroutineToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
-            // renderHitboxInterpolationToolStripMenuItem
+            // toolStripSeparator1
             // 
-            this.renderHitboxInterpolationToolStripMenuItem.CheckOnClick = true;
-            this.renderHitboxInterpolationToolStripMenuItem.Name = "renderHitboxInterpolationToolStripMenuItem";
-            this.renderHitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.renderHitboxInterpolationToolStripMenuItem.Text = "Render Hitbox Interpolation";
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(218, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(218, 6);
+            // 
+            // simpleScriptViewToolStripMenuItem
+            // 
+            this.simpleScriptViewToolStripMenuItem.CheckOnClick = true;
+            this.simpleScriptViewToolStripMenuItem.Name = "simpleScriptViewToolStripMenuItem";
+            this.simpleScriptViewToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.simpleScriptViewToolStripMenuItem.Text = "Simple Script View";
+            this.simpleScriptViewToolStripMenuItem.CheckedChanged += new System.EventHandler(this.simpleScriptViewToolStripMenuItem_CheckedChanged);
             // 
             // SubactionEditor
             // 
@@ -385,7 +415,6 @@
         private System.Windows.Forms.ListBox actionList;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripButton buttonAdd;
         private System.Windows.Forms.ToolStripButton buttonRemove;
@@ -406,5 +435,10 @@
         private System.Windows.Forms.ToolStripMenuItem loadPlayerFilesToolStripMenuItem;
         private System.Windows.Forms.Splitter splitter2;
         private System.Windows.Forms.ToolStripMenuItem renderHitboxInterpolationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem renderHurtboxsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createNewSubroutineToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem simpleScriptViewToolStripMenuItem;
     }
 }

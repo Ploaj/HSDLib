@@ -4,10 +4,12 @@ in float PNMTXIDX;
 in vec3 GX_VA_POS;
 in vec3 GX_VA_NRM;
 in vec2 GX_VA_TEX0;
+in vec4 GX_VA_CLR0;
 
 out vec3 vertPosition;
 out vec3 normal;
 out vec2 texcoord0;
+out vec4 vertexColor;
 
 uniform mat4 mvp;
 
@@ -33,6 +35,8 @@ void main()
 	normal = (inverse(transpose(singleBind)) * vec4(GX_VA_NRM, 1)).xyz;
 
 	texcoord0 = GX_VA_TEX0;
+
+	vertexColor = GX_VA_CLR0;
 
 	if (hasEnvelopes == 1)
 	{

@@ -201,6 +201,7 @@ namespace HSDRawViewer.Rendering
             if (RenderObjects)
             {
                 HSD_JOBJ parent = null;
+                List<Tuple<HSD_DOBJ, HSD_JOBJ>> XLU = new List<Tuple<HSD_DOBJ, HSD_JOBJ>>();
                 foreach (var b in jobjToCache)
                 {
                     if (b.Key.Dobj != null)
@@ -209,9 +210,19 @@ namespace HSDRawViewer.Rendering
                         {
                             if (dobj == DOBJManager.SelectedDOBJ)
                                 parent = b.Key;
-                            DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
+
+                            if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+                                XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ>(dobj, b.Key));
+                            else
+                                DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
                         }
                     }
+                }
+
+                // render xlu lookups last
+                foreach(var xlu in XLU)
+                {
+                    DOBJManager.RenderDOBJShader(cam, xlu.Item1, xlu.Item2, this);
                 }
 
                 GL.Disable(EnableCap.DepthTest);
@@ -451,6 +462,27 @@ namespace HSDRawViewer.Rendering
                     n.Tracks.Add(track);
                 }
                 Nodes.Add(n);
+            }
+        }
+
+        /// <summary>
+        /// Hides DOBJs with given indices
+        /// </summary>
+        /// <param name="DOBJIndices"></param>
+        public void HideDOBJs(List<int> DOBJIndices)
+        {
+            var i = 0;
+            foreach(var j in RootJOBJ.BreathFirstSearch)
+            {
+                if(j.Dobj != null)
+                {
+                    foreach(var dobj in j.Dobj.List)
+                    {
+                        if (DOBJIndices.Contains(i))
+                            DOBJManager.HiddenDOBJs.Add(dobj);
+                        i++;
+                    }
+                }
             }
         }
 

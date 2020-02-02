@@ -3,21 +3,20 @@
 in vec3 vertPosition;
 in vec3 normal;
 in vec2 texcoord0;
+in vec4 vertexColor;
 
 out vec4 fragColor;
 
-uniform sampler2D tex0;
 
-uniform int enableTEX0;
+// textures
+uniform int enableTexDiffuse;
+uniform sampler2D diffuseTex;
+uniform int difColorType;
+uniform int difAlphaType;
 uniform int diffuseCoordType;
 uniform vec2 diffuseUVScale;
 
-
-uniform vec3 cameraPos;
-uniform int colorOverride;
-uniform vec3 overlayColor;
-
-
+// material
 uniform vec4 ambientColor;
 uniform vec4 diffuseColor;
 uniform vec4 specularColor;
@@ -25,11 +24,18 @@ uniform float shinniness;
 uniform float alpha;
 
 
+// flags
 uniform int enableMaterial;
 uniform int enableDiffuse;
 uniform int enableSpecular;
+uniform int useVertexColor;
 
 
+// Non rendering system
+
+uniform vec3 cameraPos;
+uniform int colorOverride;
+uniform vec3 overlayColor;
 uniform mat4 sphereMatrix;
 
 ///
@@ -54,18 +60,17 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 }
 
 ///
-/// color map pass for the diffuse texture
 ///
-vec4 ColorMapDiffusePass(vec3 N, vec3 V)
+///
+vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, vec2 uvscale, int coordType, sampler2D tex, int colorMixType, int alphaMixType)
 {
-    vec4 diffuseMap = vec4(1);
+    vec4 clr = vec4(1);
 
-    vec2 diffuseCoords = GetCoordType(diffuseCoordType, texcoord0);
+    vec2 coords = GetCoordType(coordType, texCoord);
 
-    if (enableDiffuse == 1)
-        diffuseMap = texture(tex0, diffuseCoords * diffuseUVScale);
+    clr = texture(tex, coords * uvscale);
 
-    return diffuseMap;
+    return clr;
 }
 
 ///
@@ -75,12 +80,20 @@ vec4 DiffusePass(vec3 N, vec3 V)
 {
 	vec4 diffuseTerm = vec4(1);
 
-	vec4 colorPass = ColorMapDiffusePass(N, V);
-
     float lambert = clamp(dot(N, V), 0, 1);
+	if(enableMaterial == 0)
+		lambert = 1;
 	
-    diffuseTerm.rgb = colorPass.rgb * lambert;
-	diffuseTerm.a = colorPass.a;
+	vec4 colorPass = vec4(1);
+
+    if (enableTexDiffuse == 1)
+	{
+		colorPass = MixTextureColor(diffuseTerm, texcoord0, diffuseUVScale, diffuseCoordType, diffuseTex, difColorType, difAlphaType);
+
+		diffuseTerm.rgb = colorPass.rgb;
+
+		diffuseTerm.a = colorPass.a;
+	}
 	
 	if(enableMaterial == 1)
 	{
@@ -88,6 +101,8 @@ vec4 DiffusePass(vec3 N, vec3 V)
 	
 		diffuseTerm.rgb *= diffuseColor.rgb;
 	}
+
+	diffuseTerm.rgb *= lambert;
 
 	return diffuseTerm;
 }
@@ -116,15 +131,16 @@ void main()
 	vec3 V = normalize(vertPosition - cameraPos);
     vec3 N = normalize(normal);
 
-
 	fragColor = vec4(0, 0, 0, 1);
 
 	vec4 diffusePass = DiffusePass(N, V);
 
-	fragColor.rgb += diffusePass.rgb * enableDiffuse;
+	fragColor.rgb += diffusePass.rgb;// * enableDiffuse;
 
-	fragColor.a *= alpha * diffusePass.a;
+	fragColor.a = alpha * diffusePass.a;
 
+	if(useVertexColor == 1)
+		fragColor *= vertexColor;
 
 	fragColor.xyz *= overlayColor;
 

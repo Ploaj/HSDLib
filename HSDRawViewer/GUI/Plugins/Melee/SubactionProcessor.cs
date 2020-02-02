@@ -30,6 +30,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public bool CharacterInvisibility { get; internal set; } = false;
 
+        public int BodyCollisionState { get; internal set; } = 0;
+
+        public Dictionary<int, int> BoneCollisionStates = new Dictionary<int, int>();
+
         private HSDStruct Struct;
 
         /// <summary>
@@ -45,6 +49,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         private void ResetState()
         {
+            BodyCollisionState = 0;
+            BoneCollisionStates.Clear();
             OverlayColor = Vector3.One;
             CharacterInvisibility = false;
         }
@@ -119,6 +125,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public void SetFrame(float frame)
         {
             Hitboxes.Clear();
+            BoneCollisionStates.Clear();
+            BodyCollisionState = 0;
             if (frame == 0)
                 ResetState();
             SetFrame(frame, 0, Commands);
@@ -188,6 +196,25 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 16:
                         Hitboxes.Clear();
+                        break;
+                    case 26:
+                        BodyCollisionState = cmd.Parameters[1];
+                        break;
+                    case 27:
+                        // i don't really know how many bone to assume...
+                        for(int j = 0; j < 100; j++)
+                        {
+                            if (BoneCollisionStates.ContainsKey(j))
+                                BoneCollisionStates[j] = cmd.Parameters[0];
+                            else
+                                BoneCollisionStates.Add(j, cmd.Parameters[0]);
+                        }
+                        break;
+                    case 28:
+                        if (BoneCollisionStates.ContainsKey(cmd.Parameters[0]))
+                            BoneCollisionStates[cmd.Parameters[0]] = cmd.Parameters[1];
+                        else
+                            BoneCollisionStates.Add(cmd.Parameters[0], cmd.Parameters[1]);
                         break;
                     case 37:
                         CharacterInvisibility = cmd.Parameters[1] == 1;

@@ -62,11 +62,11 @@
     bitCount: 8
   - name: Unk2
     bitCount: 18
-  - name: GFXID
+  - name: GFX ID
     bitCount: 10
-  - name: Boneid
+  - name: Bone ID
     bitCount: 6
-  - name: Unk2
+  - name: Unk3
     bitCount: 16
   - name: Z
     bitCount: 16
@@ -128,17 +128,17 @@
     - Slash
     - Coin
     - Ice
-    - Sleep(103 Frames)
-    - Sleep(412 Frames)
+    - Sleep (103 Frames)
+    - Sleep (412 Frames)
     - Grounded
-    - Grounded(97 Frames)
+    - Grounded (97 Frames)
     - Cape
     - Empty
     - Disable
     - Darkness
     - Screw Attack
     - Poison Flower
-    - Nothing
+    - Nothing (No Graphic)
   - name: Unk4
     bitCount: 1
   - name: Shield Damage
@@ -196,7 +196,7 @@
     bitCount: 32
   - name: Unk2
     bitCount: 6
-  - name: SFX
+  - name: SFX ID
     bitCount: 20
     hex: true
   - name: Offset
@@ -221,14 +221,14 @@
   name: Reverse Direction
 
 - code: 21
-  name: Unknown0x15
+  name: Set flag 0x2210 to 10
   parameters:
   - name: Value
     bitCount: 26
     hex: true
 
 - code: 22
-  name: Unknown0x16
+  name: Set flag 0x2210 to 20
   parameters:
   - name: Value
     bitCount: 26
@@ -261,10 +261,15 @@
   - name: Unknown
     bitCount: 24
   - name: Body State
-    bitCount: 2
+    bitCount: 2    
+    enums:
+    - Normal
+    - Invulnerable
+    - Intangible
+
 
 - code: 27
-  name: Body Collision Status
+  name: Set All Bone Collision States
   parameters:
   - name: Unknown
     bitCount: 26
@@ -296,26 +301,63 @@
 
 - code: 32
   name: Revert Models
-
-- code: 33
-  name: Self Damage
   parameters:
   - name: Unknown
-    bitCount: 10
-  - name: Damage
-    bitCount: 16
+    bitCount: 26
+
+- code: 33
+  name: Remove Models
+  parameters:
+  - name: Unknown
+    bitCount: 26
 
 - code: 34
   name: Throw
   parameters:
+  - name: ThrowType
+    bitCount: 3
+    enums:
+    - Throw
+    - Release
   - name: Unknown1
-    bitCount: 26
+    bitCount: 14
     hex: true
+  - name: Damage
+    bitCount: 9
+  - name: Angle
+    bitCount: 9
+  - name: Knockback Growth
+    bitCount: 9
+  - name: Weight Knockback
+    bitCount: 7
   - name: Unknown2
-    bitCount: 32
-    hex: true
+    bitCount: 5
+  - name: Base Knockback
+    bitCount: 9
   - name: Unknown3
-    bitCount: 32
+    bitCount: 2
+  - name: Element
+    bitCount: 4
+    enums:
+    - Normal
+    - Fire
+    - Electric
+    - Slash
+    - Coin
+    - Ice
+    - Sleep (103 Frames)
+    - Sleep (412 Frames)
+    - Grounded
+    - Grounded (97 Frames)
+    - Cape
+    - Empty
+    - Disable
+    - Darkness
+    - Screw Attack
+    - Poison Flower
+    - Nothing (No Graphic)
+  - name: Unknown4
+    bitCount: 19
     hex: true
 
 - code: 35
@@ -409,7 +451,7 @@
     bitCount: 12
 
 - code: 42
-  name: Unknown0x2A
+  name: Related to Parasol Item?
   parameters:
   - name: Unknown
     bitCount: 26
@@ -421,7 +463,7 @@
     bitCount: 26
 
 - code: 44
-  name: Unknown0x2C
+  name: Set flag 0x221E to 20
   parameters:
   - name: Unknown
     bitCount: 25
@@ -439,22 +481,24 @@
 - code: 46
   name: Color Overlay
   parameters:
-  - name: Flag
-    bitCount: 2
-  - name: Red
-    bitCount: 8
-  - name: Green
-    bitCount: 8
-  - name: Blue
-    bitCount: 8
+  - name: Aura ID
+    bitCount: 9
+  - name: Duration
+    bitCount: 17
 
 - code: 47
-  name: Unknown0x2F
+  name: Remove Color Overlay
   parameters:
-  - name: Unknwon
+  - name: Unknown
     bitCount: 26
 
 - code: 48
+  name: Unknown0xC0
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 49
   name: Sword Trail
   parameters:
   - name: Beam Sword
@@ -464,42 +508,32 @@
   - name: Render Status
     bitCount: 8
 
-- code: 49
+- code: 50
   name: Enable Ragdoll
   parameters:
   - name: Bone ID
     bitCount: 26
 
-- code: 50
-  name: Unknown0x32
-  parameters:
-  - name: Unknown
-    bitCount: 26
-
 - code: 51
-  name: Continuation Control
+  name: Self Damage
   parameters:
   - name: Unknown
     bitCount: 26
 
 - code: 52
-  name: Unknown0x34
+  name: Continuation Control
+  parameters:
+  - name: Unknown
+    bitCount: 26
+    
+- code: 52
+  name: Set flag 0x2225 to 10
   parameters:
   - name: Unknown
     bitCount: 26
 
-- code: 53
-  name: Footstep Effect
-  parameters:
-  - name: Unknown1
-    bitCount: 26
-    hex: true
-  - name: Unknown2
-    bitCount: 32
-    hex: true
-
 - code: 54
-  name: Landing Effect
+  name: Footstep Sound and Graphic Effect
   parameters:
   - name: Unknown1
     bitCount: 26
@@ -512,6 +546,19 @@
     hex: true
 
 - code: 55
+  name: Sound + Graphic Effect
+  parameters:
+  - name: Graphic ID
+    bitCount: 26
+    hex: true
+  - name: Sound ID
+    bitCount: 32
+    hex: true
+  - name: Unknown1
+    bitCount: 32
+    hex: true
+
+- code: 56
   name: Start Smash Charge
   parameters:
   - name: Unknown
@@ -525,13 +572,14 @@
   - name: Unknown
     bitCount: 24
 
-- code: 56
-  name: Smash Charge
+- code: 57
+  name: Unknown0xE4
   parameters:
   - name: Unknown
     bitCount: 26
-
-- code: 57
+    hex: true
+    
+- code: 58
   name: Aesthetic Wind Effect
   parameters:
   - name: Unknown1
@@ -545,11 +593,4 @@
     hex: true
   - name: Unknown4
     bitCount: 32
-    hex: true
-
-- code: 58
-  name: Unknown0x3A
-  parameters:
-  - name: Unknown
-    bitCount: 26
     hex: true

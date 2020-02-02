@@ -127,6 +127,9 @@
     <Compile Include="GUI\ArrayMemberEditor.Designer.cs">
       <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\CustomTrackBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\Extra\AJSplitDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -244,6 +247,7 @@
     <Compile Include="RawHSD.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DOBJRenderer.cs" />
+    <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
     <Compile Include="Rendering\Shapes\DrawShape.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />

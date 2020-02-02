@@ -159,14 +159,14 @@ namespace HSDRawViewer.Rendering.Shapes
                 GL.Vertex3(Positions[i]);
             GL.End();
 
-            GL.Disable(EnableCap.DepthTest);
+            /*GL.Disable(EnableCap.DepthTest);
             
             GL.Color3(1f, 0,0 );
             GL.LineWidth(5f);
             GL.Begin(PrimitiveType.Lines);
             GL.Vertex3(Vector3.Zero);
             GL.Vertex3(0, Height, 0);
-            GL.End();
+            GL.End();*/
 
             GL.PopMatrix();
             GL.PopAttrib();

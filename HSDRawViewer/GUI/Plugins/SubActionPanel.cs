@@ -286,6 +286,9 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void SetValue(int value)
         {
+            if (value >= Items.Count)
+                value = Items.Count - 1;
+            
             SelectedIndex = value;
         }
     }

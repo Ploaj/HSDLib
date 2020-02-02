@@ -117,9 +117,13 @@ namespace HSDRawViewer.GUI
                     if (buttonPlay.Text == "Pause")
                         Frame++;
 
-                    panel1.Invalidate();
+                    panel1_Paint(null, null);
 
                     meansure = el;
+                }
+                else
+                {
+                    Console.WriteLine(elapsed.Milliseconds);
                 }
             };
 

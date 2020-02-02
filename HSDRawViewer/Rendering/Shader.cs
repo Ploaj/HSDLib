@@ -128,6 +128,17 @@ namespace HSDRawViewer.Rendering
                 GL.Uniform1(GetVertexAttributeUniformLocation(uniformName), 0);
         }
 
+        public void SetVector2(string uniformName, float X, float Y)
+        {
+            if (!vertexAttributeAndUniformLocations.ContainsKey(uniformName) && !invalidUniformNames.Contains(uniformName))
+            {
+                invalidUniformNames.Add(uniformName);
+                return;
+            }
+
+            GL.Uniform2(GetVertexAttributeUniformLocation(uniformName), X, Y);
+        }
+
         public void SetVector3(string uniformName, Vector3 value)
         {
             if (!vertexAttributeAndUniformLocations.ContainsKey(uniformName) && !invalidUniformNames.Contains(uniformName))

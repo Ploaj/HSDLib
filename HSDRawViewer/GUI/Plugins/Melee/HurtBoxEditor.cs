@@ -2,6 +2,7 @@
 using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
 using OpenTK;
 using System;
@@ -75,10 +76,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             };
         }
 
-        private Vector3 SelectedHurtboxColor = new Vector3(1, 1, 1);
-        private Vector3 HurtboxColor = new Vector3(1, 1, 0);
-
-        private Dictionary<SBM_Hurtbox, Capsule> HurtboxToCapsule = new Dictionary<SBM_Hurtbox, Capsule>();
 
         /// <summary>
         /// 
@@ -91,25 +88,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             JOBJManager.Render(cam);
 
             var selected = editor.SelectedObject;
+            var list = new List<SBM_Hurtbox>();
             foreach (SBM_Hurtbox v in editor.GetItems())
-            {
-                var clr = HurtboxColor;
-                var a = 0.25f;
-                if(selected == v)
-                {
-                    clr = SelectedHurtboxColor;
-                    a = 0.6f;
-                }
-                var transform = JOBJManager.GetWorldTransform(v.BoneIndex);
-
-                if (!HurtboxToCapsule.ContainsKey(v))
-                    HurtboxToCapsule.Add(v, new Capsule(new Vector3(v.X1, v.Y1, v.Z1), new Vector3(v.X2, v.Y2, v.Z2), v.Size));
-                
-                var cap = HurtboxToCapsule[v];
-                cap.SetParameters(new Vector3(v.X1, v.Y1, v.Z1), new Vector3(v.X2, v.Y2, v.Z2), v.Size);
-                cap.Draw(transform, new Vector4(clr, a));
-            }
+                list.Add(v);
+            hurtboxRenderer.Render(JOBJManager, list, (HSDAccessor)selected);
         }
+
+        private HurtboxRenderer hurtboxRenderer = new HurtboxRenderer();
 
         private JOBJManager JOBJManager = new JOBJManager();
 
