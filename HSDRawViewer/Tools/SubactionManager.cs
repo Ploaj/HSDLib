@@ -65,7 +65,7 @@ namespace HSDRawViewer.Tools
                 if (p.Name.Contains("None"))
                     continue;
 
-                var value = r.Read(p.BitCount);
+                var value = p.Signed ? r.ReadSigned(p.BitCount) : r.Read(p.BitCount);
 
                 if (p.IsPointer)
                     continue;
@@ -86,6 +86,8 @@ namespace HSDRawViewer.Tools
         public string[] Enums;
 
         public string Description;
+
+        public bool Signed = false;
 
         public bool Hex = false;
 

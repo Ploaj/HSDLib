@@ -572,9 +572,9 @@ namespace HSDRawViewer.GUI.Plugins
                     for(int i = 0; i < newVerties.Count; i++)
                     {
                         var v = newVerties[i];
-                        v.POS.X += v.NRM.X * 0.075f;
-                        v.POS.Y += v.NRM.Y * 0.075f;
-                        v.POS.Z += v.NRM.Z * 0.075f;
+                        v.POS.X += v.NRM.X * 0.0375f;
+                        v.POS.Y += v.NRM.Y * 0.0375f;
+                        v.POS.Z += v.NRM.Z * 0.0375f;
                         v.NRM.X *= -1;
                         v.NRM.Y *= -1;
                         v.NRM.Z *= -1;

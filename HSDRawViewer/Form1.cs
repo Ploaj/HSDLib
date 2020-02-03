@@ -248,11 +248,15 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd");
+            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath));
             if (f != null)
             {
                 RawHSDFile.Save(f, false, false);
-                OpenFile(f);
+
+                if (MessageBox.Show("Reload File?", "Reload File to Update Location Offsets?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    OpenFile(f);
+                }
             }
         }
 
@@ -581,6 +585,19 @@ namespace HSDRawViewer
             SEMEditor d = new SEMEditor();
             {
                 d.Show();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                OpenEditor();
             }
         }
     }

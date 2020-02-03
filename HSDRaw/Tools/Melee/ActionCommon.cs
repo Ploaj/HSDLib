@@ -13,6 +13,26 @@ namespace HSDRaw.Tools.Melee
             this.bytes = b;
         }
 
+        public int ReadSigned(int size)
+        {
+            var v = Read(size);
+
+            var isSigned = ((v >> (size - 1)) & 0x1) == 1;
+            
+            if (isSigned)
+            {
+                var bitMask = 0;
+                for (int j = 0; j < size; j++)
+                    bitMask |= (1 << j);
+                v = ~v;
+                v = v & bitMask;
+                v += 1;
+                v *= -1;
+            }
+
+            return v;
+        }
+
         public int Read(int size)
         {
             if (size > 32)

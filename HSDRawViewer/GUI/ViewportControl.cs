@@ -121,10 +121,6 @@ namespace HSDRawViewer.GUI
 
                     meansure = el;
                 }
-                else
-                {
-                    Console.WriteLine(elapsed.Milliseconds);
-                }
             };
 
             Application.Idle += RenderLoop;
@@ -482,9 +478,10 @@ namespace HSDRawViewer.GUI
               &&!keyState.IsKeyDown(Key.AltLeft) && !keyState.IsKeyDown(Key.AltRight))
             {
                 var speed = 0.10f;
+                var speedpane = 0.75f;
                 if (e.Button == MouseButtons.Right)
                 {
-                    _camera.Pan(-deltaPos.X * speed, -deltaPos.Y * speed);
+                    _camera.Pan(-deltaPos.X * speedpane, -deltaPos.Y * speedpane);
                 }
                 if (e.Button == MouseButtons.Left && !Lock2D)
                 {

@@ -44,13 +44,13 @@
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sEMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.LocationLabel = new System.Windows.Forms.Label();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.sEMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -66,6 +66,7 @@
             this.treeView1.Size = new System.Drawing.Size(194, 382);
             this.treeView1.TabIndex = 0;
             this.treeView1.DoubleClick += new System.EventHandler(this.treeView1_DoubleClick);
+            this.treeView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView1_KeyDown);
             // 
             // menuStrip1
             // 
@@ -180,16 +181,23 @@
             // aJToolToolStripMenuItem
             // 
             this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.aJToolToolStripMenuItem.Text = "AJ Tool";
             this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
             // 
             // sSMEditorToolStripMenuItem
             // 
             this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
-            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
             this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
+            // 
+            // sEMEditorToolStripMenuItem
+            // 
+            this.sEMEditorToolStripMenuItem.Name = "sEMEditorToolStripMenuItem";
+            this.sEMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.sEMEditorToolStripMenuItem.Text = "SEM Editor";
+            this.sEMEditorToolStripMenuItem.Click += new System.EventHandler(this.sEMEditorToolStripMenuItem_Click);
             // 
             // LocationLabel
             // 
@@ -243,13 +251,6 @@
             this.splitter1.Size = new System.Drawing.Size(3, 401);
             this.splitter1.TabIndex = 12;
             this.splitter1.TabStop = false;
-            // 
-            // sEMEditorToolStripMenuItem
-            // 
-            this.sEMEditorToolStripMenuItem.Name = "sEMEditorToolStripMenuItem";
-            this.sEMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.sEMEditorToolStripMenuItem.Text = "SEM Editor";
-            this.sEMEditorToolStripMenuItem.Click += new System.EventHandler(this.sEMEditorToolStripMenuItem_Click);
             // 
             // MainForm
             // 

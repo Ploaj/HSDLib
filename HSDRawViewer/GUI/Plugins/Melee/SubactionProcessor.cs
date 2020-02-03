@@ -71,19 +71,18 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="data"></param>
-        private List<Command> GetCommands(HSDStruct str, HashSet<HSDStruct> references = null)
+        private List<Command> GetCommands(HSDStruct str, Dictionary<HSDStruct, List<Command>> structToComman = null)
         {
-            if (references == null)
-                references = new HashSet<HSDStruct>();
+            if(structToComman == null)
+                structToComman = new Dictionary<HSDStruct, List<Command>>();
 
-            if (references.Contains(str))
-                return new List<Command>();
+            if (structToComman.ContainsKey(str))
+                return structToComman[str];
 
             var data = str.GetData();
-
-            references.Add(str);
-
+            
             var Commands = new List<Command>();
+            structToComman.Add(str, Commands);
 
             for (int i = 0; i < data.Length;)
             {
@@ -98,8 +97,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             throw new NotSupportedException("Multiple References not supported");
                         else
                         {
-                            cmd.Reference = r.Value;
-                            cmd.ReferenceCommands = GetCommands(cmd.Reference, references);
+                            if(r.Value != str) // prevent self reference
+                            {
+                                cmd.Reference = r.Value;
+                                cmd.ReferenceCommands = GetCommands(cmd.Reference, structToComman);
+                            }
                         }
                 }
 
@@ -118,6 +120,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             return Commands;
         }
 
+
+        // prevent recursion...
+        private HashSet<List<Command>> CommandHashes = new HashSet<List<Command>>();
         /// <summary>
         /// 
         /// </summary>
@@ -129,6 +134,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             BodyCollisionState = 0;
             if (frame == 0)
                 ResetState();
+            CommandHashes.Clear();
             SetFrame(frame, 0, Commands);
         }
 
@@ -166,7 +172,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         time = SetFrame(frame, time, cmd.ReferenceCommands);
                         break;
                     case 6: //return?
-                        break;
+                        return time;
                     case 7: //goto
                         time = SetFrame(frame, time, cmd.ReferenceCommands);
                         break;
@@ -178,8 +184,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         {
                             ID = cmd.Parameters[0],
                             BoneID = cmd.Parameters[2],
-                            Size = (short)cmd.Parameters[5] / 150f,
-                            Point1 = new Vector3((short)cmd.Parameters[8] / 150f, (short)cmd.Parameters[7] / 150f, (short)cmd.Parameters[6] / 150f),
+                            Size = ((short)cmd.Parameters[5] >> 7) / 2f,
+                            Point1 = new Vector3((short)cmd.Parameters[8] >> 7, (short)cmd.Parameters[7] >> 7, (short)cmd.Parameters[6] >> 7),
+                            Element = cmd.Parameters[15]
                         });
                         break;
                     case 13: // adjust size
@@ -243,6 +250,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public int ID;
         public int BoneID;
         public float Size;
+        public int Element;
         public Vector3 Point1;
         public Vector3 Point2;
     }

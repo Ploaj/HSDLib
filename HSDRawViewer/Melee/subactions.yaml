@@ -70,10 +70,13 @@
     bitCount: 16
   - name: Z
     bitCount: 16
+    signed: true
   - name: Y
     bitCount: 16
+    signed: true
   - name: X
     bitCount: 16
+    signed: true
   - name: Range Z
     bitCount: 16
   - name: Range Y
@@ -98,12 +101,16 @@
     bitCount: 16
   - name: Z
     bitCount: 16
+    signed: true
   - name: Y
     bitCount: 16
+    signed: true
   - name: X
     bitCount: 16
+    signed: true
   - name: Angle
     bitCount: 9
+    signed: true
   - name: KBG
     bitCount: 9
   - name: Weight Set KB
@@ -130,7 +137,7 @@
     - Ice
     - Sleep (103 Frames)
     - Sleep (412 Frames)
-    - Grounded
+    - Grab
     - Grounded (97 Frames)
     - Cape
     - Empty
@@ -569,6 +576,130 @@
     bitCount: 16
   - name: Visual Effect
     bitCount: 8
+    enums:
+    - Nothing
+    - Nothing
+    - Fast Flashing White Aura (Ends with smash)
+    - Fast Flashing Yellow Aura (Ends with smash)
+    - Brief White Aura
+    - Fast Flashing White Aura (Ends with smash)
+    - Fast Flashing Black Aura (Ends with smash)
+    - "Lens Flare shoots downward, then nothing"
+    - Healing animation (Like when you pick up a heart)
+    - Flashing White Aura
+    - Pulsating White Aura (Starts full white then fades then goes back to full white) (AWESOME!)
+    - Fire (Small Fraction of Charge)
+    - Fire (About Half of the Charge)
+    - Fire (Most of the Charge)
+    - Fire (All of the Charge)
+    - Electric (Small Fraction of Charge)
+    - Electric (About Half of the Charge)
+    - Electric (Most of the Charge)
+    - Electric (All of the Charge)
+    - "Flashing Black for Small Fraction, Electric for the rest"
+    - "Flashing Black Aura for half, Electric Aura for half"
+    - Unknown
+    - Unknown
+    - Unknown
+    - "Flashing Black Aura for half, Electric Aura for half"
+    - Unknown
+    - Unknown
+    - Unknown
+    - "Flashing Black Aura for half, Electric Aura for half"
+    - "Flashing Black Aura for half, Electric Aura for half"
+    - "Flashing Black Aura for half, Electric Aura for half"
+    - Brief Blue Aura
+    - Nothing
+    - Nothing
+    - Nothing
+    - Darkness (Small Fraction of Charge)
+    - Darkness (About Half of the Charge)
+    - Darkness (Most/All of the Charge)
+    - Darkness (All of the Charge)
+    - Flashing Dark Red Aura (Like getting your shield broken)
+    - Flashing Dark Red Aura
+    - Slow Flashing Pink Aura
+    - Slow Flashing Pink Aura
+    - Black Tint for the whole charge
+    - Brief White Lighting (not an aura)
+    - Original Aura (Might flash faster)
+    - Light Blue Aura (Shine Aura)
+    - Fast Flashing Yellow Aura that gets Yellower and Yellower (AWESOME!)
+    - Starts yellow then fades to red then to normal
+    - Starts Orange/yellow than fades away
+    - Fast Flashing Light Bluegreen
+    - Brief Flashing Dark Yellow Aura
+    - Brief White Aura
+    - Flashing White Aura with Flashing Star/Lens Flare Outside Body
+    - Flashing White Aura with Flashing Star/Lens Flare Inside Body/On Hand?
+    - Brief Yellow Aura
+    - Brief Yellow Aura
+    - Flashing White Aura with Smoke Above Head
+    - Flashing White Aura with Smoke In Front of Head
+    - Flashing White Aura with Flashing Lens Flares (Like charging a bat)
+    - Flashing White Aura
+    - Flashing White Aura
+    - Fast Flashing White Aura
+    - Starts yellowish then fades to normal
+    - Starts brownish then fades to white then to normal
+    - Flashing White with Electric
+    - Nothing
+    - No Aura but Flashing Electric Effects 
+    - Fast Flashing Electric Aura (AWESOME!)
+    - Flashing Blue Aura with Electric Effects and Lens Flares (AWESOME!)
+    - Fast Flashing White Aura
+    - Orange and Red Lighting that ends in a Yellow Aura (Looks like a fire is behind character) (AWESOME!)
+    - Fast Flashing Yellow Aura (Ends before smash is fully charged)
+    - No Aura but Pink Lighting from beneath
+    - Very Fast White and then Bluegreen Aura (Maybe Early Shine Aura?)
+    - Flashing Bluegreen Aura with Electric Effects at feet
+    - Flashing Green with Flashing Lens Flares (AWESOME!)
+    - Starts full Black then fades to normal 
+    - Starts Orangered and then fades to normal
+    - Brief White Aura in the middle of the charge
+    - Whiter and Whiter Aura over time (Ends before smash is fully charged) (AWESOME!)
+    - Starts White and fades to normal
+    - "No Aura, but Flashing Blue Lighting from beneath"
+    - Brief Orangered Aura then fades to normal
+    - Greener and Greener Aura over time (Ends before smash is fully charged)
+    - Flashing Orangered Aura then fades to normal
+    - Fast Flashing White Aura
+    - Fast Flashing White Aura
+    - Brief Green Aura
+    - "No Aura, but lots of Lens Flares and Stars (From some item) (AWESOME!)"
+    - "No Aura, but lots of Lens Flares and Stars (More then 59) (AWESOME!)"
+    - "No Aura, but Pink Lighting from beneath "
+    - Hand glows with Darkness Element (Mewtwo Style) (AWESOME!)
+    - Hand glows with Darkness Element (Mewtwo Style) (AWESOME!)
+    - Fast Flashing Purple Aura
+    - Brief Purple Aura
+    - No Aura but Pink Lighting from behind
+    - Flashing White and Pink Aura
+    - Brief White Aura
+    - Brief White Aura then progressively gets more and more Blueish Purplish
+    - Glows light red or pink
+    - Starts full Black then fades to alittle less black 
+    - Black Tint for the whole charge
+    - Nothing
+    - Yellower and Yellower Aura over time (Ends with smash) (Awesome!)
+    - Dark Red Aura that fades to normal
+    - Flashing Orangered with Flashing Smoke (AWESOME!)
+    - Flashing White Aura with Stars and Lens Flares (I think like eatting a maximum tomato) (AWESOME!)
+    - Produces Sparkles (Like the sparkles behind Captain Falcon's Up B)
+    - Flashing Yellow with Flashing Large Lens Flare 
+    - "No Aura, but Yellow Lighting from the front"
+    - Nothing
+    - Yellow Aura that fades away
+    - "No Aura, but Green Lighting passes from front to back (AWESOME!)"
+    - Brief Red Aura that fades to normal
+    - Brief Blue Aura that fades to normal
+    - Brief Green Aura that fades to normal
+    - White Tint for the whole charge
+    - Brief Flashing White with Smoke on the ground (AWESOME!)
+    - Original Aura
+    - Original Aura
+    - White with Blue Sparkles
+    - Flashing Dark Red Aura
   - name: Unknown
     bitCount: 24
 

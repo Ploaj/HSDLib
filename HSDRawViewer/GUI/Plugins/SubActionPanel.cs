@@ -48,12 +48,12 @@ namespace HSDRawViewer.GUI.Plugins
             Reference = reference;
 
             PointerBox.SelectedItem = AllActions.Find(e => e._struct == Reference);
-
-            Bitreader r = new Bitreader(Data);
-
-            var sa = SubactionManager.GetSubaction((byte)r.Read(6));
+            
+            var sa = SubactionManager.GetSubaction((byte)(Data[0] >> 2));
 
             comboBox1.SelectedItem = sa.Name;
+
+            var paramd = sa.GetParameters(Data);
 
             for (int i = 0; i < sa.Parameters.Length; i++)
             {
@@ -62,10 +62,10 @@ namespace HSDRawViewer.GUI.Plugins
                 if (p.Name.Contains("None"))
                     continue;
 
-                var value = r.Read(p.BitCount);
-
                 if (p.IsPointer)
                     continue;
+
+                var value = paramd[i];
 
                 (panel1.Controls[sa.Parameters.Length - 1 - i].Controls[0] as SubactionValueEditor).SetValue(value);
             }
@@ -126,9 +126,18 @@ namespace HSDRawViewer.GUI.Plugins
                 }
                 else
                 {
-                    SAIntEditor editor = new SAIntEditor();
-                    editor.SetBitSize(p.BitCount);
-                    group.Controls.Add(editor);
+                    if(p.Signed)
+                    {
+                        SAIntEditor editor = new SAIntEditor();
+                        editor.SetBitSize(p.BitCount);
+                        group.Controls.Add(editor);
+                    }
+                    else
+                    {
+                        SAUIntEditor editor = new SAUIntEditor();
+                        editor.SetBitSize(p.BitCount);
+                        group.Controls.Add(editor);
+                    }
                 }
 
                 group.Controls.Add(new Label() { Text = p.Name + ":", Dock = DockStyle.Left, Width = 200 });
@@ -191,9 +200,9 @@ namespace HSDRawViewer.GUI.Plugins
     }
 
     // Int Editor
-    public class SAIntEditor : NumericUpDown, SubactionValueEditor
+    public class SAUIntEditor : NumericUpDown, SubactionValueEditor
     {
-        public SAIntEditor()
+        public SAUIntEditor()
         {
             Dock = DockStyle.Fill;
         }
@@ -215,6 +224,32 @@ namespace HSDRawViewer.GUI.Plugins
         }
     }
 
+
+    // UInt Editor
+    public class SAIntEditor : NumericUpDown, SubactionValueEditor
+    {
+        public SAIntEditor()
+        {
+            Dock = DockStyle.Fill;
+        }
+
+        public void SetBitSize(int bitCount)
+        {
+            var mask = (1L << (bitCount - 1)) - 1L;
+            Maximum = mask;
+            Minimum = -mask;
+        }
+
+        public void SetValue(int value)
+        {
+            Value = value;
+        }
+
+        public long GetValue()
+        {
+            return (long)Value;
+        }
+    }
 
     // Int Editor
     public class SAFloatEditor : TextBox, SubactionValueEditor

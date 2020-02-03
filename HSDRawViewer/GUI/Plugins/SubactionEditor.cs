@@ -59,11 +59,11 @@ namespace HSDRawViewer.GUI
             {
                 get
                 {
-                    Bitreader r = new Bitreader(data);
-
-                    var sa = SubactionManager.GetSubaction((byte)r.Read(6));
+                    var sa = SubactionManager.GetSubaction((byte)(data[0] >> 2));
 
                     StringBuilder sb = new StringBuilder();
+
+                    var dparams = sa.GetParameters(data);
 
                     for (int i = 0; i < sa.Parameters.Length; i++)
                     {
@@ -72,9 +72,9 @@ namespace HSDRawViewer.GUI
                         if (param.Name.Contains("None"))
                             continue;
 
-                        var value = r.Read(param.BitCount);
+                        var value = param.IsPointer ? 0 : dparams[i];
 
-                        if(param.HasEnums && value < param.Enums.Length)
+                        if (param.HasEnums && value < param.Enums.Length)
                             yield return (param.Name +
                                 " : " +
                                 param.Enums[value]);
@@ -165,6 +165,10 @@ namespace HSDRawViewer.GUI
             previewBox.Controls.Add(viewport);
             viewport.RefreshSize();
             viewport.BringToFront();
+
+            clickTimer = new Timer();
+            clickTimer.Interval = 500;
+            clickTimer.Tick += timer_Tick;
 
             FormClosing += (sender, args) =>
             {
@@ -493,6 +497,8 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void EditSubAction()
         {
+            var selectedIndex = subActionList.SelectedIndex;
+
             if (subActionList.SelectedItem is SubActionScript sa)
             {
                 using (SubActionPanel p = new SubActionPanel(AllScripts))
@@ -507,9 +513,11 @@ namespace HSDRawViewer.GUI
                         else
                             sa.Reference = null;
 
-                        subActionList.Items[subActionList.SelectedIndex] = subActionList.SelectedItem;
+                        subActionList.Items[selectedIndex] = subActionList.SelectedItem;
 
                         SaveSubactionChanges();
+
+                        subActionList.Invalidate();
                     }
                 }
 
@@ -518,6 +526,8 @@ namespace HSDRawViewer.GUI
                 var itempos = subActionList.SelectedIndex;
                 subActionList.Items.Remove(item);
                 subActionList.Items.Insert(itempos, item);
+
+                subActionList.SelectedIndex = selectedIndex;
             }
         }
 
@@ -550,6 +560,11 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void subActionList_MeasureItem(object sender, MeasureItemEventArgs e)
         {
             if(e.Index != -1 && subActionList.Items[e.Index] is SubActionScript script)
@@ -562,6 +577,11 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void subActionList_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
@@ -630,16 +650,44 @@ namespace HSDRawViewer.GUI
 
         private List<SubActionScript> CopiedScripts = new List<SubActionScript>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonCopy_Click(object sender, EventArgs e)
         {
             CopySelected();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonPaste_Click(object sender, EventArgs e)
         {
             Paste();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ReplacePaste()
+        {
+            var selectedIndex = subActionList.SelectedIndex;
+            if (selectedIndex != -1)
+            {
+                RemoveSelected();
+                subActionList.SelectedIndex = selectedIndex - 1;
+                Paste();
+                subActionList.SelectedIndex = selectedIndex;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void CopySelected()
         {
             CopiedScripts.Clear();
@@ -648,6 +696,9 @@ namespace HSDRawViewer.GUI
             CopiedScripts.Reverse();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void Paste()
         {
             var index = subActionList.SelectedIndex + 1;
@@ -660,10 +711,18 @@ namespace HSDRawViewer.GUI
             SaveSubactionChanges();
         }
 
+        /// <summary>
+        /// Hot keys
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void subActionList_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.Control)
             {
+                if (e.KeyCode == Keys.Delete)
+                    RemoveSelected();
+
                 if (e.KeyCode == Keys.X)
                 {
                     CopySelected();
@@ -674,22 +733,47 @@ namespace HSDRawViewer.GUI
                     CopySelected();
 
                 if (e.KeyCode == Keys.V)
-                    Paste();
+                {
+                    if (e.Shift)
+                        ReplacePaste();
+                    else
+                        Paste();
+                }
 
                 if (e.KeyCode == Keys.Z)
                     Undo();
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonCut_Click(object sender, EventArgs e)
         {
             CopySelected();
             RemoveSelected();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void simpleScriptViewToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             RedrawActionItems();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonReplace_Click(object sender, EventArgs e)
+        {
+            ReplacePaste();
         }
 
         #endregion
@@ -790,7 +874,10 @@ namespace HSDRawViewer.GUI
 
             return previousPosition;
         }
-        
+
+        private static Vector3 HitboxColor = new Vector3(1, 0, 0);
+        private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
+
         /// <summary>
         /// 
         /// </summary>
@@ -816,18 +903,24 @@ namespace HSDRawViewer.GUI
             
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1.Zyx/2) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
-                
+                var transform = Matrix4.CreateTranslation(hb.Point1.Zyx) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+
+                float alpha = 0.4f;
+                Vector3 hbColor = HitboxColor;
+
+                if (hb.Element == 8)
+                    hbColor = GrabboxColor;
+
                 // drawing a capsule takes more processing power, so only draw it if necessary
-                if(renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition.ContainsKey(hb.ID))
+                if (renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition.ContainsKey(hb.ID))
                 {
                     var pos = Vector3.TransformPosition(Vector3.Zero, transform);
-                    var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size / 2);
-                    cap.Draw(Matrix4.Identity, new Vector4(1, 0, 0, 0.4f));
+                    var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size);
+                    cap.Draw(Matrix4.Identity, new Vector4(hbColor, alpha));
                 }
                 else
                 {
-                    DrawShape.DrawSphere(transform, hb.Size / 2, 16, 16, Vector3.UnitX, 0.4f);
+                    DrawShape.DrawSphere(transform, hb.Size, 16, 16, hbColor, alpha);
                 }
             }
             
@@ -857,5 +950,59 @@ namespace HSDRawViewer.GUI
 
         #endregion
 
+        private Timer clickTimer;
+        private Point MousePoint;
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if (MousePoint == Cursor.Position && subActionList.SelectedItems.Count == 1)
+            {
+                subActionList.DoDragDrop(subActionList.SelectedItems, DragDropEffects.Move);
+                clickTimer.Stop();
+            }
+            MousePoint = Cursor.Position;
+        }
+
+        private void subActionList_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (subActionList.SelectedItem == null) return;
+
+            MousePoint = Cursor.Position;
+            clickTimer.Start();
+        }
+
+        private void subActionList_DragDrop(object sender, DragEventArgs e)
+        {
+            Point point = subActionList.PointToClient(new Point(e.X, e.Y));
+            int index = subActionList.IndexFromPoint(point);
+            if (index < 0) index = subActionList.Items.Count - 1;
+
+            List<object> data = new List<object>();
+
+            foreach (var i in subActionList.SelectedItems)
+                data.Add(i);
+
+            foreach(var i in data)
+                subActionList.Items.Remove(i);
+
+            foreach(var i in data)
+            {
+                subActionList.Items.Insert(index, i);
+            }
+
+            SaveSubactionChanges();
+
+            subActionList.SelectedIndex = index;
+        }
+
+        private void subActionList_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void subActionList_MouseUp(object sender, MouseEventArgs e)
+        {
+            clickTimer.Stop();
+        }
     }
 }

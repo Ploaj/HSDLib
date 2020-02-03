@@ -42,6 +42,7 @@
             this.buttonCut = new System.Windows.Forms.ToolStripButton();
             this.buttonCopy = new System.Windows.Forms.ToolStripButton();
             this.buttonPaste = new System.Windows.Forms.ToolStripButton();
+            this.buttonReplace = new System.Windows.Forms.ToolStripButton();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonGoto = new System.Windows.Forms.Button();
@@ -53,13 +54,13 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renderHitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renderHurtboxsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.simpleScriptViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renderHitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renderHurtboxsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -118,8 +119,12 @@
             this.subActionList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.subActionList_DrawItem);
             this.subActionList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.subActionList_MeasureItem);
             this.subActionList.SelectedIndexChanged += new System.EventHandler(this.subActionList_SelectedIndexChanged);
+            this.subActionList.DragDrop += new System.Windows.Forms.DragEventHandler(this.subActionList_DragDrop);
+            this.subActionList.DragOver += new System.Windows.Forms.DragEventHandler(this.subActionList_DragOver);
             this.subActionList.DoubleClick += new System.EventHandler(this.subActionList_DoubleClick);
             this.subActionList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.subActionList_KeyDown);
+            this.subActionList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.subActionList_MouseDown);
+            this.subActionList.MouseUp += new System.Windows.Forms.MouseEventHandler(this.subActionList_MouseUp);
             // 
             // toolStrip2
             // 
@@ -131,7 +136,8 @@
             this.buttonEdit,
             this.buttonCut,
             this.buttonCopy,
-            this.buttonPaste});
+            this.buttonPaste,
+            this.buttonReplace});
             this.toolStrip2.Location = new System.Drawing.Point(3, 45);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(489, 25);
@@ -217,6 +223,15 @@
             this.buttonPaste.Size = new System.Drawing.Size(39, 22);
             this.buttonPaste.Text = "Paste";
             this.buttonPaste.Click += new System.EventHandler(this.buttonPaste_Click);
+            // 
+            // buttonReplace
+            // 
+            this.buttonReplace.Image = global::HSDRawViewer.Properties.Resources.ico_replace;
+            this.buttonReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonReplace.Name = "buttonReplace";
+            this.buttonReplace.Size = new System.Drawing.Size(68, 22);
+            this.buttonReplace.Text = "Replace";
+            this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
             // 
             // label1
             // 
@@ -339,43 +354,10 @@
             this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Model Files";
             this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
             // 
-            // renderHitboxInterpolationToolStripMenuItem
-            // 
-            this.renderHitboxInterpolationToolStripMenuItem.CheckOnClick = true;
-            this.renderHitboxInterpolationToolStripMenuItem.Name = "renderHitboxInterpolationToolStripMenuItem";
-            this.renderHitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.renderHitboxInterpolationToolStripMenuItem.Text = "Render Hitbox Interpolation";
-            // 
-            // clearAllActionsToolStripMenuItem
-            // 
-            this.clearAllActionsToolStripMenuItem.Name = "clearAllActionsToolStripMenuItem";
-            this.clearAllActionsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.clearAllActionsToolStripMenuItem.Text = "Clear All Action\'s Scripts";
-            this.clearAllActionsToolStripMenuItem.Click += new System.EventHandler(this.clearAllActionsToolStripMenuItem_Click);
-            // 
-            // renderHurtboxsToolStripMenuItem
-            // 
-            this.renderHurtboxsToolStripMenuItem.CheckOnClick = true;
-            this.renderHurtboxsToolStripMenuItem.Name = "renderHurtboxsToolStripMenuItem";
-            this.renderHurtboxsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.renderHurtboxsToolStripMenuItem.Text = "Render Hurtboxes";
-            // 
-            // createNewSubroutineToolStripMenuItem
-            // 
-            this.createNewSubroutineToolStripMenuItem.Name = "createNewSubroutineToolStripMenuItem";
-            this.createNewSubroutineToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.createNewSubroutineToolStripMenuItem.Text = "Create New Subroutine";
-            this.createNewSubroutineToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton1_Click);
-            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(218, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(218, 6);
             // 
             // simpleScriptViewToolStripMenuItem
             // 
@@ -384,6 +366,39 @@
             this.simpleScriptViewToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
             this.simpleScriptViewToolStripMenuItem.Text = "Simple Script View";
             this.simpleScriptViewToolStripMenuItem.CheckedChanged += new System.EventHandler(this.simpleScriptViewToolStripMenuItem_CheckedChanged);
+            // 
+            // renderHitboxInterpolationToolStripMenuItem
+            // 
+            this.renderHitboxInterpolationToolStripMenuItem.CheckOnClick = true;
+            this.renderHitboxInterpolationToolStripMenuItem.Name = "renderHitboxInterpolationToolStripMenuItem";
+            this.renderHitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.renderHitboxInterpolationToolStripMenuItem.Text = "Render Hitbox Interpolation";
+            // 
+            // renderHurtboxsToolStripMenuItem
+            // 
+            this.renderHurtboxsToolStripMenuItem.CheckOnClick = true;
+            this.renderHurtboxsToolStripMenuItem.Name = "renderHurtboxsToolStripMenuItem";
+            this.renderHurtboxsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.renderHurtboxsToolStripMenuItem.Text = "Render Hurtboxes";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(218, 6);
+            // 
+            // createNewSubroutineToolStripMenuItem
+            // 
+            this.createNewSubroutineToolStripMenuItem.Name = "createNewSubroutineToolStripMenuItem";
+            this.createNewSubroutineToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.createNewSubroutineToolStripMenuItem.Text = "Create New Subroutine";
+            this.createNewSubroutineToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // clearAllActionsToolStripMenuItem
+            // 
+            this.clearAllActionsToolStripMenuItem.Name = "clearAllActionsToolStripMenuItem";
+            this.clearAllActionsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.clearAllActionsToolStripMenuItem.Text = "Clear All Action\'s Scripts";
+            this.clearAllActionsToolStripMenuItem.Click += new System.EventHandler(this.clearAllActionsToolStripMenuItem_Click);
             // 
             // SubactionEditor
             // 
@@ -440,5 +455,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem simpleScriptViewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton buttonReplace;
     }
 }
