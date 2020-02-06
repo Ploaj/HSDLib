@@ -867,7 +867,7 @@ namespace HSDRawViewer.GUI
 
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1.Zyx / 2) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
                 var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                 previousPosition.Add(hb.ID, pos);
             }
@@ -903,7 +903,7 @@ namespace HSDRawViewer.GUI
             
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1.Zyx) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
 
                 float alpha = 0.4f;
                 Vector3 hbColor = HitboxColor;

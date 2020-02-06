@@ -212,9 +212,19 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm)|*.dat;*.usd;*.ssm");
+            var f = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
             if (f != null)
             {
+                if (f.ToLower().EndsWith(".sem"))
+                {
+                    SEMEditor d = new SEMEditor();
+                    {
+                        d.Show();
+                    }
+                    d.OpenSEMFile(f);
+                    d.BringToFront();
+                }
+                else
                 if (f.ToLower().EndsWith(".ssm"))
                 {
                     ssmTool.Show();

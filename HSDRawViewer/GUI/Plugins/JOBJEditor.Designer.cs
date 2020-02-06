@@ -43,6 +43,7 @@
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderVertexColorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
@@ -57,7 +58,9 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.mainRender = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAllPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -70,9 +73,9 @@
             // listDOBJ
             // 
             this.listDOBJ.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listDOBJ.Location = new System.Drawing.Point(3, 28);
+            this.listDOBJ.Location = new System.Drawing.Point(3, 30);
             this.listDOBJ.Name = "listDOBJ";
-            this.listDOBJ.Size = new System.Drawing.Size(316, 100);
+            this.listDOBJ.Size = new System.Drawing.Size(323, 98);
             this.listDOBJ.TabIndex = 0;
             this.listDOBJ.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListDOBJ_ItemCheck);
             this.listDOBJ.BindingContextChanged += new System.EventHandler(this.listDOBJ_BindingContextChanged);
@@ -84,7 +87,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.propertyGrid1.Location = new System.Drawing.Point(11, 19);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(600, 237);
+            this.propertyGrid1.Size = new System.Drawing.Size(747, 237);
             this.propertyGrid1.TabIndex = 1;
             // 
             // tabControl1
@@ -95,7 +98,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 25);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(330, 157);
+            this.tabControl1.Size = new System.Drawing.Size(337, 157);
             this.tabControl1.TabIndex = 2;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -168,7 +171,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(322, 131);
+            this.tabPage2.Size = new System.Drawing.Size(329, 131);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "DOBJs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -177,13 +180,14 @@
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton3,
-            this.toolStripLabel1,
-            this.toolStripComboBox1,
             this.buttonMoveUp,
-            this.buttonMoveDown});
+            this.buttonMoveDown,
+            this.buttonDOBJDelete,
+            this.toolStripLabel1,
+            this.toolStripComboBox1});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(316, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(323, 27);
             this.toolStrip2.TabIndex = 1;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -191,13 +195,15 @@
             // 
             this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addDummyDOBJToolStripMenuItem,
             this.renderVertexColorsToolStripMenuItem,
-            this.createOutlineMeshToolStripMenuItem});
+            this.toolStripSeparator1,
+            this.createOutlineMeshToolStripMenuItem,
+            this.addDummyDOBJToolStripMenuItem,
+            this.clearAllPOBJsToolStripMenuItem});
             this.toolStripDropDownButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton3.Image")));
             this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
-            this.toolStripDropDownButton3.Size = new System.Drawing.Size(62, 22);
+            this.toolStripDropDownButton3.Size = new System.Drawing.Size(62, 24);
             this.toolStripDropDownButton3.Text = "Options";
             // 
             // addDummyDOBJToolStripMenuItem
@@ -217,10 +223,17 @@
             this.renderVertexColorsToolStripMenuItem.Text = "Render Vertex Colors";
             this.renderVertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
             // 
+            // createOutlineMeshToolStripMenuItem
+            // 
+            this.createOutlineMeshToolStripMenuItem.Name = "createOutlineMeshToolStripMenuItem";
+            this.createOutlineMeshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.createOutlineMeshToolStripMenuItem.Text = "Create Outline Mesh";
+            this.createOutlineMeshToolStripMenuItem.Click += new System.EventHandler(this.createOutlineMeshToolStripMenuItem_Click);
+            // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(47, 22);
+            this.toolStripLabel1.Size = new System.Drawing.Size(47, 24);
             this.toolStripLabel1.Text = "Render:";
             // 
             // toolStripComboBox1
@@ -231,7 +244,7 @@
             "Selected",
             "None"});
             this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
+            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
             // buttonMoveUp
@@ -240,7 +253,7 @@
             this.buttonMoveUp.Image = global::HSDRawViewer.Properties.Resources.ts_up;
             this.buttonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonMoveUp.Name = "buttonMoveUp";
-            this.buttonMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.buttonMoveUp.Size = new System.Drawing.Size(23, 24);
             this.buttonMoveUp.Text = "Move Up";
             this.buttonMoveUp.Click += new System.EventHandler(this.buttonMoveUp_Click);
             // 
@@ -250,7 +263,7 @@
             this.buttonMoveDown.Image = global::HSDRawViewer.Properties.Resources.ts_down;
             this.buttonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonMoveDown.Name = "buttonMoveDown";
-            this.buttonMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.buttonMoveDown.Size = new System.Drawing.Size(23, 24);
             this.buttonMoveDown.Text = "Move Down";
             this.buttonMoveDown.Click += new System.EventHandler(this.buttonMoveDown_Click);
             // 
@@ -260,7 +273,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.groupBox1.Location = new System.Drawing.Point(0, 185);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(620, 262);
+            this.groupBox1.Size = new System.Drawing.Size(767, 262);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
@@ -268,17 +281,17 @@
             // previewBox
             // 
             this.previewBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.previewBox.Location = new System.Drawing.Point(330, 25);
+            this.previewBox.Location = new System.Drawing.Point(337, 25);
             this.previewBox.Margin = new System.Windows.Forms.Padding(5);
             this.previewBox.Name = "previewBox";
-            this.previewBox.Size = new System.Drawing.Size(290, 157);
+            this.previewBox.Size = new System.Drawing.Size(430, 157);
             this.previewBox.TabIndex = 4;
             this.previewBox.TabStop = false;
             this.previewBox.Text = "Preview";
             // 
             // splitter2
             // 
-            this.splitter2.Location = new System.Drawing.Point(330, 25);
+            this.splitter2.Location = new System.Drawing.Point(337, 25);
             this.splitter2.Name = "splitter2";
             this.splitter2.Size = new System.Drawing.Size(3, 157);
             this.splitter2.TabIndex = 6;
@@ -292,7 +305,7 @@
             this.mainRender});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(620, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(767, 25);
             this.toolStrip1.TabIndex = 7;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -348,22 +361,37 @@
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.splitter1.Location = new System.Drawing.Point(0, 182);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(620, 3);
+            this.splitter1.Size = new System.Drawing.Size(767, 3);
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // createOutlineMeshToolStripMenuItem
+            // clearAllPOBJsToolStripMenuItem
             // 
-            this.createOutlineMeshToolStripMenuItem.Name = "createOutlineMeshToolStripMenuItem";
-            this.createOutlineMeshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.createOutlineMeshToolStripMenuItem.Text = "Create Outline Mesh";
-            this.createOutlineMeshToolStripMenuItem.Click += new System.EventHandler(this.createOutlineMeshToolStripMenuItem_Click);
+            this.clearAllPOBJsToolStripMenuItem.Name = "clearAllPOBJsToolStripMenuItem";
+            this.clearAllPOBJsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.clearAllPOBJsToolStripMenuItem.Text = "Clear All POBJs";
+            this.clearAllPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearAllPOBJsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
+            // 
+            // buttonDOBJDelete
+            // 
+            this.buttonDOBJDelete.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDOBJDelete.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
+            this.buttonDOBJDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDOBJDelete.Name = "buttonDOBJDelete";
+            this.buttonDOBJDelete.Size = new System.Drawing.Size(23, 24);
+            this.buttonDOBJDelete.Text = "toolStripButton3";
+            this.buttonDOBJDelete.Click += new System.EventHandler(this.buttonDOBJDelete_Click);
             // 
             // JOBJEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(620, 447);
+            this.ClientSize = new System.Drawing.Size(767, 447);
             this.Controls.Add(this.splitter2);
             this.Controls.Add(this.previewBox);
             this.Controls.Add(this.tabControl1);
@@ -421,5 +449,8 @@
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem importBoneLabelINIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createOutlineMeshToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem clearAllPOBJsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton buttonDOBJDelete;
     }
 }

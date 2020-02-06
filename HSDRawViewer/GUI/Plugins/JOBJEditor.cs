@@ -604,5 +604,57 @@ namespace HSDRawViewer.GUI.Plugins
                 RefreshGUI();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void clearAllPOBJsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("Are you sure?\nThis will clear all polygons in the model\n and cannot be undone", "Clear POBJs", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                foreach (DOBJContainer v in listDOBJ.Items)
+                {
+                    v.DOBJ.Pobj = null;
+                }
+                JOBJManager.ClearRenderingCache();
+                RefreshGUI();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonDOBJDelete_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete DOBJ", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                var dobj = listDOBJ.SelectedItem as DOBJContainer;
+                if(dobj != null)
+                {
+                    var dobjs = dobj.ParentJOBJ.Dobj.List;
+
+                    HSD_DOBJ prev = null;
+                    foreach(var d in dobjs)
+                    {
+                        if(d == dobj.DOBJ)
+                        {
+                            if (prev == null)
+                                dobj.ParentJOBJ.Dobj = d.Next;
+                            else
+                                prev.Next = d.Next;
+                            break;
+                        }
+                        prev = d;
+                    }
+
+                    JOBJManager.ClearRenderingCache();
+                    RefreshGUI();
+                }
+            }
+        }
     }
 }

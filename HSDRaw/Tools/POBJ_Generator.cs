@@ -196,7 +196,7 @@ namespace HSDRaw.Tools
         /// <param name="weights"></param>
         public HSD_POBJ CreatePOBJsFromTriangleList(List<GX_Vertex> triList, GXAttribName[] attributes, List<HSD_Envelope> weights)
         {
-            TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(true, 100, 3, true);
+            TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(true, 32, 3, true);
             int pointCount, faceCount;
 
             HSD_JOBJ singleBind = null;

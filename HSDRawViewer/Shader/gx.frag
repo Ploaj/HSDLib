@@ -81,8 +81,8 @@ vec4 DiffusePass(vec3 N, vec3 V)
 	vec4 diffuseTerm = vec4(1);
 
     float lambert = clamp(dot(N, V), 0, 1);
-	if(enableMaterial == 0)
-		lambert = 1;
+	//if(enableMaterial == 0)
+	//	lambert = 1;
 	
 	vec4 colorPass = vec4(1);
 

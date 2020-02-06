@@ -1,10 +1,14 @@
 ﻿using HSDRaw;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
@@ -65,6 +69,7 @@ namespace HSDRawViewer.GUI.Extra
             byteView = new ByteViewer();
             byteView.Dock = DockStyle.Fill;
             groupBox1.Controls.Add(byteView);
+            byteView.BringToFront();
 
             CenterToScreen();
         }
@@ -73,7 +78,7 @@ namespace HSDRawViewer.GUI.Extra
         /// 
         /// </summary>
         /// <param name="path"></param>
-        private void OpenSEMFile(string path)
+        public void OpenSEMFile(string path)
         {
             using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(path, FileMode.Open)))
             {
@@ -246,9 +251,19 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void entryList_MouseUp(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void entryList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            soundList.DataSource = (entryList.SelectedItem as SEMEntry)?.Sounds;
+            soundList.DataSource = (entryList.SelectedItem as SEMEntry).Sounds;
         }
 
         /// <summary>
@@ -258,13 +273,215 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void soundList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(soundList.SelectedItem is SEMSound s)
+            if (soundList.SelectedItem is SEMSound sound)
             {
-                byteView.SetBytes(s.CommandData);
+                byteView.SetBytes(sound.CommandData);
+                scriptBox.Text = DecompileScript(sound.CommandData);
             }
-            else
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            var listBox1 = sender as ListBox;
+            if(sender == entryList)
+                soundList.DataSource = (entryList.SelectedItem as SEMEntry)?.Sounds;
+            if(sender == soundList)
             {
-                byteView.SetBytes(null);
+                if(soundList.SelectedItem is SEMSound sound)
+                {
+                    byteView.SetBytes(sound.CommandData);
+                    scriptBox.Text = DecompileScript(sound.CommandData);
+                }
+            }
+            if (listBox1.SelectedItem == null) return;
+            listBox1.DoDragDrop(new object(), DragDropEffects.Move);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listBox_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listBox_DragDrop(object sender, DragEventArgs e)
+        {
+            var listBox1 = sender as ListBox;
+            Point point = listBox1.PointToClient(new Point(e.X, e.Y));
+            int index = listBox1.IndexFromPoint(point);
+            if (index < 0) index = listBox1.Items.Count - 1;
+            if (index == listBox1.SelectedIndex)
+                return;
+            object data = listBox1.SelectedItem;
+            var ds = listBox1.DataSource as IList;
+            listBox1.BeginUpdate();
+            ds.Remove(data);
+            ds.Insert(index, data);
+            listBox1.SelectedIndex = index;
+            listBox1.EndUpdate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listBox_Remove(ListBox listBox1)
+        {
+            object data = listBox1.SelectedItem;
+            var ds = listBox1.DataSource as IList;
+            if(ds != null)
+                ds.Remove(data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            listBox_Remove(entryList);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonRemoveSound_Click(object sender, EventArgs e)
+        {
+            listBox_Remove(soundList);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonAddEntry_Click(object sender, EventArgs e)
+        {
+            Entries.Add(new SEMEntry()
+            {
+                Index = Entries.Count,
+                Sounds = new BindingList<SEMSound>()
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonAddSound_Click(object sender, EventArgs e)
+        {
+            object data = soundList.SelectedItem;
+            var ds = soundList.DataSource as IList;
+            if (ds != null)
+            {
+                ds.Add(new SEMSound()
+                {
+                    Index = ds.Count,
+                    CommandData = new byte[] { 0x0E, 0, 0, 0}
+                });
+            }
+        }
+
+        private Dictionary<byte, string> OPCODES = new Dictionary<byte, string>()
+        {
+            {0x00, "UNKNOWN00" },
+            {0x01, "SFXID" },
+            {0x02, "UNKNOWN02" },
+            {0x03, "UNKNOWN03" },
+            {0x04, "UNKNOWN04" },
+            {0x06, "UNKNOWN06" },
+            {0x07, "UNKNOWN07" },
+            {0x08, "CHANNEL" },
+            {0x09, "UNKNOWN09" },
+            {0x0C, "UNKNOWN0C" },
+            {0x0D, "UNKNOWN0D" },
+            {0x0E, "RETURN" },
+            {0x0F, "UNKNOWN0F" },
+            {0x10, "REVERB" },
+            {0x11, "UNKNOWN11" },
+            {0x14, "UNKNOWN14" },
+            {0xFD, "SFXIDEXT" },
+        };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        private string DecompileScript(byte[] data)
+        {
+            StringBuilder s = new StringBuilder();
+            for(int i = 0; i < data.Length;)
+            {
+                var op = OPCODES[data[i++]];
+
+                s.AppendLine($".{op} 0x{data[i++].ToString("X2")}{data[i++].ToString("X2")}{data[i++].ToString("X2")}");
+            }
+            return s.ToString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private int CompileScript(string script, out byte[] data)
+        {
+            var cmd = Regex.Replace(script, @"\s+", string.Empty).Split('.');
+
+            data = new byte[4 * (cmd.Length - 1)];
+
+            int i = 0;
+            foreach (var line in cmd)
+            {
+                var args = line.Split(new string[] { "0x" }, StringSplitOptions.None);
+
+                if (args.Length != 2)
+                    continue;
+
+                Console.WriteLine(string.Join(", ", args));
+
+                data[i++] = OPCODES.FirstOrDefault(x => x.Value == args[0].ToUpper()).Key;
+                var d = int.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
+                data[i++] = (byte)((d >> 16) & 0xFF);
+                data[i++] = (byte)((d >> 8) & 0xFF);
+                data[i++] = (byte)(d & 0xFF);
+            }
+
+
+            return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonSaveScript_Click(object sender, EventArgs e)
+        {
+            if (soundList.SelectedItem is SEMSound sound)
+            {
+                byte[] d;
+                if(CompileScript(scriptBox.Text, out d) == -1)
+                    sound.CommandData = d;
+                byteView.SetBytes(sound.CommandData);
+                scriptBox.Text = DecompileScript(sound.CommandData);
             }
         }
     }

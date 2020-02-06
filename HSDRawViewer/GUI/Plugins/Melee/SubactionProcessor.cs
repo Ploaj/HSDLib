@@ -185,7 +185,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             ID = cmd.Parameters[0],
                             BoneID = cmd.Parameters[2],
                             Size = ((short)cmd.Parameters[5] >> 7) / 2f,
-                            Point1 = new Vector3((short)cmd.Parameters[8] >> 7, (short)cmd.Parameters[7] >> 7, (short)cmd.Parameters[6] >> 7),
+                            Point1 = new Vector3(cmd.Parameters[6] >> 7, cmd.Parameters[7] >> 7, cmd.Parameters[8] >> 7) / 2,
                             Element = cmd.Parameters[15]
                         });
                         break;
