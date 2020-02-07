@@ -41,10 +41,8 @@
             this.propertyTexture = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.buttonReplace = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.moveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.downToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Colors = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
@@ -56,7 +54,9 @@
             this.tbShine = new System.Windows.Forms.TextBox();
             this.PixelProcessing = new System.Windows.Forms.TabPage();
             this.propertyPixel = new System.Windows.Forms.PropertyGrid();
-            this.buttonReplace = new System.Windows.Forms.ToolStripButton();
+            this.buttonSaveTexture = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.tabControl1.SuspendLayout();
             this.Textures.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -175,10 +175,12 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonSaveTexture,
             this.toolStripButton1,
             this.buttonReplace,
             this.toolStripButton2,
-            this.toolStripDropDownButton1});
+            this.toolStripButton3,
+            this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(3, 3);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(458, 25);
@@ -195,6 +197,16 @@
             this.toolStripButton1.Text = "Import";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
+            // buttonReplace
+            // 
+            this.buttonReplace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.buttonReplace.Image = ((System.Drawing.Image)(resources.GetObject("buttonReplace.Image")));
+            this.buttonReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonReplace.Name = "buttonReplace";
+            this.buttonReplace.Size = new System.Drawing.Size(52, 22);
+            this.buttonReplace.Text = "Replace";
+            this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
+            // 
             // toolStripButton2
             // 
             this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -204,32 +216,6 @@
             this.toolStripButton2.Size = new System.Drawing.Size(54, 22);
             this.toolStripButton2.Text = "Remove";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // toolStripDropDownButton1
-            // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.moveToolStripMenuItem,
-            this.downToolStripMenuItem});
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(50, 22);
-            this.toolStripDropDownButton1.Text = "Move";
-            // 
-            // moveToolStripMenuItem
-            // 
-            this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.moveToolStripMenuItem.Text = "Up";
-            this.moveToolStripMenuItem.Click += new System.EventHandler(this.moveToolStripMenuItem_Click);
-            // 
-            // downToolStripMenuItem
-            // 
-            this.downToolStripMenuItem.Name = "downToolStripMenuItem";
-            this.downToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.downToolStripMenuItem.Text = "Down";
-            this.downToolStripMenuItem.Click += new System.EventHandler(this.downToolStripMenuItem_Click);
             // 
             // Colors
             // 
@@ -357,15 +343,35 @@
             this.propertyPixel.Size = new System.Drawing.Size(464, 384);
             this.propertyPixel.TabIndex = 3;
             // 
-            // buttonReplace
+            // buttonSaveTexture
             // 
-            this.buttonReplace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.buttonReplace.Image = ((System.Drawing.Image)(resources.GetObject("buttonReplace.Image")));
-            this.buttonReplace.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonReplace.Name = "buttonReplace";
-            this.buttonReplace.Size = new System.Drawing.Size(52, 22);
-            this.buttonReplace.Text = "Replace";
-            this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
+            this.buttonSaveTexture.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonSaveTexture.Image = global::HSDRawViewer.Properties.Resources.ico_save;
+            this.buttonSaveTexture.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonSaveTexture.Name = "buttonSaveTexture";
+            this.buttonSaveTexture.Size = new System.Drawing.Size(23, 22);
+            this.buttonSaveTexture.Text = "Export";
+            this.buttonSaveTexture.Click += new System.EventHandler(this.buttonSaveTexture_Click);
+            // 
+            // toolStripButton3
+            // 
+            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton3.Image = global::HSDRawViewer.Properties.Resources.ts_up;
+            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton3.Name = "toolStripButton3";
+            this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton3.Text = "toolStripButton3";
+            this.toolStripButton3.Click += new System.EventHandler(this.moveToolStripMenuItem_Click);
+            // 
+            // toolStripButton4
+            // 
+            this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton4.Image = global::HSDRawViewer.Properties.Resources.ts_down;
+            this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton4.Name = "toolStripButton4";
+            this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton4.Text = "toolStripButton4";
+            this.toolStripButton4.Click += new System.EventHandler(this.downToolStripMenuItem_Click);
             // 
             // MOBJEditor
             // 
@@ -414,9 +420,9 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
-        private System.Windows.Forms.ToolStripMenuItem moveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem downToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonReplace;
+        private System.Windows.Forms.ToolStripButton buttonSaveTexture;
+        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripButton toolStripButton4;
     }
 }

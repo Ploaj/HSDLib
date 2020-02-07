@@ -12,6 +12,8 @@ namespace HSDRaw.Tools
     /// </summary>
     public class POBJ_Generator
     {
+        public bool UseTriangleStrips { get; set; } = true;
+
         private Dictionary<GXAttribName, Dictionary<int, int>> nameToIndexHash = new Dictionary<GXAttribName, Dictionary<int, int>>();
         private Dictionary<GXAttribName, GX_Attribute> nameToAttr = new Dictionary<GXAttribName, GX_Attribute>();
         private Dictionary<GX_Attribute, List<float[]>> attrToNewData = new Dictionary<GX_Attribute, List<float[]>>();
@@ -196,7 +198,7 @@ namespace HSDRaw.Tools
         /// <param name="weights"></param>
         public HSD_POBJ CreatePOBJsFromTriangleList(List<GX_Vertex> triList, GXAttribName[] attributes, List<HSD_Envelope> weights)
         {
-            TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(true, 32, 3, true);
+            TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(UseTriangleStrips, 32, 3, true);
             int pointCount, faceCount;
 
             HSD_JOBJ singleBind = null;

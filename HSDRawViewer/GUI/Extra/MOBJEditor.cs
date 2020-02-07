@@ -354,5 +354,20 @@ namespace HSDRawViewer.GUI.Extra
 
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonSaveTexture_Click(object sender, EventArgs e)
+        {
+            if (listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
+            {
+                var f = Tools.FileIO.SaveFile("PNG (*.png)|*.png");
+                if(f != null)
+                    TextureList.Images[con.ImageIndex].Save(f);
+            }
+        }
     }
 }

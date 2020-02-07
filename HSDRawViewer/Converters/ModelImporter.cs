@@ -54,7 +54,10 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options")]
         public bool ImportTexture { get; set; } = true;
-        
+
+        [DisplayName("Use Triangle Strips"), Description("Slower to import, but better optimized for game"), Category("Importing Options")]
+        public bool UseStrips { get; set; } = true;
+
         [DisplayName("Force Merge Objects"), Category("Importing Options"), Description("Reduces number of DOBJs by forces mesh groups to use one material")]
         public ForceGroupModes ForceMergeObjects { get; set; } = ForceGroupModes.None;
 
@@ -157,6 +160,9 @@ namespace HSDRawViewer.Converters
                 settings = new ModelImportSettings();
 
             ProcessingCache cache = new ProcessingCache();
+
+            cache.POBJGen.UseTriangleStrips = settings.UseStrips;
+
             cache.FolderPath = Path.GetDirectoryName(filePath);
 
             var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
@@ -688,6 +694,12 @@ namespace HSDRawViewer.Converters
 
                         if (mesh.HasBones)
                         {
+                            if (jobjs[indicie] == null) //  unbound verts
+                            {
+                                jobjs[indicie] = new List<HSD_JOBJ>();
+                                weights[indicie] = new List<float>();
+                            }
+
                             jobjList.Add(jobjs[indicie].ToArray());
                             wList.Add(weights[indicie].ToArray());
 
@@ -704,7 +716,7 @@ namespace HSDRawViewer.Converters
                                 tkbitan = new Vector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
                             }
 
-                            if (jobjs[indicie].Count == 1 || weights[indicie][0] == 1)
+                            if (jobjs[indicie].Count == 1 || (weights[indicie].Count > 0 && weights[indicie][0] == 1))
                             {
                                 tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[jobjs[indicie][0]]);
                                 tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[jobjs[indicie][0]]);

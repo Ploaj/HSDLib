@@ -617,7 +617,8 @@ namespace HSDRawViewer.GUI.Plugins
             var f = Tools.FileIO.SaveFile("PNG (.png)|*.png");
             if (f != null)
             {
-                var bmp = TOBJConverter.ToBitmap(GetTOBJs()[textureList.SelectedIndices[0]]);
+                var ind = textureList.SelectedIndices.Count > 0 ? textureList.SelectedIndices[0] : 0;
+                var bmp = TOBJConverter.ToBitmap(GetTOBJs()[0]);
                 bmp.Save(f);
                 bmp.Dispose();
             }

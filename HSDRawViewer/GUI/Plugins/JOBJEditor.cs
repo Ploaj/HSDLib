@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using HSDRaw.Tools;
 using HSDRaw.GX;
+using System.Drawing;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -501,6 +502,18 @@ namespace HSDRawViewer.GUI.Plugins
             RefreshGUI();
         }
 
+        private class OutlineSettings
+        {
+            [DisplayName("Outline Thickness"), Description("Thickness of the outline")]
+            public float Size { get; set; } = 0.0375f;
+
+            [DisplayName("Use Triangle Strips"), Description("Slower to generate, but better optimized for in-game")]
+            public bool UseStrips { get; set; } = true;
+            
+            [DisplayName("Outline Color"), Description("Color of Outline")]
+            public Color Color { get; set; } = Color.Black;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -508,9 +521,18 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void createOutlineMeshToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var settings = new OutlineSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Outline Settings", settings))
+            {
+                if (d.ShowDialog() != DialogResult.OK)
+                    return;
+            }
+
             if (propertyGrid1.SelectedObject is DOBJContainer con)
             {
                 var pobjGen = new POBJ_Generator();
+                pobjGen.UseTriangleStrips = settings.UseStrips;
 
                 var newDOBJ = new HSD_DOBJ();
                 newDOBJ.Mobj = new HSD_MOBJ()
@@ -529,23 +551,24 @@ namespace HSDRawViewer.GUI.Plugins
                     RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT
                 };
 
-                foreach(var pobj in con.DOBJ.Pobj.List)
+                foreach (var pobj in con.DOBJ.Pobj.List)
                 {
                     var dl = pobj.ToDisplayList();
 
                     var vertices = dl.Vertices;
 
-                    GXAttribName[] attrs = new GXAttribName[dl.Attributes.Count];
-
-                    for (int i = 0; i < attrs.Length; i++)
+                    GXAttribName[] attrs = new GXAttribName[]
                     {
-                        attrs[i] = dl.Attributes[i].AttributeName;
-                    }
+                        GXAttribName.GX_VA_PNMTXIDX,
+                        GXAttribName.GX_VA_POS,
+                        GXAttribName.GX_VA_CLR0,
+                        GXAttribName.GX_VA_NULL
+                    };
 
                     List<GX_Vertex> newVerties = new List<GX_Vertex>();
 
                     var offset = 0;
-                    foreach(var prim in dl.Primitives)
+                    foreach (var prim in dl.Primitives)
                     {
                         var verts = vertices.GetRange(offset, prim.Count);
                         offset += prim.Count;
@@ -569,20 +592,21 @@ namespace HSDRawViewer.GUI.Plugins
                     }
 
                     // extrude
-                    for(int i = 0; i < newVerties.Count; i++)
+                    for (int i = 0; i < newVerties.Count; i++)
                     {
                         var v = newVerties[i];
-                        v.POS.X += v.NRM.X * 0.0375f;
-                        v.POS.Y += v.NRM.Y * 0.0375f;
-                        v.POS.Z += v.NRM.Z * 0.0375f;
-                        v.NRM.X *= -1;
-                        v.NRM.Y *= -1;
-                        v.NRM.Z *= -1;
+                        v.POS.X += v.NRM.X * settings.Size;
+                        v.POS.Y += v.NRM.Y * settings.Size;
+                        v.POS.Z += v.NRM.Z * settings.Size;
+                        v.CLR0.R = settings.Color.R / 255f;
+                        v.CLR0.G = settings.Color.G / 255f;
+                        v.CLR0.B = settings.Color.B / 255f;
+                        v.CLR0.A = settings.Color.A / 255f;
                         newVerties[i] = v;
                     }
-                    
+
                     // invert faces
-                    for(int i = 0; i < newVerties.Count; i += 3)
+                    for (int i = 0; i < newVerties.Count; i += 3)
                     {
                         var temp = newVerties[i];
                         newVerties[i] = newVerties[i + 2];
@@ -590,7 +614,7 @@ namespace HSDRawViewer.GUI.Plugins
                     }
 
                     var newpobj = pobjGen.CreatePOBJsFromTriangleList(newVerties, attrs, dl.Envelopes);
-
+                    newpobj.Flags = (POBJ_FLAG)040962;
                     if (newDOBJ.Pobj == null)
                         newDOBJ.Pobj = newpobj;
                     else

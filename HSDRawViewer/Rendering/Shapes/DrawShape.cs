@@ -18,7 +18,7 @@ namespace HSDRawViewer.Rendering
             int space = 5;
 
             GL.LineWidth(1f);
-            GL.Color3(Color.White);
+            GL.Color4(1f, 1f, 1f, 1f);
             GL.Begin(PrimitiveType.Lines);
 
             for (int i = -size; i <= size; i += space)
