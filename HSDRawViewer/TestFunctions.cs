@@ -26,7 +26,7 @@ namespace HSDRawViewer
             var rootJOBJ = (HSD_JOBJ)(file.Roots[0].Data);
 
             var compressor = new POBJ_Generator();
-            foreach (var jobj in rootJOBJ.BreathFirstSearch)
+            foreach (var jobj in rootJOBJ.BreathFirstList)
             {
                 if (jobj.Dobj != null)
                     foreach (var dobj in jobj.Dobj.List)

@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.Melee.Pl
+﻿using System;
+
+namespace HSDRaw.Melee.Pl
 {
     public class SBM_CommonFighterAttributes : HSDAccessor
     {
@@ -196,6 +198,15 @@
 
         public float FootstoolYOffset { get => _s.GetFloat(0x17C); set => _s.SetFloat(0x17C, value); }
 
-        public float WeightDependentThrowSpeedFlags { get => _s.GetFloat(0x180); set => _s.SetFloat(0x180, value); }
+        public WeightDependentFlag WeightDependentThrowSpeedFlags { get => (WeightDependentFlag)(_s.GetInt32(0x180)>>24); set => _s.SetInt32(0x180, (int)value << 24); }
+    }
+
+    [Flags]
+    public enum WeightDependentFlag
+    {
+        FThrow = 1,
+        BThrow = 2,
+        UThrow = 4,
+        DThrow = 8
     }
 }

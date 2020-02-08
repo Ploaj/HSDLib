@@ -101,6 +101,12 @@
     <Compile Include="ContextMenus\MatAnimJointContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\MeleeEffectTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\ParticleContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\SelectCharContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>

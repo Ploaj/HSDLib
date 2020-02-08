@@ -56,14 +56,17 @@
                 _s.Resize(size);
 
                 size = 0x0C + 4 * value.Length;
-                i = 0;
                 foreach (var v in value)
                 {
                     if (size % 0x8 != 0)
                         size += 0x8 - (size % 0x8);
 
                     _s.SetBytes(size, v._s.GetData());
+
+                    size += v._s.Length;
                 }
+
+                ParticleCount = value.Length;
             }
         }
     }

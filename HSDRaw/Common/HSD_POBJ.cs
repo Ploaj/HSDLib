@@ -7,7 +7,8 @@ namespace HSDRaw.Common
     [Flags]
     public enum POBJ_FLAG
     {
-        SKIN = (0 << 12),
+        UNKNOWN = (1 << 1),
+        ANIM = (1 << 3),
         SHAPEANIM = (1 << 12),
         ENVELOPE = (1 << 13),
         CULLFRONT = (1 << 14),
@@ -83,7 +84,36 @@ namespace HSDRaw.Common
                 DisplayListSize = value.Length;
             }
         }
-        
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public HSD_ShapeSet ShapeSet
+        {
+            get
+            {
+                if (Flags.HasFlag(POBJ_FLAG.SHAPEANIM))
+                {
+                    return _s.GetReference<HSD_ShapeSet>(0x14);
+                }
+                return null;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    Flags = Flags & ~POBJ_FLAG.ENVELOPE;
+                    Flags |= POBJ_FLAG.SHAPEANIM;
+                }
+                else
+                {
+                    Flags &= ~POBJ_FLAG.SHAPEANIM;
+                }
+                _s.SetReference(0x14, value);
+            }
+        }
+
         /// <summary>
         /// Transforms model by single bound jobj
         /// </summary>
@@ -91,7 +121,7 @@ namespace HSDRaw.Common
         {
             get
             {
-                if (Flags.HasFlag(POBJ_FLAG.SKIN) && !Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+                if (!Flags.HasFlag(POBJ_FLAG.ENVELOPE) && !Flags.HasFlag(POBJ_FLAG.SHAPEANIM))
                 {
                     return _s.GetReference<HSD_JOBJ>(0x14);
                 }
@@ -99,12 +129,12 @@ namespace HSDRaw.Common
             }
             set
             {
-                Flags = Flags & ~POBJ_FLAG.SKIN;
-                Flags = Flags & ~POBJ_FLAG.ENVELOPE;
-                if (value != null)
+                if(value != null)
                 {
-                    Flags = Flags | POBJ_FLAG.SKIN;
+                    Flags = Flags & ~POBJ_FLAG.ENVELOPE;
+                    Flags = Flags & ~POBJ_FLAG.SHAPEANIM;
                 }
+
                 _s.SetReference(0x14, value);
             }
         }
@@ -124,7 +154,6 @@ namespace HSDRaw.Common
             }
             set
             {
-                Flags = Flags & ~POBJ_FLAG.SKIN;
                 Flags = Flags & ~POBJ_FLAG.ENVELOPE;
                 if (value != null && value.Length > 0)
                 {
@@ -132,8 +161,7 @@ namespace HSDRaw.Common
                     _s.GetCreateReference<HSDNullPointerArrayAccessor<HSD_Envelope>>(0x14).Array = value;
                 }
                 else
-                    if(!Flags.HasFlag(POBJ_FLAG.SKIN))
-                        _s.SetReference(0x14, null);
+                    _s.SetReference(0x14, null);
             }
         }
         

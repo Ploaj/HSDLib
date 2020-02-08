@@ -26,10 +26,11 @@ namespace HSDRaw.Common
 
         public HSD_JOBJ RootJoint { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_AnimJoint> SkelAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_AnimJoint>>(0x04); set => _s.SetReference(0x04, value); }
+        public HSDNullPointerArrayAccessor<HSD_AnimJoint> JointAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_AnimJoint>>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_MatAnimJoint> MatAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_MatAnimJoint>>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDNullPointerArrayAccessor<HSD_MatAnimJoint> MaterialAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_MatAnimJoint>>(0x08); set => _s.SetReference(0x08, value); }
 
-        //public int Unknown { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        public HSDNullPointerArrayAccessor<HSD_ShapeAnimJoint> ShapeAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_ShapeAnimJoint>>(0x0C); set => _s.SetReference(0x0C, value); }
+
     }
 }

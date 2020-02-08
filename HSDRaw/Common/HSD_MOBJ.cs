@@ -7,8 +7,8 @@ namespace HSDRaw.Common
     public enum RENDER_MODE
     {
         DIFFUSE_MAT0 = (0 << 0),
-        DIFFSE_MAT = (1 << 0),
-        DIFFSE_VTX = (2 << 0),
+        DIFFUSE_MAT = (1 << 0),
+        DIFFUSE_VTX = (2 << 0),
         DIFFSE_BOTH = (3 << 0),
         DIFFUSE = (1 << 2),
         SPECULAR = (1 << 3),

@@ -13,8 +13,8 @@ namespace HSDRaw.Melee.Gr
 
         public HSDNullPointerArrayAccessor<HSD_MatAnimJoint> MaterialAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_MatAnimJoint>>(0x08); set => _s.SetReference(0x08, value); }
 
-        //0x0C Unknown null pointer list for unknown anim
-
+        public HSDNullPointerArrayAccessor<HSD_ShapeAnimJoint> ShapeAnimations { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_ShapeAnimJoint>>(0x0C); set => _s.SetReference(0x0C, value); }
+        
         public HSD_Camera Camera { get => _s.GetReference<HSD_Camera>(0x10); set => _s.SetReference(0x10, value); }
 
         //0x14 Unknown 0x0C??

@@ -27,7 +27,14 @@ namespace HSDRaw.GX
 
         public GX_DisplayList(HSD_POBJ pobj)
         {
-            Attributes.AddRange(pobj.Attributes);
+            var attrs = pobj.Attributes;
+
+            if(attrs[attrs.Length - 1].AttributeName != GXAttribName.GX_VA_NULL)
+            {
+                throw new System.FormatException("Attribute buffer does not end with null vertex attribute");
+            }
+
+            Attributes.AddRange(attrs);
 
             Open(pobj.DisplayListBuffer);
             

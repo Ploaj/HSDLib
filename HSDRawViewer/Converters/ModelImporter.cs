@@ -284,7 +284,7 @@ namespace HSDRawViewer.Converters
         {
             rootjobj.Flags = JOBJ_FLAG.SKELETON_ROOT | JOBJ_FLAG.ENVELOPE_MODEL | JOBJ_FLAG.LIGHTING | JOBJ_FLAG.OPA | JOBJ_FLAG.ROOT_OPA;
 
-            foreach (var j in rootjobj.BreathFirstSearch)
+            foreach (var j in rootjobj.BreathFirstList)
             {
                 if (j.Dobj != null)
                     foreach (var d in j.Dobj.List)
@@ -819,7 +819,7 @@ namespace HSDRawViewer.Converters
             Mobj.Material.SpecularColorRGBA = 0xFFFFFFFF;
             Mobj.Material.Shininess = 1;
             Mobj.Material.Alpha = 1;
-            Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_VTX;
+            Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_VTX;
 
             // Properties
             if (settings.ImportMaterialInfo)

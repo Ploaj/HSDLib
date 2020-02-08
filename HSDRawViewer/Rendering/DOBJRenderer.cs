@@ -43,6 +43,8 @@ namespace HSDRawViewer.Rendering
 
         public class CachedPOBJ
         {
+            public POBJ_FLAG Flag;
+
             public Vector4[] Envelopes = new Vector4[10];
             public Vector4[] Weights = new Vector4[10];
 
@@ -190,6 +192,9 @@ namespace HSDRawViewer.Rendering
                 GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
                 
                 GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("hasEnvelopes"), p.HasWeighting ? 1 : 0);
+                
+                if(p.Flag.HasFlag(POBJ_FLAG.CULLFRONT))
+                    GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
 
                 foreach (var dl in p.DisplayLists)
                     GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
@@ -227,6 +232,8 @@ namespace HSDRawViewer.Rendering
 
                 var pobjCache = new CachedPOBJ();
 
+                pobjCache.Flag = pobj.Flags;
+
                 // build envelopes
                 int eni = 0;
                 foreach(var v in dl.Envelopes)
@@ -249,6 +256,10 @@ namespace HSDRawViewer.Rendering
                 // load display list
                 foreach (var v in dl.Primitives)
                 {
+                    /*if (pobj.ShapeSet != null)
+                    {
+                        Console.WriteLine(dl.Vertices.Count + " " + pobj.ShapeSet.VertexIndexCount);
+                    }*/
                     pobjCache.DisplayLists.Add(new CachedDL()
                     {
                         Offset = off,
@@ -300,7 +311,7 @@ namespace HSDRawViewer.Rendering
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
                 GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
 
-                GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp0), pp.AlphaRef0 / 255f);
+                //GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp0), pp.AlphaRef0 / 255f);
                 //GL.AlphaFunc(GXTranslator.toAlphaFunction(pp.AlphaComp1), pp.AlphaRef1 / 255f);
             }
 
@@ -315,11 +326,11 @@ namespace HSDRawViewer.Rendering
             }
 
             shader.SetBoolToInt("enableTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0));
+            shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
             shader.SetBoolToInt("enableSpecular", mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
             shader.SetBoolToInt("enableDiffuse", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
-
-            shader.SetBoolToInt("enableMaterial", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_MAT));
-            shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_VTX));
+            shader.SetBoolToInt("enableMaterial", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
+            shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
 
             shader.SetInt("enableTexDiffuse", 0);
             shader.SetInt("texDiffuse", 0);
@@ -366,6 +377,7 @@ namespace HSDRawViewer.Rendering
                     shader.SetInt("difColorType", 0);
                     shader.SetInt("difAlphaType", 0);
                     shader.SetInt("diffuseCoordType", coordType);
+                    shader.SetBoolToInt("diffuseMirrorFix", mirrorY);
                     shader.SetVector2("diffuseUVScale", wscale, hscale);
 
                     break;

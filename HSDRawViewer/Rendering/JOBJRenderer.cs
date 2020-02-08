@@ -388,7 +388,7 @@ namespace HSDRawViewer.Rendering
             HSD_JOBJ next = null;
             HSD_JOBJ parent = null;
 
-            foreach (var v in RootJOBJ.BreathFirstSearch)
+            foreach (var v in RootJOBJ.BreathFirstList)
             {
                 if (v.Next == jobj)
                     next = v;
@@ -422,7 +422,7 @@ namespace HSDRawViewer.Rendering
             int max = 0;
             if (joint == null)
                 return 0;
-            foreach (var j in joint.BreathFirstSearch)
+            foreach (var j in joint.BreathFirstList)
             {
                 AnimNode n = new AnimNode();
                 if (j.AOBJ != null)
@@ -472,7 +472,7 @@ namespace HSDRawViewer.Rendering
         public void HideDOBJs(List<int> DOBJIndices)
         {
             var i = 0;
-            foreach(var j in RootJOBJ.BreathFirstSearch)
+            foreach(var j in RootJOBJ.BreathFirstList)
             {
                 if(j.Dobj != null)
                 {

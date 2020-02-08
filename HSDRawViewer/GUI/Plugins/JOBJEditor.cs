@@ -376,7 +376,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 Mobj = new HSD_MOBJ()
                 {
-                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT,
+                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT,
                     Material = new HSD_Material()
                     {
                         DiffuseColorRGBA = 0xFFFFFFFF,
@@ -548,7 +548,7 @@ namespace HSDRawViewer.GUI.Plugins
                         Shininess = 50,
                         Alpha = 1
                     },
-                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT
+                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT
                 };
 
                 foreach (var pobj in con.DOBJ.Pobj.List)
@@ -614,7 +614,8 @@ namespace HSDRawViewer.GUI.Plugins
                     }
 
                     var newpobj = pobjGen.CreatePOBJsFromTriangleList(newVerties, attrs, dl.Envelopes);
-                    newpobj.Flags = (POBJ_FLAG)040962;
+                    foreach(var p in newpobj.List)
+                        p.Flags |= POBJ_FLAG.CULLBACK | POBJ_FLAG.UNKNOWN;
                     if (newDOBJ.Pobj == null)
                         newDOBJ.Pobj = newpobj;
                     else

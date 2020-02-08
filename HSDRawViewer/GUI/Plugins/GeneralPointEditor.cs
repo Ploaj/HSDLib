@@ -216,7 +216,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void LoadData()
         {
-            var jobj = GeneralPoints.JOBJReference.BreathFirstSearch;
+            var jobj = GeneralPoints.JOBJReference.BreathFirstList;
 
             foreach(var v in GeneralPoints.Points)
             {
@@ -234,7 +234,7 @@ namespace HSDRawViewer.GUI.Plugins
             var list = PointLinks;// new List<PointLink>(PointLinks.ToList().OrderBy(e => e.Type));
 
             SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[list.Count];
-            var jobjs = GeneralPoints.JOBJReference.BreathFirstSearch;
+            var jobjs = GeneralPoints.JOBJReference.BreathFirstList;
             
             for(int i = 0; i < p.Length; i++)
             {

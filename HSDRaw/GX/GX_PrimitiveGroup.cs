@@ -27,7 +27,8 @@ namespace HSDRaw.GX
             PrimitiveType = (GXPrimitiveType)Reader.ReadByte();
             if (PrimitiveType == 0)
                 return false;
-            var count = Reader.ReadUInt16();
+            var count = Reader.ReadInt16();
+
             Indices = new GX_IndexGroup[count];
             for (int j = 0; j < count; j++)
             {

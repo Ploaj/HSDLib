@@ -15,6 +15,8 @@ uniform int difColorType;
 uniform int difAlphaType;
 uniform int diffuseCoordType;
 uniform vec2 diffuseUVScale;
+uniform int diffuseMirrorFix;
+
 
 // material
 uniform vec4 ambientColor;
@@ -25,6 +27,7 @@ uniform float alpha;
 
 
 // flags
+uniform int dfNone;
 uniform int enableMaterial;
 uniform int enableDiffuse;
 uniform int enableSpecular;
@@ -62,13 +65,18 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 ///
 ///
 ///
-vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, vec2 uvscale, int coordType, sampler2D tex, int colorMixType, int alphaMixType)
+vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, vec2 uvscale, int coordType, int mirrorFix, sampler2D tex, int colorMixType, int alphaMixType)
 {
     vec4 clr = vec4(1);
 
     vec2 coords = GetCoordType(coordType, texCoord);
+	
+	coords *= uvscale;
 
-    clr = texture(tex, coords * uvscale);
+	if(mirrorFix == 1) // GX OPENGL difference
+		coords.y += 1;
+
+    clr = texture(tex, coords);
 
     return clr;
 }
@@ -81,21 +89,21 @@ vec4 DiffusePass(vec3 N, vec3 V)
 	vec4 diffuseTerm = vec4(1);
 
     float lambert = clamp(dot(N, V), 0, 1);
-	//if(enableMaterial == 0)
-	//	lambert = 1;
+	if(N.x == 0 && N.y == 0 && N.z == 0)
+		lambert = 1;
 	
 	vec4 colorPass = vec4(1);
 
     if (enableTexDiffuse == 1)
 	{
-		colorPass = MixTextureColor(diffuseTerm, texcoord0, diffuseUVScale, diffuseCoordType, diffuseTex, difColorType, difAlphaType);
+		colorPass = MixTextureColor(diffuseTerm, texcoord0, diffuseUVScale, diffuseCoordType, diffuseMirrorFix, diffuseTex, difColorType, difAlphaType);
 
 		diffuseTerm.rgb = colorPass.rgb;
 
 		diffuseTerm.a = colorPass.a;
 	}
 	
-	if(enableMaterial == 1)
+	//if(enableMaterial == 1)
 	{
 		diffuseTerm.rgb = clamp(diffuseTerm.rgb, ambientColor.rgb * colorPass.rgb, vec3(1));
 	
@@ -137,7 +145,10 @@ void main()
 
 	fragColor.rgb += diffusePass.rgb;// * enableDiffuse;
 
-	fragColor.a = alpha * diffusePass.a;
+	fragColor.a = diffusePass.a;
+
+	if(dfNone == 0)
+		fragColor.a *= alpha;
 
 	if(useVertexColor == 1)
 		fragColor *= vertexColor;
@@ -146,5 +157,4 @@ void main()
 
 	if(colorOverride == 1)
 		fragColor = vec4(1, 1, 1, 1);
-
 }

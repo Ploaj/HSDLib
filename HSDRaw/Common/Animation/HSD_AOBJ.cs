@@ -13,6 +13,16 @@ namespace HSDRaw.Common.Animation
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public class HSD_AOBJDesc : HSDListAccessor<HSD_AOBJDesc>
+    {
+        public override HSD_AOBJDesc Next { get => _s.GetReference<HSD_AOBJDesc>(0x00); set => _s.SetReference(0x00, value); }
+
+        public HSD_AOBJ AnimationObject { get => _s.GetReference<HSD_AOBJ>(0x04); set => _s.SetReference(0x04, value); }
+    }
+
+    /// <summary>
     /// Animation Object
     /// </summary>
     public class HSD_AOBJ : HSDAccessor
