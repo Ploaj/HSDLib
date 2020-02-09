@@ -46,9 +46,14 @@ namespace HSDRaw.Melee.Pl
 
         public int AnimationSize { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
-        public HSDAccessor SubAction { get => _s.GetReference<HSDAccessor>(0x0C); set => _s.SetReference(0x0C, value); }
+        public SBM_SubactionData SubAction { get => _s.GetReference<SBM_SubactionData>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public int Flags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
         
+    }
+
+    public class SBM_SubactionData : HSDAccessor
+    {
+
     }
 }

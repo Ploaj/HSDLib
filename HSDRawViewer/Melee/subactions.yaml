@@ -99,21 +99,20 @@
     bitCount: 9
   - name: Size
     bitCount: 16
-  - name: Z
+  - name: Z-Offset
     bitCount: 16
     signed: true
-  - name: Y
+  - name: Y-Offset
     bitCount: 16
     signed: true
-  - name: X
+  - name: X-Offset
     bitCount: 16
     signed: true
   - name: Angle
     bitCount: 9
-    signed: true
-  - name: KBG
+  - name: Knockback Growth
     bitCount: 9
-  - name: Weight Set KB
+  - name: Weight Set Knockback
     bitCount: 9
   - name: Unk3
     bitCount: 3
@@ -124,7 +123,7 @@
     - Normal Does not Clank
     - Can Clank
     - Normal Can Clank
-  - name: BKB
+  - name: Base Knockback
     bitCount: 9
   - name: Element
     bitCount: 5
@@ -150,7 +149,7 @@
     bitCount: 1
   - name: Shield Damage
     bitCount: 7
-  - name: Sound Effect
+  - name: Hit Sound Effect
     bitCount: 8
   - name: Hurtbox Interaction
     bitCount: 2

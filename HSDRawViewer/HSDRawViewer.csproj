@@ -50,6 +50,7 @@
     <Reference Include="OpenTK.GLControl, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.GLControl.3.1.0\lib\net20\OpenTK.GLControl.dll</HintPath>
     </Reference>
+    <Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -84,6 +85,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\FigatreeContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\FighterArticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\FOBJContextMenu.cs">
@@ -403,12 +407,6 @@
     <None Include="Resources\ico_known.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj">
-      <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
-      <Name>HSDRaw</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\ico_anim_joint.png" />
   </ItemGroup>
   <ItemGroup>
@@ -434,6 +432,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="dogg.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj">
+      <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
+      <Name>HSDRaw</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup>
     <ReferenceCopyLocalPaths>

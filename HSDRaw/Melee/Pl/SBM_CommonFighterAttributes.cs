@@ -1,11 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace HSDRaw.Melee.Pl
 {
     public class SBM_CommonFighterAttributes : HSDAccessor
     {
         public override int TrimmedSize => 0x184;
-
+        
         public float InitialWalkSpeed { get => _s.GetFloat(0x000); set => _s.SetFloat(0x000, value); }
 
         public float WalkAcceleration { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
@@ -198,15 +199,18 @@ namespace HSDRaw.Melee.Pl
 
         public float FootstoolYOffset { get => _s.GetFloat(0x17C); set => _s.SetFloat(0x17C, value); }
 
-        public WeightDependentFlag WeightDependentThrowSpeedFlags { get => (WeightDependentFlag)(_s.GetInt32(0x180)>>24); set => _s.SetInt32(0x180, (int)value << 24); }
+        [DisplayName("Weight Independent Throw Flags"), Description("Throws that are weight independent. Weight independent throw's speed are not affected by character weight")]
+        public WeightDependentFlag WeightIndependentThrows { get => (WeightDependentFlag)(_s.GetInt32(0x180)>>24); set => _s.SetInt32(0x180, (int)value << 24); }
     }
 
     [Flags]
     public enum WeightDependentFlag
     {
+        None = 0,
         FThrow = 1,
         BThrow = 2,
         UThrow = 4,
-        DThrow = 8
+        DThrow = 8,
+        All = 0xF
     }
 }

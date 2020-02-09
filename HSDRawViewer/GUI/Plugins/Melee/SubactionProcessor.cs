@@ -145,7 +145,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             int loopAmt = 0;
             int loopPos = 0;
-            for(int i = 0; i < commands.Count; i++)
+            for (int i = 0; i < commands.Count; i++)
             {
                 var cmd = commands[i];
                 switch (cmd.Action.Code)
@@ -165,7 +165,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 4: //end loop
                         loopAmt -= 1;
-                        if(loopAmt != 0)
+                        if(loopAmt > 0)
                             i = loopPos;
                         break;
                     case 5: //subroutine
@@ -184,8 +184,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         {
                             ID = cmd.Parameters[0],
                             BoneID = cmd.Parameters[2],
-                            Size = ((short)cmd.Parameters[5] >> 7) / 2f,
-                            Point1 = new Vector3(cmd.Parameters[6] >> 7, cmd.Parameters[7] >> 7, cmd.Parameters[8] >> 7) / 2,
+                            Size = ((short)cmd.Parameters[5] >> 7) / 2,
+                            Point1 = new Vector3(cmd.Parameters[6] >> 7, cmd.Parameters[7] >> 7, cmd.Parameters[8] >> 7),
                             Element = cmd.Parameters[15]
                         });
                         break;

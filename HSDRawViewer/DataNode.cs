@@ -76,6 +76,9 @@ namespace HSDRawViewer
             { typeof(Map_GOBJ), "group" },
             { typeof(SBM_EffectModel), "group" },
             { typeof(SBM_EffectTable), "table" },
+            { typeof(SBM_ArticlePointer), "group" },
+            { typeof(SBM_HurtboxBank<SBM_Hurtbox>), "group" },
+            { typeof(SBM_HurtboxBank<SBM_ItemHurtbox>), "group" },
             { typeof(SBM_SubActionTable), "table" },
             { typeof(SBM_PlayerModelLookupTables), "table" },
         };
@@ -193,7 +196,9 @@ namespace HSDRawViewer
                             {
                                 IsArrayMember = true,
                                 ArrayName = prop.Name,
-                                ArrayIndex = index
+                                ArrayIndex = index,
+                                ImageKey = "group",
+                                SelectedImageKey = "group"
                             });
                             // add substructs too so they don't get appended at the end
                             foreach (var ss in a._s.References)

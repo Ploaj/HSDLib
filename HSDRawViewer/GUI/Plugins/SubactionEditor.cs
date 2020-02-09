@@ -102,7 +102,7 @@ namespace HSDRawViewer.GUI
 
         public DockState DefaultDockState => DockState.Document;
 
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable) };
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_SubactionData) };
 
         public DataNode Node
         {
@@ -110,31 +110,47 @@ namespace HSDRawViewer.GUI
             set
             {
                 _node = value;
-                SubactionTable = _node.Accessor as SBM_SubActionTable;
-                LoadActions(SubactionTable.Subactions);
-                RefreshActionList();
-                
-                if(Node.Parent is DataNode parent)
+                if (value.Accessor is SBM_SubactionData sudata)
                 {
-                    if(parent.Accessor is SBM_PlayerData plDat)
+                    SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
                     {
-                        if(plDat.Hurtboxes != null)
-                            Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
-
-                        if (plDat.ModelLookupTables != null)
+                        new SBM_FighterSubAction()
                         {
-                            var lowpolyStruct = plDat.ModelLookupTables
-                                ?._s.GetReference<HSDAccessor>(0x04)
-                                ?._s.GetReference<HSDAccessor>(0x04)
-                                ?._s.GetReference<HSDAccessor>(0x04)?._s;
+                            SubAction = sudata,
+                            Name = "Script"
+                        }
+                    };
 
-                            var tab = lowpolyStruct?.GetReference <HSDAccessor>(0x04)?._s;
+                    LoadActions(su);
+                    RefreshActionList();
+                }
+                if(value.Accessor is SBM_SubActionTable SubactionTable)
+                {
+                    LoadActions(SubactionTable.Subactions);
+                    RefreshActionList();
 
-                            if(lowpolyStruct != null && tab != null)
+                    if (Node.Parent is DataNode parent)
+                    {
+                        if (parent.Accessor is SBM_PlayerData plDat)
+                        {
+                            if (plDat.Hurtboxes != null)
+                                Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
+
+                            if (plDat.ModelLookupTables != null)
                             {
-                                for (int i = 0; i < lowpolyStruct.GetInt32(0); i++)
+                                var lowpolyStruct = plDat.ModelLookupTables
+                                    ?._s.GetReference<HSDAccessor>(0x04)
+                                    ?._s.GetReference<HSDAccessor>(0x04)
+                                    ?._s.GetReference<HSDAccessor>(0x04)?._s;
+
+                                var tab = lowpolyStruct?.GetReference<HSDAccessor>(0x04)?._s;
+
+                                if (lowpolyStruct != null && tab != null)
                                 {
-                                    HiddenDOBJIndices.Add(tab.GetByte(i));
+                                    for (int i = 0; i < lowpolyStruct.GetInt32(0); i++)
+                                    {
+                                        HiddenDOBJIndices.Add(tab.GetByte(i));
+                                    }
                                 }
                             }
                         }
@@ -144,7 +160,6 @@ namespace HSDRawViewer.GUI
         }
 
         private DataNode _node;
-        private SBM_SubActionTable SubactionTable;
 
         private readonly List<Action> AllScripts = new List<Action>();
 

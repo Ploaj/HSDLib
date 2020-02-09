@@ -20,15 +20,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     {
         public DockState DefaultDockState => DockState.Document;
 
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_HurtboxBank) };
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_HurtboxBank<SBM_Hurtbox>) };
 
         public DataNode Node
         {
-            get => _node; set { _node = value;  HBBank = value.Accessor as SBM_HurtboxBank; }
+            get => _node; set { _node = value;  HBBank = value.Accessor as SBM_HurtboxBank<SBM_Hurtbox>; }
         }
         private DataNode _node;
 
-        private SBM_HurtboxBank HBBank
+        private SBM_HurtboxBank<SBM_Hurtbox> HBBank
         {
             get => _bank;
             set
@@ -40,7 +40,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 }
             }
         }
-        private SBM_HurtboxBank _bank;
+        private SBM_HurtboxBank<SBM_Hurtbox> _bank;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
         

@@ -37,7 +37,7 @@ namespace HSDRaw.Melee.Pl
 
         public HSDAccessor Unknown0x2C { get => _s.GetReference<HSDAccessor>(0x2C); set => _s.SetReference(0x2C, value); }
 
-        public SBM_HurtboxBank Hurtboxes { get => _s.GetReference<SBM_HurtboxBank>(0x30); set => _s.SetReference(0x30, value); }
+        public SBM_HurtboxBank<SBM_Hurtbox> Hurtboxes { get => _s.GetReference<SBM_HurtboxBank<SBM_Hurtbox>>(0x30); set => _s.SetReference(0x30, value); }
 
         public HSDAccessor Unknown0x34 { get => _s.GetReference<HSDAccessor>(0x34); set => _s.SetReference(0x34, value); }
 
@@ -49,7 +49,7 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_LedgeGrabBox LedgeGrabBox { get => _s.GetReference<SBM_LedgeGrabBox>(0x44); set => _s.SetReference(0x44, value); }
 
-        public HSDAccessor Articles { get => _s.GetReference<HSDAccessor>(0x48); set => _s.SetReference(0x48, value); }
+        public SBM_ArticlePointer Articles { get => _s.GetReference<SBM_ArticlePointer>(0x48); set => _s.SetReference(0x48, value); }
 
         public HSDAccessor Unknown0x4C { get => _s.GetReference<HSDAccessor>(0x4C); set => _s.SetReference(0x4C, value); }
 

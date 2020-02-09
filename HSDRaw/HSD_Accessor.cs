@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.ComponentModel;
 
 namespace HSDRaw
 {
@@ -11,7 +12,8 @@ namespace HSDRaw
     public class HSDAccessor
     {
         public HSDStruct _s;
-        
+
+        [Browsable(false)]
         public virtual int TrimmedSize { get; } = -1;
 
         public HSDAccessor()
