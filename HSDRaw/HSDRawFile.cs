@@ -11,6 +11,8 @@ using HSDRaw.AirRide.Vc;
 using HSDRaw.Melee.Ef;
 using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
+using System.Diagnostics;
+using HSDRaw.Melee;
 
 namespace HSDRaw
 {
@@ -84,6 +86,10 @@ namespace HSDRaw
             {
                 r.BigEndian = true;
 
+                Stopwatch sw = new Stopwatch();
+
+                sw.Start();
+
                 // Parse Header -----------------------------
                 var fsize = r.ReadInt32(); // dat size
                 int relocOffset = r.ReadInt32() + 0x20;
@@ -111,7 +117,7 @@ namespace HSDRaw
 
                     // if we need to read past end of file then we need to include filesize as an offset
                     // this fixes files that had previously been manually relocated to end of file
-                    if(objectOff > relocOffset && !Offsets.Contains(fsize))
+                    if(objectOff > relocOffset && !OffsetContain.Contains(fsize))
                         Offsets.Add(fsize);
 
                     //
@@ -131,6 +137,9 @@ namespace HSDRaw
 
                     r.BaseStream.Position = temp;
                 }
+
+                Debug.WriteLine("Relocate Parsed: " + sw.ElapsedMilliseconds);
+                sw.Restart();
 
                 // Parse Roots---------------------------------
                 List<int> rootOffsets = new List<int>();
@@ -190,14 +199,20 @@ namespace HSDRaw
                     }
 
 
+                Debug.WriteLine("Roots Parsed: " + sw.ElapsedMilliseconds);
+                sw.Restart();
                 // Split Raw Struct Data--------------------------
                 Offsets.Sort();
+
+                Debug.WriteLine("Sorted: " + sw.ElapsedMilliseconds);
+                sw.Restart();
 
                 Dictionary<int, HSDStruct> offsetToStruct = new Dictionary<int, HSDStruct>();
                 Dictionary<int, List<int>> offsetToOffsets = new Dictionary<int, List<int>>();
                 Dictionary<int, List<int>> offsetToInnerOffsets = new Dictionary<int, List<int>>();
 
                 var relockeys = relocOffsets.Keys.ToList();
+                relockeys.Sort();
                 for (int i = 0; i < Offsets.Count - 1; i++)
                 {
                     r.BaseStream.Position = Offsets[i];
@@ -205,10 +220,18 @@ namespace HSDRaw
 
                     if (!offsetToOffsets.ContainsKey(Offsets[i]))
                     {
-                        var relocKets = relockeys.FindAll(e => e >= Offsets[i] && e < Offsets[i + 1]);
+                        var relocKets = new List<int>();
                         var list = new List<int>();
-                        foreach (var k in relocKets)
-                            list.Add(relocOffsets[k]);
+                        var min = BinarySearch(relockeys, Offsets[i]);
+                        var max = BinarySearch(relockeys, Offsets[i + 1]) + 1;
+                        for(int v = min; v < max; v++)
+                        {
+                            if (relockeys[v] >= Offsets[i] && relockeys[v] < Offsets[i + 1])
+                            {
+                                relocKets.Add(relockeys[v]);
+                                list.Add(relocOffsets[relockeys[v]]);
+                            }
+                        }
                         offsetToOffsets.Add(Offsets[i], list);
                         offsetToInnerOffsets.Add(Offsets[i], relocKets);
                     }
@@ -220,9 +243,11 @@ namespace HSDRaw
                         offsetToStruct.Add(Offsets[i], struture);
                     }
                 }
+                Debug.WriteLine("Find All Parsed: " + sw.ElapsedMilliseconds);
+                sw.Restart();
 
                 // set references-------------------------
-                foreach(var str in offsetToStruct)
+                foreach (var str in offsetToStruct)
                 {
                     var offsets = offsetToOffsets[str.Key];
                     var innerOffsets = offsetToInnerOffsets[str.Key];
@@ -240,182 +265,7 @@ namespace HSDRaw
                 for (int i = 0; i < rootOffsets.Count; i++)
                 {
                     HSDStruct str = offsetToStruct[rootOffsets[i]];
-                    HSDAccessor a = new HSDAccessor();
-                    a._s = str;
-                    if (rootStrings[i].EndsWith("shapeanim_joint"))
-                    {
-                        var acc = new HSDAccessor();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("matanim_joint"))
-                    {
-                        var acc = new HSD_MatAnimJoint();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_joint"))
-                    {
-                        var jobj = new HSD_JOBJ();
-                        jobj._s = str;
-                        a = jobj;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_animjoint"))
-                    {
-                        var jobj = new HSD_AnimJoint();
-                        jobj._s = str;
-                        a = jobj;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_texanim"))
-                    {
-                        var jobj = new HSD_TexAnim();
-                        jobj._s = str;
-                        a = jobj;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_figatree"))
-                    {
-                        var jobj = new HSD_FigaTree();
-                        jobj._s = str;
-                        a = jobj;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_scene_models") ||
-                        rootStrings[i].Equals("Stc_rarwmdls") ||
-                        rootStrings[i].Equals("Stc_scemdls") ||
-                        rootStrings[i].Equals("lupe") ||
-                        rootStrings[i].Equals("tdsce"))
-                    {
-                        var jobj = new HSDNullPointerArrayAccessor<HSD_JOBJDesc>();
-                        jobj._s = str;
-                        a = jobj;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("ftData"))
-                    {
-                        var acc = new SBM_PlayerData();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("MnSelectChrDataTable"))
-                    {
-                        var acc = new SBM_SelectChrDataTable();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("MnSelectStageDataTable"))
-                    {
-                        var acc = new SBM_MnSelectStageDataTable();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("coll_data"))
-                    {
-                        var acc = new SBM_Coll_Data();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("scene_data") || 
-                        rootStrings[i].Equals("pnlsce") ||
-                        rootStrings[i].Equals("flmsce") ||
-                        (rootStrings[i].StartsWith("Sc") && str.Length == 0x10))
-                    {
-                        var acc = new HSD_SOBJ();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("map_plit"))
-                    {
-                        var acc = new HSDNullPointerArrayAccessor<HSD_Light>();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    /*else
-                    if (rootStrings[i].StartsWith("grGroundParam"))
-                    {
-                        var acc = new SBM_GroundParam();
-                        acc._s = str;
-                        a = acc;
-                    }*/
-                    else
-                    if (rootStrings[i].StartsWith("map_head"))
-                    {
-                        var acc = new SBM_Map_Head();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("grGroundParam"))
-                    {
-                        var acc = new SBM_GroundParam();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("vcDataStar"))
-                    {
-                        var acc = new KAR_vcDataStar();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("vcDataWheel"))
-                    {
-                        var acc = new KAR_vcDataWheel();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("grModelMotion"))
-                    {
-                        var acc = new KAR_grModelMotion();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("grModel"))
-                    {
-                        var acc = new KAR_grModel();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("grData"))
-                    {
-                        var acc = new KAR_grData();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_texg"))
-                    {
-                        var acc = new HSD_TEXGraphicBank();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].EndsWith("_ptcl"))
-                    {
-                        var acc = new HSD_ParticleGroup();
-                        acc._s = str;
-                        a = acc;
-                    }
-                    else
-                    if (rootStrings[i].StartsWith("eff"))
-                    {
-                        var acc = new SBM_EffectTable();
-                        acc._s = str;
-                        a = acc;
-                    }
+                    HSDAccessor a = GuessAccessor(rootStrings[i], str);
 
                     Roots.Add(new HSDRootNode() { Name = rootStrings[i], Data = a });
                 }
@@ -429,7 +279,29 @@ namespace HSDRaw
                     a._s = str;
                     References.Add(new HSDRootNode() { Name = refStrings[i], Data = a });
                 }
+
+
+                Debug.WriteLine("Finish: " + sw.ElapsedMilliseconds);
+                sw.Restart();
             }
+        }
+
+        public static int BinarySearch(List<int> a, int item)
+        {
+            int first = 0;
+            int last = a.Count - 1;
+            int mid = 0;
+            do
+            {
+                mid = first + (last - first) / 2;
+                if (item > a[mid])
+                    first = mid + 1;
+                else
+                    last = mid - 1;
+                if (a[mid] == item)
+                    return mid;
+            } while (first <= last);
+            return mid;
         }
 
         /// <summary>
@@ -746,6 +618,204 @@ namespace HSDRaw
             }
 
             return found;
+        }
+
+
+        /// <summary>
+        /// Attempts to guess the structure type based on the root name
+        /// </summary>
+        /// <param name="rootString"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private HSDAccessor GuessAccessor(string rootString, HSDStruct str)
+        {
+            HSDAccessor a = new HSDAccessor()
+            {
+                _s = str
+            };
+            if (rootString.EndsWith("shapeanim_joint"))
+            {
+                var acc = new HSDAccessor();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("matanim_joint"))
+            {
+                var acc = new HSD_MatAnimJoint();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("_joint"))
+            {
+                var jobj = new HSD_JOBJ();
+                jobj._s = str;
+                a = jobj;
+            }
+            else
+            if (rootString.EndsWith("_animjoint"))
+            {
+                var jobj = new HSD_AnimJoint();
+                jobj._s = str;
+                a = jobj;
+            }
+            else
+            if (rootString.EndsWith("_texanim"))
+            {
+                var jobj = new HSD_TexAnim();
+                jobj._s = str;
+                a = jobj;
+            }
+            else
+            if (rootString.EndsWith("_figatree"))
+            {
+                var jobj = new HSD_FigaTree();
+                jobj._s = str;
+                a = jobj;
+            }
+            else
+            if (rootString.EndsWith("_scene_models") ||
+                rootString.Equals("Stc_rarwmdls") ||
+                rootString.Equals("Stc_scemdls") ||
+                rootString.Equals("lupe") ||
+                rootString.Equals("tdsce"))
+            {
+                var jobj = new HSDNullPointerArrayAccessor<HSD_JOBJDesc>();
+                jobj._s = str;
+                a = jobj;
+            }
+            else
+            if (rootString.StartsWith("ftData"))
+            {
+                var acc = new SBM_PlayerData();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("MnSelectChrDataTable"))
+            {
+                var acc = new SBM_SelectChrDataTable();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("MnSelectStageDataTable"))
+            {
+                var acc = new SBM_MnSelectStageDataTable();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("coll_data"))
+            {
+                var acc = new SBM_Coll_Data();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("scene_data") ||
+                rootString.Equals("pnlsce") ||
+                rootString.Equals("flmsce") ||
+                (rootString.StartsWith("Sc") && str.Length == 0x10))
+            {
+                var acc = new HSD_SOBJ();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("map_plit"))
+            {
+                var acc = new HSDNullPointerArrayAccessor<HSD_Light>();
+                acc._s = str;
+                a = acc;
+            }
+            /*else
+            if (rootString.StartsWith("grGroundParam"))
+            {
+                var acc = new SBM_GroundParam();
+                acc._s = str;
+                a = acc;
+            }*/
+            else
+            if (rootString.StartsWith("map_head"))
+            {
+                var acc = new SBM_Map_Head();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("grGroundParam"))
+            {
+                var acc = new SBM_GroundParam();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("vcDataStar"))
+            {
+                var acc = new KAR_vcDataStar();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("vcDataWheel"))
+            {
+                var acc = new KAR_vcDataWheel();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("grModelMotion"))
+            {
+                var acc = new KAR_grModelMotion();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("grModel"))
+            {
+                var acc = new KAR_grModel();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("grData"))
+            {
+                var acc = new KAR_grData();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("_texg"))
+            {
+                var acc = new HSD_TEXGraphicBank();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.EndsWith("_ptcl"))
+            {
+                var acc = new HSD_ParticleGroup();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("eff"))
+            {
+                var acc = new SBM_EffectTable();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("itPublicData"))
+            {
+                var acc = new itPublicData();
+                acc._s = str;
+                a = acc;
+            }
+
+            return a;
         }
     }
 }
