@@ -51,7 +51,7 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_ArticlePointer Articles { get => _s.GetReference<SBM_ArticlePointer>(0x48); set => _s.SetReference(0x48, value); }
 
-        public HSDAccessor Unknown0x4C { get => _s.GetReference<HSDAccessor>(0x4C); set => _s.SetReference(0x4C, value); }
+        public HSDAccessor RandomSmashAttackEffectTable { get => _s.GetReference<HSDAccessor>(0x4C); set => _s.SetReference(0x4C, value); }
 
         public HSDAccessor Unknown0x50 { get => _s.GetReference<HSDAccessor>(0x50); set => _s.SetReference(0x50, value); }
 

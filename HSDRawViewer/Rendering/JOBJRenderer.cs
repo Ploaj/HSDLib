@@ -30,6 +30,14 @@ namespace HSDRawViewer.Rendering
 
         public DOBJManager DOBJManager = new DOBJManager();
 
+        public float ModelScale { get => _modelScale;
+            set
+            {
+                _modelScale = value;
+            }
+        }
+        private float _modelScale = 1f;
+
         // caches
         private class JOBJCache
         {
@@ -308,8 +316,8 @@ namespace HSDRawViewer.Rendering
             var world = local;
             if (parent != null)
                 world = local * parent.WorldTransform;
-            
-            if(!jobjToCache.ContainsKey(root))
+
+            if (!jobjToCache.ContainsKey(root))
             {
                 var jcache = new JOBJCache()
                 {
@@ -319,6 +327,9 @@ namespace HSDRawViewer.Rendering
                 };
                 jobjToCache.Add(root, jcache);
             }
+
+            if (parent == null)
+                world *= Matrix4.CreateScale(ModelScale);
 
             var cache = jobjToCache[root];
 

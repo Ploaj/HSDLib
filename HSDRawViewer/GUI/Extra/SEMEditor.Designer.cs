@@ -43,17 +43,28 @@
             this.buttonAddSound = new System.Windows.Forms.ToolStripButton();
             this.buttonRemoveSound = new System.Windows.Forms.ToolStripButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.splitter3 = new System.Windows.Forms.Splitter();
             this.scriptBox = new System.Windows.Forms.RichTextBox();
             this.buttonSaveScript = new System.Windows.Forms.Button();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.splitter2 = new System.Windows.Forms.Splitter();
+            this.scriptGroup = new System.Windows.Forms.GroupBox();
+            this.splitter4 = new System.Windows.Forms.Splitter();
+            this.soundBankList = new System.Windows.Forms.ListBox();
+            this.splitter3 = new System.Windows.Forms.Splitter();
+            this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
+            this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+            this.buttonSoundBankAdd = new System.Windows.Forms.ToolStripButton();
+            this.buttonSoundBankDelete = new System.Windows.Forms.ToolStripButton();
+            this.dspViewer1 = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.menuStrip1.SuspendLayout();
             this.entryBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.soundBox.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.scriptGroup.SuspendLayout();
+            this.toolStrip3.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -96,26 +107,22 @@
             this.entryList.FormattingEnabled = true;
             this.entryList.Location = new System.Drawing.Point(3, 41);
             this.entryList.Name = "entryList";
-            this.entryList.Size = new System.Drawing.Size(159, 281);
+            this.entryList.Size = new System.Drawing.Size(159, 405);
             this.entryList.TabIndex = 1;
             this.entryList.SelectedIndexChanged += new System.EventHandler(this.entryList_SelectedIndexChanged);
-            this.entryList.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox_DragDrop);
-            this.entryList.DragOver += new System.Windows.Forms.DragEventHandler(this.listBox_DragOver);
-            this.entryList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBox_MouseDown);
             // 
             // soundList
             // 
             this.soundList.AllowDrop = true;
-            this.soundList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.soundList.Dock = System.Windows.Forms.DockStyle.Left;
             this.soundList.FormattingEnabled = true;
             this.soundList.Location = new System.Drawing.Point(3, 41);
             this.soundList.Name = "soundList";
-            this.soundList.Size = new System.Drawing.Size(194, 281);
+            this.soundList.Size = new System.Drawing.Size(230, 134);
             this.soundList.TabIndex = 3;
             this.soundList.SelectedIndexChanged += new System.EventHandler(this.soundList_SelectedIndexChanged);
-            this.soundList.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox_DragDrop);
-            this.soundList.DragOver += new System.Windows.Forms.DragEventHandler(this.listBox_DragOver);
-            this.soundList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBox_MouseDown);
+            this.soundList.DataSourceChanged += new System.EventHandler(this.soundList_DataSourceChanged);
+            this.soundList.DoubleClick += new System.EventHandler(this.soundList_DoubleClick);
             // 
             // entryBox
             // 
@@ -124,7 +131,7 @@
             this.entryBox.Dock = System.Windows.Forms.DockStyle.Left;
             this.entryBox.Location = new System.Drawing.Point(0, 24);
             this.entryBox.Name = "entryBox";
-            this.entryBox.Size = new System.Drawing.Size(165, 325);
+            this.entryBox.Size = new System.Drawing.Size(165, 449);
             this.entryBox.TabIndex = 4;
             this.entryBox.TabStop = false;
             this.entryBox.Text = "Entries";
@@ -162,24 +169,28 @@
             // 
             // soundBox
             // 
+            this.soundBox.Controls.Add(this.splitter4);
+            this.soundBox.Controls.Add(this.scriptGroup);
             this.soundBox.Controls.Add(this.soundList);
             this.soundBox.Controls.Add(this.toolStrip2);
-            this.soundBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.soundBox.Location = new System.Drawing.Point(175, 24);
+            this.soundBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.soundBox.Location = new System.Drawing.Point(168, 24);
             this.soundBox.Name = "soundBox";
-            this.soundBox.Size = new System.Drawing.Size(200, 325);
+            this.soundBox.Size = new System.Drawing.Size(758, 178);
             this.soundBox.TabIndex = 5;
             this.soundBox.TabStop = false;
-            this.soundBox.Text = "Sounds";
+            this.soundBox.Text = "Sound Script";
             // 
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonAddSound,
-            this.buttonRemoveSound});
+            this.buttonRemoveSound,
+            this.buttonMoveUp,
+            this.buttonMoveDown});
             this.toolStrip2.Location = new System.Drawing.Point(3, 16);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(194, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(752, 25);
             this.toolStrip2.TabIndex = 4;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -205,33 +216,25 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.dspViewer1);
             this.groupBox1.Controls.Add(this.splitter3);
-            this.groupBox1.Controls.Add(this.scriptBox);
-            this.groupBox1.Controls.Add(this.buttonSaveScript);
+            this.groupBox1.Controls.Add(this.soundBankList);
+            this.groupBox1.Controls.Add(this.toolStrip3);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(375, 24);
+            this.groupBox1.Location = new System.Drawing.Point(168, 212);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(551, 325);
+            this.groupBox1.Size = new System.Drawing.Size(758, 261);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Data";
-            // 
-            // splitter3
-            // 
-            this.splitter3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter3.Location = new System.Drawing.Point(3, 148);
-            this.splitter3.Name = "splitter3";
-            this.splitter3.Size = new System.Drawing.Size(545, 3);
-            this.splitter3.TabIndex = 1;
-            this.splitter3.TabStop = false;
+            this.groupBox1.Text = "Sound Bank";
             // 
             // scriptBox
             // 
-            this.scriptBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.scriptBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scriptBox.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.scriptBox.Location = new System.Drawing.Point(3, 39);
             this.scriptBox.Name = "scriptBox";
-            this.scriptBox.Size = new System.Drawing.Size(545, 109);
+            this.scriptBox.Size = new System.Drawing.Size(516, 92);
             this.scriptBox.TabIndex = 0;
             this.scriptBox.Text = "";
             // 
@@ -240,7 +243,7 @@
             this.buttonSaveScript.Dock = System.Windows.Forms.DockStyle.Top;
             this.buttonSaveScript.Location = new System.Drawing.Point(3, 16);
             this.buttonSaveScript.Name = "buttonSaveScript";
-            this.buttonSaveScript.Size = new System.Drawing.Size(545, 23);
+            this.buttonSaveScript.Size = new System.Drawing.Size(516, 23);
             this.buttonSaveScript.TabIndex = 2;
             this.buttonSaveScript.Text = "Save";
             this.buttonSaveScript.UseVisualStyleBackColor = true;
@@ -248,29 +251,129 @@
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(165, 24);
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.splitter1.Location = new System.Drawing.Point(168, 202);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(10, 325);
+            this.splitter1.Size = new System.Drawing.Size(758, 10);
             this.splitter1.TabIndex = 7;
             this.splitter1.TabStop = false;
             // 
             // splitter2
             // 
-            this.splitter2.Location = new System.Drawing.Point(375, 24);
+            this.splitter2.Location = new System.Drawing.Point(165, 24);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(3, 325);
+            this.splitter2.Size = new System.Drawing.Size(3, 449);
             this.splitter2.TabIndex = 8;
             this.splitter2.TabStop = false;
+            // 
+            // scriptGroup
+            // 
+            this.scriptGroup.Controls.Add(this.scriptBox);
+            this.scriptGroup.Controls.Add(this.buttonSaveScript);
+            this.scriptGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scriptGroup.Location = new System.Drawing.Point(233, 41);
+            this.scriptGroup.Name = "scriptGroup";
+            this.scriptGroup.Size = new System.Drawing.Size(522, 134);
+            this.scriptGroup.TabIndex = 5;
+            this.scriptGroup.TabStop = false;
+            this.scriptGroup.Text = "Script";
+            // 
+            // splitter4
+            // 
+            this.splitter4.Location = new System.Drawing.Point(233, 41);
+            this.splitter4.Name = "splitter4";
+            this.splitter4.Size = new System.Drawing.Size(3, 134);
+            this.splitter4.TabIndex = 6;
+            this.splitter4.TabStop = false;
+            // 
+            // soundBankList
+            // 
+            this.soundBankList.AllowDrop = true;
+            this.soundBankList.Dock = System.Windows.Forms.DockStyle.Left;
+            this.soundBankList.FormattingEnabled = true;
+            this.soundBankList.Location = new System.Drawing.Point(3, 41);
+            this.soundBankList.Name = "soundBankList";
+            this.soundBankList.Size = new System.Drawing.Size(230, 217);
+            this.soundBankList.TabIndex = 4;
+            this.soundBankList.SelectedIndexChanged += new System.EventHandler(this.soundBankList_SelectedIndexChanged);
+            this.soundBankList.DataSourceChanged += new System.EventHandler(this.soundBankList_DataSourceChanged);
+            this.soundBankList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.soundBankList_MouseDoubleClick);
+            // 
+            // splitter3
+            // 
+            this.splitter3.Location = new System.Drawing.Point(233, 41);
+            this.splitter3.Name = "splitter3";
+            this.splitter3.Size = new System.Drawing.Size(3, 217);
+            this.splitter3.TabIndex = 1;
+            this.splitter3.TabStop = false;
+            // 
+            // buttonMoveUp
+            // 
+            this.buttonMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonMoveUp.Image = global::HSDRawViewer.Properties.Resources.ts_up;
+            this.buttonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonMoveUp.Name = "buttonMoveUp";
+            this.buttonMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.buttonMoveUp.Text = "toolStripButton1";
+            this.buttonMoveUp.Click += new System.EventHandler(this.buttonMoveUp_Click);
+            // 
+            // buttonMoveDown
+            // 
+            this.buttonMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonMoveDown.Image = global::HSDRawViewer.Properties.Resources.ts_down;
+            this.buttonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonMoveDown.Name = "buttonMoveDown";
+            this.buttonMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.buttonMoveDown.Text = "toolStripButton1";
+            this.buttonMoveDown.Click += new System.EventHandler(this.buttonMoveDown_Click);
+            // 
+            // toolStrip3
+            // 
+            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonSoundBankAdd,
+            this.buttonSoundBankDelete});
+            this.toolStrip3.Location = new System.Drawing.Point(3, 16);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(752, 25);
+            this.toolStrip3.TabIndex = 5;
+            this.toolStrip3.Text = "toolStrip3";
+            // 
+            // buttonSoundBankAdd
+            // 
+            this.buttonSoundBankAdd.Image = global::HSDRawViewer.Properties.Resources.ts_add;
+            this.buttonSoundBankAdd.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonSoundBankAdd.Name = "buttonSoundBankAdd";
+            this.buttonSoundBankAdd.Size = new System.Drawing.Size(113, 22);
+            this.buttonSoundBankAdd.Text = "Add New Sound";
+            this.buttonSoundBankAdd.Click += new System.EventHandler(this.buttonSoundBankAdd_Click);
+            // 
+            // buttonSoundBankDelete
+            // 
+            this.buttonSoundBankDelete.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
+            this.buttonSoundBankDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonSoundBankDelete.Name = "buttonSoundBankDelete";
+            this.buttonSoundBankDelete.Size = new System.Drawing.Size(144, 22);
+            this.buttonSoundBankDelete.Text = "Delete Selected Sound";
+            this.buttonSoundBankDelete.Click += new System.EventHandler(this.buttonSoundBankDelete_Click);
+            // 
+            // dspViewer1
+            // 
+            this.dspViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dspViewer1.DSP = null;
+            this.dspViewer1.Location = new System.Drawing.Point(236, 41);
+            this.dspViewer1.Name = "dspViewer1";
+            this.dspViewer1.Size = new System.Drawing.Size(519, 217);
+            this.dspViewer1.TabIndex = 3;
             // 
             // SEMEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(926, 349);
-            this.Controls.Add(this.splitter2);
+            this.ClientSize = new System.Drawing.Size(926, 473);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.soundBox);
             this.Controls.Add(this.splitter1);
+            this.Controls.Add(this.soundBox);
+            this.Controls.Add(this.splitter2);
             this.Controls.Add(this.entryBox);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -287,6 +390,10 @@
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.scriptGroup.ResumeLayout(false);
+            this.toolStrip3.ResumeLayout(false);
+            this.toolStrip3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -307,12 +414,21 @@
         private System.Windows.Forms.ToolStripMenuItem exportSEMToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStrip toolStrip2;
-        private System.Windows.Forms.Splitter splitter3;
         private System.Windows.Forms.RichTextBox scriptBox;
         private System.Windows.Forms.ToolStripButton buttonAddEntry;
         private System.Windows.Forms.ToolStripButton buttonDeleteEntry;
         private System.Windows.Forms.ToolStripButton buttonAddSound;
         private System.Windows.Forms.ToolStripButton buttonRemoveSound;
         private System.Windows.Forms.Button buttonSaveScript;
+        private DSPViewer dspViewer1;
+        private System.Windows.Forms.Splitter splitter4;
+        private System.Windows.Forms.GroupBox scriptGroup;
+        private System.Windows.Forms.Splitter splitter3;
+        private System.Windows.Forms.ListBox soundBankList;
+        private System.Windows.Forms.ToolStripButton buttonMoveUp;
+        private System.Windows.Forms.ToolStripButton buttonMoveDown;
+        private System.Windows.Forms.ToolStrip toolStrip3;
+        private System.Windows.Forms.ToolStripButton buttonSoundBankAdd;
+        private System.Windows.Forms.ToolStripButton buttonSoundBankDelete;
     }
 }

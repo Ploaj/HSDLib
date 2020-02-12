@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.IO;
 using HSDRaw;
-using System.Media;
-using System.IO.Compression;
+using HSDRawViewer.Tools;
+using HSDRawViewer.Sound;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -12,13 +12,13 @@ namespace HSDRawViewer.GUI.Extra
     {
         private string FilePath;
 
-        private int Unknown;
+        private int StartIndex;
 
         public BindingList<DSP> Sounds = new BindingList<DSP>();
 
-        public ContextMenu CMenu = new ContextMenu();
+        private DSPViewer dspViewer = new DSPViewer();
 
-        private SoundPlayer SoundPlayer;
+        public ContextMenu CMenu = new ContextMenu();
 
         public SSMTool()
         {
@@ -30,14 +30,16 @@ namespace HSDRawViewer.GUI.Extra
 
             Text = "SSM Editor";
 
+            dspViewer.Dock = DockStyle.Fill;
+            groupBox1.Controls.Add(dspViewer);
+
             CenterToScreen();
 
             FormClosing += (sender, args) =>
             {
                 if (args.CloseReason == CloseReason.UserClosing)
                 {
-                    if (SoundPlayer != null)
-                        SoundPlayer.Stop();
+                    dspViewer.Dispose();
                     args.Cancel = true;
                     Hide();
                 }
@@ -46,9 +48,14 @@ namespace HSDRawViewer.GUI.Extra
 
         #region Controls
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var file = Tools.FileIO.OpenFile("SSM (*.ssm, *.sdi)|*.ssm;*.sdi");
+            var file = FileIO.OpenFile("SSM (*.ssm, *.sdi)|*.ssm;*.sdi");
 
             if (file != null)
             {
@@ -56,36 +63,41 @@ namespace HSDRawViewer.GUI.Extra
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            propertyGrid1.SelectedObject = listBox1.SelectedItem;
-
-            if (listBox1.SelectedItem != null && listBox1.SelectedItem is DSP dsp)
+            if(listBox1.SelectedItem is DSP dsp)
             {
-                toolStrip1.Enabled = true;
-
-                listBox2.DataSource = dsp.Channels;
-            }
-            else
-            {
-                toolStrip1.Enabled = false;
-                listBox2.DataSource = null;
-                propertyGrid1.SelectedObject = null;
+                dspViewer.DSP = dsp;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (FilePath == null)
-                FilePath = Tools.FileIO.SaveFile("SSM (*.ssm)|*.ssm");
+                FilePath = FileIO.SaveFile("SSM (*.ssm)|*.ssm");
 
             if (FilePath != null)
                 Save(FilePath);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filePath = Tools.FileIO.SaveFile("SSM (*.ssm)|*.ssm");
+            var filePath = FileIO.SaveFile("SSM (*.ssm)|*.ssm");
 
             if (filePath != null)
             {
@@ -93,25 +105,14 @@ namespace HSDRawViewer.GUI.Extra
             }
         }
 
-
-        private void buttonExport_Click(object sender, EventArgs e)
-        {
-            var file = Tools.FileIO.SaveFile("Supported (*.wav*.dsp)|*.wav;*.dsp");
-
-            if (file != null && listBox1.SelectedItem != null)
-            {
-                if (file.EndsWith(".dsp"))
-                    SaveSoundAsDSP(file, listBox1.SelectedItem as DSP);
-                if (file.EndsWith(".wav"))
-                {
-                    File.WriteAllBytes(file, (listBox1.SelectedItem as DSP).ToWAVE());
-                }
-            }
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importDSPToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var files = Tools.FileIO.OpenFiles("DSP (*.dsp*.wav)|*.dsp;*.wav;*.hps");
+            var files = FileIO.OpenFiles("DSP (*.dsp*.wav)|*.dsp;*.wav;*.hps");
 
             if (files != null)
             {
@@ -119,7 +120,8 @@ namespace HSDRawViewer.GUI.Extra
                 {
                     if (file.ToLower().EndsWith(".dsp"))
                     {
-                        var dsp = ImportDSP(file);
+                        var dsp = new DSP();
+                        dsp.FromDSP(file);
                         Sounds.Add(dsp);
                     }
                     if (file.ToLower().EndsWith(".wav"))
@@ -135,48 +137,6 @@ namespace HSDRawViewer.GUI.Extra
                         Sounds.Add(dsp);
                     }
                 }
-            }
-        }
-
-        private void buttonReplace_Click(object sender, EventArgs e)
-        {
-            var file = Tools.FileIO.OpenFile("DSP (*.dsp*.wav)|*.dsp;*.wav");
-
-            if (file != null && listBox1.SelectedItem is DSP dsp)
-            {
-                if (file.ToLower().EndsWith(".dsp"))
-                {
-                    var newdsp = ImportDSP(file);
-
-                    dsp.Frequency = newdsp.Frequency;
-                    dsp.Channels = newdsp.Channels;
-                }
-
-                if (file.ToLower().EndsWith(".wav"))
-                {
-                    dsp.FromWAVE(File.ReadAllBytes(file));
-                }
-
-                listBox1.SelectedItem = listBox1.SelectedItem;
-                Sounds.ResetBindings();
-            }
-        }
-
-        private void buttonDelete_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void listBox2_DoubleClick(object sender, EventArgs e)
-        {
-            if (listBox2.SelectedItem is DSPChannel channel)
-            {
-                propertyGrid1.SelectedObjects = new object[] { channel };
             }
         }
 
@@ -220,146 +180,11 @@ namespace HSDRawViewer.GUI.Extra
 
         private void SaveSoundAsDSP(string filePath, DSP dsp)
         {
-            if (dsp.Channels.Count == 1)
-            {
-                // mono
-                SaveChannelAsDSP(filePath, dsp.Channels[0], dsp.Frequency);
-            }
-            else
-            {
-                // stereo or more
-                var head = Path.GetDirectoryName(filePath) + "\\" + Path.GetFileNameWithoutExtension(filePath);
-                var ext = Path.GetExtension(filePath);
-
-                for (int i = 0; i < dsp.Channels.Count; i++)
-                {
-
-                    SaveChannelAsDSP(head + $"_channel_{i}" + ext, dsp.Channels[i], dsp.Frequency);
-                }
-            }
-        }
-
-
-        private void SaveChannelAsDSP(string filePath, DSPChannel channel, int frequency)
-        {
-            using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(filePath, FileMode.Create)))
-            {
-                w.BigEndian = true;
-
-                var samples = channel.NibbleCount * 7 / 8;
-
-                w.Write(samples);
-                w.Write(channel.NibbleCount);
-                w.Write(frequency);
-
-                w.Write(channel.LoopFlag);
-                w.Write(channel.Format);
-                w.Write(2);
-                w.Write(channel.NibbleCount - 2);
-                w.Write(2);
-                foreach (var v in channel.COEF)
-                    w.Write(v);
-                w.Write(channel.Gain);
-                w.Write(channel.InitialPredictorScale);
-                w.Write(channel.InitialSampleHistory1);
-                w.Write(channel.InitialSampleHistory2);
-                w.Write(channel.LoopPredictorScale);
-                w.Write(channel.LoopSampleHistory1);
-                w.Write(channel.LoopSampleHistory2);
-                w.Write((short)0);
-
-                w.Write(new byte[0x14]);
-
-                w.Write(channel.Data);
-
-                if (w.BaseStream.Position % 0x8 != 0)
-                    w.Write(new byte[0x08 - w.BaseStream.Position % 0x08]);
-
-                w.BaseStream.Close();
-            }
-        }
-
-        private DSP ImportDSP(string filePath)
-        {
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
-            {
-                r.BigEndian = true;
-
-                var dsp = new DSP();
-
-                r.ReadInt32();
-                var nibbleCount = r.ReadInt32();
-                dsp.Frequency = r.ReadInt32();
-
-                var channel = new DSPChannel();
-
-                channel.LoopFlag = r.ReadInt16();
-                channel.Format = r.ReadInt16();
-                var LoopStartOffset = r.ReadInt32();
-                var LoopEndOffset = r.ReadInt32();
-                var CurrentAddress = r.ReadInt32();
-                for (int k = 0; k < 0x10; k++)
-                    channel.COEF[k] = r.ReadInt16();
-                channel.Gain = r.ReadInt16();
-                channel.InitialPredictorScale = r.ReadInt16();
-                channel.InitialSampleHistory1 = r.ReadInt16();
-                channel.InitialSampleHistory2 = r.ReadInt16();
-                channel.LoopPredictorScale = r.ReadInt16();
-                channel.LoopSampleHistory1 = r.ReadInt16();
-                channel.LoopSampleHistory2 = r.ReadInt16();
-                r.ReadInt16(); //  padding
-
-                r.Seek(0x60);
-                channel.NibbleCount = nibbleCount;
-                channel.LoopStart = LoopStartOffset - CurrentAddress;
-                channel.Data = r.ReadBytes((int)Math.Ceiling(nibbleCount / 2d));
-
-                dsp.Channels.Add(channel);
-
-                r.BaseStream.Close();
-
-                return dsp;
-            }
+            dsp.ExportDSP(filePath);
         }
 
         #endregion
-
-        private void PlaySound(DSP dsp)
-        {
-            // Stop the player if it is running.
-            if (SoundPlayer != null)
-            {
-                SoundPlayer.Stop();
-                SoundPlayer.Stream.Close();
-                SoundPlayer.Stream.Dispose();
-                SoundPlayer.Dispose();
-                SoundPlayer = null;
-            }
-
-            // Make the new player for the WAV file.
-            var wavFile = dsp.ToWAVE();
-            var stream = new MemoryStream();
-            stream.Write(wavFile, 0, wavFile.Length);
-            stream.Position = 0;
-            SoundPlayer = new SoundPlayer(stream);
-
-            // Play.
-            SoundPlayer.Play();
-        }
-
-        private void buttonPlay_Click(object sender, EventArgs e)
-        {
-            PlaySound();
-        }
-
-        private void PlaySound()
-        {
-            if (listBox1.SelectedItem is DSP dsp)
-            {
-                PlaySound(dsp);
-            }
-        }
-
+        
         public void OpenFile(string filePath)
         {
             Text = "SSM Editor - " + filePath;
@@ -443,160 +268,55 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="filePath"></param>
         private void OpenSSM(string filePath)
         {
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
-            {
-                r.BigEndian = true;
-
-                var headerLength = r.ReadInt32() + 0x10;
-                var dataOff = r.ReadInt32();
-                var soundCount = r.ReadInt32();
-                Unknown = r.ReadInt32();
-
-                for (int i = 0; i < soundCount; i++)
-                {
-                    var sound = new DSP();
-                    sound.Index = i;
-                    var ChannelCount = r.ReadInt32();
-                    sound.Frequency = r.ReadInt32();
-
-                    sound.Channels.Clear();
-                    for (int j = 0; j < ChannelCount; j++)
-                    {
-                        var channel = new DSPChannel();
-
-                        channel.LoopFlag = r.ReadInt16();
-                        channel.Format = r.ReadInt16();
-                        var LoopStartOffset = r.ReadInt32();
-                        var LoopEndOffset = r.ReadInt32();
-                        var CurrentAddress = r.ReadInt32();
-                        for (int k = 0; k < 0x10; k++)
-                            channel.COEF[k] = r.ReadInt16();
-                        channel.Gain = r.ReadInt16();
-                        channel.InitialPredictorScale = r.ReadInt16();
-                        channel.InitialSampleHistory1 = r.ReadInt16();
-                        channel.InitialSampleHistory2 = r.ReadInt16();
-                        channel.LoopPredictorScale = r.ReadInt16();
-                        channel.LoopSampleHistory1 = r.ReadInt16();
-                        channel.LoopSampleHistory2 = r.ReadInt16();
-                        r.ReadInt16(); //  padding
-
-                        channel.NibbleCount = LoopEndOffset - CurrentAddress;
-                        channel.LoopStart = LoopStartOffset - CurrentAddress;
-
-                        sound.Channels.Add(channel);
-
-                        var DataOffset = headerLength + (int)Math.Ceiling(CurrentAddress / 2d) - 1;
-
-                        channel.Data = r.GetSection((uint)DataOffset, (int)Math.Ceiling(channel.NibbleCount / 2d) + 1);
-
-                    }
-
-                    Sounds.Add(sound);
-                }
-            }
+            var ssm = new SSM();
+            StartIndex = ssm.StartIndex;
+            ssm.Open(filePath);
+            foreach(var s in ssm.Sounds)
+                Sounds.Add(s);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
         private void Save(string filePath)
         {
             FilePath = filePath;
 
-            using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(filePath, FileMode.Create)))
-            {
-                w.BigEndian = true;
-
-                w.Write(0);
-                w.Write(0);
-                w.Write(Sounds.Count);
-                w.Write(Unknown);
-
-                int headerSize = 0;
-                foreach (var s in Sounds)
-                {
-                    headerSize += 8 + s.Channels.Count * 0x40;
-                }
-
-                var projData = headerSize + 0x20;
-                foreach (var s in Sounds)
-                {
-                    w.Write(s.Channels.Count);
-                    w.Write(s.Frequency);
-
-                    foreach (var channel in s.Channels)
-                    {
-                        var sa = (projData - (headerSize + 0x20) + 1) * 2;
-
-                        projData += channel.Data.Length;
-                        if (projData % 0x8 != 0)
-                            projData += 0x08 - projData % 0x08;
-
-                        var en = sa + channel.NibbleCount;
-
-                        w.Write(channel.LoopFlag);
-                        w.Write(channel.Format);
-                        w.Write(sa + channel.LoopStart);
-                        w.Write(en);
-                        w.Write(sa);
-                        foreach (var v in channel.COEF)
-                            w.Write(v);
-                        w.Write(channel.Gain);
-                        w.Write(channel.InitialPredictorScale);
-                        w.Write(channel.InitialSampleHistory1);
-                        w.Write(channel.InitialSampleHistory2);
-                        w.Write(channel.LoopPredictorScale);
-                        w.Write(channel.LoopSampleHistory1);
-                        w.Write(channel.LoopSampleHistory2);
-                        w.Write((short)0);
-                    }
-
-                }
-
-                var start = w.BaseStream.Position;
-                foreach (var s in Sounds)
-                {
-                    foreach (var c in s.Channels)
-                    {
-                        w.Write(c.Data);
-                        if (w.BaseStream.Position % 0x08 != 0)
-                            w.Write(new byte[0x08 - w.BaseStream.Position % 0x08]);
-                    }
-
-                }
-
-                // align 0x20
-                if (w.BaseStream.Position % 0x20 != 0)
-                    w.Write(new byte[0x20 - w.BaseStream.Position % 0x20]);
-
-                var DataSize = w.BaseStream.Position - start;
-                
-                if (DataSize % 0x20 != 0)
-                {
-                    w.Write(new byte[0x20 - DataSize % 0x20]);
-                    w.Write(0);
-                    w.Write(0);
-                    DataSize += 0x20 - DataSize % 0x20;
-                }
-
-                w.Seek(0);
-                w.Write(headerSize);
-                w.Write((int)DataSize);
-            }
+            var ssm = new SSM();
+            ssm.StartIndex = StartIndex;
+            ssm.Sounds = (Sounds);
+            ssm.Save(filePath);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void stopButton_Click(object sender, EventArgs e)
         {
-            if (SoundPlayer != null)
-                SoundPlayer.Stop();
+            DSPPlayer.Stop();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            PlaySound();
+            dspViewer.PlaySound();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void exportAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var folder = Tools.FileIO.OpenFolder();
+            var folder = FileIO.OpenFolder();
 
             if(folder != null)
             {
@@ -605,6 +325,19 @@ namespace HSDRawViewer.GUI.Extra
                 {
                     File.WriteAllBytes(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav", s.ToWAVE());
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonRemove_Click(object sender, EventArgs e)
+        {
+            if(listBox1.SelectedItem is DSP dsp)
+            {
+                Sounds.Remove(dsp);
             }
         }
     }

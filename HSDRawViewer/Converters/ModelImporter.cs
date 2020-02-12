@@ -44,6 +44,9 @@ namespace HSDRawViewer.Converters
         public bool InvertNormals { get; set; } = false;
 
         [Category("Importing Options")]
+        public bool FlipFaces { get; set; } = false;
+
+        [Category("Importing Options")]
         public bool SetScaleToOne { get; set; } = false;
 
         [Category("Importing Options")]
@@ -168,11 +171,16 @@ namespace HSDRawViewer.Converters
             var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
                 | PostProcessSteps.Triangulate
                 | PostProcessSteps.LimitBoneWeights
-                | PostProcessSteps.FlipWindingOrder
                 | PostProcessSteps.CalculateTangentSpace;
+
+            if (settings.FlipFaces)
+                processFlags |= PostProcessSteps.FlipWindingOrder;
 
             if (settings.FlipUVs)
                 processFlags |= PostProcessSteps.FlipUVs;
+
+            if (settings.SmoothNormals)
+                processFlags |= PostProcessSteps.GenerateSmoothNormals;
 
             System.Diagnostics.Debug.WriteLine("Importing Model...");
             // import

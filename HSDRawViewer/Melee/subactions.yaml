@@ -59,15 +59,13 @@
   name: Graphic Effect
   parameters:
   - name: Unk1
-    bitCount: 8
-  - name: Unk2
-    bitCount: 18
+    bitCount: 26
   - name: GFX ID
-    bitCount: 10
+    bitCount: 16
   - name: Bone ID
     bitCount: 6
-  - name: Unk3
-    bitCount: 16
+  - name: Unk2
+    bitCount: 10
   - name: Z
     bitCount: 16
     signed: true
@@ -79,10 +77,13 @@
     signed: true
   - name: Range Z
     bitCount: 16
+    signed: true
   - name: Range Y
     bitCount: 16
+    signed: true
   - name: Range X
     bitCount: 16
+    signed: true
 
 - code: 11
   name: Create Hitbox
@@ -198,15 +199,18 @@
 - code: 17
   name: Sound Effect
   parameters:
-  - name: Unk1
-    bitCount: 32
-  - name: Unk2
-    bitCount: 6
+  - name: Behavior
+    bitCount: 8
+  - name: Unknown
+    bitCount: 18
   - name: SFX ID
-    bitCount: 20
-    hex: true
-  - name: Offset
     bitCount: 32
+  - name: Padding
+    bitCount: 16
+  - name: Volume
+    bitCount: 8
+  - name: Unknown
+    bitCount: 8
     hex: true
 
 - code: 18

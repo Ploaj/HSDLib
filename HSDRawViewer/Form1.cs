@@ -23,7 +23,7 @@ namespace HSDRawViewer
         public CommonViewport Viewport { get; internal set; }
         private SubactionEditor _ScriptEditor;
 
-        private string FilePath;
+        public string FilePath { get; internal set; }
 
         private HSDRawFile RawHSDFile = new HSDRawFile();
 

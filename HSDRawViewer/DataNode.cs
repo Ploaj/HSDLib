@@ -197,9 +197,12 @@ namespace HSDRawViewer
                                 IsArrayMember = true,
                                 ArrayName = prop.Name,
                                 ArrayIndex = index,
-                                ImageKey = "group",
-                                SelectedImageKey = "group"
                             });
+                            if(string.IsNullOrEmpty(Nodes[Nodes.Count - 1].SelectedImageKey))
+                            {
+                                Nodes[Nodes.Count - 1].ImageKey = "group";
+                                Nodes[Nodes.Count - 1].SelectedImageKey = "group";
+                            }
                             // add substructs too so they don't get appended at the end
                             foreach (var ss in a._s.References)
                                 strucs.Add(ss.Value);

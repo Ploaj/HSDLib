@@ -842,12 +842,29 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void loadPlayerFilesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var cFile = FileIO.OpenFile("Fighter Costume (Pl**Nr.dat)|*.dat");
-            if (cFile == null)
-                return;
-            var aFile = FileIO.OpenFile("Fighter Animation (Pl**AJ.dat)|*.dat");
-            if (aFile == null)
-                return;
+            var aFile = MainForm.Instance.FilePath.Replace(".dat", "AJ.dat");
+            var cFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
+
+            bool openFiles = true;
+            if(System.IO.File.Exists(aFile) && System.IO.File.Exists(cFile))
+            {
+                var r = MessageBox.Show("Open Files?", $"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", MessageBoxButtons.YesNoCancel);
+
+                if (r == DialogResult.Cancel)
+                    return;
+
+                if (r == DialogResult.Yes)
+                    openFiles = false;
+            }
+            if (openFiles)
+            {
+                cFile = FileIO.OpenFile("Fighter Costume (Pl**Nr.dat)|*.dat");
+                if (cFile == null)
+                    return;
+                aFile = FileIO.OpenFile("Fighter Animation (Pl**AJ.dat)|*.dat");
+                if (aFile == null)
+                    return;
+            }
 
             var modelFile = new HSDRawFile(cFile);
             if (modelFile.Roots[0].Data is HSD_JOBJ jobj)
@@ -908,12 +925,13 @@ namespace HSDRawViewer.GUI
             JOBJManager.DOBJManager.OverlayColor = SubactionProcess.OverlayColor;
 
             JOBJManager.Frame = viewport.Frame;
+
             if (SubactionProcess.CharacterInvisibility)
                 JOBJManager.UpdateNoRender();
             else
                 JOBJManager.Render(cam);
 
-            if(renderHurtboxsToolStripMenuItem.Checked)
+            if (renderHurtboxsToolStripMenuItem.Checked)
                 HurtboxRenderer.Render(JOBJManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
             
             foreach (var hb in SubactionProcess.Hitboxes)

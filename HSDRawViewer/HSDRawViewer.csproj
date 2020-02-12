@@ -146,6 +146,12 @@
     <Compile Include="GUI\Extra\AJSplitDialog.Designer.cs">
       <DependentUpon>AJSplitDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Extra\DSPViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\DSPViewer.Designer.cs">
+      <DependentUpon>DSPViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\MOBJEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,7 +164,6 @@
     <Compile Include="GUI\Extra\SEMEditor.Designer.cs">
       <DependentUpon>SEMEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Extra\SSMFile.cs" />
     <Compile Include="GUI\Extra\SSMTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -274,12 +279,16 @@
     <Compile Include="Rendering\Viewport.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Sound\SEM.cs" />
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
+    <Compile Include="Sound\DSP.cs" />
+    <Compile Include="Sound\DSPPlayer.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
     <None Include="Resources\ico_right.png" />
     <None Include="Resources\ico_left.png" />
@@ -304,6 +313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\AJSplitDialog.resx">
       <DependentUpon>AJSplitDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\DSPViewer.resx">
+      <DependentUpon>DSPViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\MOBJEditor.resx">
       <DependentUpon>MOBJEditor.cs</DependentUpon>
