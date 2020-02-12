@@ -22,7 +22,7 @@ namespace HSDRawViewer.Sound
 
         public byte[] Data;
 
-        public int LoopStart = 0;
+        public int LoopStart { get; set; } = 0;
         public int NibbleCount = 0;
 
         public override string ToString()

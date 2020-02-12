@@ -20,6 +20,11 @@ namespace HSDRawViewer.GUI.Extra
             entryList.DataSource = Entries;
             
             CenterToScreen();
+
+            FormClosed += (sender, args) =>
+            {
+                DSPPlayer.Stop();
+            };
         }
 
         /// <summary>
@@ -28,6 +33,10 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="path"></param>
         public void OpenSEMFile(string path)
         {
+            soundList.DataSource = null;
+            soundBankList.DataSource = null;
+            dspViewer1.DSP = null;
+            Entries.Clear();
             var entries = SEM.ReadSEMFile(path);
             foreach (var v in entries)
             {
@@ -140,9 +149,13 @@ namespace HSDRawViewer.GUI.Extra
             listBox_Remove(soundList);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private class SEMName
         {
-            public string Name { get; set; }
+            [Description("Name of new SSM file")]
+            public string Name { get; set; } = "newssm";
         }
 
         /// <summary>

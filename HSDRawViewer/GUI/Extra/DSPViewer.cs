@@ -15,7 +15,7 @@ namespace HSDRawViewer.GUI.Extra
             {
                 _dsp = value;
 
-                propertyGrid.SelectedObject = _dsp = value;
+                propertyGrid.SelectedObject = _dsp;
 
                 if (_dsp != null)
                 {

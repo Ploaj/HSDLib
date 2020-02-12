@@ -81,6 +81,7 @@ namespace HSDRawViewer
             { typeof(SBM_HurtboxBank<SBM_ItemHurtbox>), "group" },
             { typeof(SBM_SubActionTable), "table" },
             { typeof(SBM_PlayerModelLookupTables), "table" },
+            { typeof(SBM_PlayerSFXTable), "table" },
         };
 
         /// <summary>

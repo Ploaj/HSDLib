@@ -295,6 +295,73 @@ namespace HSDRaw
 
 
     /// <summary>
+    /// Null terminated pointer list
+    /// Accessor for accesing structure data
+    /// Extend for custom properties
+    /// </summary>
+    public class HSDFixedLengthPointerArrayAccessor<T> : HSDAccessor where T : HSDAccessor
+    {
+        public int Length => ((_s.Length / 4));
+
+        public T[] Array
+        {
+            get
+            {
+                T[] t = new T[Length];
+                for (int i = 0; i < Length; i++)
+                    t[i] = this[i];
+                return t;
+            }
+            set
+            {
+                if (_s == null)
+                    _s = new HSDStruct(new byte[value.Length * 4]);
+                _s.References.Clear();
+                _s.SetData(new byte[value.Length * 4]);
+
+                for (int i = 0; i < value.Length; i++)
+                    this[i] = value[i];
+
+            }
+        }
+
+        public T this[int i]
+        {
+            get
+            {
+                if (i < 0 || i > Length)
+                    throw new IndexOutOfRangeException();
+                return _s.GetReference<T>(i * 4);
+            }
+            set
+            {
+                if (i < 0 || i > Length)
+                    throw new IndexOutOfRangeException();
+                _s.SetReference(i * 4, value);
+            }
+        }
+
+        //TODO: Add and Remove Functions
+
+        public void Remove(T value)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.Remove(value);
+            Array = arr.ToArray();
+        }
+
+        public void Add(T value)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.Add(value);
+            Array = arr.ToArray();
+        }
+    }
+
+
+    /// <summary>
     /// array of object data
     /// Accessor for accesing structure data
     /// Extend for custom properties

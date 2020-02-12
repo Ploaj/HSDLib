@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using HSDRaw.Tools;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
+using System.Reflection;
 
 namespace HSDRawViewer.GUI
 {
@@ -23,6 +24,8 @@ namespace HSDRawViewer.GUI
         public KeyEditor()
         {
             InitializeComponent();
+
+            DoubleBuffered = true;
 
             DataGridViewColumn column = new DataGridViewTextBoxColumn();
             column.DataPropertyName = "Value";
@@ -45,6 +48,15 @@ namespace HSDRawViewer.GUI
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.CurrentCellDirtyStateChanged += new EventHandler(dataGridView1_CurrentCellDirtyStateChanged);
             dataGridView1.DataSource = KeyFrames;
+
+            // work around to avoid flickering
+            typeof(DataGridView).InvokeMember("DoubleBuffered",
+   BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
+   null, dataGridView1, new object[] { true });
+
+            typeof(Panel).InvokeMember("DoubleBuffered",
+   BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
+   null, panel1, new object[] { true });
         }
 
         /// <summary>
@@ -60,6 +72,7 @@ namespace HSDRawViewer.GUI
 
             var fCount = keys[keys.Count - 1].Frame + 1;
 
+            dataGridView1.DataSource = null;
             for(int i = 0; i < fCount; i++)
             {
                 KeyFrames.Add(new Key());
@@ -71,6 +84,7 @@ namespace HSDRawViewer.GUI
                 KeyFrames[(int)k.Frame].Slope = k.Tan;
                 KeyFrames[(int)k.Frame].InterpolationType = k.InterpolationType;
             }
+            dataGridView1.DataSource = KeyFrames;
 
             panel1.Invalidate();
         }

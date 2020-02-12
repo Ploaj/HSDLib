@@ -15,7 +15,8 @@
     public class SBM_LookupTable : HSDAccessor
     {
         public override int TrimmedSize => 0x8;
-        
 
+        public int Count { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+        
     }
 }

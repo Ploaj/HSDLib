@@ -206,13 +206,13 @@ namespace HSDRawViewer.Sound
                     // fix sound offset ids
                     if (e.SoundBank != null)
                     {
-                        // add sound offset
-                        foreach (var v in e.Sounds)
-                            v.SoundCommandIndex += soundOffset;
-
                         // set start offset in sem and save
                         e.SoundBank.StartIndex = soundOffset;
                         e.SoundBank.Save(Path.GetDirectoryName(path) + "\\" + e.SoundBank.Name);
+
+                        // add sound offset
+                        foreach (var v in e.Sounds)
+                            v.SoundCommandIndex += soundOffset;
 
                         foreach (var v in e.Sounds)
                             w.Write(v.CommandData);
