@@ -417,7 +417,7 @@ namespace HSDRawViewer.GUI.Extra
                 var reverb = sound.GetOPCodeValue(0x10);
                 if (reverb == -1)
                     reverb = 0;
-                dspViewer1.PlaySound(reverb / 255f, 1 + pitch / ((float)short.MaxValue));
+                dspViewer1.PlaySound(reverb / 1000f, 1 + (pitch) / 1000f);
             }
         }
 
@@ -447,16 +447,15 @@ namespace HSDRawViewer.GUI.Extra
                     SoundTestData = std;
 
                     var names = std.SoundNames;
-
-                    int index = 0;
-                    foreach(SEMEntry entry in entryList.Items)
+                    var indices = std.SoundIDs;
+                    
+                    for(int i = 0; i < indices.Length; i++)
                     {
-                        foreach(var v in entry.Sounds)
-                        {
-                            if (index > names.Length)
-                                break;
-                            v.Name = names[index++];
-                        }
+                        var ei = indices[i] / 10000;
+                        var si = indices[i] % 10000;
+
+                        if(entryList.Items[ei] is SEMEntry entry && si < entry.Sounds.Count)
+                            entry.Sounds[si].Name = names[i];
                     }
 
                     (entryList.SelectedItem as SEMEntry).Sounds.ResetBindings();
@@ -541,18 +540,23 @@ namespace HSDRawViewer.GUI.Extra
             }
             if (e.KeyCode == Keys.Space)
             {
-                soundBankList_MouseDoubleClick(null, null);
+                soundList_DoubleClick(null, null);
             }
         }
 
         private void copyScriptButton_Click(object sender, EventArgs e)
         {
-            scriptBox.Copy();
+            Clipboard.SetText(scriptBox.Text);
         }
 
         private void pasteScriptButton_Click(object sender, EventArgs e)
         {
-            scriptBox.Paste();
+            IDataObject iData = Clipboard.GetDataObject();
+
+            if (iData.GetDataPresent(DataFormats.Text))
+            {
+                scriptBox.Text = (String)iData.GetData(DataFormats.Text);
+            }
         }
 
         private void entryList_KeyDown(object sender, KeyEventArgs e)

@@ -93,9 +93,10 @@ namespace HSDRawViewer.Sound
 
             byte[] wavFile = dsp.ToWAVE();
 
+            //System.Console.WriteLine("Playing with pitch " + pitch);
             // TODO:
-            //if(pitch != 0)
-            //    wavFile = MixWAVEPitch(wavFile, pitch);
+            if(pitch != 0)
+                wavFile = MixWAVEPitch(wavFile, pitch);
             //if(reverb != 0)
             //    wavFile = MixWAVEReverb(wavFile, reverb);
 

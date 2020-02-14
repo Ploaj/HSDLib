@@ -319,7 +319,7 @@ namespace HSDRawViewer.Sound
             {
                 if (CommandData[i] == opCode)
                 {
-                    return ((CommandData[i + 1] & 0xFF) << 16) | ((CommandData[i + 2] & 0xFF) << 8) | (CommandData[i + 3] & 0xFF);
+                    return (short)(((CommandData[i + 2] & 0xFF) << 8) | (CommandData[i + 3] & 0xFF));
                 }
             }
             return -1;

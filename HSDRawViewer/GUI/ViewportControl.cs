@@ -133,6 +133,7 @@ namespace HSDRawViewer.GUI
 
             pbTimer = new System.Timers.Timer(60 / 1000d);
             pbTimer.Elapsed += PlayerTimer;
+            pbTimer.Start();
             nudPlaybackSpeed.Value = 60;
 
             panel1.MouseClick += (sender, args) =>
