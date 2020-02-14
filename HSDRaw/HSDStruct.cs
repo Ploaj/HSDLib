@@ -539,6 +539,7 @@ namespace HSDRaw
             {
                 var re = GetCreateReference<HSDAccessor>(refloc);
                 re._s.SetData(Encoding.UTF8.GetBytes(value));
+                re._s.Resize(re._s.Length + 1);
                 if (re._s.Length % 4 != 0)
                     re._s.Resize(re._s.Length + (4 - (re._s.Length % 4)));
             }

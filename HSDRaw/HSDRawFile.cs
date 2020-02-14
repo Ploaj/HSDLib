@@ -527,10 +527,9 @@ namespace HSDRaw
                     var offset = structToOffset[s];
                     foreach(var v in s.References)
                     {
-                        if(!relocationOffsets.Contains(offset + v.Key) &&
-                            (!refStructs.Contains(s) || 
+                        if(!refStructs.Contains(s) || 
                             (refStructs.Contains(s) && v.Key != 0))
-                            )
+                            
                             relocationOffsets.Add(offset + v.Key);
                         writer.Seek(offset + v.Key + 0x20, SeekOrigin.Begin);
                         writer.Write(structToOffset[v.Value]);

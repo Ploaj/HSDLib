@@ -524,5 +524,47 @@ namespace HSDRawViewer.GUI.Extra
                 }
             }
         }
+
+        private void soundList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Oemplus)
+            {
+                buttonAddSound_Click(null, null);
+            }
+            if (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Delete)
+            {
+                buttonRemoveSound_Click(null, null);
+            }
+            if (e.KeyCode == Keys.Enter)
+            {
+                renameButton_Click(null, null);
+            }
+            if (e.KeyCode == Keys.Space)
+            {
+                soundBankList_MouseDoubleClick(null, null);
+            }
+        }
+
+        private void copyScriptButton_Click(object sender, EventArgs e)
+        {
+            scriptBox.Copy();
+        }
+
+        private void pasteScriptButton_Click(object sender, EventArgs e)
+        {
+            scriptBox.Paste();
+        }
+
+        private void entryList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Oemplus)
+            {
+                buttonAddEntry_Click(null, null);
+            }
+            if (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Delete)
+            {
+                toolStripButton2_Click(null, null);
+            }
+        }
     }
 }
