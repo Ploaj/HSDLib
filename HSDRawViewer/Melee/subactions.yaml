@@ -290,8 +290,13 @@
   parameters:
   - name: Bone Id
     bitCount: 8
+  - name: Destroy On Exit
+    bitCount: 1
+    enums:
+    - false
+    - true
   - name: Collision State
-    bitCount: 18
+    bitCount: 17
 
 - code: 29
   name: Enable Jab Followup

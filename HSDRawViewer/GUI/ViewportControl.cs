@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using OpenTK;
 using System.Linq;
 using OpenTK.Input;
+using System.Timers;
 
 namespace HSDRawViewer.GUI
 {
@@ -74,6 +75,7 @@ namespace HSDRawViewer.GUI
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
         private EventHandler RenderLoop;
+        private ElapsedEventHandler PlayerTimer;
 
         private bool Selecting = false;
         private Vector2 mouseStart;
@@ -114,19 +116,22 @@ namespace HSDRawViewer.GUI
                 var elapsed = el - meansure;
                 if (ApplicationSettings.UnlockedViewport || elapsed.Milliseconds >= 16)
                 {
-                    if (buttonPlay.Text == "Pause")
-                        Frame++;
-
                     panel1_Paint(null, null);
 
                     meansure = el;
                 }
             };
+            
+            PlayerTimer = (sender, args) =>
+            {
+                if (buttonPlay.Text == "Pause")
+                    Frame++;
+            };
 
             Application.Idle += RenderLoop;
-            //System.Timers.Timer timer = new System.Timers.Timer(30 / 1000d);
-            /*timer.Elapsed += RenderLoop;
-            timer.Start();*/
+            System.Timers.Timer timer = new System.Timers.Timer(30 / 1000d);
+            timer.Elapsed += PlayerTimer;
+            timer.Start();
 
             panel1.MouseClick += (sender, args) =>
             {
@@ -200,10 +205,10 @@ namespace HSDRawViewer.GUI
 
             Disposed += (sender, args) =>
             {
-                //timer.Stop();
                 Application.Idle -= RenderLoop;
-                //timer.Elapsed -= RenderLoop;
-                //timer.Dispose();
+                timer.Stop();
+                timer.Elapsed -= PlayerTimer;
+                timer.Dispose();
             };
         }
         
@@ -221,6 +226,8 @@ namespace HSDRawViewer.GUI
             }
             else
             {
+                if (frame >= nudFrame.Maximum)
+                    frame = 0;
                 nudFrame.Value = frame;
                 animationTrack.Value = (int)frame;
             }

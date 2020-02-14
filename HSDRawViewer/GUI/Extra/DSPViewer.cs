@@ -56,9 +56,9 @@ namespace HSDRawViewer.GUI.Extra
         /// <summary>
         /// 
         /// </summary>
-        public void PlaySound()
+        public void PlaySound(float reverb = 0, float pitch = 0)
         {
-            DSPPlayer.PlayDSP(DSP);
+            DSPPlayer.PlayDSP(DSP, reverb, pitch);
         }
 
         /// <summary>

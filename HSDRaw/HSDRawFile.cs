@@ -224,14 +224,19 @@ namespace HSDRaw
                         var list = new List<int>();
                         var min = BinarySearch(relockeys, Offsets[i]);
                         var max = BinarySearch(relockeys, Offsets[i + 1]) + 1;
-                        for(int v = min; v < max; v++)
+
+                        if (min != -1 && max != -1)
                         {
-                            if (relockeys[v] >= Offsets[i] && relockeys[v] < Offsets[i + 1])
+                            for (int v = min; v < max; v++)
                             {
-                                relocKets.Add(relockeys[v]);
-                                list.Add(relocOffsets[relockeys[v]]);
+                                if (relockeys[v] >= Offsets[i] && relockeys[v] < Offsets[i + 1])
+                                {
+                                    relocKets.Add(relockeys[v]);
+                                    list.Add(relocOffsets[relockeys[v]]);
+                                }
                             }
                         }
+
                         offsetToOffsets.Add(Offsets[i], list);
                         offsetToInnerOffsets.Add(Offsets[i], relocKets);
                     }
@@ -288,6 +293,9 @@ namespace HSDRaw
 
         public static int BinarySearch(List<int> a, int item)
         {
+            if (a.Count == 0)
+                return -1;
+
             int first = 0;
             int last = a.Count - 1;
             int mid = 0;

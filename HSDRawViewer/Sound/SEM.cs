@@ -3,45 +3,43 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.Sound
 {
+    public enum SEM_OP_CODE
+    {
+        UNKNOWN00,
+        SFXID,
+        UNKNOWN02,
+        UNKNOWN03,
+        PRIORITY,
+        UNKNOWN05, // Unused
+        UNKNOWN06,
+        UNKNOWN07,
+        CHANNEL,
+        UNKNOWN09,
+        UNKNOWN0A, // Unused
+        UNKNOWN0B, // Unused
+        PITCH,
+        UNKNOWN0D,
+        END,
+        LOOP,
+        REVERB,
+        UNKNOWN11,
+        UNKNOWN12, // Unused
+        UNKNOWN13, // Unused
+        UNKNOWN14,
+        UNKNOWN15, // Unused
+        NULL = 0xFD
+    }
     /// <summary>
     /// 
     /// </summary>
     public class SEM
     {
-        private static Dictionary<byte, string> OPCODES = new Dictionary<byte, string>()
-        {
-            {0x00, "UNKNOWN00" },
-            {0x01, "SFXID" },
-            {0x02, "UNKNOWN02" },
-            {0x03, "UNKNOWN03" },
-            {0x04, "PRIORITY" },
-            {0x05, "UNKNOWN05" }, // Unused
-            {0x06, "UNKNOWN06" },
-            {0x07, "UNKNOWN07" },
-            {0x08, "CHANNEL" },
-            {0x09, "UNKNOWN09" },
-            {0x0A, "UNKNOWN0A" }, // Unused
-            {0x0B, "UNKNOWN0B" }, // Unused
-            {0x0C, "PITCH" },
-            {0x0D, "UNKNOWN0D" },
-            {0x0E, "END" },
-            {0x0F, "LOOP" },
-            {0x10, "REVERB" },
-            {0x11, "UNKNOWN11" },
-            {0x12, "UNKNOWN12" }, // Unused
-            {0x13, "UNKNOWN13" }, // Unused
-            {0x14, "UNKNOWN14" },
-            {0x15, "UNKNOWN15" }, // Unused
-            {0xFD, "NULL" },
-        };
-
         /// <summary>
         /// 
         /// </summary>
@@ -51,10 +49,10 @@ namespace HSDRawViewer.Sound
             StringBuilder s = new StringBuilder();
             for (int i = 0; i < data.Length;)
             {
-                var op = OPCODES[data[i++]];
+                var op = data[i++];
                 i++;
                 var val = (short)(((data[i++] & 0xFF) << 8) | ((data[i++] & 0xFF)));
-                s.AppendLine($".{op} : {val}");
+                s.AppendLine($".{(SEM_OP_CODE)op} : {val}");
             }
             return s.ToString();
         }
@@ -77,7 +75,7 @@ namespace HSDRawViewer.Sound
                 if (args.Length != 2)
                     continue;
 
-                data[i++] = OPCODES.FirstOrDefault(x => x.Value == args[0].ToUpper()).Key;
+                data[i++] = (byte)Enum.Parse(typeof(SEM_OP_CODE), args[0]);
                 var d = int.Parse(args[1]);
                 data[i++] = (byte)((d >> 16) & 0xFF);
                 data[i++] = (byte)((d >> 8) & 0xFF);
@@ -304,27 +302,41 @@ namespace HSDRawViewer.Sound
 
         public int SoundCommandIndex
         {
-            get
+            get => GetOPCodeValue(0x01);
+            set => SetOpCodeValue(0x01, value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="opCode"></param>
+        /// <returns></returns>
+        public int GetOPCodeValue(byte opCode)
+        {
+            for (int i = 0; i < CommandData.Length; i += 4)
             {
-                for (int i = 0; i < CommandData.Length; i += 4)
+                if (CommandData[i] == opCode)
                 {
-                    if (CommandData[i] == 0x01)
-                    {
-                        return ((CommandData[i + 1] & 0xFF) << 16) | ((CommandData[i + 2] & 0xFF) << 8) | (CommandData[i + 3] & 0xFF);
-                    }
+                    return ((CommandData[i + 1] & 0xFF) << 16) | ((CommandData[i + 2] & 0xFF) << 8) | (CommandData[i + 3] & 0xFF);
                 }
-                return -1;
             }
-            set
+            return -1;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="opCode"></param>
+        /// <param name="value"></param>
+        public void SetOpCodeValue(byte opCode, int value)
+        {
+            for (int i = 0; i < CommandData.Length; i += 4)
             {
-                for (int i = 0; i < CommandData.Length; i += 4)
+                if (CommandData[i] == 0x01)
                 {
-                    if (CommandData[i] == 0x01)
-                    {
-                        CommandData[i + 1] = (byte)((value >> 16) & 0xFF);
-                        CommandData[i + 2] = (byte)((value >> 8) & 0xFF);
-                        CommandData[i + 3] = (byte)(value & 0xFF);
-                    }
+                    CommandData[i + 1] = (byte)((value >> 16) & 0xFF);
+                    CommandData[i + 2] = (byte)((value >> 8) & 0xFF);
+                    CommandData[i + 3] = (byte)(value & 0xFF);
                 }
             }
         }

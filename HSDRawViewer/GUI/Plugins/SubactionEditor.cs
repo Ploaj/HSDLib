@@ -848,7 +848,7 @@ namespace HSDRawViewer.GUI
             bool openFiles = true;
             if(System.IO.File.Exists(aFile) && System.IO.File.Exists(cFile))
             {
-                var r = MessageBox.Show("Open Files?", $"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", MessageBoxButtons.YesNoCancel);
+                var r = MessageBox.Show($"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", "Open Files", MessageBoxButtons.YesNoCancel);
 
                 if (r == DialogResult.Cancel)
                     return;

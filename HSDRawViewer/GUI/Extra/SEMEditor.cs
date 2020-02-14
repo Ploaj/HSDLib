@@ -401,7 +401,17 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void soundList_DoubleClick(object sender, EventArgs e)
         {
-            dspViewer1.PlaySound();
+            if(soundList.SelectedItem is SEMSound sound)
+            {
+                // TODO: figure out how these values are stored
+                var pitch = sound.GetOPCodeValue(0x0C);
+                if (pitch == -1)
+                    pitch = 0;
+                var reverb = sound.GetOPCodeValue(0x10);
+                if (reverb == -1)
+                    reverb = 0;
+                dspViewer1.PlaySound(reverb / 255f, 1 + pitch / ((float)short.MaxValue));
+            }
         }
     }
 }

@@ -137,6 +137,7 @@ namespace HSDRaw
     {
         public virtual T Child { get; set; }
 
+        [Browsable(false)]
         public T[] Children
         {
             get
@@ -147,6 +148,7 @@ namespace HSDRaw
             }
         }
 
+        [Browsable(false)]
         public List<T> BreathFirstList
         {
             get
@@ -194,6 +196,7 @@ namespace HSDRaw
     {
         public virtual T Next { get; set; }
 
+        [Browsable(false)]
         public List<T> List
         {
             get
