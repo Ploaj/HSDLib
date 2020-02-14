@@ -15,7 +15,7 @@ namespace HSDRaw.Melee.Pl
 
         public int SFX_StarKO { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
 
-        public int SFX_ShortHop { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int SFX_Jump { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         public int SFX_DoubleJump { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 

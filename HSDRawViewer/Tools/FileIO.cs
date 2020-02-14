@@ -86,10 +86,11 @@ namespace HSDRawViewer.Tools
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static string SaveFile(string filter, string defaultName)
+        public static string SaveFile(string filter, string defaultName, string caption = "Save File")
         {
             using (SaveFileDialog d = new SaveFileDialog())
             {
+                d.Title = caption;
                 d.Filter = filter;
 
                 d.FileName = defaultName;

@@ -33,6 +33,9 @@ namespace HSDRawViewer.GUI
         {
             this.panel1 = new OpenTK.GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             this.animationGroup = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.nudPlaybackSpeed = new System.Windows.Forms.NumericUpDown();
+            this.cbLoop = new System.Windows.Forms.CheckBox();
             this.nudMaxFrame = new System.Windows.Forms.NumericUpDown();
             this.buttonPrevFrame = new System.Windows.Forms.Button();
             this.buttonSeekStart = new System.Windows.Forms.Button();
@@ -43,6 +46,7 @@ namespace HSDRawViewer.GUI
             this.animationTrack = new System.Windows.Forms.CustomPaintTrackBar();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.animationGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPlaybackSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.animationTrack)).BeginInit();
@@ -65,6 +69,9 @@ namespace HSDRawViewer.GUI
             // 
             // animationGroup
             // 
+            this.animationGroup.Controls.Add(this.label1);
+            this.animationGroup.Controls.Add(this.nudPlaybackSpeed);
+            this.animationGroup.Controls.Add(this.cbLoop);
             this.animationGroup.Controls.Add(this.nudMaxFrame);
             this.animationGroup.Controls.Add(this.buttonPrevFrame);
             this.animationGroup.Controls.Add(this.buttonSeekStart);
@@ -81,6 +88,53 @@ namespace HSDRawViewer.GUI
             this.animationGroup.TabStop = false;
             this.animationGroup.Text = "Animation Track";
             this.animationGroup.Visible = false;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(201, 49);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(77, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Playback FPS:";
+            // 
+            // nudPlaybackSpeed
+            // 
+            this.nudPlaybackSpeed.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.nudPlaybackSpeed.Location = new System.Drawing.Point(115, 47);
+            this.nudPlaybackSpeed.Maximum = new decimal(new int[] {
+            120,
+            0,
+            0,
+            0});
+            this.nudPlaybackSpeed.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nudPlaybackSpeed.Name = "nudPlaybackSpeed";
+            this.nudPlaybackSpeed.Size = new System.Drawing.Size(80, 20);
+            this.nudPlaybackSpeed.TabIndex = 9;
+            this.nudPlaybackSpeed.Value = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.nudPlaybackSpeed.ValueChanged += new System.EventHandler(this.nudPlaybackSpeed_ValueChanged);
+            // 
+            // cbLoop
+            // 
+            this.cbLoop.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.cbLoop.AutoSize = true;
+            this.cbLoop.Checked = true;
+            this.cbLoop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbLoop.Location = new System.Drawing.Point(12, 47);
+            this.cbLoop.Name = "cbLoop";
+            this.cbLoop.Size = new System.Drawing.Size(97, 17);
+            this.cbLoop.TabIndex = 8;
+            this.cbLoop.Text = "Loop Playback";
+            this.cbLoop.UseVisualStyleBackColor = true;
             // 
             // nudMaxFrame
             // 
@@ -198,6 +252,7 @@ namespace HSDRawViewer.GUI
             this.Size = new System.Drawing.Size(404, 341);
             this.animationGroup.ResumeLayout(false);
             this.animationGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPlaybackSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.animationTrack)).EndInit();
@@ -218,5 +273,8 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.Button buttonNextFrame;
         private System.Windows.Forms.Button buttonPlay;
         private System.Windows.Forms.NumericUpDown nudMaxFrame;
+        private System.Windows.Forms.CheckBox cbLoop;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown nudPlaybackSpeed;
     }
 }

@@ -243,7 +243,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd");
+            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath), "Save File As");
             if (f != null)
             {
                 RawHSDFile.Save(f);
@@ -608,6 +608,19 @@ namespace HSDRawViewer
             if(e.KeyCode == Keys.Enter)
             {
                 OpenEditor();
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape && dockPanel.ActiveContent is DockContent t)
+            {
+                t.Close();
             }
         }
     }

@@ -76,6 +76,7 @@ namespace HSDRawViewer.GUI
 
         private EventHandler RenderLoop;
         private ElapsedEventHandler PlayerTimer;
+        private System.Timers.Timer pbTimer;
 
         private bool Selecting = false;
         private Vector2 mouseStart;
@@ -129,9 +130,10 @@ namespace HSDRawViewer.GUI
             };
 
             Application.Idle += RenderLoop;
-            System.Timers.Timer timer = new System.Timers.Timer(30 / 1000d);
-            timer.Elapsed += PlayerTimer;
-            timer.Start();
+
+            pbTimer = new System.Timers.Timer(60 / 1000d);
+            pbTimer.Elapsed += PlayerTimer;
+            nudPlaybackSpeed.Value = 60;
 
             panel1.MouseClick += (sender, args) =>
             {
@@ -206,9 +208,9 @@ namespace HSDRawViewer.GUI
             Disposed += (sender, args) =>
             {
                 Application.Idle -= RenderLoop;
-                timer.Stop();
-                timer.Elapsed -= PlayerTimer;
-                timer.Dispose();
+                pbTimer.Stop();
+                pbTimer.Elapsed -= PlayerTimer;
+                pbTimer.Dispose();
             };
         }
         
@@ -227,7 +229,15 @@ namespace HSDRawViewer.GUI
             else
             {
                 if (frame >= nudFrame.Maximum)
-                    frame = 0;
+                {
+                    if (!cbLoop.Checked)
+                    {
+                        frame = nudFrame.Maximum;
+                        Pause();
+                    }
+                    else
+                        frame = 0;
+                }
                 nudFrame.Value = frame;
                 animationTrack.Value = (int)frame;
             }
@@ -313,6 +323,11 @@ namespace HSDRawViewer.GUI
         }
 
         private void buttonPlay_Click(object sender, EventArgs e)
+        {
+            Pause();
+        }
+
+        private void Pause()
         {
             if (buttonPlay.Text == "Play")
                 buttonPlay.Text = "Pause";
@@ -496,6 +511,18 @@ namespace HSDRawViewer.GUI
                     _camera.RotationYDegrees -= deltaPos.X * speed;
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudPlaybackSpeed_ValueChanged(object sender, EventArgs e)
+        {
+            pbTimer.Stop();
+            pbTimer.Interval = (1000f / (float)nudPlaybackSpeed.Value);
+            pbTimer.Start();
         }
     }
 }

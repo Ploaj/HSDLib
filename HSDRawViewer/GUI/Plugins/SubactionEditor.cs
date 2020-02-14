@@ -438,7 +438,7 @@ namespace HSDRawViewer.GUI
                 Text = "Custom_" + AllScripts.Count,
                 _struct = new HSDStruct(data)
             };
-            AllScripts.Add(action);
+            AllScripts.Insert(actionList.SelectedIndex, action);
             RefreshActionList();
             actionList.SelectedItem = action;
         }
@@ -463,10 +463,13 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            subActionList.Items.Add(new SubActionScript()
+            var ac = new SubActionScript()
             {
-                data = new byte[] { 0, 0, 0, 0} 
-            });
+                data = new byte[] { 0, 0, 0, 0 }
+            };
+            subActionList.Items.Insert(subActionList.SelectedIndex + 1, ac);
+            subActionList.SelectedItem = null;
+            subActionList.SelectedItem = ac;
 
             SaveSubactionChanges();
         }
@@ -733,11 +736,14 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void subActionList_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Control)
-            {
-                if (e.KeyCode == Keys.Delete)
-                    RemoveSelected();
+            if (e.KeyCode == Keys.Oemplus)
+                buttonAdd_Click(null, null);
 
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.OemMinus)
+                RemoveSelected();
+
+            if (e.Control)
+            {
                 if (e.KeyCode == Keys.X)
                 {
                     CopySelected();
