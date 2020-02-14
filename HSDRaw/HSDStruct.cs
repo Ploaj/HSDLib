@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace HSDRaw
 {
@@ -410,6 +411,59 @@ namespace HSDRaw
             }
         }
 
+
+        /// <summary>
+        /// Gets string array at specificed pointer
+        /// Size is automatically assumed
+        /// </summary>
+        /// <param name="loc"></param>
+        /// <returns></returns>
+        public string[] GetStringArray(int loc)
+        {
+            var a = GetReference<HSDAccessor>(loc);
+            if (a == null)
+                return null;
+            else
+            {
+                string[] s = new string[a._s.References.Count];
+                for (int i = 0; i < s.Length; i++)
+                {
+                    s[i] = a._s.GetString(i * 4);
+                }
+                return s;
+            }
+        }
+
+        /// <summary>
+        /// Sets string array at pointer with optional embedded count location
+        /// </summary>
+        /// <param name="loc"></param>
+        /// <param name="value"></param>
+        /// <param name="countloc"></param>
+        public void SetStringArray(int loc, string[] value, int countloc = -1)
+        {
+            if (value == null)
+            {
+                SetReference(loc, null);
+                if (countloc != -1)
+                    SetInt32(countloc, 0);
+            }
+            else
+            {
+                if (countloc != -1)
+                    SetInt32(countloc, countloc);
+
+                var a = GetCreateReference<HSDAccessor>(loc);
+                a._s.References.Clear();
+                a._s.Resize(4 * value.Length);
+
+                for (int i = 0; i < value.Length; i++)
+                {
+                    a._s.SetString(i * 4, value[i]);
+                }
+            }
+        }
+
         public int GetInt32(int loc)
         {
             return BitConverter.ToInt32(EndianFix(GetBytes(loc, 4)), 0);
@@ -448,6 +502,46 @@ namespace HSDRaw
         public void SetByte(int loc, byte value)
         {
             _data[loc] = value;
+        }
+
+        /// <summary>
+        /// Gets string value at pointer location
+        /// </summary>
+        /// <param name="refloc"></param>
+        /// <returns></returns>
+        public string GetString(int refloc)
+        {
+            var v = GetReference<HSDAccessor>(refloc);
+            if (v == null)
+                return null;
+            else
+            {
+                var nullpoint = 0;
+                foreach (var d in v._s.GetData())
+                    if (d == 0)
+                        break;
+                    else
+                        nullpoint++;
+                return Encoding.UTF8.GetString(v._s.GetData(), 0, nullpoint);
+            }
+        }
+
+        /// <summary>
+        /// Sets pointer at location to string value
+        /// </summary>
+        /// <param name="refloc"></param>
+        /// <param name="value"></param>
+        public void SetString(int refloc, string value)
+        {
+            if (value == null)
+                SetReference(refloc, null);
+            else
+            {
+                var re = GetCreateReference<HSDAccessor>(refloc);
+                re._s.SetData(Encoding.UTF8.GetBytes(value));
+                if (re._s.Length % 4 != 0)
+                    re._s.Resize(re._s.Length + (4 - (re._s.Length % 4)));
+            }
         }
 
         public float GetFloat(int loc)
@@ -492,6 +586,58 @@ namespace HSDRaw
                 Array.Reverse(b);
             return b;
         }
-        
+
+
+
+        /// <summary>
+        /// Gets string array at specificed pointer
+        /// Size is automatically assumed
+        /// </summary>
+        /// <param name="loc"></param>
+        /// <returns></returns>
+        public int[] GetInt32Array(int loc)
+        {
+            var a = GetReference<HSDAccessor>(loc);
+            if (a == null)
+                return null;
+            else
+            {
+                int[] s = new int[a._s.Length / 4];
+                for (int i = 0; i < s.Length; i++)
+                {
+                    s[i] = a._s.GetInt32(i * 4);
+                }
+                return s;
+            }
+        }
+
+        /// <summary>
+        /// Sets string array at pointer with optional embedded count location
+        /// </summary>
+        /// <param name="loc"></param>
+        /// <param name="value"></param>
+        /// <param name="countloc"></param>
+        public void SetInt32Array(int loc, int[] value, int countloc = -1)
+        {
+            if (value == null)
+            {
+                SetReference(loc, null);
+                if (countloc != -1)
+                    SetInt32(countloc, 0);
+            }
+            else
+            {
+                if (countloc != -1)
+                    SetInt32(countloc, countloc);
+
+                var a = GetCreateReference<HSDAccessor>(loc);
+                a._s.Resize(4 * value.Length);
+
+                for (int i = 0; i < value.Length; i++)
+                {
+                    a._s.SetInt32(i * 4, value[i]);
+                }
+            }
+        }
     }
 }

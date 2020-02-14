@@ -75,7 +75,7 @@ namespace HSDRawViewer.Sound
                 if (args.Length != 2)
                     continue;
 
-                data[i++] = (byte)Enum.Parse(typeof(SEM_OP_CODE), args[0]);
+                data[i++] = (byte)(SEM_OP_CODE)Enum.Parse(typeof(SEM_OP_CODE), args[0]);
                 var d = int.Parse(args[1]);
                 data[i++] = (byte)((d >> 16) & 0xFF);
                 data[i++] = (byte)((d >> 8) & 0xFF);
@@ -298,6 +298,8 @@ namespace HSDRawViewer.Sound
     {
         public byte[] CommandData = new byte[0];
 
+        public string Name { get; set; } = "SFX_";
+
         public int Index { get; set; }
 
         public int SoundCommandIndex
@@ -343,7 +345,7 @@ namespace HSDRawViewer.Sound
         
         public override string ToString()
         {
-            return $"{Index.ToString("D6")} - Sound Bank ID: {SoundCommandIndex}";
+            return $"{Index.ToString("D6")} - {Name} - ID: {SoundCommandIndex}";
         }
     }
 }

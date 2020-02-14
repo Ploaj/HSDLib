@@ -31,11 +31,12 @@ namespace HSDRawViewer.Tools
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static string OpenFile(string filter)
+        public static string OpenFile(string filter, string filename = "")
         {
             using (OpenFileDialog d = new OpenFileDialog())
             {
                 d.Filter = filter;
+                d.FileName = filename;
 
                 if (PrevOpenLocation != null)
                 {

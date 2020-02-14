@@ -49,24 +49,8 @@ namespace HSDRaw.Common
         /// </summary>
         public string ClassName
         {
-            get
-            {
-                var v = _s.GetReference<HSDAccessor>(0x00);
-                if (v == null)
-                    return null;
-                else
-                    return Encoding.UTF8.GetString(v._s.GetData(), 0, v._s.Length);
-            }
-            set
-            {
-                if (value == null)
-                    _s.SetReference(0x00, null);
-                else
-                {
-                    var re = _s.GetCreateReference<HSDAccessor>(0x00);
-                    re._s.SetData(Encoding.UTF8.GetBytes(value));
-                }
-            }
+            get => _s.GetString(0x00);
+            set => _s.SetString(0x00, value);
         }
 
         public JOBJ_FLAG Flags { get => (JOBJ_FLAG)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }

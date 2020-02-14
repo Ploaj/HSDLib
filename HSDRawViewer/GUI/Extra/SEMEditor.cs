@@ -1,7 +1,10 @@
-﻿using HSDRawViewer.Sound;
+﻿using HSDRaw;
+using HSDRaw.Melee;
+using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -42,6 +45,7 @@ namespace HSDRawViewer.GUI.Extra
             {
                 Entries.Add(v);
             }
+            smStdatToolStripMenuItem.Enabled = true;
         }
 
 
@@ -89,6 +93,8 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void entryList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (entryList.SelectedItem == null)
+                return;
             soundList.DataSource = (entryList.SelectedItem as SEMEntry).Sounds;
             soundBankList.DataSource = (entryList.SelectedItem as SEMEntry).SoundBank?.Sounds;
             dspViewer1.DSP = null;
@@ -197,6 +203,7 @@ namespace HSDRawViewer.GUI.Extra
                 ds.Add(new SEMSound()
                 {
                     Index = ds.Count + entryList.SelectedIndex * 10000,
+                    Name = "SFX_", 
                     CommandData = new byte[] { 0x01, 0, 0, 0, 0x0E, 0, 0, 0}
                 });
             }
@@ -411,6 +418,110 @@ namespace HSDRawViewer.GUI.Extra
                 if (reverb == -1)
                     reverb = 0;
                 dspViewer1.PlaySound(reverb / 255f, 1 + pitch / ((float)short.MaxValue));
+            }
+        }
+
+        private HSDRawFile SoundTestDat;
+        private smSoundTestLoadData SoundTestData;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(SoundTestDat != null)
+            {
+                if (MessageBox.Show("Sound Test Already Loaded\nReload?", "Load Sound Test Dat", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+            }
+            var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "SmSt.dat");
+            if (f != null)
+            {
+                HSDRawFile db = new HSDRawFile(f);
+
+                if(db.Roots.Count > 0 && db.Roots[0].Data is smSoundTestLoadData std)
+                {
+                    SoundTestDat = db;
+                    SoundTestData = std;
+
+                    var names = std.SoundNames;
+
+                    int index = 0;
+                    foreach(SEMEntry entry in entryList.Items)
+                    {
+                        foreach(var v in entry.Sounds)
+                        {
+                            if (index > names.Length)
+                                break;
+                            v.Name = names[index++];
+                        }
+                    }
+
+                    (entryList.SelectedItem as SEMEntry).Sounds.ResetBindings();
+
+                    exportSmStdatToolStripMenuItem.Enabled = true;
+                    renameButton.Enabled = true;
+                }
+            }
+        }
+
+        private void exportSmStdatToolStripMenuItem_Click(object sender, EventArgs args)
+        {
+            if(SoundTestDat != null)
+            {
+                var f = FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "SmSt.dat");
+                if (f == null)
+                    return;
+
+                string[] groupNames = new string[entryList.Items.Count];
+                int[] groupCounts = new int[entryList.Items.Count];
+                List<string> soundNames = new List<string>();
+                List<int> soundIndices = new List<int>();
+
+                int eIndex = 0;
+                foreach(SEMEntry e in entryList.Items)
+                {
+                    int sIndex = 0;
+                    foreach (var s in e.Sounds)
+                    {
+                        soundNames.Add(s.Name);
+                        soundIndices.Add(eIndex * 10000 + sIndex++);
+                    }
+                    groupNames[eIndex] = "GRPSFX_" + e.SoundBank.Name.Replace(".ssm", "");
+                    groupCounts[eIndex] = e.Sounds.Count;
+                    eIndex++;
+                }
+
+                SoundTestData.SoundBankNames = groupNames;
+                SoundTestData.SoundBankCount = groupCounts;
+                SoundTestData.SoundNames = soundNames.ToArray();
+                SoundTestData.SoundIDs = soundIndices.ToArray();
+
+                SoundTestDat.Save(f);
+            }
+        }
+
+        private class RenameBox
+        {
+            public string Name { get; set; }
+        }
+
+        private void renameButton_Click(object sender, EventArgs e)
+        {
+            if(soundList.SelectedItem is SEMSound sound)
+            {
+                var rn = new RenameBox();
+                rn.Name = sound.Name;
+                using(PropertyDialog d = new PropertyDialog("Rename", rn))
+                {
+                    if(d.ShowDialog() == DialogResult.OK)
+                    {
+                        sound.Name = rn.Name;
+                        (entryList.SelectedItem as SEMEntry).Sounds.ResetBindings();
+                    }
+                }
             }
         }
     }

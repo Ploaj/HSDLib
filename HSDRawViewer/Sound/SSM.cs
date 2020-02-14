@@ -71,7 +71,7 @@ namespace HSDRawViewer.Sound
                         var DataOffset = headerLength + (int)Math.Ceiling(CurrentAddress / 2d) - 1;
                         
                         channel.Data = r.GetSection((uint)DataOffset, (int)Math.Ceiling(channel.NibbleCount / 2d) + 1);
-
+                        
                     }
 
                     Sounds.Add(sound);

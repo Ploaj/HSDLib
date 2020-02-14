@@ -104,12 +104,10 @@ namespace HSDRaw
                 Dictionary<int, int> relocOffsets = new Dictionary<int, int>();
                 Offsets.Add(relocOffset);
 
-                r.BaseStream.Position = relocOffset;
                 for (int i = 0; i < relocCount; i++)
                 {
+                    r.BaseStream.Position = relocOffset + 4 * i;
                     int offset = r.ReadInt32() + 0x20;
-
-                    var temp = r.BaseStream.Position;
 
                     r.BaseStream.Position = offset;
 
@@ -120,13 +118,11 @@ namespace HSDRaw
                     if(objectOff > relocOffset && !OffsetContain.Contains(fsize))
                         Offsets.Add(fsize);
 
-                    //
+                    // alternate null pointer
                     if (objectOff < 0)
-                    {
-                        r.BaseStream.Position = temp;
                         continue;
-                    }
 
+                    Console.WriteLine(offset.ToString("X"));
                     relocOffsets.Add(offset, objectOff);
 
                     if (!OffsetContain.Contains(objectOff))
@@ -135,13 +131,13 @@ namespace HSDRaw
                         Offsets.Add(objectOff);
                     }
 
-                    r.BaseStream.Position = temp;
                 }
 
                 Debug.WriteLine("Relocate Parsed: " + sw.ElapsedMilliseconds);
                 sw.Restart();
 
                 // Parse Roots---------------------------------
+                r.BaseStream.Position = relocOffset + relocCount * 4;
                 List<int> rootOffsets = new List<int>();
                 List<string> rootStrings = new List<string>();
                 List<int> refOffsets = new List<int>();
@@ -531,7 +527,10 @@ namespace HSDRaw
                     var offset = structToOffset[s];
                     foreach(var v in s.References)
                     {
-                        if(!refStructs.Contains(s) || (refStructs.Contains(s) && v.Key != 0))
+                        if(!relocationOffsets.Contains(offset + v.Key) &&
+                            (!refStructs.Contains(s) || 
+                            (refStructs.Contains(s) && v.Key != 0))
+                            )
                             relocationOffsets.Add(offset + v.Key);
                         writer.Seek(offset + v.Key + 0x20, SeekOrigin.Begin);
                         writer.Write(structToOffset[v.Value]);
@@ -819,6 +818,13 @@ namespace HSDRaw
             if (rootString.StartsWith("itPublicData"))
             {
                 var acc = new itPublicData();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("smSoundTestLoadData"))
+            {
+                var acc = new smSoundTestLoadData();
                 acc._s = str;
                 a = acc;
             }
