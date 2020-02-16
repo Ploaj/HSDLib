@@ -17,6 +17,7 @@ using HSDRawViewer.GUI.Plugins.Melee;
 using HSDRawViewer.Rendering.Shapes;
 using OpenTK;
 using HSDRawViewer.Rendering.Renderers;
+using System.ComponentModel;
 
 namespace HSDRawViewer.GUI
 {
@@ -30,6 +31,23 @@ namespace HSDRawViewer.GUI
 
             public int AnimOffset;
             public int AnimSize;
+
+            public uint Flags;
+
+            [Category("Display Flags"), DisplayName("Flags")]
+            public string BitFlags { get => Flags.ToString("X"); set { uint v = Flags; uint.TryParse(value, out v); Flags = v; } }
+
+            [Category("Flags"), DisplayName("Character ID")]
+            public uint CharIDCheck { get => Flags & 0x3FF; set => Flags = (Flags & 0xFFFFFC00) | (value & 0x3FF); }
+
+            [Category("Flags"), DisplayName("Utilize animation-induced physics")]
+            public bool AnimInducedPhysics { get => (Flags & 0x08000000) != 0; set => Flags = ((Flags & 0x08000000) | (uint)((value ? 1 : 0) << 27)); }
+
+            [Category("Flags"), DisplayName("Loop Animation")]
+            public bool LoopAnimation { get => (Flags & 0x04000000) != 0; set => Flags = ((Flags & 0x04000000) | (uint)((value ? 1 : 0) << 26)); }
+
+            [Category("Flags"), DisplayName("Unknown")]
+            public bool Unknown { get => (Flags & 0x02000000) != 0; set => Flags = ((Flags & 0x02000000) | (uint)((value ? 1 : 0) << 25)); }
 
             public override string ToString()
             {
@@ -181,6 +199,8 @@ namespace HSDRawViewer.GUI
             viewport.RefreshSize();
             viewport.BringToFront();
 
+            toolStripComboBox1.SelectedIndex = 0;
+
             clickTimer = new Timer();
             clickTimer.Interval = 500;
             clickTimer.Tick += timer_Tick;
@@ -214,6 +234,7 @@ namespace HSDRawViewer.GUI
                         _struct = v.SubAction._s,
                         AnimOffset = v.AnimationOffset,
                         AnimSize = v.AnimationSize,
+                        Flags = v.Flags,
                         Text = v.Name == null ? "Func_" + Index.ToString("X") : v.Name
                     });
                 }
@@ -268,6 +289,8 @@ namespace HSDRawViewer.GUI
         /// <param name="script"></param>
         private void SelectAction(Action script)
         {
+            propertyGrid1.SelectedObject = script;
+
             ClearUndoStack();
 
             // gather all references to this script
@@ -380,6 +403,7 @@ namespace HSDRawViewer.GUI
                 AddActionToUndo();
 
                 a._struct.References.Clear();
+                _node.Accessor._s.SetInt32(0x18 * actionList.SelectedIndex + 0x10, (int)a.Flags);
 
                 List<byte> scriptData = new List<byte>();
                 foreach (SubActionScript scr in subActionList.Items)
@@ -589,7 +613,7 @@ namespace HSDRawViewer.GUI
             {
                 var length = script.Parameters.Count();
                 e.ItemHeight = subActionList.Font.Height *
-                    (simpleScriptViewToolStripMenuItem.Checked
+                    (toolStripComboBox1.SelectedIndex != 0
                     ? 1 :
                     (script.Parameters.Equals("") ? 1 : length + 1));
             }
@@ -607,15 +631,15 @@ namespace HSDRawViewer.GUI
             {
                 if(subActionList.Items[e.Index] is SubActionScript script)
                 {
-                    e.Graphics.DrawString(e.Index + ". " + script.Name, e.Font, new SolidBrush(Color.DarkBlue), e.Bounds);
+                    e.Graphics.DrawString(e.Index + ". " + script.Name + (toolStripComboBox1.SelectedIndex == 2 ? "(" + string.Join(", ", script.Parameters) + ")" : ""), e.Font, new SolidBrush(Color.DarkBlue), e.Bounds);
                     int i = 1;
-                    if(!simpleScriptViewToolStripMenuItem.Checked)
-                    foreach(var v in script.Parameters)
-                    {
-                        var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height * i), new Size(e.Bounds.Width, e.Bounds.Height));
-                        e.Graphics.DrawString("\t" + v, e.Font, new SolidBrush(e.ForeColor), bottomRect);
-                        i++;
-                    }
+                    if (toolStripComboBox1.SelectedIndex == 0)
+                        foreach (var v in script.Parameters)
+                        {
+                            var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height * i), new Size(e.Bounds.Width, e.Bounds.Height));
+                            e.Graphics.DrawString("\t" + v, e.Font, new SolidBrush(e.ForeColor), bottomRect);
+                            i++;
+                        }
                 }
                 else
                     e.Graphics.DrawString(subActionList.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds);
@@ -775,6 +799,16 @@ namespace HSDRawViewer.GUI
         {
             CopySelected();
             RemoveSelected();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RedrawActionItems();
         }
 
         /// <summary>
@@ -1042,6 +1076,11 @@ namespace HSDRawViewer.GUI
         private void subActionList_MouseUp(object sender, MouseEventArgs e)
         {
             clickTimer.Stop();
+        }
+
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            SaveSubactionChanges();
         }
     }
 }

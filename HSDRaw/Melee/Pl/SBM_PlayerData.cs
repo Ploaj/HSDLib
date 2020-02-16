@@ -17,11 +17,11 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_SubActionTable SubActionTable { get => _s.GetReference<SBM_SubActionTable>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public SBM_SubactionShorts SubActionShorts { get => _s.GetReference<SBM_SubactionShorts>(0x10); set => _s.SetReference(0x10, value); }
+        public SBM_DynamicBehaviorIDs SubActionDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x10); set => _s.SetReference(0x10, value); }
 
         public SBM_SubActionTable WinSubAction { get => _s.GetReference<SBM_SubActionTable>(0x14); set => _s.SetReference(0x14, value); }
 
-        public SBM_SubactionShorts WinSubActionShort { get => _s.GetReference<SBM_SubactionShorts>(0x18); set => _s.SetReference(0x18, value); }
+        public SBM_DynamicBehaviorIDs WinSubActionDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x18); set => _s.SetReference(0x18, value); }
 
         public SBM_ModelPartTable ModelPartAnimations { get => _s.GetReference<SBM_ModelPartTable>(0x1C); set => _s.SetReference(0x1C, value); }
         
@@ -62,7 +62,7 @@ namespace HSDRaw.Melee.Pl
     /// <summary>
     /// 
     /// </summary>
-    public class SBM_SubactionShorts : HSDAccessor
+    public class SBM_DynamicBehaviorIDs : HSDAccessor
     {
         public short[] Values
         {

@@ -28,6 +28,25 @@
                 }
             }
         }
+
+        public int DynamicHitBubbleCount { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+
+        public SBM_DynamicHitBubble[] DynamicHitBubbles
+        {
+            get => _s.GetReference<HSDArrayAccessor<SBM_DynamicHitBubble>>(0x0C).Array;
+            set => _s.GetCreateReference<HSDAccessor>(0x0C)._s.SetEmbeddedAccessorArray(0, value);
+        }
+    }
+
+    public class SBM_DynamicHitBubble : HSDAccessor
+    {
+        public override int TrimmedSize => 0x14;
+
+        public int BoneIndex { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+        public float Z { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+        public float Y { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+        public float X { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
+        public float Size { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
     }
 
     public class SBM_Physics : HSDAccessor

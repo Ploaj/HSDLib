@@ -101,7 +101,7 @@ namespace HSDRawViewer.Converters
 
                         ActionGroup g = new ActionGroup();
                         g.animation_name = subaction.Name;
-                        g.flags = subaction.Flags;
+                        g.flags = (int)subaction.Flags;
                         g.script = ActionDecompiler.Decompile("Func_" + i.ToString("X3"), subaction.SubAction);
                         //g.script = 
                         g.off = subaction.AnimationOffset;
@@ -208,7 +208,7 @@ namespace HSDRawViewer.Converters
                         foreach (var s in script.Actions)
                         {
                             SBM_FighterSubAction subaction = new SBM_FighterSubAction();
-                            subaction.Flags = s.flags;
+                            subaction.Flags = (uint)s.flags;
                             if (s.animation_name != null)
                             {
                                 if (!stringToStruct.ContainsKey(s.animation_name))

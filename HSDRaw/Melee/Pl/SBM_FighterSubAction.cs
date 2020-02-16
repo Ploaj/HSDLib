@@ -48,7 +48,7 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_SubactionData SubAction { get => _s.GetReference<SBM_SubactionData>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public int Flags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public uint Flags { get => (uint)_s.GetInt32(0x10); set => _s.SetInt32(0x10, (int)value); }
         
     }
 

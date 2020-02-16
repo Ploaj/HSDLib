@@ -451,7 +451,7 @@ namespace HSDRaw
             else
             {
                 if (countloc != -1)
-                    SetInt32(countloc, countloc);
+                    SetInt32(countloc, value.Length);
 
                 var a = GetCreateReference<HSDAccessor>(loc);
                 a._s.References.Clear();
