@@ -9,6 +9,9 @@ using HSDRawViewer.GUI.Plugins;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Extra;
+using System.Linq;
+using static System.ComponentModel.TypeConverter;
+using System.ComponentModel;
 
 namespace HSDRawViewer
 {
@@ -30,15 +33,15 @@ namespace HSDRawViewer
         private Dictionary<string, StructData> stringToStruct = new Dictionary<string, StructData>();
 
         public static DataNode SelectedDataNode { get; internal set; } = null;
-        
+
         public static bool RefreshNode = false;
 
         private List<EditorBase> Editors = new List<EditorBase>();
 
         public static void Init()
         {
-            if(Instance == null)
-            Instance = new MainForm();
+            if (Instance == null)
+                Instance = new MainForm();
         }
 
         public MainForm()
@@ -87,7 +90,7 @@ namespace HSDRawViewer
             treeView1.ImageList = myImageList;
 
             bool dc = false;
-            
+
             treeView1.MouseDown += (sender, args) =>
             {
                 dc = args.Clicks > 1;
@@ -109,7 +112,7 @@ namespace HSDRawViewer
             treeView1.AfterExpand += (sender, args) =>
             {
                 args.Node.Nodes.Clear();
-                if(args.Node is DataNode node)
+                if (args.Node is DataNode node)
                 {
                     node.ExpandData();
                 }
@@ -130,7 +133,7 @@ namespace HSDRawViewer
             treeView1.NodeMouseClick += (sender, args) =>
             {
                 treeView1.SelectedNode = treeView1.GetNodeAt(args.Location);
-                if(args.Button == MouseButtons.Right && args.Node != null && args.Node is DataNode node)
+                if (args.Button == MouseButtons.Right && args.Node != null && args.Node is DataNode node)
                 {
                     PluginManager.GetContextMenuFromType(node.Accessor.GetType()).Show(this, args.Location);
                 }
@@ -156,7 +159,7 @@ namespace HSDRawViewer
         /// 
         /// </summary>
         /// <param name="cast"></param>
-        public void SelectNode<T>(T cast = null) where T: HSDAccessor
+        public void SelectNode<T>(T cast = null) where T : HSDAccessor
         {
             if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode n)
             {
@@ -175,14 +178,14 @@ namespace HSDRawViewer
                 LocationLabel.Text = "Location: 0x" + RawHSDFile.GetOffsetFromStruct(n.Accessor._s).ToString("X8") + " -> " + n.FullPath;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="root"></param>
         public static void DeleteRoot(DataNode root)
         {
-            var toDel = Instance.RawHSDFile.Roots.Find(r=>r.Data == root.Accessor);
+            var toDel = Instance.RawHSDFile.Roots.Find(r => r.Data == root.Accessor);
             if (toDel != null)
             {
                 Instance.RawHSDFile.Roots.Remove(toDel);
@@ -289,7 +292,7 @@ namespace HSDRawViewer
 
             ClearWorkspace();
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -300,7 +303,7 @@ namespace HSDRawViewer
             var f = Tools.FileIO.OpenFile("HSD (*.dat;*.txg)|*.dat;*.txg");
             if (f != null)
             {
-                if(f.ToLower().EndsWith(".dat"))
+                if (f.ToLower().EndsWith(".dat"))
                 {
                     var file = new HSDRawFile(f);
 
@@ -360,9 +363,9 @@ namespace HSDRawViewer
         /// <returns></returns>
         public bool IsOpened(DataNode n)
         {
-            foreach(var c in dockPanel.Contents)
+            foreach (var c in dockPanel.Contents)
             {
-                if(c is EditorBase b && b.Node.Accessor._s == n.Accessor._s)
+                if (c is EditorBase b && b.Node.Accessor._s == n.Accessor._s)
                 {
                     return true;
                 }
@@ -418,12 +421,12 @@ namespace HSDRawViewer
             var edit = PluginManager.GetEditorFromType(SelectedDataNode.Accessor.GetType());
 
             // Special animation override
-            if(SelectedDataNode.Accessor is HSD_AnimJoint
+            if (SelectedDataNode.Accessor is HSD_AnimJoint
                 || SelectedDataNode.Accessor is HSD_FigaTree)
             {
-                foreach(var v in dockPanel.Contents)
+                foreach (var v in dockPanel.Contents)
                 {
-                    if(v is JOBJEditor jedit)
+                    if (v is JOBJEditor jedit)
                     {
                         if (SelectedDataNode.Accessor is HSD_AnimJoint joint)
                             jedit.LoadAnimation(joint);
@@ -438,9 +441,9 @@ namespace HSDRawViewer
             {
                 var editor = GetEditors(SelectedDataNode);
                 editor[0].BringToFront();
-            }else
-            if (!IsChildOpened(SelectedDataNode.Accessor._s) && 
-                edit != null && 
+            } else
+            if (!IsChildOpened(SelectedDataNode.Accessor._s) &&
+                edit != null &&
                 edit is DockContent dc)
             {
                 Editors.Add(edit);
@@ -462,11 +465,11 @@ namespace HSDRawViewer
         /// <param name="c"></param>
         public void TryClose(Control c)
         {
-            if(c == _nodePropertyViewer)
+            if (c == _nodePropertyViewer)
             {
                 propertyViewToolStripMenuItem.Checked = false;
             }
-            if(c == Viewport)
+            if (c == Viewport)
             {
                 viewportToolStripMenuItem.Checked = false;
             }
@@ -512,7 +515,7 @@ namespace HSDRawViewer
 
         private void treeView1_DoubleClick(object sender, EventArgs e)
         {
-            if(treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode dn)
+            if (treeView1.SelectedNode != null && treeView1.SelectedNode is DataNode dn)
             {
                 OpenEditor();
             }
@@ -580,7 +583,7 @@ namespace HSDRawViewer
         {
             if (FilePath == null)
                 FilePath = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
-            
+
             if (FilePath != null)
                 RawHSDFile.Save(FilePath);
         }
@@ -605,12 +608,12 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void treeView1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
             {
                 OpenEditor();
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -621,6 +624,71 @@ namespace HSDRawViewer
             if (e.KeyCode == Keys.Escape && dockPanel.ActiveContent is DockContent t)
             {
                 t.Close();
+            }
+        }
+
+
+        public class NewRootSettings
+        {
+            [DisplayName("Symbol Name"), Description("Name of the symbol being added")]
+            public string Symbol { get; set; } = "newRoot";
+
+            /*[Browsable(true),
+             TypeConverter(typeof(HSDTypeConverter))]
+            public Type Type { get; set; } = typeof(HSDAccessor);*/
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void addRootFromTypeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var settings = new NewRootSettings();
+            using (HSDTypeDialog t = new HSDTypeDialog())
+            {
+                if(t.ShowDialog() == DialogResult.OK)
+                {
+                    using (PropertyDialog d = new PropertyDialog("New Root", settings))
+                    {
+                        if (d.ShowDialog() == DialogResult.OK)
+                        {
+                            var root = new HSDRootNode();
+
+                            root.Name = settings.Symbol;
+                            root.Data = (HSDAccessor)Activator.CreateInstance(t.HSDAccessorType);
+
+                            RawHSDFile.Roots.Add(root);
+
+                            RefreshTree();
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void addRootFromFileToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("All Files |*.*");
+
+            if(f != null)
+            {
+                var root = new HSDRootNode();
+
+                root.Name = System.IO.Path.GetFileNameWithoutExtension(f);
+                root.Data = new HSDAccessor() ;
+                root.Data._s.SetData(System.IO.File.ReadAllBytes(f));
+
+                RawHSDFile.Roots.Add(root);
+
+                RefreshTree();
             }
         }
     }

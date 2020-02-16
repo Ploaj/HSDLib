@@ -214,5 +214,33 @@ namespace HSDRawViewer.GUI
                 UpdateValues();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void offsetBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Control)
+            {
+                if(e.KeyCode == Keys.OemPeriod)
+                {
+                    var f = Tools.FileIO.OpenFile("All Files |*.*");
+
+                    if (f != null)
+                    {
+                        if (CurrentOffset >= accessor._s.Length)
+                            accessor._s.Resize((int)CurrentOffset + 4);
+
+                        accessor._s.SetReferenceStruct((int)CurrentOffset, new HSDStruct(System.IO.File.ReadAllBytes(f)));
+                    }
+                }
+                if (e.KeyCode == Keys.OemMinus)
+                {
+                    accessor._s.SetReference((int)CurrentOffset, null);
+                }
+            }
+        }
     }
 }

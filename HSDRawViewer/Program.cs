@@ -16,6 +16,7 @@ namespace HSDRawViewer
             Application.SetCompatibleTextRenderingDefault(false);
             Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             MainForm.Init();
+            ApplicationSettings.Init();
             Application.Run(MainForm.Instance);
         }
     }

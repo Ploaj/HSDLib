@@ -14,13 +14,8 @@ namespace HSDRawViewer.GUI
         public HSDTypeDialog()
         {
             InitializeComponent();
-
-            List<Type> types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                                     from assemblyType in domainAssembly.GetTypes()
-                                     where typeof(HSDAccessor).IsAssignableFrom(assemblyType)
-                                     select assemblyType).ToList();
-
-            foreach(var v in types)
+            
+            foreach(var v in ApplicationSettings.HSDTypes)
             {
                 comboBoxType.Items.Add(v);
             }

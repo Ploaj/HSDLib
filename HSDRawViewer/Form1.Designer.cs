@@ -51,6 +51,8 @@
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.addRootFromTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addRootFromFileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -127,7 +129,9 @@
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addRootFromFileToolStripMenuItem});
+            this.addRootFromFileToolStripMenuItem1,
+            this.addRootFromFileToolStripMenuItem,
+            this.addRootFromTypeToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
@@ -135,8 +139,8 @@
             // addRootFromFileToolStripMenuItem
             // 
             this.addRootFromFileToolStripMenuItem.Name = "addRootFromFileToolStripMenuItem";
-            this.addRootFromFileToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.addRootFromFileToolStripMenuItem.Text = "Add Root From File";
+            this.addRootFromFileToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.addRootFromFileToolStripMenuItem.Text = "Add Root From DAT File";
             this.addRootFromFileToolStripMenuItem.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem_Click);
             // 
             // viewToolStripMenuItem
@@ -252,6 +256,20 @@
             this.splitter1.TabIndex = 12;
             this.splitter1.TabStop = false;
             // 
+            // addRootFromTypeToolStripMenuItem
+            // 
+            this.addRootFromTypeToolStripMenuItem.Name = "addRootFromTypeToolStripMenuItem";
+            this.addRootFromTypeToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.addRootFromTypeToolStripMenuItem.Text = "Add Root From Type";
+            this.addRootFromTypeToolStripMenuItem.Click += new System.EventHandler(this.addRootFromTypeToolStripMenuItem_Click);
+            // 
+            // addRootFromFileToolStripMenuItem1
+            // 
+            this.addRootFromFileToolStripMenuItem1.Name = "addRootFromFileToolStripMenuItem1";
+            this.addRootFromFileToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
+            this.addRootFromFileToolStripMenuItem1.Text = "Add Root From File";
+            this.addRootFromFileToolStripMenuItem1.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem1_Click);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -305,6 +323,8 @@
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem sEMEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addRootFromTypeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem1;
     }
 }
 
