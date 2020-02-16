@@ -237,7 +237,7 @@ namespace HSDRaw
     /// </summary>
     public class HSDNullPointerArrayAccessor<T> : HSDAccessor where T : HSDAccessor
     {
-        public int Length => ((_s.Length / 4) - 1);
+        public int Length => Math.Max(((_s.Length / 4) - 1), 0);
 
         public T[] Array
         {
@@ -417,6 +417,24 @@ namespace HSDRaw
                     throw new IndexOutOfRangeException();
                 _s.SetEmbededStruct(i * Stride, value._s);
             }
+        }
+
+
+        public void Remove(T value)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.Remove(value);
+            Array = arr.ToArray();
+        }
+
+        public void Add(T value)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.Add(value);
+            Array = arr.ToArray();
+            Console.WriteLine(arr.Count + " " + Array.Length);
         }
     }
 }

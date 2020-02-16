@@ -1,1 +1,20 @@
-﻿
+﻿- code: 0x75
+  name: Enter Action State
+  parameters:
+  - name: Default
+    bitCount: 8
+    enums:
+    - Default Float Parameters
+    - Specify Parameters
+  - name: Action State ID
+    bitCount: 16
+    hex: true
+  - name: Starting Frame
+    bitCount: 32
+    isFloat: true
+  - name: Speed Modifier
+    bitCount: 32
+    isFloat: true
+  - name: Keyframe Blend Level
+    bitCount: 32
+    isFloat: true

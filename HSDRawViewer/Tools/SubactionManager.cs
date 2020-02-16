@@ -18,13 +18,26 @@ namespace HSDRawViewer.Tools
 
         public string Description;
 
+        public bool IsCustom = false;
+
+        private int CodeSize
+        {
+            get
+            {
+                if (IsCustom)
+                    return 8;
+                else
+                    return 6;
+            }
+        }
+
         public SubactionParameter[] Parameters = new SubactionParameter[0];
 
         public int BitSize
         {
             get
             {
-                int size = 6;
+                int size = CodeSize;
 
                 if (Parameters == null || Parameters.Length == 0)
                     return 32;
@@ -54,7 +67,7 @@ namespace HSDRawViewer.Tools
         {
             Bitreader r = new Bitreader(data);
 
-            r.Read(6);
+            r.Read(CodeSize);
 
             List<int> param = new List<int>();
 
@@ -75,6 +88,35 @@ namespace HSDRawViewer.Tools
 
             return param.ToArray();
         }
+
+        public byte[] Compile(int[] parameters)
+        {
+            BitWriter w = new BitWriter();
+
+            w.Write(Code >> (IsCustom ? 0 : 2), CodeSize);
+
+            for(int i = 0; i < Parameters.Length; i++)
+            {
+                var bm = Parameters[i];
+
+                if (bm.Name.Contains("None") || bm.IsPointer)
+                {
+                    w.Write(0, bm.BitCount);
+                    continue;
+                }
+
+                var value = parameters[i];
+
+                w.Write(value, bm.BitCount);
+            }
+
+            // they should all theoretically be aligned to 32 bits
+            if (Parameters.Length == 0 && !IsCustom)
+                w.Write(0, 26);
+
+            return w.Bytes.ToArray();
+        }
+
     }
 
     public class SubactionParameter
@@ -132,17 +174,26 @@ namespace HSDRawViewer.Tools
             _subactions = new List<Subaction>();
             if (subs != null && subs.Length != 0)
             {
-                //foreach (var s in subs)
-                //    s.Code <<= 2;
+                foreach (var s in subs)
+                    s.Code <<= 2;
                 _subactions.AddRange(subs);
             }
             if(customsubs != null && customsubs.Length != 0)
+            {
+                foreach (var s in customsubs)
+                    s.IsCustom = true;
                 _subactions.AddRange(customsubs);
+            }
         }
 
         public static Subaction GetSubaction(byte code)
         {
-            return Subactions.Find(e => e.Code == code);
+            var sa = Subactions.Find(e => e.Code == code);
+
+            if (sa == null)
+                sa = Subactions.Find(e => e.Code == (code & 0xFC));
+
+            return sa;
         }
 
         public static Subaction GetSubaction(string name)

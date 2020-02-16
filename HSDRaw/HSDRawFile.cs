@@ -13,6 +13,7 @@ using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
 using System.Diagnostics;
 using HSDRaw.Melee;
+using HSDRaw.MEX;
 
 namespace HSDRaw
 {
@@ -121,8 +122,7 @@ namespace HSDRaw
                     // alternate null pointer
                     if (objectOff < 0)
                         continue;
-
-                    Console.WriteLine(offset.ToString("X"));
+                    
                     relocOffsets.Add(offset, objectOff);
 
                     if (!OffsetContain.Contains(objectOff))
@@ -831,6 +831,13 @@ namespace HSDRaw
             if (rootString.StartsWith("ftLoadCommonData"))
             {
                 var acc = new ftLoadCommonData();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("mexData"))
+            {
+                var acc = new MEX_Data();
                 acc._s = str;
                 a = acc;
             }

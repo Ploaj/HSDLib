@@ -86,7 +86,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction((byte)(data[i] >> 2));
+                var sa = SubactionManager.GetSubaction(data[i]);
 
                 var cmd = new Command();
 

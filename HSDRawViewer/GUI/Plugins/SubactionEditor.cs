@@ -67,7 +67,7 @@ namespace HSDRawViewer.GUI
                 {
                     Bitreader r = new Bitreader(data);
 
-                    var sa = SubactionManager.GetSubaction((byte)r.Read(6));
+                    var sa = SubactionManager.GetSubaction((byte)r.Read(8));
 
                     return sa.Name;
                 }
@@ -77,7 +77,7 @@ namespace HSDRawViewer.GUI
             {
                 get
                 {
-                    var sa = SubactionManager.GetSubaction((byte)(data[0] >> 2));
+                    var sa = SubactionManager.GetSubaction(data[0]);
 
                     StringBuilder sb = new StringBuilder();
 
@@ -99,6 +99,11 @@ namespace HSDRawViewer.GUI
                         else
                         if (param.IsPointer)
                             yield return ("POINTER->(Edit To View)");
+                        else
+                        if (param.IsFloat)
+                            yield return (param.Name +
+                                " : " +
+                                BitConverter.ToSingle(BitConverter.GetBytes(value), 0));
                         else
                             yield return (param.Name + 
                                 " : " + 
@@ -325,7 +330,7 @@ namespace HSDRawViewer.GUI
             subActionList.Items.Clear();
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction((byte)(data[i] >> 2));
+                var sa = SubactionManager.GetSubaction((byte)(data[i]));
 
                 var sas = new SubActionScript();
 
@@ -550,7 +555,7 @@ namespace HSDRawViewer.GUI
                     {
                         sa.data = p.Data;
 
-                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0] >> 2)).HasPointer)
+                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0])).HasPointer)
                             sa.Reference = p.Reference;
                         else
                             sa.Reference = null;

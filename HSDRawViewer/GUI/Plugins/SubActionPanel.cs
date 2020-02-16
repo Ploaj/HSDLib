@@ -49,7 +49,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             PointerBox.SelectedItem = AllActions.Find(e => e._struct == Reference);
             
-            var sa = SubactionManager.GetSubaction((byte)(Data[0] >> 2));
+            var sa = SubactionManager.GetSubaction(Data[0]);
 
             comboBox1.SelectedItem = sa.Name;
 
@@ -150,31 +150,22 @@ namespace HSDRawViewer.GUI.Plugins
 
         public byte[] CompileAction()
         {
-            BitWriter w = new BitWriter();
-
             var sa = SubactionManager.Subactions[comboBox1.SelectedIndex];
-
-            w.Write(sa.Code, 6);
+            
+            int[] values = new int[sa.Parameters.Length];
             for(int i = 0; i < sa.Parameters.Length; i++)
             {
                 var bm = sa.Parameters[i];
 
                 if (bm.Name.Contains("None") || bm.IsPointer)
                 {
-                    w.Write(0, bm.BitCount);
                     continue;
                 }
+                values[i] = (int)(panel1.Controls[sa.Parameters.Length - 1 - i].Controls[0] as SubactionValueEditor).GetValue();
                 
-                var value = (int)(panel1.Controls[sa.Parameters.Length - 1 - i].Controls[0] as SubactionValueEditor).GetValue();
-
-                w.Write(value, bm.BitCount);
             }
-
-            // they should all theoretically be aligned to 32 bits
-            if (sa.Parameters.Length == 0)
-                w.Write(0, 26);
-
-            return w.Bytes.ToArray();
+            
+            return sa.Compile(values);
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -263,7 +254,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 // Filter text
                 float val;
-                if (float.TryParse(Text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                if (float.TryParse(Text, out val))
                 {
                     FloatValue = val;
                 }
