@@ -827,6 +827,13 @@ namespace HSDRaw
                 acc._s = str;
                 a = acc;
             }
+            else
+            if (rootString.StartsWith("ftLoadCommonData"))
+            {
+                var acc = new ftLoadCommonData();
+                acc._s = str;
+                a = acc;
+            }
 
             return a;
         }

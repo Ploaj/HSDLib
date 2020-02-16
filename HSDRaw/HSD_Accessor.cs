@@ -21,7 +21,7 @@ namespace HSDRaw
             New();
         }
 
-        public void New()
+        public virtual void New()
         {
             if (TrimmedSize != -1)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -462,6 +463,30 @@ namespace HSDRaw
                     a._s.SetString(i * 4, value[i]);
                 }
             }
+        }
+
+        public Color GetColorRGB(int loc)
+        {
+            var colBytes = GetBytes(loc, 4);
+
+            return Color.FromArgb(255, colBytes[0], colBytes[1], colBytes[2]);
+        }
+
+        public void SetColorRGB(int loc, Color value)
+        {
+            SetBytes(loc, new byte[] { value.R, value.G, value.B, 0 });
+        }
+
+        public Color GetColorRGBA(int loc)
+        {
+            var colBytes = GetBytes(loc, 4);
+
+            return Color.FromArgb(colBytes[3], colBytes[0], colBytes[1], colBytes[2]);
+        }
+
+        public void SetColorRGBA(int loc, Color value)
+        {
+            SetBytes(loc, new byte[] { value.R, value.G, value.B, value.A});
         }
 
         public int GetInt32(int loc)

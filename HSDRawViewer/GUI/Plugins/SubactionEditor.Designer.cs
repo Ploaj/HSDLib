@@ -56,7 +56,6 @@
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.simpleScriptViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderHitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderHurtboxsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -352,7 +351,6 @@
             this.editDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadPlayerFilesToolStripMenuItem,
             this.toolStripSeparator1,
-            this.simpleScriptViewToolStripMenuItem,
             this.renderHitboxInterpolationToolStripMenuItem,
             this.renderHurtboxsToolStripMenuItem,
             this.toolStripSeparator2,
@@ -368,20 +366,13 @@
             // 
             this.loadPlayerFilesToolStripMenuItem.Name = "loadPlayerFilesToolStripMenuItem";
             this.loadPlayerFilesToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Model Files";
+            this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Rendering Files";
             this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(218, 6);
-            // 
-            // simpleScriptViewToolStripMenuItem
-            // 
-            this.simpleScriptViewToolStripMenuItem.Name = "simpleScriptViewToolStripMenuItem";
-            this.simpleScriptViewToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.simpleScriptViewToolStripMenuItem.Text = "Simple Script View";
-            this.simpleScriptViewToolStripMenuItem.CheckedChanged += new System.EventHandler(this.simpleScriptViewToolStripMenuItem_CheckedChanged);
             // 
             // renderHitboxInterpolationToolStripMenuItem
             // 
@@ -497,7 +488,6 @@
         private System.Windows.Forms.ToolStripMenuItem createNewSubroutineToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem simpleScriptViewToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonReplace;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.Splitter splitter3;
