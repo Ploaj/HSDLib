@@ -218,10 +218,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         }
                         break;
                     case 28:
-                        if (BoneCollisionStates.ContainsKey(cmd.Parameters[0]))
-                            BoneCollisionStates[cmd.Parameters[0]] = cmd.Parameters[1];
-                        else
-                            BoneCollisionStates.Add(cmd.Parameters[0], cmd.Parameters[1]);
+                        if(cmd.Parameters.Length > 1)
+                        {
+                            if (BoneCollisionStates.ContainsKey(cmd.Parameters[0]))
+                                BoneCollisionStates[cmd.Parameters[0]] = cmd.Parameters[1];
+                            else
+                                BoneCollisionStates.Add(cmd.Parameters[0], cmd.Parameters[1]);
+                        }
                         break;
                     case 37:
                         CharacterInvisibility = cmd.Parameters[1] == 1;

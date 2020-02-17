@@ -153,6 +153,9 @@ namespace HSDRawViewer.Tools
         }
         private static List<Subaction> _subactions;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private static void LoadFromFile()
         {
             var deserializer = new DeserializerBuilder()
@@ -186,16 +189,26 @@ namespace HSDRawViewer.Tools
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static Subaction GetSubaction(byte code)
         {
-            var sa = Subactions.Find(e => e.Code == code);
+            var sa = Subactions.Find(e => e.Code == code && e.IsCustom);
 
             if (sa == null)
-                sa = Subactions.Find(e => e.Code == (code & 0xFC));
+                sa = Subactions.Find(e => e.Code == (code & 0xFC) && !e.IsCustom);
 
             return sa;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static Subaction GetSubaction(string name)
         {
             return Subactions.Find(e => e.Name == name);

@@ -636,7 +636,8 @@ namespace HSDRawViewer.GUI
             {
                 if(subActionList.Items[e.Index] is SubActionScript script)
                 {
-                    e.Graphics.DrawString(e.Index + ". " + script.Name + (toolStripComboBox1.SelectedIndex == 2 ? "(" + string.Join(", ", script.Parameters) + ")" : ""), e.Font, new SolidBrush(Color.DarkBlue), e.Bounds);
+                    var sa = SubactionManager.GetSubaction(script.data[0]);
+                    e.Graphics.DrawString(e.Index + ". " + script.Name + (toolStripComboBox1.SelectedIndex == 2 ? "(" + string.Join(", ", script.Parameters) + ")" : ""), e.Font, new SolidBrush(sa.IsCustom ? Color.DarkOrange : Color.DarkBlue), e.Bounds);
                     int i = 1;
                     if (toolStripComboBox1.SelectedIndex == 0)
                         foreach (var v in script.Parameters)

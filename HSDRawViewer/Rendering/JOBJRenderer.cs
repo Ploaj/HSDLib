@@ -205,6 +205,8 @@ namespace HSDRawViewer.Rendering
             GL.CullFace(CullFaceMode.Front);
 
             GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+
             // Render DOBJS
             if (RenderObjects)
             {

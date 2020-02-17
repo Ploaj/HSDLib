@@ -18,7 +18,7 @@ namespace HSDRawViewer.GUI
         }
         private object _object;
 
-        public bool EnablePropertyViewer => propertyGrid.Visible;
+        public bool EnablePropertyViewer { get => propertyGrid.Visible; set => propertyGrid.Visible = value; }
 
         public object SelectedObject => elementList.SelectedItem;
 
@@ -36,8 +36,11 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void MakeChanges()
         {
-            MethodInfo method = GetType().GetMethod("ToArray").MakeGenericMethod(new Type[] { Property.PropertyType.GetElementType() });
-            Property.SetValue(_object, method.Invoke(this, new object[] { }));
+            if(Property != null)
+            {
+                MethodInfo method = GetType().GetMethod("ToArray").MakeGenericMethod(new Type[] { Property.PropertyType.GetElementType() });
+                Property.SetValue(_object, method.Invoke(this, new object[] { }));
+            }
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="propertyName"></param>
-        public void SetProperty(object obj, string propertyName)
+        public void SetArrayFromProperty(object obj, string propertyName)
         {
             Property = obj.GetType().GetProperty(propertyName);
             if (Property != null && Property.PropertyType.IsArray)
@@ -129,8 +132,12 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            elementList.Items.Add(Activator.CreateInstance(Property.PropertyType.GetElementType()));
-            MakeChanges();
+            var ob = Activator.CreateInstance(Property.PropertyType.GetElementType());
+            if(ob != null)
+            {
+                elementList.Items.Add(ob);
+                MakeChanges();
+            }
         }
 
         /// <summary>

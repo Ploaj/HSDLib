@@ -55,7 +55,10 @@
         private HSD_String JointS { get => _s.GetReference<HSD_String>(0x04); set => _s.SetReference(0x04, value); }
 
         private HSD_String MatS { get => _s.GetReference<HSD_String>(0x08); set => _s.SetReference(0x08, value); }
+
+        public override string ToString()
+        {
+            return FileName;
+        }
     }
-
-
 }

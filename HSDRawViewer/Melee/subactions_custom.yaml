@@ -18,3 +18,17 @@
   - name: Keyframe Blend Level
     bitCount: 32
     isFloat: true
+
+- code: 0x33
+  name: Interrupt Swap
+  parameters:
+  - name: Default
+    bitCount: 8
+    enums:
+    - IASA Function
+    - Physics Function
+    - Collision Function
+  - name: Padding
+    bitCount: 16
+  - name: Move Logic
+    bitCount: 32

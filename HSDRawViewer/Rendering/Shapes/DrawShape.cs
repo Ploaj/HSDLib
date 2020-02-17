@@ -34,6 +34,43 @@ namespace HSDRawViewer.Rendering
             GL.PopAttrib();
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
+        public static void DrawRectangle(float x, float y, float x2, float y2, Color c)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            
+            GL.Color4(c);
+            GL.Begin(PrimitiveType.Quads);
+
+            GL.Vertex2(x, y);
+            GL.Vertex2(x2, y);
+            GL.Vertex2(x2, y2);
+            GL.Vertex2(x, y2);
+
+            GL.End();
+
+            GL.LineWidth(2f);
+            GL.Color4(1f, 1f, 1f, 1f);
+            GL.Begin(PrimitiveType.LineLoop);
+
+            GL.Vertex2(x, y);
+            GL.Vertex2(x2, y);
+            GL.Vertex2(x2, y2);
+            GL.Vertex2(x, y2);
+
+            GL.End();
+            GL.PopAttrib();
+        }
 
         /// <summary>
         /// 

@@ -217,6 +217,14 @@
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
+    <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
+    <Compile Include="GUI\Plugins\MEX\MexDataEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\MEX\MexDataEditor.Designer.cs">
+      <DependentUpon>MexDataEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\MEX\MEXEntry.cs" />
     <Compile Include="GUI\Plugins\SubActionPanel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -349,6 +357,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\Melee\HurtBoxEditor.resx">
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\MEX\MexDataEditor.resx">
+      <DependentUpon>MexDataEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\SubActionPanel.resx">
       <DependentUpon>SubActionPanel.cs</DependentUpon>

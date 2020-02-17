@@ -2,48 +2,113 @@
 
 namespace HSDRaw.MEX
 {
+    public class MEX_Meta : HSDAccessor
+    {
+        public override int TrimmedSize => 0x10;
+        
+        public int NumOfInternalIDs { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+
+        public int NumOfExternalIDs { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        
+        public int NumOfCSSIcons { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+
+        public int NumOfAddedSSMs { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+    }
+
     public class MEX_Data : HSDAccessor
     {
         public override int TrimmedSize => 0x80;
 
-        public MEX_IconData MnSlChr_IconData { get => _s.GetReference<MEX_IconData>(0x00); set => _s.SetReference(0x00, value); }
+        public MEX_Meta MetaData { get => _s.GetReference<MEX_Meta>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_String> MnSlChr_NameText { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x04); set => _s.SetReference(0x04, value); }
+        public MEX_IconData MnSlChr_IconData { get => _s.GetReference<MEX_IconData>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDArrayAccessor<MEX_CharFileStrings> Char_CharFiles { get => _s.GetReference<HSDArrayAccessor<MEX_CharFileStrings>>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDNullPointerArrayAccessor<HSD_String> MnSlChr_NameText { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSDArrayAccessor<MEX_CostumeIDs> Char_CostumeIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeIDs>>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSDArrayAccessor<MEX_CharFileStrings> Char_CharFiles { get => _s.GetReference<HSDArrayAccessor<MEX_CharFileStrings>>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public HSDArrayAccessor<MEX_CostumeFileSymbolTable> Char_CostumeFileSymbols { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeFileSymbolTable>>(0x10); set => _s.SetReference(0x10, value); }
+        public HSDArrayAccessor<MEX_CostumeIDs> Char_CostumeIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeIDs>>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_String> Char_AnimFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x14); set => _s.SetReference(0x14, value); }
+        public HSDArrayAccessor<MEX_CostumeFileSymbolTable> Char_CostumeFileSymbols { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeFileSymbolTable>>(0x14); set => _s.SetReference(0x14, value); }
 
-        public HSDArrayAccessor<MEX_AnimCount> Char_AnimCount { get => _s.GetReference<HSDArrayAccessor<MEX_AnimCount>>(0x18); set => _s.SetReference(0x18, value); }
+        public HSDNullPointerArrayAccessor<HSD_String> Char_AnimFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x18); set => _s.SetReference(0x18, value); }
 
-        public HSDArrayAccessor<MEX_EffectFiles> Char_EffectFiles { get => _s.GetReference<HSDArrayAccessor<MEX_EffectFiles>>(0x1C); set => _s.SetReference(0x1C, value); }
+        public HSDArrayAccessor<MEX_AnimCount> Char_AnimCount { get => _s.GetReference<HSDArrayAccessor<MEX_AnimCount>>(0x1C); set => _s.SetReference(0x1C, value); }
 
-        // Effect IDs
+        public HSDArrayAccessor<MEX_EffectFiles> Char_EffectFiles { get => _s.GetReference<HSDArrayAccessor<MEX_EffectFiles>>(0x20); set => _s.SetReference(0x20, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_String> GmRst_AnimFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x24); set => _s.SetReference(0x24, value); }
+        public HSDArrayAccessor<HSD_Byte> Char_EffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x24); set => _s.SetReference(0x24, value); }
+        
+        public HSDNullPointerArrayAccessor<HSD_String> GmRst_AnimFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x28); set => _s.SetReference(0x28, value); }
 
-        // insignia ids
+        public HSDArrayAccessor<HSD_Byte> Char_InsigniaIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x2C); set => _s.SetReference(0x2C, value); }
+        
+        public HSDArrayAccessor<HSD_Float> GmRst_Scale { get => _s.GetReference<HSDArrayAccessor<HSD_Float>>(0x30); set => _s.SetReference(0x30, value); }
 
-        public HSDArrayAccessor<HSD_Float> GmRst_Scale { get => _s.GetReference<HSDArrayAccessor<HSD_Float>>(0x2C); set => _s.SetReference(0x2C, value); }
+        public HSDArrayAccessor<HSD_Int> GmRst_VictoryTheme { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x34); set => _s.SetReference(0x34, value); }
+        
+        public HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames> FtDemo_SymbolNames { get => _s.GetReference<HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>>(0x38); set => _s.SetReference(0x38, value); }
 
-        // GmRst_VictoryTheme
+        public HSDArrayAccessor<MEX_CharDefineIDs> Char_DefineIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharDefineIDs>>(0x3C); set => _s.SetReference(0x3C, value); }
 
-        public HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames> FtDemo_SymbolNames { get => _s.GetReference<HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>>(0x34); set => _s.SetReference(0x34, value); }
+        public HSDArrayAccessor<HSD_Int> SFX_NameDef { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x40); set => _s.SetReference(0x40, value); }
 
-        public HSDArrayAccessor<MEX_CharDefineIDs> Char_DefineIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharDefineIDs>>(0x38); set => _s.SetReference(0x38, value); }
+        public HSDArrayAccessor<MEX_CharSSMFileID> SSM_CharSSMFileIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharSSMFileID>>(0x44); set => _s.SetReference(0x44, value); }
 
-        // SFX_NameDef
-
-        public HSDArrayAccessor<MEX_CharSSMFileID> SSM_CharSSMFileIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharSSMFileID>>(0x40); set => _s.SetReference(0x40, value); }
-
-        public HSDNullPointerArrayAccessor<HSD_String> SSM_SSMFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x44); set => _s.SetReference(0x44, value); }
+        public HSDNullPointerArrayAccessor<HSD_String> SSM_SSMFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x48); set => _s.SetReference(0x48, value); }
 
         // SSM runtime struct
 
+        public HSDArrayAccessor<HSD_Int> OnLoad { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x50); set => _s.SetReference(0x50, value); }
+
+        public HSDArrayAccessor<HSD_Int> OnDeath { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x54); set => _s.SetReference(0x54, value); }
+
+        public HSDArrayAccessor<HSD_Int> OnUnknown { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x58); set => _s.SetReference(0x58, value); }
+
+        public HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>> MoveLogic { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>>(0x5C); set => _s.SetReference(0x5C, value); }
+        
+        public HSDArrayAccessor<HSD_Int> SpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x60); set => _s.SetReference(0x60, value); }
+
+        public HSDArrayAccessor<HSD_Int> SpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x64); set => _s.SetReference(0x64, value); }
+
+        public HSDArrayAccessor<HSD_Int> SpecialHi { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x68); set => _s.SetReference(0x68, value); }
+
+        public HSDArrayAccessor<HSD_Int> SpecialHiAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x6C); set => _s.SetReference(0x6C, value); }
+
+        public HSDArrayAccessor<HSD_Int> SpecialLw { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x70); set => _s.SetReference(0x70, value); }
+
+        public HSDArrayAccessor<HSD_Int> SpecialLwAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x74); set => _s.SetReference(0x74, value); }
+        
+        public HSDArrayAccessor<HSD_Int> SpecialS { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x78); set => _s.SetReference(0x78, value); }
+
+        public HSDArrayAccessor<HSD_Int> SpecialSAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x7C); set => _s.SetReference(0x7C, value); }
+
+        public HSDArrayAccessor<SSMFlag> SSM_Flags { get => _s.GetReference<HSDArrayAccessor<SSMFlag>>(0x80); set => _s.SetReference(0x80, value); }
+
+    }
+
+
+    public class SSMFlag : HSDAccessor
+    {
+        public override int TrimmedSize => 0x8;
+
+        public int SSMFileSize { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+
+        public int Flag { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+    }
+
+    public class HSD_Byte : HSDAccessor
+    {
+        public override int TrimmedSize => 0x01;
+
+        public byte Value { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+    }
+
+    public class HSD_Int : HSDAccessor
+    {
+        public override int TrimmedSize => 0x04;
+
+        public int Value { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
     }
 
     public class HSD_Float : HSDAccessor
@@ -62,9 +127,14 @@ namespace HSDRaw.MEX
             get => FileNameS?.Value;
             set
             {
-                if (FileNameS == null)
-                    FileNameS = new HSD_String();
-                FileNameS.Value = value;
+                if (value == null)
+                    FileNameS = null;
+                else
+                {
+                    if (FileNameS == null)
+                        FileNameS = new HSD_String();
+                    FileNameS.Value = value;
+                }
             }
         }
 
@@ -73,9 +143,14 @@ namespace HSDRaw.MEX
             get => SymbolS?.Value;
             set
             {
-                if (SymbolS == null)
-                    SymbolS = new HSD_String();
-                SymbolS.Value = value;
+                if (value == null)
+                    SymbolS = null;
+                else
+                {
+                    if (SymbolS == null)
+                        SymbolS = new HSD_String();
+                    SymbolS.Value = value;
+                }
             }
         }
 

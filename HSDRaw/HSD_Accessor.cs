@@ -277,6 +277,20 @@ namespace HSDRaw
             }
         }
 
+        /// <summary>
+        /// Sets value at index to given value
+        /// Array is resized to fit index if it is smaller
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        public void Set(int index, T value)
+        {
+            if ((index) * 4 >= _s.Length)
+                _s.Resize((index + 2) * 4);
+
+            this[index] = value;
+        }
+
         //TODO: Add and Remove Functions
 
         public void Remove(T value)
@@ -342,6 +356,20 @@ namespace HSDRaw
                     throw new IndexOutOfRangeException();
                 _s.SetReference(i * 4, value);
             }
+        }
+
+        /// <summary>
+        /// Sets value at index to given value
+        /// Array is resized to fit index if it is smaller
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        public void Set(int index, T value)
+        {
+            if ((index) * 4 >= _s.Length)
+                _s.Resize((index + 1) * 4);
+
+            this[index] = value;
         }
 
         //TODO: Add and Remove Functions
@@ -419,6 +447,19 @@ namespace HSDRaw
             }
         }
 
+        /// <summary>
+        /// Sets value at index to given value
+        /// Array is resized to fit index if it is smaller
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        public void Set(int index, T value)
+        {
+            if((index + 1) * Stride > _s.Length)
+                _s.Resize((index + 1) * Stride);
+
+            this[index] = value;
+        }
 
         public void Remove(T value)
         {

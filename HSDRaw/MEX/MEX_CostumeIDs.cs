@@ -8,8 +8,8 @@
 
         public byte RedCostumeIndex { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
-        public byte GreenCostumeIndex { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
+        public byte BlueCostumeIndex { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
 
-        public byte BlueCostumeIndex { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
+        public byte GreenCostumeIndex { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
     }
 }

@@ -36,7 +36,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 _bank = value;
                 if(_bank != null)
                 {
-                    editor.SetProperty(value, "Hurtboxes");
+                    editor.SetArrayFromProperty(value, "Hurtboxes");
                 }
             }
         }

@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using System.Collections.Generic;
 using HSDRawViewer.Tools;
-using HSDRaw.Tools.Melee;
 using System.Globalization;
 using System;
 

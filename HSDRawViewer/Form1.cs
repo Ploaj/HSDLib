@@ -112,11 +112,12 @@ namespace HSDRawViewer
             treeView1.AfterExpand += (sender, args) =>
             {
                 args.Node.Nodes.Clear();
+                treeView1.BeginUpdate();
                 if (args.Node is DataNode node)
                 {
                     node.ExpandData();
                 }
-
+                treeView1.EndUpdate();
             };
 
             treeView1.AfterCollapse += (sender, args) =>
