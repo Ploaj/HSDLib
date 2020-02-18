@@ -4,7 +4,6 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.MEX;
 using HSDRawViewer.Rendering;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -87,16 +86,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
             }
-
-            SSMEntries = new ExpandedSSM[_data.SSM_SSMFiles.Length];
-            for (int i = 0; i < _data.SSM_SSMFiles.Length; i++)
-            {
-                ExpandedSSM ssm = new ExpandedSSM();
-                ssm.Name = _data.SSM_SSMFiles[i].Value;
-                ssm.Flag = _data.SSM_Flags[i].Flag;
-                SSMEntries[i] = ssm;
-            }
-            ssmEditor.SetArrayFromProperty(this, "SSMEntries");
             
             Effects = new MEX_EffectEntry[_data.Char_EffectFiles.Length];
             for(int i = 0; i < Effects.Length; i++)
@@ -161,24 +150,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 index++;
             }
         }
-
-        private void SaveSSMData()
-        {
-            var numOfSSMs = SSMEntries.Length;
-
-            _data.MetaData.NumOfSSMs = numOfSSMs;
-
-            _data._s.GetCreateReference<HSDAccessor>(0x4C)._s.SetData(new byte[180 + ((numOfSSMs + 1) * 4 * 4) + ((numOfSSMs + 1) * 4)]);
-
-            _data.SSM_SSMFiles = new HSDNullPointerArrayAccessor<HSD_String>();
-            _data.SSM_Flags = new HSDArrayAccessor<SSMFlag>();
-            for(int i = 0; i < SSMEntries.Length; i++)
-            {
-                _data.SSM_SSMFiles.Add(new HSD_String() { Value = SSMEntries[i].Name });
-                _data.SSM_Flags.Add(new SSMFlag() { Flag = SSMEntries[i].Flag });
-            }
-        }
-
+        
         private void SaveEffectData()
         {
             _data.MetaData.NumOfEffects = Effects.Length;
@@ -217,11 +189,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         #endregion
         
-        private void saveSSMButton_Click(object sender, EventArgs e)
-        {
-            SaveSSMData();
-        }
-
         private void saveEffectButton_Click(object sender, EventArgs e)
         {
             SaveEffectData();

@@ -12,6 +12,10 @@ namespace HSDRawViewer.Sound
 
         public int StartIndex;
 
+        public int Flag = 0;
+
+        public int GroupFlags = 0;
+
         public BindingList<DSP> Sounds = new BindingList<DSP>();
 
         public SSM()
@@ -84,6 +88,16 @@ namespace HSDRawViewer.Sound
         /// </summary>
         /// <param name="filePath"></param>
         public void Save(string filePath)
+        {
+            int bf;
+            Save(filePath, out bf);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void Save(string filePath, out int bufferSize)
         {
             using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(filePath, FileMode.Create)))
             {
@@ -164,6 +178,8 @@ namespace HSDRawViewer.Sound
                 w.Seek(0);
                 w.Write(headerSize);
                 w.Write((int)DataSize);
+
+                bufferSize = (int)DataSize;
             }
         }
 

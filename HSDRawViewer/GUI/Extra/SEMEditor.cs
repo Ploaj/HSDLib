@@ -1,5 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.Melee;
+using HSDRaw.MEX;
 using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
 using System;
@@ -21,7 +22,7 @@ namespace HSDRawViewer.GUI.Extra
             InitializeComponent();
 
             entryList.DataSource = Entries;
-            
+
             CenterToScreen();
 
             FormClosed += (sender, args) =>
@@ -45,7 +46,8 @@ namespace HSDRawViewer.GUI.Extra
             {
                 Entries.Add(v);
             }
-            smStdatToolStripMenuItem.Enabled = true;
+            smStdatToolStripMenuItem1.Enabled = true;
+            mxDtdatToolStripMenuItem.Enabled = true;
         }
 
 
@@ -55,7 +57,20 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="path"></param>
         private void SaveSEMFile(string path)
         {
-            SEM.SaveSEMFile(path, Entries.ToList());
+            DialogResult r = DialogResult.No;
+            if (MEX_DATA != null)
+                r = MessageBox.Show("Save MxDt.dat changes?", "Save MxDt", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+            if (r == DialogResult.Cancel)
+                return;
+
+            SEM.SaveSEMFile(path, Entries.ToList(), r == DialogResult.Yes ? MEX_DATA : null);
+
+            if (r == DialogResult.Yes)
+            {
+                MEX_DATA.MetaData.NumOfSSMs = Entries.Count;
+                MEXDataFile.Save(MEXDataFilePath);
+            }
         }
 
         /// <summary>
@@ -66,7 +81,7 @@ namespace HSDRawViewer.GUI.Extra
         private void openSEMToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var f = Tools.FileIO.OpenFile("SEM (*.sem)|*.sem");
-            if(f != null)
+            if (f != null)
             {
                 OpenSEMFile(f);
             }
@@ -85,7 +100,7 @@ namespace HSDRawViewer.GUI.Extra
                 SaveSEMFile(f);
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -98,6 +113,7 @@ namespace HSDRawViewer.GUI.Extra
             soundList.DataSource = (entryList.SelectedItem as SEMEntry).Sounds;
             soundBankList.DataSource = (entryList.SelectedItem as SEMEntry).SoundBank?.Sounds;
             dspViewer1.DSP = null;
+            propertyGrid1.SelectedObject = entryList.SelectedItem;
         }
 
         /// <summary>
@@ -131,7 +147,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             object data = listBox1.SelectedItem;
             var ds = listBox1.DataSource as IList;
-            if(ds != null)
+            if (ds != null)
                 ds.Remove(data);
         }
 
@@ -203,8 +219,8 @@ namespace HSDRawViewer.GUI.Extra
                 ds.Add(new SEMSound()
                 {
                     Index = ds.Count + entryList.SelectedIndex * 10000,
-                    Name = "SFX_", 
-                    CommandData = new byte[] { 0x01, 0, 0, 0, 0x0E, 0, 0, 0}
+                    Name = "SFX_",
+                    CommandData = new byte[] { 0x01, 0, 0, 0, 0x0E, 0, 0, 0 }
                 });
             }
         }
@@ -219,7 +235,7 @@ namespace HSDRawViewer.GUI.Extra
             if (soundList.SelectedItem is SEMSound sound)
             {
                 byte[] d;
-                if(SEM.CompileSEMScript(scriptBox.Text, out d) == -1)
+                if (SEM.CompileSEMScript(scriptBox.Text, out d) == -1)
                     sound.CommandData = d;
                 scriptBox.Text = SEM.DecompileSEMScript(sound.CommandData);
             }
@@ -232,7 +248,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void soundBankList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if(soundBankList.SelectedItem is DSP dsp)
+            if (soundBankList.SelectedItem is DSP dsp)
                 DSPPlayer.PlayDSP(dsp);
         }
 
@@ -255,11 +271,11 @@ namespace HSDRawViewer.GUI.Extra
         private void soundList_DataSourceChanged(object sender, EventArgs e)
         {
             var index = 0;
-            if(soundList.DataSource != null)
-            foreach(var v in soundList.DataSource as BindingList<SEMSound>)
-            {
-                v.Index = entryList.SelectedIndex * 10000 + index++;
-            }
+            if (soundList.DataSource != null)
+                foreach (var v in soundList.DataSource as BindingList<SEMSound>)
+                {
+                    v.Index = entryList.SelectedIndex * 10000 + index++;
+                }
         }
 
         /// <summary>
@@ -284,7 +300,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void buttonMoveUp_Click(object sender, EventArgs e)
         {
-            if(soundList.SelectedItem != null)
+            if (soundList.SelectedItem != null)
             {
                 var sounds = soundList.DataSource as BindingList<SEMSound>;
 
@@ -300,7 +316,7 @@ namespace HSDRawViewer.GUI.Extra
                 soundList.DataSource = null;
                 soundList.DataSource = sounds;
                 soundList.SelectedIndex = index - 1;
-                
+
                 soundList.EndUpdate();
             }
         }
@@ -324,7 +340,7 @@ namespace HSDRawViewer.GUI.Extra
                 soundList.BeginUpdate();
                 sounds.RemoveAt(index);
                 sounds.Insert(index + 1, sou);
-                
+
                 soundList.DataSource = null;
                 soundList.DataSource = sounds;
                 soundList.SelectedIndex = index + 1;
@@ -374,7 +390,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void buttonSoundBankDelete_Click(object sender, EventArgs e)
         {
-            if(MessageBox.Show("Are you sure?", "Delete Sound", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes && soundBankList.SelectedIndex != -1)
+            if (MessageBox.Show("Are you sure?", "Delete Sound", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes && soundBankList.SelectedIndex != -1)
             {
                 // index to delete
                 var index = soundBankList.SelectedIndex;
@@ -383,7 +399,7 @@ namespace HSDRawViewer.GUI.Extra
                 (entryList.SelectedItem as SEMEntry)?.SoundBank?.Sounds.RemoveAt(index);
 
                 // adjust ids > index to be less and id at index to be 0?
-                foreach(SEMSound s in soundList.Items)
+                foreach (SEMSound s in soundList.Items)
                 {
                     if (s.SoundCommandIndex == index)
                         s.SoundCommandIndex = 0;
@@ -408,7 +424,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void soundList_DoubleClick(object sender, EventArgs e)
         {
-            if(soundList.SelectedItem is SEMSound sound)
+            if (soundList.SelectedItem is SEMSound sound)
             {
                 // TODO: figure out how these values are stored
                 var pitch = sound.GetOPCodeValue(0x0C);
@@ -431,7 +447,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void ImportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(SoundTestDat != null)
+            if (SoundTestDat != null)
             {
                 if (MessageBox.Show("Sound Test Already Loaded\nReload?", "Load Sound Test Dat", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) != DialogResult.Yes)
                     return;
@@ -441,26 +457,26 @@ namespace HSDRawViewer.GUI.Extra
             {
                 HSDRawFile db = new HSDRawFile(f);
 
-                if(db.Roots.Count > 0 && db.Roots[0].Data is smSoundTestLoadData std)
+                if (db.Roots.Count > 0 && db.Roots[0].Data is smSoundTestLoadData std)
                 {
                     SoundTestDat = db;
                     SoundTestData = std;
 
                     var names = std.SoundNames;
                     var indices = std.SoundIDs;
-                    
-                    for(int i = 0; i < indices.Length; i++)
+
+                    for (int i = 0; i < indices.Length; i++)
                     {
                         var ei = indices[i] / 10000;
                         var si = indices[i] % 10000;
 
-                        if(entryList.Items[ei] is SEMEntry entry && si < entry.Sounds.Count)
+                        if (entryList.Items[ei] is SEMEntry entry && si < entry.Sounds.Count)
                             entry.Sounds[si].Name = names[i];
                     }
 
                     (entryList.SelectedItem as SEMEntry).Sounds.ResetBindings();
 
-                    exportSmStdatToolStripMenuItem.Enabled = true;
+                    exportToolStripMenuItem.Enabled = true;
                     renameButton.Enabled = true;
                 }
             }
@@ -468,7 +484,7 @@ namespace HSDRawViewer.GUI.Extra
 
         private void exportSmStdatToolStripMenuItem_Click(object sender, EventArgs args)
         {
-            if(SoundTestDat != null)
+            if (SoundTestDat != null)
             {
                 var f = FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "SmSt.dat");
                 if (f == null)
@@ -480,7 +496,7 @@ namespace HSDRawViewer.GUI.Extra
                 List<int> soundIndices = new List<int>();
 
                 int eIndex = 0;
-                foreach(SEMEntry e in entryList.Items)
+                foreach (SEMEntry e in entryList.Items)
                 {
                     int sIndex = 0;
                     foreach (var s in e.Sounds)
@@ -509,13 +525,13 @@ namespace HSDRawViewer.GUI.Extra
 
         private void renameButton_Click(object sender, EventArgs e)
         {
-            if(soundList.SelectedItem is SEMSound sound)
+            if (soundList.SelectedItem is SEMSound sound)
             {
                 var rn = new RenameBox();
                 rn.Name = sound.Name;
-                using(PropertyDialog d = new PropertyDialog("Rename", rn))
+                using (PropertyDialog d = new PropertyDialog("Rename", rn))
                 {
-                    if(d.ShowDialog() == DialogResult.OK)
+                    if (d.ShowDialog() == DialogResult.OK)
                     {
                         sound.Name = rn.Name;
                         (entryList.SelectedItem as SEMEntry).Sounds.ResetBindings();
@@ -526,7 +542,7 @@ namespace HSDRawViewer.GUI.Extra
 
         private void soundList_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Oemplus)
+            if (e.KeyCode == Keys.Oemplus)
             {
                 buttonAddSound_Click(null, null);
             }
@@ -570,5 +586,60 @@ namespace HSDRawViewer.GUI.Extra
                 toolStripButton2_Click(null, null);
             }
         }
+
+
+        #region MXDATA
+
+        private string MEXDataFilePath;
+        private HSDRawFile MEXDataFile;
+        private MEX_Data MEX_DATA
+        {
+            get
+            {
+                if (MEXDataFile != null && MEXDataFile.Roots.Count > 0 && MEXDataFile.Roots[0].Data is MEX_Data data)
+                {
+                    return data;
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "MxDt.dat");
+            if (f != null)
+            {
+                MEXDataFilePath = f;
+                MEXDataFile = new HSDRawFile(f);
+                if(MEX_DATA == null)
+                {
+                    MEXDataFile = null;
+                    MEXDataFilePath = null;
+                }
+                else
+                {
+                    // Load SSM Flags
+                    // TODO: check lengths to make sure it matches?
+                    for(int i = 0; i < MEX_DATA.SSM_Flags.Length; i++)
+                    {
+                        if(i < Entries.Count)
+                            Entries[i].SoundBank.Flag = MEX_DATA.SSM_Flags[i].Flag;
+                    }
+                    for (int i = 0; i < MEX_DATA.SSM_LookupTable.Length; i++)
+                    {
+                        if (i < Entries.Count)
+                            Entries[i].SoundBank.GroupFlags = MEX_DATA.SSM_LookupTable[i]._s.GetInt32(0);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
     }
 }

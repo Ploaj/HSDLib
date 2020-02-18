@@ -126,10 +126,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public byte SSMIndex { get; set; }
 
         [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
-        public int SSMBitfield1 { get; set; }
+        public uint SSMBitfield1 { get; set; }
 
         [DisplayName("SSM Bitfield 2"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
-        public int SSMBitfield2 { get; set; }
+        public uint SSMBitfield2 { get; set; }
 
         [DisplayName("Narrator Sound Clip"), Category("3 - Misc"), Description("Index of narrator sound clip")]
         public int NameCallSound { get; set; }
@@ -174,8 +174,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             NameCallSound = mexData.SFX_NameDef[externalID].Value;
 
             SSMIndex = mexData.SSM_CharSSMFileIDs[externalID].SSMID;
-            SSMBitfield1 = mexData.SSM_CharSSMFileIDs[externalID].BitField1;
-            SSMBitfield2 = mexData.SSM_CharSSMFileIDs[externalID].BitField2;
+            SSMBitfield1 = (uint)mexData.SSM_CharSSMFileIDs[externalID].BitField1;
+            SSMBitfield2 = (uint)mexData.SSM_CharSSMFileIDs[externalID].BitField2;
 
             SubCharacterInternalID = (sbyte)mexData.Char_DefineIDs[externalID].SubCharacterInternalID;
             SubCharacterBehavior = mexData.Char_DefineIDs[externalID].SubCharacterBehavior;
@@ -225,8 +225,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.SSM_CharSSMFileIDs.Set(externalID, new MEX_CharSSMFileID()
             {
                 SSMID = SSMIndex,
-                BitField1 = SSMBitfield1,
-                BitField2 = SSMBitfield2
+                BitField1 = (int)SSMBitfield1,
+                BitField2 = (int)SSMBitfield2
             });
 
             mexData.Char_DefineIDs.Set(externalID, new MEX_CharDefineIDs()

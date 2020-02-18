@@ -33,8 +33,6 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openSEMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportSEMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.smStdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportSmStdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.entryList = new System.Windows.Forms.ListBox();
             this.soundList = new System.Windows.Forms.ListBox();
             this.entryBox = new System.Windows.Forms.GroupBox();
@@ -45,6 +43,9 @@
             this.splitter4 = new System.Windows.Forms.Splitter();
             this.scriptGroup = new System.Windows.Forms.GroupBox();
             this.scriptBox = new System.Windows.Forms.RichTextBox();
+            this.toolStrip4 = new System.Windows.Forms.ToolStrip();
+            this.copyScriptButton = new System.Windows.Forms.ToolStripButton();
+            this.pasteScriptButton = new System.Windows.Forms.ToolStripButton();
             this.buttonSaveScript = new System.Windows.Forms.Button();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.buttonAddSound = new System.Windows.Forms.ToolStripButton();
@@ -60,27 +61,31 @@
             this.buttonSoundBankDelete = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.toolStrip4 = new System.Windows.Forms.ToolStrip();
-            this.copyScriptButton = new System.Windows.Forms.ToolStripButton();
-            this.pasteScriptButton = new System.Windows.Forms.ToolStripButton();
+            this.smStdatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mxDtdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.splitter5 = new System.Windows.Forms.Splitter();
             this.dspViewer1 = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.menuStrip1.SuspendLayout();
             this.entryBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.soundBox.SuspendLayout();
             this.scriptGroup.SuspendLayout();
+            this.toolStrip4.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
-            this.toolStrip4.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.smStdatToolStripMenuItem,
-            this.exportSmStdatToolStripMenuItem});
+            this.smStdatToolStripMenuItem1,
+            this.mxDtdatToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(926, 24);
@@ -110,22 +115,6 @@
             this.exportSEMToolStripMenuItem.Text = "Export SEM";
             this.exportSEMToolStripMenuItem.Click += new System.EventHandler(this.exportSEMToolStripMenuItem_Click);
             // 
-            // smStdatToolStripMenuItem
-            // 
-            this.smStdatToolStripMenuItem.Enabled = false;
-            this.smStdatToolStripMenuItem.Name = "smStdatToolStripMenuItem";
-            this.smStdatToolStripMenuItem.Size = new System.Drawing.Size(105, 20);
-            this.smStdatToolStripMenuItem.Text = "Import SmSt.dat";
-            this.smStdatToolStripMenuItem.Click += new System.EventHandler(this.ImportToolStripMenuItem_Click);
-            // 
-            // exportSmStdatToolStripMenuItem
-            // 
-            this.exportSmStdatToolStripMenuItem.Enabled = false;
-            this.exportSmStdatToolStripMenuItem.Name = "exportSmStdatToolStripMenuItem";
-            this.exportSmStdatToolStripMenuItem.Size = new System.Drawing.Size(103, 20);
-            this.exportSmStdatToolStripMenuItem.Text = "Export SmSt.dat";
-            this.exportSmStdatToolStripMenuItem.Click += new System.EventHandler(this.exportSmStdatToolStripMenuItem_Click);
-            // 
             // entryList
             // 
             this.entryList.AllowDrop = true;
@@ -133,7 +122,7 @@
             this.entryList.FormattingEnabled = true;
             this.entryList.Location = new System.Drawing.Point(3, 41);
             this.entryList.Name = "entryList";
-            this.entryList.Size = new System.Drawing.Size(159, 405);
+            this.entryList.Size = new System.Drawing.Size(159, 185);
             this.entryList.TabIndex = 1;
             this.entryList.SelectedIndexChanged += new System.EventHandler(this.entryList_SelectedIndexChanged);
             this.entryList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.entryList_KeyDown);
@@ -155,6 +144,8 @@
             // entryBox
             // 
             this.entryBox.Controls.Add(this.entryList);
+            this.entryBox.Controls.Add(this.splitter5);
+            this.entryBox.Controls.Add(this.propertyGrid1);
             this.entryBox.Controls.Add(this.toolStrip1);
             this.entryBox.Dock = System.Windows.Forms.DockStyle.Left;
             this.entryBox.Location = new System.Drawing.Point(0, 24);
@@ -240,6 +231,37 @@
             this.scriptBox.TabIndex = 0;
             this.scriptBox.Text = "";
             // 
+            // toolStrip4
+            // 
+            this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyScriptButton,
+            this.pasteScriptButton});
+            this.toolStrip4.Location = new System.Drawing.Point(3, 39);
+            this.toolStrip4.Name = "toolStrip4";
+            this.toolStrip4.Size = new System.Drawing.Size(516, 25);
+            this.toolStrip4.TabIndex = 3;
+            this.toolStrip4.Text = "toolStrip4";
+            // 
+            // copyScriptButton
+            // 
+            this.copyScriptButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.copyScriptButton.Image = ((System.Drawing.Image)(resources.GetObject("copyScriptButton.Image")));
+            this.copyScriptButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.copyScriptButton.Name = "copyScriptButton";
+            this.copyScriptButton.Size = new System.Drawing.Size(39, 22);
+            this.copyScriptButton.Text = "Copy";
+            this.copyScriptButton.Click += new System.EventHandler(this.copyScriptButton_Click);
+            // 
+            // pasteScriptButton
+            // 
+            this.pasteScriptButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.pasteScriptButton.Image = ((System.Drawing.Image)(resources.GetObject("pasteScriptButton.Image")));
+            this.pasteScriptButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.pasteScriptButton.Name = "pasteScriptButton";
+            this.pasteScriptButton.Size = new System.Drawing.Size(39, 22);
+            this.pasteScriptButton.Text = "Paste";
+            this.pasteScriptButton.Click += new System.EventHandler(this.pasteScriptButton_Click);
+            // 
             // buttonSaveScript
             // 
             this.buttonSaveScript.Dock = System.Windows.Forms.DockStyle.Top;
@@ -247,7 +269,7 @@
             this.buttonSaveScript.Name = "buttonSaveScript";
             this.buttonSaveScript.Size = new System.Drawing.Size(516, 23);
             this.buttonSaveScript.TabIndex = 2;
-            this.buttonSaveScript.Text = "Save";
+            this.buttonSaveScript.Text = "Save Script Changes";
             this.buttonSaveScript.UseVisualStyleBackColor = true;
             this.buttonSaveScript.Click += new System.EventHandler(this.buttonSaveScript_Click);
             // 
@@ -397,36 +419,62 @@
             this.splitter2.TabIndex = 8;
             this.splitter2.TabStop = false;
             // 
-            // toolStrip4
+            // smStdatToolStripMenuItem1
             // 
-            this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.copyScriptButton,
-            this.pasteScriptButton});
-            this.toolStrip4.Location = new System.Drawing.Point(3, 39);
-            this.toolStrip4.Name = "toolStrip4";
-            this.toolStrip4.Size = new System.Drawing.Size(516, 25);
-            this.toolStrip4.TabIndex = 3;
-            this.toolStrip4.Text = "toolStrip4";
+            this.smStdatToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem,
+            this.exportToolStripMenuItem});
+            this.smStdatToolStripMenuItem1.Enabled = false;
+            this.smStdatToolStripMenuItem1.Name = "smStdatToolStripMenuItem1";
+            this.smStdatToolStripMenuItem1.Size = new System.Drawing.Size(66, 20);
+            this.smStdatToolStripMenuItem1.Text = "SmSt.dat";
             // 
-            // copyScriptButton
+            // importToolStripMenuItem
             // 
-            this.copyScriptButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.copyScriptButton.Image = ((System.Drawing.Image)(resources.GetObject("copyScriptButton.Image")));
-            this.copyScriptButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.copyScriptButton.Name = "copyScriptButton";
-            this.copyScriptButton.Size = new System.Drawing.Size(39, 22);
-            this.copyScriptButton.Text = "Copy";
-            this.copyScriptButton.Click += new System.EventHandler(this.copyScriptButton_Click);
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Text = "Import";
+            this.importToolStripMenuItem.Click += new System.EventHandler(this.ImportToolStripMenuItem_Click);
             // 
-            // pasteScriptButton
+            // exportToolStripMenuItem
             // 
-            this.pasteScriptButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.pasteScriptButton.Image = ((System.Drawing.Image)(resources.GetObject("pasteScriptButton.Image")));
-            this.pasteScriptButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.pasteScriptButton.Name = "pasteScriptButton";
-            this.pasteScriptButton.Size = new System.Drawing.Size(39, 22);
-            this.pasteScriptButton.Text = "Paste";
-            this.pasteScriptButton.Click += new System.EventHandler(this.pasteScriptButton_Click);
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportSmStdatToolStripMenuItem_Click);
+            // 
+            // mxDtdatToolStripMenuItem
+            // 
+            this.mxDtdatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem1});
+            this.mxDtdatToolStripMenuItem.Enabled = false;
+            this.mxDtdatToolStripMenuItem.Name = "mxDtdatToolStripMenuItem";
+            this.mxDtdatToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
+            this.mxDtdatToolStripMenuItem.Text = "MxDt.dat";
+            // 
+            // importToolStripMenuItem1
+            // 
+            this.importToolStripMenuItem1.Name = "importToolStripMenuItem1";
+            this.importToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem1.Text = "Import";
+            this.importToolStripMenuItem1.Click += new System.EventHandler(this.importToolStripMenuItem1_Click);
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.propertyGrid1.Location = new System.Drawing.Point(3, 229);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(159, 217);
+            this.propertyGrid1.TabIndex = 3;
+            // 
+            // splitter5
+            // 
+            this.splitter5.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter5.Location = new System.Drawing.Point(3, 226);
+            this.splitter5.Name = "splitter5";
+            this.splitter5.Size = new System.Drawing.Size(159, 3);
+            this.splitter5.TabIndex = 4;
+            this.splitter5.TabStop = false;
             // 
             // dspViewer1
             // 
@@ -461,14 +509,14 @@
             this.soundBox.PerformLayout();
             this.scriptGroup.ResumeLayout(false);
             this.scriptGroup.PerformLayout();
+            this.toolStrip4.ResumeLayout(false);
+            this.toolStrip4.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.toolStrip3.ResumeLayout(false);
             this.toolStrip3.PerformLayout();
-            this.toolStrip4.ResumeLayout(false);
-            this.toolStrip4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -505,11 +553,16 @@
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripButton buttonSoundBankAdd;
         private System.Windows.Forms.ToolStripButton buttonSoundBankDelete;
-        private System.Windows.Forms.ToolStripMenuItem smStdatToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportSmStdatToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton renameButton;
         private System.Windows.Forms.ToolStrip toolStrip4;
         private System.Windows.Forms.ToolStripButton copyScriptButton;
         private System.Windows.Forms.ToolStripButton pasteScriptButton;
+        private System.Windows.Forms.ToolStripMenuItem smStdatToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mxDtdatToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem1;
+        private System.Windows.Forms.Splitter splitter5;
+        private System.Windows.Forms.PropertyGrid propertyGrid1;
     }
 }

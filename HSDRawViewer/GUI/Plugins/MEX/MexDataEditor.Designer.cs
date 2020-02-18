@@ -41,10 +41,11 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.saveFightersButton = new System.Windows.Forms.ToolStripButton();
             this.cloneButton = new System.Windows.Forms.ToolStripButton();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.saveSSMButton = new System.Windows.Forms.ToolStripButton();
+            this.exportFighter = new System.Windows.Forms.ToolStripButton();
+            this.importFighter = new System.Windows.Forms.ToolStripButton();
+            this.deleteFighter = new System.Windows.Forms.ToolStripButton();
             this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.effectEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip3 = new System.Windows.Forms.ToolStrip();
             this.saveEffectButton = new System.Windows.Forms.ToolStripButton();
             this.tabPage5 = new System.Windows.Forms.TabPage();
@@ -52,11 +53,6 @@
             this.buttonLoadPlSl = new System.Windows.Forms.Button();
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.buttonSaveCSS = new System.Windows.Forms.ToolStripButton();
-            this.exportFighter = new System.Windows.Forms.ToolStripButton();
-            this.importFighter = new System.Windows.Forms.ToolStripButton();
-            this.deleteFighter = new System.Windows.Forms.ToolStripButton();
-            this.ssmEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
-            this.effectEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.mainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -65,8 +61,6 @@
             this.tabPage4.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.toolStrip2.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.toolStrip3.SuspendLayout();
             this.tabPage5.SuspendLayout();
@@ -77,7 +71,6 @@
             // mainTabControl
             // 
             this.mainTabControl.Controls.Add(this.tabPage1);
-            this.mainTabControl.Controls.Add(this.tabPage2);
             this.mainTabControl.Controls.Add(this.tabPage6);
             this.mainTabControl.Controls.Add(this.tabPage5);
             this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -208,36 +201,35 @@
             this.cloneButton.Text = "Clone Fighter";
             this.cloneButton.Click += new System.EventHandler(this.cloneButton_Click);
             // 
-            // tabPage2
+            // exportFighter
             // 
-            this.tabPage2.Controls.Add(this.ssmEditor);
-            this.tabPage2.Controls.Add(this.toolStrip2);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(791, 307);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Sounds";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.exportFighter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.exportFighter.Image = ((System.Drawing.Image)(resources.GetObject("exportFighter.Image")));
+            this.exportFighter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportFighter.Name = "exportFighter";
+            this.exportFighter.Size = new System.Drawing.Size(85, 22);
+            this.exportFighter.Text = "Export Fighter";
+            this.exportFighter.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
-            // toolStrip2
+            // importFighter
             // 
-            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveSSMButton});
-            this.toolStrip2.Location = new System.Drawing.Point(3, 3);
-            this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(785, 25);
-            this.toolStrip2.TabIndex = 3;
-            this.toolStrip2.Text = "toolStrip2";
+            this.importFighter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.importFighter.Image = ((System.Drawing.Image)(resources.GetObject("importFighter.Image")));
+            this.importFighter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.importFighter.Name = "importFighter";
+            this.importFighter.Size = new System.Drawing.Size(87, 22);
+            this.importFighter.Text = "Import Fighter";
+            this.importFighter.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
-            // saveSSMButton
+            // deleteFighter
             // 
-            this.saveSSMButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
-            this.saveSSMButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveSSMButton.Name = "saveSSMButton";
-            this.saveSSMButton.Size = new System.Drawing.Size(126, 22);
-            this.saveSSMButton.Text = "Save SSM Changes";
-            this.saveSSMButton.Click += new System.EventHandler(this.saveSSMButton_Click);
+            this.deleteFighter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.deleteFighter.Image = ((System.Drawing.Image)(resources.GetObject("deleteFighter.Image")));
+            this.deleteFighter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.deleteFighter.Name = "deleteFighter";
+            this.deleteFighter.Size = new System.Drawing.Size(84, 22);
+            this.deleteFighter.Text = "Delete Fighter";
+            this.deleteFighter.Click += new System.EventHandler(this.deleteFighter_Click);
             // 
             // tabPage6
             // 
@@ -249,6 +241,14 @@
             this.tabPage6.TabIndex = 3;
             this.tabPage6.Text = "Effects";
             this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // effectEditor
+            // 
+            this.effectEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.effectEditor.Location = new System.Drawing.Point(0, 25);
+            this.effectEditor.Name = "effectEditor";
+            this.effectEditor.Size = new System.Drawing.Size(791, 282);
+            this.effectEditor.TabIndex = 1;
             // 
             // toolStrip3
             // 
@@ -322,52 +322,6 @@
             this.buttonSaveCSS.Text = "Save CSS Icon Data";
             this.buttonSaveCSS.Click += new System.EventHandler(this.buttonSaveCSS_Click);
             // 
-            // exportFighter
-            // 
-            this.exportFighter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.exportFighter.Image = ((System.Drawing.Image)(resources.GetObject("exportFighter.Image")));
-            this.exportFighter.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exportFighter.Name = "exportFighter";
-            this.exportFighter.Size = new System.Drawing.Size(85, 22);
-            this.exportFighter.Text = "Export Fighter";
-            this.exportFighter.Click += new System.EventHandler(this.toolStripButton1_Click);
-            // 
-            // importFighter
-            // 
-            this.importFighter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.importFighter.Image = ((System.Drawing.Image)(resources.GetObject("importFighter.Image")));
-            this.importFighter.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.importFighter.Name = "importFighter";
-            this.importFighter.Size = new System.Drawing.Size(87, 22);
-            this.importFighter.Text = "Import Fighter";
-            this.importFighter.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // deleteFighter
-            // 
-            this.deleteFighter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.deleteFighter.Image = ((System.Drawing.Image)(resources.GetObject("deleteFighter.Image")));
-            this.deleteFighter.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.deleteFighter.Name = "deleteFighter";
-            this.deleteFighter.Size = new System.Drawing.Size(84, 22);
-            this.deleteFighter.Text = "Delete Fighter";
-            this.deleteFighter.Click += new System.EventHandler(this.deleteFighter_Click);
-            // 
-            // ssmEditor
-            // 
-            this.ssmEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ssmEditor.Location = new System.Drawing.Point(3, 28);
-            this.ssmEditor.Name = "ssmEditor";
-            this.ssmEditor.Size = new System.Drawing.Size(785, 276);
-            this.ssmEditor.TabIndex = 6;
-            // 
-            // effectEditor
-            // 
-            this.effectEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.effectEditor.Location = new System.Drawing.Point(0, 25);
-            this.effectEditor.Name = "effectEditor";
-            this.effectEditor.Size = new System.Drawing.Size(791, 282);
-            this.effectEditor.TabIndex = 1;
-            // 
             // cssIconEditor
             // 
             this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Left;
@@ -394,10 +348,6 @@
             this.groupBox1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
-            this.toolStrip2.ResumeLayout(false);
-            this.toolStrip2.PerformLayout();
             this.tabPage6.ResumeLayout(false);
             this.tabPage6.PerformLayout();
             this.toolStrip3.ResumeLayout(false);
@@ -415,7 +365,6 @@
 
         private System.Windows.Forms.TabControl mainTabControl;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ListBox fighterList;
         private System.Windows.Forms.TabControl tabControl1;
@@ -425,11 +374,8 @@
         private System.Windows.Forms.TabPage tabPage6;
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.PropertyGrid propertyGrid2;
-        private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton saveFightersButton;
-        private System.Windows.Forms.ToolStripButton saveSSMButton;
-        private ArrayMemberEditor ssmEditor;
         private ArrayMemberEditor effectEditor;
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripButton saveEffectButton;

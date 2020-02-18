@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.MEX;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -166,8 +167,15 @@ namespace HSDRawViewer.Sound
         /// <summary>
         /// 
         /// </summary>
-        public static void SaveSEMFile(string path, List<SEMEntry> Entries)
+        public static void SaveSEMFile(string path, List<SEMEntry> Entries, MEX_Data mexData)
         {
+            if(mexData != null)
+            {
+                mexData.SSM_Flags = new HSDArrayAccessor<SSMFlag>();
+                mexData.SSM_SSMFiles = new HSDNullPointerArrayAccessor<HSD_String>();
+                mexData.SSM_LookupTable = new HSDArrayAccessor<MEX_SSMLookup>();
+            }
+
             var soundOffset = 0;
             using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(path, FileMode.Create)))
             {
@@ -189,7 +197,6 @@ namespace HSDRawViewer.Sound
 
                 foreach (var e in Entries)
                 {
-
                     foreach (var v in e.Sounds)
                     {
                         w.Write((int)(offset + dataindex));
@@ -206,7 +213,17 @@ namespace HSDRawViewer.Sound
                     {
                         // set start offset in sem and save
                         e.SoundBank.StartIndex = soundOffset;
-                        e.SoundBank.Save(Path.GetDirectoryName(path) + "\\" + e.SoundBank.Name);
+                        int bufSize;
+                        e.SoundBank.Save(Path.GetDirectoryName(path) + "\\" + e.SoundBank.Name, out bufSize);
+
+                        if(mexData != null)
+                        {
+                            mexData.SSM_SSMFiles.Add(new HSD_String() { Value = e.SoundBank.Name });
+                            mexData.SSM_Flags.Add(new SSMFlag() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
+                            var lu = new MEX_SSMLookup();
+                            lu._s.SetInt32(0x00, e.SoundBank.GroupFlags);
+                            mexData.SSM_LookupTable.Add(lu);
+                        }
 
                         // add sound offset
                         foreach (var v in e.Sounds)
@@ -282,8 +299,14 @@ namespace HSDRawViewer.Sound
         public BindingList<SEMSound> Sounds = new BindingList<SEMSound>();
 
         public SSM SoundBank;
-        
-        public int Index { get; set; }
+
+        public int Index;
+
+        [Description("Unknown Flag"), TypeConverter(typeof(HexType))]
+        public uint Flags { get => SoundBank == null ? 0 : (uint)SoundBank.Flag; set { if (SoundBank != null) SoundBank.Flag = (int)value; } }
+
+        [DisplayName("Group Flags"), Description("Groupping Lookup information"), TypeConverter(typeof(HexType))]
+        public uint GroupFlags { get => SoundBank == null ? 0 : (uint)SoundBank.GroupFlags; set { if (SoundBank != null) SoundBank.GroupFlags = (int)value; } }
 
         public override string ToString()
         {

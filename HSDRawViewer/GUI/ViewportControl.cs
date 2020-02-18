@@ -229,12 +229,12 @@ namespace HSDRawViewer.GUI
             }
             else
             {
-                if (frame > nudFrame.Maximum)
+                if (frame >= nudFrame.Maximum)
                 {
                     if (!cbLoop.Checked)
                     {
+                        buttonPlay.Text = "Play";
                         frame = nudFrame.Maximum;
-                        Pause();
                     }
                     else
                         frame = 0;
