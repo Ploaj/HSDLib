@@ -32,7 +32,7 @@ namespace HSDRaw.MEX
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (destinationType == typeof(string) && value.GetType() == typeof(int))
+            if (destinationType == typeof(string) && value.GetType() == typeof(uint))
             {
                 return string.Format("0x{0:X8}", value);
             }
@@ -53,7 +53,7 @@ namespace HSDRaw.MEX
                     input = input.Substring(2);
                 }
 
-                return int.Parse(input, NumberStyles.HexNumber, culture);
+                return uint.Parse(input, NumberStyles.HexNumber, culture);
             }
             else
             {

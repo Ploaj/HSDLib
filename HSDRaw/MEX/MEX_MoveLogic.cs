@@ -13,19 +13,19 @@ namespace HSDRaw.MEX
         public byte AttackID { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
 
         [TypeConverter(typeof(HexType))]
-        public int AnimationCallBack { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        public uint AnimationCallBack { get => (uint)_s.GetInt32(0x0C); set => _s.SetInt32(0x0C, (int)value); }
 
         [TypeConverter(typeof(HexType))]
-        public int IASACallBack { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public uint IASACallBack { get => (uint)_s.GetInt32(0x10); set => _s.SetInt32(0x10, (int)value); }
 
         [TypeConverter(typeof(HexType))]
-        public int PhysicsCallback { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public uint PhysicsCallback { get => (uint)_s.GetInt32(0x14); set => _s.SetInt32(0x14, (int)value); }
 
         [TypeConverter(typeof(HexType))]
-        public int CollisionCallback { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        public uint CollisionCallback { get => (uint)_s.GetInt32(0x18); set => _s.SetInt32(0x18, (int)value); }
 
         [TypeConverter(typeof(HexType))]
-        public int CameraCallback { get => _s.GetInt32(0x1C); set => _s.SetInt32(0x1C, value); }
+        public uint CameraCallback { get => (uint)_s.GetInt32(0x1C); set => _s.SetInt32(0x1C, (int)value); }
 
     }
 }

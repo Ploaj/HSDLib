@@ -229,7 +229,7 @@ namespace HSDRawViewer.GUI
             }
             else
             {
-                if (frame >= nudFrame.Maximum)
+                if (frame > nudFrame.Maximum)
                 {
                     if (!cbLoop.Checked)
                     {

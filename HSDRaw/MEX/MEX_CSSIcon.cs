@@ -19,7 +19,7 @@ namespace HSDRaw.MEX
         [DisplayName("External Char ID"), Description("")]
         public byte ExternalCharID { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
-        [DisplayName("Status"), Description("")]
+        [Browsable(false)]
         public Status StatusID { get => (Status)_s.GetByte(0x02); set => _s.SetByte(0x02, (byte)value); }
 
         [Browsable(false)]
@@ -34,21 +34,21 @@ namespace HSDRaw.MEX
         [DisplayName("Sound Effect ID"), Description("")]
         public int SFXID { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
-        [DisplayName("X"), Description("")]
+        [DisplayName("X1"), Description("")]
         public float X1 { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
 
-        [DisplayName("Y"), Description("")]
-        public float Y1 { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+        [DisplayName("X2"), Description("")]
+        public float X2 { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
 
-        [DisplayName("Width"), Description("")]
-        public float X2 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+        [DisplayName("Y1"), Description("")]
+        public float Y1 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
 
-        [DisplayName("Height"), Description("")]
+        [DisplayName("Y2"), Description("")]
         public float Y2 { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
 
         public override string ToString()
         {
-            return $"{ExternalCharID} - ({X1}, {X2}, {Y1}, {Y2})";
+            return $"{ExternalCharID} - ({X1}, {Y1}, {X2}, {Y2})";
         }
     }
 }

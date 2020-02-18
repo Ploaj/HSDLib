@@ -6,8 +6,11 @@ using HSDRawViewer.Rendering;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
@@ -73,7 +76,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             FighterEntries.Clear();
             for(int i = 0; i < _data.MetaData.NumOfInternalIDs; i++)
             {
-                FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i)));
+                FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
             }
 
             SSMEntries = new ExpandedSSM[_data.SSM_SSMFiles.Length];
@@ -110,37 +113,38 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             int index = 0;
             d.MetaData.NumOfExternalIDs = FighterEntries.Count;
             d.MetaData.NumOfInternalIDs = FighterEntries.Count;
-            d.MnSlChr_NameText = new HSDRaw.HSDNullPointerArrayAccessor<HSD_String>();
-            d.Char_CharFiles = new HSDRaw.HSDArrayAccessor<MEX_CharFileStrings>();
-            d.Char_CostumeIDs = new HSDRaw.HSDArrayAccessor<MEX_CostumeIDs>();
-            d.Char_CostumeFileSymbols = new HSDRaw.HSDArrayAccessor<MEX_CostumeFileSymbolTable>();
-            d.Char_AnimFiles = new HSDRaw.HSDNullPointerArrayAccessor<HSD_String>();
-            d.Char_AnimCount = new HSDRaw.HSDArrayAccessor<MEX_AnimCount>();
-            d.Char_InsigniaIDs = new HSDRaw.HSDArrayAccessor<HSD_Byte>();
-            d.GmRst_AnimFiles = new HSDRaw.HSDNullPointerArrayAccessor<HSD_String>();
+            d.MnSlChr_NameText = new HSDNullPointerArrayAccessor<HSD_String>();
+            d.Char_CharFiles = new HSDArrayAccessor<MEX_CharFileStrings>();
+            d.Char_CostumeIDs = new HSDArrayAccessor<MEX_CostumeIDs>();
+            d.Char_CostumeFileSymbols = new HSDArrayAccessor<MEX_CostumeFileSymbolTable>();
+            d.Char_AnimFiles = new HSDNullPointerArrayAccessor<HSD_String>();
+            d.Char_AnimCount = new HSDArrayAccessor<MEX_AnimCount>();
+            d.Char_InsigniaIDs = new HSDArrayAccessor<HSD_Byte>();
+            d.GmRst_AnimFiles = new HSDNullPointerArrayAccessor<HSD_String>();
             d.GmRst_Scale = new HSDArrayAccessor<HSDRaw.MEX.HSD_Float>();
-            d.GmRst_VictoryTheme = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.FtDemo_SymbolNames = new HSDRaw.HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>();
-            d.SFX_NameDef = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SSM_CharSSMFileIDs = new HSDRaw.HSDArrayAccessor<MEX_CharSSMFileID>();
-            d.Char_EffectIDs = new HSDRaw.HSDArrayAccessor<HSD_Byte>();
+            d.GmRst_VictoryTheme = new HSDArrayAccessor<HSD_Int>();
+            d.FtDemo_SymbolNames = new HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>();
+            d.SFX_NameDef = new HSDArrayAccessor<HSD_Int>();
+            d.SSM_CharSSMFileIDs = new HSDArrayAccessor<MEX_CharSSMFileID>();
+            d.Char_EffectIDs = new HSDArrayAccessor<HSD_Byte>();
+            d.Char_CostumePointers = new HSDArrayAccessor<MEX_CostumeRuntimePointers>();
 
-            d.OnLoad = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.OnDeath = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.OnUnknown = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.MoveLogic = new HSDRaw.HSDFixedLengthPointerArrayAccessor<HSDRaw.HSDArrayAccessor<MEX_MoveLogic>>();
-            d.SpecialN = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialNAir = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialHi = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialHiAir = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialLw = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialLwAir = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialS = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-            d.SpecialSAir = new HSDRaw.HSDArrayAccessor<HSD_Int>();
-
+            d.OnLoad = new HSDArrayAccessor<HSD_UInt>();
+            d.OnDeath = new HSDArrayAccessor<HSD_UInt>();
+            d.OnUnknown = new HSDArrayAccessor<HSD_UInt>();
+            d.MoveLogic = new HSDFixedLengthPointerArrayAccessor<HSDRaw.HSDArrayAccessor<MEX_MoveLogic>>();
+            d.SpecialN = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialNAir = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialHi = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialHiAir = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialLw = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialLwAir = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialS = new HSDArrayAccessor<HSD_UInt>();
+            d.SpecialSAir = new HSDArrayAccessor<HSD_UInt>();
+            
             foreach (var v in FighterEntries)
             {
-                v.SaveData(d, index, MEXIdConverter.ToExternalID(index));
+                v.SaveData(d, index, MEXIdConverter.ToExternalID(index, FighterEntries.Count));
                 index++;
             }
         }
@@ -149,9 +153,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             var numOfSSMs = SSMEntries.Length;
 
-            _data.MetaData.NumOfAddedSSMs = numOfSSMs - 55;
+            _data.MetaData.NumOfSSMs = numOfSSMs;
 
-            _data._s.GetCreateReference<HSDAccessor>(0x4C)._s.SetData(new byte[180 + (numOfSSMs * 4 * 4) + ((numOfSSMs + 1) * 4)]);
+            _data._s.GetCreateReference<HSDAccessor>(0x4C)._s.SetData(new byte[180 + ((numOfSSMs + 1) * 4 * 4) + ((numOfSSMs + 1) * 4)]);
 
             _data.SSM_SSMFiles = new HSDNullPointerArrayAccessor<HSD_String>();
             _data.SSM_Flags = new HSDArrayAccessor<SSMFlag>();
@@ -195,12 +199,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         }
 
         #endregion
-
-        private void saveChangesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFighterData();
-        }
-
+        
         private void saveSSMButton_Click(object sender, EventArgs e)
         {
             SaveSSMData();
@@ -227,9 +226,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             foreach(var i in Icons)
             {
                 if (cssIconEditor.SelectedObject == (object)i)
-                    DrawShape.DrawRectangle(i.X1, i.X2, i.Y1, i.Y2, SelectedIconColor);
+                    DrawShape.DrawRectangle(i.X1, i.Y1, i.X2, i.Y2, SelectedIconColor);
                 else
-                    DrawShape.DrawRectangle(i.X1, i.X2, i.Y1, i.Y2, IconColor);
+                    DrawShape.DrawRectangle(i.X1, i.Y1, i.X2, i.Y2, IconColor);
             }
         }
         
@@ -262,6 +261,130 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     JOBJManager.SetAnimJoint(tab.MenuAnimation);
                     JOBJManager.Frame = 600;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cloneButton_Click(object sender, EventArgs e)
+        {
+            if(fighterList.SelectedItem is MEXEntry me)
+            {
+                FighterEntries.Insert(FighterEntries.Count - 6, ObjectExtensions.Copy(me));
+            }
+        }
+
+        private void saveFightersButton_Click(object sender, EventArgs e)
+        {
+            SaveFighterData();
+        }
+
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            FighterEntries.ResetBindings();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            if(fighterList.SelectedItem is MEXEntry mex)
+            {
+                var f = Tools.FileIO.SaveFile("YAML (*.yaml)|*.yaml", mex.NameText + ".yaml");
+                if (f != null)
+                {
+                    var builder = new SerializerBuilder();
+                    builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
+                    builder.WithTypeInspector(inspector => new MEXTypeInspector(inspector));
+
+                    using (StreamWriter writer = File.CreateText(f))
+                    {
+                        builder.Build().Serialize(writer, fighterList.SelectedItem);
+                    }
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("YAML (*.yaml)|*.yaml");
+            if (f != null)
+            {
+                var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
+                .Build();
+
+                var me = deserializer.Deserialize<MEXEntry>(File.ReadAllText(f));
+
+                FighterEntries.Insert(FighterEntries.Count - 6, ObjectExtensions.Copy(me));
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void deleteFighter_Click(object sender, EventArgs e)
+        {
+            var selected = fighterList.SelectedIndex;
+            if (IsClone(selected))
+            {
+                FighterEntries.RemoveAt(selected);
+                return;
+            }
+            MessageBox.Show("Unable to delete base game fighters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+        /// <summary>
+        /// Returns true if fighter at this index is an extended fighter
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool IsClone(int index)
+        {
+            return (index >= 0x21 - 6 && index < FighterEntries.Count - 6);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fighterList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            try
+            {
+                e.DrawBackground();
+                Brush myBrush = Brushes.Black;
+                
+                if(IsClone(e.Index))
+                {
+                    myBrush = Brushes.DarkViolet;
+                }
+
+                e.Graphics.DrawString(((ListBox)sender).Items[e.Index].ToString(),
+                e.Font, myBrush, e.Bounds, StringFormat.GenericDefault);
+
+                e.DrawFocusRectangle();
+            }
+            catch
+            {
+
             }
         }
     }

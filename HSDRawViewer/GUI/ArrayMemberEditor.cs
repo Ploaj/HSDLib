@@ -17,10 +17,13 @@ namespace HSDRawViewer.GUI
             }
         }
         private object _object;
-
-        public bool EnablePropertyViewer { get => propertyGrid.Visible; set => propertyGrid.Visible = value; }
-
+        
         public object SelectedObject => elementList.SelectedItem;
+
+        public void EnablePropertyViewer(bool enable)
+        {
+            propertyGrid.Visible = enable;
+        }
 
         /// <summary>
         /// 

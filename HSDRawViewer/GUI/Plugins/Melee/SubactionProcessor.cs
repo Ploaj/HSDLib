@@ -150,33 +150,33 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 var cmd = commands[i];
                 switch (cmd.Action.Code)
                 {
-                    case 0: //end script
+                    case 0 << 2: //end script
                         time = int.MaxValue;
                         break;
-                    case 1: //synchronous
+                    case 1 << 2: //synchronous
                         time += cmd.Parameters[0];
                         break;
-                    case 2: //asynchronus
+                    case 2 << 2: //asynchronus
                         time = cmd.Parameters[0];
                         break;
-                    case 3: //start loop
+                    case 3 << 2: //start loop
                         loopAmt = cmd.Parameters[0];
                         loopPos = i;
                         break;
-                    case 4: //end loop
+                    case 4 << 2: //end loop
                         loopAmt -= 1;
                         if(loopAmt > 0)
                             i = loopPos;
                         break;
-                    case 5: //subroutine
+                    case 5 << 2: //subroutine
                         time = SetFrame(frame, time, cmd.ReferenceCommands);
                         break;
-                    case 6: //return?
+                    case 6 << 2: //return?
                         return time;
-                    case 7: //goto
+                    case 7 << 2: //goto
                         time = SetFrame(frame, time, cmd.ReferenceCommands);
                         break;
-                    case 11: // Create Hitbox
+                    case 11 << 2: // Create Hitbox
                         // remove the current hitbox with this id
                         Hitboxes.RemoveAll(e => e.ID == cmd.Parameters[0]);
                         // add hitbox
@@ -189,7 +189,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             Element = cmd.Parameters[15]
                         });
                         break;
-                    case 13: // adjust size
+                    case 13 << 2: // adjust size
                         {
                             var hb = Hitboxes.Find(e=>e.ID == cmd.Parameters[0]);
                             if(hb != null)
@@ -198,16 +198,16 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             }
                         }
                         break;
-                    case 15:
+                    case 15 << 2:
                         Hitboxes.RemoveAll(e=>e.ID == cmd.Parameters[0]);
                         break;
-                    case 16:
+                    case 16 << 2:
                         Hitboxes.Clear();
                         break;
-                    case 26:
+                    case 26 << 2:
                         BodyCollisionState = cmd.Parameters[1];
                         break;
-                    case 27:
+                    case 27 << 2:
                         // i don't really know how many bone to assume...
                         for(int j = 0; j < 100; j++)
                         {
@@ -217,7 +217,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                                 BoneCollisionStates.Add(j, cmd.Parameters[0]);
                         }
                         break;
-                    case 28:
+                    case 28 << 2:
                         if(cmd.Parameters.Length > 1)
                         {
                             if (BoneCollisionStates.ContainsKey(cmd.Parameters[0]))
@@ -226,10 +226,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                                 BoneCollisionStates.Add(cmd.Parameters[0], cmd.Parameters[1]);
                         }
                         break;
-                    case 37:
+                    case 37 << 2:
                         CharacterInvisibility = cmd.Parameters[1] == 1;
                         break;
-                    case 46: //overlay color
+                    case 46 << 2: //overlay color
                         if(cmd.Parameters[0] == 1)
                         {
                             OverlayColor = new Vector3(cmd.Parameters[1] / 255f, cmd.Parameters[2] / 255f, cmd.Parameters[3] / 255f);

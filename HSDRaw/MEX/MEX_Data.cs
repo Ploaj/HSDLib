@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 
 namespace HSDRaw.MEX
 {
@@ -6,18 +7,22 @@ namespace HSDRaw.MEX
     {
         public override int TrimmedSize => 0x10;
         
+        [DisplayName("Internal ID Count")]
         public int NumOfInternalIDs { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
+        [DisplayName("External ID Count")]
         public int NumOfExternalIDs { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
-        
+
+        [DisplayName("CSS Icon Count")]
         public int NumOfCSSIcons { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
-        public int NumOfAddedSSMs { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        [DisplayName("SSM Count")]
+        public int NumOfSSMs { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
     }
 
     public class MEX_Data : HSDAccessor
     {
-        public override int TrimmedSize => 0x80;
+        public override int TrimmedSize => 0x8C;
 
         public MEX_Meta MetaData { get => _s.GetReference<MEX_Meta>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -59,34 +64,55 @@ namespace HSDRaw.MEX
 
         // SSM runtime struct
 
-        public HSDArrayAccessor<HSD_Int> OnLoad { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x50); set => _s.SetReference(0x50, value); }
+        public HSDArrayAccessor<HSD_UInt> OnLoad { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x50); set => _s.SetReference(0x50, value); }
 
-        public HSDArrayAccessor<HSD_Int> OnDeath { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x54); set => _s.SetReference(0x54, value); }
+        public HSDArrayAccessor<HSD_UInt> OnDeath { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x54); set => _s.SetReference(0x54, value); }
 
-        public HSDArrayAccessor<HSD_Int> OnUnknown { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x58); set => _s.SetReference(0x58, value); }
+        public HSDArrayAccessor<HSD_UInt> OnUnknown { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x58); set => _s.SetReference(0x58, value); }
 
         public HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>> MoveLogic { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>>(0x5C); set => _s.SetReference(0x5C, value); }
         
-        public HSDArrayAccessor<HSD_Int> SpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x60); set => _s.SetReference(0x60, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x60); set => _s.SetReference(0x60, value); }
 
-        public HSDArrayAccessor<HSD_Int> SpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x64); set => _s.SetReference(0x64, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x64); set => _s.SetReference(0x64, value); }
 
-        public HSDArrayAccessor<HSD_Int> SpecialHi { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x68); set => _s.SetReference(0x68, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialHi { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x68); set => _s.SetReference(0x68, value); }
 
-        public HSDArrayAccessor<HSD_Int> SpecialHiAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x6C); set => _s.SetReference(0x6C, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialHiAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x6C); set => _s.SetReference(0x6C, value); }
 
-        public HSDArrayAccessor<HSD_Int> SpecialLw { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x70); set => _s.SetReference(0x70, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialLw { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x70); set => _s.SetReference(0x70, value); }
 
-        public HSDArrayAccessor<HSD_Int> SpecialLwAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x74); set => _s.SetReference(0x74, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialLwAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x74); set => _s.SetReference(0x74, value); }
         
-        public HSDArrayAccessor<HSD_Int> SpecialS { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x78); set => _s.SetReference(0x78, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialS { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x78); set => _s.SetReference(0x78, value); }
 
-        public HSDArrayAccessor<HSD_Int> SpecialSAir { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x7C); set => _s.SetReference(0x7C, value); }
+        public HSDArrayAccessor<HSD_UInt> SpecialSAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x7C); set => _s.SetReference(0x7C, value); }
 
         public HSDArrayAccessor<SSMFlag> SSM_Flags { get => _s.GetReference<HSDArrayAccessor<SSMFlag>>(0x80); set => _s.SetReference(0x80, value); }
 
+        public HSDArrayAccessor<MEX_CostumeRuntimePointers> Char_CostumePointers { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeRuntimePointers>>(0x84); set => _s.SetReference(0x84, value); }
+        
+        public HSDArrayAccessor<MEX_SSMLookup> SSM_LookupTable { get => _s.GetReference<HSDArrayAccessor<MEX_SSMLookup>>(0x88); set => _s.SetReference(0x88, value); }
     }
 
+    public class MEX_CostumeRuntimePointers : HSDAccessor
+    {
+        public override int TrimmedSize => 0x08;
+
+        public HSDAccessor Pointer { get => _s.GetReference<HSDAccessor>(0x00); set => _s.SetReference(0x00, value); }
+
+        public byte CostumeCount { get => _s.GetByte(0x04); set => _s.SetByte(0x04, value); }
+    }
+
+    public class MEX_SSMLookup : HSDAccessor
+    {
+        public override int TrimmedSize => 0x04;
+
+        public byte GroupIndex { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+        public byte Unknown1 { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
+        public byte Unknown2 { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
+        public byte Unknown3 { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
+    }
 
     public class SSMFlag : HSDAccessor
     {
@@ -102,6 +128,13 @@ namespace HSDRaw.MEX
         public override int TrimmedSize => 0x01;
 
         public byte Value { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+    }
+
+    public class HSD_UInt : HSDAccessor
+    {
+        public override int TrimmedSize => 0x04;
+
+        public uint Value { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
     }
 
     public class HSD_Int : HSDAccessor

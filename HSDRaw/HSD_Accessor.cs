@@ -285,7 +285,7 @@ namespace HSDRaw
         /// <param name="value"></param>
         public void Set(int index, T value)
         {
-            if ((index) * 4 >= _s.Length)
+            if ((index + 1) * 4 >= _s.Length)
                 _s.Resize((index + 2) * 4);
 
             this[index] = value;

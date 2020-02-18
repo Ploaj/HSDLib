@@ -1,15 +1,29 @@
-﻿using HSDRaw.MEX;
+﻿using HSDRaw;
+using HSDRaw.MEX;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.TypeInspectors;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
     public class MEXIdConverter
     {
+        private static int BaseCharacterCount { get; } = 0x21;
+
         public static int InternalExtraCharCount { get; } = 6;
 
         public static int ExternalExtraCharCount { get; } = 7;
 
-        private static int[] ExternalToInternal = { };
+        private static int[] ExternalToInternal = {
+            0x02, 0x03, 0x01, 0x18, 0x04, 0x05, 0x06,
+            0x11, 0x00, 0x12, 0x10, 0x08, 0x09, 0x0C,
+            0x0A, 0x0F, 0x0D, 0x0E, 0x13, 0x07, 0x16,
+            0x14, 0x15, 0x1A, 0x17, 0x19, 0x1B, 0x1D,
+            0x1E, 0x1F, 0x1C, 0x20, 0x0A
+        };
 
         private static int[] InternalToExternal = {
             0x08, 0x02, 0x00, 0x01, 0x04, 0x05, 0x06,
@@ -18,20 +32,37 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             0x16, 0x14, 0x18, 0x03, 0x19, 0x17, 0x1A,
             0x1E, 0x1B, 0x1C, 0x1D, 0x1F};
 
-        public static int ToExternalID(int internalID)
+        public static int ToExternalID(int internalID, int characterCount)
         {
-            if (internalID < InternalToExternal.Length)
-                return InternalToExternal[internalID];
-            return internalID;
-        }
+            var addedChars = characterCount - BaseCharacterCount;
+            bool isSpecialCharacter = internalID >= characterCount - InternalExtraCharCount;
 
-        // TODO:
-        public static int ToInternalID(int externalID)
+            if (internalID >= characterCount - InternalExtraCharCount - addedChars &&
+                !isSpecialCharacter)
+                return (BaseCharacterCount - ExternalExtraCharCount) + (internalID - (BaseCharacterCount - InternalExtraCharCount));
+
+            int externalId = internalID + (isSpecialCharacter ? -addedChars : 0);
+
+            if (externalId < InternalToExternal.Length)
+                externalId = InternalToExternal[externalId];
+
+            if (isSpecialCharacter)
+                externalId += addedChars;
+
+            return externalId;
+        }
+        
+        private static int ToInternalID(int externalID, int characterCount)
         {
+            var addedChars = characterCount - 0x21;
+
+            if (externalID < ExternalToInternal.Length)
+                return ExternalToInternal[externalID];
             return externalID;
         }
     }
 
+    [Serializable]
     public class MEXEntry
     {
         [DisplayName("Name"), Category("0 - General"), Description("Name used for CSS screen")]
@@ -111,12 +142,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public MEXFunctionPointers Functions = new MEXFunctionPointers();
 
-        public bool IsExtendedCharacterInternal(MEX_Data mexData, int internalID)
+        public bool IsSpecialCharacterInternal(MEX_Data mexData, int internalID)
         {
             return internalID >= mexData.MetaData.NumOfInternalIDs - MEXIdConverter.InternalExtraCharCount;
         }
 
-        public bool IsExtendedCharacterExternal(MEX_Data mexData, int externalID)
+        public bool IsSpecialCharacterExternal(MEX_Data mexData, int externalID)
         {
             return externalID >= mexData.MetaData.NumOfExternalIDs - MEXIdConverter.ExternalExtraCharCount;
         }
@@ -147,7 +178,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SubCharacterInternalID = (sbyte)mexData.Char_DefineIDs[externalID].SubCharacterInternalID;
             SubCharacterBehavior = mexData.Char_DefineIDs[externalID].SubCharacterBehavior;
 
-            if (!IsExtendedCharacterInternal(mexData, internalId))
+            if (!IsSpecialCharacterInternal(mexData, internalId))
             {
                 DemoResult = mexData.FtDemo_SymbolNames.Array[internalId].Result;
                 DemoIntro = mexData.FtDemo_SymbolNames.Array[internalId].Intro;
@@ -155,7 +186,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 DemoWait = mexData.FtDemo_SymbolNames.Array[internalId].ViWait;
             }
 
-            if (!IsExtendedCharacterExternal(mexData, externalID))
+            if (!IsSpecialCharacterExternal(mexData, externalID))
             {
                 RedCostumeID = mexData.Char_CostumeIDs[externalID].RedCostumeIndex;
                 GreenCostumeID = mexData.Char_CostumeIDs[externalID].GreenCostumeIndex;
@@ -183,6 +214,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.Char_EffectIDs.Set(externalID, new HSD_Byte() { Value = EffectIndex });
             mexData.SFX_NameDef.Set(externalID, new HSD_Int() { Value = NameCallSound });
 
+            mexData.Char_CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
+            {
+                CostumeCount = CostumeCount,
+                Pointer = new HSDRaw.HSDAccessor() { _s = new HSDRaw.HSDStruct(4 * 6) }
+            });
+
             mexData.SSM_CharSSMFileIDs.Set(externalID, new MEX_CharSSMFileID()
             {
                 SSMID = SSMIndex,
@@ -197,7 +234,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 SubCharacterBehavior = SubCharacterBehavior
             });
 
-            if (!IsExtendedCharacterInternal(mexData, internalId))
+            if (!IsSpecialCharacterInternal(mexData, internalId))
             {
                 mexData.FtDemo_SymbolNames.Set(internalId, new MEX_FtDemoSymbolNames()
                 {
@@ -210,7 +247,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             mexData.GmRst_AnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
             
-            if (!IsExtendedCharacterExternal(mexData, externalID))
+            if (!IsSpecialCharacterExternal(mexData, externalID))
             {
                 mexData.Char_CostumeIDs.Set(externalID, new MEX_CostumeIDs()
                 {
@@ -236,39 +273,39 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     public class MEXFunctionPointers
     {
         [TypeConverter(typeof(HexType))]
-        public int OnLoad { get; set; }
+        public uint OnLoad { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int OnDeath { get; set; }
+        public uint OnDeath { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int OnUnk { get; set; }
+        public uint OnUnk { get; set; }
 
         public MEX_MoveLogic[] MoveLogic { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialN { get; set; }
+        public uint SpecialN { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialNAir { get; set; }
+        public uint SpecialNAir { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialHi { get; set; }
+        public uint SpecialHi { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialHiAir { get; set; }
+        public uint SpecialHiAir { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialLw { get; set; }
+        public uint SpecialLw { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialLwAir { get; set; }
+        public uint SpecialLwAir { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialS { get; set; }
+        public uint SpecialS { get; set; }
 
         [TypeConverter(typeof(HexType))]
-        public int SpecialSAir { get; set; }
+        public uint SpecialSAir { get; set; }
 
 
         public MEXFunctionPointers LoadData(MEX_Data mexData, int internalId, int externalID)
@@ -291,18 +328,36 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public void SaveData(MEX_Data mexData, int internalId, int externalID)
         {
-            mexData.OnLoad.Set(internalId, new HSD_Int() { Value = OnLoad });
-            mexData.OnDeath.Set(internalId, new HSD_Int() { Value = OnDeath });
-            mexData.OnUnknown.Set(internalId, new HSD_Int() { Value = OnUnk });
+            mexData.OnLoad.Set(internalId, new HSD_UInt() { Value = OnLoad });
+            mexData.OnDeath.Set(internalId, new HSD_UInt() { Value = OnDeath });
+            mexData.OnUnknown.Set(internalId, new HSD_UInt() { Value = OnUnk });
             mexData.MoveLogic.Set(internalId, new HSDRaw.HSDArrayAccessor<MEX_MoveLogic>() { Array = MoveLogic });
-            mexData.SpecialN.Set(internalId, new HSD_Int() { Value = SpecialN });
-            mexData.SpecialNAir.Set(internalId, new HSD_Int() { Value = SpecialNAir });
-            mexData.SpecialHi.Set(internalId, new HSD_Int() { Value = SpecialHi });
-            mexData.SpecialHiAir.Set(internalId, new HSD_Int() { Value = SpecialHiAir });
-            mexData.SpecialLw.Set(internalId, new HSD_Int() { Value = SpecialLw });
-            mexData.SpecialLwAir.Set(internalId, new HSD_Int() { Value = SpecialLwAir });
-            mexData.SpecialS.Set(internalId, new HSD_Int() { Value = SpecialS });
-            mexData.SpecialSAir.Set(internalId, new HSD_Int() { Value = SpecialSAir });
+            mexData.SpecialN.Set(internalId, new HSD_UInt() { Value = SpecialN });
+            mexData.SpecialNAir.Set(internalId, new HSD_UInt() { Value = SpecialNAir });
+            mexData.SpecialHi.Set(internalId, new HSD_UInt() { Value = SpecialHi });
+            mexData.SpecialHiAir.Set(internalId, new HSD_UInt() { Value = SpecialHiAir });
+            mexData.SpecialLw.Set(internalId, new HSD_UInt() { Value = SpecialLw });
+            mexData.SpecialLwAir.Set(internalId, new HSD_UInt() { Value = SpecialLwAir });
+            mexData.SpecialS.Set(internalId, new HSD_UInt() { Value = SpecialS });
+            mexData.SpecialSAir.Set(internalId, new HSD_UInt() { Value = SpecialSAir });
+        }
+    }
+
+
+    public class MEXTypeInspector : TypeInspectorSkeleton
+    {
+        private readonly ITypeInspector _innerTypeDescriptor;
+
+        public MEXTypeInspector(ITypeInspector innerTypeDescriptor)
+        {
+            _innerTypeDescriptor = innerTypeDescriptor;
+        }
+
+        public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
+        {
+            var props = _innerTypeDescriptor.GetProperties(type, container);
+            props = props.Where(p => p.Type != typeof(HSDStruct) && p.Name != "trimmedSize" && p.Name != "costumeCount");
+            return props;
         }
     }
 }

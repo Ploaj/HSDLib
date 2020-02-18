@@ -10,7 +10,7 @@ namespace HSDRawViewer
     {
         public static bool UnlockedViewport { get; set; } = false;
 
-        public static string HSDFileFilter { get; } = "HSD Dat File(*.dat)|*.dat";
+        public static string HSDFileFilter { get; } = "HSD DAT Archive File|*.dat;*.usd";
 
         public static List<Type> HSDTypes { get; internal set; } = new List<Type>();
 

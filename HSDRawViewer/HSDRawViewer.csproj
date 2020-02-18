@@ -296,6 +296,7 @@
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
     <Compile Include="Tools\FileIO.cs" />
+    <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
