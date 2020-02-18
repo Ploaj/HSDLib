@@ -1,6 +1,6 @@
 ﻿namespace HSDRawViewer.GUI.Plugins.MEX
 {
-    public class MEXEffectEntry
+    public class MEX_EffectEntry
     {
         public string FileName { get; set; }
 

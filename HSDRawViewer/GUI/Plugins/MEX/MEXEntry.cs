@@ -125,17 +125,19 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter")]
         public byte SSMIndex { get; set; }
 
-        [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description("")]
+        [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
         public int SSMBitfield1 { get; set; }
 
-        [DisplayName("SSM Bitfield 2"), Category("3 - Misc"), Description("")]
+        [DisplayName("SSM Bitfield 2"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
         public int SSMBitfield2 { get; set; }
 
         [DisplayName("Narrator Sound Clip"), Category("3 - Misc"), Description("Index of narrator sound clip")]
         public int NameCallSound { get; set; }
 
-        [DisplayName("SubCharacter Internal ID"), Category("3 - Misc"), Description("")]
-        public sbyte SubCharacterInternalID { get; set; }
+        [DisplayName("Sub-Character"), 
+            Category("3 - Misc"), Description(""), 
+            TypeConverter(typeof(FighterInternalIDConverter))]
+        public int SubCharacterInternalID { get; set; }
 
         [DisplayName("SubCharacter Behavior"), Category("3 - Misc"), Description("")]
         public SubCharacterBehavior SubCharacterBehavior { get; set; }
@@ -168,7 +170,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             RstAnimFile = mexData.GmRst_AnimFiles[externalID].Value;
 
-            EffectIndex = mexData.Char_EffectIDs[externalID].Value;
+            EffectIndex = mexData.Char_EffectIDs[internalId].Value;
             NameCallSound = mexData.SFX_NameDef[externalID].Value;
 
             SSMIndex = mexData.SSM_CharSSMFileIDs[externalID].SSMID;
@@ -211,7 +213,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             mexData.Char_CostumeFileSymbols.Set(internalId, new MEX_CostumeFileSymbolTable() { CostumeSymbols = new HSDRaw.HSDArrayAccessor<MEX_CostumeFileSymbol>() { Array = Costumes } });
 
-            mexData.Char_EffectIDs.Set(externalID, new HSD_Byte() { Value = EffectIndex });
+            mexData.Char_EffectIDs.Set(internalId, new HSD_Byte() { Value = EffectIndex });
             mexData.SFX_NameDef.Set(externalID, new HSD_Int() { Value = NameCallSound });
 
             mexData.Char_CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
@@ -342,7 +344,67 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.SpecialSAir.Set(internalId, new HSD_UInt() { Value = SpecialSAir });
         }
     }
+    
+    /// <summary>
+    /// use proxy class for make selecting character id easier
+    /// </summary>
+    public class MEX_CSSIconEntry
+    {
+        [Description("Joint ID on the CSS to use for Icon Flash Animation")]
+        public int JointID { get; set; }
 
+        [Description("Indicates a clone fighter, can leave false for added fighters")]
+        public bool Clone { get; set; }
+
+        [DisplayName("Fighter"), TypeConverter(typeof(FighterExternalIDConverter))]
+        public int FighterExternalID { get; set; }
+
+        [Description("Starting X Coord")]
+        public float X1 { get; set; }
+
+        [Description("Ending X Coord")]
+        public float X2 { get; set; }
+
+        [Description("Starting Y Coord")]
+        public float Y1 { get; set; }
+
+        [Description("Ending Y Coord")]
+        public float Y2 { get; set; }
+
+        public static MEX_CSSIconEntry FromIcon(MEX_CSSIcon icon)
+        {
+            return new MEX_CSSIconEntry()
+            {
+                JointID = icon.JointID,
+                FighterExternalID = icon.ExternalCharID,
+                Clone = icon.ExternalCharID != icon.CharUNKID,
+                X1 = icon.X1,
+                Y1 = icon.Y1,
+                X2 = icon.X2,
+                Y2 = icon.Y2
+            };
+        }
+
+        public MEX_CSSIcon ToIcon()
+        {
+            return new MEX_CSSIcon()
+            {
+                JointID = (byte)JointID,
+                UnkID = (byte)JointID,
+                ExternalCharID = (byte)FighterExternalID,
+                CharUNKID = (byte)(FighterExternalID + (Clone ? -1 : 0)),
+                X1 = X1,
+                Y1 = Y1,
+                X2 = X2,
+                Y2 = Y2
+            };
+        }
+
+        public override string ToString()
+        {
+            return $"{FighterConverter.externalIDValues[FighterExternalID + 1]} ({X1}, {Y1}, {X2}, {Y2})";
+        }
+    }
 
     public class MEXTypeInspector : TypeInspectorSkeleton
     {

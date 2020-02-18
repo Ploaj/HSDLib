@@ -5,7 +5,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_Meta : HSDAccessor
     {
-        public override int TrimmedSize => 0x10;
+        public override int TrimmedSize => 0x20;
         
         [DisplayName("Internal ID Count")]
         public int NumOfInternalIDs { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
@@ -18,6 +18,9 @@ namespace HSDRaw.MEX
 
         [DisplayName("SSM Count")]
         public int NumOfSSMs { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+
+        [DisplayName("Effect Count")]
+        public int NumOfEffects { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
     }
 
     public class MEX_Data : HSDAccessor

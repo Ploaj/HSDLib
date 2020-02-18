@@ -4,9 +4,11 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.MEX;
 using HSDRawViewer.Rendering;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using YamlDotNet.Serialization;
@@ -34,6 +36,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             viewport.BringToFront();
             //viewport.Visible = false;
 
+            FighterEntries.ListChanged += (sender, args) =>
+            {
+                FighterConverter.internalIDValues.Clear();
+                FighterConverter.internalIDValues.Add("None");
+                FighterConverter.internalIDValues.AddRange(FighterEntries.Select(e=>e.NameText));
+            };
+
             FormClosing += (sender, args) =>
             {
                 JOBJManager.ClearRenderingCache();
@@ -58,8 +67,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         private BindingList<MEXEntry> FighterEntries = new BindingList<MEXEntry>();
         public ExpandedSSM[] SSMEntries { get; set; }
-        public MEXEffectEntry[] Effects { get; set; }
-        public MEX_CSSIcon[] Icons { get; set; }
+        public MEX_EffectEntry[] Effects { get; set; }
+        public MEX_CSSIconEntry[] Icons { get; set; }
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -89,18 +98,22 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
             ssmEditor.SetArrayFromProperty(this, "SSMEntries");
             
-            Effects = new MEXEffectEntry[_data.Char_EffectFiles.Length];
+            Effects = new MEX_EffectEntry[_data.Char_EffectFiles.Length];
             for(int i = 0; i < Effects.Length; i++)
             {
-                Effects[i] = new MEXEffectEntry()
+                Effects[i] = new MEX_EffectEntry()
                 {
                     FileName = _data.Char_EffectFiles[i].FileName,
                     Symbol = _data.Char_EffectFiles[i].Symbol,
                 };
             }
             effectEditor.SetArrayFromProperty(this, "Effects");
-
-            Icons = _data.MnSlChr_IconData.Icons;
+            
+            Icons = new MEX_CSSIconEntry[_data.MnSlChr_IconData.Icons.Length];
+            for(int i = 0; i < Icons.Length; i++)
+            {
+                Icons[i] = MEX_CSSIconEntry.FromIcon(_data.MnSlChr_IconData.Icons[i]);
+            }
             cssIconEditor.SetArrayFromProperty(this, "Icons");
         }
 
@@ -168,6 +181,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         private void SaveEffectData()
         {
+            _data.MetaData.NumOfEffects = Effects.Length;
             _data.Char_EffectFiles = new HSDArrayAccessor<MEX_EffectFiles>();
             foreach(var v in Effects)
             {
@@ -182,7 +196,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void SaveIconData()
         {
             _data.MetaData.NumOfCSSIcons = Icons.Length;
-            _data.MnSlChr_IconData.Icons = Icons;
+            MEX_CSSIcon[] ico = new MEX_CSSIcon[Icons.Length];
+            for (int i = 0; i < ico.Length; i++)
+                ico[i] = Icons[i].ToIcon();
+            _data.MnSlChr_IconData.Icons = ico;
         }
 
         #region Events

@@ -218,6 +218,7 @@
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
     <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXConverters.cs" />
     <Compile Include="GUI\Plugins\MEX\MexDataEditor.cs">
       <SubType>Form</SubType>
     </Compile>

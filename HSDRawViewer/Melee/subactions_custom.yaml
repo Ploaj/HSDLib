@@ -32,3 +32,4 @@
     bitCount: 16
   - name: Move Logic
     bitCount: 32
+    hex: true
