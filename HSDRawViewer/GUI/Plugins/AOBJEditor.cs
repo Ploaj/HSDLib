@@ -46,7 +46,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void RefreshList()
         {
             treeView1.Nodes.Clear();
-            foreach(var fobjDesc in aobj.FObjDesc.List)
+            foreach(var fobjDesc in aobj.FObjDesc?.List)
             {
                 treeView1.Nodes.Add(new TreeNode()
                 {

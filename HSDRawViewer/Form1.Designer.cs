@@ -37,7 +37,9 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsUnoptimizedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addRootFromFileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.addRootFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addRootFromTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,8 +53,6 @@
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.addRootFromTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addRootFromFileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -63,10 +63,13 @@
             this.treeView1.HideSelection = false;
             this.treeView1.Indent = 16;
             this.treeView1.ItemHeight = 24;
+            this.treeView1.LabelEdit = true;
             this.treeView1.Location = new System.Drawing.Point(3, 16);
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(194, 382);
             this.treeView1.TabIndex = 0;
+            this.treeView1.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_BeforeLabelEdit);
+            this.treeView1.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_AfterLabelEdit);
             this.treeView1.DoubleClick += new System.EventHandler(this.treeView1_DoubleClick);
             this.treeView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView1_KeyDown);
             // 
@@ -136,12 +139,26 @@
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
             // 
+            // addRootFromFileToolStripMenuItem1
+            // 
+            this.addRootFromFileToolStripMenuItem1.Name = "addRootFromFileToolStripMenuItem1";
+            this.addRootFromFileToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
+            this.addRootFromFileToolStripMenuItem1.Text = "Add Root From File";
+            this.addRootFromFileToolStripMenuItem1.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem1_Click);
+            // 
             // addRootFromFileToolStripMenuItem
             // 
             this.addRootFromFileToolStripMenuItem.Name = "addRootFromFileToolStripMenuItem";
             this.addRootFromFileToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.addRootFromFileToolStripMenuItem.Text = "Add Root From DAT File";
             this.addRootFromFileToolStripMenuItem.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem_Click);
+            // 
+            // addRootFromTypeToolStripMenuItem
+            // 
+            this.addRootFromTypeToolStripMenuItem.Name = "addRootFromTypeToolStripMenuItem";
+            this.addRootFromTypeToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.addRootFromTypeToolStripMenuItem.Text = "Add Root From Type";
+            this.addRootFromTypeToolStripMenuItem.Click += new System.EventHandler(this.addRootFromTypeToolStripMenuItem_Click);
             // 
             // viewToolStripMenuItem
             // 
@@ -255,20 +272,6 @@
             this.splitter1.Size = new System.Drawing.Size(3, 401);
             this.splitter1.TabIndex = 12;
             this.splitter1.TabStop = false;
-            // 
-            // addRootFromTypeToolStripMenuItem
-            // 
-            this.addRootFromTypeToolStripMenuItem.Name = "addRootFromTypeToolStripMenuItem";
-            this.addRootFromTypeToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
-            this.addRootFromTypeToolStripMenuItem.Text = "Add Root From Type";
-            this.addRootFromTypeToolStripMenuItem.Click += new System.EventHandler(this.addRootFromTypeToolStripMenuItem_Click);
-            // 
-            // addRootFromFileToolStripMenuItem1
-            // 
-            this.addRootFromFileToolStripMenuItem1.Name = "addRootFromFileToolStripMenuItem1";
-            this.addRootFromFileToolStripMenuItem1.Size = new System.Drawing.Size(200, 22);
-            this.addRootFromFileToolStripMenuItem1.Text = "Add Root From File";
-            this.addRootFromFileToolStripMenuItem1.Click += new System.EventHandler(this.addRootFromFileToolStripMenuItem1_Click);
             // 
             // MainForm
             // 

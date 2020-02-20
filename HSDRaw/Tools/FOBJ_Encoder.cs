@@ -18,7 +18,7 @@ namespace HSDRaw.Tools
         public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, byte TrackType)
         {
             HSD_FOBJ fobj = new HSD_FOBJ();
-            fobj.AnimationType = (JointTrackType)TrackType;
+            fobj.JointTrackType = (JointTrackType)TrackType;
 
             // perform quantization
             FOBJQuantanizer valueQ = new FOBJQuantanizer();

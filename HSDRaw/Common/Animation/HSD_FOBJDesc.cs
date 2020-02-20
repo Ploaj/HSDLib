@@ -96,7 +96,7 @@ namespace HSDRaw.Common.Animation
 
         public void FromFOBJ(HSD_FOBJ fobj)
         {
-            AnimationType = fobj.AnimationType;
+            AnimationType = fobj.JointTrackType;
             ValueFormat = fobj.ValueFormat;
             ValueScale = fobj.ValueScale;
             TanFormat = fobj.TanFormat;
@@ -108,7 +108,7 @@ namespace HSDRaw.Common.Animation
         public HSD_FOBJ ToFOBJ()
         {
             var fobj = new HSD_FOBJ();
-            fobj.AnimationType = AnimationType;
+            fobj.JointTrackType = AnimationType;
             fobj.ValueScale = ValueScale;
             fobj.ValueFormat = ValueFormat;
             fobj.TanFormat = TanFormat;

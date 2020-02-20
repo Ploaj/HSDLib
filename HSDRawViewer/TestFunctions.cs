@@ -127,7 +127,7 @@ namespace HSDRawViewer
                 foreach(var track in tracks.Tracks)
                 {
                     HSD_Track newtrack = new HSD_Track();
-                    newtrack.FOBJ = FOBJFrameEncoder.EncodeFrames(track.GetKeys(), track.FOBJ.AnimationType);
+                    newtrack.FOBJ = FOBJFrameEncoder.EncodeFrames(track.GetKeys(), track.FOBJ.JointTrackType);
                     newt.Add(newtrack);
                 }
                 newtracks.Add(new FigaTreeNode() { Tracks = newt });

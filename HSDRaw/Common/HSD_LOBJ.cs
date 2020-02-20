@@ -78,10 +78,4 @@ namespace HSDRaw.Common
         public float Z { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
         public int Unknown { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
     }
-
-    public class HSD_Float : HSDAccessor
-    {
-        public override int TrimmedSize => 0x04;
-        public float Value { get => _s.GetFloat(0); set => _s.SetFloat(0, value); }
-    }
 }

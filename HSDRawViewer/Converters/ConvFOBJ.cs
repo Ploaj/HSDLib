@@ -37,7 +37,7 @@ namespace HSDRawViewer.Converters
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(fobj.AnimationType.ToString());
+            sb.AppendLine(fobj.JointTrackType.ToString());
 
             foreach(var v in fobj.GetDecodedKeys())
             {

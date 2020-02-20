@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.MEX;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     {
         private static int BaseCharacterCount { get; } = 0x21;
 
-        public static int InternalExtraCharCount { get; } = 6;
+        public static int InternalSpecialCharCount { get; } = 6;
 
-        public static int ExternalExtraCharCount { get; } = 7;
+        public static int ExternalSpecialCharCount { get; } = 7;
 
         private static int[] ExternalToInternal = {
             0x02, 0x03, 0x01, 0x18, 0x04, 0x05, 0x06,
@@ -35,12 +36,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public static int ToExternalID(int internalID, int characterCount)
         {
             var addedChars = characterCount - BaseCharacterCount;
-            bool isSpecialCharacter = internalID >= characterCount - InternalExtraCharCount;
+            bool isSpecialCharacter = internalID >= characterCount - InternalSpecialCharCount;
 
-            if (internalID >= characterCount - InternalExtraCharCount - addedChars &&
+            if (internalID >= characterCount - InternalSpecialCharCount - addedChars &&
                 !isSpecialCharacter)
-                return (BaseCharacterCount - ExternalExtraCharCount) + (internalID - (BaseCharacterCount - InternalExtraCharCount));
-
+                return (BaseCharacterCount - ExternalSpecialCharCount) + (internalID - (BaseCharacterCount - InternalSpecialCharCount));
+            
             int externalId = internalID + (isSpecialCharacter ? -addedChars : 0);
 
             if (externalId < InternalToExternal.Length)
@@ -49,16 +50,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (isSpecialCharacter)
                 externalId += addedChars;
 
-            return externalId;
-        }
-        
-        private static int ToInternalID(int externalID, int characterCount)
-        {
-            var addedChars = characterCount - 0x21;
+            if (internalID == 11) // POPO special case
+                externalId = characterCount - 1;
 
-            if (externalID < ExternalToInternal.Length)
-                return ExternalToInternal[externalID];
-            return externalID;
+            return externalId;
         }
     }
 
@@ -146,12 +141,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public bool IsSpecialCharacterInternal(MEX_Data mexData, int internalID)
         {
-            return internalID >= mexData.MetaData.NumOfInternalIDs - MEXIdConverter.InternalExtraCharCount;
+            return internalID >= mexData.MetaData.NumOfInternalIDs - MEXIdConverter.InternalSpecialCharCount;
         }
 
         public bool IsSpecialCharacterExternal(MEX_Data mexData, int externalID)
         {
-            return externalID >= mexData.MetaData.NumOfExternalIDs - MEXIdConverter.ExternalExtraCharCount;
+            return externalID >= mexData.MetaData.NumOfExternalIDs - MEXIdConverter.ExternalSpecialCharCount;
         }
 
         public MEXEntry LoadData(MEX_Data mexData, int internalId, int externalID)
@@ -179,7 +174,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             SubCharacterInternalID = (sbyte)mexData.Char_DefineIDs[externalID].SubCharacterInternalID;
             SubCharacterBehavior = mexData.Char_DefineIDs[externalID].SubCharacterBehavior;
-
+            
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
                 DemoResult = mexData.FtDemo_SymbolNames.Array[internalId].Result;
@@ -231,13 +226,20 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             mexData.Char_DefineIDs.Set(externalID, new MEX_CharDefineIDs()
             {
-                InternalID = (byte)internalId,
+                InternalID = (byte)(internalId + (internalId == 11 ? -1 : 0)), // popo id reference ice climbers
                 SubCharacterInternalID = (byte)SubCharacterInternalID,
                 SubCharacterBehavior = SubCharacterBehavior
             });
 
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
+                if(DemoResult == null)
+                {
+                    DemoResult = "";
+                    DemoIntro = "";
+                    DemoEnding = "";
+                    DemoWait = "";
+                }
                 mexData.FtDemo_SymbolNames.Set(internalId, new MEX_FtDemoSymbolNames()
                 {
                     Result = DemoResult,

@@ -67,8 +67,10 @@ namespace HSDRaw.Common.Animation
     {
         public override int TrimmedSize => 8;
 
-        public JointTrackType AnimationType { get => (JointTrackType)_s.GetByte(0x00); set => _s.SetByte(0x00, (byte)value); }
-        
+        public byte TrackType { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+
+        public JointTrackType JointTrackType { get => (JointTrackType)TrackType; set => TrackType = (byte)value; }
+
         private byte ValueFlag { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
         private byte TangentFlag { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
@@ -151,7 +153,7 @@ namespace HSDRaw.Common.Animation
         {
             var fobj = FOBJFrameEncoder.EncodeFrames(keys, type);
 
-            AnimationType = type;
+            JointTrackType = type;
             ValueFlag = fobj.ValueFlag;
             TangentFlag = fobj.TangentFlag;
             Buffer = fobj.Buffer;

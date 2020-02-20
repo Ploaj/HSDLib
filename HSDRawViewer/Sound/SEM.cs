@@ -174,6 +174,8 @@ namespace HSDRawViewer.Sound
                 mexData.SSM_Flags = new HSDArrayAccessor<SSMFlag>();
                 mexData.SSM_SSMFiles = new HSDNullPointerArrayAccessor<HSD_String>();
                 mexData.SSM_LookupTable = new HSDArrayAccessor<MEX_SSMLookup>();
+
+                mexData.SSM_Flags.Set(Entries.Count, new SSMFlag() { });// blank entry at end
             }
 
             var soundOffset = 0;

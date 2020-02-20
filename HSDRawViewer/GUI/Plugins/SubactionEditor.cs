@@ -328,6 +328,7 @@ namespace HSDRawViewer.GUI
             SubactionProcess.SetStruct(script._struct);
 
             subActionList.Items.Clear();
+            subActionList.BeginUpdate();
             for (int i = 0; i < data.Length;)
             {
                 var sa = SubactionManager.GetSubaction((byte)(data[i]));
@@ -356,6 +357,7 @@ namespace HSDRawViewer.GUI
 
                 i += sa.ByteSize;
             }
+            subActionList.EndUpdate();
         }
 
 

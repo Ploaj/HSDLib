@@ -309,8 +309,10 @@
   parameters:
   - name: Struct ID
     bitCount: 6
+  - name: StructUnk
+    bitCount: 1
   - name: Unknown
-    bitCount: 12
+    bitCount: 11
   - name: Object ID
     bitCount: 8
 

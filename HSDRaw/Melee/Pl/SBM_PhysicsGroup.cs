@@ -33,7 +33,7 @@
 
         public SBM_DynamicHitBubble[] DynamicHitBubbles
         {
-            get => _s.GetReference<HSDArrayAccessor<SBM_DynamicHitBubble>>(0x0C).Array;
+            get => _s.GetReference<HSDArrayAccessor<SBM_DynamicHitBubble>>(0x0C)?.Array;
             set => _s.GetCreateReference<HSDAccessor>(0x0C)._s.SetEmbeddedAccessorArray(0, value);
         }
     }

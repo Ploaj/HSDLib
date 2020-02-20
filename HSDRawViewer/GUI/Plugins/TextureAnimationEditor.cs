@@ -281,7 +281,7 @@ namespace HSDRawViewer.GUI.Plugins
                     if (TexAnim?.AnimationObject?.FObjDesc?.List.Count < 2)
                     {
                         TexAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();
-                        TexAnim.AnimationObject.FObjDesc.Next.FromFOBJ(new HSD_FOBJ() { AnimationType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] });
+                        TexAnim.AnimationObject.FObjDesc.Next.FromFOBJ(new HSD_FOBJ() { JointTrackType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] });
                     }
                 }
                 else
@@ -794,7 +794,7 @@ namespace HSDRawViewer.GUI.Plugins
                             if (TexAnim?.AnimationObject?.FObjDesc?.List.Count < 2)
                             {
                                 TexAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();
-                                TexAnim.AnimationObject.FObjDesc.Next.FromFOBJ(new HSD_FOBJ() { AnimationType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] });
+                                TexAnim.AnimationObject.FObjDesc.Next.FromFOBJ(new HSD_FOBJ() { JointTrackType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] });
                             }
                         }
                         else

@@ -123,18 +123,19 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.Char_AnimCount = new HSDArrayAccessor<MEX_AnimCount>();
             d.Char_InsigniaIDs = new HSDArrayAccessor<HSD_Byte>();
             d.GmRst_AnimFiles = new HSDNullPointerArrayAccessor<HSD_String>();
-            d.GmRst_Scale = new HSDArrayAccessor<HSDRaw.MEX.HSD_Float>();
+            d.GmRst_Scale = new HSDArrayAccessor<HSD_Float>();
             d.GmRst_VictoryTheme = new HSDArrayAccessor<HSD_Int>();
             d.FtDemo_SymbolNames = new HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>();
             d.SFX_NameDef = new HSDArrayAccessor<HSD_Int>();
             d.SSM_CharSSMFileIDs = new HSDArrayAccessor<MEX_CharSSMFileID>();
             d.Char_EffectIDs = new HSDArrayAccessor<HSD_Byte>();
             d.Char_CostumePointers = new HSDArrayAccessor<MEX_CostumeRuntimePointers>();
+            d.Char_DefineIDs = new HSDArrayAccessor<MEX_CharDefineIDs>();
 
             d.OnLoad = new HSDArrayAccessor<HSD_UInt>();
             d.OnDeath = new HSDArrayAccessor<HSD_UInt>();
             d.OnUnknown = new HSDArrayAccessor<HSD_UInt>();
-            d.MoveLogic = new HSDFixedLengthPointerArrayAccessor<HSDRaw.HSDArrayAccessor<MEX_MoveLogic>>();
+            d.MoveLogic = new HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>();
             d.SpecialN = new HSDArrayAccessor<HSD_UInt>();
             d.SpecialNAir = new HSDArrayAccessor<HSD_UInt>();
             d.SpecialHi = new HSDArrayAccessor<HSD_UInt>();
@@ -257,8 +258,31 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             if(fighterList.SelectedItem is MEXEntry me)
             {
-                FighterEntries.Insert(FighterEntries.Count - 6, ObjectExtensions.Copy(me));
+                var clone = ObjectExtensions.Copy(me);
+                // give unique name
+                int clnIndex = 0;
+                if (NameExists(clone.NameText))
+                {
+                    while (NameExists(clone.NameText + " " + clnIndex.ToString())) clnIndex++;
+                    clone.NameText = clone.NameText + " " + clnIndex;
+                }
+                FighterEntries.Insert(FighterEntries.Count - 6, clone);
             }
+        }
+
+        /// <summary>
+        /// Returns true if any fighter already uses given name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private bool NameExists(string name)
+        {
+            foreach(var v in FighterEntries)
+            {
+                if (v.NameText.Equals(name))
+                    return true;
+            }
+            return false;
         }
 
         private void saveFightersButton_Click(object sender, EventArgs e)
@@ -326,7 +350,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void deleteFighter_Click(object sender, EventArgs e)
         {
             var selected = fighterList.SelectedIndex;
-            if (IsClone(selected))
+            if (IsExtendedFighter(selected))
             {
                 FighterEntries.RemoveAt(selected);
                 return;
@@ -339,7 +363,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        private bool IsClone(int index)
+        private bool IsExtendedFighter(int index)
         {
             return (index >= 0x21 - 6 && index < FighterEntries.Count - 6);
         }
@@ -356,7 +380,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 e.DrawBackground();
                 Brush myBrush = Brushes.Black;
                 
-                if(IsClone(e.Index))
+                if(IsExtendedFighter(e.Index))
                 {
                     myBrush = Brushes.DarkViolet;
                 }

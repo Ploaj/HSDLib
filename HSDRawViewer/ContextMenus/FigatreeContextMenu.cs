@@ -31,7 +31,7 @@ namespace HSDRawViewer.ContextMenus
 
                                 foreach(var t in n.Tracks)
                                 {
-                                    w.WriteLine($"{t.FOBJ.AnimationType}");
+                                    w.WriteLine($"{t.FOBJ.JointTrackType}");
 
                                     w.WriteLine("{");
 

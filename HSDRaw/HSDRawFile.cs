@@ -821,6 +821,12 @@ namespace HSDRaw
                 a = acc;
             }
             else
+            if (rootString.StartsWith("itemdata"))
+            {
+                var acc = new HSDNullPointerArrayAccessor<SBM_MapItem>();
+                acc._s = str;
+                a = acc;
+            }
             if (rootString.StartsWith("smSoundTestLoadData"))
             {
                 var acc = new smSoundTestLoadData();

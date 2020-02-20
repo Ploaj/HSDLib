@@ -58,9 +58,10 @@ namespace HSDRaw.Common
         public override HSD_JOBJ Child { get => _s.GetReference<HSD_JOBJ>(0x08); set => _s.SetReference(0x08, value); }
 
         public override HSD_JOBJ Next { get => _s.GetReference<HSD_JOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
+        
+        public HSD_DOBJ Dobj { get => !Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_DOBJ>(0x10) : null; set { _s.SetReference(0x10, value); Flags |= ~JOBJ_FLAG.SPLINE; } }
 
-        // TODO: this can also be a spline
-        public HSD_DOBJ Dobj { get => _s.GetReference<HSD_DOBJ>(0x10); set => _s.SetReference(0x10, value); }
+        public HSD_Spline Spline { get => Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_Spline>(0x10) : null; set { _s.SetReference(0x10, value); Flags |= JOBJ_FLAG.SPLINE; } }
 
         public float RX { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
         public float RY { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }

@@ -16,6 +16,9 @@ namespace HSDRawViewer
     public class DataNode : TreeNode
     {
         private bool ReferenceNode = false;
+        private HSDRootNode Root { get; set; }
+        public string RootText { set { Root.Name = value; } }
+        public bool IsRootNode { get => Root != null; }
 
         public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }
@@ -98,7 +101,8 @@ namespace HSDRawViewer
             if(o.GetType().IsGenericType)
             {
                 if (o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDArrayAccessor<>))
-                    || o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDNullPointerArrayAccessor<>)))
+                    || o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDNullPointerArrayAccessor<>))
+                    || o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDFixedLengthPointerArrayAccessor<>)))
                 {
                     ImageKey = "folder";
                     SelectedImageKey = "folder";
@@ -113,16 +117,16 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="Text"></param>
         /// <param name="accessor"></param>
-        public DataNode(string Text, HSDAccessor accessor, bool referenceNode = false)
+        public DataNode(string Text, HSDAccessor accessor, bool referenceNode = false, HSDRootNode root = null)
         {
             ReferenceNode = referenceNode;
             this.Text = Text;
             Accessor = accessor;
+            Root = root;
 
             if (Accessor is HSD_JOBJ jobj && jobj.ClassName != null)
                 Text = jobj.ClassName + ":" + Text;
-
-
+        
             // add dummy only if this node has references or if there is an array in the accessor's properties
             if(accessor._s.References.Count != 0 || Accessor.GetType().GetProperties().ToList().Find(e=>e.PropertyType.IsArray) != null)
                 Nodes.Add(new TreeNode()); // dummy
@@ -390,11 +394,11 @@ namespace HSDRawViewer
             HSDRawFile file;
             if (Accessor is SBM_Map_Head head && OpenDAT(out file))
             {
-                var group = head.ModelGroups.ToList();
+                var group = head.ModelGroups.Array.ToList();
 
                 group.Add(new Map_GOBJ() { _s = file.Roots[0].Data._s });
 
-                head.ModelGroups = group.ToArray();
+                head.ModelGroups.Array = group.ToArray();
 
                 Refresh();
             }

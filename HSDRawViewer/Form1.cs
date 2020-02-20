@@ -122,8 +122,10 @@ namespace HSDRawViewer
 
             treeView1.AfterCollapse += (sender, args) =>
             {
+                treeView1.BeginUpdate();
                 args.Node.Nodes.Clear();
                 args.Node.Nodes.Add(new TreeNode());
+                treeView1.EndUpdate();
             };
 
             treeView1.AfterSelect += (sender, args) =>
@@ -279,17 +281,21 @@ namespace HSDRawViewer
         /// </summary>
         private void RefreshTree()
         {
+            treeView1.BeginUpdate();
+
             treeView1.Nodes.Clear();
             foreach (var r in RawHSDFile.Roots)
             {
-                treeView1.Nodes.Add(new DataNode(r.Name, r.Data));
+                treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r));
             }
             foreach (var r in RawHSDFile.References)
             {
-                treeView1.Nodes.Add(new DataNode(r.Name, r.Data, true));
+                treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r, referenceNode: true));
             }
             if (treeView1.Nodes.Count > 0)
                 treeView1.SelectedNode = treeView1.Nodes[0];
+
+            treeView1.EndUpdate();
 
             ClearWorkspace();
         }
@@ -690,6 +696,33 @@ namespace HSDRawViewer
                 RawHSDFile.Roots.Add(root);
 
                 RefreshTree();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeView1_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            // Can only edit root node labels
+            if(!(e.Node is DataNode d && d.IsRootNode))
+            {
+                e.CancelEdit = true;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            if (e.Node is DataNode d && d.IsRootNode)
+            {
+                d.RootText = e.Label;
             }
         }
     }

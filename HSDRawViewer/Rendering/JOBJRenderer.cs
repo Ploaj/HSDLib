@@ -470,7 +470,7 @@ namespace HSDRawViewer.Rendering
                 foreach (HSD_Track t in tracks.Tracks)
                 {
                     AnimTrack track = new AnimTrack();
-                    track.TrackType = t.FOBJ.AnimationType;
+                    track.TrackType = t.FOBJ.JointTrackType;
                     track.Keys = t.GetKeys();
                     n.Tracks.Add(track);
                 }
