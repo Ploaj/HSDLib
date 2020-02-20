@@ -458,6 +458,8 @@ namespace HSDRawViewer.GUI.Plugins
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
+            GL.Disable(EnableCap.CullFace);
+
             RenderColl_Data();
 
             BlinkTimer++;

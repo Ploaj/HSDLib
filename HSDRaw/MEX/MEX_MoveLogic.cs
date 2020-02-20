@@ -8,7 +8,8 @@ namespace HSDRaw.MEX
 
         public int MoveID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
-        public int StateFlags { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        [TypeConverter(typeof(HexType))]
+        public uint StateFlags { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
 
         public byte AttackID { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
 
@@ -27,5 +28,9 @@ namespace HSDRaw.MEX
         [TypeConverter(typeof(HexType))]
         public uint CameraCallback { get => (uint)_s.GetInt32(0x1C); set => _s.SetInt32(0x1C, (int)value); }
 
+        public override string ToString()
+        {
+            return $"{MoveID} {AttackID} {StateFlags.ToString("X8")}";
+        }
     }
 }

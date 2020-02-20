@@ -19,6 +19,7 @@ namespace HSDRawViewer
         private HSDRootNode Root { get; set; }
         public string RootText { set { Root.Name = value; } }
         public bool IsRootNode { get => Root != null; }
+        public bool IsReferenceNode { get => ReferenceNode; }
 
         public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }

@@ -87,23 +87,24 @@ namespace HSDRawViewer.Converters
                 postProcess |= PostProcessSteps.FlipUVs;
 
             settings.Directory = System.IO.Path.GetDirectoryName(filePath) + "\\";
-            
-            if(System.IO.Path.GetExtension(filePath).ToLower() == ".dae")
+
+            Dictionary<Node, HSD_JOBJ> nodeToJOBJ = new Dictionary<Node, HSD_JOBJ>();
+            if (System.IO.Path.GetExtension(filePath).ToLower() == ".dae")
             {
-                var sc = mex.WriteRootNode(rootJOBJ, settings, boneLabels);
+                var sc = mex.WriteRootNode(rootJOBJ, settings, boneLabels, nodeToJOBJ);
                 /*var scn = Scene.ToUnmanagedScene(sc);
                 scn = AssimpLibrary.Instance.ApplyPostProcessing(scn, postProcess);
                 var scene = Scene.FromUnmanagedScene(scn);
                 Scene.FreeUnmanagedScene(scn);*/
-                ExportCustomDAE(filePath, sc, settings);
+                ExportCustomDAE(filePath, sc, settings, nodeToJOBJ);
             }
             else
-                importer.ExportFile(mex.WriteRootNode(rootJOBJ, settings, boneLabels), filePath, extToId[System.IO.Path.GetExtension(filePath)], postProcess);
+                importer.ExportFile(mex.WriteRootNode(rootJOBJ, settings, boneLabels, nodeToJOBJ), filePath, extToId[System.IO.Path.GetExtension(filePath)], postProcess);
 
             importer.Dispose();
         }
 
-        private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings)
+        private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
             using (DAEWriter writer = new DAEWriter(filePath, true))
             {
@@ -144,7 +145,7 @@ namespace HSDRawViewer.Converters
 
                 var rootSkeleton = scene.RootNode.Children[0];
 
-                RecursivlyWriteDAEJoints(writer, rootSkeleton, "", Matrix4.Identity);
+                RecursivlyWriteDAEJoints(writer, rootSkeleton, "", Matrix4.Identity, nodeToJOBJ);
 
                 writer.StartGeometrySection();
                 for(int i = 1; i < scene.RootNode.Children.Count; i++)
@@ -295,7 +296,7 @@ namespace HSDRawViewer.Converters
             return f;
         }
 
-        private static void RecursivlyWriteDAEJoints(DAEWriter writer, Node joint, string parentName, Matrix4 parentTransform)
+        private static void RecursivlyWriteDAEJoints(DAEWriter writer, Node joint, string parentName, Matrix4 parentTransform, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
             var transform = ModelImporter.FromMatrix(joint.Transform);
             float[] Transform = new float[] { transform.M11, transform.M21, transform.M31, transform.M41,
@@ -309,10 +310,16 @@ namespace HSDRawViewer.Converters
                     InvWorldTransform.M13, InvWorldTransform.M23, InvWorldTransform.M33, InvWorldTransform.M43,
                     InvWorldTransform.M14, InvWorldTransform.M24, InvWorldTransform.M34, InvWorldTransform.M44 };
 
-            writer.AddJoint(joint.Name, parentName, Transform, InvTransform);
+            var jobj = nodeToJOBJ[joint];
+            writer.AddJoint(joint.Name, parentName, Transform, InvTransform, 
+                new float[] {
+                jobj.TX, jobj.TY, jobj.TZ,
+                jobj.RX, jobj.RY, jobj.RZ,
+                jobj.SX, jobj.SY, jobj.SZ,
+                });
 
             foreach (var child in joint.Children)
-                RecursivlyWriteDAEJoints(writer, child, joint.Name, transform * parentTransform);
+                RecursivlyWriteDAEJoints(writer, child, joint.Name, transform * parentTransform, nodeToJOBJ);
         }
 
         /// <summary>
@@ -355,11 +362,11 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        private Scene WriteRootNode(HSD_JOBJ root, ModelExportSettings settings, Dictionary<int, string> boneLabels)
+        private Scene WriteRootNode(HSD_JOBJ root, ModelExportSettings settings, Dictionary<int, string> boneLabels, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
             Scene.RootNode = RootNode;
 
-            RecursiveExport(root, RootNode, Matrix4.Identity, boneLabels);
+            RecursiveExport(root, RootNode, Matrix4.Identity, boneLabels, nodeToJOBJ);
 
             WriteDOBJNodes(settings);
 
@@ -369,9 +376,10 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        private void RecursiveExport(HSD_JOBJ jobj, Node parent, Matrix4 parentTransform, Dictionary<int, string> indexToName)
+        private void RecursiveExport(HSD_JOBJ jobj, Node parent, Matrix4 parentTransform, Dictionary<int, string> indexToName, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
             Node root = new Node();
+            nodeToJOBJ.Add(root, jobj);
             root.Name = "JOBJ_" + Jobjs.Count;
             if (indexToName.ContainsKey(Jobjs.Count))
                 root.Name = indexToName[Jobjs.Count];
@@ -396,7 +404,7 @@ namespace HSDRawViewer.Converters
 
             foreach (var c in jobj.Children)
             {
-                RecursiveExport(c, root, worldTransform, indexToName);
+                RecursiveExport(c, root, worldTransform, indexToName, nodeToJOBJ);
             }
         }
 

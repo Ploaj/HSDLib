@@ -33,6 +33,7 @@ namespace HSDRawViewer.GUI
             public int AnimSize;
 
             public uint Flags;
+            public int Index;
 
             [Category("Display Flags"), DisplayName("Flags")]
             public string BitFlags { get => Flags.ToString("X"); set { uint v = Flags; uint.TryParse(value, out v); Flags = v; } }
@@ -226,11 +227,14 @@ namespace HSDRawViewer.GUI
             HashSet<HSDStruct> aHash = new HashSet<HSDStruct>();
             Queue<HSDStruct> extra = new Queue<HSDStruct>();
 
-            int Index = 0;
+            int Index = -1;
             foreach (var v in Subactions)
             {
+                Index++;
+
                 if (v.SubAction == null)
                     continue;
+
                 if (!aHash.Contains(v.SubAction._s))
                 {
                     aHash.Add(v.SubAction._s);
@@ -240,6 +244,7 @@ namespace HSDRawViewer.GUI
                         AnimOffset = v.AnimationOffset,
                         AnimSize = v.AnimationSize,
                         Flags = v.Flags,
+                        Index = Index,
                         Text = v.Name == null ? "Func_" + Index.ToString("X") : v.Name
                     });
                 }
@@ -252,7 +257,6 @@ namespace HSDRawViewer.GUI
                     }
                 }
 
-                Index++;
             }
 
             Index = 0;
@@ -410,7 +414,7 @@ namespace HSDRawViewer.GUI
                 AddActionToUndo();
 
                 a._struct.References.Clear();
-                _node.Accessor._s.SetInt32(0x18 * actionList.SelectedIndex + 0x10, (int)a.Flags);
+                _node.Accessor._s.SetInt32(0x18 * a.Index + 0x10, (int)a.Flags);
 
                 List<byte> scriptData = new List<byte>();
                 foreach (SubActionScript scr in subActionList.Items)

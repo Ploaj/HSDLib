@@ -28,6 +28,9 @@ namespace HSDRawViewer.Converters
             public int Parent = -1;
             public float[] Transform;
             public float[] BindPose;
+            public float[] Translate;
+            public float[] Rotate;
+            public float[] Scale;
         }
 
         private XmlTextWriter writer;
@@ -519,13 +522,34 @@ namespace HSDRawViewer.Converters
             writer.WriteAttributeString("sid", joint.Name);
             writer.WriteAttributeString("type", "JOINT");
 
-            writer.WriteStartElement("matrix");
-            writer.WriteAttributeString("sid", "transform");
-            StringBuilder mat = new StringBuilder();
-            foreach (var v in joint.Transform)
-                mat.Append(v.ToString("0.####") + " ");
-            writer.WriteString(mat.ToString());
-            writer.WriteEndElement();
+            {
+                writer.WriteStartElement("matrix");
+                writer.WriteAttributeString("sid", "transform");
+                StringBuilder mat = new StringBuilder();
+                foreach (var v in joint.Transform)
+                    mat.Append(v.ToString("0.####") + " ");
+                writer.WriteString(mat.ToString());
+                writer.WriteEndElement();
+            }
+
+            /*{
+                writer.WriteStartElement("translate");
+                writer.WriteAttributeString("sid", "trans");
+                StringBuilder mat = new StringBuilder();
+                foreach (var v in joint.Translate)
+                    mat.Append(v.ToString("0.####") + " ");
+                writer.WriteString(mat.ToString());
+                writer.WriteEndElement();
+            }
+            {
+                writer.WriteStartElement("rotate");
+                writer.WriteAttributeString("sid", "rot");
+                StringBuilder mat = new StringBuilder();
+                foreach (var v in joint.Rotate)
+                    mat.Append(v.ToString("0.####") + " ");
+                writer.WriteString(mat.ToString());
+                writer.WriteEndElement();
+            }*/
 
             foreach (var child in GetChildren(joint))
             {
@@ -574,7 +598,7 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// Adds a new joint to the default skeletal tree
         /// </summary>
-        public void AddJoint(string name, string parentName, float[] Transform, float[] InvWorldTransform)
+        public void AddJoint(string name, string parentName, float[] Transform, float[] InvWorldTransform, float[] trs)
         {
             JOINT j = new JOINT();
             j.Name = name;
@@ -583,6 +607,9 @@ namespace HSDRawViewer.Converters
             foreach (var joint in Joints)
                 if (joint.Name.Equals(parentName))
                     j.Parent = Joints.IndexOf(joint);
+            j.Translate = new float[] { trs[0], trs[1], trs[2] };
+            j.Rotate = new float[] { trs[3], trs[4], trs[5] };
+            j.Scale = new float[] { trs[6], trs[7], trs[8] };
             jointNameToIndex.Add(name, Joints.Count);
             Joints.Add(j);
         }

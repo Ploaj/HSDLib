@@ -707,7 +707,7 @@ namespace HSDRawViewer
         private void treeView1_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
             // Can only edit root node labels
-            if(!(e.Node is DataNode d && d.IsRootNode))
+            if(!(e.Node is DataNode d && d.IsRootNode && !d.IsReferenceNode))
             {
                 e.CancelEdit = true;
             }
@@ -720,7 +720,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            if (e.Node is DataNode d && d.IsRootNode)
+            if (e.Node is DataNode d && d.IsRootNode && !e.CancelEdit)
             {
                 d.RootText = e.Label;
             }

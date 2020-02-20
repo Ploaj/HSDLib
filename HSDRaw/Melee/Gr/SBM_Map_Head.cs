@@ -46,8 +46,16 @@ namespace HSDRaw.Melee.Gr
             }
         }
 
-        // Section 5
-        
+        public HSDArrayAccessor<SBM_MapSpline> SplineDesc
+        {
+            get => _s.GetReference<HSDArrayAccessor<SBM_MapSpline>>(0x20);
+            set
+            {
+                _s.SetInt32(0x24, value.Length);
+                _s.SetReference(0x20, value);
+            }
+        }
+
         public HSDFixedLengthPointerArrayAccessor<HSD_MOBJ> MOBJs
         {
             get
