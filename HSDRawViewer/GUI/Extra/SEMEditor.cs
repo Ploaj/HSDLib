@@ -68,7 +68,6 @@ namespace HSDRawViewer.GUI.Extra
 
             if (r == DialogResult.Yes)
             {
-                MEX_DATA.MetaData.NumOfSSMs = Entries.Count;
                 MEXDataFile.Save(MEXDataFilePath);
             }
         }

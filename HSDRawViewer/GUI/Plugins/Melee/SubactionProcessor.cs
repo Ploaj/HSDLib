@@ -107,6 +107,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
                 var sub = new byte[sa.ByteSize];
 
+                if (i + sub.Length > data.Length)
+                    break;
+
                 for (int j = 0; j < sub.Length; j++)
                     sub[j] = data[i + j];
 
@@ -115,6 +118,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 Commands.Add(cmd);
 
                 i += sa.ByteSize;
+
+                if (sa.Code == 0)
+                    break;
             }
 
             return Commands;

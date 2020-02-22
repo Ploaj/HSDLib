@@ -164,6 +164,14 @@ namespace HSDRawViewer.Sound
             return Entries;
         }
 
+        private static byte[] GeneratePaddedBuffer(int size, byte value)
+        {
+            byte[] b = new byte[size];
+            for (int i = 0; i < b.Length; i++)
+                b[i] = value;
+            return b;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -176,6 +184,20 @@ namespace HSDRawViewer.Sound
                 mexData.SSM_LookupTable = new HSDArrayAccessor<MEX_SSMLookup>();
 
                 mexData.SSM_Flags.Set(Entries.Count, new SSMFlag() { });// blank entry at end
+
+                // generate runtime struct
+                mexData.MetaData.NumOfSSMs = Entries.Count;
+
+                HSDStruct rtTable = new HSDStruct(6 * 4);
+
+                rtTable.SetReferenceStruct(0x00, new HSDStruct(GeneratePaddedBuffer(0x180, 0x01)));
+                rtTable.SetReferenceStruct(0x04, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x02)));
+                rtTable.SetReferenceStruct(0x08, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x03)));
+                rtTable.SetReferenceStruct(0x0C, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x04)));
+                rtTable.SetReferenceStruct(0x10, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x05)));
+                rtTable.SetReferenceStruct(0x14, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x06)));
+                
+                mexData._s.SetReferenceStruct(0x4C, rtTable);
             }
 
             var soundOffset = 0;

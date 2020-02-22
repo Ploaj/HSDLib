@@ -350,10 +350,13 @@ namespace HSDRawViewer.GUI
 
                 var sub = new byte[sa.ByteSize];
 
-                for (int j = 0; j < sub.Length; j++)
+                if (i + sub.Length > data.Length)
                 {
-                    sub[j] = data[i + j];
+                    break;
                 }
+
+                for (int j = 0; j < sub.Length; j++)
+                    sub[j] = data[i + j];
 
                 sas.data = sub;
 
