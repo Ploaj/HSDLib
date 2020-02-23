@@ -25,6 +25,11 @@ namespace HSDRawViewer.GUI
             propertyGrid.Visible = enable;
         }
 
+        public void EnablePropertyViewerDescription(bool enable)
+        {
+            propertyGrid.HelpVisible = enable;
+        }
+
         /// <summary>
         /// 
         /// </summary>

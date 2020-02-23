@@ -54,6 +54,10 @@
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.buttonSaveCSS = new System.Windows.Forms.ToolStripButton();
             this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.saveMusicButton = new System.Windows.Forms.ToolStripButton();
+            this.musicListEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.mainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -66,6 +70,8 @@
             this.tabPage5.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip4.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTabControl
@@ -73,6 +79,7 @@
             this.mainTabControl.Controls.Add(this.tabPage1);
             this.mainTabControl.Controls.Add(this.tabPage6);
             this.mainTabControl.Controls.Add(this.tabPage5);
+            this.mainTabControl.Controls.Add(this.tabPage2);
             this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainTabControl.Location = new System.Drawing.Point(0, 0);
             this.mainTabControl.Name = "mainTabControl";
@@ -330,6 +337,44 @@
             this.cssIconEditor.Size = new System.Drawing.Size(208, 307);
             this.cssIconEditor.TabIndex = 0;
             // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.musicListEditor);
+            this.tabPage2.Controls.Add(this.toolStrip2);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Size = new System.Drawing.Size(791, 307);
+            this.tabPage2.TabIndex = 4;
+            this.tabPage2.Text = "Music";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveMusicButton});
+            this.toolStrip2.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(791, 25);
+            this.toolStrip2.TabIndex = 3;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // saveMusicButton
+            // 
+            this.saveMusicButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
+            this.saveMusicButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveMusicButton.Name = "saveMusicButton";
+            this.saveMusicButton.Size = new System.Drawing.Size(135, 22);
+            this.saveMusicButton.Text = "Save Music Changes";
+            this.saveMusicButton.Click += new System.EventHandler(this.saveMusicButton_Click);
+            // 
+            // musicListEditor
+            // 
+            this.musicListEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.musicListEditor.Location = new System.Drawing.Point(0, 25);
+            this.musicListEditor.Name = "musicListEditor";
+            this.musicListEditor.Size = new System.Drawing.Size(791, 282);
+            this.musicListEditor.TabIndex = 4;
+            // 
             // MexDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -357,6 +402,10 @@
             this.groupBox2.ResumeLayout(false);
             this.toolStrip4.ResumeLayout(false);
             this.toolStrip4.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -388,5 +437,9 @@
         private System.Windows.Forms.ToolStripButton exportFighter;
         private System.Windows.Forms.ToolStripButton importFighter;
         private System.Windows.Forms.ToolStripButton deleteFighter;
+        private System.Windows.Forms.TabPage tabPage2;
+        private ArrayMemberEditor musicListEditor;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripButton saveMusicButton;
     }
 }

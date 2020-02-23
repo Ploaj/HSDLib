@@ -19,14 +19,17 @@ namespace HSDRaw.MEX
 
         [DisplayName("SSM Count")]
         public int NumOfSSMs { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        
+        [DisplayName("BGM Count")]
+        public int NumOfMusic { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         [DisplayName("Effect Count")]
-        public int NumOfEffects { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int NumOfEffects { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
     }
 
     public class MEX_Data : HSDAccessor
     {
-        public override int TrimmedSize => 0x8C;
+        public override int TrimmedSize => 0x100;
 
         public MEX_Meta MetaData { get => _s.GetReference<MEX_Meta>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -95,8 +98,10 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<SSMFlag> SSM_Flags { get => _s.GetReference<HSDArrayAccessor<SSMFlag>>(0x80); set => _s.SetReference(0x80, value); }
 
         public HSDArrayAccessor<MEX_CostumeRuntimePointers> Char_CostumePointers { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeRuntimePointers>>(0x84); set => _s.SetReference(0x84, value); }
-        
+
         public HSDArrayAccessor<MEX_SSMLookup> SSM_LookupTable { get => _s.GetReference<HSDArrayAccessor<MEX_SSMLookup>>(0x88); set => _s.SetReference(0x88, value); }
+
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> BackgroundMusicStrings { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x8C); set => _s.SetReference(0x8C, value); }
     }
 
     public class MEX_CostumeRuntimePointers : HSDAccessor
@@ -205,6 +210,11 @@ namespace HSDRaw.MEX
         {
             base.New();
             _s.Resize(0x04);
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
     }
 }

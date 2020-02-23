@@ -35,6 +35,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             viewport.BringToFront();
             //viewport.Visible = false;
 
+            musicListEditor.EnablePropertyViewerDescription(false);
+
             FighterEntries.ListChanged += (sender, args) =>
             {
                 FighterConverter.internalIDValues.Clear();
@@ -68,6 +70,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public ExpandedSSM[] SSMEntries { get; set; }
         public MEX_EffectEntry[] Effects { get; set; }
         public MEX_CSSIconEntry[] Icons { get; set; }
+        public HSD_String[] Music { get; set; }
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -104,6 +107,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 Icons[i] = MEX_CSSIconEntry.FromIcon(_data.MnSlChr_IconData.Icons[i]);
             }
             cssIconEditor.SetArrayFromProperty(this, "Icons");
+
+
+            Music = _data.BackgroundMusicStrings.Array;
+            musicListEditor.SetArrayFromProperty(this, "Music");
         }
 
         /// <summary>
@@ -164,6 +171,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     Symbol = v.Symbol
                 });
             }
+        }
+
+
+        private void saveMusicButton_Click(object sender, EventArgs e)
+        {
+            _data.MetaData.NumOfMusic = Music.Length;
+            _data.BackgroundMusicStrings.Array = new HSD_String[0];
+            foreach (var v in Music)
+                _data.BackgroundMusicStrings.Add(v);
         }
 
         private void SaveIconData()
