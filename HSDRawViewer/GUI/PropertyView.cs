@@ -2,6 +2,8 @@
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Text.RegularExpressions;
+using Be.Windows.Forms;
+using System.Collections.Generic;
 
 namespace HSDRawViewer.GUI
 {
@@ -23,6 +25,17 @@ namespace HSDRawViewer.GUI
 
             Text = "Property View";
 
+            hexbox.SelectionStartChanged += (sender, args) =>
+            {
+                selectedIndex = (int)hexbox.SelectionStart;
+                offsetBox.Text = "0x" + hexbox.SelectionStart.ToString("X8");
+            };
+
+            hexbox.SelectionLengthChanged += (sender, args) =>
+            {
+                selectedLength = (int)hexbox.SelectionLength;
+            };
+
             FormClosing += (sender, args) =>
             {
                 if (args.CloseReason == CloseReason.UserClosing)
@@ -41,16 +54,96 @@ namespace HSDRawViewer.GUI
                 return;
 
             propertyGrid1.SelectedObject = accessor;
-            panel1.SetBytes(accessor._s.GetData());
+            SetBytes();
 
-            if(this.accessor != accessor)
+            if (this.accessor != accessor)
                 offsetBox.Text = "0";
         }
 
-        private void propertyGrid1_PropertyValueChanged(object s, System.Windows.Forms.PropertyValueChangedEventArgs e)
+        private int selectedLength = 0;
+        private int selectedIndex = 0;
+
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            if(propertyGrid1.SelectedObject is HSDAccessor accessor)
-                panel1.SetBytes(accessor._s.GetData());
+            if (propertyGrid1.SelectedObject is HSDAccessor accessor)
+                SetBytes();
+        }
+
+        private void SetBytes()
+        {
+            hexbox.ByteProvider = new DynamicByteProvider(accessor._s.GetData());
+            bool editinglock = false;
+            hexbox.ByteProvider.Changed += (sender, args) =>
+            {
+                if (editinglock)
+                    return;
+
+                if (hexbox.ByteProvider.Length != accessor._s.Length)
+                {
+                    editinglock = true;
+                    hexbox.ByteProvider.DeleteBytes(0, hexbox.ByteProvider.Length);
+                    hexbox.ByteProvider.InsertBytes(0, accessor._s.GetData());
+                    editinglock = false;
+                }
+
+                if (hexbox.ByteProvider.Length == accessor._s.Length)
+                {
+                    for (int i = 0; i < hexbox.ByteProvider.Length; i++)
+                    {
+                        if (hexbox.ByteProvider.ReadByte(i) != accessor._s.GetByte(i))
+                            accessor._s.SetByte(i, hexbox.ByteProvider.ReadByte(i));
+                    }
+                }
+                else
+                if (hexbox.ByteProvider.Length > accessor._s.Length)
+                {
+                    var added = (int)hexbox.ByteProvider.Length - accessor._s.Length;
+
+                    accessor._s.Resize((int)hexbox.ByteProvider.Length);
+
+                    // shift references
+                    var newref = new Dictionary<int, HSDStruct>();
+                    foreach (var r in accessor._s.References)
+                    {
+                        if (r.Key >= selectedIndex)
+                            newref.Add(r.Key + added, r.Value);
+                        else
+                            newref.Add(r.Key, r.Value);
+                    }
+                    accessor._s.References.Clear();
+                    foreach (var r in newref)
+                        accessor._s.References.Add(r.Key, r.Value);
+
+                    // shift data
+                    for (int i = accessor._s.Length - 1; i > selectedIndex + added; i--)
+                        accessor._s.SetByte(i, accessor._s.GetByte(i - 1));
+
+                }
+                else
+                if (hexbox.ByteProvider.Length < accessor._s.Length)
+                {
+                    var shiftStart = selectedIndex + selectedLength;
+
+                    // shift references
+                    var newref = new Dictionary<int, HSDStruct>();
+                    foreach(var r in accessor._s.References)
+                    {
+                        if (r.Key >= selectedIndex)
+                            newref.Add(r.Key - selectedLength, r.Value);
+                        else
+                            newref.Add(r.Key, r.Value);
+                    }
+                    accessor._s.References.Clear();
+                    foreach(var r in newref)
+                        accessor._s.References.Add(r.Key, r.Value);
+
+                    // shift data
+                    for (int i = shiftStart; i < accessor._s.Length; i++)
+                        accessor._s.SetByte(selectedIndex + (i - shiftStart), accessor._s.GetByte(i));
+
+                    accessor._s.Resize((int)hexbox.ByteProvider.Length);
+                }
+            };
         }
 
         private string LastGoodOffset = "0x00000000";
@@ -76,6 +169,7 @@ namespace HSDRawViewer.GUI
 
             // bad
             offsetBox.Text = LastGoodOffset;
+            UpdateValues();
         }
 
         private bool IsReference(uint offset, int byteSize)

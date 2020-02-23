@@ -59,7 +59,7 @@ namespace HSDRaw.Common
 
         public override HSD_JOBJ Next { get => _s.GetReference<HSD_JOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
         
-        public HSD_DOBJ Dobj { get => !Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_DOBJ>(0x10) : null; set { _s.SetReference(0x10, value); Flags |= ~JOBJ_FLAG.SPLINE; } }
+        public HSD_DOBJ Dobj { get => !Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_DOBJ>(0x10) : null; set { _s.SetReference(0x10, value); Flags &= ~JOBJ_FLAG.SPLINE; } }
 
         public HSD_Spline Spline { get => Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_Spline>(0x10) : null; set { _s.SetReference(0x10, value); Flags |= JOBJ_FLAG.SPLINE; } }
 

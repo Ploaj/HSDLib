@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Design;
+﻿using Be.Windows.Forms;
+using System.ComponentModel.Design;
 
 namespace HSDRawViewer.GUI
 {
@@ -32,7 +33,7 @@ namespace HSDRawViewer.GUI
         {
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.panel1 = new System.ComponentModel.Design.ByteViewer();
+            this.hexbox = new Be.Windows.Forms.HexBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.ByteBox = new System.Windows.Forms.TextBox();
             this.Int16Box = new System.Windows.Forms.TextBox();
@@ -69,36 +70,25 @@ namespace HSDRawViewer.GUI
             // 
             // panel1
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.hexbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Inset;
-            this.panel1.ColumnCount = 1;
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.Location = new System.Drawing.Point(118, 19);
-            this.panel1.Name = "panel1";
-            this.panel1.RowCount = 1;
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.panel1.Size = new System.Drawing.Size(634, 283);
-            this.panel1.TabIndex = 2;
+            this.hexbox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.hexbox.BackColorDisabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.hexbox.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.hexbox.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.hexbox.GroupSeparatorVisible = true;
+            this.hexbox.InfoForeColor = System.Drawing.Color.LightGray;
+            this.hexbox.LineInfoVisible = true;
+            this.hexbox.Location = new System.Drawing.Point(118, 19);
+            this.hexbox.Name = "panel1";
+            this.hexbox.SelectionBackColor = System.Drawing.Color.MediumBlue;
+            this.hexbox.SelectionForeColor = System.Drawing.Color.Yellow;
+            this.hexbox.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
+            this.hexbox.Size = new System.Drawing.Size(634, 298);
+            this.hexbox.StringViewVisible = true;
+            this.hexbox.TabIndex = 2;
+            this.hexbox.UseFixedBytesPerLine = true;
             // 
             // groupBox1
             // 
@@ -113,7 +103,7 @@ namespace HSDRawViewer.GUI
             this.groupBox1.Controls.Add(this.buttonInt16);
             this.groupBox1.Controls.Add(this.buttonInt32);
             this.groupBox1.Controls.Add(this.buttonFloat);
-            this.groupBox1.Controls.Add(this.panel1);
+            this.groupBox1.Controls.Add(this.hexbox);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 224);
             this.groupBox1.Name = "groupBox1";
@@ -242,7 +232,7 @@ namespace HSDRawViewer.GUI
 
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.Splitter splitter1;
-        private ByteViewer panel1;
+        private HexBox hexbox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button buttonFloat;
         private System.Windows.Forms.Label label1;

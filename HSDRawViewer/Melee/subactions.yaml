@@ -476,8 +476,12 @@
 - code: 43
   name: Rumble
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: Flag
+    bitCount: 1
+  - name: RequestRumble
+    bitCount: 12
+  - name: RequestRumble2
+    bitCount: 13
 
 - code: 44
   name: Set flag 0x221E to 20

@@ -6,7 +6,7 @@ namespace HSDRaw.MEX
     {
         public override int TrimmedSize => 0x20;
 
-        public int MoveID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+        public int AnimationID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
         [TypeConverter(typeof(HexType))]
         public uint StateFlags { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
@@ -30,7 +30,7 @@ namespace HSDRaw.MEX
 
         public override string ToString()
         {
-            return $"{MoveID} {AttackID} {StateFlags.ToString("X8")}";
+            return $"{AnimationID} {AttackID} {StateFlags.ToString("X8")}";
         }
     }
 }

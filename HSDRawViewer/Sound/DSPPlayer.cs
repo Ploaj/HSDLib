@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using CSCore.Streams.Effects;
-using CSCore.Codecs.WAV;
-using CSCore;
+//using CSCore.Streams.Effects;
+//using CSCore.Codecs.WAV;
+//using CSCore;
 using System.Media;
 
 namespace HSDRawViewer.Sound
@@ -34,7 +34,7 @@ namespace HSDRawViewer.Sound
         {
             using (MemoryStream wavstream = new MemoryStream(wavFile))
             {
-                using (IWaveSource r = new WaveFileReader(wavstream))
+                /*using (IWaveSource r = new WaveFileReader(wavstream))
                 {
                     PitchShifter ps = new PitchShifter(r.ToSampleSource());
                     ps.PitchShiftFactor = pitch;
@@ -44,10 +44,10 @@ namespace HSDRawViewer.Sound
                         ps.ToWaveSource().WriteToWaveStream(streamout);
                         wavFile = streamout.ToArray();
                     }
-                }
+                }*/
             }
 
-            FixHeader(ref wavFile);
+            //FixHeader(ref wavFile);
 
             return wavFile;
         }
@@ -57,7 +57,7 @@ namespace HSDRawViewer.Sound
             //Contains the sound to play
             using (MemoryStream wavstream = new MemoryStream(wavFile))
             {
-                using (IWaveSource r = new WaveFileReader(wavstream))
+                /*using (IWaveSource r = new WaveFileReader(wavstream))
                 {
                     using (MemoryStream streamout = new MemoryStream())
                     {
@@ -74,10 +74,10 @@ namespace HSDRawViewer.Sound
                             wavFile = streamout.ToArray();
                         }
                     }
-                }
+                }*/
             }
 
-            FixHeader(ref wavFile);
+            //FixHeader(ref wavFile);
 
             return wavFile;
         }

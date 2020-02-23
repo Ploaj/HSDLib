@@ -720,7 +720,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            if (e.Node is DataNode d && d.IsRootNode && !e.CancelEdit)
+            if (e.Node is DataNode d && d.IsRootNode && !e.CancelEdit && !string.IsNullOrEmpty(e.Label))
             {
                 d.RootText = e.Label;
             }

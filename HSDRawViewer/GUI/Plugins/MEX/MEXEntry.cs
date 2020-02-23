@@ -326,7 +326,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SpecialLwAir = mexData.SpecialLwAir[internalId].Value;
             SpecialS = mexData.SpecialS[internalId].Value;
             SpecialSAir = mexData.SpecialSAir[internalId].Value;
-
+            
             return this;
         }
 

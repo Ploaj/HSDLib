@@ -201,6 +201,7 @@ namespace HSDRawViewer.Converters
 
             // get root of skeleton
             rootjobj = rootjobj.Child;
+            rootjobj.Flags = 0;
 
             rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;
 
@@ -230,8 +231,8 @@ namespace HSDRawViewer.Converters
                 if (settings.ShadingType == ShadingType.Material)
                 {
                     rootjobj.Flags |= JOBJ_FLAG.LIGHTING;
-                    foreach (var dobj in rootjobj.Dobj.List)
-                        dobj.Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
+                    //foreach (var dobj in rootjobj.Dobj.List)
+                    //    dobj.Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
                 }
             }
             
@@ -827,7 +828,11 @@ namespace HSDRawViewer.Converters
             Mobj.Material.SpecularColorRGBA = 0xFFFFFFFF;
             Mobj.Material.Shininess = 1;
             Mobj.Material.Alpha = 1;
-            Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_VTX;
+            Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT;
+            if (settings.ImportVertexAlpha)
+                Mobj.RenderFlags |= RENDER_MODE.DIFFUSE_VTX;
+            else
+                Mobj.RenderFlags |= RENDER_MODE.DIFFUSE_MAT;
 
             // Properties
             if (settings.ImportMaterialInfo)
