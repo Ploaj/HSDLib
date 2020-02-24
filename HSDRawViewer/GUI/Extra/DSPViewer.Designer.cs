@@ -58,10 +58,13 @@
             // propertyGrid
             // 
             this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid.HelpVisible = false;
             this.propertyGrid.Location = new System.Drawing.Point(3, 87);
             this.propertyGrid.Name = "propertyGrid";
+            this.propertyGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.propertyGrid.Size = new System.Drawing.Size(493, 111);
             this.propertyGrid.TabIndex = 2;
+            this.propertyGrid.ToolbarVisible = false;
             // 
             // splitter1
             // 

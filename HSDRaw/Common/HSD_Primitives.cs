@@ -25,6 +25,11 @@ namespace HSDRaw.Common
             }
         }
 
+        public HSD_String() : base()
+        {
+
+        }
+
         public override void New()
         {
             base.New();

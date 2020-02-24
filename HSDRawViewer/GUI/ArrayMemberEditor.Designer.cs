@@ -58,6 +58,7 @@
             this.elementList.Size = new System.Drawing.Size(208, 212);
             this.elementList.TabIndex = 4;
             this.elementList.SelectedValueChanged += new System.EventHandler(this.elementList_SelectedValueChanged);
+            this.elementList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.elementList_MouseDoubleClick);
             // 
             // toolStrip1
             // 

@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRaw.Melee.Mn;
 using HSDRaw.MEX;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Sound;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -34,6 +35,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             viewport.RefreshSize();
             viewport.BringToFront();
             //viewport.Visible = false;
+
+            musicDSPPlayer.ReplaceButtonVisbile = false;
+
+            musicListEditor.DoubleClickedNode += musicListEditor_SelectedObjectChange;
 
             musicListEditor.EnablePropertyViewerDescription(false);
 
@@ -109,7 +114,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             cssIconEditor.SetArrayFromProperty(this, "Icons");
 
 
-            Music = _data.BackgroundMusicStrings.Array;
+            Music = _data.MusicTable.BackgroundMusicStrings.Array;
             musicListEditor.SetArrayFromProperty(this, "Music");
         }
 
@@ -199,9 +204,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void saveMusicButton_Click(object sender, EventArgs e)
         {
             _data.MetaData.NumOfMusic = Music.Length;
-            _data.BackgroundMusicStrings.Array = new HSD_String[0];
+            _data.MusicTable.BackgroundMusicStrings.Array = new HSD_String[0];
             foreach (var v in Music)
-                _data.BackgroundMusicStrings.Add(v);
+                _data.MusicTable.BackgroundMusicStrings.Add(v);
         }
 
         private void SaveIconData()
@@ -406,6 +411,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             return (index >= 0x21 - 6 && index < FighterEntries.Count - 6);
         }
 
+
+        private static Brush textColor = new SolidBrush(System.Drawing.SystemColors.WindowText);
+
         /// <summary>
         /// 
         /// </summary>
@@ -416,21 +424,48 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             try
             {
                 e.DrawBackground();
-                Brush myBrush = Brushes.Black;
                 
                 if(IsExtendedFighter(e.Index))
                 {
-                    myBrush = Brushes.DarkViolet;
+                    textColor = Brushes.DarkViolet;
                 }
 
                 e.Graphics.DrawString(((ListBox)sender).Items[e.Index].ToString(),
-                e.Font, myBrush, e.Bounds, StringFormat.GenericDefault);
+                e.Font, textColor, e.Bounds, StringFormat.GenericDefault);
 
                 e.DrawFocusRectangle();
             }
             catch
             {
 
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void musicListEditor_SelectedObjectChange(object sender, EventArgs e)
+        {
+            if(musicListEditor.SelectedObject is HSD_String str)
+            {
+                var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{str.Value}");
+
+                DSPPlayer.Stop();
+                musicDSPPlayer.DSP = null;
+                if (File.Exists(path))
+                {
+                    musicDSPPlayer.SoundName = str.Value;
+                    var dsp = new Sound.DSP();
+                    dsp.FromHPS(File.ReadAllBytes(path));
+                    musicDSPPlayer.DSP = dsp;
+                    musicDSPPlayer.PlaySound();
+                }
+                else
+                {
+                    MessageBox.Show("Could not find sound \"" + str.Value + "\"", "Sound Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
             }
         }
     }

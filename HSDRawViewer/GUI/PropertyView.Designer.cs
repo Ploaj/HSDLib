@@ -68,7 +68,7 @@ namespace HSDRawViewer.GUI
             this.splitter1.TabIndex = 1;
             this.splitter1.TabStop = false;
             // 
-            // panel1
+            // hexbox
             // 
             this.hexbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -81,7 +81,7 @@ namespace HSDRawViewer.GUI
             this.hexbox.InfoForeColor = System.Drawing.Color.LightGray;
             this.hexbox.LineInfoVisible = true;
             this.hexbox.Location = new System.Drawing.Point(118, 19);
-            this.hexbox.Name = "panel1";
+            this.hexbox.Name = "hexbox";
             this.hexbox.SelectionBackColor = System.Drawing.Color.MediumBlue;
             this.hexbox.SelectionForeColor = System.Drawing.Color.Yellow;
             this.hexbox.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
@@ -89,6 +89,7 @@ namespace HSDRawViewer.GUI
             this.hexbox.StringViewVisible = true;
             this.hexbox.TabIndex = 2;
             this.hexbox.UseFixedBytesPerLine = true;
+            this.hexbox.VScrollBarVisible = true;
             // 
             // groupBox1
             // 

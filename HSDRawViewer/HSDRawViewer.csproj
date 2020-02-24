@@ -291,6 +291,7 @@
     <Compile Include="Rendering\Viewport.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Sound\HPS.cs" />
     <Compile Include="Sound\SEM.cs" />
     <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />

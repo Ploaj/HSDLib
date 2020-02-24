@@ -10,6 +10,7 @@ using HSDRaw.Melee.Pl;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Melee.Ef;
 using HSDRaw.Melee;
+using HSDRaw.MEX;
 
 namespace HSDRawViewer
 {
@@ -90,6 +91,10 @@ namespace HSDRawViewer
             { typeof(SBM_PlayerSFXTable), "table" },
             { typeof(SBM_HurtboxBank<SBM_ShieldModelContainer>), "folder" },
             { typeof(smSoundTestLoadData), "table" },
+            { typeof(MEX_FighterData), "table" },
+            { typeof(MEX_SSMTable), "table" },
+            { typeof(MEX_FighterFunctionTable), "table" },
+            { typeof(MEX_BGMStruct), "table" },
         };
 
         /// <summary>

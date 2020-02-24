@@ -15,8 +15,8 @@ namespace HSDRaw.MEX
         public MEX_FighterFunctionTable FighterFunctions{ get => _s.GetReference<MEX_FighterFunctionTable>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public MEX_SSMTable SSMTable { get => _s.GetReference<MEX_SSMTable>(0x10); set => _s.SetReference(0x10, value); }
-        
-        public HSDFixedLengthPointerArrayAccessor<HSD_String> BackgroundMusicStrings { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x14); set => _s.SetReference(0x14, value); }
+
+        public MEX_BGMStruct MusicTable { get => _s.GetReference<MEX_BGMStruct>(0x14); set => _s.SetReference(0x14, value); }
 
         public HSDArrayAccessor<MEX_EffectFiles> EffectFiles { get => _s.GetReference<HSDArrayAccessor<MEX_EffectFiles>>(0x18); set => _s.SetReference(0x18, value); }
         

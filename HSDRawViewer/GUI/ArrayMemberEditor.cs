@@ -20,6 +20,9 @@ namespace HSDRawViewer.GUI
         
         public object SelectedObject => elementList.SelectedItem;
 
+        public event EventHandler SelectedObjectChanged;
+        public event EventHandler DoubleClickedNode;
+
         public void EnablePropertyViewer(bool enable)
         {
             propertyGrid.Visible = enable;
@@ -104,6 +107,7 @@ namespace HSDRawViewer.GUI
         private void elementList_SelectedValueChanged(object sender, EventArgs e)
         {
             propertyGrid.SelectedObject = elementList.SelectedItem;
+            OnSelectedObjectChanged(EventArgs.Empty);
         }
         
         /// <summary>
@@ -190,6 +194,42 @@ namespace HSDRawViewer.GUI
 
                 elementList.EndUpdate();
                 MakeChanges();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void elementList_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            OnDoubleClickNode(EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnSelectedObjectChanged(EventArgs e)
+        {
+            EventHandler handler = SelectedObjectChanged;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnDoubleClickNode(EventArgs e)
+        {
+            EventHandler handler = DoubleClickedNode;
+            if (handler != null)
+            {
+                handler(this, e);
             }
         }
     }

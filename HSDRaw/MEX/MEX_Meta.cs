@@ -26,7 +26,7 @@ namespace HSDRaw.MEX
 
         [DisplayName("BGM Count")]
         public int NumOfMusic { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
-
+        
         [DisplayName("Effect Count")]
         public int NumOfEffects { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
     }

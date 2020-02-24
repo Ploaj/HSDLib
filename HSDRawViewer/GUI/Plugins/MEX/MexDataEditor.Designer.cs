@@ -51,13 +51,15 @@
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonLoadPlSl = new System.Windows.Forms.Button();
+            this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.buttonSaveCSS = new System.Windows.Forms.ToolStripButton();
-            this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.musicListEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.musicDSPPlayer = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.saveMusicButton = new System.Windows.Forms.ToolStripButton();
-            this.musicListEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.mainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -279,8 +281,8 @@
             // tabPage5
             // 
             this.tabPage5.Controls.Add(this.groupBox2);
-            this.tabPage5.Controls.Add(this.toolStrip4);
             this.tabPage5.Controls.Add(this.cssIconEditor);
+            this.tabPage5.Controls.Add(this.toolStrip4);
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Size = new System.Drawing.Size(791, 307);
@@ -310,13 +312,21 @@
             this.buttonLoadPlSl.UseVisualStyleBackColor = true;
             this.buttonLoadPlSl.Click += new System.EventHandler(this.buttonLoadPlSl_Click);
             // 
+            // cssIconEditor
+            // 
+            this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Left;
+            this.cssIconEditor.Location = new System.Drawing.Point(0, 25);
+            this.cssIconEditor.Name = "cssIconEditor";
+            this.cssIconEditor.Size = new System.Drawing.Size(208, 282);
+            this.cssIconEditor.TabIndex = 0;
+            // 
             // toolStrip4
             // 
             this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonSaveCSS});
-            this.toolStrip4.Location = new System.Drawing.Point(208, 0);
+            this.toolStrip4.Location = new System.Drawing.Point(0, 0);
             this.toolStrip4.Name = "toolStrip4";
-            this.toolStrip4.Size = new System.Drawing.Size(583, 25);
+            this.toolStrip4.Size = new System.Drawing.Size(791, 25);
             this.toolStrip4.TabIndex = 1;
             this.toolStrip4.Text = "toolStrip4";
             // 
@@ -325,21 +335,15 @@
             this.buttonSaveCSS.Image = global::HSDRawViewer.Properties.Resources.ico_save;
             this.buttonSaveCSS.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonSaveCSS.Name = "buttonSaveCSS";
-            this.buttonSaveCSS.Size = new System.Drawing.Size(127, 22);
-            this.buttonSaveCSS.Text = "Save CSS Icon Data";
+            this.buttonSaveCSS.Size = new System.Drawing.Size(123, 22);
+            this.buttonSaveCSS.Text = "Save CSS Changes";
             this.buttonSaveCSS.Click += new System.EventHandler(this.buttonSaveCSS_Click);
-            // 
-            // cssIconEditor
-            // 
-            this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Left;
-            this.cssIconEditor.Location = new System.Drawing.Point(0, 0);
-            this.cssIconEditor.Name = "cssIconEditor";
-            this.cssIconEditor.Size = new System.Drawing.Size(208, 307);
-            this.cssIconEditor.TabIndex = 0;
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.splitter1);
             this.tabPage2.Controls.Add(this.musicListEditor);
+            this.tabPage2.Controls.Add(this.musicDSPPlayer);
             this.tabPage2.Controls.Add(this.toolStrip2);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -347,6 +351,23 @@
             this.tabPage2.TabIndex = 4;
             this.tabPage2.Text = "Music";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // musicListEditor
+            // 
+            this.musicListEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.musicListEditor.Location = new System.Drawing.Point(0, 25);
+            this.musicListEditor.Name = "musicListEditor";
+            this.musicListEditor.Size = new System.Drawing.Size(422, 282);
+            this.musicListEditor.TabIndex = 4;
+            // 
+            // musicDSPPlayer
+            // 
+            this.musicDSPPlayer.Dock = System.Windows.Forms.DockStyle.Right;
+            this.musicDSPPlayer.DSP = null;
+            this.musicDSPPlayer.Location = new System.Drawing.Point(422, 25);
+            this.musicDSPPlayer.Name = "musicDSPPlayer";
+            this.musicDSPPlayer.Size = new System.Drawing.Size(369, 282);
+            this.musicDSPPlayer.TabIndex = 5;
             // 
             // toolStrip2
             // 
@@ -367,13 +388,14 @@
             this.saveMusicButton.Text = "Save Music Changes";
             this.saveMusicButton.Click += new System.EventHandler(this.saveMusicButton_Click);
             // 
-            // musicListEditor
+            // splitter1
             // 
-            this.musicListEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.musicListEditor.Location = new System.Drawing.Point(0, 25);
-            this.musicListEditor.Name = "musicListEditor";
-            this.musicListEditor.Size = new System.Drawing.Size(791, 282);
-            this.musicListEditor.TabIndex = 4;
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.splitter1.Location = new System.Drawing.Point(419, 25);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(3, 282);
+            this.splitter1.TabIndex = 6;
+            this.splitter1.TabStop = false;
             // 
             // MexDataEditor
             // 
@@ -441,5 +463,7 @@
         private ArrayMemberEditor musicListEditor;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripButton saveMusicButton;
+        private Extra.DSPViewer musicDSPPlayer;
+        private System.Windows.Forms.Splitter splitter1;
     }
 }
