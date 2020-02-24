@@ -1,5 +1,42 @@
-﻿namespace HSDRaw.Common
+﻿using System.Text;
+
+namespace HSDRaw.Common
 {
+    public class HSD_String : HSDAccessor
+    {
+        public string Value
+        {
+            get
+            {
+                var nullpoint = 0;
+                foreach (var d in _s.GetData())
+                    if (d == 0)
+                        break;
+                    else
+                        nullpoint++;
+                return Encoding.UTF8.GetString(_s.GetData(), 0, nullpoint);
+            }
+            set
+            {
+                _s.SetData(Encoding.UTF8.GetBytes(value));
+                _s.Resize(_s.Length + 1);
+                if (_s.Length % 4 != 0)
+                    _s.Resize(_s.Length + (4 - (_s.Length % 4)));
+            }
+        }
+
+        public override void New()
+        {
+            base.New();
+            _s.Resize(0x04);
+        }
+
+        public override string ToString()
+        {
+            return Value;
+        }
+    }
+
     public class HSD_Vector3 : HSDAccessor
     {
         public override int TrimmedSize => 0x0C;

@@ -90,21 +90,21 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
             }
             
-            Effects = new MEX_EffectEntry[_data.Char_EffectFiles.Length];
+            Effects = new MEX_EffectEntry[_data.EffectFiles.Length];
             for(int i = 0; i < Effects.Length; i++)
             {
                 Effects[i] = new MEX_EffectEntry()
                 {
-                    FileName = _data.Char_EffectFiles[i].FileName,
-                    Symbol = _data.Char_EffectFiles[i].Symbol,
+                    FileName = _data.EffectFiles[i].FileName,
+                    Symbol = _data.EffectFiles[i].Symbol,
                 };
             }
             effectEditor.SetArrayFromProperty(this, "Effects");
             
-            Icons = new MEX_CSSIconEntry[_data.MnSlChr_IconData.Icons.Length];
+            Icons = new MEX_CSSIconEntry[_data.CSSIconData.Icons.Length];
             for(int i = 0; i < Icons.Length; i++)
             {
-                Icons[i] = MEX_CSSIconEntry.FromIcon(_data.MnSlChr_IconData.Icons[i]);
+                Icons[i] = MEX_CSSIconEntry.FromIcon(_data.CSSIconData.Icons[i]);
             }
             cssIconEditor.SetArrayFromProperty(this, "Icons");
 
@@ -122,35 +122,57 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             int index = 0;
             d.MetaData.NumOfExternalIDs = FighterEntries.Count;
             d.MetaData.NumOfInternalIDs = FighterEntries.Count;
-            d.MnSlChr_NameText = new HSDNullPointerArrayAccessor<HSD_String>();
-            d.Char_CharFiles = new HSDArrayAccessor<MEX_CharFileStrings>();
-            d.Char_CostumeIDs = new HSDArrayAccessor<MEX_CostumeIDs>();
-            d.Char_CostumeFileSymbols = new HSDArrayAccessor<MEX_CostumeFileSymbolTable>();
-            d.Char_AnimFiles = new HSDNullPointerArrayAccessor<HSD_String>();
-            d.Char_AnimCount = new HSDArrayAccessor<MEX_AnimCount>();
-            d.Char_InsigniaIDs = new HSDArrayAccessor<HSD_Byte>();
-            d.GmRst_AnimFiles = new HSDNullPointerArrayAccessor<HSD_String>();
-            d.GmRst_Scale = new HSDArrayAccessor<HSD_Float>();
-            d.GmRst_VictoryTheme = new HSDArrayAccessor<HSD_Int>();
-            d.FtDemo_SymbolNames = new HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>();
-            d.SFX_NameDef = new HSDArrayAccessor<HSD_Int>();
-            d.SSM_CharSSMFileIDs = new HSDArrayAccessor<MEX_CharSSMFileID>();
-            d.Char_EffectIDs = new HSDArrayAccessor<HSD_Byte>();
-            d.Char_CostumePointers = new HSDArrayAccessor<MEX_CostumeRuntimePointers>();
-            d.Char_DefineIDs = new HSDArrayAccessor<MEX_CharDefineIDs>();
+            d.FighterData.NameText.Array = new HSD_String[0];
+            d.FighterData.CharFiles.Array = new MEX_CharFileStrings[0];
+            d.FighterData.CostumeIDs.Array = new MEX_CostumeIDs[0];
+            d.FighterData.CostumeFileSymbols.Array = new MEX_CostumeFileSymbolTable[0];
+            d.FighterData.AnimFiles.Array = new HSD_String[0];
+            d.FighterData.AnimCount.Array = new MEX_AnimCount[0];
+            d.FighterData.InsigniaIDs.Array = new HSD_Byte[0];
+            d.FighterData.ResultAnimFiles.Array = new HSD_String[0];
+            d.FighterData.ResultScale.Array = new HSD_Float[0];
+            d.FighterData.VictoryThemeIDs.Array = new HSD_Int[0];
+            d.FighterData.FtDemo_SymbolNames.Array = new MEX_FtDemoSymbolNames[0];
+            d.FighterData.AnnouncerCalls.Array = new HSD_Int[0];
+            d.FighterData.SSMFileIDs.Array = new MEX_CharSSMFileID[0];
+            d.FighterData.EffectIDs.Array = new HSD_Byte[0];
+            d.FighterData.CostumePointers.Array = new MEX_CostumeRuntimePointers[0];
+            d.FighterData.DefineIDs.Array = new MEX_CharDefineIDs[0];
 
-            d.OnLoad = new HSDArrayAccessor<HSD_UInt>();
-            d.OnDeath = new HSDArrayAccessor<HSD_UInt>();
-            d.OnUnknown = new HSDArrayAccessor<HSD_UInt>();
-            d.MoveLogic = new HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>();
-            d.SpecialN = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialNAir = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialHi = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialHiAir = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialLw = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialLwAir = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialS = new HSDArrayAccessor<HSD_UInt>();
-            d.SpecialSAir = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
+            d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
+            d.FighterFunctions.OnUnknown.Array = new HSD_UInt[0];
+            d.FighterFunctions.MoveLogic.Array = new HSDArrayAccessor<MEX_MoveLogic>[0];
+            d.FighterFunctions.SpecialN.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialNAir.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialHi.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialHiAir.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialLw.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialLwAir.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialS.Array = new HSD_UInt[0];
+            d.FighterFunctions.SpecialSAir.Array = new HSD_UInt[0];
+            d.FighterFunctions.OnAbsorb.Array = new HSD_UInt[0];
+            d.FighterFunctions.onItemPickup.Array = new HSD_UInt[0];
+            d.FighterFunctions.onMakeItemInvisible.Array = new HSD_UInt[0];
+            d.FighterFunctions.onMakeItemVisible.Array = new HSD_UInt[0];
+            d.FighterFunctions.onItemDrop.Array = new HSD_UInt[0];
+            d.FighterFunctions.onItemCatch.Array = new HSD_UInt[0];
+            d.FighterFunctions.onUnknownItemRelated.Array = new HSD_UInt[0];
+            d.FighterFunctions.onUnknownCharacterModelFlags1.Array = new HSD_UInt[0];
+            d.FighterFunctions.onUnknownCharacterModelFlags2.Array = new HSD_UInt[0];
+            d.FighterFunctions.onHit.Array = new HSD_UInt[0];
+            d.FighterFunctions.onUnknownEyeTextureRelated.Array = new HSD_UInt[0];
+            d.FighterFunctions.onFrame.Array = new HSD_UInt[0];
+            d.FighterFunctions.onActionStateChange.Array = new HSD_UInt[0];
+            d.FighterFunctions.onRespawn.Array = new HSD_UInt[0];
+            d.FighterFunctions.onModelRender.Array = new HSD_UInt[0];
+            d.FighterFunctions.onShadowRender.Array = new HSD_UInt[0];
+            d.FighterFunctions.onUnknownMultijump.Array = new HSD_UInt[0];
+            d.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Array = new HSD_UInt[0];
+            d.FighterFunctions.onTwoEntryTable.Array = new HSD_UInt[0];
+            
+            // funtime fighter pointer struct
+            d.FighterFunctions._s.GetReference<HSDAccessor>(0x40)._s.Resize(FighterEntries.Count * 8);
             
             foreach (var v in FighterEntries)
             {
@@ -162,10 +184,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void SaveEffectData()
         {
             _data.MetaData.NumOfEffects = Effects.Length;
-            _data.Char_EffectFiles = new HSDArrayAccessor<MEX_EffectFiles>();
+            _data.EffectFiles = new HSDArrayAccessor<MEX_EffectFiles>();
             foreach(var v in Effects)
             {
-                _data.Char_EffectFiles.Add(new MEX_EffectFiles()
+                _data.EffectFiles.Add(new MEX_EffectFiles()
                 {
                     FileName = v.FileName,
                     Symbol = v.Symbol
@@ -188,7 +210,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             MEX_CSSIcon[] ico = new MEX_CSSIcon[Icons.Length];
             for (int i = 0; i < ico.Length; i++)
                 ico[i] = Icons[i].ToIcon();
-            _data.MnSlChr_IconData.Icons = ico;
+            _data.CSSIconData.Icons = ico;
         }
 
         #region Events

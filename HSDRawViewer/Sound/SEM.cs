@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.MEX;
 using System;
 using System.Collections.Generic;
@@ -179,11 +180,11 @@ namespace HSDRawViewer.Sound
         {
             if(mexData != null)
             {
-                mexData.SSM_Flags = new HSDArrayAccessor<SSMFlag>();
-                mexData.SSM_SSMFiles = new HSDNullPointerArrayAccessor<HSD_String>();
-                mexData.SSM_LookupTable = new HSDArrayAccessor<MEX_SSMLookup>();
+                mexData.SSMTable.SSM_Flags.Array = new MEX_SSMSizeAndFlags[0];
+                mexData.SSMTable.SSM_SSMFiles.Array = new HSD_String[0];
+                mexData.SSMTable.SSM_LookupTable.Array = new MEX_SSMLookup[0];
 
-                mexData.SSM_Flags.Set(Entries.Count, new SSMFlag() { });// blank entry at end
+                mexData.SSMTable.SSM_Flags.Set(Entries.Count, new MEX_SSMSizeAndFlags() { });// blank entry at end
 
                 // generate runtime struct
                 mexData.MetaData.NumOfSSMs = Entries.Count;
@@ -197,7 +198,7 @@ namespace HSDRawViewer.Sound
                 rtTable.SetReferenceStruct(0x10, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x05)));
                 rtTable.SetReferenceStruct(0x14, new HSDStruct(GeneratePaddedBuffer(Entries.Count * 4, 0x06)));
                 
-                mexData._s.SetReferenceStruct(0x4C, rtTable);
+                mexData.SSMTable._s.SetReferenceStruct(0x0C, rtTable);
             }
 
             var soundOffset = 0;
@@ -242,11 +243,11 @@ namespace HSDRawViewer.Sound
 
                         if(mexData != null)
                         {
-                            mexData.SSM_SSMFiles.Add(new HSD_String() { Value = e.SoundBank.Name });
-                            mexData.SSM_Flags.Add(new SSMFlag() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
+                            mexData.SSMTable.SSM_SSMFiles.Add(new HSD_String() { Value = e.SoundBank.Name });
+                            mexData.SSMTable.SSM_Flags.Add(new MEX_SSMSizeAndFlags() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
                             var lu = new MEX_SSMLookup();
                             lu._s.SetInt32(0x00, e.SoundBank.GroupFlags);
-                            mexData.SSM_LookupTable.Add(lu);
+                            mexData.SSMTable.SSM_LookupTable.Add(lu);
                         }
 
                         // add sound offset

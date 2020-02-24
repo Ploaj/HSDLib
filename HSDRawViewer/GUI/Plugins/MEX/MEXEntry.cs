@@ -127,7 +127,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public uint SSMBitfield2 { get; set; }
 
         [DisplayName("Narrator Sound Clip"), Category("3 - Misc"), Description("Index of narrator sound clip")]
-        public int NameCallSound { get; set; }
+        public int AnnouncerCall { get; set; }
 
         [DisplayName("Sub-Character"), 
             Category("3 - Misc"), Description(""), 
@@ -153,44 +153,44 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             Functions.LoadData(mexData, internalId, externalID);
 
-            NameText = mexData.MnSlChr_NameText[externalID].Value;
-            FighterDataPath = mexData.Char_CharFiles[internalId].FileName;
-            FighterDataSymbol = mexData.Char_CharFiles[internalId].Symbol;
-            AnimFile = mexData.Char_AnimFiles[internalId].Value;
-            AnimCount = mexData.Char_AnimCount[internalId].AnimCount;
+            NameText = mexData.FighterData.NameText[externalID].Value;
+            FighterDataPath = mexData.FighterData.CharFiles[internalId].FileName;
+            FighterDataSymbol = mexData.FighterData.CharFiles[internalId].Symbol;
+            AnimFile = mexData.FighterData.AnimFiles[internalId].Value;
+            AnimCount = mexData.FighterData.AnimCount[internalId].AnimCount;
 
-            InsigniaID = mexData.Char_InsigniaIDs[externalID].Value;
+            InsigniaID = mexData.FighterData.InsigniaIDs[externalID].Value;
             
-            Costumes = mexData.Char_CostumeFileSymbols[internalId].CostumeSymbols.Array;
+            Costumes = mexData.FighterData.CostumeFileSymbols[internalId].CostumeSymbols.Array;
 
-            RstAnimFile = mexData.GmRst_AnimFiles[externalID].Value;
+            RstAnimFile = mexData.FighterData.ResultAnimFiles[externalID].Value;
 
-            EffectIndex = mexData.Char_EffectIDs[internalId].Value;
-            NameCallSound = mexData.SFX_NameDef[externalID].Value;
+            EffectIndex = mexData.FighterData.EffectIDs[internalId].Value;
+            AnnouncerCall = mexData.FighterData.AnnouncerCalls[externalID].Value;
 
-            SSMIndex = mexData.SSM_CharSSMFileIDs[externalID].SSMID;
-            SSMBitfield1 = (uint)mexData.SSM_CharSSMFileIDs[externalID].BitField1;
-            SSMBitfield2 = (uint)mexData.SSM_CharSSMFileIDs[externalID].BitField2;
+            SSMIndex = mexData.FighterData.SSMFileIDs[externalID].SSMID;
+            SSMBitfield1 = (uint)mexData.FighterData.SSMFileIDs[externalID].BitField1;
+            SSMBitfield2 = (uint)mexData.FighterData.SSMFileIDs[externalID].BitField2;
 
-            SubCharacterInternalID = (sbyte)mexData.Char_DefineIDs[externalID].SubCharacterInternalID;
-            SubCharacterBehavior = mexData.Char_DefineIDs[externalID].SubCharacterBehavior;
+            SubCharacterInternalID = (sbyte)mexData.FighterData.DefineIDs[externalID].SubCharacterInternalID;
+            SubCharacterBehavior = mexData.FighterData.DefineIDs[externalID].SubCharacterBehavior;
             
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
-                DemoResult = mexData.FtDemo_SymbolNames.Array[internalId].Result;
-                DemoIntro = mexData.FtDemo_SymbolNames.Array[internalId].Intro;
-                DemoEnding = mexData.FtDemo_SymbolNames.Array[internalId].Ending;
-                DemoWait = mexData.FtDemo_SymbolNames.Array[internalId].ViWait;
+                DemoResult = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Result;
+                DemoIntro = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Intro;
+                DemoEnding = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Ending;
+                DemoWait = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].ViWait;
             }
 
             if (!IsSpecialCharacterExternal(mexData, externalID))
             {
-                RedCostumeID = mexData.Char_CostumeIDs[externalID].RedCostumeIndex;
-                GreenCostumeID = mexData.Char_CostumeIDs[externalID].GreenCostumeIndex;
-                BlueCostumeID = mexData.Char_CostumeIDs[externalID].BlueCostumeIndex;
+                RedCostumeID = mexData.FighterData.CostumeIDs[externalID].RedCostumeIndex;
+                GreenCostumeID = mexData.FighterData.CostumeIDs[externalID].GreenCostumeIndex;
+                BlueCostumeID = mexData.FighterData.CostumeIDs[externalID].BlueCostumeIndex;
 
-                ResultScreenScale = mexData.GmRst_Scale[externalID].Value;
-                VictoryThemeID = mexData.GmRst_VictoryTheme[externalID].Value;
+                ResultScreenScale = mexData.FighterData.ResultScale[externalID].Value;
+                VictoryThemeID = mexData.FighterData.VictoryThemeIDs[externalID].Value;
             }
 
             return this;
@@ -200,31 +200,31 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             Functions.SaveData(mexData, internalId, externalID);
 
-            mexData.MnSlChr_NameText.Set(externalID, new HSD_String() { Value = NameText });
-            mexData.Char_CharFiles.Set(internalId, new MEX_CharFileStrings() { FileName = FighterDataPath, Symbol = FighterDataSymbol});
-            mexData.Char_AnimFiles.Set(internalId, new HSD_String() { Value = AnimFile });
-            mexData.Char_AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
-            mexData.Char_InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
+            mexData.FighterData.NameText.Set(externalID, new HSD_String() { Value = NameText });
+            mexData.FighterData.CharFiles.Set(internalId, new MEX_CharFileStrings() { FileName = FighterDataPath, Symbol = FighterDataSymbol});
+            mexData.FighterData.AnimFiles.Set(internalId, new HSD_String() { Value = AnimFile });
+            mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
+            mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 
-            mexData.Char_CostumeFileSymbols.Set(internalId, new MEX_CostumeFileSymbolTable() { CostumeSymbols = new HSDRaw.HSDArrayAccessor<MEX_CostumeFileSymbol>() { Array = Costumes } });
+            mexData.FighterData.CostumeFileSymbols.Set(internalId, new MEX_CostumeFileSymbolTable() { CostumeSymbols = new HSDRaw.HSDArrayAccessor<MEX_CostumeFileSymbol>() { Array = Costumes } });
 
-            mexData.Char_EffectIDs.Set(internalId, new HSD_Byte() { Value = EffectIndex });
-            mexData.SFX_NameDef.Set(externalID, new HSD_Int() { Value = NameCallSound });
+            mexData.FighterData.EffectIDs.Set(internalId, new HSD_Byte() { Value = EffectIndex });
+            mexData.FighterData.AnnouncerCalls.Set(externalID, new HSD_Int() { Value = AnnouncerCall });
 
-            mexData.Char_CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
+            mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
                 CostumeCount = CostumeCount,
                 Pointer = new HSDRaw.HSDAccessor() { _s = new HSDRaw.HSDStruct(4 * 6) }
             });
 
-            mexData.SSM_CharSSMFileIDs.Set(externalID, new MEX_CharSSMFileID()
+            mexData.FighterData.SSMFileIDs.Set(externalID, new MEX_CharSSMFileID()
             {
                 SSMID = SSMIndex,
                 BitField1 = (int)SSMBitfield1,
                 BitField2 = (int)SSMBitfield2
             });
 
-            mexData.Char_DefineIDs.Set(externalID, new MEX_CharDefineIDs()
+            mexData.FighterData.DefineIDs.Set(externalID, new MEX_CharDefineIDs()
             {
                 InternalID = (byte)(internalId + (internalId == 11 ? -1 : 0)), // popo id reference ice climbers
                 SubCharacterInternalID = (byte)SubCharacterInternalID,
@@ -240,7 +240,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     DemoEnding = "";
                     DemoWait = "";
                 }
-                mexData.FtDemo_SymbolNames.Set(internalId, new MEX_FtDemoSymbolNames()
+                mexData.FighterData.FtDemo_SymbolNames.Set(internalId, new MEX_FtDemoSymbolNames()
                 {
                     Result = DemoResult,
                     Intro = DemoIntro,
@@ -249,11 +249,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 });
             }
 
-            mexData.GmRst_AnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
+            mexData.FighterData.ResultAnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
             
             if (!IsSpecialCharacterExternal(mexData, externalID))
             {
-                mexData.Char_CostumeIDs.Set(externalID, new MEX_CostumeIDs()
+                mexData.FighterData.CostumeIDs.Set(externalID, new MEX_CostumeIDs()
                 {
                     CostumeCount = CostumeCount,
                     RedCostumeIndex = RedCostumeID,
@@ -261,8 +261,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     BlueCostumeIndex = BlueCostumeID
                 });
 
-                mexData.GmRst_Scale.Set(externalID, new HSD_Float() { Value = ResultScreenScale });
-                mexData.GmRst_VictoryTheme.Set(externalID, new HSD_Int() { Value = VictoryThemeID });
+                mexData.FighterData.ResultScale.Set(externalID, new HSD_Float() { Value = ResultScreenScale });
+                mexData.FighterData.VictoryThemeIDs.Set(externalID, new HSD_Int() { Value = VictoryThemeID });
             }
 
         }
@@ -311,39 +311,135 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [TypeConverter(typeof(HexType))]
         public uint SpecialSAir { get; set; }
 
+        [TypeConverter(typeof(HexType))]
+        public uint OnAbsorb { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnItemPickup { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnMakeItemInvisible { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnMakeItemVisible { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnItemDrop { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnItemCatch { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnUnknownItemRelated { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnUnknownCharacterFlags1 { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnUnknownCharacterFlags2 { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnHit { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnUnknownEyeTextureRelated { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnFrame { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnActionStateChange { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnRespawn { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnModelRender { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnShadowRender { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnUnknownMultijump { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnActionStateChangeWhileEyeTextureIsChanged { get; set; }
+
+        [TypeConverter(typeof(HexType))]
+        public uint OnTwoEntryTable { get; set; }
+
 
         public MEXFunctionPointers LoadData(MEX_Data mexData, int internalId, int externalID)
         {
-            OnLoad = mexData.OnLoad[internalId].Value;
-            OnDeath = mexData.OnDeath[internalId].Value;
-            OnUnk = mexData.OnUnknown[internalId].Value;
-            MoveLogic = mexData.MoveLogic.Array[internalId].Array;
-            SpecialN = mexData.SpecialN[internalId].Value;
-            SpecialNAir = mexData.SpecialNAir[internalId].Value;
-            SpecialHi = mexData.SpecialHi[internalId].Value;
-            SpecialHiAir = mexData.SpecialHiAir[internalId].Value;
-            SpecialLw = mexData.SpecialLw[internalId].Value;
-            SpecialLwAir = mexData.SpecialLwAir[internalId].Value;
-            SpecialS = mexData.SpecialS[internalId].Value;
-            SpecialSAir = mexData.SpecialSAir[internalId].Value;
-            
+            OnLoad = mexData.FighterFunctions.OnLoad[internalId].Value;
+            OnDeath = mexData.FighterFunctions.OnDeath[internalId].Value;
+            OnUnk = mexData.FighterFunctions.OnUnknown[internalId].Value;
+            MoveLogic = mexData.FighterFunctions.MoveLogic.Array[internalId].Array;
+            SpecialN = mexData.FighterFunctions.SpecialN[internalId].Value;
+            SpecialNAir = mexData.FighterFunctions.SpecialNAir[internalId].Value;
+            SpecialHi = mexData.FighterFunctions.SpecialHi[internalId].Value;
+            SpecialHiAir = mexData.FighterFunctions.SpecialHiAir[internalId].Value;
+            SpecialLw = mexData.FighterFunctions.SpecialLw[internalId].Value;
+            SpecialLwAir = mexData.FighterFunctions.SpecialLwAir[internalId].Value;
+            SpecialS = mexData.FighterFunctions.SpecialS[internalId].Value;
+            SpecialSAir = mexData.FighterFunctions.SpecialSAir[internalId].Value;
+            OnAbsorb = mexData.FighterFunctions.OnAbsorb[internalId].Value;
+            OnItemPickup = mexData.FighterFunctions.onItemPickup[internalId].Value;
+
+            OnMakeItemInvisible = mexData.FighterFunctions.onMakeItemInvisible[internalId].Value;
+            OnMakeItemVisible = mexData.FighterFunctions.onMakeItemVisible[internalId].Value;
+            OnItemDrop = mexData.FighterFunctions.onItemDrop[internalId].Value;
+            OnItemCatch = mexData.FighterFunctions.onItemCatch[internalId].Value;
+            OnUnknownItemRelated = mexData.FighterFunctions.onUnknownItemRelated[internalId].Value;
+            OnUnknownCharacterFlags1 = mexData.FighterFunctions.onUnknownCharacterModelFlags1[internalId].Value;
+            OnUnknownCharacterFlags2 = mexData.FighterFunctions.onUnknownCharacterModelFlags2[internalId].Value;
+            OnHit = mexData.FighterFunctions.onHit[internalId].Value;
+            OnUnknownEyeTextureRelated = mexData.FighterFunctions.onUnknownEyeTextureRelated[internalId].Value;
+            OnFrame = mexData.FighterFunctions.onFrame[internalId].Value;
+            OnActionStateChange = mexData.FighterFunctions.onActionStateChange[internalId].Value;
+            OnRespawn = mexData.FighterFunctions.onRespawn[internalId].Value;
+            OnModelRender = mexData.FighterFunctions.onModelRender[internalId].Value;
+            OnShadowRender = mexData.FighterFunctions.onShadowRender[internalId].Value;
+            OnUnknownMultijump = mexData.FighterFunctions.onUnknownMultijump[internalId].Value;
+            OnActionStateChangeWhileEyeTextureIsChanged = mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged[internalId].Value;
+            OnTwoEntryTable = mexData.FighterFunctions.onTwoEntryTable[internalId].Value;
+
             return this;
         }
 
         public void SaveData(MEX_Data mexData, int internalId, int externalID)
         {
-            mexData.OnLoad.Set(internalId, new HSD_UInt() { Value = OnLoad });
-            mexData.OnDeath.Set(internalId, new HSD_UInt() { Value = OnDeath });
-            mexData.OnUnknown.Set(internalId, new HSD_UInt() { Value = OnUnk });
-            mexData.MoveLogic.Set(internalId, new HSDRaw.HSDArrayAccessor<MEX_MoveLogic>() { Array = MoveLogic });
-            mexData.SpecialN.Set(internalId, new HSD_UInt() { Value = SpecialN });
-            mexData.SpecialNAir.Set(internalId, new HSD_UInt() { Value = SpecialNAir });
-            mexData.SpecialHi.Set(internalId, new HSD_UInt() { Value = SpecialHi });
-            mexData.SpecialHiAir.Set(internalId, new HSD_UInt() { Value = SpecialHiAir });
-            mexData.SpecialLw.Set(internalId, new HSD_UInt() { Value = SpecialLw });
-            mexData.SpecialLwAir.Set(internalId, new HSD_UInt() { Value = SpecialLwAir });
-            mexData.SpecialS.Set(internalId, new HSD_UInt() { Value = SpecialS });
-            mexData.SpecialSAir.Set(internalId, new HSD_UInt() { Value = SpecialSAir });
+            mexData.FighterFunctions.OnLoad.Set(internalId, new HSD_UInt() { Value = OnLoad });
+            mexData.FighterFunctions.OnDeath.Set(internalId, new HSD_UInt() { Value = OnDeath });
+            mexData.FighterFunctions.OnUnknown.Set(internalId, new HSD_UInt() { Value = OnUnk });
+            mexData.FighterFunctions.MoveLogic.Set(internalId, new HSDRaw.HSDArrayAccessor<MEX_MoveLogic>() { Array = MoveLogic });
+            mexData.FighterFunctions.SpecialN.Set(internalId, new HSD_UInt() { Value = SpecialN });
+            mexData.FighterFunctions.SpecialNAir.Set(internalId, new HSD_UInt() { Value = SpecialNAir });
+            mexData.FighterFunctions.SpecialHi.Set(internalId, new HSD_UInt() { Value = SpecialHi });
+            mexData.FighterFunctions.SpecialHiAir.Set(internalId, new HSD_UInt() { Value = SpecialHiAir });
+            mexData.FighterFunctions.SpecialLw.Set(internalId, new HSD_UInt() { Value = SpecialLw });
+            mexData.FighterFunctions.SpecialLwAir.Set(internalId, new HSD_UInt() { Value = SpecialLwAir });
+            mexData.FighterFunctions.SpecialS.Set(internalId, new HSD_UInt() { Value = SpecialS });
+            mexData.FighterFunctions.SpecialSAir.Set(internalId, new HSD_UInt() { Value = SpecialSAir });
+            mexData.FighterFunctions.OnAbsorb.Set(internalId, new HSD_UInt() { Value = OnAbsorb });
+            mexData.FighterFunctions.onItemPickup.Set(internalId, new HSD_UInt() { Value = OnItemPickup });
+            mexData.FighterFunctions.onMakeItemInvisible.Set(internalId, new HSD_UInt() { Value = OnMakeItemInvisible });
+            mexData.FighterFunctions.onMakeItemVisible.Set(internalId, new HSD_UInt() { Value = OnMakeItemVisible });
+            mexData.FighterFunctions.onItemDrop.Set(internalId, new HSD_UInt() { Value = OnItemDrop });
+            mexData.FighterFunctions.onItemCatch.Set(internalId, new HSD_UInt() { Value = OnItemCatch });
+            mexData.FighterFunctions.onUnknownItemRelated.Set(internalId, new HSD_UInt() { Value = OnUnknownItemRelated });
+            mexData.FighterFunctions.onUnknownCharacterModelFlags1.Set(internalId, new HSD_UInt() { Value = OnUnknownCharacterFlags1 });
+            mexData.FighterFunctions.onUnknownCharacterModelFlags2.Set(internalId, new HSD_UInt() { Value = OnUnknownCharacterFlags2 });
+            mexData.FighterFunctions.onHit.Set(internalId, new HSD_UInt() { Value = OnHit });
+            mexData.FighterFunctions.onUnknownEyeTextureRelated.Set(internalId, new HSD_UInt() { Value = OnUnknownEyeTextureRelated });
+            mexData.FighterFunctions.onFrame.Set(internalId, new HSD_UInt() { Value = OnFrame });
+            mexData.FighterFunctions.onActionStateChange.Set(internalId, new HSD_UInt() { Value = OnActionStateChange });
+            mexData.FighterFunctions.onRespawn.Set(internalId, new HSD_UInt() { Value = OnRespawn });
+            mexData.FighterFunctions.onModelRender.Set(internalId, new HSD_UInt() { Value = OnModelRender });
+            mexData.FighterFunctions.onShadowRender.Set(internalId, new HSD_UInt() { Value = OnShadowRender });
+            mexData.FighterFunctions.onUnknownMultijump.Set(internalId, new HSD_UInt() { Value = OnUnknownMultijump });
+            mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Set(internalId, new HSD_UInt() { Value = OnActionStateChangeWhileEyeTextureIsChanged });
+            mexData.FighterFunctions.onTwoEntryTable.Set(internalId, new HSD_UInt() { Value = OnTwoEntryTable });
         }
     }
     

@@ -624,15 +624,15 @@ namespace HSDRawViewer.GUI.Extra
                 {
                     // Load SSM Flags
                     // TODO: check lengths to make sure it matches?
-                    for(int i = 0; i < MEX_DATA.SSM_Flags.Length; i++)
+                    for(int i = 0; i < MEX_DATA.SSMTable.SSM_Flags.Length; i++)
                     {
                         if(i < Entries.Count)
-                            Entries[i].SoundBank.Flag = MEX_DATA.SSM_Flags[i].Flag;
+                            Entries[i].SoundBank.Flag = MEX_DATA.SSMTable.SSM_Flags[i].Flag;
                     }
-                    for (int i = 0; i < MEX_DATA.SSM_LookupTable.Length; i++)
+                    for (int i = 0; i < MEX_DATA.SSMTable.SSM_LookupTable.Length; i++)
                     {
                         if (i < Entries.Count)
-                            Entries[i].SoundBank.GroupFlags = MEX_DATA.SSM_LookupTable[i]._s.GetInt32(0);
+                            Entries[i].SoundBank.GroupFlags = MEX_DATA.SSMTable.SSM_LookupTable[i]._s.GetInt32(0);
                     }
                 }
             }

@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.MEX
+﻿using HSDRaw.Common;
+
+namespace HSDRaw.MEX
 {
     public class MEX_CostumeFileSymbolTable : HSDAccessor
     {

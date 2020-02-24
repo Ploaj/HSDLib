@@ -327,6 +327,13 @@ namespace HSDRawViewer.GUI
                         if (CurrentOffset >= accessor._s.Length)
                             accessor._s.Resize((int)CurrentOffset + 4);
 
+                        if (f.ToLower().EndsWith(".dat"))
+                        {
+                            var datFile = new HSDRawFile(f);
+                            
+                            accessor._s.SetReferenceStruct((int)CurrentOffset, datFile.Roots[0].Data._s);
+                        }
+                        else
                         accessor._s.SetReferenceStruct((int)CurrentOffset, new HSDStruct(System.IO.File.ReadAllBytes(f)));
                     }
                 }
