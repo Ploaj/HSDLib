@@ -22,6 +22,7 @@ namespace HSDRawViewer.GUI
 
         public event EventHandler SelectedObjectChanged;
         public event EventHandler DoubleClickedNode;
+        public event EventHandler ArrayUpdated;
 
         public void EnablePropertyViewer(bool enable)
         {
@@ -51,6 +52,7 @@ namespace HSDRawViewer.GUI
             {
                 MethodInfo method = GetType().GetMethod("ToArray").MakeGenericMethod(new Type[] { Property.PropertyType.GetElementType() });
                 Property.SetValue(_object, method.Invoke(this, new object[] { }));
+                OnArrayUpdated(EventArgs.Empty);
             }
         }
 
@@ -87,6 +89,7 @@ namespace HSDRawViewer.GUI
             if (Property != null && Property.PropertyType.IsArray)
             {
                 Object = obj;
+                OnArrayUpdated(EventArgs.Empty);
             }
         }
 
@@ -227,6 +230,19 @@ namespace HSDRawViewer.GUI
         protected virtual void OnDoubleClickNode(EventArgs e)
         {
             EventHandler handler = DoubleClickedNode;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnArrayUpdated(EventArgs e)
+        {
+            EventHandler handler = ArrayUpdated;
             if (handler != null)
             {
                 handler(this, e);

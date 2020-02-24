@@ -5,8 +5,10 @@ using System.Globalization;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
-    public class FighterConverter
+    public class MEXConverter
     {
+        public static List<string> musicIDValues { get; } = new List<string>();
+
         public static List<string> internalIDValues { get; } = new List<string>();
 
         public static List<string> externalIDValues
@@ -26,7 +28,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         }
     }
 
-    public class IDConverter : TypeConverter
+    public class FighterIDConverter : TypeConverter
     {
         public virtual List<string> values { get; } = new List<string>();
 
@@ -78,13 +80,71 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         }
     }
 
-    public class FighterInternalIDConverter : IDConverter
+
+    public class IDConverter : TypeConverter
     {
-        public override List<string> values { get => FighterConverter.internalIDValues; }
+        public virtual List<string> values { get; } = new List<string>();
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            if (value is int)
+            {
+                int index = (int)value;
+
+                if (index >= 0 && index < values.Count)
+                    return values[index];
+
+                return values[0]; // error, go back to first
+            }
+            return value;
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            string s = value as string;
+            if (s != null)
+            {
+                int index = values.IndexOf(s);
+                if (index >= 0)
+                    return index;
+
+                if (int.TryParse(s, out index) && index >= 0 && index < values.Count)
+                    return index;
+
+                return -1;
+            }
+
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return new StandardValuesCollection(values);
+        }
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
     }
 
-    public class FighterExternalIDConverter : IDConverter
+    public class FighterInternalIDConverter : FighterIDConverter
     {
-        public override List<string> values { get => FighterConverter.externalIDValues; }
+        public override List<string> values { get => MEXConverter.internalIDValues; }
+    }
+
+    public class FighterExternalIDConverter : FighterIDConverter
+    {
+        public override List<string> values { get => MEXConverter.externalIDValues; }
+    }
+
+    public class MusicIDConverter : IDConverter
+    {
+        public override List<string> values { get => MEXConverter.musicIDValues; }
     }
 }

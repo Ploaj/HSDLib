@@ -38,21 +38,24 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             musicDSPPlayer.ReplaceButtonVisbile = false;
 
-            musicListEditor.DoubleClickedNode += musicListEditor_SelectedObjectChange;
+            menuPlaylistEditor.DoubleClickedNode += menuPlaylistEditor_DoubleClick;
 
+            musicListEditor.DoubleClickedNode += musicListEditor_DoubleClicked;
+            musicListEditor.ArrayUpdated += musicListEditor_ArrayUpdated;
             musicListEditor.EnablePropertyViewerDescription(false);
 
             FighterEntries.ListChanged += (sender, args) =>
             {
-                FighterConverter.internalIDValues.Clear();
-                FighterConverter.internalIDValues.Add("None");
-                FighterConverter.internalIDValues.AddRange(FighterEntries.Select(e=>e.NameText));
+                MEXConverter.internalIDValues.Clear();
+                MEXConverter.internalIDValues.Add("None");
+                MEXConverter.internalIDValues.AddRange(FighterEntries.Select(e=>e.NameText));
             };
 
             FormClosing += (sender, args) =>
             {
                 JOBJManager.ClearRenderingCache();
                 viewport.Dispose();
+                DSPPlayer.Stop();
             };
         }
 
@@ -76,6 +79,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public MEX_EffectEntry[] Effects { get; set; }
         public MEX_CSSIconEntry[] Icons { get; set; }
         public HSD_String[] Music { get; set; }
+        public MEXPlaylistEntry[] MenuPlaylist { get; set; }
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -116,6 +120,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             Music = _data.MusicTable.BackgroundMusicStrings.Array;
             musicListEditor.SetArrayFromProperty(this, "Music");
+
+            MenuPlaylist = new MEXPlaylistEntry[_data.MusicTable.MenuPlayListCount];
+            for (int i = 0; i < MenuPlaylist.Length; i++)
+            {
+                var e = _data.MusicTable.MenuPlaylist[i];
+                MenuPlaylist[i] = new MEXPlaylistEntry()
+                {
+                    MusicID = e.HPSID,
+                    PlayChance = e.ChanceToPlay.ToString() + "%"
+                };
+            }
+            menuPlaylistEditor.SetArrayFromProperty(this, "MenuPlaylist");
         }
 
         /// <summary>
@@ -199,14 +215,29 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 });
             }
         }
-
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveMusicButton_Click(object sender, EventArgs e)
         {
             _data.MetaData.NumOfMusic = Music.Length;
             _data.MusicTable.BackgroundMusicStrings.Array = new HSD_String[0];
             foreach (var v in Music)
                 _data.MusicTable.BackgroundMusicStrings.Add(v);
+
+            _data.MusicTable.MenuPlaylist.Array = new MEX_MenuPlaylistItem[0];
+            _data.MusicTable.MenuPlayListCount = MenuPlaylist.Length;
+            foreach(var v in MenuPlaylist)
+            {
+                _data.MusicTable.MenuPlaylist.Add(new MEX_MenuPlaylistItem()
+                {
+                    HPSID = (ushort)v.MusicID,
+                    ChanceToPlay = v.PlayChanceValue
+                });
+            }
         }
 
         private void SaveIconData()
@@ -444,29 +475,62 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="str"></param>
+        private void PlayMusicFromName(string str)
+        {
+            var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{str}");
+
+            DSPPlayer.Stop();
+            musicDSPPlayer.DSP = null;
+            if (File.Exists(path))
+            {
+                musicDSPPlayer.SoundName = str;
+                var dsp = new Sound.DSP();
+                dsp.FromHPS(File.ReadAllBytes(path));
+                musicDSPPlayer.DSP = dsp;
+                musicDSPPlayer.PlaySound();
+            }
+            else
+            {
+                MessageBox.Show("Could not find sound \"" + str + "\"", "Sound Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void musicListEditor_SelectedObjectChange(object sender, EventArgs e)
+        private void musicListEditor_DoubleClicked(object sender, EventArgs e)
         {
             if(musicListEditor.SelectedObject is HSD_String str)
             {
-                var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{str.Value}");
-
-                DSPPlayer.Stop();
-                musicDSPPlayer.DSP = null;
-                if (File.Exists(path))
-                {
-                    musicDSPPlayer.SoundName = str.Value;
-                    var dsp = new Sound.DSP();
-                    dsp.FromHPS(File.ReadAllBytes(path));
-                    musicDSPPlayer.DSP = dsp;
-                    musicDSPPlayer.PlaySound();
-                }
-                else
-                {
-                    MessageBox.Show("Could not find sound \"" + str.Value + "\"", "Sound Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
+                PlayMusicFromName(str.Value);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuPlaylistEditor_DoubleClick(object sender, EventArgs e)
+        {
+            if (menuPlaylistEditor.SelectedObject is MEXPlaylistEntry str)
+            {
+                PlayMusicFromName(Music[str.MusicID].Value);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void musicListEditor_ArrayUpdated(object sender, EventArgs e)
+        {
+            MEXConverter.musicIDValues.Clear();
+            MEXConverter.musicIDValues.AddRange(Music.Select(r => r.Value));
         }
     }
 }

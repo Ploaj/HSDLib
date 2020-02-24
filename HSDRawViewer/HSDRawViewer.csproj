@@ -226,6 +226,7 @@
       <DependentUpon>MexDataEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\MEX\MEXEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXPlaylistEntry.cs" />
     <Compile Include="GUI\Plugins\SubActionPanel.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -500,7 +500,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public override string ToString()
         {
-            return $"{FighterConverter.externalIDValues[FighterExternalID + 1]} ({X1}, {Y1}, {X2}, {Y2})";
+            return $"{MEXConverter.externalIDValues[FighterExternalID + 1]} ({X1}, {Y1}, {X2}, {Y2})";
         }
     }
 
