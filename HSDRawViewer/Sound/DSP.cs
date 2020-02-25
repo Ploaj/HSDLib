@@ -35,14 +35,24 @@ namespace HSDRawViewer.Sound
     {
         public int Frequency { get; set; }
 
+        public string LoopPoint
+        {
+            get
+            {
+                if (Channels.Count == 0)
+                    return "0:00";
+                var sec = (int)Math.Ceiling(Channels[0].LoopStart / 2 / (double)Frequency * 1.75f);
+                return $"{sec / 60}:{sec % 60}";
+            }
+        }
+
         public string Length
         {
             get
             {
                 if (Channels.Count == 0)
                     return "0:00";
-                var decodedLength = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF).Length;
-                var sec = (int)Math.Ceiling(decodedLength / (double)Frequency);
+                var sec = (int)Math.Ceiling(Channels[0].Data.Length / (double)Frequency * 1.75f);
                 return $"{sec / 60}:{sec % 60}";
             }
         }
@@ -220,7 +230,13 @@ namespace HSDRawViewer.Sound
                 if (bpp != 16)
                     throw new NotSupportedException("Only 16 bit WAVE formats accepted");
 
-                r.BaseStream.Position = 0x28;
+                
+                while (new string(r.ReadChars(4)) != "data")
+                {
+                    var skip = r.ReadInt32();
+                    r.BaseStream.Position += skip;
+                }
+                
                 var channelSizes = r.ReadInt32() / channelCount / 2;
 
                 List<List<short>> channels = new List<List<short>>();
@@ -311,6 +327,7 @@ namespace HSDRawViewer.Sound
 
         #endregion
 
+        [Browsable(false)]
         public int Index { get; set; }
 
         public override string ToString()

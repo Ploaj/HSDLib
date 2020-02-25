@@ -137,7 +137,22 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("SubCharacter Behavior"), Category("3 - Misc"), Description("")]
         public SubCharacterBehavior SubCharacterBehavior { get; set; }
 
+
+        [DisplayName("Kirby Cap FileName"), Category("4 - Kirby"), Description("")]
+        public string KirbyCapFileName { get; set; }
+
+        [DisplayName("Kirby Cap Symbol"), Category("4 - Kirby"), Description("")]
+        public string KirbyCapSymbol { get; set; }
+
+        [DisplayName("Kirby Costumes"), Category("4 - Kirby"), Description("")]
+        public MEX_KirbyCostume KirbySpecialCostumes { get; set; }
+
+        [DisplayName("Kirby Effect ID"), Category("4 - Kirby"), Description("")]
+        public byte KirbyEffectID { get; set; }
+
+
         public MEXFunctionPointers Functions = new MEXFunctionPointers();
+
 
         public bool IsSpecialCharacterInternal(MEX_Data mexData, int internalID)
         {
@@ -147,6 +162,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public bool IsSpecialCharacterExternal(MEX_Data mexData, int externalID)
         {
             return externalID >= mexData.MetaData.NumOfExternalIDs - MEXIdConverter.ExternalSpecialCharCount;
+        }
+
+        private byte[] GenerateSpecialBuffer(int length, string s)
+        {
+            byte[] b = new byte[length];
+            for (int i = 0; i < length; i++)
+                b[i] = (byte)s[i % s.Length];
+            return b;
         }
 
         public MEXEntry LoadData(MEX_Data mexData, int internalId, int externalID)
@@ -181,6 +204,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 DemoIntro = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Intro;
                 DemoEnding = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Ending;
                 DemoWait = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].ViWait;
+
+                KirbyCapFileName = mexData.KirbyTable.CapFiles[internalId].FileName;
+                KirbyCapSymbol = mexData.KirbyTable.CapFiles[internalId].Symbol;
+                KirbyEffectID = mexData.KirbyTable.EffectIDs[internalId].Value;
+                KirbySpecialCostumes = mexData.KirbyTable.KirbyCostumes[internalId];
             }
 
             if (!IsSpecialCharacterExternal(mexData, externalID))
@@ -247,6 +275,21 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     Ending = DemoEnding,
                     ViWait = DemoWait
                 });
+
+
+                // Saving Kirby Elements
+                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
+                {
+                    FileName = KirbyCapFileName,
+                    Symbol = KirbyCapSymbol
+                });
+
+                mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = KirbyEffectID });
+
+                mexData.KirbyTable.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
+
+                if (KirbySpecialCostumes != null)
+                    mexData.KirbyTable.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
             }
 
             mexData.FighterData.ResultAnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
@@ -276,98 +319,110 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
     public class MEXFunctionPointers
     {
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnLoad { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnDeath { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnUnk { get; set; }
 
+        [Category("Fighter")]
         public MEX_MoveLogic[] MoveLogic { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialN { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialNAir { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialHi { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialHiAir { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialLw { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialLwAir { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialS { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialSAir { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnAbsorb { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnItemPickup { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnMakeItemInvisible { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnMakeItemVisible { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnItemDrop { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnItemCatch { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnUnknownItemRelated { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnUnknownCharacterFlags1 { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnUnknownCharacterFlags2 { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnHit { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnUnknownEyeTextureRelated { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnFrame { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnActionStateChange { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnRespawn { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnModelRender { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnShadowRender { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnUnknownMultijump { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnActionStateChangeWhileEyeTextureIsChanged { get; set; }
 
-        [TypeConverter(typeof(HexType))]
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnTwoEntryTable { get; set; }
+        
+        [TypeConverter(typeof(HexType)), DisplayName("Kirby N Special"), Category("Kirby"), Description("")]
+        public uint KirbySpecialN { get; set; }
 
+        [TypeConverter(typeof(HexType)), DisplayName("Kirby N Air Special"), Category("Kirby"), Description("")]
+        public uint KirbySpecialNAir { get; set; }
+
+        [TypeConverter(typeof(HexType)), DisplayName("Kirby OnSwallow"), Category("Kirby"), Description("")]
+        public uint KirbyOnSwallow { get; set; }
+
+        [TypeConverter(typeof(HexType)), DisplayName("Kirby OnLoseAbility"), Category("Kirby"), Description("")]
+        public uint KirbyOnLoseAbility { get; set; }
 
         public MEXFunctionPointers LoadData(MEX_Data mexData, int internalId, int externalID)
         {
@@ -403,6 +458,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             OnUnknownMultijump = mexData.FighterFunctions.onUnknownMultijump[internalId].Value;
             OnActionStateChangeWhileEyeTextureIsChanged = mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged[internalId].Value;
             OnTwoEntryTable = mexData.FighterFunctions.onTwoEntryTable[internalId].Value;
+
+            KirbyOnSwallow = mexData.KirbyTable.KirbyHatFunctions[internalId].HatAdd;
+            KirbyOnLoseAbility = mexData.KirbyTable.KirbyHatFunctions[internalId].HatRemove;
+            KirbySpecialN = mexData.KirbyTable.KirbySpecialN[internalId].Value;
+            KirbySpecialNAir = mexData.KirbyTable.KirbySpecialNAir[internalId].Value;
 
             return this;
         }
@@ -440,6 +500,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterFunctions.onUnknownMultijump.Set(internalId, new HSD_UInt() { Value = OnUnknownMultijump });
             mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Set(internalId, new HSD_UInt() { Value = OnActionStateChangeWhileEyeTextureIsChanged });
             mexData.FighterFunctions.onTwoEntryTable.Set(internalId, new HSD_UInt() { Value = OnTwoEntryTable });
+
+            mexData.KirbyTable.KirbyHatFunctions.Set(internalId, new MEX_KirbyHatLoad()
+            {
+                HatAdd = KirbyOnSwallow,
+                HatRemove = KirbyOnLoseAbility
+            });
+            mexData.KirbyTable.KirbySpecialN.Set(internalId, new HSD_UInt() { Value = KirbySpecialN });
+            mexData.KirbyTable.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
         }
     }
     

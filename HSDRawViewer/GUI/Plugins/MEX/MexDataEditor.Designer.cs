@@ -64,6 +64,7 @@
             this.musicDSPPlayer = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.saveMusicButton = new System.Windows.Forms.ToolStripButton();
+            this.createHPSButton = new System.Windows.Forms.ToolStripButton();
             this.mainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -430,7 +431,8 @@
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveMusicButton});
+            this.saveMusicButton,
+            this.createHPSButton});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(791, 25);
@@ -445,6 +447,16 @@
             this.saveMusicButton.Size = new System.Drawing.Size(135, 22);
             this.saveMusicButton.Text = "Save Music Changes";
             this.saveMusicButton.Click += new System.EventHandler(this.saveMusicButton_Click);
+            // 
+            // createHPSButton
+            // 
+            this.createHPSButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.createHPSButton.Image = ((System.Drawing.Image)(resources.GetObject("createHPSButton.Image")));
+            this.createHPSButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.createHPSButton.Name = "createHPSButton";
+            this.createHPSButton.Size = new System.Drawing.Size(129, 22);
+            this.createHPSButton.Text = "Create HPS From WAV";
+            this.createHPSButton.Click += new System.EventHandler(this.createHPSButton_Click);
             // 
             // MexDataEditor
             // 
@@ -521,5 +533,6 @@
         private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.TabPage tabPage8;
         private ArrayMemberEditor menuPlaylistEditor;
+        private System.Windows.Forms.ToolStripButton createHPSButton;
     }
 }

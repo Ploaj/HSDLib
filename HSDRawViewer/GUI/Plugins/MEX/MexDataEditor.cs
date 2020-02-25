@@ -192,9 +192,21 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Array = new HSD_UInt[0];
             d.FighterFunctions.onTwoEntryTable.Array = new HSD_UInt[0];
             
+            d.KirbyTable.CapFiles.Array = new MEX_KirbyCapFiles[0];
+            d.KirbyTable.KirbyCostumes.Array = new MEX_KirbyCostume[0];
+            d.KirbyTable.EffectIDs.Array = new HSD_Byte[0];
+            d.KirbyTable.KirbyHatFunctions.Array = new MEX_KirbyHatLoad[0];
+            d.KirbyTable.KirbySpecialN.Array = new HSD_UInt[0];
+            d.KirbyTable.KirbySpecialNAir.Array = new HSD_UInt[0];
+            
             // funtime fighter pointer struct
             d.FighterFunctions._s.GetReference<HSDAccessor>(0x40)._s.Resize(FighterEntries.Count * 8);
+
+            // kirby runtimes
+            d.KirbyTable.CapFileRuntime._s = new HSDStruct(4 * FighterEntries.Count);
+            d.KirbyTable.CostumeRuntime._s = new HSDStruct(4);
             
+            // dump data
             foreach (var v in FighterEntries)
             {
                 v.SaveData(d, index, MEXIdConverter.ToExternalID(index, FighterEntries.Count));
@@ -455,14 +467,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             try
             {
                 e.DrawBackground();
+
+                var brush = textColor;
                 
                 if(IsExtendedFighter(e.Index))
                 {
-                    textColor = Brushes.DarkViolet;
+                    brush = Brushes.DarkViolet;
                 }
 
                 e.Graphics.DrawString(((ListBox)sender).Items[e.Index].ToString(),
-                e.Font, textColor, e.Bounds, StringFormat.GenericDefault);
+                e.Font, brush, e.Bounds, StringFormat.GenericDefault);
 
                 e.DrawFocusRectangle();
             }
@@ -531,6 +545,34 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             MEXConverter.musicIDValues.Clear();
             MEXConverter.musicIDValues.AddRange(Music.Select(r => r.Value));
+        }
+
+        public class HPSSettings
+        {
+            [DisplayName("Loop Start"), Description("Loop start in seconds")]
+            public int LoopStart { get; set; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createHPSButton_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("WAVE (*.wav)|*.wav");
+
+            if(f != null)
+            {
+                var dsp = new DSP();
+                dsp.FromWAVE(File.ReadAllBytes(f));
+                HPS.SaveDSPAsHPS(dsp, Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "audio\\" + Path.GetFileNameWithoutExtension(f) + ".hps"));
+                var newHPSName = Path.GetFileNameWithoutExtension(f) + ".hps";
+                foreach (var v in Music)
+                    if (v.Value.Equals(newHPSName))
+                        return;
+                musicListEditor.AddItem(new HSD_String() { Value = newHPSName });
+            }
         }
     }
 }

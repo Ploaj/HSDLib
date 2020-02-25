@@ -450,6 +450,9 @@ namespace HSDRaw
         /// <param name="bufferAlign"></param>
         public void Save(Stream stream, bool bufferAlign = true, bool optimize = true)
         {
+            if (Roots[0].Data is MEX_Data)
+                bufferAlign = false;
+
             // gather all structs--------------------------------------------------------------------------
             var allStructs = GetAllStructs();
 
@@ -485,7 +488,7 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
-            if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_PlayerData))
+            if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_PlayerData) && !(Roots[0].Data is MEX_Data))
                 RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------

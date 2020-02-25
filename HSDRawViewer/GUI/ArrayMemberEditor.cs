@@ -248,5 +248,15 @@ namespace HSDRawViewer.GUI
                 handler(this, e);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="o"></param>
+        public void AddItem(object o)
+        {
+            elementList.Items.Add(o);
+            MakeChanges();
+        }
     }
 }
