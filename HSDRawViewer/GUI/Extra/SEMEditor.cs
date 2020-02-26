@@ -24,11 +24,6 @@ namespace HSDRawViewer.GUI.Extra
             entryList.DataSource = Entries;
 
             CenterToScreen();
-
-            FormClosed += (sender, args) =>
-            {
-                DSPPlayer.Stop();
-            };
         }
 
         /// <summary>
@@ -248,7 +243,7 @@ namespace HSDRawViewer.GUI.Extra
         private void soundBankList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (soundBankList.SelectedItem is DSP dsp)
-                DSPPlayer.PlayDSP(dsp);
+                dspViewer1.PlaySound();
         }
 
         /// <summary>
@@ -432,7 +427,9 @@ namespace HSDRawViewer.GUI.Extra
                 var reverb = sound.GetOPCodeValue(0x10);
                 if (reverb == -1)
                     reverb = 0;
-                dspViewer1.PlaySound(reverb / 1000f, 1 + (pitch) / 1000f);
+                dspViewer1.ApplyReverb(reverb);
+                dspViewer1.ApplyPitch(1 + pitch / 1200f);
+                dspViewer1.PlaySound();
             }
         }
 

@@ -294,16 +294,6 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void stopButton_Click(object sender, EventArgs e)
-        {
-            DSPPlayer.Stop();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
             dspViewer.PlaySound();

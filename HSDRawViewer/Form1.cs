@@ -233,9 +233,12 @@ namespace HSDRawViewer
                 else
                 if (f.ToLower().EndsWith(".ssm"))
                 {
-                    ssmTool.Show();
-                    ssmTool.OpenFile(f);
-                    ssmTool.BringToFront();
+                    SSMTool d = new SSMTool();
+                    {
+                        d.Show();
+                    }
+                    d.OpenFile(f);
+                    d.BringToFront();
                 }
                 else
                     OpenFile(f);
@@ -545,12 +548,17 @@ namespace HSDRawViewer
                 d.ShowDialog();
             }
         }
-
-        private SSMTool ssmTool = new SSMTool();
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void sSMEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ssmTool.Show();
+            SSMTool d = new SSMTool();
+            d.Show();
+            d.BringToFront();
         }
 
         /// <summary>

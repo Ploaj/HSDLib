@@ -7,6 +7,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 {
     public class MEXConverter
     {
+        public static List<string> effectValues { get; } = new List<string>();
+
         public static List<string> musicIDValues { get; } = new List<string>();
 
         public static List<string> internalIDValues { get; } = new List<string>();
@@ -146,5 +148,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     public class MusicIDConverter : IDConverter
     {
         public override List<string> values { get => MEXConverter.musicIDValues; }
+    }
+
+    public class EffectIDConverter : IDConverter
+    {
+        public override List<string> values { get => MEXConverter.effectValues; }
     }
 }

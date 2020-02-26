@@ -51,11 +51,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MEXConverter.internalIDValues.AddRange(FighterEntries.Select(e=>e.NameText));
             };
 
+            effectEditor.ArrayUpdated += (sender, args) =>
+            {
+                MEXConverter.effectValues.Clear();
+                MEXConverter.effectValues.AddRange(Effects.Select(e=>e.FileName));
+            };
+
             FormClosing += (sender, args) =>
             {
                 JOBJManager.ClearRenderingCache();
                 viewport.Dispose();
-                DSPPlayer.Stop();
             };
         }
 
@@ -93,14 +98,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="data"></param>
         private void LoadData()
         {
-            FighterEntries.Clear();
-            for(int i = 0; i < _data.MetaData.NumOfInternalIDs; i++)
-            {
-                FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
-            }
-            
             Effects = new MEX_EffectEntry[_data.EffectFiles.Length];
-            for(int i = 0; i < Effects.Length; i++)
+            for (int i = 0; i < Effects.Length; i++)
             {
                 Effects[i] = new MEX_EffectEntry()
                 {
@@ -109,7 +108,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 };
             }
             effectEditor.SetArrayFromProperty(this, "Effects");
+
+
+            FighterEntries.Clear();
+            for(int i = 0; i < _data.MetaData.NumOfInternalIDs; i++)
+            {
+                FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
+            }
             
+
             Icons = new MEX_CSSIconEntry[_data.CSSIconData.Icons.Length];
             for(int i = 0; i < Icons.Length; i++)
             {
@@ -493,8 +500,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void PlayMusicFromName(string str)
         {
             var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{str}");
-
-            DSPPlayer.Stop();
+            
             musicDSPPlayer.DSP = null;
             if (File.Exists(path))
             {

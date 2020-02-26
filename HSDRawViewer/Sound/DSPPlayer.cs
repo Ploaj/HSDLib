@@ -1,131 +1,234 @@
-﻿using System.IO;
-//using CSCore.Streams.Effects;
-//using CSCore.Codecs.WAV;
-//using CSCore;
-using System.Media;
+﻿using CSCore.SoundOut;
+using System.IO;
+using CSCore;
+using CSCore.Codecs.WAV;
+using CSCore.CoreAudioAPI;
+using System.Collections.Generic;
+using System;
+using CSCore.Streams.Effects;
 
 namespace HSDRawViewer.Sound
 {
     /// <summary>
     /// 
     /// </summary>
-    public class DSPPlayer
+    public class DSPPlayer : IDisposable
     {
+        private ISoundOut _soundOut;
+        private IWaveSource _waveSource;
+        private MemoryStream _memoryStream;
 
-        private static SoundPlayer SoundPlayer;
+        public event EventHandler<PlaybackStoppedEventArgs> PlaybackStopped;
 
-        private static void FixHeader(ref byte[] wavFile)
+        public TimeSpan Position
         {
-            // is this a bug?
-            var length = wavFile.Length - 0x2C;
-            wavFile[0x28] = (byte)(length & 0xFF);
-            wavFile[0x29] = (byte)((length >> 8) & 0xFF);
-            wavFile[0x2A] = (byte)((length >> 16) & 0xFF);
-            wavFile[0x2B] = (byte)((length >> 24) & 0xFF);
-
-            length = wavFile.Length - 0x08;
-            wavFile[0x04] = (byte)(length & 0xFF);
-            wavFile[0x05] = (byte)((length >> 8) & 0xFF);
-            wavFile[0x06] = (byte)((length >> 16) & 0xFF);
-            wavFile[0x07] = (byte)((length >> 24) & 0xFF);
-        }
-
-        private static byte[] MixWAVEPitch(byte[] wavFile, float pitch)
-        {
-            using (MemoryStream wavstream = new MemoryStream(wavFile))
+            get
             {
-                /*using (IWaveSource r = new WaveFileReader(wavstream))
-                {
-                    PitchShifter ps = new PitchShifter(r.ToSampleSource());
-                    ps.PitchShiftFactor = pitch;
-
-                    using (MemoryStream streamout = new MemoryStream())
-                    {
-                        ps.ToWaveSource().WriteToWaveStream(streamout);
-                        wavFile = streamout.ToArray();
-                    }
-                }*/
+                if (_waveSource != null)
+                    return _waveSource.GetPosition();
+                return TimeSpan.Zero;
             }
-
-            //FixHeader(ref wavFile);
-
-            return wavFile;
+            set
+            {
+                if (_waveSource != null && value < _waveSource.GetLength())
+                    _waveSource.SetPosition(value);
+            }
         }
 
-        private static byte[] MixWAVEReverb(byte[] wavFile, float reverb)
+        public TimeSpan Length
         {
-            //Contains the sound to play
-            using (MemoryStream wavstream = new MemoryStream(wavFile))
+            get
             {
-                /*using (IWaveSource r = new WaveFileReader(wavstream))
+                if (_waveSource != null)
+                    return _waveSource.GetLength();
+                return TimeSpan.Zero;
+            }
+        }
+
+        private MMDevice DefaultDevice
+        {
+            get
+            {
+                List<MMDevice> _devices = new List<MMDevice>();
+                using (var mmdeviceEnumerator = new MMDeviceEnumerator())
                 {
-                    using (MemoryStream streamout = new MemoryStream())
+                    using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
                     {
-                        using (WaveWriter w = new WaveWriter(streamout, r.WaveFormat))
+                        foreach (var device in mmdeviceCollection)
                         {
-                            var effect = new DmoWavesReverbEffect(r);
-                            effect.ReverbMix = -96 / 2 + (96 / 2 * reverb);
-                            var buffer = new byte[r.WaveFormat.BytesPerSecond];
-                            int read = 0;
-                            while ((read = effect.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                w.Write(buffer, 0, read);
-                            }
-                            wavFile = streamout.ToArray();
+                            _devices.Add(device);
                         }
                     }
-                }*/
+                }
+                return _devices[0];
             }
+        }
 
-            //FixHeader(ref wavFile);
+        public DSPPlayer()
+        {
 
-            return wavFile;
+        }
+
+        ~DSPPlayer()
+        {
+            Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="src"></param>
+        private void InitPlayback(IWaveSource src)
+        {
+            CleanupPlayback();
+
+            _waveSource = src;
+
+            _soundOut = new WasapiOut() { Latency = 100, Device = DefaultDevice };
+            _soundOut.Initialize(_waveSource);
+
+            if (PlaybackStopped != null) _soundOut.Stopped += PlaybackStopped;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reverb"></param>
+        public void ApplyReverb(float reverb)
+        {
+            if (_waveSource == null)
+                return;
+
+            if (reverb > 96)
+                reverb = 96;
+
+            var reverbPass = new DmoWavesReverbEffect(_waveSource)
+            {
+                ReverbTime = 1000,
+                ReverbMix = -96 + reverb
+            };
+
+            InitPlayback(reverbPass);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reverb"></param>
+        public void ApplyPitch(float pitch)
+        {
+            if (_waveSource == null)
+                return;
+
+            var pitchPass = new PitchShifter(_waveSource.ToSampleSource());
+
+            pitchPass.PitchShiftFactor = pitch;
+
+            InitPlayback(pitchPass.ToWaveSource());
+        }
+
+        /// <summary>
+        /// Loads DSP for playback
+        /// </summary>
+        /// <param name="dsp"></param>
+        public void LoadDSP(DSP dsp, float reverb = -1, float pitch = -1)
+        {
+            if (dsp == null)
+                return;
+
+            var data = dsp.ToWAVE();
+
+            CleanUpSource();
+
+            _memoryStream = new MemoryStream(data);
+            var waveSource = new WaveFileReader(_memoryStream);
+
+            InitPlayback(waveSource);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private static ISoundOut GetSoundOut()
+        {
+            if (WasapiOut.IsSupportedOnCurrentPlatform)
+                return new WasapiOut();
+            else
+                return new DirectSoundOut();
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dsp"></param>
-        public static void PlayDSP(DSP dsp, float reverb = 0, float pitch = 0)
+        public void Play()
         {
-            if (dsp == null)
-                return;
-
-            byte[] wavFile = dsp.ToWAVE();
-
-            //System.Console.WriteLine("Playing with pitch " + pitch);
-            // TODO:
-            //if(pitch != 0)
-            //    wavFile = MixWAVEPitch(wavFile, pitch);
-            //if(reverb != 0)
-            //    wavFile = MixWAVEReverb(wavFile, reverb);
-
-            // Stop the player if it is running.
-            if (SoundPlayer != null)
+            if (_soundOut != null)
             {
-                SoundPlayer.Stop();
-                SoundPlayer.Stream.Close();
-                SoundPlayer.Stream.Dispose();
-                SoundPlayer.Dispose();
-                SoundPlayer = null;
+                _soundOut.Play();
             }
-
-            // Make the new player for the WAV file.
-            var stream = new MemoryStream();
-            stream.Write(wavFile, 0, wavFile.Length);
-            stream.Position = 0;
-            SoundPlayer = new SoundPlayer(stream);
-
-            // Play.
-            SoundPlayer.Play();
         }
         
-
-        public static void Stop()
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Stop()
         {
-            if (SoundPlayer != null)
-                SoundPlayer.Stop();
+            if (_soundOut != null)
+            {
+                _waveSource.SetPosition(TimeSpan.Zero);
+                _soundOut.Stop();
+            }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Pause()
+        {
+            if (_soundOut != null)
+                _soundOut.Pause();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void CleanupPlayback()
+        {
+            if (_soundOut != null)
+            {
+                _soundOut.Dispose();
+                _soundOut = null;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void CleanUpSource()
+        {
+            if (_memoryStream != null)
+            {
+                _memoryStream.Dispose();
+                _memoryStream = null;
+            }
+            if (_waveSource != null)
+            {
+                _waveSource.Dispose();
+                _waveSource = null;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            CleanUpSource();
+            CleanupPlayback();
+        }
+
         
     }
 }

@@ -71,8 +71,15 @@ namespace HSDRawViewer.Sound
             }
         }
 
-        public BindingList<DSPChannel> Channels = new BindingList<DSPChannel>();
+        public List<DSPChannel> Channels = new List<DSPChannel>();
 
+        public void SetLoopFromTimeSpan(TimeSpan s)
+        {
+            var sec = (s.TotalSeconds / 1.75f) * 2 * Frequency;
+
+            foreach (var c in Channels)
+                c.LoopStart = (int)sec;
+        }
 
         #region DSP
 

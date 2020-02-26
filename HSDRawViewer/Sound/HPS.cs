@@ -123,7 +123,7 @@ namespace HSDRawViewer.Sound
                 // channel meta data
                 foreach(var c in dsp.Channels)
                 {
-                    w.Write(c.LoopFlag);
+                    w.Write((short)1);
                     w.Write(c.Format);
                     w.Write(2);
                     w.Write(dsp.Channels[0].Data.Length * 2);
@@ -140,6 +140,8 @@ namespace HSDRawViewer.Sound
                 // now divide into chunks taking into account loop point
 
                 var loopStart = dsp.Channels[0].LoopStart / 2;
+                if (loopStart == 0)
+                    loopStart = int.MaxValue;
                 if (loopStart % 56 == 0)
                     loopStart += 56 - (loopStart % 56);
                 var loopPosition = -1;

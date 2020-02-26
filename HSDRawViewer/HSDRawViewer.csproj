@@ -44,6 +44,9 @@
     <Reference Include="Be.Windows.Forms.HexBox, Version=1.6.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Be.Windows.Forms.HexBox.1.6.1\lib\net40\Be.Windows.Forms.HexBox.dll</HintPath>
     </Reference>
+    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
+      <HintPath>..\packages\CSCore.1.2.1.2\lib\net35-client\CSCore.dll</HintPath>
+    </Reference>
     <Reference Include="DirectXTexNet, Version=1.0.0.4, Culture=neutral, PublicKeyToken=67e4f5ed452a4f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\DirectXTexNet.1.0.0-rc4\lib\netstandard2.0\DirectXTexNet.dll</HintPath>
     </Reference>
@@ -305,6 +308,7 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\ts_pause.png" />
     <None Include="Resources\ico_right.png" />
     <None Include="Resources\ico_left.png" />
     <Content Include="Resources\ico_replace.png" />

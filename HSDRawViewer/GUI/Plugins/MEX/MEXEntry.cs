@@ -114,8 +114,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Victory Theme ID"), Category("3 - Misc"), Description("")]
         public int VictoryThemeID { get; set; }
 
-        [DisplayName("Effect File ID"), Category("3 - Misc"), Description("Index of Effect(Ef) file for this fighter")]
-        public byte EffectIndex { get; set; }
+        [DisplayName("Effect File ID"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
+        public int EffectIndex { get; set; }
 
         [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter")]
         public byte SSMIndex { get; set; }
@@ -147,8 +147,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Kirby Costumes"), Category("4 - Kirby"), Description("")]
         public MEX_KirbyCostume KirbySpecialCostumes { get; set; }
 
-        [DisplayName("Kirby Effect ID"), Category("4 - Kirby"), Description("")]
-        public byte KirbyEffectID { get; set; }
+        [DisplayName("Kirby Effect ID"), Category("4 - Kirby"), Description(""), TypeConverter(typeof(EffectIDConverter))]
+        public int KirbyEffectID { get; set; }
 
 
         public MEXFunctionPointers Functions = new MEXFunctionPointers();
@@ -236,7 +236,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             mexData.FighterData.CostumeFileSymbols.Set(internalId, new MEX_CostumeFileSymbolTable() { CostumeSymbols = new HSDRaw.HSDArrayAccessor<MEX_CostumeFileSymbol>() { Array = Costumes } });
 
-            mexData.FighterData.EffectIDs.Set(internalId, new HSD_Byte() { Value = EffectIndex });
+            mexData.FighterData.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)EffectIndex });
             mexData.FighterData.AnnouncerCalls.Set(externalID, new HSD_Int() { Value = AnnouncerCall });
             
             // Saving Kirby Elements
@@ -254,7 +254,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (KirbySpecialCostumes != null)
                 mexData.KirbyTable.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
 
-            mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = KirbyEffectID });
+            mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
@@ -278,7 +278,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
-                if(DemoResult == null)
+                if (DemoResult == null)
                 {
                     DemoResult = "";
                     DemoIntro = "";
@@ -292,8 +292,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     Ending = DemoEnding,
                     ViWait = DemoWait
                 });
-
-
+            }
+            else
+            {
+                mexData.FighterData.FtDemo_SymbolNames.Set(internalId, null);
             }
             
             mexData.FighterData.ResultAnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
