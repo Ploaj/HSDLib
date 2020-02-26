@@ -244,9 +244,13 @@ namespace HSDRawViewer.Sound
                 for (int i = 0; i < channelCount; i++)
                     channels.Add(new List<short>());
 
-                foreach (var v in channels)
-                    for (int i = 0; i < channelSizes; i++)
+                for (int i = 0; i < channelSizes; i++)
+                {
+                    foreach (var v in channels)
+                    {
                         v.Add(r.ReadInt16());
+                    }
+                }
 
                 Channels.Clear();
                 foreach (var data in channels)

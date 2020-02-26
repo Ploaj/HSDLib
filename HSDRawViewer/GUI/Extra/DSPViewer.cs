@@ -43,7 +43,7 @@ namespace HSDRawViewer.GUI.Extra
         }
         private DSP _dsp;
 
-        private static string Supported = "Supported Types (*.wav*.dsp)|*.wav;*.dsp";
+        private static string Supported = "Supported Types (*.wav*.dsp*.hps)|*.wav;*.dsp;*.hps";
 
         /// <summary>
         /// 
@@ -88,12 +88,15 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void replaceButton_CLick(object sender, EventArgs e)
         {
-            var file = FileIO.OpenFile("DSP (*.dsp*.wav)|*.dsp;*.wav");
+            var file = FileIO.OpenFile("DSP (*.dsp*.hps*.wav)|*.dsp;*.hps;*.wav");
 
             if (file != null)
             {
                 if (file.ToLower().EndsWith(".dsp"))
                     DSP.FromDSP(file);
+
+                if (file.ToLower().EndsWith(".hps"))
+                    DSP.FromHPS(File.ReadAllBytes(file));
 
                 if (file.ToLower().EndsWith(".wav"))
                     DSP.FromWAVE(File.ReadAllBytes(file));
@@ -113,6 +116,9 @@ namespace HSDRawViewer.GUI.Extra
             {
                 if (file.EndsWith(".dsp"))
                     DSP.ExportDSP(file);
+
+                if (file.EndsWith(".hps"))
+                    HPS.SaveDSPAsHPS(DSP, file);
 
                 if (file.EndsWith(".wav"))
                     File.WriteAllBytes(file, DSP.ToWAVE());
