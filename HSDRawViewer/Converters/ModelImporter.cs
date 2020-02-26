@@ -186,7 +186,7 @@ namespace HSDRawViewer.Converters
             // import
             AssimpContext importer = new AssimpContext();
             if(settings.SmoothNormals)
-                importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
+                importer.SetConfig(new NormalSmoothingAngleConfig(80.0f));
             importer.SetConfig(new VertexBoneWeightLimitConfig(4));
             var importmodel = importer.ImportFile(filePath, processFlags);
 
@@ -213,7 +213,7 @@ namespace HSDRawViewer.Converters
             System.Diagnostics.Debug.WriteLine("Processing Mesh...");
             foreach (var mesh in cache.MeshNodes)
             {
-                var Dobj = GetMeshes(cache, settings, importmodel, mesh);
+                var Dobj = GetMeshes(cache, settings, importmodel, mesh, rootjobj);
 
                 if (rootjobj.Dobj == null)
                     rootjobj.Dobj = Dobj;
@@ -498,6 +498,7 @@ namespace HSDRawViewer.Converters
             var scale = new Vector3(s.X, s.Y, s.Z);
             var rotation = Math3D.ToEulerAngles(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W).Inverted());
 
+            Console.WriteLine(scale.ToString());
             if (settings.SetScaleToOne)
                 scale = Vector3.One;
 
@@ -509,7 +510,7 @@ namespace HSDRawViewer.Converters
 
             HSD_JOBJ jobj = new HSD_JOBJ();
 
-            if (node.Parent != null)
+            if (node.Parent != null && node.Parent != scene.RootNode)
             {
                 t = t * cache.jobjToWorldTransform[cache.NameToJOBJ[node.Parent.Name]];
             }
@@ -545,7 +546,7 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <returns></returns>
-        private static HSD_DOBJ GetMeshes(ProcessingCache cache, ModelImportSettings settings, Scene scene, Node node)
+        private static HSD_DOBJ GetMeshes(ProcessingCache cache, ModelImportSettings settings, Scene scene, Node node, HSD_JOBJ rootnode)
         {
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
@@ -558,6 +559,7 @@ namespace HSDRawViewer.Converters
                 var material = scene.Materials[mesh.MaterialIndex];
 
                 Console.WriteLine(mesh.Name + " " + material.Name);
+                Console.WriteLine(cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]].ToString());
 
                 // Generate DOBJ
                 HSD_DOBJ dobj = new HSD_DOBJ();
@@ -701,6 +703,17 @@ namespace HSDRawViewer.Converters
 
                         GX_Vertex vertex = new GX_Vertex();
 
+                        var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z) * settings.Scale;
+                        var tknrm = new Vector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
+                        var tktan = Vector3.Zero;
+                        var tkbitan = Vector3.Zero;
+
+                        tkvert = Vector3.TransformPosition(tkvert, cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]]);
+                        tknrm = Vector3.TransformNormal(tknrm, cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]]);
+
+                        tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[rootnode]);
+                        tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[rootnode]);
+
                         if (mesh.HasBones)
                         {
                             if (jobjs[indicie] == null) //  unbound verts
@@ -713,11 +726,6 @@ namespace HSDRawViewer.Converters
                             wList.Add(weights[indicie].ToArray());
 
                             // Single Binds Get Inverted
-                            var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z) * settings.Scale;
-                            var tknrm = new Vector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
-
-                            Vector3 tktan = Vector3.Zero;
-                            Vector3 tkbitan = Vector3.Zero;
 
                             if (mesh.HasTangentBasis)
                             {
@@ -736,25 +744,18 @@ namespace HSDRawViewer.Converters
                                     tkbitan = Vector3.TransformNormal(tkbitan, cache.jobjToInverseTransform[jobjs[indicie][0]]);
                                 }
                             }
+                        }
 
+                        if (mesh.HasVertices)
                             vertex.POS = GXTranslator.fromVector3(tkvert);
+
+                        if (mesh.HasNormals)
                             vertex.NRM = GXTranslator.fromVector3(tknrm);
+
+                        if (mesh.HasTangentBasis)
+                        {
                             vertex.TAN = GXTranslator.fromVector3(tktan);
                             vertex.BITAN = GXTranslator.fromVector3(tkbitan);
-                        }
-                        else
-                        {
-                            if (mesh.HasVertices)
-                                vertex.POS = new GXVector3(mesh.Vertices[indicie].X * settings.Scale, mesh.Vertices[indicie].Y * settings.Scale, mesh.Vertices[indicie].Z * settings.Scale) ;
-                            
-                            if (mesh.HasNormals)
-                                vertex.NRM = new GXVector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
-
-                            if (mesh.HasTangentBasis)
-                            {
-                                vertex.TAN = new GXVector3(mesh.Tangents[indicie].X, mesh.Tangents[indicie].Y, mesh.Tangents[indicie].Z);
-                                vertex.BITAN = new GXVector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
-                            }
                         }
 
                         if (settings.InvertNormals)

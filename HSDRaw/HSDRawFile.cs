@@ -695,7 +695,7 @@ namespace HSDRaw
                 a = jobj;
             }
             else
-            if (rootString.StartsWith("ftData"))
+            if (rootString.StartsWith("ftData") && !rootString.Contains("Copy"))
             {
                 var acc = new SBM_PlayerData();
                 acc._s = str;

@@ -197,18 +197,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             SubCharacterInternalID = (sbyte)mexData.FighterData.DefineIDs[externalID].SubCharacterInternalID;
             SubCharacterBehavior = mexData.FighterData.DefineIDs[externalID].SubCharacterBehavior;
-            
+
+            KirbyCapFileName = mexData.KirbyTable.CapFiles[internalId].FileName;
+            KirbyCapSymbol = mexData.KirbyTable.CapFiles[internalId].Symbol;
+            KirbySpecialCostumes = mexData.KirbyTable.KirbyCostumes[internalId];
+            KirbyEffectID = mexData.KirbyTable.EffectIDs[internalId].Value;
+
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
                 DemoResult = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Result;
                 DemoIntro = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Intro;
                 DemoEnding = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].Ending;
                 DemoWait = mexData.FighterData.FtDemo_SymbolNames.Array[internalId].ViWait;
-
-                KirbyCapFileName = mexData.KirbyTable.CapFiles[internalId].FileName;
-                KirbyCapSymbol = mexData.KirbyTable.CapFiles[internalId].Symbol;
-                KirbyEffectID = mexData.KirbyTable.EffectIDs[internalId].Value;
-                KirbySpecialCostumes = mexData.KirbyTable.KirbyCostumes[internalId];
             }
 
             if (!IsSpecialCharacterExternal(mexData, externalID))
@@ -238,6 +238,23 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             mexData.FighterData.EffectIDs.Set(internalId, new HSD_Byte() { Value = EffectIndex });
             mexData.FighterData.AnnouncerCalls.Set(externalID, new HSD_Int() { Value = AnnouncerCall });
+            
+            // Saving Kirby Elements
+            if (!string.IsNullOrEmpty(KirbyCapFileName))
+                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
+                {
+                    FileName = KirbyCapFileName,
+                    Symbol = KirbyCapSymbol
+                });
+            else
+                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles());
+
+            mexData.KirbyTable.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
+
+            if (KirbySpecialCostumes != null)
+                mexData.KirbyTable.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
+
+            mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = KirbyEffectID });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
@@ -277,21 +294,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 });
 
 
-                // Saving Kirby Elements
-                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
-                {
-                    FileName = KirbyCapFileName,
-                    Symbol = KirbyCapSymbol
-                });
-
-                mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = KirbyEffectID });
-
-                mexData.KirbyTable.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
-
-                if (KirbySpecialCostumes != null)
-                    mexData.KirbyTable.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
             }
-
+            
             mexData.FighterData.ResultAnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
             
             if (!IsSpecialCharacterExternal(mexData, externalID))
