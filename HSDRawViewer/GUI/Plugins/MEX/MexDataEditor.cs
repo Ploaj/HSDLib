@@ -205,7 +205,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.KirbyTable.KirbyHatFunctions.Array = new MEX_KirbyHatLoad[0];
             d.KirbyTable.KirbySpecialN.Array = new HSD_UInt[0];
             d.KirbyTable.KirbySpecialNAir.Array = new HSD_UInt[0];
-            
+            d.KirbyTable.KirbyOnHit.Array = new HSD_UInt[0];
+            d.KirbyTable.KirbyOnItemInit.Array = new HSD_UInt[0];
+
             // funtime fighter pointer struct
             d.FighterFunctions._s.GetReference<HSDAccessor>(0x40)._s.Resize(FighterEntries.Count * 8);
 

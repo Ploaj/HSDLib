@@ -95,6 +95,7 @@ namespace HSDRawViewer
             { typeof(MEX_SSMTable), "table" },
             { typeof(MEX_FighterFunctionTable), "table" },
             { typeof(MEX_BGMStruct), "table" },
+            { typeof(MEX_KirbyTable), "table" },
         };
 
         /// <summary>

@@ -430,6 +430,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [TypeConverter(typeof(HexType)), DisplayName("Kirby OnLoseAbility"), Category("Kirby"), Description("")]
         public uint KirbyOnLoseAbility { get; set; }
 
+        [TypeConverter(typeof(HexType)), DisplayName("Kirby OnHit"), Category("Kirby"), Description("")]
+        public uint KirbyOnHit { get; set; }
+
+        [TypeConverter(typeof(HexType)), DisplayName("Kirby OnItemInit"), Category("Kirby"), Description("")]
+        public uint KirbyOnItemInit { get; set; }
+
         public MEXFunctionPointers LoadData(MEX_Data mexData, int internalId, int externalID)
         {
             OnLoad = mexData.FighterFunctions.OnLoad[internalId].Value;
@@ -469,6 +475,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             KirbyOnLoseAbility = mexData.KirbyTable.KirbyHatFunctions[internalId].HatRemove;
             KirbySpecialN = mexData.KirbyTable.KirbySpecialN[internalId].Value;
             KirbySpecialNAir = mexData.KirbyTable.KirbySpecialNAir[internalId].Value;
+            KirbyOnHit = mexData.KirbyTable.KirbyOnHit[internalId].Value;
+            KirbyOnItemInit = mexData.KirbyTable.KirbyOnItemInit[internalId].Value;
 
             return this;
         }
@@ -514,6 +522,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             });
             mexData.KirbyTable.KirbySpecialN.Set(internalId, new HSD_UInt() { Value = KirbySpecialN });
             mexData.KirbyTable.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
+            mexData.KirbyTable.KirbyOnHit.Set(internalId, new HSD_UInt() { Value = KirbyOnHit });
+            mexData.KirbyTable.KirbyOnItemInit.Set(internalId, new HSD_UInt() { Value = KirbyOnItemInit });
         }
     }
     

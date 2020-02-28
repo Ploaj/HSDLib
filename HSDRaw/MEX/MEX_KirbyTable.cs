@@ -4,7 +4,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_KirbyTable : HSDAccessor
     {
-        public override int TrimmedSize => 0x20;
+        public override int TrimmedSize => 0x28;
 
         public HSDArrayAccessor<MEX_KirbyCapFiles> CapFiles { get => _s.GetReference<HSDArrayAccessor<MEX_KirbyCapFiles>>(0x00); set => _s.SetReference(0x00, value); }
         
@@ -21,6 +21,10 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<HSD_UInt> KirbySpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x18); set => _s.SetReference(0x18, value); }
 
         public HSDArrayAccessor<HSD_UInt> KirbySpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x1C); set => _s.SetReference(0x1C, value); }
+
+        public HSDArrayAccessor<HSD_UInt> KirbyOnHit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x20); set => _s.SetReference(0x20, value); }
+
+        public HSDArrayAccessor<HSD_UInt> KirbyOnItemInit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x24); set => _s.SetReference(0x24, value); }
 
     }
 
