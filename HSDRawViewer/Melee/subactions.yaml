@@ -58,14 +58,18 @@
 - code: 10
   name: Graphic Effect
   parameters:
+  - name: Bone ID
+    bitCount: 8
+  - name: Destroy on State Change
+    bitCount: 1
+  - name: Use Common Bone IDs
+    bitCount: 1
   - name: Unk1
-    bitCount: 26
+    bitCount: 16
   - name: GFX ID
     bitCount: 16
-  - name: Bone ID
-    bitCount: 6
   - name: Unk2
-    bitCount: 10
+    bitCount: 16
   - name: Z
     bitCount: 16
     signed: true
@@ -309,10 +313,8 @@
   parameters:
   - name: Struct ID
     bitCount: 6
-  - name: StructUnk
-    bitCount: 1
   - name: Unknown
-    bitCount: 11
+    bitCount: 12
   - name: Object ID
     bitCount: 8
 
@@ -476,12 +478,8 @@
 - code: 43
   name: Rumble
   parameters:
-  - name: Flag
-    bitCount: 1
-  - name: RequestRumble
-    bitCount: 12
-  - name: RequestRumble2
-    bitCount: 13
+  - name: Unknown
+    bitCount: 26
 
 - code: 44
   name: Set flag 0x221E to 20
