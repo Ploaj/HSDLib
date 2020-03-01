@@ -37,7 +37,10 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<MEX_CharSSMFileID> SSMFileIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharSSMFileID>>(0x38); set => _s.SetReference(0x38, value); }
 
         public HSDArrayAccessor<MEX_CostumeRuntimePointers> CostumePointers { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeRuntimePointers>>(0x3C); set => _s.SetReference(0x3C, value); }
-        
+
         // 0x40 ft Data Runtime Pointer Struct. Size is internalIDCount * 8
+
+        public HSDArrayAccessor<HSD_Byte> WallJump { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x44); set => _s.SetReference(0x44, value); }
+
     }
 }

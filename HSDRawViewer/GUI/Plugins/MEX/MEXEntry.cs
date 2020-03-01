@@ -108,13 +108,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Result Screen Scale"), Category("3 - Misc"), Description("")]
         public float ResultScreenScale { get; set; }
 
+        [DisplayName("Can Wall Jump"), Category("3 - Misc"), Description("")]
+        public bool CanWallJump { get; set; }
+
         [DisplayName("Insignia ID"), Category("3 - Misc"), Description("")]
         public byte InsigniaID { get; set; }
 
-        [DisplayName("Victory Theme ID"), Category("3 - Misc"), Description("")]
+        [DisplayName("Victory Theme"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
         public int VictoryThemeID { get; set; }
 
-        [DisplayName("Effect File ID"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
+        [DisplayName("Effect File"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int EffectIndex { get; set; }
 
         [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter")]
@@ -183,6 +186,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             AnimCount = mexData.FighterData.AnimCount[internalId].AnimCount;
 
             InsigniaID = mexData.FighterData.InsigniaIDs[externalID].Value;
+
+            CanWallJump = mexData.FighterData.WallJump[internalId].Value != 0;
             
             Costumes = mexData.FighterData.CostumeFileSymbols[internalId].CostumeSymbols.Array;
 
@@ -233,6 +238,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterData.AnimFiles.Set(internalId, new HSD_String() { Value = AnimFile });
             mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
+
+            mexData.FighterData.WallJump.Set(internalId, new HSD_Byte() { Value = CanWallJump ? (byte)1 : (byte)0 });
 
             mexData.FighterData.CostumeFileSymbols.Set(internalId, new MEX_CostumeFileSymbolTable() { CostumeSymbols = new HSDRaw.HSDArrayAccessor<MEX_CostumeFileSymbol>() { Array = Costumes } });
 
@@ -417,7 +424,19 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnTwoEntryTable { get; set; }
-        
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint OnLand { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint EnterFloat { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint EnterDoubleJump { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint EnterTether { get; set; }
+
         [TypeConverter(typeof(HexType)), DisplayName("Kirby N Special"), Category("Kirby"), Description("")]
         public uint KirbySpecialN { get; set; }
 
@@ -470,6 +489,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             OnUnknownMultijump = mexData.FighterFunctions.onUnknownMultijump[internalId].Value;
             OnActionStateChangeWhileEyeTextureIsChanged = mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged[internalId].Value;
             OnTwoEntryTable = mexData.FighterFunctions.onTwoEntryTable[internalId].Value;
+            OnLand = mexData.FighterFunctions.onLand[internalId].Value;
+
+            EnterFloat = mexData.FighterFunctions.enterFloat[internalId].Value;
+            EnterDoubleJump = mexData.FighterFunctions.enterSpecialDoubleJump[internalId].Value;
+            EnterTether = mexData.FighterFunctions.enterTether[internalId].Value;
 
             KirbyOnSwallow = mexData.KirbyTable.KirbyHatFunctions[internalId].HatAdd;
             KirbyOnLoseAbility = mexData.KirbyTable.KirbyHatFunctions[internalId].HatRemove;
@@ -514,6 +538,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterFunctions.onUnknownMultijump.Set(internalId, new HSD_UInt() { Value = OnUnknownMultijump });
             mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Set(internalId, new HSD_UInt() { Value = OnActionStateChangeWhileEyeTextureIsChanged });
             mexData.FighterFunctions.onTwoEntryTable.Set(internalId, new HSD_UInt() { Value = OnTwoEntryTable });
+            mexData.FighterFunctions.onLand.Set(internalId, new HSD_UInt() { Value = OnLand });
+
+            mexData.FighterFunctions.enterFloat.Set(internalId, new HSD_UInt() { Value = EnterFloat });
+            mexData.FighterFunctions.enterSpecialDoubleJump.Set(internalId, new HSD_UInt() { Value = EnterDoubleJump });
+            mexData.FighterFunctions.enterTether.Set(internalId, new HSD_UInt() { Value = EnterTether });
 
             mexData.KirbyTable.KirbyHatFunctions.Set(internalId, new MEX_KirbyHatLoad()
             {

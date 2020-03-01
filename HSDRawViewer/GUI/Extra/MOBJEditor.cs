@@ -70,9 +70,9 @@ namespace HSDRawViewer.GUI.Extra
 
             // load material color
             var mc = mobj.Material;
-            buttonAmbient.BackColor = Color.FromArgb(mc.AMB_A, mc.AMB_R, mc.AMB_G, mc.AMB_B);
-            buttonDiffuse.BackColor = Color.FromArgb(mc.DIF_A, mc.DIF_R, mc.DIF_G, mc.DIF_B);
-            buttonSpecular.BackColor = Color.FromArgb(mc.SPC_A, mc.SPC_R, mc.SPC_G, mc.SPC_B);
+            buttonAmbient.BackColor = mc.AmbientColor;
+            buttonDiffuse.BackColor = mc.DiffuseColor;
+            buttonSpecular.BackColor = mc.SpecularColor;
             tbShine.Text = mc.Shininess.ToString();
             tbAlpha.Text = mc.Alpha.ToString();
 
@@ -117,7 +117,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             var col = GetColor(buttonAmbient.BackColor);
 
-            _mobj.Material.AmbientColorRGBA = ColorToRGBA(col);
+            _mobj.Material.AmbientColor = col;
 
             buttonAmbient.BackColor = col;
         }
@@ -126,7 +126,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             var col = GetColor(buttonDiffuse.BackColor);
 
-            _mobj.Material.DiffuseColorRGBA = ColorToRGBA(col);
+            _mobj.Material.DiffuseColor = col;
 
             buttonDiffuse.BackColor = col;
         }
@@ -135,7 +135,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             var col = GetColor(buttonSpecular.BackColor);
 
-            _mobj.Material.SpecularColorRGBA = ColorToRGBA(col);
+            _mobj.Material.SpecularColor = col;
 
             buttonSpecular.BackColor = col;
         }
@@ -365,8 +365,12 @@ namespace HSDRawViewer.GUI.Extra
             if (listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
             {
                 var f = Tools.FileIO.SaveFile("PNG (*.png)|*.png");
-                if(f != null)
-                    TextureList.Images[con.ImageIndex].Save(f);
+                if (f != null)
+                {
+                    var bmp = TOBJConverter.ToBitmap(con.TOBJ);
+                    bmp.Save(f);
+                    bmp.Dispose();
+                }
             }
         }
     }

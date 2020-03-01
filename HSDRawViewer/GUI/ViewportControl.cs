@@ -29,10 +29,6 @@ namespace HSDRawViewer.GUI
             }
             set
             {
-                if (value > MaxFrame)
-                    value = 0;
-                if (value < 0)
-                    value = MaxFrame;
                 _frame = value;
                 UpdateFrame((decimal)_frame);
             }
@@ -229,15 +225,14 @@ namespace HSDRawViewer.GUI
             }
             else
             {
-                if (frame >= nudFrame.Maximum)
+                if (frame > nudFrame.Maximum)
                 {
                     if (!cbLoop.Checked)
                     {
-                        buttonPlay.Text = "Play";
-                        frame = nudFrame.Maximum;
+                        Pause();
                     }
-                    else
-                        frame = 0;
+                    frame = 0;
+                    _frame = 0;
                 }
                 nudFrame.Value = frame;
                 animationTrack.Value = (int)frame;

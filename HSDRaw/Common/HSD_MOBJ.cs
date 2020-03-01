@@ -1,5 +1,6 @@
 ﻿using HSDRaw.GX;
 using System;
+using System.Drawing;
 
 namespace HSDRaw.Common
 {
@@ -106,10 +107,37 @@ namespace HSDRaw.Common
         public byte SPC_B { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
         public byte SPC_A { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
 
-        public uint AmbientColorRGBA { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
-        public uint DiffuseColorRGBA { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
-        public uint SpecularColorRGBA { get => (uint)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
-        
+        public Color DiffuseColor { get => Color.FromArgb(DIF_A, DIF_R, DIF_G, DIF_B); set
+            {
+                DIF_A = value.A;
+                DIF_R = value.R;
+                DIF_G = value.G;
+                DIF_B = value.B;
+            }
+        }
+
+        public Color SpecularColor
+        {
+            get => Color.FromArgb(SPC_A, SPC_R, SPC_G, SPC_B); set
+            {
+                SPC_A = value.A;
+                SPC_R = value.R;
+                SPC_G = value.G;
+                SPC_B = value.B;
+            }
+        }
+
+        public Color AmbientColor
+        {
+            get => Color.FromArgb(AMB_A, AMB_R, AMB_G, AMB_B); set
+            {
+                AMB_A = value.A;
+                AMB_R = value.R;
+                AMB_G = value.G;
+                AMB_B = value.B;
+            }
+        }
+
         public float Alpha { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
 
         public float Shininess { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }

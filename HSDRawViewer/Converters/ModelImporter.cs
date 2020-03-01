@@ -824,10 +824,13 @@ namespace HSDRawViewer.Converters
         {
             var Mobj = new HSD_MOBJ();
             Mobj.Material = new HSD_Material();
-            Mobj.Material.AmbientColorRGBA = 0x7F7F7FFF;
-            Mobj.Material.DiffuseColorRGBA = 0xFFFFFFFF;
-            Mobj.Material.SpecularColorRGBA = 0xFFFFFFFF;
-            Mobj.Material.Shininess = 1;
+            Mobj.Material.AMB_A = 0xFF;
+            Mobj.Material.AMB_R = 0x7F;
+            Mobj.Material.AMB_G = 0x7F;
+            Mobj.Material.AMB_B = 0x7F;
+            Mobj.Material.DiffuseColor = System.Drawing.Color.White;
+            Mobj.Material.SpecularColor = System.Drawing.Color.White;
+            Mobj.Material.Shininess = 50;
             Mobj.Material.Alpha = 1;
             Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT;
             if (settings.ImportVertexAlpha)

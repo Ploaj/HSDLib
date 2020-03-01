@@ -6,7 +6,7 @@
 
         public short Unknown2 { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
 
-        public int Unknown3 { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public int EffectIDStart { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
         public int ParticleCount { get => _s.GetInt32(0x08); internal set => _s.SetInt32(0x08, value); }
 

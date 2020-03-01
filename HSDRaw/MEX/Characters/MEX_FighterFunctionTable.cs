@@ -67,7 +67,15 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<HSD_UInt> onActionStateChangeWhileEyeTextureIsChanged { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x74); set => _s.SetReference(0x74, value); }
 
         public HSDArrayAccessor<HSD_UInt> onTwoEntryTable { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x78); set => _s.SetReference(0x78, value); }
-        
-        // kirby stuff to be added
+
+        // special function tables
+        public HSDArrayAccessor<HSD_UInt> enterFloat { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x7C); set => _s.SetReference(0x7C, value); }
+
+        public HSDArrayAccessor<HSD_UInt> enterSpecialDoubleJump { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x80); set => _s.SetReference(0x80, value); }
+
+        public HSDArrayAccessor<HSD_UInt> enterTether { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x84); set => _s.SetReference(0x84, value); }
+
+        public HSDArrayAccessor<HSD_UInt> onLand { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x88); set => _s.SetReference(0x88, value); }
+
     }
 }

@@ -38,6 +38,8 @@ namespace HSDRawViewer
 
         private List<EditorBase> Editors = new List<EditorBase>();
 
+        private IDockContent LastActiveContent = null;
+
         public static void Init()
         {
             if (Instance == null)
@@ -56,6 +58,12 @@ namespace HSDRawViewer
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
+
+            dockPanel.ActiveContentChanged += (sender, args) =>
+            {
+                if (dockPanel.ActiveContent != null)
+                    LastActiveContent = dockPanel.ActiveContent;
+            };
 
             Viewport = new CommonViewport();
             Viewport.Dock = DockStyle.Fill;
@@ -86,6 +94,7 @@ namespace HSDRawViewer
             myImageList.Images.Add("anim_texture", Properties.Resources.ico_anim_texture);
             myImageList.Images.Add("anim_material", Properties.Resources.ico_anim_material);
             myImageList.Images.Add("anim_joint", Properties.Resources.ico_anim_joint);
+            myImageList.Images.Add("kabii", Properties.Resources.ico_kabii);
 
             treeView1.ImageList = myImageList;
 
@@ -207,6 +216,23 @@ namespace HSDRawViewer
             RawHSDFile = new HSDRawFile();
             RawHSDFile.Open(filePath);
             RefreshTree();
+
+#if !DEBUG
+            if(RawHSDFile.Roots.Count > 0 && RawHSDFile.Roots[0].Data is HSDRaw.MEX.MEX_Data)
+            {
+                if (nodeBox.Visible)
+                {
+                    // hide nodes
+                    showHideButton_Click(null, null);
+
+                    // select the mexData node
+                    treeView1.SelectedNode = treeView1.Nodes[0];
+
+                    // open the editor
+                    OpenEditor();
+                }
+            }
+#endif
 
             Text = "HSD DAT Browser - " + filePath;
         }
@@ -434,9 +460,9 @@ namespace HSDRawViewer
             if (SelectedDataNode.Accessor is HSD_AnimJoint
                 || SelectedDataNode.Accessor is HSD_FigaTree)
             {
-                foreach (var v in dockPanel.Contents)
+                //foreach (var v in dockPanel.Contents)
                 {
-                    if (v is JOBJEditor jedit)
+                    if (LastActiveContent is JOBJEditor jedit && jedit.Visible)
                     {
                         if (SelectedDataNode.Accessor is HSD_AnimJoint joint)
                             jedit.LoadAnimation(joint);

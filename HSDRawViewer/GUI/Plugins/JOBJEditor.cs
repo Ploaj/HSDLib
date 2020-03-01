@@ -203,7 +203,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void LoadAnimation(HSD_FigaTree tree)
         {
-            var vp = PluginManager.GetCommonViewport();
+            var vp = viewport; //PluginManager.GetCommonViewport();
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = tree.FrameCount;
@@ -212,7 +212,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void LoadAnimation(HSD_AnimJoint joint)
         {
-            var vp = PluginManager.GetCommonViewport();
+            var vp = viewport; //PluginManager.GetCommonViewport();
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = JOBJManager.SetAnimJoint(joint);
@@ -220,7 +220,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            JOBJManager.Frame = PluginManager.GetCommonViewport().Frame;
+            JOBJManager.Frame = viewport.Frame;// PluginManager.GetCommonViewport().Frame;
             JOBJManager.Render(cam);
         }
 
@@ -379,9 +379,9 @@ namespace HSDRawViewer.GUI.Plugins
                     RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT,
                     Material = new HSD_Material()
                     {
-                        DiffuseColorRGBA = 0xFFFFFFFF,
-                        SpecularColorRGBA = 0xFFFFFFFF,
-                        AmbientColorRGBA = 0xFFFFFFFF,
+                        DiffuseColor = Color.White,
+                        SpecularColor = Color.White,
+                        AmbientColor = Color.White,
                         Shininess = 50
                     }
                 }
@@ -539,9 +539,9 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     Material = new HSD_Material()
                     {
-                        AmbientColorRGBA = 0,
-                        SpecularColorRGBA = 0,
-                        DiffuseColorRGBA = 0,
+                        AmbientColor = Color.Black,
+                        SpecularColor = Color.Black,
+                        DiffuseColor = Color.Black,
                         DIF_A = 255,
                         SPC_A = 255,
                         AMB_A = 255,

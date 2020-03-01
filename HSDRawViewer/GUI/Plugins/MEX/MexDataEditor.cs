@@ -166,6 +166,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterData.EffectIDs.Array = new HSD_Byte[0];
             d.FighterData.CostumePointers.Array = new MEX_CostumeRuntimePointers[0];
             d.FighterData.DefineIDs.Array = new MEX_CharDefineIDs[0];
+            d.FighterData.WallJump.Array = new HSD_Byte[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
@@ -198,7 +199,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterFunctions.onUnknownMultijump.Array = new HSD_UInt[0];
             d.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Array = new HSD_UInt[0];
             d.FighterFunctions.onTwoEntryTable.Array = new HSD_UInt[0];
-            
+            d.FighterFunctions.onLand.Array = new HSD_UInt[0];
+
+            d.FighterFunctions.enterFloat.Array = new HSD_UInt[0];
+            d.FighterFunctions.enterSpecialDoubleJump.Array = new HSD_UInt[0];
+            d.FighterFunctions.enterTether.Array = new HSD_UInt[0];
+
             d.KirbyTable.CapFiles.Array = new MEX_KirbyCapFiles[0];
             d.KirbyTable.KirbyCostumes.Array = new MEX_KirbyCostume[0];
             d.KirbyTable.EffectIDs.Array = new HSD_Byte[0];
