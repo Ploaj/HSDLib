@@ -17,6 +17,8 @@ namespace HSDRawViewer.Rendering
 
         public bool RenderVertexColor { get; set; } = true;
 
+        public bool OutlineSelected = true;
+
         public bool OnlyRenderSelected = false;
 
         public HSD_DOBJ SelectedDOBJ;

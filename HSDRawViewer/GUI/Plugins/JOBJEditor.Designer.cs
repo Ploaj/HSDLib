@@ -41,13 +41,16 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderVertexColorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAllPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
+            this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.previewBox = new System.Windows.Forms.GroupBox();
             this.splitter2 = new System.Windows.Forms.Splitter();
@@ -58,9 +61,13 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.mainRender = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.clearAllPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.toolStrip4 = new System.Windows.Forms.ToolStrip();
+            this.animfileDropDown = new System.Windows.Forms.ToolStripDropDownButton();
+            this.importFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAsANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAnimButton = new System.Windows.Forms.ToolStripButton();
+            this.showOutlineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -68,6 +75,8 @@
             this.toolStrip2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            this.toolStrip4.SuspendLayout();
             this.SuspendLayout();
             // 
             // listDOBJ
@@ -94,6 +103,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Left;
             this.tabControl1.Location = new System.Drawing.Point(0, 25);
             this.tabControl1.Name = "tabControl1";
@@ -109,9 +119,9 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(322, 131);
+            this.tabPage1.Size = new System.Drawing.Size(329, 131);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "JOBJs";
+            this.tabPage1.Text = "Joints";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // treeJOBJ
@@ -119,7 +129,7 @@
             this.treeJOBJ.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeJOBJ.Location = new System.Drawing.Point(3, 28);
             this.treeJOBJ.Name = "treeJOBJ";
-            this.treeJOBJ.Size = new System.Drawing.Size(316, 100);
+            this.treeJOBJ.Size = new System.Drawing.Size(323, 100);
             this.treeJOBJ.TabIndex = 0;
             // 
             // toolStrip3
@@ -129,7 +139,7 @@
             this.toolStripButton1});
             this.toolStrip3.Location = new System.Drawing.Point(3, 3);
             this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(316, 25);
+            this.toolStrip3.Size = new System.Drawing.Size(323, 25);
             this.toolStrip3.TabIndex = 1;
             this.toolStrip3.Text = "toolStrip3";
             // 
@@ -173,7 +183,7 @@
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(329, 131);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "DOBJs";
+            this.tabPage2.Text = "Objects";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // toolStrip2
@@ -195,6 +205,7 @@
             // 
             this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showOutlineToolStripMenuItem,
             this.renderVertexColorsToolStripMenuItem,
             this.toolStripSeparator1,
             this.createOutlineMeshToolStripMenuItem,
@@ -206,13 +217,6 @@
             this.toolStripDropDownButton3.Size = new System.Drawing.Size(62, 24);
             this.toolStripDropDownButton3.Text = "Options";
             // 
-            // addDummyDOBJToolStripMenuItem
-            // 
-            this.addDummyDOBJToolStripMenuItem.Name = "addDummyDOBJToolStripMenuItem";
-            this.addDummyDOBJToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.addDummyDOBJToolStripMenuItem.Text = "Add Dummy DOBJ";
-            this.addDummyDOBJToolStripMenuItem.Click += new System.EventHandler(this.addDummyDOBJToolStripMenuItem_Click);
-            // 
             // renderVertexColorsToolStripMenuItem
             // 
             this.renderVertexColorsToolStripMenuItem.Checked = true;
@@ -223,6 +227,11 @@
             this.renderVertexColorsToolStripMenuItem.Text = "Render Vertex Colors";
             this.renderVertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
+            // 
             // createOutlineMeshToolStripMenuItem
             // 
             this.createOutlineMeshToolStripMenuItem.Name = "createOutlineMeshToolStripMenuItem";
@@ -230,10 +239,54 @@
             this.createOutlineMeshToolStripMenuItem.Text = "Create Outline Mesh";
             this.createOutlineMeshToolStripMenuItem.Click += new System.EventHandler(this.createOutlineMeshToolStripMenuItem_Click);
             // 
+            // addDummyDOBJToolStripMenuItem
+            // 
+            this.addDummyDOBJToolStripMenuItem.Name = "addDummyDOBJToolStripMenuItem";
+            this.addDummyDOBJToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.addDummyDOBJToolStripMenuItem.Text = "Add Dummy DOBJ";
+            this.addDummyDOBJToolStripMenuItem.Click += new System.EventHandler(this.addDummyDOBJToolStripMenuItem_Click);
+            // 
+            // clearAllPOBJsToolStripMenuItem
+            // 
+            this.clearAllPOBJsToolStripMenuItem.Name = "clearAllPOBJsToolStripMenuItem";
+            this.clearAllPOBJsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.clearAllPOBJsToolStripMenuItem.Text = "Clear All POBJs";
+            this.clearAllPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearAllPOBJsToolStripMenuItem_Click);
+            // 
+            // buttonMoveUp
+            // 
+            this.buttonMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonMoveUp.Image = global::HSDRawViewer.Properties.Resources.ts_up;
+            this.buttonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonMoveUp.Name = "buttonMoveUp";
+            this.buttonMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.buttonMoveUp.Text = "Move Up";
+            this.buttonMoveUp.Click += new System.EventHandler(this.buttonMoveUp_Click);
+            // 
+            // buttonMoveDown
+            // 
+            this.buttonMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonMoveDown.Image = global::HSDRawViewer.Properties.Resources.ts_down;
+            this.buttonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonMoveDown.Name = "buttonMoveDown";
+            this.buttonMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.buttonMoveDown.Text = "Move Down";
+            this.buttonMoveDown.Click += new System.EventHandler(this.buttonMoveDown_Click);
+            // 
+            // buttonDOBJDelete
+            // 
+            this.buttonDOBJDelete.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonDOBJDelete.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
+            this.buttonDOBJDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonDOBJDelete.Name = "buttonDOBJDelete";
+            this.buttonDOBJDelete.Size = new System.Drawing.Size(23, 22);
+            this.buttonDOBJDelete.Text = "toolStripButton3";
+            this.buttonDOBJDelete.Click += new System.EventHandler(this.buttonDOBJDelete_Click);
+            // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(47, 24);
+            this.toolStripLabel1.Size = new System.Drawing.Size(47, 22);
             this.toolStripLabel1.Text = "Render:";
             // 
             // toolStripComboBox1
@@ -244,28 +297,8 @@
             "Selected",
             "None"});
             this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
+            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
-            // 
-            // buttonMoveUp
-            // 
-            this.buttonMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonMoveUp.Image = global::HSDRawViewer.Properties.Resources.ts_up;
-            this.buttonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonMoveUp.Name = "buttonMoveUp";
-            this.buttonMoveUp.Size = new System.Drawing.Size(23, 24);
-            this.buttonMoveUp.Text = "Move Up";
-            this.buttonMoveUp.Click += new System.EventHandler(this.buttonMoveUp_Click);
-            // 
-            // buttonMoveDown
-            // 
-            this.buttonMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonMoveDown.Image = global::HSDRawViewer.Properties.Resources.ts_down;
-            this.buttonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonMoveDown.Name = "buttonMoveDown";
-            this.buttonMoveDown.Size = new System.Drawing.Size(23, 24);
-            this.buttonMoveDown.Text = "Move Down";
-            this.buttonMoveDown.Click += new System.EventHandler(this.buttonMoveDown_Click);
             // 
             // groupBox1
             // 
@@ -365,27 +398,71 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // clearAllPOBJsToolStripMenuItem
+            // tabPage3
             // 
-            this.clearAllPOBJsToolStripMenuItem.Name = "clearAllPOBJsToolStripMenuItem";
-            this.clearAllPOBJsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.clearAllPOBJsToolStripMenuItem.Text = "Clear All POBJs";
-            this.clearAllPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearAllPOBJsToolStripMenuItem_Click);
+            this.tabPage3.Controls.Add(this.toolStrip4);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(329, 131);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Animation";
+            this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // toolStripSeparator1
+            // toolStrip4
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
+            this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.animfileDropDown,
+            this.clearAnimButton});
+            this.toolStrip4.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip4.Name = "toolStrip4";
+            this.toolStrip4.Size = new System.Drawing.Size(329, 25);
+            this.toolStrip4.TabIndex = 0;
+            this.toolStrip4.Text = "toolStrip4";
             // 
-            // buttonDOBJDelete
+            // animfileDropDown
             // 
-            this.buttonDOBJDelete.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonDOBJDelete.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
-            this.buttonDOBJDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonDOBJDelete.Name = "buttonDOBJDelete";
-            this.buttonDOBJDelete.Size = new System.Drawing.Size(23, 24);
-            this.buttonDOBJDelete.Text = "toolStripButton3";
-            this.buttonDOBJDelete.Click += new System.EventHandler(this.buttonDOBJDelete_Click);
+            this.animfileDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.animfileDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importFromFileToolStripMenuItem,
+            this.exportAsANIMToolStripMenuItem});
+            this.animfileDropDown.Image = ((System.Drawing.Image)(resources.GetObject("animfileDropDown.Image")));
+            this.animfileDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.animfileDropDown.Name = "animfileDropDown";
+            this.animfileDropDown.Size = new System.Drawing.Size(38, 22);
+            this.animfileDropDown.Text = "File";
+            // 
+            // importFromFileToolStripMenuItem
+            // 
+            this.importFromFileToolStripMenuItem.Name = "importFromFileToolStripMenuItem";
+            this.importFromFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.importFromFileToolStripMenuItem.Text = "Import";
+            this.importFromFileToolStripMenuItem.Click += new System.EventHandler(this.importFromFileToolStripMenuItem_Click);
+            // 
+            // exportAsANIMToolStripMenuItem
+            // 
+            this.exportAsANIMToolStripMenuItem.Name = "exportAsANIMToolStripMenuItem";
+            this.exportAsANIMToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportAsANIMToolStripMenuItem.Text = "Export";
+            this.exportAsANIMToolStripMenuItem.Click += new System.EventHandler(this.exportAsANIMToolStripMenuItem_Click);
+            // 
+            // clearAnimButton
+            // 
+            this.clearAnimButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.clearAnimButton.Image = ((System.Drawing.Image)(resources.GetObject("clearAnimButton.Image")));
+            this.clearAnimButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.clearAnimButton.Name = "clearAnimButton";
+            this.clearAnimButton.Size = new System.Drawing.Size(97, 22);
+            this.clearAnimButton.Text = "Clear Animation";
+            this.clearAnimButton.Click += new System.EventHandler(this.clearAnimButton_Click);
+            // 
+            // showOutlineToolStripMenuItem
+            // 
+            this.showOutlineToolStripMenuItem.Checked = true;
+            this.showOutlineToolStripMenuItem.CheckOnClick = true;
+            this.showOutlineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showOutlineToolStripMenuItem.Name = "showOutlineToolStripMenuItem";
+            this.showOutlineToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.showOutlineToolStripMenuItem.Text = "Show Selected Outline";
             // 
             // JOBJEditor
             // 
@@ -413,6 +490,10 @@
             this.groupBox1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            this.toolStrip4.ResumeLayout(false);
+            this.toolStrip4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -452,5 +533,12 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem clearAllPOBJsToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonDOBJDelete;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.ToolStrip toolStrip4;
+        private System.Windows.Forms.ToolStripDropDownButton animfileDropDown;
+        private System.Windows.Forms.ToolStripMenuItem importFromFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportAsANIMToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton clearAnimButton;
+        private System.Windows.Forms.ToolStripMenuItem showOutlineToolStripMenuItem;
     }
 }

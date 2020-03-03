@@ -167,6 +167,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterData.CostumePointers.Array = new MEX_CostumeRuntimePointers[0];
             d.FighterData.DefineIDs.Array = new MEX_CharDefineIDs[0];
             d.FighterData.WallJump.Array = new HSD_Byte[0];
+            d.FighterData.RstRuntime.Array = new HSDRaw.MEX.Characters.MEX_RstRuntime[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
@@ -201,6 +202,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterFunctions.onTwoEntryTable.Array = new HSD_UInt[0];
             d.FighterFunctions.onLand.Array = new HSD_UInt[0];
 
+            d.FighterFunctions.onSmashDown.Array = new HSD_UInt[0];
+            d.FighterFunctions.onSmashUp.Array = new HSD_UInt[0];
+            d.FighterFunctions.onSmashForward.Array = new HSD_UInt[0];
+
             d.FighterFunctions.enterFloat.Array = new HSD_UInt[0];
             d.FighterFunctions.enterSpecialDoubleJump.Array = new HSD_UInt[0];
             d.FighterFunctions.enterTether.Array = new HSD_UInt[0];
@@ -214,8 +219,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.KirbyTable.KirbyOnHit.Array = new HSD_UInt[0];
             d.KirbyTable.KirbyOnItemInit.Array = new HSD_UInt[0];
 
-            // funtime fighter pointer struct
-            d.FighterFunctions._s.GetReference<HSDAccessor>(0x40)._s.Resize(FighterEntries.Count * 8);
+            // runtime fighter pointer struct
+            d.FighterData._s.GetReference<HSDAccessor>(0x40)._s.Resize(FighterEntries.Count * 8);
 
             // kirby runtimes
             d.KirbyTable.CapFileRuntime._s = new HSDStruct(4 * FighterEntries.Count);

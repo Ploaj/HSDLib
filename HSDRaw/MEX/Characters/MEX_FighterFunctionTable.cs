@@ -77,5 +77,11 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<HSD_UInt> onLand { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x88); set => _s.SetReference(0x88, value); }
 
+        public HSDArrayAccessor<HSD_UInt> onSmashForward { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x8C); set => _s.SetReference(0x8C, value); }
+
+        public HSDArrayAccessor<HSD_UInt> onSmashUp { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x90); set => _s.SetReference(0x90, value); }
+
+        public HSDArrayAccessor<HSD_UInt> onSmashDown { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x94); set => _s.SetReference(0x94, value); }
+
     }
 }

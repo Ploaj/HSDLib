@@ -237,7 +237,7 @@ namespace HSDRawViewer.Rendering
 
                 GL.Disable(EnableCap.DepthTest);
 
-                if (DOBJManager.SelectedDOBJ != null)
+                if (DOBJManager.SelectedDOBJ != null && DOBJManager.OutlineSelected)
                 {
                     DOBJManager.RenderDOBJShader(cam, DOBJManager.SelectedDOBJ, parent, this, true);
                 }
@@ -423,7 +423,7 @@ namespace HSDRawViewer.Rendering
 
         #region Animation Loader
 
-        private List<AnimNode> Nodes = new List<AnimNode>();
+        public List<AnimNode> Nodes = new List<AnimNode>();
 
         /// <summary>
         /// 

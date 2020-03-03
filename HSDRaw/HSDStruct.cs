@@ -595,7 +595,7 @@ namespace HSDRaw
         public void SetBytes(int loc, byte[] bytes)
         {
             if (loc < 0 || loc > _data.Length + bytes.Length)
-                throw new InvalidOperationException("Tried to set data out of struct range");
+                throw new IndexOutOfRangeException("Tried to set data out of struct range");
 
             for (int i = loc; i < loc + bytes.Length; i++)
                 _data[i] = bytes[i - loc];

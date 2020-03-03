@@ -122,7 +122,12 @@ namespace HSDRawViewer.GUI
             PlayerTimer = (sender, args) =>
             {
                 if (buttonPlay.Text == "Pause")
-                    Frame++;
+                {
+                    if(!(!cbLoop.Checked && Frame == MaxFrame))
+                    {
+                        Frame++;
+                    }
+                }
             };
 
             Application.Idle += RenderLoop;
@@ -225,7 +230,7 @@ namespace HSDRawViewer.GUI
             }
             else
             {
-                if (frame > nudFrame.Maximum)
+                if (frame >= nudFrame.Maximum)
                 {
                     if (!cbLoop.Checked)
                     {

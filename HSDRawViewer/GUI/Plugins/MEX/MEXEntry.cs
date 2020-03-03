@@ -78,6 +78,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Result Animation File"), Category("0 - General"), Description("File Containing the Result Fighter Animations")]
         public string RstAnimFile { get; set; }
 
+        [DisplayName("Result Animation Count"), Category("0 - General"), Description("Number of Result Animations")]
+        public int RstAnimCount { get; set; }
+
         [Browsable(false)]
         public byte CostumeCount { get => (byte)Costumes.Length; }
 
@@ -184,6 +187,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             FighterDataSymbol = mexData.FighterData.CharFiles[internalId].Symbol;
             AnimFile = mexData.FighterData.AnimFiles[internalId].Value;
             AnimCount = mexData.FighterData.AnimCount[internalId].AnimCount;
+            RstAnimCount = mexData.FighterData.RstRuntime[internalId].AnimMax;
 
             InsigniaID = mexData.FighterData.InsigniaIDs[externalID].Value;
 
@@ -237,6 +241,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterData.CharFiles.Set(internalId, new MEX_CharFileStrings() { FileName = FighterDataPath, Symbol = FighterDataSymbol});
             mexData.FighterData.AnimFiles.Set(internalId, new HSD_String() { Value = AnimFile });
             mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
+
+            mexData.FighterData.RstRuntime.Set(internalId, new HSDRaw.MEX.Characters.MEX_RstRuntime() { AnimMax = RstAnimCount });
+
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 
             mexData.FighterData.WallJump.Set(internalId, new HSD_Byte() { Value = CanWallJump ? (byte)1 : (byte)0 });
@@ -369,6 +376,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public uint SpecialSAir { get; set; }
 
         [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint SmashUp { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint SmashDown { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint SmashSide { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint OnAbsorb { get; set; }
 
         [TypeConverter(typeof(HexType)), Category("Fighter")]
@@ -491,6 +507,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             OnTwoEntryTable = mexData.FighterFunctions.onTwoEntryTable[internalId].Value;
             OnLand = mexData.FighterFunctions.onLand[internalId].Value;
 
+            SmashDown = mexData.FighterFunctions.onSmashDown[internalId].Value;
+            SmashUp = mexData.FighterFunctions.onSmashUp[internalId].Value;
+            SmashSide = mexData.FighterFunctions.onSmashForward[internalId].Value;
+
             EnterFloat = mexData.FighterFunctions.enterFloat[internalId].Value;
             EnterDoubleJump = mexData.FighterFunctions.enterSpecialDoubleJump[internalId].Value;
             EnterTether = mexData.FighterFunctions.enterTether[internalId].Value;
@@ -539,6 +559,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Set(internalId, new HSD_UInt() { Value = OnActionStateChangeWhileEyeTextureIsChanged });
             mexData.FighterFunctions.onTwoEntryTable.Set(internalId, new HSD_UInt() { Value = OnTwoEntryTable });
             mexData.FighterFunctions.onLand.Set(internalId, new HSD_UInt() { Value = OnLand });
+
+            mexData.FighterFunctions.onSmashDown.Set(internalId, new HSD_UInt() { Value = SmashDown });
+            mexData.FighterFunctions.onSmashUp.Set(internalId, new HSD_UInt() { Value = SmashUp });
+            mexData.FighterFunctions.onSmashForward.Set(internalId, new HSD_UInt() { Value = SmashSide });
 
             mexData.FighterFunctions.enterFloat.Set(internalId, new HSD_UInt() { Value = EnterFloat });
             mexData.FighterFunctions.enterSpecialDoubleJump.Set(internalId, new HSD_UInt() { Value = EnterDoubleJump });

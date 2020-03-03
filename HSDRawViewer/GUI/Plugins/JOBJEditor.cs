@@ -220,7 +220,8 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            JOBJManager.Frame = viewport.Frame;// PluginManager.GetCommonViewport().Frame;
+            JOBJManager.Frame = viewport.Frame;
+            JOBJManager.DOBJManager.OutlineSelected = showOutlineToolStripMenuItem.Checked;
             JOBJManager.Render(cam);
         }
 
@@ -679,6 +680,59 @@ namespace HSDRawViewer.GUI.Plugins
                     JOBJManager.ClearRenderingCache();
                     RefreshGUI();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void clearAnimButton_Click(object sender, EventArgs e)
+        {
+            viewport.AnimationTrackEnabled = false;
+            JOBJManager.SetFigaTree(null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importFromFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+
+            if(f != null)
+            {
+                var dat = new HSDRaw.HSDRawFile(f);
+                
+                if(dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
+                    LoadAnimation(tree);
+
+                if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
+                    LoadAnimation(joint);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportAsANIMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+            {
+                MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            var f = Tools.FileIO.SaveFile("Supported Formats (*.anim)|*.anim");
+
+            if(f != null)
+            {
+                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Nodes);
             }
         }
     }

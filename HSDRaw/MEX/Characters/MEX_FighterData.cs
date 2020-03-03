@@ -1,10 +1,11 @@
 ﻿using HSDRaw.Common;
+using HSDRaw.MEX.Characters;
 
 namespace HSDRaw.MEX
 {
     public class MEX_FighterData : HSDAccessor
     {
-        public override int TrimmedSize => 0x48;
+        public override int TrimmedSize => 0x50;
 
         public HSDNullPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -41,6 +42,8 @@ namespace HSDRaw.MEX
         // 0x40 ft Data Runtime Pointer Struct. Size is internalIDCount * 8
 
         public HSDArrayAccessor<HSD_Byte> WallJump { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x44); set => _s.SetReference(0x44, value); }
-
+        
+        public HSDArrayAccessor<MEX_RstRuntime> RstRuntime { get => _s.GetReference<HSDArrayAccessor<MEX_RstRuntime>>(0x48); set => _s.SetReference(0x48, value); }
+        
     }
 }
