@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using YamlDotNet.Serialization;
@@ -18,9 +19,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 {
     public partial class MexDataEditor : DockContent, EditorBase, IDrawable
     {
+
         public MexDataEditor()
         {
             InitializeComponent();
+
+            //GUITools.SetIconFromBitmap(this, Properties.Resources.doc_kabii);
 
             fighterList.DataSource = FighterEntries;
 
@@ -80,11 +84,19 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private MEX_Data _data { get { if (_node.Accessor is MEX_Data data) return data; else return null; } }
 
         private BindingList<MEXEntry> FighterEntries = new BindingList<MEXEntry>();
-        public ExpandedSSM[] SSMEntries { get; set; }
+
         public MEX_EffectEntry[] Effects { get; set; }
+        public MEX_Effect[] MEX_Effects { get; set; }
+
         public MEX_CSSIconEntry[] Icons { get; set; }
+        
         public HSD_String[] Music { get; set; }
         public MEXPlaylistEntry[] MenuPlaylist { get; set; }
+
+        public MEX_Item[] ItemCommon { get; set; }
+        public MEX_Item[] ItemFighter { get; set; }
+        public MEX_Item[] ItemPokemon { get; set; }
+        public MEX_Item[] ItemStage { get; set; }
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -98,6 +110,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="data"></param>
         private void LoadData()
         {
+            // Effects------------------------------------
             Effects = new MEX_EffectEntry[_data.EffectFiles.Length];
             for (int i = 0; i < Effects.Length; i++)
             {
@@ -109,14 +122,19 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
             effectEditor.SetArrayFromProperty(this, "Effects");
 
+            MEX_Effects = _data.MEXEffects.Array;
+            mEXEffectEditor.SetArrayFromProperty(this, "MEX_Effects");
 
+
+            // Fighters------------------------------------
             FighterEntries.Clear();
             for(int i = 0; i < _data.MetaData.NumOfInternalIDs; i++)
             {
                 FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
             }
-            
 
+
+            // CSS------------------------------------
             Icons = new MEX_CSSIconEntry[_data.CSSIconData.Icons.Length];
             for(int i = 0; i < Icons.Length; i++)
             {
@@ -125,6 +143,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             cssIconEditor.SetArrayFromProperty(this, "Icons");
 
 
+            // Music------------------------------------
             Music = _data.MusicTable.BackgroundMusicStrings.Array;
             musicListEditor.SetArrayFromProperty(this, "Music");
 
@@ -139,6 +158,20 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 };
             }
             menuPlaylistEditor.SetArrayFromProperty(this, "MenuPlaylist");
+
+
+            // Items------------------------------------
+            ItemCommon = _data.ItemTable.CommonItems.Array;
+            commonItemEditor.SetArrayFromProperty(this, "ItemCommon");
+
+            ItemFighter = _data.ItemTable.FighterItems.Array;
+            fighterItemEditor.SetArrayFromProperty(this, "ItemFighter");
+
+            ItemPokemon = _data.ItemTable.Pokemon.Array;
+            pokemonItemEditor.SetArrayFromProperty(this, "ItemPokemon");
+
+            ItemStage = _data.ItemTable.Stages.Array;
+            stageItemEditor.SetArrayFromProperty(this, "ItemStage");
         }
 
         /// <summary>
@@ -234,6 +267,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
         private void SaveEffectData()
         {
             _data.MetaData.NumOfEffects = Effects.Length;
@@ -246,6 +282,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     Symbol = v.Symbol
                 });
             }
+
+            _data.MEXEffects.Array = MEX_Effects;
         }
         
         /// <summary>
@@ -272,6 +310,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void SaveIconData()
         {
             _data.MetaData.NumOfCSSIcons = Icons.Length;
@@ -279,6 +320,17 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             for (int i = 0; i < ico.Length; i++)
                 ico[i] = Icons[i].ToIcon();
             _data.CSSIconData.Icons = ico;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SaveItemData()
+        {
+            _data.ItemTable.CommonItems.Array = ItemCommon;
+            _data.ItemTable.FighterItems.Array = ItemFighter;
+            _data.ItemTable.Pokemon.Array = ItemPokemon;
+            _data.ItemTable.Stages.Array = ItemStage;
         }
 
         #region Events
@@ -304,6 +356,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void buttonSaveCSS_Click(object sender, EventArgs e)
         {
             SaveIconData();
+        }
+
+        private void saveItemButton_Click(object sender, EventArgs e)
+        {
+            SaveItemData();
         }
 
         private static Color IconColor = Color.FromArgb(128, 255, 0, 0);
@@ -564,12 +621,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             MEXConverter.musicIDValues.Clear();
             MEXConverter.musicIDValues.AddRange(Music.Select(r => r.Value));
-        }
-
-        public class HPSSettings
-        {
-            [DisplayName("Loop Start"), Description("Loop start in seconds")]
-            public int LoopStart { get; set; }
         }
 
         /// <summary>

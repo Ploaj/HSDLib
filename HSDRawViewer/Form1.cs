@@ -58,7 +58,8 @@ namespace HSDRawViewer
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
-
+            
+            //dockPanel.ShowDocumentIcon = true;
             dockPanel.ActiveContentChanged += (sender, args) =>
             {
                 if (dockPanel.ActiveContent != null)
@@ -95,6 +96,7 @@ namespace HSDRawViewer
             myImageList.Images.Add("anim_material", Properties.Resources.ico_anim_material);
             myImageList.Images.Add("anim_joint", Properties.Resources.ico_anim_joint);
             myImageList.Images.Add("kabii", Properties.Resources.ico_kabii);
+            myImageList.Images.Add("fuma", Properties.Resources.ico_fuma);
 
             treeView1.ImageList = myImageList;
 

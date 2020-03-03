@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace HSDRaw.MEX
+﻿namespace HSDRaw.MEX
 {
     public enum MEXEffectType
     {
@@ -17,5 +15,10 @@ namespace HSDRaw.MEX
         public int ExternalID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
         public MEXEffectType Type { get => (MEXEffectType)(_s.GetInt32(0x04)); set => _s.SetInt32(0x04, (int)value); }
+
+        public override string ToString()
+        {
+            return $"{ExternalID} {Type}";
+        }
     }
 }

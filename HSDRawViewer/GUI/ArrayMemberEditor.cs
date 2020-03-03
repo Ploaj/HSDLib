@@ -24,6 +24,12 @@ namespace HSDRawViewer.GUI
         public event EventHandler DoubleClickedNode;
         public event EventHandler ArrayUpdated;
 
+        public bool CanClone
+        {
+            get => buttonClone.Enabled;
+            set => buttonClone.Enabled = value;
+        }
+
         public void EnablePropertyViewer(bool enable)
         {
             propertyGrid.Visible = enable;
@@ -256,6 +262,21 @@ namespace HSDRawViewer.GUI
         public void AddItem(object o)
         {
             elementList.Items.Add(o);
+            MakeChanges();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonClone_Click(object sender, EventArgs e)
+        {
+            if (elementList.SelectedItem == null)
+                return;
+
+            elementList.Items.Add(ObjectExtensions.Copy(elementList.SelectedItem));
+
             MakeChanges();
         }
     }

@@ -63,6 +63,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap doc_kabii {
+            get {
+                object obj = ResourceManager.GetObject("doc_kabii", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ico_anim_joint {
             get {
                 object obj = ResourceManager.GetObject("ico_anim_joint", resourceCulture);
@@ -146,6 +156,16 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ico_folder {
             get {
                 object obj = ResourceManager.GetObject("ico_folder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico_fuma {
+            get {
+                object obj = ResourceManager.GetObject("ico_fuma", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -323,9 +343,39 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ts_clone {
+            get {
+                object obj = ResourceManager.GetObject("ts_clone", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ts_down {
             get {
                 object obj = ResourceManager.GetObject("ts_down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_exportfile {
+            get {
+                object obj = ResourceManager.GetObject("ts_exportfile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_importfile {
+            get {
+                object obj = ResourceManager.GetObject("ts_importfile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

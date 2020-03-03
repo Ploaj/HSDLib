@@ -98,6 +98,7 @@ namespace HSDRawViewer
             { typeof(MEX_KirbyTable), "table" },
             { typeof(MEX_ItemTables), "table" },
             { typeof(MEX_Data), "kabii" },
+            { typeof(MEX_Meta), "fuma" },
         };
 
         /// <summary>

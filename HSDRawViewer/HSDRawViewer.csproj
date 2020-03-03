@@ -303,16 +303,22 @@
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
     <Compile Include="Tools\FileIO.cs" />
+    <Compile Include="Tools\GUITools.cs" />
     <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\ts_importfile.png" />
+    <None Include="Resources\ts_exportfile.png" />
+    <None Include="Resources\ts_clone.png" />
     <None Include="Resources\ts_pause.png" />
     <None Include="Resources\ico_right.png" />
     <None Include="Resources\ico_left.png" />
     <None Include="Resources\ico_kabii.png" />
+    <None Include="Resources\ico_fuma.png" />
+    <None Include="Resources\doc_kabii.png" />
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />
