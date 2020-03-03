@@ -194,8 +194,10 @@ namespace HSDRawViewer.Rendering
                 GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
                 
                 GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("hasEnvelopes"), p.HasWeighting ? 1 : 0);
-                
-                if(p.Flag.HasFlag(POBJ_FLAG.CULLFRONT))
+
+                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("notInverted"), p.Flag.HasFlag(POBJ_FLAG.NOTINVERTED) ? 1 : 0);
+
+                if (p.Flag.HasFlag(POBJ_FLAG.CULLFRONT))
                     GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
 
                 foreach (var dl in p.DisplayLists)

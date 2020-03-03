@@ -2,6 +2,20 @@
 
 namespace HSDRaw.MEX
 {
+    public class MEX_ItemTables : HSDAccessor
+    {
+        public override int TrimmedSize => 0x10;
+
+        public HSDArrayAccessor<MEX_Item> CommonItems { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x00); set => _s.SetReference(0x00, value); }
+
+        public HSDArrayAccessor<MEX_Item> FighterItems { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x04); set => _s.SetReference(0x04, value); }
+
+        public HSDArrayAccessor<MEX_Item> Pokemon { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x08); set => _s.SetReference(0x08, value); }
+
+        public HSDArrayAccessor<MEX_Item> Stages { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x0C); set => _s.SetReference(0x0C, value); }
+
+    }
+
     public class MEX_Item : HSDAccessor
     {
         public override int TrimmedSize => 0x3C;

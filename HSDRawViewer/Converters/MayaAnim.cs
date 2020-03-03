@@ -71,15 +71,18 @@ namespace HSDRawViewer.Converters
                         // get current state at this key frame
                         var state = t.GetState(t.Keys[i].Frame);
 
+
+                        bool nextSlope = i + 1 < t.Keys.Count && t.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
+
+                        // Debug
+                        /*if (mnode.name == "JOBJ_99" && mtrack.type == MayaAnim.TrackType.rotateX)
+                        {
+                            Console.WriteLine($"{t.Keys[i].Frame} {t.Keys[i].Value} {t.Keys[i].Tan} {t.Keys[i].InterpolationType} {nextSlope}");
+                            Console.WriteLine($"{state.t0} {state.t1} {state.p0} {state.p1} {state.d0} {state.d1} {state.op_intrp}");
+                        }*/
                         if (t.Keys[i].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
                             continue;
 
-                        // Debug
-                        /*if (mnode.name == "JOBJ_13" && mtrack.type == MayaAnim.TrackType.rotateZ)
-                        {
-                            Console.WriteLine($"{t.Keys[i].Frame} {t.Keys[i].Value} {t.Keys[i].Tan} {t.Keys[i].InterpolationType}");
-                            Console.WriteLine($"{state.t0} {state.t1} {state.p0} {state.p1} {state.d0} {state.d1} {state.op_intrp}");
-                        }*/
 
                         // assuming last frame
                         // if last frame shift frame information over
@@ -88,7 +91,6 @@ namespace HSDRawViewer.Converters
                             state.t0 = state.t1;
                             state.p0 = state.p1;
                             state.d0 = state.d1;
-                            state.d1 = 0;
                             //state.op_intrp = state.op;
                         }
                         
@@ -106,8 +108,8 @@ namespace HSDRawViewer.Converters
                         if (state.op_intrp == GXInterpolationType.HSD_A_OP_CON || 
                             state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
                         {
-                            animkey.intan = "stepped";
-                            animkey.outtan = "stepped";
+                            animkey.intan = "step";
+                            animkey.outtan = "step";
                         }
 
                         // set tangents for weighted slopes
@@ -116,9 +118,11 @@ namespace HSDRawViewer.Converters
                              || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL)
                         {
                             animkey.t1 = state.d0;
-                            animkey.t2 = state.d1;
-                            animkey.intan = "fixed";
-                            animkey.outtan = "fixed";
+                            animkey.t2 = state.d0;
+                            if (nextSlope)
+                                animkey.t2 = state.d1;
+                            animkey.intan = "spline";
+                            animkey.outtan = "spline";
                         }
 
                         // add final key
@@ -149,6 +153,7 @@ namespace HSDRawViewer.Converters
 
             // linear, const, and step are straight forward:
             // if only one value, use KEY
+            // for step only out matters?
 
             // slope notes:
             // if output tan is not equal to next frames input, add SPL operation to use new spline
@@ -465,8 +470,8 @@ namespace HSDRawViewer.Converters
                         file.WriteLine(" keys {");
                         foreach (AnimKey key in animData.keys)
                         {
-                            string tanin = key.intan == "fixed" || key.intan == "auto" ? " " + key.t1 + " " + key.w1 : "";
-                            string tanout = key.outtan == "fixed" || key.outtan == "auto" ? " " + key.t2 + " " + key.w2 : "";
+                            string tanin = key.intan == "spline" || key.intan == "fixed" || key.intan == "auto" ? " " + key.t1 + " " + key.w1 : "";
+                            string tanout = key.intan == "spline" || key.outtan == "fixed" || key.outtan == "auto" ? " " + key.t2 + " " + key.w2 : "";
                             file.WriteLine($" {key.input} {key.output:N6} {key.intan} {key.outtan} 1 1 0{tanin}{tanout};");
                         }
                         file.WriteLine(" }");

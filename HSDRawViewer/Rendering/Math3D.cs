@@ -47,8 +47,8 @@ namespace HSDRawViewer.Rendering
 
                 Quaternion q = (zRotation * yRotation * xRotation);
 
-                if (q.W < 0)
-                    q *= -1;
+                //if (q.W < 0)
+                //    q *= -1;
 
                 //return xRotation * yRotation * zRotation;
                 return q;

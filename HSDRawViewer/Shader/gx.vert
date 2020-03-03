@@ -14,6 +14,7 @@ out vec4 vertexColor;
 uniform mat4 mvp;
 
 uniform int isRootBound;
+uniform int notInverted;
 uniform mat4 singleBind;
 
 uniform int hasEnvelopes;
@@ -30,9 +31,15 @@ uniform vec4 weights[10];
 
 void main()
 {
-	vec4 pos = singleBind * vec4(GX_VA_POS, 1);
+	vec4 pos = vec4(GX_VA_POS, 1);
+	
+	normal = GX_VA_NRM;
 
-	normal = (inverse(transpose(singleBind)) * vec4(GX_VA_NRM, 1)).xyz;
+	if(notInverted == 0)
+	{
+		pos = singleBind * pos;
+		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
+	}
 
 	texcoord0 = GX_VA_TEX0;
 
@@ -43,7 +50,7 @@ void main()
 
 	int matrixIndex = int(PNMTXIDX / 3);
 
-	if(weights[matrixIndex].x == 1 && isRootBound == 1)
+	if(weights[matrixIndex].x == 1 && (isRootBound == 1 || notInverted == 1))
 	{
 		pos = transforms[int(envelopeIndex[matrixIndex].x)] * vec4(pos.xyz, 1);
 		normal = (inverse(transpose(transforms[int(envelopeIndex[matrixIndex].x)])) * vec4(normal, 1)).xyz;

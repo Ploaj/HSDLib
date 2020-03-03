@@ -7,6 +7,7 @@ namespace HSDRaw.Common
     [Flags]
     public enum POBJ_FLAG
     {
+        NOTINVERTED = (1 << 0),
         UNKNOWN = (1 << 1),
         ANIM = (1 << 3),
         SHAPEANIM = (1 << 12),
