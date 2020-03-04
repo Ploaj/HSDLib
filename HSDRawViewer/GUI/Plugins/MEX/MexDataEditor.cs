@@ -5,6 +5,7 @@ using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Sound;
+using OpenTK;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -18,7 +19,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
-    public partial class MexDataEditor : DockContent, EditorBase, IDrawable
+    public partial class MexDataEditor : DockContent, EditorBase, IDrawableInterface
     {
         public MexDataEditor()
         {
@@ -34,7 +35,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
-            viewport.EnableFloor = true;
+            viewport.EnableFloor = false;
             groupBox2.Controls.Add(viewport);
             viewport.RefreshSize();
             viewport.BringToFront();
@@ -409,9 +410,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
 
         #region IconRendering
-        private static Color IconColor = Color.FromArgb(128, 255, 0, 0);
-
-        private static Color SelectedIconColor = Color.FromArgb(128, 255, 255, 0);
 
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
@@ -419,10 +417,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             foreach(var i in Icons)
             {
-                if (cssIconEditor.SelectedObject == (object)i)
-                    DrawShape.DrawRectangle(i.X1, i.Y1, i.X2, i.Y2, SelectedIconColor);
-                else
-                    DrawShape.DrawRectangle(i.X1, i.Y1, i.X2, i.Y2, IconColor);
+                i.Render(cssIconEditor.SelectedObject == (object)i);
             }
         }
 
@@ -754,6 +749,95 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 mexItemEditor.AddItem(pokemonItemEditor.SelectedObject);
             if (itemTabs.SelectedIndex == 3)
                 mexItemEditor.AddItem(stageItemEditor.SelectedObject);
+        }
+
+
+
+
+        public void ScreenClick(MouseButtons button, PickInformation pick)
+        {
+            if (cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            {
+                if (button == MouseButtons.Right && MousePrevDown)
+                {
+                    icon.X = oldPosition.X;
+                    icon.Y = oldPosition.Y;
+                    MousePrevDown = false;
+                }
+            }
+        }
+
+        public void ScreenDoubleClick(PickInformation pick)
+        {
+            var planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+            foreach (var i in Icons)
+            {
+                if(i.ToRect().Contains(planePoint.X, planePoint.Y))
+                {
+                    cssIconEditor.SelectObject(i);
+                    break;
+                }
+            }
+        }
+
+        private bool MousePrevDown = false;
+        private Vector3 prevPlanePoint = Vector3.Zero;
+        private Vector2 oldPosition = Vector2.Zero;
+        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        {
+            var mouseDown = OpenTK.Input.Mouse.GetState().IsButtonDown(OpenTK.Input.MouseButton.Left);
+            
+            if (cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            {
+                if (mouseDown &&
+                    viewport.IsAltAction)
+                {
+                    var planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+                    if (!MousePrevDown)
+                    {
+                        oldPosition = new Vector2(icon.X, icon.Y);
+                        prevPlanePoint = planePoint;
+                    }
+                    if (icon.ToRect().Contains(prevPlanePoint.X, prevPlanePoint.Y))
+                    {
+                        icon.X -= prevPlanePoint.X - planePoint.X;
+                        icon.Y -= prevPlanePoint.Y - planePoint.Y;
+                        SnapAlignIcon(icon);
+                    }
+                    prevPlanePoint = planePoint;
+                }
+            }
+
+            MousePrevDown = mouseDown;
+        }
+
+        public void ScreenSelectArea(PickInformation start, PickInformation end)
+        {
+
+        }
+
+        private float SnapDelta = 0.15f;
+
+        private void SnapAlignIcon(MEX_CSSIconEntry icon)
+        {
+            foreach(var i in Icons)
+            {
+                if (i == icon)
+                    continue;
+
+                // if distance between part of rect is less than threshold, snap to it
+                if (Math.Abs(icon.X - (i.X + i.Width)) < SnapDelta) icon.X = i.X + i.Width;
+                if (Math.Abs(icon.X - i.X) < SnapDelta) icon.X = i.X;
+
+                if (Math.Abs((icon.X + icon.Width) - (i.X + i.Width)) < SnapDelta) icon.X = i.X + i.Width - icon.Width;
+                if (Math.Abs((icon.X + icon.Width) - i.X) < SnapDelta) icon.X = i.X - icon.Width;
+
+                if (Math.Abs(icon.Y - (i.Y - i.Height)) < SnapDelta) icon.Y = i.Y - i.Height;
+                if (Math.Abs(icon.Y - i.Y) < SnapDelta) icon.Y = i.Y;
+
+                if (Math.Abs((icon.Y - icon.Height) - (i.Y - i.Height)) < SnapDelta) icon.Y = i.Y - i.Height + icon.Height;
+                if (Math.Abs((icon.Y - icon.Height) - i.Y) < SnapDelta) icon.Y = i.Y + icon.Height;
+            }
         }
 
         #endregion

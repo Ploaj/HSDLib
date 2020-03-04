@@ -374,5 +374,17 @@ namespace HSDRawViewer.GUI
 
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="o"></param>
+        public void SelectObject(object o)
+        {
+            if (elementList.Items.Contains(o))
+            {
+                elementList.SelectedItem = o;
+            }
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace HSDRawViewer.Rendering
 
             GL.End();
 
-            GL.LineWidth(2f);
+            GL.LineWidth(1f);
             GL.Color4(1f, 1f, 1f, 1f);
             GL.Begin(PrimitiveType.LineLoop);
 

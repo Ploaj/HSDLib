@@ -14,6 +14,11 @@ namespace HSDRawViewer.Rendering
         public Vector3 TransformedPosition { get; private set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public Vector3 DefaultTranslation = new Vector3(0, 10, -80);
+
+        /// <summary>
         /// The translation component of the camera's transforms in scene units.
         /// </summary>
         public Vector3 Translation
@@ -389,6 +394,16 @@ namespace HSDRawViewer.Rendering
         public void ResetTransforms()
         {
             Translation = Vector3.Zero;
+            RotationXRadians = 0;
+            RotationYRadians = 0;
+        }
+
+        /// <summary>
+        /// Sets rotation and translation to default values 
+        /// </summary>
+        public void RestoreDefault()
+        {
+            Translation = DefaultTranslation;
             RotationXRadians = 0;
             RotationYRadians = 0;
         }

@@ -68,6 +68,25 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public bool Lock2D { get; set; } = false;
 
+        public bool IsAltAction
+        {
+            get
+            {
+                var keyState = Keyboard.GetState();
+                return keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+            }
+        }
+
+        public bool Frozen
+        {
+            get
+            {
+                var keyState = Keyboard.GetState();
+                return keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight) ||
+                       IsAltAction;
+            }
+        }
+
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
         private EventHandler RenderLoop;
@@ -136,6 +155,14 @@ namespace HSDRawViewer.GUI
             pbTimer.Elapsed += PlayerTimer;
             pbTimer.Start();
             nudPlaybackSpeed.Value = 60;
+
+            panel1.KeyDown += (sender, args) =>
+            {
+                if(args.Alt && args.KeyCode == Keys.R)
+                {
+                    _camera.RestoreDefault();
+                }
+            };
 
             panel1.MouseClick += (sender, args) =>
             {
@@ -493,12 +520,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            var keyState = Keyboard.GetState();
-
             mouseEnd = new Vector2(e.X, e.Y);
 
-            if (!keyState.IsKeyDown(Key.ControlLeft) && !keyState.IsKeyDown(Key.ControlRight)
-              &&!keyState.IsKeyDown(Key.AltLeft) && !keyState.IsKeyDown(Key.AltRight))
+            if (!Frozen)
             {
                 var speed = 0.10f;
                 var speedpane = 0.75f;

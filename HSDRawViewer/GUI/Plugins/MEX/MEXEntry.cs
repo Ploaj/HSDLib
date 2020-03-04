@@ -2,9 +2,11 @@
 using HSDRaw.Common;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
+using HSDRawViewer.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.TypeInspectors;
@@ -601,16 +603,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public int FighterExternalID { get; set; }
 
         [Description("Starting X Coord")]
-        public float X1 { get; set; }
+        public float X { get; set; }
 
         [Description("Ending X Coord")]
-        public float X2 { get; set; }
+        public float Y { get; set; }
 
         [Description("Starting Y Coord")]
-        public float Y1 { get; set; }
+        public float Width { get; set; }
 
         [Description("Ending Y Coord")]
-        public float Y2 { get; set; }
+        public float Height { get; set; }
 
         public static MEX_CSSIconEntry FromIcon(MEX_CSSIcon icon)
         {
@@ -619,10 +621,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 JointID = icon.JointID,
                 FighterExternalID = icon.ExternalCharID,
                 Clone = icon.ExternalCharID != icon.CharUNKID,
-                X1 = icon.X1,
-                Y1 = icon.Y1,
-                X2 = icon.X2,
-                Y2 = icon.Y2
+                X = icon.X1,
+                Y = icon.Y1,
+                Width = icon.X2 - icon.X1,
+                Height = icon.Y1 - icon.Y2
             };
         }
 
@@ -634,16 +636,33 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 UnkID = (byte)JointID,
                 ExternalCharID = (byte)FighterExternalID,
                 CharUNKID = (byte)(FighterExternalID + (Clone ? -1 : 0)),
-                X1 = X1,
-                Y1 = Y1,
-                X2 = X2,
-                Y2 = Y2
+                X1 = X,
+                Y1 = Y,
+                X2 = X + Width,
+                Y2 = Y - Height
             };
+        }
+
+        private static Color IconColor = Color.FromArgb(128, 255, 0, 0);
+
+        private static Color SelectedIconColor = Color.FromArgb(128, 255, 255, 0);
+
+        public void Render(bool selected)
+        {
+            if (selected)
+                DrawShape.DrawRectangle(X, Y, X + Width, Y - Height, SelectedIconColor);
+            else
+                DrawShape.DrawRectangle(X, Y, X + Width, Y - Height, IconColor);
+        }
+
+        public RectangleF ToRect()
+        {
+            return new RectangleF(X, Y - Height, Width, Height);
         }
 
         public override string ToString()
         {
-            return $"{MEXConverter.externalIDValues[FighterExternalID + 1]} ({X1}, {Y1}, {X2}, {Y2})";
+            return $"{MEXConverter.externalIDValues[FighterExternalID + 1]} X: {X} Y: {Y} W: {Width} H: {Height})";
         }
     }
 
