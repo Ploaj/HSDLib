@@ -129,8 +129,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Effect File"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int EffectIndex { get; set; }
 
-        [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter")]
-        public byte SSMIndex { get; set; }
+        [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter"), TypeConverter(typeof(SSMIDConverter))]
+        public int SSMIndex { get; set; }
 
         [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
         public uint SSMBitfield1 { get; set; }
@@ -286,7 +286,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             mexData.FighterData.SSMFileIDs.Set(externalID, new MEX_CharSSMFileID()
             {
-                SSMID = SSMIndex,
+                SSMID = (byte)SSMIndex,
                 BitField1 = (int)SSMBitfield1,
                 BitField2 = (int)SSMBitfield2
             });

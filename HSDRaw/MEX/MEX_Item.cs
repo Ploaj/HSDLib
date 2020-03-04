@@ -4,7 +4,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_ItemTables : HSDAccessor
     {
-        public override int TrimmedSize => 0x14;
+        public override int TrimmedSize => 0x18;
 
         public HSDArrayAccessor<MEX_Item> CommonItems { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -15,6 +15,8 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<MEX_Item> Stages { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public HSDArrayAccessor<MEX_Item> MEXItems { get => _s.GetCreateReference<HSDArrayAccessor<MEX_Item>>(0x10); set => _s.SetReference(0x10, value); }
+
+        // table
     }
 
     public class MEX_Item : HSDAccessor

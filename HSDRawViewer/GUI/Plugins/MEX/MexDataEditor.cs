@@ -158,6 +158,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
 
             // Music------------------------------------
+            MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(e=>e.Value));
+
             Music = _data.MusicTable.BackgroundMusicStrings.Array;
             musicListEditor.SetArrayFromProperty(this, "Music");
 
@@ -358,7 +360,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.ItemTable.Pokemon.Array = ItemPokemon;
             _data.ItemTable.Stages.Array = ItemStage;
             _data.ItemTable.MEXItems.Array = ItemMEX;
-            _data.ItemTable._s.GetCreateReference<HSDAccessor>(0x14)._s.Resize(Math.Max(4, ItemMEX.Length * 4));
+            _data.ItemTable._s.GetCreateReference<HSDAccessor>(0x18)._s.Resize(Math.Max(4, ItemMEX.Length * 4));
         }
 
         #region Events

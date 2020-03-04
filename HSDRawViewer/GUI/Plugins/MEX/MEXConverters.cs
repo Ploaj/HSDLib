@@ -7,6 +7,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 {
     public class MEXConverter
     {
+        public static List<string> ssmValues { get; } = new List<string>();
+
         public static List<string> effectValues { get; } = new List<string>();
 
         public static List<string> musicIDValues { get; } = new List<string>();
@@ -82,6 +84,55 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         }
     }
 
+    public class NullIDConverter : TypeConverter
+    {
+        public virtual List<string> values { get; } = new List<string>();
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            if (value is int)
+            {
+                int index = (int)value;
+
+                if (index >= 0 && index < values.Count)
+                    return values[index];
+
+                return "None";
+            }
+            return value;
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            string s = value as string;
+            if (s != null)
+            {
+                int index = values.IndexOf(s);
+
+                return index;
+            }
+
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            var l = new List<string>();
+            l.Add("None");
+            l.AddRange(values);
+            return new StandardValuesCollection(l);
+        }
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+    }
 
     public class IDConverter : TypeConverter
     {
@@ -145,12 +196,17 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public override List<string> values { get => MEXConverter.externalIDValues; }
     }
 
+    public class SSMIDConverter : NullIDConverter
+    {
+        public override List<string> values { get => MEXConverter.ssmValues; }
+    }
+
     public class MusicIDConverter : IDConverter
     {
         public override List<string> values { get => MEXConverter.musicIDValues; }
     }
 
-    public class EffectIDConverter : IDConverter
+    public class EffectIDConverter : NullIDConverter
     {
         public override List<string> values { get => MEXConverter.effectValues; }
     }

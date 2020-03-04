@@ -47,8 +47,16 @@ namespace HSDRawViewer.Sound
             {
                 if (Channels.Count == 0)
                     return "0:00";
-                var sec = (int)Math.Ceiling(Channels[0].LoopStart / 2 / (double)Frequency * 1.75f);
-                return $"{sec / 60}:{sec % 60}";
+                var sec = (int)Math.Ceiling(Channels[0].LoopStart / 2 / (double)Frequency * 1.75f * 1000);
+                return TimeSpan.FromMilliseconds(sec).ToString();
+            }
+            set
+            {
+                TimeSpan ts;
+                if(TimeSpan.TryParse(value, out ts))
+                {
+                    SetLoopFromTimeSpan(ts);
+                }
             }
         }
 
@@ -58,8 +66,8 @@ namespace HSDRawViewer.Sound
             {
                 if (Channels.Count == 0)
                     return "0:00";
-                var sec = (int)Math.Ceiling(Channels[0].Data.Length / (double)Frequency * 1.75f);
-                return $"{sec / 60}:{sec % 60}";
+                var sec = (int)Math.Ceiling(Channels[0].Data.Length / (double)Frequency * 1.75f * 1000);
+                return TimeSpan.FromMilliseconds(sec).ToString();
             }
         }
 
