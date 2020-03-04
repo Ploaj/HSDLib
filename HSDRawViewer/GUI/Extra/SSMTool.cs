@@ -112,30 +112,15 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void importDSPToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var files = FileIO.OpenFiles("DSP (*.dsp*.wav)|*.dsp;*.wav;*.hps");
+            var files = FileIO.OpenFiles(DSP.SupportedImportFilter);
 
             if (files != null)
             {
                 foreach(var file in files)
                 {
-                    if (file.ToLower().EndsWith(".dsp"))
-                    {
-                        var dsp = new DSP();
-                        dsp.FromDSP(file);
-                        Sounds.Add(dsp);
-                    }
-                    if (file.ToLower().EndsWith(".wav"))
-                    {
-                        var dsp = new DSP();
-                        dsp.FromWAVE(File.ReadAllBytes(file));
-                        Sounds.Add(dsp);
-                    }
-                    if (file.ToLower().EndsWith(".hps"))
-                    {
-                        var dsp = new DSP();
-                        dsp.FromHPS(File.ReadAllBytes(file));
-                        Sounds.Add(dsp);
-                    }
+                    var dsp = new DSP();
+                    dsp.FromFormat(File.ReadAllBytes(file), Path.GetExtension(file));
+                    Sounds.Add(dsp);
                 }
             }
         }
@@ -176,11 +161,6 @@ namespace HSDRawViewer.GUI.Extra
             listBox1.Items.Insert(newIndex, selected);
             // Restore selection
             listBox1.SetSelected(newIndex, true);
-        }
-
-        private void SaveSoundAsDSP(string filePath, DSP dsp)
-        {
-            dsp.ExportDSP(filePath);
         }
 
         #endregion
@@ -313,7 +293,7 @@ namespace HSDRawViewer.GUI.Extra
                 var sIndex = 0;
                 foreach(var s in Sounds)
                 {
-                    File.WriteAllBytes(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav", s.ToWAVE());
+                    s.ExportFormat(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav");
                 }
             }
         }

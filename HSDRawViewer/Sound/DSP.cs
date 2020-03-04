@@ -1,4 +1,6 @@
-﻿using HSDRaw;
+﻿using CSCore;
+using CSCore.Codecs.MP3;
+using HSDRaw;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,6 +35,10 @@ namespace HSDRawViewer.Sound
 
     public class DSP
     {
+        public static string SupportedImportFilter { get; } = "Supported (*.dsp*.wav*.hps*.mp3*.aiff*.wma)|*.dsp;*.wav;*.hps;*.mp3;*.aiff;*.wma";
+
+        public static string SupportedExportFilter { get; } = "Supported Types(*.wav*.dsp*.hps)|*.wav;*.dsp;*.hps";
+
         public int Frequency { get; set; }
 
         public string LoopPoint
@@ -81,12 +87,75 @@ namespace HSDRawViewer.Sound
                 c.LoopStart = (int)sec;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void FromFile(string filePath)
+        {
+            FromFormat(File.ReadAllBytes(filePath), Path.GetExtension(filePath));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="format"></param>
+        public void FromFormat(byte[] data, string format)
+        {
+            format = format.Replace(".", "").ToLower();
+
+            switch (format)
+            {
+                case "wav":
+                    FromWAVE(data);
+                    break;
+                case "dsp":
+                    FromDSP(data);
+                    break;
+                case "mp3":
+                    FromMP3(data);
+                    break;
+                case "aiff":
+                    FromAIFF(data);
+                    break;
+                case "wma":
+                    FromWMA(data);
+                    break;
+                case "hps":
+                    FromHPS(data);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void ExportFormat(string filePath)
+        {
+            var ext = Path.GetExtension(filePath).ToLower();
+
+            switch (ext)
+            {
+                case "wav":
+                    File.WriteAllBytes(filePath, ToWAVE());
+                    break;
+                case "dsp":
+                    ExportDSP(filePath);
+                    break;
+                case "hps":
+                    HPS.SaveDSPAsHPS(this, filePath);
+                    break;
+            }
+        }
+
         #region DSP
 
-        public void FromDSP(string filePath)
+        private void FromDSP(byte[] data)
         {
             Channels.Clear();
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
+            using (BinaryReaderExt r = new BinaryReaderExt(new MemoryStream(data)))
             {
                 r.BigEndian = true;
 
@@ -126,7 +195,7 @@ namespace HSDRawViewer.Sound
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        public void ExportDSP(string filePath)
+        private void ExportDSP(string filePath)
         {
             if (Channels.Count == 1)
             {
@@ -195,7 +264,7 @@ namespace HSDRawViewer.Sound
 
         #region HPS
 
-        public void FromHPS(byte[] data)
+        private void FromHPS(byte[] data)
         {
             var dsp = HPS.ToDSP(data);
             Channels = dsp.Channels;
@@ -211,7 +280,7 @@ namespace HSDRawViewer.Sound
 
         #region WAVE
 
-        public void FromWAVE(byte[] wavFile)
+        private void FromWAVE(byte[] wavFile)
         {
             if (wavFile.Length < 0x2C)
                 throw new NotSupportedException("File is not a valid WAVE file");
@@ -280,60 +349,103 @@ namespace HSDRawViewer.Sound
             }
         }
 
+        /// <summary>
+        /// Wraps the decoded DSP data into a WAVE file stored as a byte array
+        /// </summary>
+        /// <returns></returns>
         public byte[] ToWAVE()
         {
-            var stream = new MemoryStream();
-            using (BinaryWriter w = new BinaryWriter(stream))
+            using (var stream = new MemoryStream())
             {
-                w.Write("RIFF".ToCharArray());
-                w.Write(0); // wave size
-
-                w.Write("WAVE".ToCharArray());
-
-                short BitsPerSample = 16;
-                var byteRate = Frequency * Channels.Count * BitsPerSample / 8;
-                short blockAlign = (short)(Channels.Count * BitsPerSample / 8);
-
-                w.Write("fmt ".ToCharArray());
-                w.Write(16); // chunk size
-                w.Write((short)1); // compression
-                w.Write((short)Channels.Count);
-                w.Write(Frequency);
-                w.Write(byteRate);
-                w.Write(blockAlign);
-                w.Write(BitsPerSample);
-
-                w.Write("data".ToCharArray());
-                var subchunkOffset = w.BaseStream.Position;
-                w.Write(0);
-
-                int subChunkSize = 0;
-                if (Channels.Count == 1)
+                using (BinaryWriter w = new BinaryWriter(stream))
                 {
-                    short[] sound_data = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
-                    subChunkSize += sound_data.Length * 2;
-                    foreach (var s in sound_data)
-                        w.Write(s);
-                }
-                if (Channels.Count == 2)
-                {
-                    short[] sound_data1 = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
-                    short[] sound_data2 = GcAdpcmDecoder.Decode(Channels[1].Data, Channels[1].COEF);
-                    subChunkSize += (sound_data1.Length + sound_data2.Length) * 2;
-                    for (int i = 0; i < sound_data1.Length; i++)
+                    w.Write("RIFF".ToCharArray());
+                    w.Write(0); // wave size
+
+                    w.Write("WAVE".ToCharArray());
+
+                    short BitsPerSample = 16;
+                    var byteRate = Frequency * Channels.Count * BitsPerSample / 8;
+                    short blockAlign = (short)(Channels.Count * BitsPerSample / 8);
+
+                    w.Write("fmt ".ToCharArray());
+                    w.Write(16); // chunk size
+                    w.Write((short)1); // compression
+                    w.Write((short)Channels.Count);
+                    w.Write(Frequency);
+                    w.Write(byteRate);
+                    w.Write(blockAlign);
+                    w.Write(BitsPerSample);
+
+                    w.Write("data".ToCharArray());
+                    var subchunkOffset = w.BaseStream.Position;
+                    w.Write(0);
+
+                    int subChunkSize = 0;
+                    if (Channels.Count == 1)
                     {
-                        w.Write(sound_data1[i]);
-                        w.Write(sound_data2[i]);
+                        short[] sound_data = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
+                        subChunkSize += sound_data.Length * 2;
+                        foreach (var s in sound_data)
+                            w.Write(s);
                     }
+                    if (Channels.Count == 2)
+                    {
+                        short[] sound_data1 = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
+                        short[] sound_data2 = GcAdpcmDecoder.Decode(Channels[1].Data, Channels[1].COEF);
+                        subChunkSize += (sound_data1.Length + sound_data2.Length) * 2;
+                        for (int i = 0; i < sound_data1.Length; i++)
+                        {
+                            w.Write(sound_data1[i]);
+                            w.Write(sound_data2[i]);
+                        }
+                    }
+
+                    w.BaseStream.Position = subchunkOffset;
+                    w.Write(subChunkSize);
+
+                    w.BaseStream.Position = 4;
+                    w.Write((int)(w.BaseStream.Length - 8));
                 }
-
-                w.BaseStream.Position = subchunkOffset;
-                w.Write(subChunkSize);
-
-                w.BaseStream.Position = 4;
-                w.Write((int)(w.BaseStream.Length - 8));
+                return stream.ToArray();
             }
-            return stream.ToArray();
+        }
+
+        #endregion
+
+        #region Extra Formats
+
+        private void FromMP3(byte[] data)
+        {
+            using (MemoryStream s = new MemoryStream(data))
+            using (IWaveSource soundSource = new DmoMp3Decoder(s))
+            using (MemoryStream w = new MemoryStream())
+            {
+                soundSource.WriteToWaveStream(w);
+                FromWAVE(w.ToArray());
+            }
+        }
+
+        private void FromWMA(byte[] data)
+        {
+            using (MemoryStream s = new MemoryStream(data))
+            using (IWaveSource soundSource = new CSCore.Codecs.WMA.WmaDecoder(s))
+            using (MemoryStream w = new MemoryStream())
+            {
+                soundSource.WriteToWaveStream(w);
+                FromWAVE(w.ToArray());
+            }
+        }
+
+        private void FromAIFF(byte[] data)
+        {
+            using (MemoryStream s = new MemoryStream(data))
+            using (IWaveSource soundSource = new CSCore.Codecs.AIFF.AiffReader(s))
+            using (MemoryStream w = new MemoryStream())
+            {
+                soundSource.WriteToWaveStream(w);
+                FromWAVE(w.ToArray());
+            }
         }
 
         #endregion

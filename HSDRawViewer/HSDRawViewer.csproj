@@ -221,6 +221,7 @@
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
+    <Compile Include="GUI\Plugins\MEX\DefaultItemNames.cs" />
     <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXConverters.cs" />
     <Compile Include="GUI\Plugins\MEX\MexDataEditor.cs">

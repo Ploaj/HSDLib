@@ -55,8 +55,6 @@ namespace HSDRawViewer.GUI.Extra
         }
         private DSP _dsp;
 
-        private static string Supported = "Supported Types (*.wav*.dsp*.hps)|*.wav;*.dsp;*.hps";
-
         /// <summary>
         /// 
         /// </summary>
@@ -143,14 +141,7 @@ namespace HSDRawViewer.GUI.Extra
 
             if (file != null)
             {
-                if (file.ToLower().EndsWith(".dsp"))
-                    DSP.FromDSP(file);
-
-                if (file.ToLower().EndsWith(".hps"))
-                    DSP.FromHPS(File.ReadAllBytes(file));
-
-                if (file.ToLower().EndsWith(".wav"))
-                    DSP.FromWAVE(File.ReadAllBytes(file));
+                DSP.FromFormat(File.ReadAllBytes(file), Path.GetExtension(file));
             }
         }
 
@@ -161,18 +152,11 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportButton_Click(object sender, EventArgs e)
         {
-            var file = FileIO.SaveFile(Supported);
+            var file = FileIO.SaveFile(DSP.SupportedExportFilter);
 
             if (file != null)
             {
-                if (file.EndsWith(".dsp"))
-                    DSP.ExportDSP(file);
-
-                if (file.EndsWith(".hps"))
-                    HPS.SaveDSPAsHPS(DSP, file);
-
-                if (file.EndsWith(".wav"))
-                    File.WriteAllBytes(file, DSP.ToWAVE());
+                DSP.ExportFormat(file);
             }
         }
 

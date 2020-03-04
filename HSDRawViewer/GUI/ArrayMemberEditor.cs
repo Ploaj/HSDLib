@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Drawing;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace HSDRawViewer.GUI
 {
     public partial class ArrayMemberEditor : UserControl
     {
         private PropertyInfo Property { get; set; }
+
+        public List<string> TextOverrides { get; } = new List<string>();
 
         private object Object
         {
@@ -24,29 +29,54 @@ namespace HSDRawViewer.GUI
         public event EventHandler DoubleClickedNode;
         public event EventHandler ArrayUpdated;
 
+        [DefaultValue(true)]
+        public bool EnableToolStrip
+        {
+            get => _enableToolStrip;
+            set { toolStrip1.Visible = value; _enableToolStrip = value; }
+        }
+        private bool _enableToolStrip = true;
+
+        [DefaultValue(true)]
         public bool CanAdd
         {
-            get => buttonAdd.Visible;
-            set => buttonAdd.Visible = value;
+            get => _canAdd;
+            set { buttonAdd.Visible = value; _canAdd = value; }
         }
+        private bool _canAdd = true;
 
+        [DefaultValue(true)]
         public bool CanRemove
         {
-            get => buttonRemove.Visible;
-            set => buttonRemove.Visible = value;
+            get => _canRemove;
+            set { buttonRemove.Visible = value; _canRemove = value; }
         }
+        private bool _canRemove = true;
 
+        [DefaultValue(true)]
         public bool CanMove
         {
-            get => buttonDown.Visible;
-            set { buttonDown.Visible = value; buttonUp.Visible = value; }
+            get => _canMove;
+            set { buttonDown.Visible = value; buttonUp.Visible = value; _canMove = value; }
         }
+        private bool _canMove = true;
 
+        [DefaultValue(true)]
         public bool CanClone
         {
-            get => buttonClone.Visible;
-            set => buttonClone.Visible = value;
+            get => _canClone;
+            set { buttonClone.Visible = value; _canClone = value; }
         }
+        private bool _canClone = true;
+
+        public bool DisplayItemIndices { get; set; } = false;
+
+        [DefaultValue(true)]
+        public bool EnablePropertyView { get => _enablePropertyView; set { propertyGrid.Visible = value; _enablePropertyView = value; } }
+        private bool _enablePropertyView = true;
+
+        public bool EnablePropertyViewDescription { get => propertyGrid.HelpVisible; set => propertyGrid.HelpVisible = value; }
+
 
         public void DisableAllControls()
         {
@@ -55,17 +85,11 @@ namespace HSDRawViewer.GUI
             CanMove = false;
             CanClone = false;
         }
-
-        public void EnablePropertyViewer(bool enable)
-        {
-            propertyGrid.Visible = enable;
-        }
-
-        public void EnablePropertyViewerDescription(bool enable)
-        {
-            propertyGrid.HelpVisible = enable;
-        }
-
+        /// <summary>
+        /// Starting offset for item index display
+        /// </summary>
+        public int ItemIndexOffset { get; set; } = 0;
+        
         /// <summary>
         /// 
         /// </summary>
@@ -306,6 +330,49 @@ namespace HSDRawViewer.GUI
             elementList.Items.Add(ObjectExtensions.Copy(elementList.SelectedItem));
 
             MakeChanges();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void elementList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            try
+            {
+                e.DrawBackground();
+
+                var brush = ApplicationSettings.SystemWindowTextColorBrush;
+
+                var itemText = ((ListBox)sender).Items[e.Index].ToString();
+
+                if (e.Index < TextOverrides.Count && !string.IsNullOrEmpty(TextOverrides[e.Index]))
+                    itemText = TextOverrides[e.Index];
+
+                if (string.IsNullOrEmpty(itemText))
+                    itemText = "-";
+
+                if (DisplayItemIndices)
+                {
+                    var indText = (e.Index + ItemIndexOffset).ToString() + ".";
+
+                    var indSize =  TextRenderer.MeasureText(indText, e.Font);
+                    var indexBound = new Rectangle(e.Bounds.X, e.Bounds.Y, indSize.Width, indSize.Height);
+                    var textBound = new Rectangle(e.Bounds.X + indSize.Width, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
+
+                    e.Graphics.DrawString(indText, e.Font, ApplicationSettings.SystemGrayTextColorBrush, indexBound, StringFormat.GenericDefault);
+                    e.Graphics.DrawString(itemText, e.Font, brush, textBound, StringFormat.GenericDefault);
+                }
+                else
+                    e.Graphics.DrawString(itemText, e.Font, brush, e.Bounds, StringFormat.GenericDefault);
+
+                e.DrawFocusRectangle();
+            }
+            catch
+            {
+
+            }
         }
     }
 }

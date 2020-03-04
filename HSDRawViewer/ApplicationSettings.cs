@@ -4,6 +4,7 @@ using HSDRawViewer.GUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -12,6 +13,12 @@ namespace HSDRawViewer
 {
     public class ApplicationSettings
     {
+        [Browsable(false),]
+        public static Brush SystemWindowTextColorBrush = new SolidBrush(System.Drawing.SystemColors.WindowText);
+
+        [Browsable(false),]
+        public static Brush SystemGrayTextColorBrush = new SolidBrush(System.Drawing.SystemColors.GrayText);
+
         [Browsable(false), ]
         public static bool UnlockedViewport { get; set; } = false;
 

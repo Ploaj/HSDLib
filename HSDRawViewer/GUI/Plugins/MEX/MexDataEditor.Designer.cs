@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MexDataEditor));
             this.mainTabControl = new System.Windows.Forms.TabControl();
             this.tabPageFighter = new System.Windows.Forms.TabPage();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -54,8 +53,11 @@
             this.pokemonItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPageItemStages = new System.Windows.Forms.TabPage();
             this.stageItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.tabPageMexItems = new System.Windows.Forms.TabPage();
+            this.mexItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip5 = new System.Windows.Forms.ToolStrip();
             this.saveItemButton = new System.Windows.Forms.ToolStripButton();
+            this.mexItemCloneButton = new System.Windows.Forms.ToolStripButton();
             this.tabPageEffects = new System.Windows.Forms.TabPage();
             this.effectTabControl = new System.Windows.Forms.TabControl();
             this.effectFileTab = new System.Windows.Forms.TabPage();
@@ -67,9 +69,9 @@
             this.tabPageCSS = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonLoadPlSl = new System.Windows.Forms.Button();
+            this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.buttonSaveCSS = new System.Windows.Forms.ToolStripButton();
-            this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPageMusic = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage7 = new System.Windows.Forms.TabPage();
@@ -81,9 +83,8 @@
             this.saveMusicButton = new System.Windows.Forms.ToolStripButton();
             this.createHPSButton = new System.Windows.Forms.ToolStripButton();
             this.musicDSPPlayer = new HSDRawViewer.GUI.Extra.DSPViewer();
-            this.tabPageMexItems = new System.Windows.Forms.TabPage();
-            this.mexItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
-            this.mexItemCloneButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip6 = new System.Windows.Forms.ToolStrip();
+            this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
             this.mainTabControl.SuspendLayout();
             this.tabPageFighter.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -97,6 +98,7 @@
             this.tabPageItemFighter.SuspendLayout();
             this.tabPageItemPokemon.SuspendLayout();
             this.tabPageItemStages.SuspendLayout();
+            this.tabPageMexItems.SuspendLayout();
             this.toolStrip5.SuspendLayout();
             this.tabPageEffects.SuspendLayout();
             this.effectTabControl.SuspendLayout();
@@ -111,7 +113,7 @@
             this.tabPage7.SuspendLayout();
             this.tabPage8.SuspendLayout();
             this.toolStrip2.SuspendLayout();
-            this.tabPageMexItems.SuspendLayout();
+            this.toolStrip6.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTabControl
@@ -122,10 +124,10 @@
             this.mainTabControl.Controls.Add(this.tabPageCSS);
             this.mainTabControl.Controls.Add(this.tabPageMusic);
             this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainTabControl.Location = new System.Drawing.Point(0, 0);
+            this.mainTabControl.Location = new System.Drawing.Point(0, 25);
             this.mainTabControl.Name = "mainTabControl";
             this.mainTabControl.SelectedIndex = 0;
-            this.mainTabControl.Size = new System.Drawing.Size(799, 333);
+            this.mainTabControl.Size = new System.Drawing.Size(799, 308);
             this.mainTabControl.TabIndex = 0;
             // 
             // tabPageFighter
@@ -136,7 +138,7 @@
             this.tabPageFighter.Location = new System.Drawing.Point(4, 22);
             this.tabPageFighter.Name = "tabPageFighter";
             this.tabPageFighter.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageFighter.Size = new System.Drawing.Size(791, 307);
+            this.tabPageFighter.Size = new System.Drawing.Size(791, 282);
             this.tabPageFighter.TabIndex = 0;
             this.tabPageFighter.Text = "Fighters";
             this.tabPageFighter.UseVisualStyleBackColor = true;
@@ -149,7 +151,7 @@
             this.tabControl1.Location = new System.Drawing.Point(203, 28);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(585, 276);
+            this.tabControl1.Size = new System.Drawing.Size(585, 251);
             this.tabControl1.TabIndex = 2;
             // 
             // tabPage3
@@ -158,7 +160,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(577, 250);
+            this.tabPage3.Size = new System.Drawing.Size(577, 225);
             this.tabPage3.TabIndex = 0;
             this.tabPage3.Text = "Properties";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -169,7 +171,7 @@
             this.propertyGrid1.Location = new System.Drawing.Point(3, 3);
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid1.Size = new System.Drawing.Size(571, 244);
+            this.propertyGrid1.Size = new System.Drawing.Size(571, 219);
             this.propertyGrid1.TabIndex = 0;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
@@ -179,7 +181,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(577, 250);
+            this.tabPage4.Size = new System.Drawing.Size(577, 225);
             this.tabPage4.TabIndex = 1;
             this.tabPage4.Text = "Functions";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -190,7 +192,7 @@
             this.propertyGrid2.Location = new System.Drawing.Point(3, 3);
             this.propertyGrid2.Name = "propertyGrid2";
             this.propertyGrid2.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid2.Size = new System.Drawing.Size(571, 244);
+            this.propertyGrid2.Size = new System.Drawing.Size(571, 219);
             this.propertyGrid2.TabIndex = 1;
             // 
             // groupBox1
@@ -199,7 +201,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.Location = new System.Drawing.Point(3, 28);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(200, 276);
+            this.groupBox1.Size = new System.Drawing.Size(200, 251);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Fighters";
@@ -211,7 +213,7 @@
             this.fighterList.FormattingEnabled = true;
             this.fighterList.Location = new System.Drawing.Point(3, 16);
             this.fighterList.Name = "fighterList";
-            this.fighterList.Size = new System.Drawing.Size(194, 257);
+            this.fighterList.Size = new System.Drawing.Size(194, 232);
             this.fighterList.TabIndex = 0;
             this.fighterList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.fighterList_DrawItem);
             this.fighterList.SelectedIndexChanged += new System.EventHandler(this.fighterList_SelectedIndexChanged);
@@ -282,7 +284,7 @@
             this.tabPageItem.Location = new System.Drawing.Point(4, 22);
             this.tabPageItem.Name = "tabPageItem";
             this.tabPageItem.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItem.Size = new System.Drawing.Size(791, 307);
+            this.tabPageItem.Size = new System.Drawing.Size(791, 282);
             this.tabPageItem.TabIndex = 5;
             this.tabPageItem.Text = "Items";
             this.tabPageItem.UseVisualStyleBackColor = true;
@@ -298,7 +300,7 @@
             this.itemTabs.Location = new System.Drawing.Point(3, 28);
             this.itemTabs.Name = "itemTabs";
             this.itemTabs.SelectedIndex = 0;
-            this.itemTabs.Size = new System.Drawing.Size(785, 276);
+            this.itemTabs.Size = new System.Drawing.Size(785, 251);
             this.itemTabs.TabIndex = 2;
             // 
             // tabPageItemCommon
@@ -307,18 +309,25 @@
             this.tabPageItemCommon.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemCommon.Name = "tabPageItemCommon";
             this.tabPageItemCommon.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemCommon.Size = new System.Drawing.Size(777, 250);
+            this.tabPageItemCommon.Size = new System.Drawing.Size(777, 225);
             this.tabPageItemCommon.TabIndex = 0;
             this.tabPageItemCommon.Text = "Common";
             this.tabPageItemCommon.UseVisualStyleBackColor = true;
             // 
             // commonItemEditor
             // 
-            this.commonItemEditor.CanClone = true;
+            this.commonItemEditor.CanAdd = false;
+            this.commonItemEditor.CanClone = false;
+            this.commonItemEditor.CanMove = false;
+            this.commonItemEditor.CanRemove = false;
+            this.commonItemEditor.DisplayItemIndices = true;
             this.commonItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.commonItemEditor.EnablePropertyViewDescription = true;
+            this.commonItemEditor.EnableToolStrip = false;
+            this.commonItemEditor.ItemIndexOffset = 0;
             this.commonItemEditor.Location = new System.Drawing.Point(3, 3);
             this.commonItemEditor.Name = "commonItemEditor";
-            this.commonItemEditor.Size = new System.Drawing.Size(771, 244);
+            this.commonItemEditor.Size = new System.Drawing.Size(771, 219);
             this.commonItemEditor.TabIndex = 1;
             // 
             // tabPageItemFighter
@@ -327,18 +336,25 @@
             this.tabPageItemFighter.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemFighter.Name = "tabPageItemFighter";
             this.tabPageItemFighter.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemFighter.Size = new System.Drawing.Size(777, 250);
+            this.tabPageItemFighter.Size = new System.Drawing.Size(777, 225);
             this.tabPageItemFighter.TabIndex = 1;
             this.tabPageItemFighter.Text = "Fighter";
             this.tabPageItemFighter.UseVisualStyleBackColor = true;
             // 
             // fighterItemEditor
             // 
-            this.fighterItemEditor.CanClone = true;
+            this.fighterItemEditor.CanAdd = false;
+            this.fighterItemEditor.CanClone = false;
+            this.fighterItemEditor.CanMove = false;
+            this.fighterItemEditor.CanRemove = false;
+            this.fighterItemEditor.DisplayItemIndices = true;
             this.fighterItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fighterItemEditor.EnablePropertyViewDescription = true;
+            this.fighterItemEditor.EnableToolStrip = false;
+            this.fighterItemEditor.ItemIndexOffset = 0;
             this.fighterItemEditor.Location = new System.Drawing.Point(3, 3);
             this.fighterItemEditor.Name = "fighterItemEditor";
-            this.fighterItemEditor.Size = new System.Drawing.Size(771, 244);
+            this.fighterItemEditor.Size = new System.Drawing.Size(771, 219);
             this.fighterItemEditor.TabIndex = 2;
             // 
             // tabPageItemPokemon
@@ -347,18 +363,25 @@
             this.tabPageItemPokemon.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemPokemon.Name = "tabPageItemPokemon";
             this.tabPageItemPokemon.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemPokemon.Size = new System.Drawing.Size(777, 250);
+            this.tabPageItemPokemon.Size = new System.Drawing.Size(777, 225);
             this.tabPageItemPokemon.TabIndex = 2;
             this.tabPageItemPokemon.Text = "Pokemon";
             this.tabPageItemPokemon.UseVisualStyleBackColor = true;
             // 
             // pokemonItemEditor
             // 
-            this.pokemonItemEditor.CanClone = true;
+            this.pokemonItemEditor.CanAdd = false;
+            this.pokemonItemEditor.CanClone = false;
+            this.pokemonItemEditor.CanMove = false;
+            this.pokemonItemEditor.CanRemove = false;
+            this.pokemonItemEditor.DisplayItemIndices = true;
             this.pokemonItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pokemonItemEditor.EnablePropertyViewDescription = true;
+            this.pokemonItemEditor.EnableToolStrip = false;
+            this.pokemonItemEditor.ItemIndexOffset = 0;
             this.pokemonItemEditor.Location = new System.Drawing.Point(3, 3);
             this.pokemonItemEditor.Name = "pokemonItemEditor";
-            this.pokemonItemEditor.Size = new System.Drawing.Size(771, 244);
+            this.pokemonItemEditor.Size = new System.Drawing.Size(771, 219);
             this.pokemonItemEditor.TabIndex = 2;
             // 
             // tabPageItemStages
@@ -367,19 +390,48 @@
             this.tabPageItemStages.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemStages.Name = "tabPageItemStages";
             this.tabPageItemStages.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemStages.Size = new System.Drawing.Size(777, 250);
+            this.tabPageItemStages.Size = new System.Drawing.Size(777, 225);
             this.tabPageItemStages.TabIndex = 3;
             this.tabPageItemStages.Text = "Stages";
             this.tabPageItemStages.UseVisualStyleBackColor = true;
             // 
             // stageItemEditor
             // 
-            this.stageItemEditor.CanClone = true;
+            this.stageItemEditor.CanAdd = false;
+            this.stageItemEditor.CanClone = false;
+            this.stageItemEditor.CanMove = false;
+            this.stageItemEditor.CanRemove = false;
+            this.stageItemEditor.DisplayItemIndices = true;
             this.stageItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageItemEditor.EnablePropertyViewDescription = true;
+            this.stageItemEditor.EnableToolStrip = false;
+            this.stageItemEditor.ItemIndexOffset = 0;
             this.stageItemEditor.Location = new System.Drawing.Point(3, 3);
             this.stageItemEditor.Name = "stageItemEditor";
-            this.stageItemEditor.Size = new System.Drawing.Size(771, 244);
+            this.stageItemEditor.Size = new System.Drawing.Size(771, 219);
             this.stageItemEditor.TabIndex = 2;
+            // 
+            // tabPageMexItems
+            // 
+            this.tabPageMexItems.Controls.Add(this.mexItemEditor);
+            this.tabPageMexItems.Location = new System.Drawing.Point(4, 22);
+            this.tabPageMexItems.Name = "tabPageMexItems";
+            this.tabPageMexItems.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageMexItems.Size = new System.Drawing.Size(777, 225);
+            this.tabPageMexItems.TabIndex = 4;
+            this.tabPageMexItems.Text = "MEX Items";
+            this.tabPageMexItems.UseVisualStyleBackColor = true;
+            // 
+            // mexItemEditor
+            // 
+            this.mexItemEditor.DisplayItemIndices = true;
+            this.mexItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mexItemEditor.EnablePropertyViewDescription = true;
+            this.mexItemEditor.ItemIndexOffset = 0;
+            this.mexItemEditor.Location = new System.Drawing.Point(3, 3);
+            this.mexItemEditor.Name = "mexItemEditor";
+            this.mexItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.mexItemEditor.TabIndex = 3;
             // 
             // toolStrip5
             // 
@@ -401,6 +453,15 @@
             this.saveItemButton.Text = "Save Item Changes";
             this.saveItemButton.Click += new System.EventHandler(this.saveItemButton_Click);
             // 
+            // mexItemCloneButton
+            // 
+            this.mexItemCloneButton.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
+            this.mexItemCloneButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mexItemCloneButton.Name = "mexItemCloneButton";
+            this.mexItemCloneButton.Size = new System.Drawing.Size(146, 22);
+            this.mexItemCloneButton.Text = "Clone Selected to MEX";
+            this.mexItemCloneButton.Click += new System.EventHandler(this.mexItemCloneButton_Click);
+            // 
             // tabPageEffects
             // 
             this.tabPageEffects.Controls.Add(this.effectTabControl);
@@ -408,7 +469,7 @@
             this.tabPageEffects.Location = new System.Drawing.Point(4, 22);
             this.tabPageEffects.Name = "tabPageEffects";
             this.tabPageEffects.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageEffects.Size = new System.Drawing.Size(791, 307);
+            this.tabPageEffects.Size = new System.Drawing.Size(791, 282);
             this.tabPageEffects.TabIndex = 3;
             this.tabPageEffects.Text = "Effects";
             this.tabPageEffects.UseVisualStyleBackColor = true;
@@ -421,7 +482,7 @@
             this.effectTabControl.Location = new System.Drawing.Point(3, 28);
             this.effectTabControl.Name = "effectTabControl";
             this.effectTabControl.SelectedIndex = 0;
-            this.effectTabControl.Size = new System.Drawing.Size(785, 276);
+            this.effectTabControl.Size = new System.Drawing.Size(785, 251);
             this.effectTabControl.TabIndex = 3;
             // 
             // effectFileTab
@@ -430,18 +491,20 @@
             this.effectFileTab.Location = new System.Drawing.Point(4, 22);
             this.effectFileTab.Name = "effectFileTab";
             this.effectFileTab.Padding = new System.Windows.Forms.Padding(3);
-            this.effectFileTab.Size = new System.Drawing.Size(777, 250);
+            this.effectFileTab.Size = new System.Drawing.Size(777, 225);
             this.effectFileTab.TabIndex = 0;
             this.effectFileTab.Text = "Effect Files";
             this.effectFileTab.UseVisualStyleBackColor = true;
             // 
             // effectEditor
             // 
-            this.effectEditor.CanClone = true;
+            this.effectEditor.DisplayItemIndices = true;
             this.effectEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.effectEditor.EnablePropertyViewDescription = true;
+            this.effectEditor.ItemIndexOffset = 0;
             this.effectEditor.Location = new System.Drawing.Point(3, 3);
             this.effectEditor.Name = "effectEditor";
-            this.effectEditor.Size = new System.Drawing.Size(771, 244);
+            this.effectEditor.Size = new System.Drawing.Size(771, 219);
             this.effectEditor.TabIndex = 1;
             // 
             // mexEffectTab
@@ -450,18 +513,20 @@
             this.mexEffectTab.Location = new System.Drawing.Point(4, 22);
             this.mexEffectTab.Name = "mexEffectTab";
             this.mexEffectTab.Padding = new System.Windows.Forms.Padding(3);
-            this.mexEffectTab.Size = new System.Drawing.Size(777, 250);
+            this.mexEffectTab.Size = new System.Drawing.Size(777, 225);
             this.mexEffectTab.TabIndex = 1;
             this.mexEffectTab.Text = "MEX Effects";
             this.mexEffectTab.UseVisualStyleBackColor = true;
             // 
             // mEXEffectEditor
             // 
-            this.mEXEffectEditor.CanClone = true;
+            this.mEXEffectEditor.DisplayItemIndices = true;
             this.mEXEffectEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mEXEffectEditor.EnablePropertyViewDescription = true;
+            this.mEXEffectEditor.ItemIndexOffset = 0;
             this.mEXEffectEditor.Location = new System.Drawing.Point(3, 3);
             this.mEXEffectEditor.Name = "mEXEffectEditor";
-            this.mEXEffectEditor.Size = new System.Drawing.Size(771, 244);
+            this.mEXEffectEditor.Size = new System.Drawing.Size(771, 219);
             this.mEXEffectEditor.TabIndex = 2;
             // 
             // toolStrip3
@@ -486,12 +551,12 @@
             // tabPageCSS
             // 
             this.tabPageCSS.Controls.Add(this.groupBox2);
-            this.tabPageCSS.Controls.Add(this.toolStrip4);
             this.tabPageCSS.Controls.Add(this.cssIconEditor);
+            this.tabPageCSS.Controls.Add(this.toolStrip4);
             this.tabPageCSS.Location = new System.Drawing.Point(4, 22);
             this.tabPageCSS.Name = "tabPageCSS";
             this.tabPageCSS.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageCSS.Size = new System.Drawing.Size(791, 307);
+            this.tabPageCSS.Size = new System.Drawing.Size(791, 282);
             this.tabPageCSS.TabIndex = 2;
             this.tabPageCSS.Text = "CSS";
             this.tabPageCSS.UseVisualStyleBackColor = true;
@@ -502,7 +567,7 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(211, 28);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(577, 276);
+            this.groupBox2.Size = new System.Drawing.Size(577, 251);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Preview";
@@ -518,13 +583,24 @@
             this.buttonLoadPlSl.UseVisualStyleBackColor = true;
             this.buttonLoadPlSl.Click += new System.EventHandler(this.buttonLoadPlSl_Click);
             // 
+            // cssIconEditor
+            // 
+            this.cssIconEditor.DisplayItemIndices = false;
+            this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Left;
+            this.cssIconEditor.EnablePropertyViewDescription = true;
+            this.cssIconEditor.ItemIndexOffset = 0;
+            this.cssIconEditor.Location = new System.Drawing.Point(3, 28);
+            this.cssIconEditor.Name = "cssIconEditor";
+            this.cssIconEditor.Size = new System.Drawing.Size(208, 251);
+            this.cssIconEditor.TabIndex = 0;
+            // 
             // toolStrip4
             // 
             this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonSaveCSS});
-            this.toolStrip4.Location = new System.Drawing.Point(211, 3);
+            this.toolStrip4.Location = new System.Drawing.Point(3, 3);
             this.toolStrip4.Name = "toolStrip4";
-            this.toolStrip4.Size = new System.Drawing.Size(577, 25);
+            this.toolStrip4.Size = new System.Drawing.Size(785, 25);
             this.toolStrip4.TabIndex = 1;
             this.toolStrip4.Text = "toolStrip4";
             // 
@@ -537,15 +613,6 @@
             this.buttonSaveCSS.Text = "Save CSS Changes";
             this.buttonSaveCSS.Click += new System.EventHandler(this.buttonSaveCSS_Click);
             // 
-            // cssIconEditor
-            // 
-            this.cssIconEditor.CanClone = true;
-            this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Left;
-            this.cssIconEditor.Location = new System.Drawing.Point(3, 3);
-            this.cssIconEditor.Name = "cssIconEditor";
-            this.cssIconEditor.Size = new System.Drawing.Size(208, 301);
-            this.cssIconEditor.TabIndex = 0;
-            // 
             // tabPageMusic
             // 
             this.tabPageMusic.Controls.Add(this.tabControl2);
@@ -555,7 +622,7 @@
             this.tabPageMusic.Location = new System.Drawing.Point(4, 22);
             this.tabPageMusic.Name = "tabPageMusic";
             this.tabPageMusic.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageMusic.Size = new System.Drawing.Size(791, 307);
+            this.tabPageMusic.Size = new System.Drawing.Size(791, 282);
             this.tabPageMusic.TabIndex = 4;
             this.tabPageMusic.Text = "Music";
             this.tabPageMusic.UseVisualStyleBackColor = true;
@@ -568,7 +635,7 @@
             this.tabControl2.Location = new System.Drawing.Point(3, 28);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(413, 276);
+            this.tabControl2.Size = new System.Drawing.Size(413, 251);
             this.tabControl2.TabIndex = 7;
             // 
             // tabPage7
@@ -577,18 +644,20 @@
             this.tabPage7.Location = new System.Drawing.Point(4, 22);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(405, 250);
+            this.tabPage7.Size = new System.Drawing.Size(405, 225);
             this.tabPage7.TabIndex = 0;
             this.tabPage7.Text = "Music Files";
             this.tabPage7.UseVisualStyleBackColor = true;
             // 
             // musicListEditor
             // 
-            this.musicListEditor.CanClone = true;
+            this.musicListEditor.DisplayItemIndices = true;
             this.musicListEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.musicListEditor.EnablePropertyViewDescription = true;
+            this.musicListEditor.ItemIndexOffset = 0;
             this.musicListEditor.Location = new System.Drawing.Point(3, 3);
             this.musicListEditor.Name = "musicListEditor";
-            this.musicListEditor.Size = new System.Drawing.Size(399, 244);
+            this.musicListEditor.Size = new System.Drawing.Size(399, 219);
             this.musicListEditor.TabIndex = 4;
             // 
             // tabPage8
@@ -597,18 +666,20 @@
             this.tabPage8.Location = new System.Drawing.Point(4, 22);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(405, 250);
+            this.tabPage8.Size = new System.Drawing.Size(405, 225);
             this.tabPage8.TabIndex = 1;
             this.tabPage8.Text = "Menu Playlist";
             this.tabPage8.UseVisualStyleBackColor = true;
             // 
             // menuPlaylistEditor
             // 
-            this.menuPlaylistEditor.CanClone = true;
+            this.menuPlaylistEditor.DisplayItemIndices = true;
             this.menuPlaylistEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.menuPlaylistEditor.EnablePropertyViewDescription = true;
+            this.menuPlaylistEditor.ItemIndexOffset = 0;
             this.menuPlaylistEditor.Location = new System.Drawing.Point(3, 3);
             this.menuPlaylistEditor.Name = "menuPlaylistEditor";
-            this.menuPlaylistEditor.Size = new System.Drawing.Size(399, 244);
+            this.menuPlaylistEditor.Size = new System.Drawing.Size(399, 219);
             this.menuPlaylistEditor.TabIndex = 0;
             // 
             // splitter1
@@ -616,7 +687,7 @@
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Right;
             this.splitter1.Location = new System.Drawing.Point(416, 28);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 276);
+            this.splitter1.Size = new System.Drawing.Size(3, 251);
             this.splitter1.TabIndex = 6;
             this.splitter1.TabStop = false;
             // 
@@ -642,12 +713,11 @@
             // 
             // createHPSButton
             // 
-            this.createHPSButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.createHPSButton.Image = ((System.Drawing.Image)(resources.GetObject("createHPSButton.Image")));
+            this.createHPSButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.createHPSButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.createHPSButton.Name = "createHPSButton";
-            this.createHPSButton.Size = new System.Drawing.Size(129, 22);
-            this.createHPSButton.Text = "Create HPS From WAV";
+            this.createHPSButton.Size = new System.Drawing.Size(151, 22);
+            this.createHPSButton.Text = "Create HPS From File(s)";
             this.createHPSButton.Click += new System.EventHandler(this.createHPSButton_Click);
             // 
             // musicDSPPlayer
@@ -657,37 +727,27 @@
             this.musicDSPPlayer.Location = new System.Drawing.Point(419, 3);
             this.musicDSPPlayer.Name = "musicDSPPlayer";
             this.musicDSPPlayer.ReplaceButtonVisible = false;
-            this.musicDSPPlayer.Size = new System.Drawing.Size(369, 301);
+            this.musicDSPPlayer.Size = new System.Drawing.Size(369, 276);
             this.musicDSPPlayer.TabIndex = 5;
             // 
-            // tabPageMexItems
+            // toolStrip6
             // 
-            this.tabPageMexItems.Controls.Add(this.mexItemEditor);
-            this.tabPageMexItems.Location = new System.Drawing.Point(4, 22);
-            this.tabPageMexItems.Name = "tabPageMexItems";
-            this.tabPageMexItems.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageMexItems.Size = new System.Drawing.Size(777, 250);
-            this.tabPageMexItems.TabIndex = 4;
-            this.tabPageMexItems.Text = "MEX Items";
-            this.tabPageMexItems.UseVisualStyleBackColor = true;
+            this.toolStrip6.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveAllChangesButton});
+            this.toolStrip6.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip6.Name = "toolStrip6";
+            this.toolStrip6.Size = new System.Drawing.Size(799, 25);
+            this.toolStrip6.TabIndex = 9;
+            this.toolStrip6.Text = "toolStrip6";
             // 
-            // mexItemEditor
+            // saveAllChangesButton
             // 
-            this.mexItemEditor.CanClone = true;
-            this.mexItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mexItemEditor.Location = new System.Drawing.Point(3, 3);
-            this.mexItemEditor.Name = "mexItemEditor";
-            this.mexItemEditor.Size = new System.Drawing.Size(771, 244);
-            this.mexItemEditor.TabIndex = 3;
-            // 
-            // mexItemCloneButton
-            // 
-            this.mexItemCloneButton.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
-            this.mexItemCloneButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.mexItemCloneButton.Name = "mexItemCloneButton";
-            this.mexItemCloneButton.Size = new System.Drawing.Size(146, 22);
-            this.mexItemCloneButton.Text = "Clone Selected to MEX";
-            this.mexItemCloneButton.Click += new System.EventHandler(this.mexItemCloneButton_Click);
+            this.saveAllChangesButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
+            this.saveAllChangesButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveAllChangesButton.Name = "saveAllChangesButton";
+            this.saveAllChangesButton.Size = new System.Drawing.Size(117, 22);
+            this.saveAllChangesButton.Text = "Save All Changes";
+            this.saveAllChangesButton.Click += new System.EventHandler(this.saveAllChangesButton_Click);
             // 
             // MexDataEditor
             // 
@@ -695,6 +755,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(799, 333);
             this.Controls.Add(this.mainTabControl);
+            this.Controls.Add(this.toolStrip6);
             this.Name = "MexDataEditor";
             this.TabText = "MexDataEditor";
             this.Text = "MexDataEditor";
@@ -714,6 +775,7 @@
             this.tabPageItemFighter.ResumeLayout(false);
             this.tabPageItemPokemon.ResumeLayout(false);
             this.tabPageItemStages.ResumeLayout(false);
+            this.tabPageMexItems.ResumeLayout(false);
             this.toolStrip5.ResumeLayout(false);
             this.toolStrip5.PerformLayout();
             this.tabPageEffects.ResumeLayout(false);
@@ -735,8 +797,10 @@
             this.tabPage8.ResumeLayout(false);
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
-            this.tabPageMexItems.ResumeLayout(false);
+            this.toolStrip6.ResumeLayout(false);
+            this.toolStrip6.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -797,5 +861,7 @@
         private System.Windows.Forms.TabPage tabPageMexItems;
         private ArrayMemberEditor mexItemEditor;
         private System.Windows.Forms.ToolStripButton mexItemCloneButton;
+        private System.Windows.Forms.ToolStrip toolStrip6;
+        private System.Windows.Forms.ToolStripButton saveAllChangesButton;
     }
 }

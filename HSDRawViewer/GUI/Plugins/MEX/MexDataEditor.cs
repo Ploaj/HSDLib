@@ -20,7 +20,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 {
     public partial class MexDataEditor : DockContent, EditorBase, IDrawable
     {
-
         public MexDataEditor()
         {
             InitializeComponent();
@@ -47,12 +46,17 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             musicListEditor.DoubleClickedNode += musicListEditor_DoubleClicked;
             musicListEditor.ArrayUpdated += musicListEditor_ArrayUpdated;
-            musicListEditor.EnablePropertyViewerDescription(false);
+            musicListEditor.EnablePropertyViewDescription = false;
 
             commonItemEditor.DisableAllControls();
             fighterItemEditor.DisableAllControls();
             pokemonItemEditor.DisableAllControls();
             stageItemEditor.DisableAllControls();
+
+            commonItemEditor.TextOverrides.AddRange(DefaultItemNames.CommonItemNames);
+            fighterItemEditor.TextOverrides.AddRange(DefaultItemNames.FighterItemNames);
+            pokemonItemEditor.TextOverrides.AddRange(DefaultItemNames.PokemonItemNames);
+            stageItemEditor.TextOverrides.AddRange(DefaultItemNames.StageItemNames);
 
             FighterEntries.ListChanged += (sender, args) =>
             {
@@ -104,6 +108,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public MEX_Item[] ItemPokemon { get; set; }
         public MEX_Item[] ItemStage { get; set; }
         public MEX_Item[] ItemMEX { get; set; }
+
+        private int MEXItemOffset = 0;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -168,20 +174,30 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
 
             // Items------------------------------------
+            MEXItemOffset = 0;
+
             ItemCommon = _data.ItemTable.CommonItems.Array;
             commonItemEditor.SetArrayFromProperty(this, "ItemCommon");
+            MEXItemOffset += ItemCommon.Length;
 
             ItemFighter = _data.ItemTable.FighterItems.Array;
             fighterItemEditor.SetArrayFromProperty(this, "ItemFighter");
+            fighterItemEditor.ItemIndexOffset = MEXItemOffset;
+            MEXItemOffset += ItemFighter.Length;
 
             ItemPokemon = _data.ItemTable.Pokemon.Array;
             pokemonItemEditor.SetArrayFromProperty(this, "ItemPokemon");
+            pokemonItemEditor.ItemIndexOffset = MEXItemOffset;
+            MEXItemOffset += ItemPokemon.Length;
 
             ItemStage = _data.ItemTable.Stages.Array;
             stageItemEditor.SetArrayFromProperty(this, "ItemStage");
+            stageItemEditor.ItemIndexOffset = MEXItemOffset;
+            MEXItemOffset += ItemStage.Length;
 
             ItemMEX = _data.ItemTable.MEXItems.Array;
             mexItemEditor.SetArrayFromProperty(this, "ItemMEX");
+            mexItemEditor.ItemIndexOffset = MEXItemOffset;
         }
 
         /// <summary>
@@ -296,13 +312,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             _data.MEXEffects.Array = MEX_Effects;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveMusicButton_Click(object sender, EventArgs e)
+        private void SaveMusicData()
         {
             _data.MetaData.NumOfMusic = Music.Length;
             _data.MusicTable.BackgroundMusicStrings.Array = new HSD_String[0];
@@ -311,7 +325,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             _data.MusicTable.MenuPlaylist.Array = new MEX_MenuPlaylistItem[0];
             _data.MusicTable.MenuPlayListCount = MenuPlaylist.Length;
-            foreach(var v in MenuPlaylist)
+            foreach (var v in MenuPlaylist)
             {
                 _data.MusicTable.MenuPlaylist.Add(new MEX_MenuPlaylistItem()
                 {
@@ -360,7 +374,22 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         }
 
         #endregion
+
+        #region Save Button GUI
+        private void saveAllChangesButton_Click(object sender, EventArgs e)
+        {
+            SaveFighterData();
+            SaveItemData();
+            SaveEffectData();
+            SaveIconData();
+            SaveMusicData();
+        }
         
+        private void saveMusicButton_Click(object sender, EventArgs e)
+        {
+            SaveMusicData();
+        }
+
         private void saveEffectButton_Click(object sender, EventArgs e)
         {
             SaveEffectData();
@@ -376,6 +405,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SaveItemData();
         }
 
+        #endregion
+
+
+        #region IconRendering
         private static Color IconColor = Color.FromArgb(128, 255, 0, 0);
 
         private static Color SelectedIconColor = Color.FromArgb(128, 255, 255, 0);
@@ -392,7 +425,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     DrawShape.DrawRectangle(i.X1, i.Y1, i.X2, i.Y2, IconColor);
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -403,7 +436,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (!viewport.Visible)
                 viewport.Visible = true;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -424,6 +457,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 }
             }
         }
+        #endregion
+
+        #region Fighter Controls
 
         /// <summary>
         /// 
@@ -544,8 +580,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             return (index >= 0x21 - 6 && index < FighterEntries.Count - 6);
         }
 
-
-        private static Brush textColor = new SolidBrush(System.Drawing.SystemColors.WindowText);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private bool IsSpecialFighter(int index)
+        {
+            return (index >= FighterEntries.Count - 6);
+        }
 
         /// <summary>
         /// 
@@ -558,12 +601,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 e.DrawBackground();
 
-                var brush = textColor;
+                var brush = ApplicationSettings.SystemWindowTextColorBrush;
                 
-                if(IsExtendedFighter(e.Index))
-                {
+                if (IsExtendedFighter(e.Index))
                     brush = Brushes.DarkViolet;
-                }
+
+                if (IsSpecialFighter(e.Index))
+                    brush = Brushes.DarkRed;
 
                 e.Graphics.DrawString(((ListBox)sender).Items[e.Index].ToString(),
                 e.Font, brush, e.Bounds, StringFormat.GenericDefault);
@@ -575,6 +619,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             }
         }
+
+        #endregion
+
+        #region Music
 
         /// <summary>
         /// 
@@ -589,7 +637,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 musicDSPPlayer.SoundName = str;
                 var dsp = new Sound.DSP();
-                dsp.FromHPS(File.ReadAllBytes(path));
+                dsp.FromFile(path);
                 musicDSPPlayer.DSP = dsp;
                 musicDSPPlayer.PlaySound();
             }
@@ -632,8 +680,29 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="e"></param>
         private void musicListEditor_ArrayUpdated(object sender, EventArgs e)
         {
+            var oldValues = MEXConverter.musicIDValues.ToArray();
             MEXConverter.musicIDValues.Clear();
             MEXConverter.musicIDValues.AddRange(Music.Select(r => r.Value));
+
+            if(oldValues != null && oldValues.Length == Music.Length)
+            {
+                for(int i = 0; i < oldValues.Length; i++)
+                {
+                    if(oldValues[i] != Music[i].Value)
+                    {
+                        var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{oldValues[i]}");
+                        var newpath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{Music[i].Value}");
+                        
+                        if (File.Exists(path) && !File.Exists(newpath))
+                        {
+                            if(MessageBox.Show($"Rename {oldValues[i]} to {Music[i].Value}?", "Rename File", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+                            {
+                                File.Move(path, newpath);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -643,20 +712,32 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="e"></param>
         private void createHPSButton_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("WAVE (*.wav)|*.wav");
+            var fs = Tools.FileIO.OpenFiles(DSP.SupportedImportFilter);
 
-            if(f != null)
+            if(fs != null)
             {
-                var dsp = new DSP();
-                dsp.FromWAVE(File.ReadAllBytes(f));
-                HPS.SaveDSPAsHPS(dsp, Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "audio\\" + Path.GetFileNameWithoutExtension(f) + ".hps"));
-                var newHPSName = Path.GetFileNameWithoutExtension(f) + ".hps";
-                foreach (var v in Music)
-                    if (v.Value.Equals(newHPSName))
-                        return;
-                musicListEditor.AddItem(new HSD_String() { Value = newHPSName });
+                var audioPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "audio\\");
+
+                if (!Directory.Exists(audioPath))
+                    Directory.CreateDirectory(audioPath);
+
+                foreach(var f in fs)
+                {
+                    var dsp = new DSP();
+                    dsp.FromFile(f);
+                    HPS.SaveDSPAsHPS(dsp, Path.Combine(audioPath, Path.GetFileNameWithoutExtension(f) + ".hps"));
+                    var newHPSName = Path.GetFileNameWithoutExtension(f) + ".hps";
+                    foreach (var v in Music)
+                        if (v.Value.Equals(newHPSName))
+                            return;
+                    musicListEditor.AddItem(new HSD_String() { Value = newHPSName });
+                }
             }
         }
+
+        #endregion
+
+        #region Items
 
         /// <summary>
         /// 
@@ -674,5 +755,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (itemTabs.SelectedIndex == 3)
                 mexItemEditor.AddItem(stageItemEditor.SelectedObject);
         }
+
+        #endregion
     }
 }

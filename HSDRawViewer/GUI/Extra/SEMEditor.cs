@@ -350,7 +350,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void buttonSoundBankAdd_Click(object sender, EventArgs e)
         {
-            var files = FileIO.OpenFiles("Supported Formats (*.dsp, *.wav, *.hps)|*.dsp;*.wav;*.hps");
+            var files = FileIO.OpenFiles(DSP.SupportedImportFilter);
 
             if (files != null)
             {
@@ -358,14 +358,7 @@ namespace HSDRawViewer.GUI.Extra
                 {
                     var dsp = new DSP();
 
-                    if (file.ToLower().EndsWith(".dsp"))
-                        dsp.FromDSP(file);
-
-                    if (file.ToLower().EndsWith(".wav"))
-                        dsp.FromWAVE(File.ReadAllBytes(file));
-
-                    if (file.ToLower().EndsWith(".hps"))
-                        dsp.FromHPS(File.ReadAllBytes(file));
+                    dsp.FromFile(file);
 
                     (entryList.SelectedItem as SEMEntry)?.SoundBank?.Sounds.Add(dsp);
 

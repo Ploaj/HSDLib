@@ -31,12 +31,12 @@
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.elementList = new System.Windows.Forms.ListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.splitter1 = new System.Windows.Forms.Splitter();
             this.buttonAdd = new System.Windows.Forms.ToolStripButton();
             this.buttonRemove = new System.Windows.Forms.ToolStripButton();
+            this.buttonClone = new System.Windows.Forms.ToolStripButton();
             this.buttonUp = new System.Windows.Forms.ToolStripButton();
             this.buttonDown = new System.Windows.Forms.ToolStripButton();
-            this.buttonClone = new System.Windows.Forms.ToolStripButton();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,11 +53,13 @@
             // elementList
             // 
             this.elementList.Dock = System.Windows.Forms.DockStyle.Top;
+            this.elementList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.elementList.FormattingEnabled = true;
             this.elementList.Location = new System.Drawing.Point(0, 25);
             this.elementList.Name = "elementList";
             this.elementList.Size = new System.Drawing.Size(208, 212);
             this.elementList.TabIndex = 4;
+            this.elementList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.elementList_DrawItem);
             this.elementList.SelectedValueChanged += new System.EventHandler(this.elementList_SelectedValueChanged);
             this.elementList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.elementList_MouseDoubleClick);
             // 
@@ -74,15 +76,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(208, 25);
             this.toolStrip1.TabIndex = 8;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // splitter1
-            // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(0, 237);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(208, 8);
-            this.splitter1.TabIndex = 9;
-            this.splitter1.TabStop = false;
             // 
             // buttonAdd
             // 
@@ -104,6 +97,16 @@
             this.buttonRemove.Text = "Remove";
             this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
             // 
+            // buttonClone
+            // 
+            this.buttonClone.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.buttonClone.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
+            this.buttonClone.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonClone.Name = "buttonClone";
+            this.buttonClone.Size = new System.Drawing.Size(23, 22);
+            this.buttonClone.Text = "Clone";
+            this.buttonClone.Click += new System.EventHandler(this.buttonClone_Click);
+            // 
             // buttonUp
             // 
             this.buttonUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -124,15 +127,14 @@
             this.buttonDown.Text = "Move Down";
             this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
             // 
-            // buttonClone
+            // splitter1
             // 
-            this.buttonClone.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonClone.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
-            this.buttonClone.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonClone.Name = "buttonClone";
-            this.buttonClone.Size = new System.Drawing.Size(23, 22);
-            this.buttonClone.Text = "Clone";
-            this.buttonClone.Click += new System.EventHandler(this.buttonClone_Click);
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.splitter1.Location = new System.Drawing.Point(0, 237);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(208, 8);
+            this.splitter1.TabIndex = 9;
+            this.splitter1.TabStop = false;
             // 
             // ArrayMemberEditor
             // 

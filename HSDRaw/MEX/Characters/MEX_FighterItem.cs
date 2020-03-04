@@ -10,7 +10,12 @@ namespace HSDRaw.MEX.Characters
 
         public HSD_UShort[] MEXItems
         {
-            get => _s.GetCreateReference<HSDArrayAccessor<HSD_UShort>>(0x04).Array;
+            get
+            {
+                var arr = _s.GetCreateReference<HSDArrayAccessor<HSD_UShort>>(0x04).Array;
+                System.Array.Resize(ref arr, Count);
+                return arr;
+            }
             set
             {
                 Count = value.Length;
