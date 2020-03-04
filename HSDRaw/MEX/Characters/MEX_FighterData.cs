@@ -45,5 +45,7 @@ namespace HSDRaw.MEX
         
         public HSDArrayAccessor<MEX_RstRuntime> RstRuntime { get => _s.GetReference<HSDArrayAccessor<MEX_RstRuntime>>(0x48); set => _s.SetReference(0x48, value); }
         
+        public HSDArrayAccessor<MEX_FighterItem> FighterItems { get => _s.GetReference<HSDArrayAccessor<MEX_FighterItem>>(0x4C); set => _s.SetReference(0x4C, value); }
+
     }
 }

@@ -75,7 +75,7 @@ namespace HSDRawViewer.Sound
 
         public void SetLoopFromTimeSpan(TimeSpan s)
         {
-            var sec = (s.TotalSeconds / 1.75f) * 2 * Frequency;
+            var sec = (s.TotalMilliseconds / 1.75f / 1000f) * 2 * Frequency;
 
             foreach (var c in Channels)
                 c.LoopStart = (int)sec;

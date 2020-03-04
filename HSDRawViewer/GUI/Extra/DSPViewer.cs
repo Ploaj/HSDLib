@@ -73,8 +73,9 @@ namespace HSDRawViewer.GUI.Extra
                 _dsp.Channels[0].LoopStart != 0 && 
                 Player.Position == Player.Length)
                 {
-                    var sec = (int)Math.Ceiling(_dsp.Channels[0].LoopStart / 2 / (double)_dsp.Frequency * 1.75f);
-                    Player.Position = TimeSpan.FromSeconds(sec);
+                    //var sec = (int)Math.Ceiling(_dsp.Channels[0].LoopStart / 2 / (double)_dsp.Frequency * 1.75f);
+                    var mill = (int)(_dsp.Channels[0].LoopStart / 2 / (double)_dsp.Frequency * 1.75f * 1000);
+                    Player.Position = TimeSpan.FromMilliseconds(mill);
                     PlaySound();
                 }
                 else

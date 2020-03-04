@@ -2,6 +2,7 @@
 using HSDRaw.Common;
 using HSDRaw.Melee.Mn;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Characters;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Sound;
 using System;
@@ -209,7 +210,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterData.CostumePointers.Array = new MEX_CostumeRuntimePointers[0];
             d.FighterData.DefineIDs.Array = new MEX_CharDefineIDs[0];
             d.FighterData.WallJump.Array = new HSD_Byte[0];
-            d.FighterData.RstRuntime.Array = new HSDRaw.MEX.Characters.MEX_RstRuntime[0];
+            d.FighterData.RstRuntime.Array = new MEX_RstRuntime[0];
+            d.FighterData.FighterItems.Array = new MEX_FighterItem[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
@@ -341,6 +343,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.ItemTable.Pokemon.Array = ItemPokemon;
             _data.ItemTable.Stages.Array = ItemStage;
             _data.ItemTable.MEXItems.Array = ItemMEX;
+            _data.ItemTable._s.GetCreateReference<HSDAccessor>(0x14)._s.Resize(Math.Max(4, ItemMEX.Length * 4));
         }
 
         #region Events

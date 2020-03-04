@@ -1,6 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Characters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -80,6 +81,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         [DisplayName("Result Animation Count"), Category("0 - General"), Description("Number of Result Animations")]
         public int RstAnimCount { get; set; }
+        
+        [DisplayName("MEX Items"), Category("0 - General"), Description("MEX Item lookup for Fighter")]
+        public HSD_UShort[] MEXItems { get; set; }
 
         [Browsable(false)]
         public byte CostumeCount { get => (byte)Costumes.Length; }
@@ -189,6 +193,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             AnimCount = mexData.FighterData.AnimCount[internalId].AnimCount;
             RstAnimCount = mexData.FighterData.RstRuntime[internalId].AnimMax;
 
+            MEXItems = mexData.FighterData.FighterItems[internalId].MEXItems;
+
             InsigniaID = mexData.FighterData.InsigniaIDs[externalID].Value;
 
             CanWallJump = mexData.FighterData.WallJump[internalId].Value != 0;
@@ -241,8 +247,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterData.CharFiles.Set(internalId, new MEX_CharFileStrings() { FileName = FighterDataPath, Symbol = FighterDataSymbol});
             mexData.FighterData.AnimFiles.Set(internalId, new HSD_String() { Value = AnimFile });
             mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
-
-            mexData.FighterData.RstRuntime.Set(internalId, new HSDRaw.MEX.Characters.MEX_RstRuntime() { AnimMax = RstAnimCount });
+            mexData.FighterData.RstRuntime.Set(internalId, new MEX_RstRuntime() { AnimMax = RstAnimCount });
+            mexData.FighterData.FighterItems.Set(internalId, new MEX_FighterItem() { MEXItems = MEXItems });
 
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 

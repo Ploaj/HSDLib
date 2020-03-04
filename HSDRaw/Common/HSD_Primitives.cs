@@ -53,6 +53,17 @@ namespace HSDRaw.Common
         public float Z { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
     }
 
+    public class HSD_UShort : HSDAccessor
+    {
+        public override int TrimmedSize => 0x02;
+
+        public ushort Value { get => (ushort)_s.GetInt16(0x00); set => _s.SetInt16(0x00, (short)value); }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+    }
 
     public class HSD_Byte : HSDAccessor
     {

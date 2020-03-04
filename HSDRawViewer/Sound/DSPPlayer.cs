@@ -65,7 +65,7 @@ namespace HSDRawViewer.Sound
 
             _waveSource = src;
 
-            _soundOut = new WasapiOut() { Latency = 100, Device = ApplicationSettings.DefaultDevice };
+            _soundOut = new WasapiOut() { Latency = 50, Device = ApplicationSettings.DefaultDevice };
             _soundOut.Initialize(_waveSource);
 
             if (PlaybackStopped != null) _soundOut.Stopped += PlaybackStopped;

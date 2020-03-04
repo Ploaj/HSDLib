@@ -92,6 +92,33 @@ namespace HSDRawViewer
             {
                 return true;
             }
+
+            public override bool CanConvertFrom(ITypeDescriptorContext context,
+                                                  System.Type sourceType)
+            {
+                if (sourceType == typeof(string))
+                {
+                    return true;
+                }
+                else
+                    return base.CanConvertFrom(context, sourceType);
+            }
+            
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+            {
+                if (value is string)
+                {
+                    MMDevice item = AudioDevices.FirstOrDefault(q => (string.Compare(q.ToString(), value.ToString(), true) == 0));
+                    return item;
+                }
+                else
+                    return base.ConvertFrom(context, culture, value);
+            }
         }
     }
 
