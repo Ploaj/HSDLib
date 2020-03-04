@@ -40,13 +40,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             viewport.BringToFront();
             //viewport.Visible = false;
 
-            musicDSPPlayer.ReplaceButtonVisbile = false;
+            musicDSPPlayer.ReplaceButtonVisible = false;
 
             menuPlaylistEditor.DoubleClickedNode += menuPlaylistEditor_DoubleClick;
 
             musicListEditor.DoubleClickedNode += musicListEditor_DoubleClicked;
             musicListEditor.ArrayUpdated += musicListEditor_ArrayUpdated;
             musicListEditor.EnablePropertyViewerDescription(false);
+
+            commonItemEditor.DisableAllControls();
+            fighterItemEditor.DisableAllControls();
+            pokemonItemEditor.DisableAllControls();
+            stageItemEditor.DisableAllControls();
 
             FighterEntries.ListChanged += (sender, args) =>
             {
@@ -97,6 +102,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public MEX_Item[] ItemFighter { get; set; }
         public MEX_Item[] ItemPokemon { get; set; }
         public MEX_Item[] ItemStage { get; set; }
+        public MEX_Item[] ItemMEX { get; set; }
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -172,6 +178,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             ItemStage = _data.ItemTable.Stages.Array;
             stageItemEditor.SetArrayFromProperty(this, "ItemStage");
+
+            ItemMEX = _data.ItemTable.MEXItems.Array;
+            mexItemEditor.SetArrayFromProperty(this, "ItemMEX");
         }
 
         /// <summary>
@@ -331,6 +340,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.ItemTable.FighterItems.Array = ItemFighter;
             _data.ItemTable.Pokemon.Array = ItemPokemon;
             _data.ItemTable.Stages.Array = ItemStage;
+            _data.ItemTable.MEXItems.Array = ItemMEX;
         }
 
         #region Events
@@ -643,6 +653,23 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                         return;
                 musicListEditor.AddItem(new HSD_String() { Value = newHPSName });
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mexItemCloneButton_Click(object sender, EventArgs e)
+        {
+            if(itemTabs.SelectedIndex == 0)
+                mexItemEditor.AddItem(commonItemEditor.SelectedObject);
+            if (itemTabs.SelectedIndex == 1)
+                mexItemEditor.AddItem(fighterItemEditor.SelectedObject);
+            if (itemTabs.SelectedIndex == 2)
+                mexItemEditor.AddItem(pokemonItemEditor.SelectedObject);
+            if (itemTabs.SelectedIndex == 3)
+                mexItemEditor.AddItem(stageItemEditor.SelectedObject);
         }
     }
 }

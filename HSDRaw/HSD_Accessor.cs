@@ -426,6 +426,10 @@ namespace HSDRaw
 
                 for (int i = 0; i < value.Length; i++)
                     this[i] = value[i];
+
+                // add dummy data if empty
+                if (_s.Length == 0) 
+                    _s.Resize(4);
             }
         }
 

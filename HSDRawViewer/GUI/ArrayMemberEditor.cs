@@ -24,10 +24,36 @@ namespace HSDRawViewer.GUI
         public event EventHandler DoubleClickedNode;
         public event EventHandler ArrayUpdated;
 
+        public bool CanAdd
+        {
+            get => buttonAdd.Visible;
+            set => buttonAdd.Visible = value;
+        }
+
+        public bool CanRemove
+        {
+            get => buttonRemove.Visible;
+            set => buttonRemove.Visible = value;
+        }
+
+        public bool CanMove
+        {
+            get => buttonDown.Visible;
+            set { buttonDown.Visible = value; buttonUp.Visible = value; }
+        }
+
         public bool CanClone
         {
-            get => buttonClone.Enabled;
-            set => buttonClone.Enabled = value;
+            get => buttonClone.Visible;
+            set => buttonClone.Visible = value;
+        }
+
+        public void DisableAllControls()
+        {
+            CanAdd = false;
+            CanRemove = false;
+            CanMove = false;
+            CanClone = false;
         }
 
         public void EnablePropertyViewer(bool enable)
@@ -261,6 +287,8 @@ namespace HSDRawViewer.GUI
         /// <param name="o"></param>
         public void AddItem(object o)
         {
+            if (o == null)
+                return;
             elementList.Items.Add(o);
             MakeChanges();
         }

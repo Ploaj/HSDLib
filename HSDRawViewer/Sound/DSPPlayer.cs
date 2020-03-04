@@ -44,26 +44,7 @@ namespace HSDRawViewer.Sound
                 return TimeSpan.Zero;
             }
         }
-
-        private MMDevice DefaultDevice
-        {
-            get
-            {
-                List<MMDevice> _devices = new List<MMDevice>();
-                using (var mmdeviceEnumerator = new MMDeviceEnumerator())
-                {
-                    using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
-                    {
-                        foreach (var device in mmdeviceCollection)
-                        {
-                            _devices.Add(device);
-                        }
-                    }
-                }
-                return _devices[0];
-            }
-        }
-
+        
         public DSPPlayer()
         {
 
@@ -84,7 +65,7 @@ namespace HSDRawViewer.Sound
 
             _waveSource = src;
 
-            _soundOut = new WasapiOut() { Latency = 100, Device = DefaultDevice };
+            _soundOut = new WasapiOut() { Latency = 100, Device = ApplicationSettings.DefaultDevice };
             _soundOut.Initialize(_waveSource);
 
             if (PlaybackStopped != null) _soundOut.Stopped += PlaybackStopped;

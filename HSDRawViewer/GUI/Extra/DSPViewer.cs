@@ -8,7 +8,7 @@ namespace HSDRawViewer.GUI.Extra
 {
     public partial class DSPViewer : UserControl
     {
-        public bool ReplaceButtonVisbile { get => buttonReplace.Visible; set => buttonReplace.Visible = value; }
+        public bool ReplaceButtonVisible { get => buttonReplace.Visible; set => buttonReplace.Visible = value; }
 
         private DSPPlayer Player;
 

@@ -53,6 +53,8 @@
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectAudioPlaybackDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -79,7 +81,8 @@
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
             this.viewToolStripMenuItem,
-            this.toolsToolStripMenuItem});
+            this.toolsToolStripMenuItem,
+            this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(704, 24);
@@ -273,6 +276,21 @@
             this.splitter1.TabIndex = 12;
             this.splitter1.TabStop = false;
             // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAudioPlaybackDeviceToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Text = "Options";
+            // 
+            // selectAudioPlaybackDeviceToolStripMenuItem
+            // 
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Name = "selectAudioPlaybackDeviceToolStripMenuItem";
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Text = "Select Audio Playback Device";
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Click += new System.EventHandler(this.selectAudioPlaybackDeviceToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -328,6 +346,8 @@
         private System.Windows.Forms.ToolStripMenuItem sEMEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRootFromTypeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectAudioPlaybackDeviceToolStripMenuItem;
     }
 }
 

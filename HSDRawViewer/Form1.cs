@@ -761,6 +761,16 @@ namespace HSDRawViewer
                 d.RootText = e.Label;
             }
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void selectAudioPlaybackDeviceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ApplicationSettings.SelectAudioPlaybackDevice();
+        }
     }
     
 }
