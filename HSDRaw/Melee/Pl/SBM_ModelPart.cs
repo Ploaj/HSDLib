@@ -17,7 +17,7 @@ namespace HSDRaw.Melee.Pl
     {
         public override int TrimmedSize => 0x0C;
 
-        public short Unknown { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
+        public short StartingBone { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
 
         public short Count { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
 

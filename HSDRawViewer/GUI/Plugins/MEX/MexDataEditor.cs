@@ -11,7 +11,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using YamlDotNet.Serialization;
@@ -328,9 +327,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             _data.MusicTable.MenuPlaylist.Array = new MEX_MenuPlaylistItem[0];
             _data.MusicTable.MenuPlayListCount = MenuPlaylist.Length;
-            foreach (var v in MenuPlaylist)
+            for(int i = 0; i < MenuPlaylist.Length; i++)
             {
-                _data.MusicTable.MenuPlaylist.Add(new MEX_MenuPlaylistItem()
+                var v = MenuPlaylist[i];
+                _data.MusicTable.MenuPlaylist.Set(i, new MEX_MenuPlaylistItem()
                 {
                     HPSID = (ushort)v.MusicID,
                     ChanceToPlay = v.PlayChanceValue
@@ -604,7 +604,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     brush = Brushes.DarkViolet;
 
                 if (IsSpecialFighter(e.Index))
-                    brush = Brushes.DarkRed;
+                    brush = ApplicationSettings.SystemWindowTextRedColorBrush;
 
                 e.Graphics.DrawString(((ListBox)sender).Items[e.Index].ToString(),
                 e.Font, brush, e.Bounds, StringFormat.GenericDefault);

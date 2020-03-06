@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace HSDRaw.MEX
 {
@@ -16,9 +17,9 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<MEX_Item> MEXItems { get => _s.GetCreateReference<HSDArrayAccessor<MEX_Item>>(0x10); set => _s.SetReference(0x10, value); }
 
-        // table
+        // runtime table at 0x14
     }
-
+    
     public class MEX_Item : HSDAccessor
     {
         public override int TrimmedSize => 0x3C;

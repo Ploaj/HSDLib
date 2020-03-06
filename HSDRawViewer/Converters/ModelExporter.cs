@@ -104,6 +104,18 @@ namespace HSDRawViewer.Converters
             importer.Dispose();
         }
 
+        /// <summary>
+        /// Converts JOBJ to Assimp Scene
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        public static Scene JOBJtoScene(HSD_JOBJ root)
+        {
+            Dictionary<Node, HSD_JOBJ> nodeToJOBJ = new Dictionary<Node, HSD_JOBJ>();
+            ModelExporter mex = new ModelExporter();
+            return mex.WriteRootNode(root, new ModelExportSettings(), new Dictionary<int, string>(), nodeToJOBJ);
+        }
+
         private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
             using (DAEWriter writer = new DAEWriter(filePath, true))

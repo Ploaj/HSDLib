@@ -180,5 +180,31 @@ namespace HSDRawViewer.Rendering
 
             return false;
         }
+        
+        private float coPlanerThreshold = 0.7f; // Some threshold value that is application dependent
+        private float lengthErrorThreshold = 1e-3f;
+
+        public bool IntersectsLine(Vector3 start, Vector3 end)
+        {
+            Vector3 da = Dir;  // Unnormalized direction of the ray
+            Vector3 db = end - start;
+            Vector3 dc = start - Origin;
+
+            if (Math.Abs(Vector3.Dot(dc, Vector3.Cross(da, db))) >= coPlanerThreshold) // Lines are not coplanar
+                return false;
+
+            float s = Vector3.Dot(Vector3.Cross(dc, db), Vector3.Cross(da, db)) / Vector3.Cross(da, db).LengthSquared;
+
+            if (s >= 0.0f && s <= 1.0f)   // Means we have an intersection
+            {
+                Vector3 intersection = Origin + s * da;
+
+                // See if this lies on the segment
+                if ((intersection - start).LengthSquared + (intersection - end).LengthSquared <= (end - start).LengthSquared + lengthErrorThreshold)
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

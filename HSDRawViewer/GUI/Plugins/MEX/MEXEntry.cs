@@ -662,7 +662,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public override string ToString()
         {
-            return $"{MEXConverter.externalIDValues[FighterExternalID + 1]} X: {X} Y: {Y} W: {Width} H: {Height})";
+            return String.Format("{0}\t X:{1} Y:{2} W:{3} H:{4}",
+                MEXConverter.externalIDValues[FighterExternalID + 1],
+                X,
+                Y,
+                Width,
+                Height);
         }
     }
 

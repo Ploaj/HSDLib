@@ -47,14 +47,14 @@
             this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sEMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectAudioPlaybackDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.LocationLabel = new System.Windows.Forms.Label();
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectAudioPlaybackDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -223,6 +223,21 @@
             this.sEMEditorToolStripMenuItem.Text = "SEM Editor";
             this.sEMEditorToolStripMenuItem.Click += new System.EventHandler(this.sEMEditorToolStripMenuItem_Click);
             // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAudioPlaybackDeviceToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Text = "Options";
+            // 
+            // selectAudioPlaybackDeviceToolStripMenuItem
+            // 
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Name = "selectAudioPlaybackDeviceToolStripMenuItem";
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Text = "Select Audio Playback Device";
+            this.selectAudioPlaybackDeviceToolStripMenuItem.Click += new System.EventHandler(this.selectAudioPlaybackDeviceToolStripMenuItem_Click);
+            // 
             // LocationLabel
             // 
             this.LocationLabel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -237,7 +252,7 @@
             // 
             this.dockPanel.ActiveAutoHideContent = null;
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dockPanel.Location = new System.Drawing.Point(216, 40);
             this.dockPanel.Name = "dockPanel";
             this.dockPanel.Size = new System.Drawing.Size(488, 401);
@@ -275,21 +290,6 @@
             this.splitter1.Size = new System.Drawing.Size(3, 401);
             this.splitter1.TabIndex = 12;
             this.splitter1.TabStop = false;
-            // 
-            // optionsToolStripMenuItem
-            // 
-            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAudioPlaybackDeviceToolStripMenuItem});
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
-            this.optionsToolStripMenuItem.Text = "Options";
-            // 
-            // selectAudioPlaybackDeviceToolStripMenuItem
-            // 
-            this.selectAudioPlaybackDeviceToolStripMenuItem.Name = "selectAudioPlaybackDeviceToolStripMenuItem";
-            this.selectAudioPlaybackDeviceToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
-            this.selectAudioPlaybackDeviceToolStripMenuItem.Text = "Select Audio Playback Device";
-            this.selectAudioPlaybackDeviceToolStripMenuItem.Click += new System.EventHandler(this.selectAudioPlaybackDeviceToolStripMenuItem_Click);
             // 
             // MainForm
             // 

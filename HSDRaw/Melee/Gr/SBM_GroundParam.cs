@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.Melee.Gr
+﻿using System.Drawing;
+
+namespace HSDRaw.Melee.Gr
 {
     public class SBM_GroundParam : HSDAccessor
     {
@@ -91,29 +93,45 @@
         public short UnknownShort16 { get => _s.GetInt16(0xa8); set => _s.SetInt16(0xa8, value); }
 
         public short UnknownShort17 { get => _s.GetInt16(0xac); set => _s.SetInt16(0xac, value); }
+        
+        public SBM_GroundBGM[] BGMData
+        {
+            get
+            {
+                return _s.GetCreateReference<HSDArrayAccessor<SBM_GroundBGM>>(0xB0).Array;
+            }
+            set
+            {
+                if(value == null)
+                {
+                    _s.GetCreateReference<HSDArrayAccessor<SBM_GroundBGM>>(0xB0).Array = new SBM_GroundBGM[0];
+                    BGMVariationCount = 0;
+                    return;
+                }
+                _s.GetCreateReference<HSDArrayAccessor<SBM_GroundBGM>>(0xB0).Array = value;
+                BGMVariationCount = value.Length;
+            }
+        }
+        
+        public int BGMVariationCount { get => _s.GetInt32(0xB4); internal set => _s.SetInt32(0xB4, value); }
 
-        // TODO: there are actually multiple of these
-        public SBM_GroundBGM BGM { get => _s.GetReference<SBM_GroundBGM>(0xB0); set => _s.SetReference(0xB0, value); }
+        public Color BubbleColorTopLeft { get => _s.GetColorRGBA(0xB8); set => _s.SetColorRGBA(0xB8, value); }
 
-        public int VariationCount { get => _s.GetInt32(0xB4); set => _s.SetInt32(0xB4, value); }
+        public Color BubbleColorTopMiddle { get => _s.GetColorRGBA(0xBC); set => _s.SetColorRGBA(0xBC, value); }
 
-        public float BubbleColorTopLeft { get => _s.GetFloat(0xB8); set => _s.SetFloat(0xB8, value); }
+        public Color BubbleColorTopRight { get => _s.GetColorRGBA(0xC0); set => _s.SetColorRGBA(0xC0, value); }
 
-        public float BubbleColorTopMiddle { get => _s.GetFloat(0xBC); set => _s.SetFloat(0xBC, value); }
+        public Color BubbleColorSidesTop { get => _s.GetColorRGBA(0xC4); set => _s.SetColorRGBA(0xC4, value); }
 
-        public float BubbleColorTopRight { get => _s.GetFloat(0xC0); set => _s.SetFloat(0xC0, value); }
+        public Color BubbleColorSidesMiddle { get => _s.GetColorRGBA(0xC8); set => _s.SetColorRGBA(0xC8, value); }
 
-        public float BubbleColorSidesTop { get => _s.GetFloat(0xC4); set => _s.SetFloat(0xC4, value); }
+        public Color BubbleColorSidesBottom { get => _s.GetColorRGBA(0xCC); set => _s.SetColorRGBA(0xCC, value); }
 
-        public float BubbleColorSidesMiddle { get => _s.GetFloat(0xC8); set => _s.SetFloat(0xC8, value); }
+        public Color BubbleColorBottomLeft { get => _s.GetColorRGBA(0xD0); set => _s.SetColorRGBA(0xD0, value); }
 
-        public float BubbleColorSidesBottom { get => _s.GetFloat(0xCC); set => _s.SetFloat(0xCC, value); }
+        public Color BubbleColorBottomMiddle { get => _s.GetColorRGBA(0xD4); set => _s.SetColorRGBA(0xD4, value); }
 
-        public float BubbleColorBottomLeft { get => _s.GetFloat(0xD0); set => _s.SetFloat(0xD0, value); }
-
-        public float BubbleColorBottomMiddle { get => _s.GetFloat(0xD4); set => _s.SetFloat(0xD4, value); }
-
-        public float BubbleColorBottomRight { get => _s.GetFloat(0xD8); set => _s.SetFloat(0xD8, value); }
+        public Color BubbleColorBottomRight { get => _s.GetColorRGBA(0xD8); set => _s.SetColorRGBA(0xD8, value); }
     }
 
     public class SBM_GroundBGM : HSDAccessor

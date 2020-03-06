@@ -35,7 +35,7 @@ namespace HSDRawViewer.Sound
 
     public class DSP
     {
-        public static string SupportedImportFilter { get; } = "Supported (*.dsp*.wav*.hps*.mp3*.aiff*.wma)|*.dsp;*.wav;*.hps;*.mp3;*.aiff;*.wma";
+        public static string SupportedImportFilter { get; } = "Supported (*.dsp*.wav*.hps*.mp3*.aiff*.wma*.m4a)|*.dsp;*.wav;*.hps;*.mp3;*.aiff;*.wma;*.m4a";
 
         public static string SupportedExportFilter { get; } = "Supported Types(*.wav*.dsp*.hps)|*.wav;*.dsp;*.hps";
 
@@ -130,6 +130,9 @@ namespace HSDRawViewer.Sound
                 case "wma":
                     FromWMA(data);
                     break;
+                case "m4a":
+                    FromM4A(data);
+                    break;
                 case "hps":
                     FromHPS(data);
                     break;
@@ -146,13 +149,13 @@ namespace HSDRawViewer.Sound
 
             switch (ext)
             {
-                case "wav":
+                case ".wav":
                     File.WriteAllBytes(filePath, ToWAVE());
                     break;
-                case "dsp":
+                case ".dsp":
                     ExportDSP(filePath);
                     break;
-                case "hps":
+                case ".hps":
                     HPS.SaveDSPAsHPS(this, filePath);
                     break;
             }
@@ -427,6 +430,17 @@ namespace HSDRawViewer.Sound
         {
             using (MemoryStream s = new MemoryStream(data))
             using (IWaveSource soundSource = new DmoMp3Decoder(s))
+            using (MemoryStream w = new MemoryStream())
+            {
+                soundSource.WriteToWaveStream(w);
+                FromWAVE(w.ToArray());
+            }
+        }
+
+        private void FromM4A(byte[] data)
+        {
+            using (MemoryStream s = new MemoryStream(data))
+            using (IWaveSource soundSource = new CSCore.Codecs.DDP.DDPDecoder(s))
             using (MemoryStream w = new MemoryStream())
             {
                 soundSource.WriteToWaveStream(w);

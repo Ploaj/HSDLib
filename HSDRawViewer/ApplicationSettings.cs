@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace HSDRawViewer
 {
@@ -15,6 +14,9 @@ namespace HSDRawViewer
     {
         [Browsable(false),]
         public static Brush SystemWindowTextColorBrush = new SolidBrush(System.Drawing.SystemColors.WindowText);
+
+        [Browsable(false),]
+        public static Brush SystemWindowTextRedColorBrush = new SolidBrush(Color.Red);
 
         [Browsable(false),]
         public static Brush SystemGrayTextColorBrush = new SolidBrush(System.Drawing.SystemColors.GrayText);
@@ -36,8 +38,21 @@ namespace HSDRawViewer
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        private static bool IsDark(Color c)
+        {
+            return c.GetBrightness() < 0.5f;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public static void Init()
         {
+            //SystemWindowTextRedColorBrush = new SolidBrush(IsDark(SystemColors.ControlText) ? ControlPaint.Light(Color.Red) : ControlPaint.Dark(Color.Red));
+            //SystemWindowTextRedColorBrush = new SolidBrush(ControlPaint.Dark(Color.Red));
+
             List<Type> types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                                 from assemblyType in domainAssembly.GetTypes()
                                 where typeof(HSDAccessor).IsAssignableFrom(assemblyType)

@@ -129,6 +129,7 @@
     <Compile Include="Converters\MayaAnim.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
+    <Compile Include="Converters\ModeltoCollData.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
@@ -195,10 +196,10 @@
     <Compile Include="GUI\Plugins\AOBJEditor.Designer.cs">
       <DependentUpon>AOBJEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\CollDataEditor.cs">
+    <Compile Include="GUI\Plugins\Melee\CollDataEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Plugins\CollDataEditor.Designer.cs">
+    <Compile Include="GUI\Plugins\Melee\CollDataEditor.Designer.cs">
       <DependentUpon>CollDataEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\EditorBase.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="GUI\Plugins\JOBJEditor.Designer.cs">
       <DependentUpon>JOBJEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Plugins\Melee\CollDataItems.cs" />
     <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -223,6 +225,7 @@
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
     <Compile Include="GUI\Plugins\MEX\DefaultItemNames.cs" />
     <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
+    <Compile Include="GUI\Plugins\MEX\FighterPackageInstaller.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXConverters.cs" />
     <Compile Include="GUI\Plugins\MEX\MexDataEditor.cs">
       <SubType>Form</SubType>
@@ -363,7 +366,7 @@
     <EmbeddedResource Include="GUI\Plugins\AOBJEditor.resx">
       <DependentUpon>AOBJEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\CollDataEditor.resx">
+    <EmbeddedResource Include="GUI\Plugins\Melee\CollDataEditor.resx">
       <DependentUpon>CollDataEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\GeneralPointEditor.resx">

@@ -844,6 +844,13 @@ namespace HSDRaw
                 a = acc;
             }
             else
+            if (rootString.StartsWith("quake_model_set"))
+            {
+                var acc = new SBM_Quake_Model_Set();
+                acc._s = str;
+                a = acc;
+            }
+            else
             if (rootString.StartsWith("mexData"))
             {
                 var acc = new MEX_Data();

@@ -113,6 +113,28 @@ namespace HSDRawViewer.GUI
 
             RenderLoop = (sender, args) =>
             {
+                //while (ReadyToRender && panel1 != null && panel1.IsIdle)
+                {
+                    if (MainForm.Instance == null || 
+                    MainForm.Instance.WindowState == FormWindowState.Minimized || 
+                    !Visible ||
+                    _camera == null)
+                        return;
+
+                    var el = DateTime.Now;
+                    var elapsed = el - meansure;
+                    if (ApplicationSettings.UnlockedViewport || elapsed.Milliseconds >= 16)
+                    {
+                        panel1_Paint(null, null);
+
+                        meansure = el;
+                    }
+
+                }
+            };
+            
+            PlayerTimer = (sender, args) =>
+            {
                 var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
 
                 if (prevPos == null)
@@ -121,25 +143,7 @@ namespace HSDRawViewer.GUI
                 deltaPos = prevPos - pos;
 
                 prevPos = pos;
-
-                if (MainForm.Instance == null || MainForm.Instance.WindowState == FormWindowState.Minimized)
-                    return;
-
-                if (_camera == null || !Visible)
-                    return;
                 
-                var el = DateTime.Now;
-                var elapsed = el - meansure;
-                if (ApplicationSettings.UnlockedViewport || elapsed.Milliseconds >= 16)
-                {
-                    panel1_Paint(null, null);
-
-                    meansure = el;
-                }
-            };
-            
-            PlayerTimer = (sender, args) =>
-            {
                 if (buttonPlay.Text == "Pause")
                 {
                     if(!(!cbLoop.Checked && Frame == MaxFrame))

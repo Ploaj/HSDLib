@@ -10,95 +10,12 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using OpenTK.Input;
 using System.ComponentModel;
+using HSDRawViewer.GUI.Plugins.Melee;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     public partial class CollDataEditor : DockContent, EditorBase, IDrawableInterface
     {
-
-        #region EditorClasses
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private class LineGroup
-        {
-            public Vector4 Range = new Vector4();
-
-            public float MinX { get => Range.X; set => Range.X = value; }
-            public float MinY { get => Range.Y; set => Range.Y = value; }
-            public float MaxX { get => Range.Z; set => Range.Z = value; }
-            public float MaxY { get => Range.W; set => Range.W = value; }
-
-            public void CalcuateRange(IList<Vertex> vertices)
-            {
-                Vector4 newRange = new Vector4(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
-                
-                foreach(var v in vertices)
-                {
-                    newRange.X = Math.Min(newRange.X, v.X);
-                    newRange.Y = Math.Min(newRange.Y, v.Y);
-                    newRange.Z = Math.Max(newRange.Z, v.X);
-                    newRange.W = Math.Max(newRange.W, v.Y);
-                }
-                // add 8 in each direction
-                newRange += new Vector4(-8, -8, 8, 8);
-
-                Range = newRange;
-            }
-
-            public override string ToString()
-            {
-                return "Polygon Group";
-            }
-        }
-
-        private class Line
-        {
-            public Vertex v1;
-            public Vertex v2;
-
-            public LineGroup Group = null;
-
-            public Line AltNext = null;
-            public Line AltPrevious = null;
-
-            public float X1 { get => v1.X; set => v1.X = value; }
-            public float Y1 { get => v1.Y; set => v1.Y = value; }
-            public float X2 { get => v2.X; set => v2.X = value; }
-            public float Y2 { get => v2.Y; set => v2.Y = value; }
-
-            public bool DynamicCollision { get; set; } = false;
-
-            public CollPhysics CollisionFlag { get; set; } = CollPhysics.Bottom;
-            public CollProperty Flag { get; set; } = 0;
-            public CollMaterial Material { get; set; } = CollMaterial.Basic;
-
-            public override string ToString()
-            {
-                return $"Line: ({v1.X}, {v1.Y}) ({v2.X}, {v2.Y})";
-            }
-        }
-
-        private class Vertex
-        {
-            public float X { get; set; }
-            public float Y { get; set; }
-
-            public Vertex(float x, float y)
-            {
-                X = x;
-                Y = y;
-            }
-
-            public Vector2 ToVector2()
-            {
-                return new Vector2(X, Y);
-            }
-        }
-
-#endregion
-
         public Type[] SupportedTypes => new Type[] { typeof(SBM_Coll_Data) };
 
         public DataNode Node { get => _node;
@@ -120,37 +37,37 @@ namespace HSDRawViewer.GUI.Plugins
 
         private SBM_Coll_Data CollData;
 
-        private BindingList<LineGroup> LineGroups = new BindingList<LineGroup>();
+        private BindingList<CollLineGroup> LineGroups = new BindingList<CollLineGroup>();
 
-        private IEnumerable<Line> SelectedLines
+        private IEnumerable<CollLine> SelectedLines
         {
             get
             {
-                foreach(Line l in listBox1.SelectedItems)
+                foreach(CollLine l in listBox1.SelectedItems)
                 {
                     yield return l;
                 }
             }
         }
 
-        private BindingList<Line> Lines
+        private BindingList<CollLine> Lines
         {
             get; set;
-        } = new BindingList<Line>();
+        } = new BindingList<CollLine>();
 
-        private LineGroup SelectedLineGroup
+        private CollLineGroup SelectedLineGroup
         {
             get
             {
-                return listBox1.SelectedItem as LineGroup;
+                return listBox1.SelectedItem as CollLineGroup;
             }
         }
 
-        private List<Vertex> Vertices
+        private List<CollVertex> Vertices
         {
             get
             {
-                var vl = new List<Vertex>();
+                var vl = new List<CollVertex>();
                 foreach (var l in Lines)
                 {
                     if(!vl.Contains(l.v1))
@@ -162,11 +79,11 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
-        private List<Line> SelectedGroupLines
+        private List<CollLine> SelectedGroupLines
         {
             get
             {
-                var vl = new List<Line>();
+                var vl = new List<CollLine>();
                 foreach (var l in Lines)
                 {
                     if (cbShowAllGroups.Checked || l.Group == SelectedLineGroup)
@@ -176,11 +93,11 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
-        private List<Vertex> SelectedGroupVertices
+        private List<CollVertex> SelectedGroupVertices
         {
             get
             {
-                var vl = new List<Vertex>();
+                var vl = new List<CollVertex>();
                 foreach (var l in Lines)
                 {
                     if (cbShowAllGroups.Checked && l.Group != SelectedLineGroup)
@@ -222,9 +139,9 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 if (!updateList)
                 {
-                    var sel = new Line[listLines.SelectedItems.Count];
+                    var sel = new CollLine[listLines.SelectedItems.Count];
                     for (int i = 0; i < sel.Length; i++)
-                        sel[i] = listLines.SelectedItems[i] as Line;
+                        sel[i] = listLines.SelectedItems[i] as CollLine;
                     propertyGrid1.SelectedObjects = sel;
                 }
             };
@@ -234,7 +151,7 @@ namespace HSDRawViewer.GUI.Plugins
                 updateList = true;
                 listLines.SelectedItem = null;
                 foreach (var ob in propertyGrid1.SelectedObjects)
-                    if (ob is Line l)
+                    if (ob is CollLine l)
                     {
                         var index = Lines.IndexOf(l);
                         listLines.SetSelected(index, true);
@@ -243,9 +160,9 @@ namespace HSDRawViewer.GUI.Plugins
 
                 deleteButton.Enabled = (propertyGrid1.SelectedObjects.Length != 0);
 
-                editVertexMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is Vertex);
+                editVertexMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is CollVertex);
 
-                editLineMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is Line);
+                editLineMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is CollLine);
             };
 
             FormClosing += (sender, args) =>
@@ -259,7 +176,7 @@ namespace HSDRawViewer.GUI.Plugins
             propertyGrid1.SelectedObject = null;
         }
         
-        #region Controls
+        #region Interaction
 
         public void ScreenClick(MouseButtons button, PickInformation ray)
         {
@@ -297,7 +214,6 @@ namespace HSDRawViewer.GUI.Plugins
                         new Vector3(p1.X, p1.Y, -PlatformWidth / 2))
                        )
                     {
-                        Console.WriteLine(lindex);
                         closest = dis;
                         selectedObject = l;
                     }
@@ -344,7 +260,7 @@ namespace HSDRawViewer.GUI.Plugins
                 var pick2D = pick.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
                 foreach (var v in propertyGrid1.SelectedObjects)
                 {
-                    if (v is Vertex vert && !moved.Contains(vert.ToVector2()))
+                    if (v is CollVertex vert && !moved.Contains(vert.ToVector2()))
                     {
                         if(propertyGrid1.SelectedObjects.Length == 1)
                         {
@@ -358,9 +274,9 @@ namespace HSDRawViewer.GUI.Plugins
                         }
                         moved.Add(vert.ToVector2());
                     }
-                    if (v is Line line)
+                    if (v is CollLine line)
                     {
-                        var group = listBox1.SelectedItem as LineGroup;
+                        var group = listBox1.SelectedItem as CollLineGroup;
 
                         line.v1.X -= Xdelta;
                         line.v1.Y += Ydelta;
@@ -444,12 +360,14 @@ namespace HSDRawViewer.GUI.Plugins
             { CollMaterial.GreatBay, new Vector3(1f, 0, 0) },
         };
 
-        private int BlinkTimer = 0;
+        //private int BlinkTimer = 0;
 
-        private bool Blink { get => BlinkTimer < 15; }
+        //private bool Blink { get => BlinkTimer < 15; }
 
         public void Draw(Camera camera, int windowWidth, int windowHeight)
         {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
             // clear depth buffer to draw overtop of scene
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
@@ -462,9 +380,11 @@ namespace HSDRawViewer.GUI.Plugins
 
             RenderColl_Data();
 
-            BlinkTimer++;
+            GL.PopAttrib();
+
+            /*BlinkTimer++;
             if (BlinkTimer > 30)
-                BlinkTimer = 0;
+                BlinkTimer = 0;*/
         }
         
         /// <summary>
@@ -496,7 +416,7 @@ namespace HSDRawViewer.GUI.Plugins
                 else if (!cbShowAllGroups.Checked)
                     continue;
 
-                if (IsSelected(line) && Blink)
+                if (IsSelected(line))// && Blink)
                 {
                     GL.Color4(1, 1, 1, alpha);
                 }
@@ -565,19 +485,21 @@ namespace HSDRawViewer.GUI.Plugins
             GL.LineWidth(2f);
             GL.Begin(PrimitiveType.Lines);
 
+            GL.DepthFunc(DepthFunction.Always);
+
             foreach (var v in Lines)
             {
                 if (v.Group != SelectedLineGroup && !cbShowAllGroups.Checked)
                     continue;
 
-                if (IsSelected(v.v1) && Blink)
+                if (IsSelected(v.v1)) //&& Blink)
                     GL.Color3(Color.White);
                 else
                     GL.Color3(Color.Black);
                 GL.Vertex3(v.v1.X, v.v1.Y, 10);
                 GL.Vertex3(v.v1.X, v.v1.Y, -10);
 
-                if (IsSelected(v.v2) && Blink)
+                if (IsSelected(v.v2)) // && Blink)
                     GL.Color3(Color.White);
                 else
                     GL.Color3(Color.Black);
@@ -585,10 +507,12 @@ namespace HSDRawViewer.GUI.Plugins
                 GL.Vertex3(v.v2.X, v.v2.Y, -10);
             }
 
+            GL.DepthFunc(DepthFunction.Lequal);
+
             GL.End();
         }
 
-        private void RenderGroup(LineGroup group, float alpha)
+        private void RenderGroup(CollLineGroup group, float alpha)
         {
             GL.Color4(1f, 0f, 0f, alpha);
             GL.Begin(PrimitiveType.LineLoop);
@@ -635,7 +559,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonAddGroup_Click(object sender, EventArgs e)
         {
-            LineGroups.Add(new LineGroup());
+            LineGroups.Add(new CollLineGroup());
             ClearSelection();
         }
 
@@ -648,7 +572,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(listBox1.SelectedItem != null)
             {
-                LineGroups.Remove(listBox1.SelectedItem as LineGroup);
+                LineGroups.Remove(listBox1.SelectedItem as CollLineGroup);
             }
             ClearSelection();
         }
@@ -663,14 +587,14 @@ namespace HSDRawViewer.GUI.Plugins
             var selected = propertyGrid1.SelectedObjects;
             ClearSelection();
 
-            var group = listBox1.SelectedItem as LineGroup;
+            var group = listBox1.SelectedItem as CollLineGroup;
 
             foreach (var v in selected)
             {
                 // delete all lines containing vert
-                if(v is Vertex vert)
+                if(v is CollVertex vert)
                 {
-                    var toRem = new List<Line>();
+                    var toRem = new List<CollLine>();
                     foreach(var l in Lines)
                     {
                         if(l.v1 == v || l.v2 == v)
@@ -683,12 +607,12 @@ namespace HSDRawViewer.GUI.Plugins
                 }
 
                 // delete line
-                if (v is Line line)
+                if (v is CollLine line)
                 {
                     Lines.Remove(line);
                 }
 
-                if (v is LineGroup g)
+                if (v is CollLineGroup g)
                     LineGroups.Remove(g);
 
             }
@@ -705,12 +629,12 @@ namespace HSDRawViewer.GUI.Plugins
         private void LoadCollData()
         {
             // Load Vertices
-            Dictionary<int, Vertex> indexToVertex = new Dictionary<int, Vertex>();
-            Dictionary<Vertex, int> vertexToIndex = new Dictionary<Vertex, int>();
+            Dictionary<int, CollVertex> indexToVertex = new Dictionary<int, CollVertex>();
+            Dictionary<CollVertex, int> vertexToIndex = new Dictionary<CollVertex, int>();
             List<Vector2> v = new List<Vector2>();
             foreach (var ve in CollData.Vertices)
             {
-                var vert = new Vertex(ve.X, ve.Y);
+                var vert = new CollVertex(ve.X, ve.Y);
                 indexToVertex.Add(v.Count, vert);
                 vertexToIndex.Add(vert, v.Count);
                 v.Add(new Vector2(ve.X, ve.Y));
@@ -731,7 +655,7 @@ namespace HSDRawViewer.GUI.Plugins
             for(int lineIndex = 0; lineIndex < links.Length; lineIndex++)
             {
                 var line = links[lineIndex];
-                Lines.Add(new Line()
+                Lines.Add(new CollLine()
                 {
                     v1 = indexToVertex[line.VertexIndex1],
                     v2 = indexToVertex[line.VertexIndex2],
@@ -757,7 +681,7 @@ namespace HSDRawViewer.GUI.Plugins
             foreach (var group in groups)
             {
                 // Create group and range
-                var lineGroup = new LineGroup();
+                var lineGroup = new CollLineGroup();
                 lineGroup.Range = new Vector4(group.XMin, group.YMin, group.XMax, group.YMax);
 
                 // add vertices
@@ -786,222 +710,19 @@ namespace HSDRawViewer.GUI.Plugins
             listBox1.SelectedIndex = 0;
         }
 
-        /// <summary>
-        /// Dumps all the collision information in the <see cref="SBM_Coll_Data"/> structure
-        /// </summary>
         private void SaveCollData()
         {
-            //TODO: Optimize
-
             // remove fake lines
             var fake = Lines.Where(e => e.CollisionFlag == 0).ToArray();
-            foreach(var v in fake)
+            foreach (var v in fake)
                 Lines.Remove(v);
 
-            // gather all tops
-            var topCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
-
-            // gather all bottoms
-            var bottomCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
-
-            // gather all rights
-            var leftCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
-
-            // gather all lefts
-            var rightCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
-
-            // gather all dynamic collisions
-            var dynamicCount = Lines.Count(e => e.DynamicCollision);
-
-            int topOffset = 0;
-            int bottomOffset = topCount;
-            int rightOffset = bottomOffset + bottomCount;
-            int leftOffset = rightOffset + rightCount;
-            int dynamicOffset = leftOffset + leftCount;
-            int totalLines = dynamicOffset + dynamicCount;
-            
-            // create each group creating vertices and links as necessary
-
-            // TODO: 
-
-            SBM_CollLine[] newLines = new SBM_CollLine[totalLines];
-            List<SBM_CollVertex> vertices = new List<SBM_CollVertex>();
-
-            // cache
-            Dictionary<Line, SBM_CollLine> lineToCollLine = new Dictionary<Line, SBM_CollLine>();
-            Dictionary<SBM_CollLine, int> collLineToIndex = new Dictionary<SBM_CollLine, int>();
-            Dictionary<SBM_CollLine, Line> lineToAltNext = new Dictionary<SBM_CollLine, Line>();
-            Dictionary<SBM_CollLine, Line> lineToAltPrev = new Dictionary<SBM_CollLine, Line>();
-
-            // groups
-            List<SBM_CollLineGroup> groups = new List<SBM_CollLineGroup>();
-            int boff = 0, toff = 0, loff = 0, roff = 0, doff = 0;
-            foreach (var g in LineGroups)
-            {
-                var lines = Lines.Where(e => e.Group == g).ToList();
-                var groupBottom = lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
-                var groupTop = lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
-                var groupRight = lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
-                var groupLeft = lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
-                var groupDynamic = lines.Count(e => e.DynamicCollision);
-
-                var group = new SBM_CollLineGroup();
-                group.XMin = g.Range.X;
-                group.YMin = g.Range.Y;
-                group.XMax = g.Range.Z;
-                group.YMax = g.Range.W;
-                groups.Add(group);
-
-                if(groupTop > 0)
-                    group.TopLineIndex = (short)(topOffset + toff);
-                group.TopLineCount = (short)groupTop;
-                if (groupBottom > 0)
-                    group.BottomLineIndex = (short)(bottomOffset + boff);
-                group.BottomLineCount = (short)groupBottom;
-                if (groupRight > 0)
-                    group.RightLineIndex = (short)(rightOffset + roff);
-                group.RightLineCount = (short)groupRight;
-                if (groupLeft > 0)
-                    group.LeftLineIndex = (short)(leftOffset + loff);
-                group.LeftLineCount = (short)groupLeft;
-                if (groupDynamic > 0)
-                    group.DynamicLineIndex = (short)(dynamicOffset + doff);
-                group.DynamicLineCount = (short)groupDynamic;
-
-                Dictionary<Line, Line> nextPointToLine = new Dictionary<Line, Line>();
-                Dictionary<Line, Line> prevPointToLine = new Dictionary<Line, Line>();
-                List<Vector2> groupVertices = new List<Vector2>();
-                foreach (var l in lines)
-                {
-                    var line = new SBM_CollLine();
-
-                    line.NextLineAltGroup = -1;
-                    line.NextLine = -1;
-                    line.PreviousLine = -1;
-                    line.PreviousLineAltGroup = -1;
-
-                    var v1 = l.v1.ToVector2();
-                    var v2 = l.v2.ToVector2();
-
-                    var prevPoint = lines.Find(e => e != l && e.v1 == l.v2);
-                    var nextPoint = lines.Find(e => e != l && e.v2 == l.v1);
-                    if(prevPoint != null)
-                        prevPointToLine.Add(l, prevPoint);
-                    if(nextPoint != null)
-                        nextPointToLine.Add(l, nextPoint);
-
-                    if (l.AltNext != null && Lines.Contains(l.AltNext))
-                        lineToAltNext.Add(line, l.AltNext);
-
-                    if (l.AltPrevious != null && Lines.Contains(l.AltPrevious))
-                        lineToAltPrev.Add(line, l.AltPrevious);
-
-                    // set vertices
-                    // TODO: ew, clean this
-                    if (!groupVertices.Contains(v1))
-                        groupVertices.Add(v1);
-
-                    if (!groupVertices.Contains(v2))
-                        groupVertices.Add(v2);
-
-                    line.VertexIndex1 = (short)(vertices.Count + groupVertices.IndexOf(v1));
-                    line.VertexIndex2 = (short)(vertices.Count + groupVertices.IndexOf(v2));
-                    line.Material = l.Material;
-                    line.Flag = l.Flag;
-                    line.CollisionFlag = l.CollisionFlag;
-                    
-                    // set the index
-
-                    int lineIndex = -1;
-
-                    if (l.DynamicCollision)
-                        lineIndex = dynamicOffset + doff++;
-                    else
-                    switch (l.CollisionFlag)
-                    {
-                        case CollPhysics.Bottom:
-                            lineIndex = bottomOffset + boff++;
-                            break;
-                        case CollPhysics.Top:
-                            lineIndex = topOffset + toff++;
-                            break;
-                        case CollPhysics.Left:
-                            lineIndex = leftOffset + loff++;
-                            break;
-                        case CollPhysics.Right:
-                            lineIndex = rightOffset + roff++;
-                            break;
-                    }
-                    
-                    collLineToIndex.Add(line, lineIndex);
-                    lineToCollLine.Add(l, line);
-                    newLines[lineIndex] = line;
-                }
-
-                // Update Links
-                foreach (var l in lines)
-                {
-                    var line = lineToCollLine[l];
-
-                    if (prevPointToLine.ContainsKey(l))
-                        line.PreviousLine = (short)collLineToIndex[lineToCollLine[prevPointToLine[l]]];
-
-                    if (nextPointToLine.ContainsKey(l))
-                        line.NextLine = (short)collLineToIndex[lineToCollLine[nextPointToLine[l]]];
-                }
-
-                group.VertexStart = (short)vertices.Count;
-                group.VertexCount = (short)groupVertices.Count;
-
-                foreach (var v in groupVertices)
-                    vertices.Add(new SBM_CollVertex() { X = v.X, Y = v.Y });
-            }
-
-            // update alt group links
-            foreach (var v in newLines)
-            {
-                if (lineToAltNext.ContainsKey(v))
-                    v.NextLineAltGroup = (short)collLineToIndex[lineToCollLine[lineToAltNext[v]]];
-
-                if (lineToAltPrev.ContainsKey(v))
-                    v.PreviousLineAltGroup = (short)collLineToIndex[lineToCollLine[lineToAltPrev[v]]];
-            }
-
-            // dump to file
-
-            if(topCount != 0)
-            {
-                CollData.TopLinksOffset = (short)topOffset;
-                CollData.TopLinksCount = (short)topCount;
-            }
-            if (bottomCount != 0)
-            {
-                CollData.BottomLinksOffset = (short)bottomOffset;
-                CollData.BottomLinksCount = (short)bottomCount;
-            }
-            if (rightCount != 0)
-            {
-                CollData.RightLinksOffset = (short)rightOffset;
-                CollData.RightLinksCount = (short)rightCount;
-            }
-            if (leftCount != 0)
-            {
-                CollData.LeftLinksOffset = (short)leftOffset;
-                CollData.LeftLinksCount = (short)leftCount;
-            }
-            if (dynamicCount != 0)
-            {
-                CollData.DynamicLinksOffset = (short)dynamicOffset;
-                CollData.DynamicLinksCount = (short)dynamicCount;
-            }
-
-            CollData.Vertices = vertices.ToArray();
-            CollData.Links = newLines.ToArray();
-            CollData.LineGroups = groups.ToArray();
+            CollDataBuilder.GenerateCollData(Lines, LineGroups, CollData);
         }
-
+        
         #endregion
 
+        #region Controls
         /// <summary>
         /// 
         /// </summary>
@@ -1009,7 +730,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonCalculateRange_Click(object sender, EventArgs e)
         {
-            var verts = new List<Vertex>();
+            var verts = new List<CollVertex>();
 
             foreach (var l in Lines.Where(p => p.Group == SelectedLineGroup))
             {
@@ -1027,18 +748,18 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void newLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is Vertex vert)
+            if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is CollVertex vert)
             {
                 var lines = Lines.Where(r => r.v2 == vert).ToList();
-                var v2 = new Vertex(vert.X + 10, vert.Y);
+                var v2 = new CollVertex(vert.X + 10, vert.Y);
 
                 if (lines.Count > 0)
                 {
-                    v2 = new Vertex((vert.X + lines[0].v1.X) / 2, (vert.Y + lines[0].v1.Y) / 2);
+                    v2 = new CollVertex((vert.X + lines[0].v1.X) / 2, (vert.Y + lines[0].v1.Y) / 2);
                     lines[0].v2 = v2;
                 }
 
-                Lines.Add(new Line()
+                Lines.Add(new CollLine()
                 {
                     v1 = vert,
                     v2 = v2,
@@ -1050,12 +771,12 @@ namespace HSDRawViewer.GUI.Plugins
                 propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
             }
             else
-            if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is Line line)
+            if (propertyGrid1.SelectedObjects.Length == 1 && propertyGrid1.SelectedObject is CollLine line)
             {
-                Lines.Add(new Line()
+                Lines.Add(new CollLine()
                 {
                     v1 = line.v2,
-                    v2 = new Vertex(line.v2.X + 10, line.v2.Y),
+                    v2 = new CollVertex(line.v2.X + 10, line.v2.Y),
                     Material = line.Material,
                     CollisionFlag = line.CollisionFlag,
                     Flag = line.Flag,
@@ -1063,13 +784,13 @@ namespace HSDRawViewer.GUI.Plugins
                 });
                 propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
             }
-            if (propertyGrid1.SelectedObjects.Length == 0 || propertyGrid1.SelectedObject is LineGroup)
+            if (propertyGrid1.SelectedObjects.Length == 0 || propertyGrid1.SelectedObject is CollLineGroup)
             {
-                Lines.Add(new Line()
+                Lines.Add(new CollLine()
                 {
-                    v1 = new Vertex(-10, 0),
-                    v2 = new Vertex(10, 0),
-                    Group = (LineGroup)propertyGrid1.SelectedObject
+                    v1 = new CollVertex(-10, 0),
+                    v2 = new CollVertex(10, 0),
+                    Group = (CollLineGroup)propertyGrid1.SelectedObject
                 });
                 propertyGrid1.SelectedObject = Lines[Lines.Count - 1];
             }
@@ -1082,7 +803,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void removeSelectedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach (Vertex v in propertyGrid1.SelectedObjects)
+            foreach (CollVertex v in propertyGrid1.SelectedObjects)
             {
                 var linesv1 = Lines.Where(l => l.v1 == v).ToList();
                 var linesv2 = Lines.Where(l => l.v2 == v).ToList();
@@ -1116,9 +837,9 @@ namespace HSDRawViewer.GUI.Plugins
             if (propertyGrid1.SelectedObjects.Length < 1)
                 return;
 
-            var mid = new Vertex(0, 0);
+            var mid = new CollVertex(0, 0);
 
-            foreach(Vertex v in propertyGrid1.SelectedObjects)
+            foreach(CollVertex v in propertyGrid1.SelectedObjects)
             {
                 mid.X += v.X;
                 mid.Y += v.Y;
@@ -1149,19 +870,19 @@ namespace HSDRawViewer.GUI.Plugins
 
             HashSet<Vector2> has = new HashSet<Vector2>();
 
-            foreach(Vertex v in propertyGrid1.SelectedObjects)
+            foreach(CollVertex v in propertyGrid1.SelectedObjects)
             {
                 var lines = Lines.Where(l => l.v1 == v || l.v2 == v);
 
                 foreach(var l in lines)
                 {
                     if (has.Contains(l.v1.ToVector2()))
-                        l.v1 = new Vertex(v.X, v.Y);
+                        l.v1 = new CollVertex(v.X, v.Y);
                     else
                         has.Add(l.v1.ToVector2());
 
                     if (has.Contains(l.v2.ToVector2()))
-                        l.v2 = new Vertex(v.X, v.Y);
+                        l.v2 = new CollVertex(v.X, v.Y);
                     else
                         has.Add(l.v2.ToVector2());
                 }
@@ -1179,7 +900,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void addToSelectedGroupToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach(Line l in propertyGrid1.SelectedObjects)
+            foreach(CollLine l in propertyGrid1.SelectedObjects)
             {
                 l.Group = SelectedLineGroup;
             }
@@ -1194,11 +915,11 @@ namespace HSDRawViewer.GUI.Plugins
         {
             foreach(var p in propertyGrid1.SelectedObjects)
             {
-                if(p is Line line)
+                if(p is CollLine line)
                 {
-                    var v2 = new Vertex((line.v1.X + line.v2.X) / 2, (line.v1.Y + line.v2.Y) / 2);
+                    var v2 = new CollVertex((line.v1.X + line.v2.X) / 2, (line.v1.Y + line.v2.Y) / 2);
 
-                    Lines.Add(new Line()
+                    Lines.Add(new CollLine()
                     {
                         v1 = v2,
                         v2 = line.v2,
@@ -1224,13 +945,13 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(propertyGrid1.SelectedObjects.Length == 2)
             {
-                if(propertyGrid1.SelectedObjects[0] is Vertex v1 && propertyGrid1.SelectedObjects[1] is Vertex v2)
+                if(propertyGrid1.SelectedObjects[0] is CollVertex v1 && propertyGrid1.SelectedObjects[1] is CollVertex v2)
                 {
                     // only create a new line if one does not already exist
                     var dup = Lines.Where(e => (e.v1 == v1 && e.v2 == v2) || (e.v1 == v2 && e.v2 == v1));
 
                     if (dup == null || dup.Count() == 0)
-                        Lines.Add(new Line()
+                        Lines.Add(new CollLine()
                         {
                             Group = SelectedLineGroup,
                             v1 = v1,
@@ -1239,5 +960,6 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
         }
+        #endregion
     }
 }
