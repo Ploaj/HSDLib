@@ -576,7 +576,28 @@ namespace HSDRawViewer.GUI.Extra
             }
         }
 
+        private void exportScriptButton_Click(object sender, EventArgs e)
+        {
+            if(entryList.SelectedItem is SEMEntry eentry)
+            {
+                var f = FileIO.SaveFile("Sem Script (*.yaml)|*.yaml");
+                if (f != null)
+                    eentry.Serialize(f);
+            }
+        }
 
+        private void importScriptButton_Click(object sender, EventArgs e)
+        {
+            if (entryList.SelectedItem is SEMEntry eentry)
+            {
+                var f = FileIO.OpenFile("Sem Script (*.yaml)|*.yaml");
+                if (f != null)
+                {
+                    Entries.RemoveAt(entryList.SelectedIndex);
+                    Entries.Insert(entryList.SelectedIndex, SEMEntry.Deserialize(File.ReadAllText(f)));
+                }
+            }
+        }
         #region MXDATA
 
         private string MEXDataFilePath;

@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization.TypeInspectors;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
@@ -336,6 +338,52 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 mexData.FighterData.VictoryThemeIDs.Set(externalID, new HSD_Int() { Value = VictoryThemeID });
             }
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static MEXEntry DeserializeFile(string filePath)
+        {
+            var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
+            .Build();
+
+            return deserializer.Deserialize<MEXEntry>(File.ReadAllText(filePath));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static MEXEntry Deserialize(string data)
+        {
+            var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
+            .Build();
+
+            return deserializer.Deserialize<MEXEntry>(data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
+        public void Serialize(string filepath)
+        {
+            var builder = new SerializerBuilder();
+            builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
+            builder.WithTypeInspector(inspector => new MEXTypeInspector(inspector));
+
+            using (StreamWriter writer = File.CreateText(filepath))
+            {
+                builder.Build().Serialize(writer, this);
+            }
         }
 
         public override string ToString()

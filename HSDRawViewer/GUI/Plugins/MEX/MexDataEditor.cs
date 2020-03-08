@@ -7,6 +7,7 @@ using HSDRawViewer.Rendering;
 using HSDRawViewer.Sound;
 using OpenTK;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -20,6 +21,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 {
     public partial class MexDataEditor : DockContent, EditorBase, IDrawableInterface
     {
+        public int NumberOfEntries
+        {
+            get => FighterEntries.Count;
+        }
+
         public MexDataEditor()
         {
             InitializeComponent();
@@ -52,6 +58,35 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             fighterItemEditor.DisableAllControls();
             pokemonItemEditor.DisableAllControls();
             stageItemEditor.DisableAllControls();
+
+            mexItemEditor.OnItemRemove += ( args) =>
+            {
+                foreach (var v in FighterEntries)
+                {
+                    foreach (var s in v.MEXItems)
+                    {
+                        if (s.Value == MEXItemOffset + args.Index)
+                            s.Value = 0;
+                        if (s.Value > MEXItemOffset + args.Index)
+                            s.Value -= 1;
+                    }
+                }
+            };
+
+            effectEditor.OnItemRemove += (args) =>
+            {
+                foreach (var v in FighterEntries)
+                {
+                    if (v.EffectIndex == args.Index)
+                        v.EffectIndex = 0;
+                    if (v.EffectIndex > args.Index)
+                        v.EffectIndex--;
+                    if (v.KirbyEffectID == args.Index)
+                        v.KirbyEffectID = 0;
+                    if (v.KirbyEffectID > args.Index)
+                        v.KirbyEffectID--;
+                }
+            };
 
             commonItemEditor.TextOverrides.AddRange(DefaultItemNames.CommonItemNames);
             fighterItemEditor.TextOverrides.AddRange(DefaultItemNames.FighterItemNames);
@@ -91,9 +126,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
         }
         private DataNode _node;
-        private MEX_Data _data { get { if (_node.Accessor is MEX_Data data) return data; else return null; } }
+        public MEX_Data _data { get { if (_node.Accessor is MEX_Data data) return data; else return null; } }
 
-        private BindingList<MEXEntry> FighterEntries = new BindingList<MEXEntry>();
+        public BindingList<MEXEntry> FighterEntries = new BindingList<MEXEntry>();
 
         public MEX_EffectEntry[] Effects { get; set; }
         public MEX_Effect[] MEX_Effects { get; set; }
@@ -475,7 +510,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     while (NameExists(clone.NameText + " " + clnIndex.ToString())) clnIndex++;
                     clone.NameText = clone.NameText + " " + clnIndex;
                 }
-                FighterEntries.Insert(FighterEntries.Count - 6, clone);
+                AddEntry(clone);
             }
         }
 
@@ -516,15 +551,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var f = Tools.FileIO.SaveFile("YAML (*.yaml)|*.yaml", mex.NameText + ".yaml");
                 if (f != null)
                 {
-                    var builder = new SerializerBuilder();
-                    builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
-                    builder.WithTypeInspector(inspector => new MEXTypeInspector(inspector));
-
-                    using (StreamWriter writer = File.CreateText(f))
-                    {
-                        builder.Build().Serialize(writer, fighterList.SelectedItem);
-                    }
-
+                    mex.Serialize(f);
                 }
             }
         }
@@ -539,14 +566,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var f = Tools.FileIO.OpenFile("YAML (*.yaml)|*.yaml");
             if (f != null)
             {
-                var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
-                .Build();
-
-                var me = deserializer.Deserialize<MEXEntry>(File.ReadAllText(f));
-
-                FighterEntries.Insert(FighterEntries.Count - 6, ObjectExtensions.Copy(me));
+                FighterEntries.Insert(FighterEntries.Count - 6, MEXEntry.DeserializeFile(f));
             }
 
         }
@@ -842,6 +862,180 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void itemExportButton_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.SaveFile("Item (*.yaml)|*.yaml");
+            if(f != null)
+            {
+                if (itemTabs.SelectedIndex == 0 && commonItemEditor.SelectedObject is MEX_Item)
+                    Serialize(f, commonItemEditor.SelectedObject as MEX_Item);
+                if (itemTabs.SelectedIndex == 1 && fighterItemEditor.SelectedObject is MEX_Item)
+                    Serialize(f, fighterItemEditor.SelectedObject as MEX_Item);
+                if (itemTabs.SelectedIndex == 2 && pokemonItemEditor.SelectedObject is MEX_Item)
+                    Serialize(f, pokemonItemEditor.SelectedObject as MEX_Item);
+                if (itemTabs.SelectedIndex == 3 && stageItemEditor.SelectedObject is MEX_Item)
+                    Serialize(f, stageItemEditor.SelectedObject as MEX_Item);
+                if (itemTabs.SelectedIndex == 4 && mexItemEditor.SelectedObject is MEX_Item)
+                    Serialize(f, mexItemEditor.SelectedObject as MEX_Item);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public MEX_Item Deserialize(string data)
+        {
+            var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
+            .Build();
+
+            return deserializer.Deserialize<MEX_Item>(data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
+        public void Serialize(string filepath, MEX_Item item)
+        {
+            var builder = new SerializerBuilder()
+            .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
+            .WithNamingConvention(CamelCaseNamingConvention.Instance);
+
+            using (StreamWriter writer = File.CreateText(filepath))
+            {
+                builder.Build().Serialize(writer, item);
+            }
+        }
+
         #endregion
+
+        private void installFighterButton_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
+            if(f != null)
+            {
+                FighterPackageInstaller.InstallFighter(f, this);
+                saveAllChangesButton_Click(null, null);
+                MEXConverter.ssmValues.Clear();
+                MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
+                MessageBox.Show("Fighter installed");
+            }
+        }
+
+        private void uninstallFighterButton_Click(object sender, EventArgs e)
+        {
+            if(IsExtendedFighter(fighterList.SelectedIndex) && fighterList.SelectedItem is MEXEntry en)
+            {
+                FighterPackageUninstaller.UninstallerFighter(fighterList.SelectedIndex, en, this);
+                saveAllChangesButton_Click(null, null);
+                MEXConverter.ssmValues.Clear();
+                MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
+                MessageBox.Show("Fighter uninstalled");
+            }
+        }
+
+        /// <summary>
+        /// Adds new entry to fighter list
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns>internal ID</returns>
+        public int AddEntry(MEXEntry e)
+        {
+            FighterEntries.Insert(FighterEntries.Count - 6, e);
+            return FighterEntries.Count - 6;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="internalID"></param>
+        public void RemoveFighterEntry(int internalID)
+        {
+            FighterEntries.RemoveAt(internalID);
+        }
+
+        /// <summary>
+        /// Adds a new MEX item to table
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>added mex item id</returns>
+        public int AddMEXItem(string yaml)
+        {
+            return AddMEXItem(Deserialize(yaml));
+        }
+
+        /// <summary>
+        /// Adds a new MEX item to table
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>added mex item id</returns>
+        public int AddMEXItem(MEX_Item item)
+        {
+            mexItemEditor.AddItem(item);
+
+            return MEXItemOffset + ItemMEX.Length - 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public void RemoveMEXItem(int index)
+        {
+            // only remove if index is in range of mex item
+            if (index < MEXItemOffset)
+                return;
+            
+            mexItemEditor.RemoveAt(index - MEXItemOffset);
+        }
+
+        /// <summary>
+        /// Adds a new MEX effect file to table
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>added mex file id</returns>
+        public int AddMEXEffectFile(MEX_EffectEntry item)
+        {
+            effectEditor.AddItem(item);
+            return Effects.Length - 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        public void SafeRemoveEffectFile(int index)
+        {
+            bool inUse = FighterEntries.Any(e => e.EffectIndex == index || e.KirbyEffectID == index);
+            if(!inUse)
+                effectEditor.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int AddMusic(HSD_String musicName)
+        {
+            musicListEditor.AddItem(musicName);
+            return Music.Length - 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="musicName"></param>
+        public void RemoveMusicAt(int index)
+        {
+            musicListEditor.RemoveAt(index);
+        }
     }
 }

@@ -170,7 +170,7 @@ namespace HSDRawViewer
 
                         foreach (var r in hsd.Roots)
                         {
-                            if (r.Data is SBM_PlayerData pl)
+                            if (r.Data is SBM_FighterData pl)
                             {
                                 w.WriteLine(r.Name);
 

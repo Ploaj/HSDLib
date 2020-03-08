@@ -33,9 +33,16 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openSEMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportSEMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.smStdatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mxDtdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.entryList = new System.Windows.Forms.ListBox();
             this.soundList = new System.Windows.Forms.ListBox();
             this.entryBox = new System.Windows.Forms.GroupBox();
+            this.splitter5 = new System.Windows.Forms.Splitter();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonAddEntry = new System.Windows.Forms.ToolStripButton();
             this.buttonDeleteEntry = new System.Windows.Forms.ToolStripButton();
@@ -61,13 +68,7 @@
             this.buttonSoundBankDelete = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.smStdatToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mxDtdatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.splitter5 = new System.Windows.Forms.Splitter();
+            this.exportScriptButton = new System.Windows.Forms.ToolStripButton();
             this.dspViewer1 = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.menuStrip1.SuspendLayout();
             this.entryBox.SuspendLayout();
@@ -115,6 +116,46 @@
             this.exportSEMToolStripMenuItem.Text = "Export SEM";
             this.exportSEMToolStripMenuItem.Click += new System.EventHandler(this.exportSEMToolStripMenuItem_Click);
             // 
+            // smStdatToolStripMenuItem1
+            // 
+            this.smStdatToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem,
+            this.exportToolStripMenuItem});
+            this.smStdatToolStripMenuItem1.Enabled = false;
+            this.smStdatToolStripMenuItem1.Name = "smStdatToolStripMenuItem1";
+            this.smStdatToolStripMenuItem1.Size = new System.Drawing.Size(66, 20);
+            this.smStdatToolStripMenuItem1.Text = "SmSt.dat";
+            // 
+            // importToolStripMenuItem
+            // 
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Text = "Import";
+            this.importToolStripMenuItem.Click += new System.EventHandler(this.ImportToolStripMenuItem_Click);
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportSmStdatToolStripMenuItem_Click);
+            // 
+            // mxDtdatToolStripMenuItem
+            // 
+            this.mxDtdatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem1});
+            this.mxDtdatToolStripMenuItem.Enabled = false;
+            this.mxDtdatToolStripMenuItem.Name = "mxDtdatToolStripMenuItem";
+            this.mxDtdatToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
+            this.mxDtdatToolStripMenuItem.Text = "MxDt.dat";
+            // 
+            // importToolStripMenuItem1
+            // 
+            this.importToolStripMenuItem1.Name = "importToolStripMenuItem1";
+            this.importToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem1.Text = "Import";
+            this.importToolStripMenuItem1.Click += new System.EventHandler(this.importToolStripMenuItem1_Click);
+            // 
             // entryList
             // 
             this.entryList.AllowDrop = true;
@@ -154,6 +195,23 @@
             this.entryBox.TabIndex = 4;
             this.entryBox.TabStop = false;
             this.entryBox.Text = "Entries";
+            // 
+            // splitter5
+            // 
+            this.splitter5.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter5.Location = new System.Drawing.Point(3, 226);
+            this.splitter5.Name = "splitter5";
+            this.splitter5.Size = new System.Drawing.Size(159, 3);
+            this.splitter5.TabIndex = 4;
+            this.splitter5.TabStop = false;
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.propertyGrid1.Location = new System.Drawing.Point(3, 229);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(159, 217);
+            this.propertyGrid1.TabIndex = 3;
             // 
             // toolStrip1
             // 
@@ -280,7 +338,8 @@
             this.buttonRemoveSound,
             this.buttonMoveUp,
             this.buttonMoveDown,
-            this.renameButton});
+            this.renameButton,
+            this.exportScriptButton});
             this.toolStrip2.Location = new System.Drawing.Point(3, 16);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(752, 25);
@@ -419,62 +478,14 @@
             this.splitter2.TabIndex = 8;
             this.splitter2.TabStop = false;
             // 
-            // smStdatToolStripMenuItem1
+            // exportScriptButton
             // 
-            this.smStdatToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importToolStripMenuItem,
-            this.exportToolStripMenuItem});
-            this.smStdatToolStripMenuItem1.Enabled = false;
-            this.smStdatToolStripMenuItem1.Name = "smStdatToolStripMenuItem1";
-            this.smStdatToolStripMenuItem1.Size = new System.Drawing.Size(66, 20);
-            this.smStdatToolStripMenuItem1.Text = "SmSt.dat";
-            // 
-            // importToolStripMenuItem
-            // 
-            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.importToolStripMenuItem.Text = "Import";
-            this.importToolStripMenuItem.Click += new System.EventHandler(this.ImportToolStripMenuItem_Click);
-            // 
-            // exportToolStripMenuItem
-            // 
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.exportToolStripMenuItem.Text = "Export";
-            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportSmStdatToolStripMenuItem_Click);
-            // 
-            // mxDtdatToolStripMenuItem
-            // 
-            this.mxDtdatToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importToolStripMenuItem1});
-            this.mxDtdatToolStripMenuItem.Enabled = false;
-            this.mxDtdatToolStripMenuItem.Name = "mxDtdatToolStripMenuItem";
-            this.mxDtdatToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
-            this.mxDtdatToolStripMenuItem.Text = "MxDt.dat";
-            // 
-            // importToolStripMenuItem1
-            // 
-            this.importToolStripMenuItem1.Name = "importToolStripMenuItem1";
-            this.importToolStripMenuItem1.Size = new System.Drawing.Size(110, 22);
-            this.importToolStripMenuItem1.Text = "Import";
-            this.importToolStripMenuItem1.Click += new System.EventHandler(this.importToolStripMenuItem1_Click);
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.propertyGrid1.Location = new System.Drawing.Point(3, 229);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(159, 217);
-            this.propertyGrid1.TabIndex = 3;
-            // 
-            // splitter5
-            // 
-            this.splitter5.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter5.Location = new System.Drawing.Point(3, 226);
-            this.splitter5.Name = "splitter5";
-            this.splitter5.Size = new System.Drawing.Size(159, 3);
-            this.splitter5.TabIndex = 4;
-            this.splitter5.TabStop = false;
+            this.exportScriptButton.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
+            this.exportScriptButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportScriptButton.Name = "exportScriptButton";
+            this.exportScriptButton.Size = new System.Drawing.Size(94, 22);
+            this.exportScriptButton.Text = "Export Script";
+            this.exportScriptButton.Click += new System.EventHandler(this.exportScriptButton_Click);
             // 
             // dspViewer1
             // 
@@ -482,6 +493,7 @@
             this.dspViewer1.DSP = null;
             this.dspViewer1.Location = new System.Drawing.Point(236, 41);
             this.dspViewer1.Name = "dspViewer1";
+            this.dspViewer1.ReplaceButtonVisible = true;
             this.dspViewer1.Size = new System.Drawing.Size(519, 217);
             this.dspViewer1.TabIndex = 3;
             // 
@@ -564,5 +576,6 @@
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem1;
         private System.Windows.Forms.Splitter splitter5;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
+        private System.Windows.Forms.ToolStripButton exportScriptButton;
     }
 }

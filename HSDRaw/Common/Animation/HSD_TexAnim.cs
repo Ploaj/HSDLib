@@ -43,6 +43,50 @@ namespace HSDRaw.Common.Animation
             get => _s.GetInt16(0x16);
             internal set => _s.SetInt16(0x16, value);
         }
+
+        /// <summary>
+        /// Adds a new <see cref="HSD_TOBJ"/> too image bank
+        /// </summary>
+        /// <param name="tobj"></param>
+        /// <returns>-1 is TOBJ is inavlid format and new index otherwise</returns>
+        public int AddImage(HSD_TOBJ tobj)
+        {
+            if (ImageCount > 0 && tobj.ImageData.Format != ImageBuffers[0].Data.Format)
+                return -1;
+
+            if (TlutCount > 0 && tobj.TlutData != null && tobj.TlutData.Format != TlutBuffers[0].Data.Format)
+                return -1;
+
+            ImageBuffers.Add(new HSD_TexBuffer() { Data = tobj.ImageData });
+            ImageCount++;
+
+            if(tobj.TlutData != null)
+            {
+                TlutBuffers.Add(new HSD_TlutBuffer() { Data = tobj.TlutData });
+                TlutCount++;
+            }
+
+            return ImageBuffers.Length - 1;
+        }
+
+        /// <summary>
+        /// Removes image at given index
+        /// Adjust Key Frames to remove image as well
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveImageAt(int index)
+        {
+            if(index >= 0 && index < ImageCount)
+            {
+                ImageBuffers.RemoveAt(index);
+                ImageCount--;
+            }
+            if (index >= 0 && index < TlutCount)
+            {
+                TlutBuffers.RemoveAt(index);
+                TlutCount--;
+            }
+        }
     }
 
     public class HSD_TexBuffer : HSDAccessor

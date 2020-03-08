@@ -5,7 +5,7 @@ namespace HSDRaw.Melee.Pl
     /// <summary>
     /// 
     /// </summary>
-    public class SBM_PlayerData : HSDAccessor
+    public class SBM_FighterData : HSDAccessor
     {
         public override int TrimmedSize => 0x60;
 

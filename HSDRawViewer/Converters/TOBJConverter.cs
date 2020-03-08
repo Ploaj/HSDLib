@@ -7,6 +7,8 @@ using System.Windows.Forms;
 using HSDRawViewer.GUI;
 using System.IO;
 using System;
+using nQuant;
+using System.Drawing.Imaging;
 
 namespace HSDRawViewer.Converters
 {
@@ -103,6 +105,31 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="b"></param>
+        public static HSD_TOBJ BitmapToTOBJ(Bitmap bmp, GXTexFmt imgFormat, GXTlutFmt palFormat)
+        {
+            var TOBJ = new HSD_TOBJ()
+            {
+                MagFilter = GXTexFilter.GX_LINEAR,
+                HScale = 1,
+                WScale = 1,
+                WrapS = GXWrapMode.CLAMP,
+                WrapT = GXWrapMode.CLAMP,
+                SX = 1,
+                SY = 1,
+                SZ = 1,
+                GXTexGenSrc = 4,
+                Blending = 1
+            };
+
+            InjectBitmap(TOBJ, bmp, imgFormat, palFormat);
+
+            return TOBJ;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="tobj"></param>
         /// <param name="bmp"></param>
         /// <param name="imgFormat"></param>
@@ -111,6 +138,9 @@ namespace HSDRawViewer.Converters
         {
             if (imgFormat != GXTexFmt.CMP)
             {
+                if (imgFormat == GXTexFmt.CI8 || imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
+                    bmp = ReduceColors(bmp);
+
                 var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 var length = bitmapData.Stride * bitmapData.Height;
 
@@ -120,6 +150,10 @@ namespace HSDRawViewer.Converters
                 bmp.UnlockBits(bitmapData);
 
                 tobj.EncodeImageData(bytes, bmp.Width, bmp.Height, imgFormat, palFormat);
+
+                // dispose if we use our color reduced bitmap
+                if (imgFormat == GXTexFmt.CI8 || imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
+                    bmp.Dispose();
             }
             else
             {
@@ -150,6 +184,19 @@ namespace HSDRawViewer.Converters
 
                 // Call unmanaged code
                 Marshal.FreeHGlobal(unmanagedPointer);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp"></param>
+        private static Bitmap ReduceColors(Bitmap bitmap)
+        {
+            var quantizer = new WuQuantizer();
+            using (var quantized = quantizer.QuantizeImage(bitmap, 1, 1))
+            {
+                return new Bitmap(quantized);
             }
         }
 

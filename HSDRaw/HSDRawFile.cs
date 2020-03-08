@@ -488,7 +488,7 @@ namespace HSDRaw
             allStructs.Clear();
 
             // remove duplicate buffers--------------------------------------------------------------------------
-            if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_PlayerData) && !(Roots[0].Data is MEX_Data))
+            if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_FighterData) && !(Roots[0].Data is MEX_Data))
                 RemoveDuplicateBuffers();
 
             // build file --------------------------------------------------------------------------
@@ -697,7 +697,7 @@ namespace HSDRaw
             else
             if (rootString.StartsWith("ftData") && !rootString.Contains("Copy"))
             {
-                var acc = new SBM_PlayerData();
+                var acc = new SBM_FighterData();
                 acc._s = str;
                 a = acc;
             }

@@ -29,8 +29,18 @@ namespace HSDRawViewer.Sound
         /// <param name="filePath"></param>
         public void Open(string filePath)
         {
-            Name = Path.GetFileName(filePath);
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
+            using (var fs = new FileStream(filePath, FileMode.Open))
+                Open(Path.GetFileName(filePath), fs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void Open(string name, Stream s)
+        {
+            Name = name;
+            using (BinaryReaderExt r = new BinaryReaderExt(s))
             {
                 r.BigEndian = true;
 

@@ -50,6 +50,12 @@
     <Reference Include="DirectXTexNet, Version=1.0.0.4, Culture=neutral, PublicKeyToken=67e4f5ed452a4f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\DirectXTexNet.1.0.0-rc4\lib\netstandard2.0\DirectXTexNet.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
+    <Reference Include="nQuant.Core, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\nQuant.1.0.3\lib\net40\nQuant.Core.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -60,6 +66,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -139,9 +146,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ArrayMemberEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="GUI\ArrayMemberEditor.cs" />
     <Compile Include="GUI\ArrayMemberEditor.Designer.cs">
       <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
     </Compile>
@@ -226,6 +231,7 @@
     <Compile Include="GUI\Plugins\MEX\DefaultItemNames.cs" />
     <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
     <Compile Include="GUI\Plugins\MEX\FighterPackageInstaller.cs" />
+    <Compile Include="GUI\Plugins\MEX\FighterPackageUninstaller.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXConverters.cs" />
     <Compile Include="GUI\Plugins\MEX\MexDataEditor.cs">
       <SubType>Form</SubType>

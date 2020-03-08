@@ -465,6 +465,14 @@ namespace HSDRaw
             this[index] = value;
         }
 
+        public void RemoveAt(int index)
+        {
+            // temp; slow
+            var arr = Array.ToList();
+            arr.RemoveAt(index);
+            Array = arr.ToArray();
+        }
+
         public void Remove(T value)
         {
             // temp; slow
@@ -479,7 +487,6 @@ namespace HSDRaw
             var arr = Array.ToList();
             arr.Add(value);
             Array = arr.ToArray();
-            Console.WriteLine(arr.Count + " " + Array.Length);
         }
     }
 }

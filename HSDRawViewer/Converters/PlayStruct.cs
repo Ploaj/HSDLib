@@ -46,7 +46,7 @@ namespace HSDRawViewer.Converters
             var path = Path.GetDirectoryName(plFilePath) + "\\" + outputFolder + "\\";
             Directory.CreateDirectory(path);
 
-            var data = plfile.Roots[0].Data as SBM_PlayerData;
+            var data = plfile.Roots[0].Data as SBM_FighterData;
 
             if (data == null)
                 return;
@@ -144,7 +144,7 @@ namespace HSDRawViewer.Converters
 
             HSDRootNode root = new HSDRootNode();
             root.Name = rootName;
-            var ftData = new SBM_PlayerData();
+            var ftData = new SBM_FighterData();
             root.Data = ftData;
             file.Roots.Add(root);
             var prop = root.Data.GetType().GetProperties().ToList();

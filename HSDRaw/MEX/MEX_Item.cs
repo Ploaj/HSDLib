@@ -20,6 +20,7 @@ namespace HSDRaw.MEX
         // runtime table at 0x14
     }
     
+    [Serializable]
     public class MEX_Item : HSDAccessor
     {
         public override int TrimmedSize => 0x3C;

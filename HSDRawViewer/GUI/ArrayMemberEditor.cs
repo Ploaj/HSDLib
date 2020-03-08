@@ -7,6 +7,11 @@ using System.Collections.Generic;
 
 namespace HSDRawViewer.GUI
 {
+    public class RemovedItemEventArgs : EventArgs
+    {
+        public int Index { get; set; }
+    }
+
     public partial class ArrayMemberEditor : UserControl
     {
         private PropertyInfo Property { get; set; }
@@ -28,6 +33,9 @@ namespace HSDRawViewer.GUI
         public event EventHandler SelectedObjectChanged;
         public event EventHandler DoubleClickedNode;
         public event EventHandler ArrayUpdated;
+
+        public delegate void OnItemRemoveHandler(RemovedItemEventArgs e);
+        public event OnItemRemoveHandler OnItemRemove;
 
         [DefaultValue(true)]
         public bool EnableToolStrip
@@ -189,11 +197,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonRemove_Click(object sender, EventArgs e)
         {
-            if (elementList.SelectedIndex != -1)
-            {
-                elementList.Items.RemoveAt(elementList.SelectedIndex);
-                MakeChanges();
-            }
+            RemoveAt(elementList.SelectedIndex);
         }
 
         /// <summary>
@@ -384,6 +388,20 @@ namespace HSDRawViewer.GUI
             if (elementList.Items.Contains(o))
             {
                 elementList.SelectedItem = o;
+            }
+        }
+
+        /// <summary>
+        /// Removes item at index
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveAt(int index)
+        {
+            if (index != -1)
+            {
+                OnItemRemove?.Invoke(new RemovedItemEventArgs() { Index = index });
+                elementList.Items.RemoveAt(index);
+                MakeChanges();
             }
         }
     }

@@ -85,14 +85,16 @@ namespace HSDRaw.Common.Animation
                     return;
                 }
 
-                var re = _s.GetReference<HSDAccessor>(0x04);
+                /*var re = _s.GetReference<HSDAccessor>(0x04);
                 if (re == null)
                 {
                     re = new HSDAccessor();
                     _s.SetReference(0x04, re);
-                }
-
+                }*/
+                //Always make new buffer
+                var re = new HSDAccessor();
                 re._s.SetData(value);
+                _s.SetReference(0x04, re);
             }
         }
         

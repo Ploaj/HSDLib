@@ -5,9 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace HSDRawViewer.Sound
 {
@@ -94,13 +97,22 @@ namespace HSDRawViewer.Sound
         /// <returns></returns>
         public static List<SEMEntry> ReadSEMFile(string filePath)
         {
-            var o = MessageBox.Show("Load Sound Banks(SSM) as well?", "Load SSM Files?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            var o = MessageBox.Show("Load Sound Banks(SSM) as well?", "Load SSM Files?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes;
+            return ReadSEMFile(filePath, o);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static List<SEMEntry> ReadSEMFile(string filePath, bool loadSoundBanks, MEX_Data mexData = null)
+        {
             var Entries = new List<SEMEntry>();
 
             Dictionary<int, SSM> indexToSSM = new Dictionary<int, SSM>();
 
-            if(o == DialogResult.Yes)
+            if(loadSoundBanks)
             {
                 foreach(var f in Directory.GetFiles(Path.GetDirectoryName(filePath)))
                 {
@@ -113,8 +125,8 @@ namespace HSDRawViewer.Sound
                 }
             }
 
-            if (o == DialogResult.Cancel)
-                return Entries;
+            //if (!loadSoundBanks)
+            //    return Entries;
 
             using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
             {
@@ -154,9 +166,16 @@ namespace HSDRawViewer.Sound
                         ssmStartIndex = Math.Min(ssmStartIndex, s.SoundCommandIndex);
                     }
                     
-                    if (o == DialogResult.Yes && indexToSSM.ContainsKey(ssmStartIndex))
+                    if (loadSoundBanks && indexToSSM.ContainsKey(ssmStartIndex))
                     {
                         e.SoundBank = indexToSSM[ssmStartIndex];
+
+                        if (mexData != null)
+                        {
+                            e.SoundBank.GroupFlags = mexData.SSMTable.SSM_LookupTable[(int)i].EntireFlag;
+                            e.SoundBank.Flag = mexData.SSMTable.SSM_Flags[(int)i].Flag;
+                        }
+
                         foreach (var v in e.Sounds)
                             v.SoundCommandIndex -= ssmStartIndex;
                     }
@@ -180,11 +199,12 @@ namespace HSDRawViewer.Sound
         {
             if(mexData != null)
             {
-                mexData.SSMTable.SSM_Flags.Array = new MEX_SSMSizeAndFlags[0];
                 mexData.SSMTable.SSM_SSMFiles.Array = new HSD_String[0];
+                mexData.SSMTable.SSM_Flags.Array = new MEX_SSMSizeAndFlags[0];
                 mexData.SSMTable.SSM_LookupTable.Array = new MEX_SSMLookup[0];
 
-                mexData.SSMTable.SSM_Flags.Set(Entries.Count, new MEX_SSMSizeAndFlags() { });// blank entry at end
+                mexData.SSMTable.SSM_Flags.Set(Entries.Count, new MEX_SSMSizeAndFlags());// blank entry at end
+                mexData.SSMTable.SSM_LookupTable.Set(Entries.Count, new MEX_SSMLookup());// blank entry at beginning
 
                 // generate runtime struct
                 mexData.MetaData.NumOfSSMs = Entries.Count;
@@ -231,8 +251,10 @@ namespace HSDRawViewer.Sound
 
                 w.Write(0);
 
+                int entryIndex = -1;
                 foreach (var e in Entries)
                 {
+                    entryIndex++;
                     // fix sound offset ids
                     if (e.SoundBank != null)
                     {
@@ -244,10 +266,10 @@ namespace HSDRawViewer.Sound
                         if(mexData != null)
                         {
                             mexData.SSMTable.SSM_SSMFiles.Add(new HSD_String() { Value = e.SoundBank.Name });
-                            mexData.SSMTable.SSM_Flags.Add(new MEX_SSMSizeAndFlags() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
+                            mexData.SSMTable.SSM_Flags.Set(entryIndex, new MEX_SSMSizeAndFlags() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
                             var lu = new MEX_SSMLookup();
                             lu._s.SetInt32(0x00, e.SoundBank.GroupFlags);
-                            mexData.SSMTable.SSM_LookupTable.Add(lu);
+                            mexData.SSMTable.SSM_LookupTable.Set(entryIndex, lu);
                         }
 
                         // add sound offset
@@ -319,23 +341,90 @@ namespace HSDRawViewer.Sound
     /// <summary>
     /// 
     /// </summary>
+    [Serializable]
     public class SEMEntry
     {
-        public BindingList<SEMSound> Sounds = new BindingList<SEMSound>();
-
-        public SSM SoundBank;
-
-        public int Index;
-
         [Description("Unknown Flag"), TypeConverter(typeof(HexType))]
         public uint Flags { get => SoundBank == null ? 0 : (uint)SoundBank.Flag; set { if (SoundBank != null) SoundBank.Flag = (int)value; } }
 
         [DisplayName("Group Flags"), Description("Groupping Lookup information"), TypeConverter(typeof(HexType))]
         public uint GroupFlags { get => SoundBank == null ? 0 : (uint)SoundBank.GroupFlags; set { if (SoundBank != null) SoundBank.GroupFlags = (int)value; } }
+        
+        public BindingList<SEMSound> Sounds = new BindingList<SEMSound>();
+
+        [YamlIgnore]
+        public int Index;
+
+        [YamlIgnore]
+        public SSM SoundBank;
 
         public override string ToString()
         {
             return SoundBank != null ? SoundBank.Name : $"Entry_{Index} : Count {Sounds.Count}";
+        }
+
+        /// <summary>
+        /// Removes sound with given ID from sound bank
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveSoundAt(int index)
+        {
+            //foreach(var r in Sounds.Where(e=>e.SoundCommandIndex == index))
+            //    Sounds.Remove(r);
+
+            Sounds.RemoveAt(index);
+
+            RemoveUnusedSounds();
+        }
+
+        /// <summary>
+        /// Removes unused sounds from sound bank
+        /// </summary>
+        public void RemoveUnusedSounds()
+        {
+            if (SoundBank == null)
+                return;
+
+            var usedSounds = Sounds.Select(e=>e.SoundCommandIndex);
+
+            List<DSP> toRem = new List<DSP>();
+
+            for(int i = 0; i < SoundBank.Sounds.Count; i++)
+            {
+                if (!usedSounds.Contains(i))
+                    toRem.Add(SoundBank.Sounds[i]);
+            }
+            foreach (var v in toRem)
+                SoundBank.Sounds.Remove(v);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static SEMEntry Deserialize(string data)
+        {
+            var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+
+            return deserializer.Deserialize<SEMEntry>(data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
+        public void Serialize(string filepath)
+        {
+            var builder = new SerializerBuilder();
+            builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
+
+            using (StreamWriter writer = File.CreateText(filepath))
+            {
+                builder.Build().Serialize(writer, this);
+            }
         }
     }
 
@@ -346,10 +435,12 @@ namespace HSDRawViewer.Sound
     {
         public byte[] CommandData = new byte[0];
 
+        [YamlIgnore]
         public string Name { get; set; } = "SFX_";
 
         public int Index { get; set; }
 
+        [YamlIgnore]
         public int SoundCommandIndex
         {
             get => GetOPCodeValue(0x01);

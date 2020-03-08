@@ -155,7 +155,7 @@ namespace HSDRawViewer.GUI
 
                     if (Node.Parent is DataNode parent)
                     {
-                        if (parent.Accessor is SBM_PlayerData plDat)
+                        if (parent.Accessor is SBM_FighterData plDat)
                         {
                             if (plDat.Hurtboxes != null)
                                 Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);

@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Tools;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace HSDRaw.Common.Animation
@@ -29,20 +30,16 @@ namespace HSDRaw.Common.Animation
             get => _s.GetReference<HSDAccessor>(0x10)?._s.GetData();
             set
             {
-                if (value == null)
-                {
-                    _s.SetReference(0x10, null);
-                    return;
-                }
-
-                var re = _s.GetReference<HSDAccessor>(0x10);
+                /*var re = _s.GetReference<HSDAccessor>(0x04);
                 if (re == null)
                 {
                     re = new HSDAccessor();
-                    _s.SetReference(0x10, re);
-                }
-
+                    _s.SetReference(0x04, re);
+                }*/
+                //Always make new buffer
+                var re = new HSDAccessor();
                 re._s.SetData(value);
+                _s.SetReference(0x10, re);
             }
         }
 
@@ -126,6 +123,44 @@ namespace HSDRaw.Common.Animation
         {
             var fobj = FOBJFrameEncoder.EncodeFrames(keys, type);
             FromFOBJ(fobj);
+        }
+
+        /// <summary>
+        /// Adds a key frame to the collection
+        /// If a key with given frame already exists, it is overrwritten
+        /// </summary>
+        /// <param name="key"></param>
+        public void SetKey(FOBJKey key)
+        {
+            var keys = GetDecodedKeys();
+
+            var dup = keys.Find(e => e.Frame == key.Frame);
+            keys.Remove(dup);
+
+            keys.Insert(keys.FindIndex(e => e.Frame > key.Frame) - 1, key);
+
+            SetKeys(keys, this.AnimationType);
+        }
+
+        /// <summary>
+        /// Inserts Key into track pushing other key frames down a frame
+        /// </summary>
+        /// <param name="key"></param>
+        public void InsertKey(FOBJKey key)
+        {
+            var keys = GetDecodedKeys();
+
+            foreach (var k in keys)
+                if (k.Frame >= key.Frame)
+                    k.Frame++;
+                    
+            var index = keys.FindIndex(e => e.Frame > key.Frame);
+            if (index < 0)
+                index = keys.Count;
+
+            keys.Insert(index, key);
+            
+            SetKeys(keys, AnimationType);
         }
 
         public override string ToString()

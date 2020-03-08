@@ -286,14 +286,16 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var folder = FileIO.OpenFolder();
+            var file = FileIO.SaveFile(DSP.SupportedExportFilter);
 
-            if(folder != null)
+            if(file != null)
             {
                 var sIndex = 0;
                 foreach(var s in Sounds)
                 {
-                    s.ExportFormat(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav");
+                    var o = Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + sIndex++.ToString("D2") + Path.GetExtension(file));
+                    s.ExportFormat(o);
+                    //s.ExportFormat(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav");
                 }
             }
         }

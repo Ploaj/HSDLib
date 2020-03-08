@@ -33,7 +33,7 @@ namespace HSDRawViewer.GUI
         private BindingList<Animation> FightingAnimations = new BindingList<Animation>();
         private BindingList<Animation> ResultAnimations = new BindingList<Animation>();
 
-        private SBM_PlayerData PlayerData;
+        private SBM_FighterData PlayerData;
 
         public AJSplitDialog()
         {
@@ -136,7 +136,7 @@ namespace HSDRawViewer.GUI
 
                 foreach(var root in file.Roots)
                 {
-                    if(root.Data is SBM_PlayerData plData)
+                    if(root.Data is SBM_FighterData plData)
                     {
                         PlayerFile = file;
                         PlayerData = plData;
