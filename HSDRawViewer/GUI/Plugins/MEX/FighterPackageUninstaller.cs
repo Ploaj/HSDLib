@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee;
 using HSDRaw.Melee.Mn;
@@ -36,11 +37,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             editor.RemoveFighterEntry(internalID);
 
-            RemoveMEXItems(fighter, editor);
+            //RemoveMEXItems(fighter, editor);
 
             RemoveMEXEffects(fighter, editor);
 
-            RemoveSounds(fighter, editor);
+            //RemoveSounds(fighter, editor);
             
             RemoveUI(fighter, editor, internalID);
 
@@ -187,24 +188,61 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private static void RemoveUI(MEXEntry fighter, MexDataEditor editor, int internalID)
         {
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
-            var chrSelPath = Path.Combine(root, "MnSlChr.usd");
-            var cssFile = new HSDRawFile(chrSelPath);
-
+            int externalID = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1);
             int stride = editor.FighterEntries.Count - 3 + 1;
 
-            if (cssFile.Roots[0].Data is SBM_SelectChrDataTable cssTable)
+
+            var chrSelPath = Path.Combine(root, "MnSlChr.usd");
+            if (File.Exists(chrSelPath))
             {
-                foreach (var n in cssTable.MenuMaterialAnimation.Children[6].Children)
-                    RemoveMatAnim(n, MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1), stride, 7);
+                var cssFile = new HSDRawFile(chrSelPath);
 
-                foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[6].Children)
-                    RemoveMatAnim(n, MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1), stride, 7);
+                if (cssFile.Roots[0].Data is SBM_SelectChrDataTable cssTable)
+                {
+                    foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[9].Children)
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
 
-                foreach (var n in cssTable.PortraitMaterialAnimation.Children[2].Children)
-                    RemoveMatAnim(n, MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1), stride, 7);
+                    foreach (var n in cssTable.MenuMaterialAnimation.Children[6].Children)
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+
+                    foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[6].Children)
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+
+                    foreach (var n in cssTable.PortraitMaterialAnimation.Children[2].Children)
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+                }
+                cssFile.Save(chrSelPath);
             }
 
-            cssFile.Save(chrSelPath);
+            
+            var ifallPath = Path.Combine(root, "IfAll.usd");
+            if (File.Exists(ifallPath))
+            {
+                var datFile = new HSDRawFile(ifallPath);
+
+                var mark = datFile.Roots.Find(e => e.Name.Equals("Stc_scemdls")).Data as HSDNullPointerArrayAccessor<HSD_JOBJDesc>;
+
+                for (int i = 0; i < 7; i++) // first 7
+                    RemoveMatAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, externalID, stride);
+
+                datFile.Save(ifallPath);
+            }
+
+
+            var gmrst = Path.Combine(root, "GmRst.usd");
+            if (File.Exists(gmrst))
+            {
+                var datFile = new HSDRawFile(gmrst);
+
+                var mark = datFile.Roots.Find(e => e.Name.Equals("pnlsce")).Data as HSD_SOBJ;
+
+                for (int i = 5; i <= 8; i++) // at 5-8, 2nd mat anim
+                    RemoveMatAnim(mark.JOBJDescs[0].MaterialAnimations[0].Children[i].MaterialAnimation.Next.TextureAnimation,
+                        externalID,
+                        stride);
+
+                datFile.Save(gmrst);
+            }
         }
 
         /// <summary>
@@ -214,13 +252,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="externalID"></param>
         /// <param name="stride"></param>
         /// <param name="count"></param>
-        private static void RemoveMatAnim(HSD_MatAnimJoint n, int externalID, int stride, int count)
+        private static void RemoveMatAnim(HSD_TexAnim texAnim, int externalID, int stride)
         {
-            var fobjs = n.MaterialAnimation.TextureAnimation.AnimationObject.FObjDesc.List;
+            var fobjs = texAnim.AnimationObject.FObjDesc.List;
 
             List<int> toRem = new List<int>();
 
-            for (int i = count - 1; i >= 0; i--)
+            for (int i = FighterPackageInstaller.MAX_COSTUME_COUNT - 1; i >= 0; i--)
             {
                 var frame = externalID + stride * i;
 
@@ -235,7 +273,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             toRem.Sort();
             toRem.Reverse();
             foreach (var r in toRem)
-                n.MaterialAnimation.TextureAnimation.RemoveImageAt(r);
+            {
+                texAnim.RemoveImageAt(r);
+            }
         }
         
         /// <summary>

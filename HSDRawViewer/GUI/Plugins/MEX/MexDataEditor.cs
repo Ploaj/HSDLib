@@ -192,6 +192,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
 
             // Music------------------------------------
+            MEXConverter.ssmValues.Clear();
             MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(e=>e.Value));
 
             Music = _data.MusicTable.BackgroundMusicStrings.Array;
@@ -924,10 +925,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if(f != null)
             {
                 FighterPackageInstaller.InstallFighter(f, this);
-                saveAllChangesButton_Click(null, null);
                 MEXConverter.ssmValues.Clear();
                 MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
                 MessageBox.Show("Fighter installed");
+                saveAllChangesButton_Click(null, null);
             }
         }
 
@@ -936,10 +937,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if(IsExtendedFighter(fighterList.SelectedIndex) && fighterList.SelectedItem is MEXEntry en)
             {
                 FighterPackageUninstaller.UninstallerFighter(fighterList.SelectedIndex, en, this);
-                saveAllChangesButton_Click(null, null);
                 MEXConverter.ssmValues.Clear();
                 MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
                 MessageBox.Show("Fighter uninstalled");
+                saveAllChangesButton_Click(null, null);
             }
         }
 

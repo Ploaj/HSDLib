@@ -54,7 +54,8 @@
       <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
     <Reference Include="nQuant.Core, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\nQuant.1.0.3\lib\net40\nQuant.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\nQuant.Core.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
@@ -329,6 +330,9 @@
     <None Include="Resources\ico_kabii.png" />
     <None Include="Resources\ico_fuma.png" />
     <None Include="Resources\doc_kabii.png" />
+    <Content Include="lib\nQuant.Core.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />

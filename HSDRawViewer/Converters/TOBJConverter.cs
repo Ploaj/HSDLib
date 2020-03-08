@@ -138,8 +138,10 @@ namespace HSDRawViewer.Converters
         {
             if (imgFormat != GXTexFmt.CMP)
             {
-                if (imgFormat == GXTexFmt.CI8 || imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
-                    bmp = ReduceColors(bmp);
+                if (imgFormat == GXTexFmt.CI8)
+                    bmp = ReduceColors(bmp, 256);
+                if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
+                    bmp = ReduceColors(bmp, 16);
 
                 var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 var length = bitmapData.Stride * bitmapData.Height;
@@ -191,10 +193,10 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="bmp"></param>
-        private static Bitmap ReduceColors(Bitmap bitmap)
+        private static Bitmap ReduceColors(Bitmap bitmap, int colorCount)
         {
             var quantizer = new WuQuantizer();
-            using (var quantized = quantizer.QuantizeImage(bitmap, 1, 1))
+            using (var quantized = quantizer.QuantizeImage(bitmap, 1, 1, colorCount))
             {
                 return new Bitmap(quantized);
             }
