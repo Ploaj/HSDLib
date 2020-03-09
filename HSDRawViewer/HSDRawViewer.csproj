@@ -243,6 +243,12 @@
     </Compile>
     <Compile Include="GUI\Plugins\MEX\MEXEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXPlaylistEntry.cs" />
+    <Compile Include="GUI\ProgressBarDisplay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\ProgressBarDisplay.Designer.cs">
+      <DependentUpon>ProgressBarDisplay.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\SubActionPanel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -391,6 +397,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\MEX\MexDataEditor.resx">
       <DependentUpon>MexDataEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\ProgressBarDisplay.resx">
+      <DependentUpon>ProgressBarDisplay.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\SubActionPanel.resx">
       <DependentUpon>SubActionPanel.cs</DependentUpon>

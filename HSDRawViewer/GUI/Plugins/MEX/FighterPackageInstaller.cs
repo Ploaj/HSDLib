@@ -12,13 +12,14 @@ using HSDRawViewer.Sound;
 using HSDRawViewer.Converters;
 using HSDRaw.Melee.Mn;
 using HSDRaw.Common.Animation;
+using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
     /// <summary>
     /// 
     /// </summary>
-    public class FighterPackageInstaller
+    public class FighterPackageInstaller : ProgressClass
     {
         public static int MAX_COSTUME_COUNT { get; } = 7;
 
@@ -57,7 +58,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
          *! /Sound/victory.hps
          *! /UI/result_victory_name.png
          *! /UI/result_name.png
-         * /UI/emblem.obj
+         *! /UI/emblem.obj
          *! /bone_table.dat
          *! /fighter.yaml            -Required
          *! /GmRst**.dat
@@ -65,12 +66,24 @@ namespace HSDRawViewer.GUI.Plugins.MEX
          *! /Pl**AJ.dat
          *! /Pl**DViWaitAJ.dat
          */
+         
+
+        private string packagePath;
+        private MexDataEditor editor;
+        private List<Tuple<HSDRawFile, string, bool>> editedFiles = new List<Tuple<HSDRawFile, string, bool>>();
+        private List<SEMEntry> SemEntries = new List<SEMEntry>();
+
+        public FighterPackageInstaller(string packagePage, MexDataEditor editor)
+        {
+            this.packagePath = packagePage;
+            this.editor = editor;
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="packagePath"></param>
-        public static void InstallFighter(string packagePath, MexDataEditor editor)
+        public override void Work(BackgroundWorker w)
         {
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
             var plco = Path.Combine(root, "PlCo.dat");
@@ -108,19 +121,44 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 if (mexEntry == null)
                     return;
-
-                Console.WriteLine($"Importing {mexEntry.NameText}...");
+                
+                ProgressStatus = $"Importing  {mexEntry.NameText}...";
+                w.ReportProgress(0);
 
                 var internalID = editor.AddEntry(mexEntry);
 
-                ImportItemData(pack, mexEntry, editor);
-                var effectDict = GenerateEffectFile(pack, mexEntry, editor);
-                ImportSoundData(pack, mexEntry, editor, sem);
-                InstallUI(pack, mexEntry, editor);
-                InjectBoneTable(pack, plco, internalID, editor);
-                ExtractFiles(pack, mexEntry, editor);
-                //...
+                ProgressStatus = "Installing Item Data"; w.ReportProgress(10);
+                ImportItemData(pack, mexEntry);
 
+                ProgressStatus = "Installing Item Data"; w.ReportProgress(20);
+                GenerateEffectFile(pack, mexEntry);
+
+                ProgressStatus = "Installing Item Data"; w.ReportProgress(30);
+                ImportSoundData(pack, mexEntry, sem);
+
+                ProgressStatus = "Installing UI"; w.ReportProgress(50);
+                InstallUI(pack, mexEntry);
+
+                ProgressStatus = "Installing Item Data"; w.ReportProgress(60);
+                InjectBoneTable(pack, plco, internalID);
+
+                //...
+                ProgressStatus = "Extracting Files";
+                w.ReportProgress(70);
+                ExtractFiles(pack, mexEntry, editor);
+
+                ProgressStatus = "Building new SEM";
+                w.ReportProgress(80);
+                if (SemEntries.Count != 0)
+                    SEM.SaveSEMFile(sem, SemEntries, editor._data);
+
+                ProgressStatus = "Saving Files";
+                w.ReportProgress(90);
+                foreach (var d in editedFiles)
+                    d.Item1.Save(d.Item2, d.Item3);
+
+                ProgressStatus = "Done";
+                w.ReportProgress(100);
                 // done
                 Console.WriteLine($"Done!");
             }
@@ -148,7 +186,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="internalID"></param>
         /// <param name="editor"></param>
         /// <returns>true if bone table was injected</returns>
-        private static bool InjectBoneTable(ZipFile pack, string PlCoPath, int internalID, MexDataEditor editor)
+        private bool InjectBoneTable(ZipFile pack, string PlCoPath, int internalID)
         {
             var bone = pack["bone_table.dat"];
             if (bone == null)
@@ -180,7 +218,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             else
                 return false;
 
-            plco.Save(PlCoPath, false);
+            editedFiles.Add(new Tuple<HSDRawFile, string, bool>(plco, PlCoPath, false));
 
             return true;
         }
@@ -190,9 +228,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="pack"></param>
         /// <param name="fighter"></param>
-        /// <param name="mexData"></param>
+        /// <param name="editor"></param>
         /// <returns></returns>
-        private static void ImportItemData(ZipFile pack, MEXEntry fighter, MexDataEditor mexData)
+        private void ImportItemData(ZipFile pack, MEXEntry fighter)
         {
             Console.WriteLine($"Importing Item Data...");
 
@@ -208,7 +246,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     using (StreamReader r = new StreamReader(s))
                     {
                         // add item entry to mex items
-                        var id = mexData.AddMEXItem(r.ReadToEnd());
+                        var id = editor.AddMEXItem(r.ReadToEnd());
 
                         // add it to itemIndices
                         Array.Resize(ref itemIndices, val + 1);
@@ -226,9 +264,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="pack"></param>
         /// <param name="fighter"></param>
-        /// <param name="mexData"></param>
+        /// <param name="editor"></param>
         /// <returns>Dictionary to maps old id values to new values</returns>
-        private static Dictionary<int, int> GenerateEffectFile(ZipFile pack, MEXEntry fighter, MexDataEditor mexData)
+        private void GenerateEffectFile(ZipFile pack, MEXEntry fighter)
         {
             Console.WriteLine($"Generating Effect File...");
 
@@ -238,8 +276,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var effectFileName = $"Ef{charID}Data.dat";
             var effectOutputFilePath = Path.Combine(root, effectFileName);
             var symbol = $"eff{fighter.NameText}DataTable";
-
-            Dictionary<int, int> effectToNewEffect = new Dictionary<int, int>();
             
 
             // Generate Effect File-------------------------------------------
@@ -273,23 +309,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 Data = effTable
             });
 
-            effFile.Save(effectOutputFilePath);
+            editedFiles.Add(new Tuple<HSDRawFile, string, bool>(effFile, effectOutputFilePath, true));
 
 
             // Add Effect Entries-------------------------------------------
             MEX_EffectEntry effectFiles = new MEX_EffectEntry();
             effectFiles.FileName = effectFileName;
             effectFiles.Symbol = symbol;
-            var effectID = mexData.AddMEXEffectFile(effectFiles);
+            var effectID = editor.AddMEXEffectFile(effectFiles);
 
             fighter.EffectIndex = effectID;
             Console.WriteLine("Effect ID:" + effectID);
-
-
-            // Add MEX Effects and fill in dictionary....
-
-
-            return effectToNewEffect;
+            
         }
 
         /// <summary>
@@ -297,16 +328,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="pack"></param>
         /// <param name="fighter"></param>
-        /// <param name="mexData"></param>
+        /// <param name="editor"></param>
         /// <returns>Dictionary to maps old sound id values to new values</returns>
-        private static Dictionary<int, int> ImportSoundData(ZipFile pack, MEXEntry fighter, MexDataEditor mexData, string semFile)
+        private void ImportSoundData(ZipFile pack, MEXEntry fighter, string semFile)
         {
             Console.WriteLine($"Importing Sound Data...");
 
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
 
             // Load SEM File
-            var semEntries = SEM.ReadSEMFile(semFile, true, mexData._data);
+            SemEntries = SEM.ReadSEMFile(semFile, true, editor._data);
 
             // narrator call-----------------------------------------------
             var narratorScript = @".SFXID : (id)
@@ -316,7 +347,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 .END : 0";
             var narr = pack["Sound/narrator.dsp"];
 
-            var nameBank = semEntries.Find(e => e.SoundBank?.Name == "nr_name.ssm");
+            var nameBank = SemEntries.Find(e => e.SoundBank?.Name == "nr_name.ssm");
             if(narr != null && nameBank != null)
             {
                 var narsound = new DSP();
@@ -329,7 +360,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var scriptIndex = nameBank.Sounds.Count;
                 nameBank.Sounds.Add(script);
 
-                fighter.AnnouncerCall = scriptIndex + semEntries.IndexOf(nameBank) * 10000;
+                fighter.AnnouncerCall = scriptIndex + SemEntries.IndexOf(nameBank) * 10000;
 
                 Console.WriteLine("Imported Announcer Call");
             }
@@ -361,31 +392,28 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                             File.WriteAllBytes(ssmFilePath, GetBytes(ssmFile));
                         }
 
-                        fighter.SSMIndex = semEntries.Count;
-                        semEntries.Add(semEntry);
+                        fighter.SSMIndex = SemEntries.Count;
+                        SemEntries.Add(semEntry);
                     }
                 }
 
-            SEM.SaveSEMFile(semFile, semEntries, mexData._data);
             
             // Import Victory Theme
             var victory = pack["Sound/victory.hps"];
             if (victory != null)
             {
                 var ffname = $"ff_{fighter.NameText.ToLower()}.hps";
-                fighter.VictoryThemeID = mexData.AddMusic(new HSD_String() { Value = ffname });
+                fighter.VictoryThemeID = editor.AddMusic(new HSD_String() { Value = ffname });
 
                 var fffilePath = Path.Combine(root, "audio\\" + ffname);
                 File.WriteAllBytes(fffilePath, GetBytes(victory));
             }
-
-            return null;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private static void InstallUI(ZipFile pack, MEXEntry fighter, MexDataEditor mexData)
+        private void InstallUI(ZipFile pack, MEXEntry fighter)
         {
             Console.WriteLine($"Installing UI data...");
 
@@ -441,15 +469,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
             
-            int stride = mexData.FighterEntries.Count - 3;
-            int internalID = mexData.FighterEntries.IndexOf(fighter);
-            var externalId = MEXIdConverter.ToExternalID(internalID, mexData.FighterEntries.Count);
+            int stride = editor.FighterEntries.Count - 3;
+            int internalID = editor.FighterEntries.IndexOf(fighter);
+            var externalId = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count);
             int GroupID = externalId - (externalId > 18 ? 1 : 0);
 
             // Inject CSPs and Stock Icons into Character Select
             var chrSelPath = Path.Combine(root, "MnSlChr.usd");
             if (File.Exists(chrSelPath))
-                InjectCharSelectImages(pack, chrSelPath, iconTOBJs, fighter, stride, GroupID);
+                InjectCharSelectImages(pack, chrSelPath, iconTOBJs, emblemTexture, fighter, stride, GroupID);
 
             // Inject Stock Icons into IfAll, GmRst
 
@@ -463,7 +491,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 for(int i = 0; i < 7; i++) // first 7
                     InjectIntoMatTexAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, iconTOBJs, GroupID, stride, MAX_COSTUME_COUNT);
 
-                datFile.Save(ifallPath);
+
+                var emblemGroup = datFile.Roots.Find(e => e.Name.Equals("DmgMrk_scene_models")).Data as HSDNullPointerArrayAccessor<HSD_JOBJDesc>;
+
+                InjectIntoMatTexAnim(emblemGroup[0].MaterialAnimations[0].Child.MaterialAnimation.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, GroupID, stride, 1, fighter.InsigniaID);
+
+
+                editedFiles.Add(new Tuple<HSDRawFile, string, bool>(datFile, ifallPath, true));
             }
 
 
@@ -488,7 +522,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var matgroup = pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[17];
 
                 for (int i = 0; i < 4; i++)
-                    InjectIntoMatTexAnim(matgroup.Children[i].MaterialAnimation.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, GroupID, stride, 1);
+                    InjectIntoMatTexAnim(matgroup.Children[i].MaterialAnimation.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, GroupID, stride, 1, fighter.InsigniaID);
 
                 // Emblem Model--------------------------------------
                 var emblemGroup = flmsce.JOBJDescs[0];
@@ -522,7 +556,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     InjectIntoMatTexAnim(smallnameGroup.Children[i].Children[1].MaterialAnimation.TextureAnimation, new HSD_TOBJ[] { smallNameTexture }, GroupID, stride, 1);
 
 
-                datFile.Save(gmRst);
+                editedFiles.Add(new Tuple<HSDRawFile, string, bool>(datFile, gmRst, true));
             }
 
             // Inject Emblem
@@ -537,7 +571,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="datPath"></param>
         /// <param name="pack"></param>
-        private static void InjectCharSelectImages(ZipFile pack, string datPath, HSD_TOBJ[] icons, MEXEntry fighter, int stride, int groupID)
+        private void InjectCharSelectImages(ZipFile pack, string datPath, HSD_TOBJ[] icons, HSD_TOBJ emblemTexture, MEXEntry fighter, int stride, int groupID)
         {
             var cssFile = new HSDRawFile(datPath);
 
@@ -591,9 +625,22 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 foreach (var n in cssTable.PortraitMaterialAnimation.Children[2].Children)
                     InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, groupID, stride, MAX_COSTUME_COUNT);
+
+
+                // Emblem 
+
+                foreach (var n in cssTable.MenuMaterialAnimation.Children[5].Children)
+                    InjectIntoMatTexAnim(n.MaterialAnimation.Next.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, groupID, stride, 1, fighter.InsigniaID);
+
+                foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[5].Children)
+                    InjectIntoMatTexAnim(n.MaterialAnimation.Next.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, groupID, stride, 1, fighter.InsigniaID);
+
+                foreach (var n in cssTable.PortraitMaterialAnimation.Children[1].Children)
+                    InjectIntoMatTexAnim(n.MaterialAnimation.Next.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, groupID, stride, 1, fighter.InsigniaID);
+
             }
 
-            cssFile.Save(datPath);
+            editedFiles.Add(new Tuple<HSDRawFile, string, bool>(cssFile, datPath, true));
         }
 
         /// <summary>

@@ -7,22 +7,38 @@ using HSDRaw.Tools;
 using HSDRawViewer.Sound;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
-    public class FighterPackageUninstaller
+    public class FighterPackageUninstaller : ProgressClass
     {
-        
-        
+        private int internalID;
+        private MEXEntry fighter;
+        private MexDataEditor editor;
+        private List<Tuple<HSDRawFile, string, bool>> editedFiles = new List<Tuple<HSDRawFile, string, bool>>();
+        private List<SEMEntry> SemEntries = new List<SEMEntry>();
+
+        public FighterPackageUninstaller(int internalID, MEXEntry fighter, MexDataEditor editor)
+        {
+            this.internalID = internalID;
+            this.fighter = fighter;
+            this.editor = editor;
+        }
+
         /// <summary>
         /// 
         /// </summary>
-        public static void UninstallerFighter(int internalID, MEXEntry fighter, MexDataEditor editor)
+        public override void Work(BackgroundWorker w)
         {
+            if (!editor.FighterEntries.Contains(fighter))
+            {
+                w.ReportProgress(100);
+                return;
+            }
+
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
             var plco = Path.Combine(root, "PlCo.dat");
             var sem = Path.Combine(root, "audio\\us\\smash2.sem");
@@ -32,20 +48,42 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (!File.Exists(sem))
                 throw new FileNotFoundException("smash2.sem was not found");
-            
-            RemoveBoneTableEntry(plco, internalID, editor);
 
+            ProgressStatus = "Removing Bone Entry";
+            w.ReportProgress(0);
+            RemoveBoneTableEntry(plco);
+
+            ProgressStatus = "Removing Fighter Entry";
+            w.ReportProgress(20);
             editor.RemoveFighterEntry(internalID);
 
-            RemoveMEXItems(fighter, editor);
+            ProgressStatus = "Removing Items";
+            w.ReportProgress(40);
+            RemoveMEXItems();
 
-            RemoveMEXEffects(fighter, editor);
+            ProgressStatus = "Removing Fighter Effects";
+            w.ReportProgress(50);
+            RemoveMEXEffects();
 
-            RemoveSounds(fighter, editor);
-            
+            ProgressStatus = "Removing Sounds";
+            w.ReportProgress(60);
+            RemoveSounds();
+
+            ProgressStatus = "Removing UI";
+            w.ReportProgress(70);
             RemoveUI(fighter, editor, internalID);
 
             // TODO: remove unused files
+
+            ProgressStatus = "Saving Files";
+            w.ReportProgress(90);
+            SEM.SaveSEMFile(sem, SemEntries, editor._data);
+
+            foreach (var v in editedFiles)
+                v.Item1.Save(v.Item2, v.Item3);
+
+            ProgressStatus = "Done";
+            w.ReportProgress(100);
         }
 
         /// <summary>
@@ -56,7 +94,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="internalID"></param>
         /// <param name="editor"></param>
         /// <returns>true if bone table was injected</returns>
-        private static bool RemoveBoneTableEntry(string PlCoPath, int internalID, MexDataEditor editor)
+        private bool RemoveBoneTableEntry(string PlCoPath)
         {
             Console.WriteLine($"Removing Bone Table Entry...");
 
@@ -78,8 +116,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
             else
                 return false;
-
-            plco.Save(PlCoPath, false);
+            
+            editedFiles.Add(new Tuple<HSDRawFile, string, bool>(plco, PlCoPath, false));
 
             return true;
         }
@@ -90,7 +128,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
-        private static void RemoveMEXItems(MEXEntry fighter, MexDataEditor editor)
+        private void RemoveMEXItems()
         {
             // get items used by this fighter
             // remove them from editor
@@ -110,7 +148,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
-        private static void RemoveMEXEffects(MEXEntry fighter, MexDataEditor editor)
+        private void RemoveMEXEffects()
         {
             if (fighter.EffectIndex >= 0)
                 editor.SafeRemoveEffectFile(fighter.EffectIndex);
@@ -123,7 +161,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
-        private static void RemoveSounds(MEXEntry fighter, MexDataEditor editor)
+        private void RemoveSounds()
         {
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
             var sem = Path.Combine(root, "audio\\us\\smash2.sem");
@@ -132,13 +170,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 return;
 
             // Load SEM File
-            var semEntries = SEM.ReadSEMFile(sem, true, editor._data);
+            SemEntries = SEM.ReadSEMFile(sem, true, editor._data);
 
             // remove narrator call
             var inUse = editor.FighterEntries.Any(e=>e.AnnouncerCall == fighter.AnnouncerCall);
             if (!inUse)
             {
-                var nameBank = semEntries.Find(e => e.SoundBank?.Name == "nr_name.ssm");
+                var nameBank = SemEntries.Find(e => e.SoundBank?.Name == "nr_name.ssm");
                 nameBank.RemoveSoundAt(fighter.AnnouncerCall % 10000);
 
                 foreach(var v in editor.FighterEntries)
@@ -152,7 +190,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var ssminUse = editor.FighterEntries.Any(e => e.SSMIndex == fighter.SSMIndex);
             if (!ssminUse)
             {
-                semEntries.RemoveAt(fighter.SSMIndex);
+                SemEntries.RemoveAt(fighter.SSMIndex);
 
                 foreach (var v in editor.FighterEntries)
                 {
@@ -173,10 +211,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                         v.VictoryThemeID -= 1;
                 }
             }
-
-            // save SEM File
-            SEM.SaveSEMFile(sem, semEntries, editor._data);
-
         }
 
         /// <summary>
@@ -185,7 +219,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
         /// <param name="internalID"></param>
-        private static void RemoveUI(MEXEntry fighter, MexDataEditor editor, int internalID)
+        private void RemoveUI(MEXEntry fighter, MexDataEditor editor, int internalID)
         {
             Console.WriteLine("Removing UI");
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
@@ -212,8 +246,20 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                     foreach (var n in cssTable.PortraitMaterialAnimation.Children[2].Children)
                         RemoveMatAnim(n.MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
+
+
+                    foreach (var n in cssTable.MenuMaterialAnimation.Children[5].Children)
+                        RemoveMatAnim(n.MaterialAnimation.Next.TextureAnimation, GroupID, stride, 1);
+
+                    foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[5].Children)
+                        RemoveMatAnim(n.MaterialAnimation.Next.TextureAnimation, GroupID, stride, 1);
+
+                    foreach (var n in cssTable.PortraitMaterialAnimation.Children[1].Children)
+                        RemoveMatAnim(n.MaterialAnimation.Next.TextureAnimation, GroupID, stride, 1);
+
                 }
-                cssFile.Save(chrSelPath);
+
+                editedFiles.Add(new Tuple<HSDRawFile, string, bool>(cssFile, chrSelPath, true));
             }
 
 
@@ -228,7 +274,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 for (int i = 0; i < 7; i++) // first 7
                     RemoveMatAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
 
-                datFile.Save(ifallPath);
+
+                var emblemGroup = datFile.Roots.Find(e => e.Name.Equals("DmgMrk_scene_models")).Data as HSDNullPointerArrayAccessor<HSD_JOBJDesc>;
+
+                RemoveMatAnim(emblemGroup[0].MaterialAnimations[0].Child.MaterialAnimation.TextureAnimation, GroupID, stride, 1);
+
+
+                editedFiles.Add(new Tuple<HSDRawFile, string, bool>(datFile, ifallPath, true));
             }
 
 
@@ -281,8 +333,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 for (int i = 9; i < 13; i++)
                     RemoveMatAnim(smallnameGroup.Children[i].Children[1].MaterialAnimation.TextureAnimation, GroupID, stride, 1);
 
-
-                datFile.Save(gmrst);
+                editedFiles.Add(new Tuple<HSDRawFile, string, bool>(datFile, gmrst, true));
             }
         }
 

@@ -920,10 +920,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var f = Tools.FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
             if(f != null)
             {
-                FighterPackageInstaller.InstallFighter(f, this);
+                using (ProgressBarDisplay d = new ProgressBarDisplay (new FighterPackageInstaller(f, this)))
+                {
+                    d.DoWork();
+                    d.ShowDialog();
+                }
+
                 MEXConverter.ssmValues.Clear();
                 MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
                 MessageBox.Show("Fighter installed");
+                Invalidate();
                 saveAllChangesButton_Click(null, null);
             }
         }
@@ -932,10 +938,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             if(IsExtendedFighter(fighterList.SelectedIndex) && fighterList.SelectedItem is MEXEntry en)
             {
-                FighterPackageUninstaller.UninstallerFighter(fighterList.SelectedIndex, en, this);
+                using (ProgressBarDisplay d = new ProgressBarDisplay(new FighterPackageUninstaller(fighterList.SelectedIndex, en, this)))
+                {
+                    d.DoWork();
+                    d.ShowDialog();
+                }
+
                 MEXConverter.ssmValues.Clear();
                 MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
                 MessageBox.Show("Fighter uninstalled");
+                Invalidate();
                 saveAllChangesButton_Click(null, null);
             }
         }
