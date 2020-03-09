@@ -187,11 +187,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="internalID"></param>
         private static void RemoveUI(MEXEntry fighter, MexDataEditor editor, int internalID)
         {
+            Console.WriteLine("Removing UI");
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
             int GroupID = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1) - 1;
             int stride = editor.FighterEntries.Count - 3 + 1;
 
 
+            Console.WriteLine("Removing CSP");
             var chrSelPath = Path.Combine(root, "MnSlChr.usd");
             if (File.Exists(chrSelPath))
             {
@@ -214,7 +216,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 cssFile.Save(chrSelPath);
             }
 
-            
+
+            Console.WriteLine("Removing Icons");
             var ifallPath = Path.Combine(root, "IfAll.usd");
             if (File.Exists(ifallPath))
             {
@@ -229,6 +232,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
 
 
+            Console.WriteLine("Removing Result UI");
             var gmrst = Path.Combine(root, "GmRst.usd");
             if (File.Exists(gmrst))
             {
@@ -265,6 +269,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                         if (f.InsigniaID > fighter.InsigniaID)
                             f.InsigniaID--;
                 }
+
+
+                // name textures
+                var largenameGroup = pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[0].Children[2].MaterialAnimation.Next.TextureAnimation;
+
+                RemoveMatAnim(largenameGroup, GroupID, stride, 1);
+
+                var smallnameGroup = pnlsce.JOBJDescs[0].MaterialAnimations[0];
+
+                for (int i = 9; i < 13; i++)
+                    RemoveMatAnim(smallnameGroup.Children[i].Children[1].MaterialAnimation.TextureAnimation, GroupID, stride, 1);
+
 
                 datFile.Save(gmrst);
             }

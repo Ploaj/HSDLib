@@ -136,13 +136,18 @@ namespace HSDRaw
         /// <param name="index"></param>
         public void RemoveChildAt(int index)
         {
+            Console.WriteLine(index + " " + Children.Length);
+
             if (index > Children.Length)
                 return;
 
+            var prev = Children[index - 1];
+            var next = Children[index].Next;
+
             if (index == 0)
-                Child = Child.Next;
+                Child = next;
             else
-                Children[index - 1].Next = Children[index].Next;
+                prev.Next = next; ;
         }
     }
 

@@ -55,9 +55,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
          *! /Sound/sem.yaml (wait until personal sound id is added)
          *! /Sound/sound.ssm
          *! /Sound/victory.hps
-         * /UI/result_victory_name.png
-         * /UI/result_tiny_name.png
-         *! /UI/emblem.obj
+         *! /UI/result_victory_name.png
+         *! /UI/result_name.png
+         * /UI/emblem.obj
          *! /bone_table.dat
          *! /fighter.yaml            -Required
          *! /GmRst**.dat
@@ -413,12 +413,29 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     emblemPack.Extract(stream);
                     stream.Position = 0;
                     emblemModel = Converters.EmblemConverter.GenerateEmblemModel(stream);
+                }
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    emblemPack.Extract(stream);
                     stream.Position = 0;
                     emblemTexture = Converters.EmblemConverter.GenerateEmblemIconImage(stream);
                 }
             }
 
             // Load Misc Name Tags and icons
+
+            var largeName = pack["UI/result_victory_name.png"];
+            var smallName = pack["UI/result_name.png"];
+            HSD_TOBJ largeNameTexture = null;
+            HSD_TOBJ smallNameTexture = null;
+            if (largeName != null)
+                using (MemoryStream stream = new MemoryStream(GetBytes(largeName)))
+                using (var bmp = new System.Drawing.Bitmap(stream))
+                    largeNameTexture = TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.I4, HSDRaw.GX.GXTlutFmt.IA8);
+            if (smallName != null)
+                using (MemoryStream stream = new MemoryStream(GetBytes(smallName)))
+                using (var bmp = new System.Drawing.Bitmap(stream))
+                    smallNameTexture = TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.I4, HSDRaw.GX.GXTlutFmt.IA8);
 
             // --------------------------------------------------------------------------
 
@@ -482,10 +499,27 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                     fighter.InsigniaID = (byte)modelIndex;
 
-                    emblemGroup.JointAnimations[0].Children[4].AddChild(HSDAccessor.DeepClone<HSDRaw.Common.Animation.HSD_AnimJoint>(emblemGroup.JointAnimations[0].Children[4].Child));
-                    emblemGroup.MaterialAnimations[0].Children[4].AddChild(HSDAccessor.DeepClone<HSDRaw.Common.Animation.HSD_MatAnimJoint>(emblemGroup.MaterialAnimations[0].Children[4].Child));
+                    var jointClone = HSDAccessor.DeepClone<HSDRaw.Common.Animation.HSD_AnimJoint>(emblemGroup.JointAnimations[0].Children[4].Child);
+                    jointClone.Next = null;
+
+                    var matjointClone = HSDAccessor.DeepClone<HSDRaw.Common.Animation.HSD_MatAnimJoint>(emblemGroup.MaterialAnimations[0].Children[4].Child);
+                    matjointClone.Next = null;
+
+                    emblemGroup.JointAnimations[0].Children[4].AddChild(jointClone);
+                    emblemGroup.MaterialAnimations[0].Children[4].AddChild(matjointClone);
                     emblemGroup.RootJoint.Children[4].AddChild(emblemModel);
                 }
+
+
+                // name textures
+                var largenameGroup = pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[0].Children[2].MaterialAnimation.Next.TextureAnimation;
+
+                InjectIntoMatTexAnim(largenameGroup, new HSD_TOBJ[] { largeNameTexture }, GroupID, stride, 1);
+
+                var smallnameGroup = pnlsce.JOBJDescs[0].MaterialAnimations[0];
+
+                for (int i = 9; i < 13; i++)
+                    InjectIntoMatTexAnim(smallnameGroup.Children[i].Children[1].MaterialAnimation.TextureAnimation, new HSD_TOBJ[] { smallNameTexture }, GroupID, stride, 1);
 
 
                 datFile.Save(gmRst);
