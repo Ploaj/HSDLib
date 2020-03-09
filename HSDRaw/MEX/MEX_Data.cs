@@ -19,12 +19,10 @@ namespace HSDRaw.MEX
         public MEX_BGMStruct MusicTable { get => _s.GetReference<MEX_BGMStruct>(0x14); set => _s.SetReference(0x14, value); }
 
         public HSDArrayAccessor<MEX_EffectFiles> EffectFiles { get => _s.GetReference<HSDArrayAccessor<MEX_EffectFiles>>(0x18); set => _s.SetReference(0x18, value); }
-
-        public HSDArrayAccessor<MEX_Effect> MEXEffects { get => _s.GetReference<HSDArrayAccessor<MEX_Effect>>(0x1C); set => _s.SetReference(0x1C, value); }
-
-        public MEX_ItemTables ItemTable { get => _s.GetReference<MEX_ItemTables>(0x20); set => _s.SetReference(0x20, value); }
         
-        public MEX_KirbyTable KirbyTable { get => _s.GetReference<MEX_KirbyTable>(0x24); set => _s.SetReference(0x24, value); }
+        public MEX_ItemTables ItemTable { get => _s.GetReference<MEX_ItemTables>(0x1C); set => _s.SetReference(0x1C, value); }
+        
+        public MEX_KirbyTable KirbyTable { get => _s.GetReference<MEX_KirbyTable>(0x20); set => _s.SetReference(0x20, value); }
         
     }
 }

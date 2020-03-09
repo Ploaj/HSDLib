@@ -131,7 +131,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public BindingList<MEXEntry> FighterEntries = new BindingList<MEXEntry>();
 
         public MEX_EffectEntry[] Effects { get; set; }
-        public MEX_Effect[] MEX_Effects { get; set; }
+        public MEX_FighterEffect[] MEX_Effects { get; set; }
 
         public MEX_CSSIconEntry[] Icons { get; set; }
         
@@ -169,9 +169,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 };
             }
             effectEditor.SetArrayFromProperty(this, "Effects");
-
-            MEX_Effects = _data.MEXEffects.Array;
-            mEXEffectEditor.SetArrayFromProperty(this, "MEX_Effects");
 
 
             // Fighters------------------------------------
@@ -265,7 +262,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterData.DefineIDs.Array = new MEX_CharDefineIDs[0];
             d.FighterData.WallJump.Array = new HSD_Byte[0];
             d.FighterData.RstRuntime.Array = new MEX_RstRuntime[0];
-            d.FighterData.FighterItems.Array = new MEX_FighterItem[0];
+            d.FighterData.FighterItemLookup.Array = new MEX_FighterItem[0];
+            d.FighterData.FighterEffectLookup.Array = new MEX_FighterEffect[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
@@ -347,8 +345,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     Symbol = v.Symbol
                 });
             }
-
-            _data.MEXEffects.Array = MEX_Effects;
         }
 
         /// <summary>

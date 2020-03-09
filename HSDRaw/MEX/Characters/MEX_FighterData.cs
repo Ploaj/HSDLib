@@ -5,7 +5,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_FighterData : HSDAccessor
     {
-        public override int TrimmedSize => 0x50;
+        public override int TrimmedSize => 0x58;
 
         public HSDNullPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -45,7 +45,9 @@ namespace HSDRaw.MEX
         
         public HSDArrayAccessor<MEX_RstRuntime> RstRuntime { get => _s.GetReference<HSDArrayAccessor<MEX_RstRuntime>>(0x48); set => _s.SetReference(0x48, value); }
         
-        public HSDArrayAccessor<MEX_FighterItem> FighterItems { get => _s.GetReference<HSDArrayAccessor<MEX_FighterItem>>(0x4C); set => _s.SetReference(0x4C, value); }
+        public HSDArrayAccessor<MEX_FighterItem> FighterItemLookup { get => _s.GetReference<HSDArrayAccessor<MEX_FighterItem>>(0x4C); set => _s.SetReference(0x4C, value); }
+
+        public HSDArrayAccessor<MEX_FighterEffect> FighterEffectLookup { get => _s.GetReference<HSDArrayAccessor<MEX_FighterEffect>>(0x50); set => _s.SetReference(0x50, value); }
 
     }
 }

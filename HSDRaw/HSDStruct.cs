@@ -665,5 +665,25 @@ namespace HSDRaw
                 }
             }
         }
+
+        /// <summary>
+        /// Creates a clone of this struct that shares no data
+        /// </summary>
+        /// <returns></returns>
+        public HSDStruct DeepClone()
+        {
+            HSDStruct clone = new HSDStruct(Length);
+            clone.SetData(GetData());
+
+            foreach(var r in References)
+            {
+                if(r.Value == this) // prevent direction recursion
+                    clone.References.Add(r.Key, r.Value.DeepClone());
+                else
+                    clone.References.Add(r.Key, r.Value);
+            }
+
+            return clone;
+        }
     }
 }

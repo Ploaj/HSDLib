@@ -37,11 +37,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             editor.RemoveFighterEntry(internalID);
 
-            //RemoveMEXItems(fighter, editor);
+            RemoveMEXItems(fighter, editor);
 
             RemoveMEXEffects(fighter, editor);
 
-            //RemoveSounds(fighter, editor);
+            RemoveSounds(fighter, editor);
             
             RemoveUI(fighter, editor, internalID);
 
@@ -188,7 +188,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private static void RemoveUI(MEXEntry fighter, MexDataEditor editor, int internalID)
         {
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
-            int externalID = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1);
+            int GroupID = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1) - 1;
             int stride = editor.FighterEntries.Count - 3 + 1;
 
 
@@ -200,16 +200,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 if (cssFile.Roots[0].Data is SBM_SelectChrDataTable cssTable)
                 {
                     foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[9].Children)
-                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
 
                     foreach (var n in cssTable.MenuMaterialAnimation.Children[6].Children)
-                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
 
                     foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[6].Children)
-                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
 
                     foreach (var n in cssTable.PortraitMaterialAnimation.Children[2].Children)
-                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, externalID, stride);
+                        RemoveMatAnim(n.MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
                 }
                 cssFile.Save(chrSelPath);
             }
@@ -223,7 +223,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var mark = datFile.Roots.Find(e => e.Name.Equals("Stc_scemdls")).Data as HSDNullPointerArrayAccessor<HSD_JOBJDesc>;
 
                 for (int i = 0; i < 7; i++) // first 7
-                    RemoveMatAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, externalID, stride);
+                    RemoveMatAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, GroupID, stride, FighterPackageInstaller.MAX_COSTUME_COUNT);
 
                 datFile.Save(ifallPath);
             }
@@ -234,12 +234,37 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 var datFile = new HSDRawFile(gmrst);
 
-                var mark = datFile.Roots.Find(e => e.Name.Equals("pnlsce")).Data as HSD_SOBJ;
+                var flmsce = datFile.Roots.Find(e => e.Name.Equals("flmsce")).Data as HSD_SOBJ;
+                var pnlsce = datFile.Roots.Find(e => e.Name.Equals("pnlsce")).Data as HSD_SOBJ;
 
+                // remove stock icons
                 for (int i = 5; i <= 8; i++) // at 5-8, 2nd mat anim
-                    RemoveMatAnim(mark.JOBJDescs[0].MaterialAnimations[0].Children[i].MaterialAnimation.Next.TextureAnimation,
-                        externalID,
-                        stride);
+                    RemoveMatAnim(pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[i].MaterialAnimation.Next.TextureAnimation,
+                        GroupID,
+                        stride,
+                        FighterPackageInstaller.MAX_COSTUME_COUNT);
+
+                // remove emblem entries
+                var matgroup = pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[17];
+
+                for (int i = 0; i < 4; i++)
+                    RemoveMatAnim(matgroup.Children[i].MaterialAnimation.TextureAnimation, GroupID, stride, 1);
+
+
+                // check if any other fighter is using this stock icon
+                // if not, remove it and adjust ids
+                if (!editor.FighterEntries.Any(e => e.InsigniaID == fighter.InsigniaID))
+                {
+                    var emblemGroup = flmsce.JOBJDescs[0];
+                    
+                    emblemGroup.JointAnimations[0].Children[4].RemoveChildAt(fighter.InsigniaID);
+                    emblemGroup.MaterialAnimations[0].Children[4].RemoveChildAt(fighter.InsigniaID);
+                    emblemGroup.RootJoint.Children[4].RemoveChildAt(fighter.InsigniaID);
+
+                    foreach (var f in editor.FighterEntries)
+                        if (f.InsigniaID > fighter.InsigniaID)
+                            f.InsigniaID--;
+                }
 
                 datFile.Save(gmrst);
             }
@@ -252,13 +277,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="externalID"></param>
         /// <param name="stride"></param>
         /// <param name="count"></param>
-        private static void RemoveMatAnim(HSD_TexAnim texAnim, int externalID, int stride)
+        private static void RemoveMatAnim(HSD_TexAnim texAnim, int externalID, int stride, int count)
         {
             var fobjs = texAnim.AnimationObject.FObjDesc.List;
 
             List<int> toRem = new List<int>();
 
-            for (int i = FighterPackageInstaller.MAX_COSTUME_COUNT - 1; i >= 0; i--)
+            for (int i = count - 1; i >= 0; i--)
             {
                 var frame = externalID + stride * i;
 

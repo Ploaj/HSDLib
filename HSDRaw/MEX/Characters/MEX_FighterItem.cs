@@ -8,7 +8,7 @@ namespace HSDRaw.MEX.Characters
 
         public int Count { get => _s.GetInt32(0x00); internal set => _s.SetInt32(0x00, value); }
 
-        public HSD_UShort[] MEXItems
+        public HSD_UShort[] Entries
         {
             get
             {

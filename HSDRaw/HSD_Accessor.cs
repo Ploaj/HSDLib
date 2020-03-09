@@ -31,6 +31,19 @@ namespace HSDRaw
                 _s = new HSDStruct(new byte[0]);
         }
 
+        /// <summary>
+        /// Returns a deep clone of given accessor
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static T DeepClone<T>(HSDAccessor a) where T : HSDAccessor
+        {
+            var clone = ((HSDAccessor)Activator.CreateInstance<T>());
+            clone._s = a._s.DeepClone();
+            return (T)clone;
+        }
+
         public static bool operator ==(HSDAccessor obj1, HSDAccessor obj2)
         {
             if ((object)obj1 == null && (object)obj2 == null)
@@ -58,77 +71,7 @@ namespace HSDRaw
             return _s.GetHashCode();
         }
     }
-
-    /// <summary>
-    /// Special Accessor for handling simpler HSDStructs
-    /// </summary>
-    public class HSDDynamicAccessor : HSDAccessor
-    {
-        public string[] PropertyNames { get { return NameToStruct.Keys.ToArray(); } }
-
-        private Dictionary<string, StructInfo> NameToStruct = new Dictionary<string, StructInfo>();
-
-        private static Dictionary<string, Type> Types = new Dictionary<string, Type>() {
-            { "int", typeof(int)}
-        };
-
-        public object this[string key]
-        {
-            get
-            {
-                return Get(key);
-            }
-            set
-            {
-                Set(key, value);
-            }
-        }
-
-        public void LoadStructureFromFile(string filePath)
-        {
-            /*var lines = System.IO.File.ReadAllLines(filePath);
-            foreach (var line in lines)
-            {
-                var args = line.Split(' ');
-                var off = Convert.ToInt32(args[0], 16);
-                var type = Types[args[1]];
-                var name = args[2];
-
-                NameToStruct.Add(name, new StructInfo() { Name = name, Type = type, Location = off });
-            }*/
-        }
-
-        public object Get(string name)
-        {
-            if (NameToStruct.ContainsKey(name))
-            {
-                var structinfo = NameToStruct[name];
-                if (structinfo.Type == typeof(int))
-                    return _s.GetInt32(structinfo.Location);
-            }
-
-            return null;
-        }
-
-        public void Set(string name, object value)
-        {
-            if (NameToStruct.ContainsKey(name))
-            {
-                var structinfo = NameToStruct[name];
-
-                if (structinfo.Type == typeof(int) && value is int i)
-                    _s.SetInt32(structinfo.Location, i);
-            }
-        }
-    }
-
-    public class StructInfo
-    {
-        public string Name { get; set; }
-        public int Location { get; set; }
-        public Type Type { get; set; }
-    }
-
+    
     /// <summary>
     /// Accessor that implements a tree containing a next and child node
     /// </summary>
@@ -185,6 +128,21 @@ namespace HSDRaw
                 Child = t;
             else
                 Child.Add(t);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveChildAt(int index)
+        {
+            if (index > Children.Length)
+                return;
+
+            if (index == 0)
+                Child = Child.Next;
+            else
+                Children[index - 1].Next = Children[index].Next;
         }
     }
 

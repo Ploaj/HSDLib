@@ -85,9 +85,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         [DisplayName("Result Animation Count"), Category("0 - General"), Description("Number of Result Animations")]
         public int RstAnimCount { get; set; }
-        
+
         [DisplayName("MEX Items"), Category("0 - General"), Description("MEX Item lookup for Fighter")]
         public HSD_UShort[] MEXItems { get; set; }
+
+        [DisplayName("MEX Effects"), Category("0 - General"), Description("MEX Effect lookup for Fighter")]
+        public MEXEffectType[] MEXEffects { get; set; }
 
         [Browsable(false)]
         public byte CostumeCount { get => (byte)Costumes.Length; }
@@ -197,7 +200,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             AnimCount = mexData.FighterData.AnimCount[internalId].AnimCount;
             RstAnimCount = mexData.FighterData.RstRuntime[internalId].AnimMax;
 
-            MEXItems = mexData.FighterData.FighterItems[internalId].MEXItems;
+            MEXItems = mexData.FighterData.FighterItemLookup[internalId].Entries;
+            MEXEffects = mexData.FighterData.FighterEffectLookup[internalId].Entries;
 
             InsigniaID = mexData.FighterData.InsigniaIDs[externalID].Value;
 
@@ -252,7 +256,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterData.AnimFiles.Set(internalId, new HSD_String() { Value = AnimFile });
             mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
             mexData.FighterData.RstRuntime.Set(internalId, new MEX_RstRuntime() { AnimMax = RstAnimCount });
-            mexData.FighterData.FighterItems.Set(internalId, new MEX_FighterItem() { MEXItems = MEXItems });
+
+            mexData.FighterData.FighterItemLookup.Set(internalId, new MEX_FighterItem() { Entries = MEXItems });
+            mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_FighterEffect() { Entries = MEXEffects });
 
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 
@@ -644,9 +650,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [Description("Joint ID on the CSS to use for Icon Flash Animation")]
         public int JointID { get; set; }
 
-        [Description("Indicates a clone fighter, can leave false for added fighters")]
-        public bool Clone { get; set; }
-
         [DisplayName("Fighter"), TypeConverter(typeof(FighterExternalIDConverter))]
         public int FighterExternalID { get; set; }
 
@@ -668,7 +671,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 JointID = icon.JointID,
                 FighterExternalID = icon.ExternalCharID,
-                Clone = icon.ExternalCharID != icon.CharUNKID,
                 X = icon.X1,
                 Y = icon.Y1,
                 Width = icon.X2 - icon.X1,
@@ -683,7 +685,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 JointID = (byte)JointID,
                 UnkID = (byte)JointID,
                 ExternalCharID = (byte)FighterExternalID,
-                CharUNKID = (byte)(FighterExternalID + (Clone ? -1 : 0)),
+                CharUNKID = (byte)(FighterExternalID - (FighterExternalID > 18 ? 1 : 0)),
                 X1 = X,
                 Y1 = Y,
                 X2 = X + Width,

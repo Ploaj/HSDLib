@@ -134,6 +134,7 @@
     <Compile Include="Converters\ConvFOBJ.cs" />
     <Compile Include="Converters\ConvSVG.cs" />
     <Compile Include="Converters\DAEWriter.cs" />
+    <Compile Include="Converters\EmblemConverter.cs" />
     <Compile Include="Converters\MayaAnim.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />

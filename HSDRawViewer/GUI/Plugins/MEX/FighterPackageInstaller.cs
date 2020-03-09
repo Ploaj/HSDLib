@@ -57,7 +57,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
          *! /Sound/victory.hps
          * /UI/result_victory_name.png
          * /UI/result_tiny_name.png
-         * /UI/emblem.png
+         *! /UI/emblem.obj
          *! /bone_table.dat
          *! /fighter.yaml            -Required
          *! /GmRst**.dat
@@ -113,12 +113,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 var internalID = editor.AddEntry(mexEntry);
 
-                //ImportItemData(pack, mexEntry, editor);
+                ImportItemData(pack, mexEntry, editor);
                 var effectDict = GenerateEffectFile(pack, mexEntry, editor);
-                //ExtractFiles(pack, mexEntry, editor);
-                //ImportSoundData(pack, mexEntry, editor, sem);
+                ImportSoundData(pack, mexEntry, editor, sem);
                 InstallUI(pack, mexEntry, editor);
                 InjectBoneTable(pack, plco, internalID, editor);
+                ExtractFiles(pack, mexEntry, editor);
                 //...
 
                 // done
@@ -403,6 +403,20 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             // Load Menu Icon
 
             // Load Emblem
+            var emblemPack = pack["UI/emblem.obj"];
+            HSD_TOBJ emblemTexture = null;
+            HSD_JOBJ emblemModel = null;
+            if(emblemPack != null)
+            {
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    emblemPack.Extract(stream);
+                    stream.Position = 0;
+                    emblemModel = Converters.EmblemConverter.GenerateEmblemModel(stream);
+                    stream.Position = 0;
+                    emblemTexture = Converters.EmblemConverter.GenerateEmblemIconImage(stream);
+                }
+            }
 
             // Load Misc Name Tags and icons
 
@@ -412,12 +426,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             
             int stride = mexData.FighterEntries.Count - 3;
             int internalID = mexData.FighterEntries.IndexOf(fighter);
-            int externalID = MEXIdConverter.ToExternalID(internalID, mexData.FighterEntries.Count);
+            var externalId = MEXIdConverter.ToExternalID(internalID, mexData.FighterEntries.Count);
+            int GroupID = externalId - (externalId > 18 ? 1 : 0);
 
             // Inject CSPs and Stock Icons into Character Select
             var chrSelPath = Path.Combine(root, "MnSlChr.usd");
             if (File.Exists(chrSelPath))
-                InjectCharSelectImages(pack, chrSelPath, iconTOBJs, fighter, stride, externalID);
+                InjectCharSelectImages(pack, chrSelPath, iconTOBJs, fighter, stride, GroupID);
 
             // Inject Stock Icons into IfAll, GmRst
 
@@ -429,7 +444,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var mark = datFile.Roots.Find(e => e.Name.Equals("Stc_scemdls")).Data as HSDNullPointerArrayAccessor<HSD_JOBJDesc>;
 
                 for(int i = 0; i < 7; i++) // first 7
-                    InjectIntoMatTexAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, iconTOBJs, externalID, stride);
+                    InjectIntoMatTexAnim(mark[0].MaterialAnimations[0].Children[i].MaterialAnimation.TextureAnimation, iconTOBJs, GroupID, stride, MAX_COSTUME_COUNT);
 
                 datFile.Save(ifallPath);
             }
@@ -440,14 +455,38 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 var datFile = new HSDRawFile(gmRst);
 
-                var mark = datFile.Roots.Find(e => e.Name.Equals("pnlsce")).Data as HSD_SOBJ;
-                
+                var flmsce = datFile.Roots.Find(e => e.Name.Equals("flmsce")).Data as HSD_SOBJ;
+                var pnlsce = datFile.Roots.Find(e => e.Name.Equals("pnlsce")).Data as HSD_SOBJ;
+
+                // Stock Icons-------------------------------------
                 for (int i = 5; i <= 8; i++) // at 5-8, 2nd mat anim
                     InjectIntoMatTexAnim(
-                        mark.JOBJDescs[0].MaterialAnimations[0].Children[i].MaterialAnimation.Next.TextureAnimation,
+                        pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[i].MaterialAnimation.Next.TextureAnimation,
                         iconTOBJs, 
-                        externalID, 
-                        stride);
+                        GroupID, 
+                        stride,
+                        MAX_COSTUME_COUNT);
+
+                // Emblem Textures--------------------------------------
+                var matgroup = pnlsce.JOBJDescs[0].MaterialAnimations[0].Children[17];
+
+                for (int i = 0; i < 4; i++)
+                    InjectIntoMatTexAnim(matgroup.Children[i].MaterialAnimation.TextureAnimation, new HSDRaw.Common.HSD_TOBJ[] { emblemTexture }, GroupID, stride, 1);
+
+                // Emblem Model--------------------------------------
+                var emblemGroup = flmsce.JOBJDescs[0];
+
+                if(emblemModel != null)
+                {
+                    var modelIndex = emblemGroup.RootJoint.Children[4].Children.Length;
+
+                    fighter.InsigniaID = (byte)modelIndex;
+
+                    emblemGroup.JointAnimations[0].Children[4].AddChild(HSDAccessor.DeepClone<HSDRaw.Common.Animation.HSD_AnimJoint>(emblemGroup.JointAnimations[0].Children[4].Child));
+                    emblemGroup.MaterialAnimations[0].Children[4].AddChild(HSDAccessor.DeepClone<HSDRaw.Common.Animation.HSD_MatAnimJoint>(emblemGroup.MaterialAnimations[0].Children[4].Child));
+                    emblemGroup.RootJoint.Children[4].AddChild(emblemModel);
+                }
+
 
                 datFile.Save(gmRst);
             }
@@ -464,7 +503,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="datPath"></param>
         /// <param name="pack"></param>
-        private static void InjectCharSelectImages(ZipFile pack, string datPath, HSD_TOBJ[] icons, MEXEntry fighter, int stride, int externalId)
+        private static void InjectCharSelectImages(ZipFile pack, string datPath, HSD_TOBJ[] icons, MEXEntry fighter, int stride, int groupID)
         {
             var cssFile = new HSDRawFile(datPath);
 
@@ -507,17 +546,17 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 // Inject Icons
                 foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[9].Children)
-                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, icons, externalId, stride);
+                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, icons, groupID, stride, MAX_COSTUME_COUNT);
 
                 // Inject CSPs
                 foreach (var n in cssTable.MenuMaterialAnimation.Children[6].Children)
-                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, externalId, stride);
+                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, groupID, stride, MAX_COSTUME_COUNT);
 
                 foreach (var n in cssTable.SingleMenuMaterialAnimation.Children[6].Children)
-                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, externalId, stride);
+                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, groupID, stride, MAX_COSTUME_COUNT);
 
                 foreach (var n in cssTable.PortraitMaterialAnimation.Children[2].Children)
-                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, externalId, stride);
+                    InjectIntoMatTexAnim(n.MaterialAnimation.TextureAnimation, cspTOBJs, groupID, stride, MAX_COSTUME_COUNT);
             }
 
             cssFile.Save(datPath);
@@ -531,14 +570,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="externalID"></param>
         /// <param name="stride"></param>
         /// <param name="count"></param>
-        private static void InjectIntoMatTexAnim(HSD_TexAnim texAnim, HSD_TOBJ[] tobjs, int externalID, int stride)
+        public static void InjectIntoMatTexAnim(HSD_TexAnim texAnim, HSD_TOBJ[] tobjs, int externalID, int stride, int count, int defaultValue = 0)
         {
             var fobjs = texAnim.AnimationObject.FObjDesc.List;
 
             int cspIndex = 0;
-            for (int i = 0; i < MAX_COSTUME_COUNT; i++)
+            for (int i = 0; i < count; i++)
             {
-                var tindex = 0;
+                var tindex = defaultValue;
                 if (i < tobjs.Length && tobjs[i] != null)
                     tindex = texAnim.AddImage(tobjs[i]);
                 foreach (var f in fobjs)
