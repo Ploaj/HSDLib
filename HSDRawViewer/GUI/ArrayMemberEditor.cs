@@ -190,7 +190,8 @@ namespace HSDRawViewer.GUI
         private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             // refresh display
-            elementList.Items[elementList.SelectedIndex] = elementList.Items[elementList.SelectedIndex];
+            Items[elementList.SelectedIndex] = Items[elementList.SelectedIndex];
+
             // save changes
             MakeChanges();
         }
