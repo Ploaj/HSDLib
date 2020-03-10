@@ -291,6 +291,15 @@ namespace HSDRawViewer
         /// <summary>
         /// 
         /// </summary>
+        public void SaveDAT()
+        {
+            if(RawHSDFile != null)
+                RawHSDFile.Save(FilePath);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)

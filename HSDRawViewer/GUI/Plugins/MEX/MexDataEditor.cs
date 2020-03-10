@@ -445,8 +445,20 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         #region IconRendering
 
+        private HSDRawFile MenuFile;
+        private string MenuFilePath;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
+            if (!viewport.Visible)
+                return;
+
             JOBJManager.Render(cam);
 
             foreach(var i in Icons)
@@ -458,12 +470,33 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <summary>
         /// 
         /// </summary>
+        private void SaveMenuFile()
+        {
+            if (MenuFile != null)
+                MenuFile.Save(MenuFilePath);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void LoadModel(HSD_JOBJ jobj)
         {
             JOBJManager.ClearRenderingCache();
             JOBJManager.SetJOBJ(jobj);
+            mnslchrToolStrip.Visible = true;
             if (!viewport.Visible)
                 viewport.Visible = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UnloadMenuFile()
+        {
+            JOBJManager.ClearRenderingCache();
+            mnslchrToolStrip.Visible = false;
+            viewport.Visible = false;
+            MenuFile = null;
         }
 
         /// <summary>
@@ -480,12 +513,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var hsd = new HSDRawFile(f);
                 if (hsd.Roots[0].Data is SBM_SelectChrDataTable tab)
                 {
+                    MenuFilePath = f;
+                    MenuFile = hsd;
                     LoadModel(tab.MenuModel);
                     JOBJManager.SetAnimJoint(tab.MenuAnimation);
                     JOBJManager.Frame = 600;
                 }
             }
         }
+
         #endregion
 
         #region Fighter Controls
@@ -920,17 +956,25 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var f = Tools.FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
             if(f != null)
             {
+                bool openMenuFile = MenuFile != null;
+                UnloadMenuFile(); // for editing
+
                 using (ProgressBarDisplay d = new ProgressBarDisplay (new FighterPackageInstaller(f, this)))
                 {
                     d.DoWork();
                     d.ShowDialog();
                 }
 
+                FighterEntries.ResetBindings();
+                mexItemEditor.ResetBindings();
+                effectEditor.ResetBindings();
+                musicListEditor.ResetBindings();
+
                 MEXConverter.ssmValues.Clear();
                 MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
                 MessageBox.Show("Fighter installed");
-                Invalidate();
                 saveAllChangesButton_Click(null, null);
+                MainForm.Instance.SaveDAT();
             }
         }
 
@@ -943,12 +987,17 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     d.DoWork();
                     d.ShowDialog();
                 }
+                
+                FighterEntries.ResetBindings();
+                mexItemEditor.ResetBindings();
+                effectEditor.ResetBindings();
+                musicListEditor.ResetBindings();
 
                 MEXConverter.ssmValues.Clear();
                 MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
                 MessageBox.Show("Fighter uninstalled");
-                Invalidate();
                 saveAllChangesButton_Click(null, null);
+                MainForm.Instance.SaveDAT();
             }
         }
 

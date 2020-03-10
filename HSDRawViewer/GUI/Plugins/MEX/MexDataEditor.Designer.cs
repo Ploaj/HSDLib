@@ -84,6 +84,7 @@
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
             this.installFighterButton = new System.Windows.Forms.ToolStripButton();
             this.uninstallFighterButton = new System.Windows.Forms.ToolStripButton();
+            this.mnslchrToolStrip = new System.Windows.Forms.ToolStrip();
             this.mainTabControl.SuspendLayout();
             this.tabPageFighter.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -526,6 +527,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.mnslchrToolStrip);
             this.groupBox2.Controls.Add(this.buttonLoadPlSl);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(211, 28);
@@ -732,6 +734,15 @@
             this.uninstallFighterButton.Text = "Uninstall Fighter";
             this.uninstallFighterButton.Click += new System.EventHandler(this.uninstallFighterButton_Click);
             // 
+            // mnslchrToolStrip
+            // 
+            this.mnslchrToolStrip.Location = new System.Drawing.Point(3, 39);
+            this.mnslchrToolStrip.Name = "mnslchrToolStrip";
+            this.mnslchrToolStrip.Size = new System.Drawing.Size(571, 25);
+            this.mnslchrToolStrip.TabIndex = 1;
+            this.mnslchrToolStrip.Text = "toolStrip7";
+            this.mnslchrToolStrip.Visible = false;
+            // 
             // MexDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -768,6 +779,7 @@
             this.tabPageCSS.ResumeLayout(false);
             this.tabPageCSS.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.toolStrip4.ResumeLayout(false);
             this.toolStrip4.PerformLayout();
             this.tabPageMusic.ResumeLayout(false);
@@ -842,5 +854,6 @@
         private System.Windows.Forms.ToolStripButton itemExportButton;
         private System.Windows.Forms.ToolStripButton installFighterButton;
         private System.Windows.Forms.ToolStripButton uninstallFighterButton;
+        private System.Windows.Forms.ToolStrip mnslchrToolStrip;
     }
 }

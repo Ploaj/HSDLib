@@ -50,7 +50,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
          *! /Item/item**.dat
          *! /Kirby/PlKbCp**.dat
          * /Kirby/EfKb**.dat
-         * /Kirby/effect.txt
          * /Kirby/sfx**.dsp
          *! /Sound/narrator.dsp
          *! /Sound/sem.yaml (wait until personal sound id is added)
@@ -436,18 +435,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             HSD_JOBJ emblemModel = null;
             if(emblemPack != null)
             {
+                EmblemModel model;
                 using (MemoryStream stream = new MemoryStream())
                 {
                     emblemPack.Extract(stream);
                     stream.Position = 0;
-                    emblemModel = Converters.EmblemConverter.GenerateEmblemModel(stream);
+                    model = Converters.EmblemConverter.GenerateEmblemModelFromOBJ(stream);
                 }
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    emblemPack.Extract(stream);
-                    stream.Position = 0;
-                    emblemTexture = Converters.EmblemConverter.GenerateEmblemIconImage(stream);
-                }
+                emblemModel = Converters.EmblemConverter.GenerateEmblemModel(model);
+                emblemTexture = Converters.EmblemConverter.GenerateEmblemIconImage(model);
             }
 
             // Load Misc Name Tags and icons
