@@ -345,6 +345,8 @@ namespace HSDRawViewer.GUI
 
             Items.Add(ObjectExtensions.Copy(elementList.SelectedItem));
 
+            elementList.SelectedIndex = Items.Count - 1;
+
             MakeChanges();
         }
 

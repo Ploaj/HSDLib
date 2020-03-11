@@ -69,9 +69,8 @@ namespace HSDRawViewer
                         AudioDevices.Add(device);
                     }
                 }
+                DefaultDevice = mmdeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
             }
-
-            DefaultDevice = AudioDevices[0];
         }
 
 

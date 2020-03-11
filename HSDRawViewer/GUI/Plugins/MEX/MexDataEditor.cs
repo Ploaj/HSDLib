@@ -532,12 +532,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         private void UnloadMenuFile()
         {
-            JOBJManager.ClearRenderingCache();
-            mnslchrToolStrip.Visible = false;
-            viewport.Visible = false;
-            addedIconEditor.Visible = false;
-            MenuFile = null;
-            addedIconEditor.SetArrayFromProperty(null, null);
+            if(MenuFile != null)
+            {
+                JOBJManager.ClearRenderingCache();
+                mnslchrToolStrip.Visible = false;
+                viewport.Visible = false;
+                addedIconEditor.Visible = false;
+                MenuFile = null;
+                addedIconEditor.SetArrayFromProperty(null, null);
+            }
         }
 
         /// <summary>
