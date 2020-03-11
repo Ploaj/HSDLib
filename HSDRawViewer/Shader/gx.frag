@@ -16,6 +16,7 @@ uniform int difAlphaType;
 uniform int diffuseCoordType;
 uniform vec2 diffuseUVScale;
 uniform int diffuseMirrorFix;
+uniform mat4 difTransform;
 
 
 // material
@@ -65,13 +66,15 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 ///
 ///
 ///
-vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, vec2 uvscale, int coordType, int mirrorFix, sampler2D tex, int colorMixType, int alphaMixType)
+vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, mat4 uvTransform, vec2 uvscale, int coordType, int mirrorFix, sampler2D tex, int colorMixType, int alphaMixType)
 {
     vec4 clr = vec4(1);
 
     vec2 coords = GetCoordType(coordType, texCoord);
 	
 	coords *= uvscale;
+
+	coords = (uvTransform * vec4(coords.x, coords.y, 0, 1)).xy;
 
 	if(mirrorFix == 1) // GX OPENGL difference
 		coords.y += 1;
@@ -96,7 +99,7 @@ vec4 DiffusePass(vec3 N, vec3 V)
 
     if (enableTexDiffuse == 1)
 	{
-		colorPass = MixTextureColor(diffuseTerm, texcoord0, diffuseUVScale, diffuseCoordType, diffuseMirrorFix, diffuseTex, difColorType, difAlphaType);
+		colorPass = MixTextureColor(diffuseTerm, texcoord0, difTransform, diffuseUVScale, diffuseCoordType, diffuseMirrorFix, diffuseTex, difColorType, difAlphaType);
 
 		diffuseTerm.rgb = colorPass.rgb;
 

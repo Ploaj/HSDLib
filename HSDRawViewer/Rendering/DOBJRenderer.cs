@@ -329,6 +329,7 @@ namespace HSDRawViewer.Rendering
                 shader.SetFloat("alpha", color.Alpha);
             }
 
+
             shader.SetBoolToInt("enableTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0));
             shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
             shader.SetBoolToInt("enableSpecular", mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
@@ -336,12 +337,15 @@ namespace HSDRawViewer.Rendering
             shader.SetBoolToInt("enableMaterial", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
             shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
 
+
             shader.SetInt("enableTexDiffuse", 0);
             shader.SetInt("texDiffuse", 0);
             shader.SetInt("difColorType", 0);
             shader.SetInt("difAlphaType", 0);
             shader.SetInt("diffuseCoordType", 0);
             shader.SetVector2("diffuseUVScale", 1, 1);
+            var id = Matrix4.Identity;
+            shader.SetMatrix4x4("difTransform", ref id);
 
 
             // Bind Textures
@@ -376,6 +380,10 @@ namespace HSDRawViewer.Rendering
                     if (tex.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
                         coordType = 1;
 
+                    var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
+                        Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
+                        Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+
                     shader.SetInt("enableTexDiffuse", 1);
                     shader.SetInt("diffuseTex", 0);
                     shader.SetInt("difColorType", 0);
@@ -383,6 +391,7 @@ namespace HSDRawViewer.Rendering
                     shader.SetInt("diffuseCoordType", coordType);
                     shader.SetBoolToInt("diffuseMirrorFix", mirrorY);
                     shader.SetVector2("diffuseUVScale", wscale, hscale);
+                    shader.SetMatrix4x4("difTransform", ref transform);
 
                     break;
                 }

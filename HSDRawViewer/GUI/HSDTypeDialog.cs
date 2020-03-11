@@ -20,6 +20,8 @@ namespace HSDRawViewer.GUI
                 comboBoxType.Items.Add(v);
             }
             comboBoxType.SelectedIndex = 0;
+
+            CenterToScreen();
         }
 
         private void buttonOkay_Click(object sender, EventArgs e)

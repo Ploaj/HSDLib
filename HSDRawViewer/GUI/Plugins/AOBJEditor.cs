@@ -34,7 +34,7 @@ namespace HSDRawViewer.GUI.Plugins
             keyEditor = new KeyEditor();
             keyEditor.Dock = DockStyle.Fill;
 
-            cbAnimationType.DataSource = Enum.GetValues(typeof(JointTrackType));
+            comboBoxAnimType.SelectedIndex = 0;
 
             groupBox2.Controls.Add(keyEditor);
             keyEditor.BringToFront();
@@ -45,14 +45,33 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private void RefreshList()
         {
+            if (aobj == null)
+                return;
+            
             treeView1.Nodes.Clear();
             foreach(var fobjDesc in aobj.FObjDesc?.List)
             {
                 treeView1.Nodes.Add(new TreeNode()
                 {
-                    Text = fobjDesc.AnimationType.ToString(),
+                    Text =  GetTrackName(fobjDesc),
                     Tag = fobjDesc
                 });
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        private string GetTrackName(HSD_FOBJDesc desc)
+        {
+            switch (comboBoxAnimType.SelectedIndex)
+            {
+                case 0: return desc.JointTrackType.ToString();
+                case 1: return desc.MatTrackType.ToString();
+                case 2: return desc.TexTrackType.ToString();
+                default: return desc.TrackType.ToString("X2");
             }
         }
 
@@ -65,7 +84,8 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(e.Node?.Tag is HSD_FOBJDesc desc)
             {
-                cbAnimationType.SelectedItem = desc.AnimationType;
+                if(desc.TrackType - 1 < cbAnimationType.Items.Count)
+                    cbAnimationType.SelectedIndex = desc.TrackType - 1;
                 keyEditor.SetKeys(desc.GetDecodedKeys());
             }
         }
@@ -79,8 +99,8 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (treeView1.SelectedNode?.Tag is HSD_FOBJDesc desc)
             {
-                desc.SetKeys(keyEditor.GetFOBJKeys(), (JointTrackType)(cbAnimationType.SelectedItem));
-                treeView1.SelectedNode.Text = desc.AnimationType.ToString();
+                desc.SetKeys(keyEditor.GetFOBJKeys(), (byte)(cbAnimationType.SelectedItem));
+                treeView1.SelectedNode.Text = desc.TrackType.ToString();
             }
         }
 
@@ -104,7 +124,7 @@ namespace HSDRawViewer.GUI.Plugins
                     Frame = aobj.EndFrame,
                     InterpolationType = GXInterpolationType.HSD_A_OP_CON
                 }
-            }, JointTrackType.HSD_A_J_NODE);
+            }, 1);
 
             if (aobj.FObjDesc == null)
                 aobj.FObjDesc = FOBJDesc;
@@ -139,6 +159,27 @@ namespace HSDRawViewer.GUI.Plugins
                     }
                 }
             }
+
+            RefreshList();
+        }
+
+        private void comboBoxAnimType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBoxAnimType.SelectedIndex)
+            {
+                case 0:
+                    cbAnimationType.DataSource = Enum.GetValues(typeof(JointTrackType));
+                    break;
+                case 1:
+                    cbAnimationType.DataSource = Enum.GetValues(typeof(MatTrackType));
+                    break;
+                case 2:
+                    cbAnimationType.DataSource = Enum.GetValues(typeof(TexTrackType));
+                    break;
+            }
+
+            if (treeView1.SelectedNode?.Tag is HSD_FOBJDesc desc && desc.TrackType - 1 < cbAnimationType.Items.Count)
+                cbAnimationType.SelectedIndex = desc.TrackType - 1;
 
             RefreshList();
         }

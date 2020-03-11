@@ -525,13 +525,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             addedIconEditor.SetArrayFromProperty(this, "AddedIcons");
 
 
-            if (jobj.Children.Length >= 17)
+            if (jobj.Children.Length >= 13)
             {
-                addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[16]) + 1;
-                for (int i = 0; i < jobj.Children[16].Children.Length; i++)
+                addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[12]) + 1;
+                for (int i = 0; i < jobj.Children[12].Children.Length; i++)
                 {
-                    Console.WriteLine("adding icon");
-                    addedIconEditor.AddItem(new AddedIcon(jobj.Children[16].Children[i]));
+                    addedIconEditor.AddItem(new AddedIcon(jobj.Children[12].Children[i]));
                 }
             }
         }
@@ -579,8 +578,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 var chrsel = MenuFile.Roots[0].Data as SBM_SelectChrDataTable;
 
-                InjectCSSIconTexture(chrsel.MenuModel, chrsel.MenuAnimation, chrsel.MenuMaterialAnimation, tobj, 17, true);
-                InjectCSSIconTexture(chrsel.SingleMenuModel, chrsel.SingleMenuAnimation, chrsel.SingleMenuMaterialAnimation, tobj, 13, false);
+                InjectCSSIconTexture(chrsel.MenuModel, chrsel.MenuAnimation, chrsel.MenuMaterialAnimation, tobj, 17, false);
+                InjectCSSIconTexture(chrsel.SingleMenuModel, chrsel.SingleMenuAnimation, chrsel.SingleMenuMaterialAnimation, tobj, 13, true);
             }
         }
 
@@ -594,8 +593,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void InjectCSSIconTexture(HSD_JOBJ menu, HSD_AnimJoint anm, HSD_MatAnimJoint matAnm, HSD_TOBJ tobj, int jobjSection, bool setSelectedIcon)
         {
             var iconAnimClone = HSDAccessor.DeepClone<HSD_AnimJoint>(anm.Children[2].Children[0]);
+            iconAnimClone.Next = null;
+            iconAnimClone.Child = null;
 
             var iconMatAnimClone = HSDAccessor.DeepClone<HSD_MatAnimJoint>(matAnm.Children[2].Children[0]);
+            iconMatAnimClone.Next = null;
+            iconMatAnimClone.Child = null;
 
             var iconClone = HSDAccessor.DeepClone<HSD_JOBJ>(menu.Children[2].Children[0]);
             iconClone.Next = null;
@@ -672,8 +675,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MenuFilePath = filePath;
                 MenuFile = hsd;
 
-                LoadModel(tab.MenuModel);
-                JOBJManager.SetAnimJoint(tab.MenuAnimation);
+                LoadModel(tab.SingleMenuModel);
+                JOBJManager.SetAnimJoint(tab.SingleMenuAnimation);
                 JOBJManager.Frame = 600;
             }
         }

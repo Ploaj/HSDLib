@@ -397,7 +397,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     k.Frame--;
             }
 
-            fobj.SetKeys(keys, fobj.AnimationType);
+            fobj.SetKeys(keys, fobj.TrackType);
 
             return key;
         }

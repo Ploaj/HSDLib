@@ -1,6 +1,5 @@
 ﻿using HSDRaw.Tools;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace HSDRaw.Common.Animation
@@ -18,8 +17,14 @@ namespace HSDRaw.Common.Animation
         public int DataLength { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
         public int StartFrame { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
-        
-        public JointTrackType AnimationType { get => (JointTrackType)_s.GetByte(0x0C); set => _s.SetByte(0x0C, (byte)value); }
+
+        public byte TrackType { get => _s.GetByte(0x0C); set => _s.SetByte(0x0C, value); }
+
+        public JointTrackType JointTrackType { get => (JointTrackType)TrackType; set => TrackType = (byte)value; }
+
+        public MatTrackType MatTrackType { get => (MatTrackType)TrackType; set => TrackType = (byte)value; }
+
+        public TexTrackType TexTrackType { get => (TexTrackType)TrackType; set => TrackType = (byte)value; }
 
         private byte ValueFlag { get => _s.GetByte(0x0D); set => _s.SetByte(0x0D, value); }
 
@@ -93,7 +98,7 @@ namespace HSDRaw.Common.Animation
 
         public void FromFOBJ(HSD_FOBJ fobj)
         {
-            AnimationType = fobj.JointTrackType;
+            TrackType = fobj.TrackType;
             ValueFormat = fobj.ValueFormat;
             ValueScale = fobj.ValueScale;
             TanFormat = fobj.TanFormat;
@@ -105,7 +110,7 @@ namespace HSDRaw.Common.Animation
         public HSD_FOBJ ToFOBJ()
         {
             var fobj = new HSD_FOBJ();
-            fobj.JointTrackType = AnimationType;
+            fobj.TrackType = TrackType;
             fobj.ValueScale = ValueScale;
             fobj.ValueFormat = ValueFormat;
             fobj.TanFormat = TanFormat;
@@ -119,9 +124,9 @@ namespace HSDRaw.Common.Animation
             return FOBJFrameDecoder.GetKeys(ToFOBJ());
         }
 
-        public void SetKeys(List<FOBJKey> keys, JointTrackType type)
+        public void SetKeys(List<FOBJKey> keys, byte trackType)
         {
-            var fobj = FOBJFrameEncoder.EncodeFrames(keys, type);
+            var fobj = FOBJFrameEncoder.EncodeFrames(keys, trackType);
             FromFOBJ(fobj);
         }
 
@@ -139,7 +144,7 @@ namespace HSDRaw.Common.Animation
 
             keys.Insert(keys.FindIndex(e => e.Frame > key.Frame) - 1, key);
 
-            SetKeys(keys, this.AnimationType);
+            SetKeys(keys, this.TrackType);
         }
 
         /// <summary>
@@ -160,12 +165,12 @@ namespace HSDRaw.Common.Animation
 
             keys.Insert(index, key);
             
-            SetKeys(keys, AnimationType);
+            SetKeys(keys, TrackType);
         }
 
         public override string ToString()
         {
-            return AnimationType.ToString();
+            return TrackType.ToString() + " " + JointTrackType + " " + MatTrackType + " " + TexTrackType;
         }
     }
 }

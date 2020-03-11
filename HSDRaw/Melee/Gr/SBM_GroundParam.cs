@@ -10,7 +10,7 @@ namespace HSDRaw.Melee.Gr
 
         public float DeltaCam1 { get => _s.GetFloat(0x4); set => _s.SetFloat(0x4, value); }
 
-        public float DeltaCam2 { get => _s.GetFloat(0x8); set => _s.SetFloat(0x8, value); }
+        public float FieldOfView { get => _s.GetFloat(0x8); set => _s.SetFloat(0x8, value); }
 
         public int CameraDistanceMin { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
@@ -46,17 +46,17 @@ namespace HSDRaw.Melee.Gr
 
         public float PauseMaxAngleDown { get => _s.GetFloat(0x4c); set => _s.SetFloat(0x4c, value); }
 
-        public float Unknown3 { get => _s.GetFloat(0x50); set => _s.SetFloat(0x50, value); }
+        public float FixedCamX { get => _s.GetFloat(0x50); set => _s.SetFloat(0x50, value); }
 
-        public float Unknown4 { get => _s.GetFloat(0x54); set => _s.SetFloat(0x54, value); }
+        public float FixedCamY { get => _s.GetFloat(0x54); set => _s.SetFloat(0x54, value); }
 
-        public float Unknown5 { get => _s.GetFloat(0x58); set => _s.SetFloat(0x58, value); }
+        public float FixedCamZ { get => _s.GetFloat(0x58); set => _s.SetFloat(0x58, value); }
 
-        public float Unknown6 { get => _s.GetFloat(0x5c); set => _s.SetFloat(0x5c, value); }
+        public float FixedFieldOfView { get => _s.GetFloat(0x5c); set => _s.SetFloat(0x5c, value); }
 
-        public float Unknown7 { get => _s.GetFloat(0x60); set => _s.SetFloat(0x60, value); }
+        public float FixedVerticalAngle { get => _s.GetFloat(0x60); set => _s.SetFloat(0x60, value); }
 
-        public float Unknown8 { get => _s.GetFloat(0x64); set => _s.SetFloat(0x64, value); }
+        public float FixedHorizontalAngle { get => _s.GetFloat(0x64); set => _s.SetFloat(0x64, value); }
 
         public short UnknownShort0 { get => _s.GetInt16(0x68); set => _s.SetInt16(0x68, value); }
 
