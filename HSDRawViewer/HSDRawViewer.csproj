@@ -328,6 +328,9 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Melee\subactions_item.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\ts_importfile.png" />
     <None Include="Resources\ts_exportfile.png" />
     <None Include="Resources\ts_clone.png" />

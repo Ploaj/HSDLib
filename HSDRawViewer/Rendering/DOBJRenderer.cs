@@ -384,6 +384,8 @@ namespace HSDRawViewer.Rendering
                         Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
                         Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
 
+                    transform.Invert();
+
                     shader.SetInt("enableTexDiffuse", 1);
                     shader.SetInt("diffuseTex", 0);
                     shader.SetInt("difColorType", 0);

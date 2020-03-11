@@ -683,6 +683,8 @@ namespace HSDRawViewer.Converters
                     Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
                     Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
 
+                transform.Invert();
+
                 uv = Vector3.TransformPosition(uv, transform);
             }
 
