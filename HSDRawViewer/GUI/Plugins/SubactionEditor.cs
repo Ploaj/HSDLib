@@ -62,13 +62,20 @@ namespace HSDRawViewer.GUI
 
             public HSDStruct Reference;
 
+            private SubactionGroup SubactionGroup = SubactionGroup.Fighter;
+
+            public SubActionScript(SubactionGroup SubactionGroup)
+            {
+                this.SubactionGroup = SubactionGroup;
+            }
+
             public string Name
             {
                 get
                 {
                     Bitreader r = new Bitreader(data);
 
-                    var sa = SubactionManager.GetSubaction((byte)r.Read(8));
+                    var sa = SubactionManager.GetSubaction((byte)r.Read(8), SubactionGroup);
 
                     return sa.Name;
                 }
@@ -78,7 +85,7 @@ namespace HSDRawViewer.GUI
             {
                 get
                 {
-                    var sa = SubactionManager.GetSubaction(data[0]);
+                    var sa = SubactionManager.GetSubaction(data[0], SubactionGroup);
 
                     StringBuilder sb = new StringBuilder();
 
@@ -116,7 +123,7 @@ namespace HSDRawViewer.GUI
 
             public SubActionScript Clone()
             {
-                return new SubActionScript()
+                return new SubActionScript(SubactionGroup)
                 {
                     data = (byte[])data.Clone(),
                     Reference = Reference
@@ -126,7 +133,7 @@ namespace HSDRawViewer.GUI
 
         public DockState DefaultDockState => DockState.Document;
 
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_SubactionData) };
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) };
 
         public DataNode Node
         {
@@ -134,7 +141,22 @@ namespace HSDRawViewer.GUI
             set
             {
                 _node = value;
-                if (value.Accessor is SBM_SubactionData sudata)
+                if (value.Accessor is SBM_ItemSubactionData suidata)
+                {
+                    SubactionGroup = SubactionGroup.Item;
+                    SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
+                    {
+                        new SBM_FighterSubAction()
+                        {
+                            SubAction = suidata,
+                            Name = "Script"
+                        }
+                    };
+
+                    LoadActions(su);
+                    RefreshActionList();
+                }else
+                if (value.Accessor is SBM_FighterSubactionData sudata)
                 {
                     SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
                     {
@@ -147,7 +169,7 @@ namespace HSDRawViewer.GUI
 
                     LoadActions(su);
                     RefreshActionList();
-                }
+                }else
                 if(value.Accessor is SBM_SubActionTable SubactionTable)
                 {
                     LoadActions(SubactionTable.Subactions);
@@ -186,6 +208,8 @@ namespace HSDRawViewer.GUI
         private DataNode _node;
 
         private readonly List<Action> AllScripts = new List<Action>();
+
+        public SubactionGroup SubactionGroup = SubactionGroup.Fighter;
 
         /// <summary>
         /// 
@@ -329,15 +353,15 @@ namespace HSDRawViewer.GUI
         {
             var data = script._struct.GetData();
 
-            SubactionProcess.SetStruct(script._struct);
+            SubactionProcess.SetStruct(script._struct, SubactionGroup);
 
             subActionList.Items.Clear();
             subActionList.BeginUpdate();
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction((byte)(data[i]));
+                var sa = SubactionManager.GetSubaction((byte)(data[i]), SubactionGroup);
 
-                var sas = new SubActionScript();
+                var sas = new SubActionScript(SubactionGroup);
 
                 foreach (var r in script._struct.References)
                 {
@@ -431,7 +455,7 @@ namespace HSDRawViewer.GUI
                 }
                 
                 a._struct.SetData(scriptData.ToArray());
-                SubactionProcess.SetStruct(a._struct);
+                SubactionProcess.SetStruct(a._struct, SubactionGroup);
             }
         }
 
@@ -501,7 +525,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var ac = new SubActionScript()
+            var ac = new SubActionScript(SubactionGroup)
             {
                 data = new byte[] { 0, 0, 0, 0 }
             };
@@ -559,12 +583,12 @@ namespace HSDRawViewer.GUI
             {
                 using (SubActionPanel p = new SubActionPanel(AllScripts))
                 {
-                    p.LoadData(sa.data, sa.Reference);
+                    p.LoadData(sa.data, sa.Reference, SubactionGroup);
                     if (p.ShowDialog() == DialogResult.OK)
                     {
                         sa.data = p.Data;
 
-                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0])).HasPointer)
+                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0]), SubactionGroup).HasPointer)
                             sa.Reference = p.Reference;
                         else
                             sa.Reference = null;
@@ -645,7 +669,7 @@ namespace HSDRawViewer.GUI
             {
                 if(subActionList.Items[e.Index] is SubActionScript script)
                 {
-                    var sa = SubactionManager.GetSubaction(script.data[0]);
+                    var sa = SubactionManager.GetSubaction(script.data[0], SubactionGroup);
                     e.Graphics.DrawString(e.Index + ". " + script.Name + (toolStripComboBox1.SelectedIndex == 2 ? "(" + string.Join(", ", script.Parameters) + ")" : ""), e.Font, new SolidBrush(sa.IsCustom ? Color.DarkOrange : Color.DarkBlue), e.Bounds);
                     int i = 1;
                     if (toolStripComboBox1.SelectedIndex == 0)

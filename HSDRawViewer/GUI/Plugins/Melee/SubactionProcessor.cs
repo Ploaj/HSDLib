@@ -59,10 +59,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="str"></param>
-        public void SetStruct(HSDStruct str)
+        public void SetStruct(HSDStruct str, SubactionGroup subGroup)
         {
             Struct = str;
-            Commands = GetCommands(Struct);
+            Commands = GetCommands(Struct, subGroup);
             ResetState();
             SetFrame(0);
         }
@@ -71,8 +71,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="data"></param>
-        private List<Command> GetCommands(HSDStruct str, Dictionary<HSDStruct, List<Command>> structToComman = null)
+        private List<Command> GetCommands(HSDStruct str, SubactionGroup subGroup, Dictionary<HSDStruct, List<Command>> structToComman = null)
         {
+            if (subGroup != SubactionGroup.Fighter)
+                return new List<Command>();
+
             if(structToComman == null)
                 structToComman = new Dictionary<HSDStruct, List<Command>>();
 
@@ -86,7 +89,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction(data[i]);
+                var sa = SubactionManager.GetSubaction(data[i], subGroup);
 
                 var cmd = new Command();
 
@@ -100,7 +103,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             if(r.Value != str) // prevent self reference
                             {
                                 cmd.Reference = r.Value;
-                                cmd.ReferenceCommands = GetCommands(cmd.Reference, structToComman);
+                                cmd.ReferenceCommands = GetCommands(cmd.Reference, subGroup, structToComman);
                             }
                         }
                 }

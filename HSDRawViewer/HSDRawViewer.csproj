@@ -328,6 +328,9 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Melee\subactions_fighter.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Melee\subactions_item.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -348,7 +351,7 @@
     <None Include="Resources\ts_add.png" />
     <None Include="Resources\ts_up.png" />
     <None Include="Resources\ts_down.png" />
-    <None Include="Melee\subactions.yaml">
+    <None Include="Melee\subactions_control.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Melee\subactions_custom.yaml">
