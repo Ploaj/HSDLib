@@ -31,7 +31,7 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new OpenTK.GLControl();
+            this.panel1 = new OpenTK.GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 16, 0, 8));
             this.animationGroup = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.nudPlaybackSpeed = new System.Windows.Forms.NumericUpDown();

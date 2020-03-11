@@ -59,6 +59,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             pokemonItemEditor.DisableAllControls();
             stageItemEditor.DisableAllControls();
 
+            addedIconEditor.SelectedObjectChanged += (sender, args) =>
+            {
+                JOBJManager.DOBJManager.SelectedDOBJ = null;
+                if (MenuFile != null && addedIconEditor.SelectedObject is AddedIcon ico)
+                {
+                    JOBJManager.DOBJManager.SelectedDOBJ = ico.jobj.Dobj;
+                }
+            };
+
             mexItemEditor.OnItemRemove += ( args) =>
             {
                 foreach (var v in FighterEntries)
@@ -512,19 +521,19 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             
             addedIconEditor.ItemIndexOffset = jobj.BreathFirstList.Count + 1;
 
-            if (jobj.Children.Length < 17)
-                AddedIcons = new AddedIcon[0];
-            else
+            AddedIcons = new AddedIcon[0];
+            addedIconEditor.SetArrayFromProperty(this, "AddedIcons");
+
+
+            if (jobj.Children.Length >= 17)
             {
                 addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[16]) + 1;
-                AddedIcons = new AddedIcon[jobj.Children[16].Children.Length];
-                for (int i = 0; i < AddedIcons.Length; i++)
-                    AddedIcons[i] = new AddedIcon(jobj.Children[16].Children[i]);
+                for (int i = 0; i < jobj.Children[16].Children.Length; i++)
+                {
+                    Console.WriteLine("adding icon");
+                    addedIconEditor.AddItem(new AddedIcon(jobj.Children[16].Children[i]));
+                }
             }
-
-            Console.WriteLine(AddedIcons.Length);
-            addedIconEditor.SetArrayFromProperty(this, "AddedIcons");
-            Console.WriteLine(AddedIcons.Length);
         }
 
         /// <summary>
