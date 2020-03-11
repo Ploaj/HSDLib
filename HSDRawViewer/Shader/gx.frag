@@ -71,10 +71,10 @@ vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, mat4 uvTransform, vec2 u
     vec4 clr = vec4(1);
 
     vec2 coords = GetCoordType(coordType, texCoord);
-	
-	coords *= uvscale;
 
 	coords = (uvTransform * vec4(coords.x, coords.y, 0, 1)).xy;
+	
+	coords *= uvscale;
 
 	if(mirrorFix == 1) // GX OPENGL difference
 		coords.y += 1;

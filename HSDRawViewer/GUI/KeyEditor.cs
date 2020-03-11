@@ -20,12 +20,40 @@ namespace HSDRawViewer.GUI
         }
 
         private BindingList<Key> KeyFrames = new BindingList<Key>();
+        private ContextMenu KeyContextMenu = new ContextMenu();
 
         public KeyEditor()
         {
             InitializeComponent();
 
             DoubleBuffered = true;
+
+            var insert = new MenuItem("Insert");
+            insert.Click += (sender, args) =>
+            {
+                InsertKey();
+            };
+            KeyContextMenu.MenuItems.Add(insert);
+
+            var delete = new MenuItem("Delete");
+            delete.Click += (sender, args) =>
+            {
+                DeleteKeys();
+            };
+            KeyContextMenu.MenuItems.Add(delete);
+
+            dataGridView1.MouseDown += (sender, args) =>
+            {
+                var hti = dataGridView1.HitTest(args.X, args.Y);
+                dataGridView1.ClearSelection();
+                dataGridView1.Rows[hti.RowIndex].Selected = true;
+            };
+
+            dataGridView1.MouseClick += (sender, args) =>
+            {
+                if (args.Button == MouseButtons.Right)
+                    KeyContextMenu.Show(dataGridView1, args.Location);
+            };
 
             DataGridViewColumn column = new DataGridViewTextBoxColumn();
             column.DataPropertyName = "Value";
@@ -220,17 +248,36 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
+        public void InsertKey()
+        {
+            var i = dataGridView1.SelectedRows[0].Index + 1;
+            if (i != -1)
+            {
+                KeyFrames.Insert(i, new Key());
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void DeleteKeys()
+        {
+            foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+            {
+                dataGridView1.Rows.RemoveAt(row.Index);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Insert && dataGridView1.SelectedRows.Count > 0)
+            if (e.KeyCode == Keys.Insert && dataGridView1.SelectedRows.Count > 0)
             {
-                var i = dataGridView1.SelectedRows[0].Index + 1;
-                if(i != -1)
-                {
-                    KeyFrames.Insert(i, new Key());
-                }
+                InsertKey();
             }
         }
 

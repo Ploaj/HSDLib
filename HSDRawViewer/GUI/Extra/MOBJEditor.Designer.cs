@@ -167,6 +167,7 @@
             this.propertyTexture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyTexture.Location = new System.Drawing.Point(3, 192);
             this.propertyTexture.Name = "propertyTexture";
+            this.propertyTexture.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.propertyTexture.Size = new System.Drawing.Size(458, 206);
             this.propertyTexture.TabIndex = 1;
             this.propertyTexture.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyTexture_PropertyValueChanged);
@@ -365,6 +366,7 @@
             this.propertyPixel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyPixel.Location = new System.Drawing.Point(0, 17);
             this.propertyPixel.Name = "propertyPixel";
+            this.propertyPixel.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.propertyPixel.Size = new System.Drawing.Size(464, 384);
             this.propertyPixel.TabIndex = 3;
             // 
