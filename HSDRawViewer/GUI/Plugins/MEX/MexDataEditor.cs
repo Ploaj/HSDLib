@@ -1,5 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Mn;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
@@ -7,7 +8,6 @@ using HSDRawViewer.Rendering;
 using HSDRawViewer.Sound;
 using OpenTK;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -306,21 +306,22 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterFunctions.enterSpecialDoubleJump.Array = new HSD_UInt[0];
             d.FighterFunctions.enterTether.Array = new HSD_UInt[0];
 
-            d.KirbyTable.CapFiles.Array = new MEX_KirbyCapFiles[0];
-            d.KirbyTable.KirbyCostumes.Array = new MEX_KirbyCostume[0];
-            d.KirbyTable.EffectIDs.Array = new HSD_Byte[0];
-            d.KirbyTable.KirbyHatFunctions.Array = new MEX_KirbyHatLoad[0];
-            d.KirbyTable.KirbySpecialN.Array = new HSD_UInt[0];
-            d.KirbyTable.KirbySpecialNAir.Array = new HSD_UInt[0];
-            d.KirbyTable.KirbyOnHit.Array = new HSD_UInt[0];
-            d.KirbyTable.KirbyOnItemInit.Array = new HSD_UInt[0];
+            d.KirbyData.CapFiles.Array = new MEX_KirbyCapFiles[0];
+            d.KirbyData.KirbyCostumes.Array = new MEX_KirbyCostume[0];
+            d.KirbyData.EffectIDs.Array = new HSD_Byte[0];
+            d.KirbyFunctions.OnAbilityGain.Array = new HSD_UInt[0];
+            d.KirbyFunctions.OnAbilityLose.Array = new HSD_UInt[0];
+            d.KirbyFunctions.KirbySpecialN.Array = new HSD_UInt[0];
+            d.KirbyFunctions.KirbySpecialNAir.Array = new HSD_UInt[0];
+            d.KirbyFunctions.KirbyOnHit.Array = new HSD_UInt[0];
+            d.KirbyFunctions.KirbyOnItemInit.Array = new HSD_UInt[0];
 
             // runtime fighter pointer struct
             d.FighterData._s.GetReference<HSDAccessor>(0x40)._s.Resize(FighterEntries.Count * 8);
 
             // kirby runtimes
-            d.KirbyTable.CapFileRuntime._s = new HSDStruct(4 * FighterEntries.Count);
-            d.KirbyTable.CostumeRuntime._s = new HSDStruct(4);
+            d.KirbyData.CapFileRuntime._s = new HSDStruct(4 * FighterEntries.Count);
+            d.KirbyData.CostumeRuntime._s = new HSDStruct(4);
             
             // dump data
             foreach (var v in FighterEntries)
@@ -448,6 +449,27 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private HSDRawFile MenuFile;
         private string MenuFilePath;
 
+        public AddedIcon[] AddedIcons;
+
+        public class AddedIcon
+        {
+            public HSD_JOBJ jobj;
+
+            public float X { get => jobj.TX; set => jobj.TX = value; }
+            public float Y { get => jobj.TY; set => jobj.TY = value; }
+            public float Z { get => jobj.TZ; set => jobj.TZ = value; }
+
+            public AddedIcon(HSD_JOBJ jobj)
+            {
+                this.jobj = jobj;
+            }
+
+            public override string ToString()
+            {
+                return $"{X} {Y} {Z}";
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -484,8 +506,25 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             JOBJManager.ClearRenderingCache();
             JOBJManager.SetJOBJ(jobj);
             mnslchrToolStrip.Visible = true;
+            addedIconEditor.Visible = true;
             if (!viewport.Visible)
                 viewport.Visible = true;
+            
+            addedIconEditor.ItemIndexOffset = jobj.BreathFirstList.Count + 1;
+
+            if (jobj.Children.Length < 17)
+                AddedIcons = new AddedIcon[0];
+            else
+            {
+                addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[16]) + 1;
+                AddedIcons = new AddedIcon[jobj.Children[16].Children.Length];
+                for (int i = 0; i < AddedIcons.Length; i++)
+                    AddedIcons[i] = new AddedIcon(jobj.Children[16].Children[i]);
+            }
+
+            Console.WriteLine(AddedIcons.Length);
+            addedIconEditor.SetArrayFromProperty(this, "AddedIcons");
+            Console.WriteLine(AddedIcons.Length);
         }
 
         /// <summary>
@@ -496,7 +535,135 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             JOBJManager.ClearRenderingCache();
             mnslchrToolStrip.Visible = false;
             viewport.Visible = false;
+            addedIconEditor.Visible = false;
             MenuFile = null;
+            addedIconEditor.SetArrayFromProperty(null, null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveMnSlChrButton_Click(object sender, EventArgs e)
+        {
+            SaveMenuFile();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importIconButton_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+
+            if(f != null)
+            {
+                HSD_TOBJ tobj = null;
+                using (Bitmap bmp = new Bitmap(f))
+                    tobj = Converters.TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
+
+                var chrsel = MenuFile.Roots[0].Data as SBM_SelectChrDataTable;
+
+                InjectCSSIconTexture(chrsel.MenuModel, chrsel.MenuAnimation, chrsel.MenuMaterialAnimation, tobj, 17, true);
+                InjectCSSIconTexture(chrsel.SingleMenuModel, chrsel.SingleMenuAnimation, chrsel.SingleMenuMaterialAnimation, tobj, 13, false);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="menu"></param>
+        /// <param name="tobj"></param>
+        /// <param name="jobjSection"></param>
+        /// <param name="setSelectedIcon"></param>
+        private void InjectCSSIconTexture(HSD_JOBJ menu, HSD_AnimJoint anm, HSD_MatAnimJoint matAnm, HSD_TOBJ tobj, int jobjSection, bool setSelectedIcon)
+        {
+            var iconAnimClone = HSDAccessor.DeepClone<HSD_AnimJoint>(anm.Children[2].Children[0]);
+
+            var iconMatAnimClone = HSDAccessor.DeepClone<HSD_MatAnimJoint>(matAnm.Children[2].Children[0]);
+
+            var iconClone = HSDAccessor.DeepClone<HSD_JOBJ>(menu.Children[2].Children[0]);
+            iconClone.Next = null;
+            iconClone.Child = null;
+            iconClone.TX = 0;
+            iconClone.TY = 0;
+            iconClone.TZ = 0;
+            iconClone.Dobj.List[1].Mobj.Textures = tobj;
+
+            if (menu.Children.Length < jobjSection)
+                menu.AddChild(new HSD_JOBJ() { SX = 1, SY = 1, SZ = 1, Flags = JOBJ_FLAG.CLASSICAL_SCALING | JOBJ_FLAG.ROOT_XLU });
+            menu.Children[jobjSection - 1].AddChild(iconClone);
+
+            if (anm.Children.Length < jobjSection)
+                anm.AddChild(new HSD_AnimJoint());
+            anm.Children[jobjSection - 1].AddChild(iconAnimClone);
+
+            if (matAnm.Children.Length < jobjSection)
+                matAnm.AddChild(new HSD_MatAnimJoint());
+            matAnm.Children[jobjSection - 1].AddChild(iconMatAnimClone);
+
+            if (setSelectedIcon && cssIconEditor.SelectedObject is MEX_CSSIconEntry ico)
+            {
+                JOBJManager.ClearRenderingCache();
+                JOBJManager.UpdateNoRender();
+                addedIconEditor.AddItem(new AddedIcon(iconClone));
+                iconClone.TX = ico.X;
+                iconClone.TY = ico.Y;
+                ico.JointID = JOBJManager.IndexOf(iconClone);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void removeIconButton_Click(object sender, EventArgs e)
+        {
+            if(cssIconTabControl.SelectedIndex == 1 && addedIconEditor.SelectedObject is AddedIcon ico)
+            {
+                var index = addedIconEditor.IndexOf(ico);
+
+                addedIconEditor.RemoveAt(index);
+
+                foreach (var v in Icons)
+                    if (v.JointID > addedIconEditor.ItemIndexOffset + index)
+                        v.JointID--;
+
+                var chrsel = MenuFile.Roots[0].Data as SBM_SelectChrDataTable;
+
+                chrsel.MenuModel.Children[17 - 1].RemoveChildAt(index);
+                chrsel.MenuAnimation.Children[17 - 1].RemoveChildAt(index);
+                chrsel.MenuMaterialAnimation.Children[17 - 1].RemoveChildAt(index);
+
+                chrsel.SingleMenuModel.Children[13 - 1].RemoveChildAt(index);
+                chrsel.SingleMenuAnimation.Children[13 - 1].RemoveChildAt(index);
+                chrsel.SingleMenuMaterialAnimation.Children[13 - 1].RemoveChildAt(index);
+
+                JOBJManager.ClearRenderingCache();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void LoadMnSlChr(string filePath)
+        {
+            HSDRawFile hsd = new HSDRawFile(filePath);
+
+            if (hsd.Roots[0].Data is SBM_SelectChrDataTable tab)
+            {
+                MenuFilePath = filePath;
+                MenuFile = hsd;
+
+                LoadModel(tab.MenuModel);
+                JOBJManager.SetAnimJoint(tab.MenuAnimation);
+                JOBJManager.Frame = 600;
+            }
         }
 
         /// <summary>
@@ -510,15 +677,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (f != null)
             {
-                var hsd = new HSDRawFile(f);
-                if (hsd.Roots[0].Data is SBM_SelectChrDataTable tab)
-                {
-                    MenuFilePath = f;
-                    MenuFile = hsd;
-                    LoadModel(tab.MenuModel);
-                    JOBJManager.SetAnimJoint(tab.MenuAnimation);
-                    JOBJManager.Frame = 600;
-                }
+                LoadMnSlChr(f);
             }
         }
 

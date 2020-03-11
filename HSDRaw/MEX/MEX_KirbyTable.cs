@@ -16,15 +16,23 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<HSD_Byte> EffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSDArrayAccessor<MEX_KirbyHatLoad> KirbyHatFunctions { get => _s.GetReference<HSDArrayAccessor<MEX_KirbyHatLoad>>(0x14); set => _s.SetReference(0x14, value); }
+    }
 
-        public HSDArrayAccessor<HSD_UInt> KirbySpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x18); set => _s.SetReference(0x18, value); }
+    public class MEX_KirbyFunctionTable : HSDAccessor
+    {
+        public override int TrimmedSize => 0x20;
 
-        public HSDArrayAccessor<HSD_UInt> KirbySpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x1C); set => _s.SetReference(0x1C, value); }
+        public HSDArrayAccessor<HSD_UInt> OnAbilityGain { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSDArrayAccessor<HSD_UInt> KirbyOnHit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x20); set => _s.SetReference(0x20, value); }
+        public HSDArrayAccessor<HSD_UInt> OnAbilityLose { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDArrayAccessor<HSD_UInt> KirbyOnItemInit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x24); set => _s.SetReference(0x24, value); }
+        public HSDArrayAccessor<HSD_UInt> KirbySpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x08); set => _s.SetReference(0x08, value); }
+
+        public HSDArrayAccessor<HSD_UInt> KirbySpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x0C); set => _s.SetReference(0x0C, value); }
+
+        public HSDArrayAccessor<HSD_UInt> KirbyOnHit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x10); set => _s.SetReference(0x10, value); }
+
+        public HSDArrayAccessor<HSD_UInt> KirbyOnItemInit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x14); set => _s.SetReference(0x14, value); }
 
     }
 
@@ -67,16 +75,6 @@ namespace HSDRaw.MEX
         private HSD_String FileNameS { get => _s.GetReference<HSD_String>(0x00); set => _s.SetReference(0x00, value); }
 
         private HSD_String SymbolS { get => _s.GetReference<HSD_String>(0x04); set => _s.SetReference(0x04, value); }
-
-    }
-
-    public class MEX_KirbyHatLoad : HSDAccessor
-    {
-        public override int TrimmedSize => 8;
-
-        public uint HatAdd { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
-
-        public uint HatRemove { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
 
     }
 

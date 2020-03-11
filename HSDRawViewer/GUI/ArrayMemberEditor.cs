@@ -153,6 +153,12 @@ namespace HSDRawViewer.GUI
         /// <param name="propertyName"></param>
         public void SetArrayFromProperty(object obj, string propertyName)
         {
+            if(obj == null)
+            {
+                Object = null;
+                Property = null;
+                return;
+            }
             Property = obj.GetType().GetProperty(propertyName);
             if (Property != null && Property.PropertyType.IsArray)
             {
@@ -409,6 +415,16 @@ namespace HSDRawViewer.GUI
                 Items.RemoveAt(index);
                 MakeChanges();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public int IndexOf(object o)
+        {
+            return Items.IndexOf(o);
         }
         
         /// <summary>

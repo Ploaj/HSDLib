@@ -22,7 +22,9 @@ namespace HSDRaw.MEX
         
         public MEX_ItemTables ItemTable { get => _s.GetReference<MEX_ItemTables>(0x1C); set => _s.SetReference(0x1C, value); }
         
-        public MEX_KirbyTable KirbyTable { get => _s.GetReference<MEX_KirbyTable>(0x20); set => _s.SetReference(0x20, value); }
-        
+        public MEX_KirbyTable KirbyData { get => _s.GetReference<MEX_KirbyTable>(0x20); set => _s.SetReference(0x20, value); }
+
+        public MEX_KirbyFunctionTable KirbyFunctions { get => _s.GetReference<MEX_KirbyFunctionTable>(0x24); set => _s.SetReference(0x24, value); }
+
     }
 }

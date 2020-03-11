@@ -221,10 +221,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SubCharacterInternalID = (sbyte)mexData.FighterData.DefineIDs[externalID].SubCharacterInternalID;
             SubCharacterBehavior = mexData.FighterData.DefineIDs[externalID].SubCharacterBehavior;
 
-            KirbyCapFileName = mexData.KirbyTable.CapFiles[internalId].FileName;
-            KirbyCapSymbol = mexData.KirbyTable.CapFiles[internalId].Symbol;
-            KirbySpecialCostumes = mexData.KirbyTable.KirbyCostumes[internalId];
-            KirbyEffectID = mexData.KirbyTable.EffectIDs[internalId].Value;
+            KirbyCapFileName = mexData.KirbyData.CapFiles[internalId].FileName;
+            KirbyCapSymbol = mexData.KirbyData.CapFiles[internalId].Symbol;
+            KirbySpecialCostumes = mexData.KirbyData.KirbyCostumes[internalId];
+            KirbyEffectID = mexData.KirbyData.EffectIDs[internalId].Value;
 
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
@@ -271,20 +271,20 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             
             // Saving Kirby Elements
             if (!string.IsNullOrEmpty(KirbyCapFileName))
-                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
+                mexData.KirbyData.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
                 {
                     FileName = KirbyCapFileName,
                     Symbol = KirbyCapSymbol
                 });
             else
-                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles());
+                mexData.KirbyData.CapFiles.Set(internalId, new MEX_KirbyCapFiles());
 
-            mexData.KirbyTable.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
+            mexData.KirbyData.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
 
             if (KirbySpecialCostumes != null)
-                mexData.KirbyTable.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
+                mexData.KirbyData.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
 
-            mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
+            mexData.KirbyData.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
@@ -577,12 +577,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             EnterDoubleJump = mexData.FighterFunctions.enterSpecialDoubleJump[internalId].Value;
             EnterTether = mexData.FighterFunctions.enterTether[internalId].Value;
 
-            KirbyOnSwallow = mexData.KirbyTable.KirbyHatFunctions[internalId].HatAdd;
-            KirbyOnLoseAbility = mexData.KirbyTable.KirbyHatFunctions[internalId].HatRemove;
-            KirbySpecialN = mexData.KirbyTable.KirbySpecialN[internalId].Value;
-            KirbySpecialNAir = mexData.KirbyTable.KirbySpecialNAir[internalId].Value;
-            KirbyOnHit = mexData.KirbyTable.KirbyOnHit[internalId].Value;
-            KirbyOnItemInit = mexData.KirbyTable.KirbyOnItemInit[internalId].Value;
+            KirbyOnSwallow = mexData.KirbyFunctions.OnAbilityGain[internalId].Value;
+            KirbyOnLoseAbility = mexData.KirbyFunctions.OnAbilityLose[internalId].Value;
+            KirbySpecialN = mexData.KirbyFunctions.KirbySpecialN[internalId].Value;
+            KirbySpecialNAir = mexData.KirbyFunctions.KirbySpecialNAir[internalId].Value;
+            KirbyOnHit = mexData.KirbyFunctions.KirbyOnHit[internalId].Value;
+            KirbyOnItemInit = mexData.KirbyFunctions.KirbyOnItemInit[internalId].Value;
 
             return this;
         }
@@ -630,15 +630,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterFunctions.enterSpecialDoubleJump.Set(internalId, new HSD_UInt() { Value = EnterDoubleJump });
             mexData.FighterFunctions.enterTether.Set(internalId, new HSD_UInt() { Value = EnterTether });
 
-            mexData.KirbyTable.KirbyHatFunctions.Set(internalId, new MEX_KirbyHatLoad()
-            {
-                HatAdd = KirbyOnSwallow,
-                HatRemove = KirbyOnLoseAbility
-            });
-            mexData.KirbyTable.KirbySpecialN.Set(internalId, new HSD_UInt() { Value = KirbySpecialN });
-            mexData.KirbyTable.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
-            mexData.KirbyTable.KirbyOnHit.Set(internalId, new HSD_UInt() { Value = KirbyOnHit });
-            mexData.KirbyTable.KirbyOnItemInit.Set(internalId, new HSD_UInt() { Value = KirbyOnItemInit });
+            mexData.KirbyFunctions.OnAbilityGain.Set(internalId, new HSD_UInt() { Value = KirbyOnSwallow });
+            mexData.KirbyFunctions.OnAbilityLose.Set(internalId, new HSD_UInt() { Value = KirbyOnLoseAbility });
+            mexData.KirbyFunctions.KirbySpecialN.Set(internalId, new HSD_UInt() { Value = KirbySpecialN });
+            mexData.KirbyFunctions.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
+            mexData.KirbyFunctions.KirbyOnHit.Set(internalId, new HSD_UInt() { Value = KirbyOnHit });
+            mexData.KirbyFunctions.KirbyOnItemInit.Set(internalId, new HSD_UInt() { Value = KirbyOnItemInit });
         }
     }
     

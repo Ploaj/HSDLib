@@ -30,6 +30,8 @@ namespace HSDRawViewer.Rendering
 
         public DOBJManager DOBJManager = new DOBJManager();
 
+        public bool EnableDepth { get; set; } = true;
+
         public float ModelScale { get => _modelScale;
             set
             {
@@ -199,13 +201,18 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void Render(Camera cam)
         {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
             UpdateTransforms(RootJOBJ);
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Front);
 
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Lequal);
+            if (EnableDepth)
+            {
+                GL.Enable(EnableCap.DepthTest);
+                GL.DepthFunc(DepthFunction.Lequal);
+            }
 
             // Render DOBJS
             if (RenderObjects)
@@ -251,6 +258,8 @@ namespace HSDRawViewer.Rendering
                 {
                     RenderBone(b.Value, b.Key.Equals(SelectetedJOBJ));
                 }
+
+            GL.PopAttrib();
         }
 
         /// <summary>

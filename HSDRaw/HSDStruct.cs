@@ -672,15 +672,15 @@ namespace HSDRaw
         /// <returns></returns>
         public HSDStruct DeepClone()
         {
-            HSDStruct clone = new HSDStruct(Length);
-            clone.SetData(GetData());
+            HSDStruct clone = new HSDStruct();
+            clone.SetData(GetBytes(0, Length));
 
             foreach(var r in References)
             {
                 if(r.Value == this) // prevent direction recursion
-                    clone.References.Add(r.Key, r.Value.DeepClone());
+                    clone.References.Add(r.Key, clone);
                 else
-                    clone.References.Add(r.Key, r.Value);
+                    clone.References.Add(r.Key, r.Value.DeepClone());
             }
 
             return clone;

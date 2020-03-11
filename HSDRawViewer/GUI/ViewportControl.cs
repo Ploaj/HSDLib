@@ -97,8 +97,8 @@ namespace HSDRawViewer.GUI
         private Vector2 mouseStart;
         private Vector2 mouseEnd;
 
-        private Vector2 prevPos;
-        private Vector2 deltaPos;
+        private Vector2 PrevCursorPos;
+        private Vector2 DeltaCursorPos;
 
         public bool EnableCrossHair = false;
         private Vector3 CrossHair = new Vector3();
@@ -135,14 +135,6 @@ namespace HSDRawViewer.GUI
             
             PlayerTimer = (sender, args) =>
             {
-                var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
-
-                if (prevPos == null)
-                    prevPos = pos;
-
-                deltaPos = prevPos - pos;
-
-                prevPos = pos;
                 
                 if (buttonPlay.Text == "Pause")
                 {
@@ -204,7 +196,7 @@ namespace HSDRawViewer.GUI
                 
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                         inter.ScreenDrag(GetScreenPosition(point), deltaPos.X * 40, deltaPos.Y * 40);
+                         inter.ScreenDrag(GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
             };
 
             panel1.MouseUp += (sender, args) =>
@@ -261,6 +253,8 @@ namespace HSDRawViewer.GUI
             }
             else
             {
+                if (frame < 0)
+                    frame = 0;
                 if (frame >= nudFrame.Maximum)
                 {
                     if (!cbLoop.Checked)
@@ -522,9 +516,26 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void panel1_MouseEnter(object sender, EventArgs e)
+        {
+            PrevCursorPos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void panel1_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            mouseEnd = new Vector2(e.X, e.Y);
+            var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+
+            if (PrevCursorPos == null)
+                PrevCursorPos = pos;
+
+            DeltaCursorPos = PrevCursorPos - pos;
+
+            PrevCursorPos = pos;
 
             if (!Frozen)
             {
@@ -532,12 +543,12 @@ namespace HSDRawViewer.GUI
                 var speedpane = 0.75f;
                 if (e.Button == MouseButtons.Right)
                 {
-                    _camera.Pan(-deltaPos.X * speedpane, -deltaPos.Y * speedpane);
+                    _camera.Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
                 }
                 if (e.Button == MouseButtons.Left && !Lock2D)
                 {
-                    _camera.RotationXDegrees -= deltaPos.Y * speed;
-                    _camera.RotationYDegrees -= deltaPos.X * speed;
+                    _camera.RotationXDegrees -= DeltaCursorPos.Y * speed;
+                    _camera.RotationYDegrees -= DeltaCursorPos.X * speed;
                 }
             }
         }
