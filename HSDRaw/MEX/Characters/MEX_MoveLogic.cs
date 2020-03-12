@@ -13,6 +13,8 @@ namespace HSDRaw.MEX
 
         public byte AttackID { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
 
+        public byte BitFlags { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
+
         [TypeConverter(typeof(HexType))]
         public uint AnimationCallBack { get => (uint)_s.GetInt32(0x0C); set => _s.SetInt32(0x0C, (int)value); }
 

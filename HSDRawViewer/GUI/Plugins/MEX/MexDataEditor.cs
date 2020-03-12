@@ -2,6 +2,7 @@
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Mn;
+using HSDRaw.Melee.Pl;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
 using HSDRawViewer.Rendering;
@@ -12,6 +13,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using YamlDotNet.Serialization;
@@ -1268,6 +1270,63 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public void RemoveMusicAt(int index)
         {
             musicListEditor.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonCopyMoveLogic_Click(object sender, EventArgs e)
+        {
+            if(fighterList.SelectedItem is MEXEntry fighter)
+            {
+                var moveLogic = fighter.Functions.MoveLogic;
+
+                var ftDataFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), fighter.FighterDataPath);
+
+                SBM_FighterData fighterData = null;
+
+                if (File.Exists(ftDataFile))
+                    fighterData = new HSDRawFile(ftDataFile).Roots[0].Data as SBM_FighterData;
+
+                StringBuilder table = new StringBuilder();
+
+                foreach(var m in moveLogic)
+                {
+                    table.AppendLine("\t// " + (fighterData != null && m.AnimationID != -1 ? System.Text.RegularExpressions.Regex.Replace(fighterData.SubActionTable.Subactions[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
+
+                    table.AppendLine(string.Format(
+                        "\t{{" +
+                        "\n\t\t{0, -12}// AnimationID" +
+                        "\n\t\t0x{1, -10}// StateFlags" +
+                        "\n\t\t0x{2, -10}// AttackID" +
+                        "\n\t\t0x{3, -10}// BitFlags" +
+                        "\n\t\t0x{4, -10}// AnimationCallback" +
+                        "\n\t\t0x{5, -10}// IASACallback" +
+                        "\n\t\t0x{6, -10}// PhysicsCallback" +
+                        "\n\t\t0x{7, -10}// CollisionCallback" +
+                        "\n\t\t0x{8, -10}// CameraCallback" +
+                        "\n\t}},",
+                m.AnimationID + ",",
+                m.StateFlags.ToString("X") + ",",
+                m.AttackID.ToString("X") + ",",
+                m.BitFlags.ToString("X") + ",",
+                m.AnimationCallBack.ToString("X") + ",",
+                m.IASACallBack.ToString("X") + ",",
+                m.PhysicsCallback.ToString("X") + ",",
+                m.CollisionCallback.ToString("X") + ",",
+                m.CameraCallback.ToString("X") + ","
+                ));
+                }
+
+                Clipboard.SetText(
+                    @"__attribute__((used))
+static struct MoveLogic move_logic[] = {
+" + table.ToString() + @"}; ");
+
+                MessageBox.Show("Move Logic Table Copied to Clipboard");
+            }
         }
     }
 }

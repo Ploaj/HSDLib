@@ -246,7 +246,7 @@ namespace HSDRawViewer.GUI
         private delegate void SafeUpdateFrame(decimal frame);
         private void UpdateFrame(decimal frame)
         {
-            if (nudFrame.InvokeRequired)
+            if (nudFrame.InvokeRequired && !nudFrame.IsDisposed)
             {
                 var d = new SafeUpdateFrame(UpdateFrame);
                 nudFrame.Invoke(d, new object[] { frame });

@@ -55,8 +55,16 @@ namespace HSDRawViewer.Converters
         [Category("Importing Options")]
         public bool ImportMaterialInfo { get; set; } = false;
 
+
+        [Category("Importing Options")]
+        public bool ImportBoneNames { get; set; } = false;
+        
         [Category("Importing Options")]
         public bool ImportTexture { get; set; } = true;
+
+        [Category("Importing Options")]
+        public bool ImportMOBJ { get; set; } = false;
+        
 
         [DisplayName("Use Triangle Strips"), Description("Slower to import, but better optimized for game"), Category("Importing Options")]
         public bool UseStrips { get; set; } = true;
@@ -518,7 +526,8 @@ namespace HSDRawViewer.Converters
             cache.jobjToWorldTransform.Add(jobj, t);
             cache.jobjToInverseTransform.Add(jobj, t.Inverted());
 
-            jobj.ClassName = node.Name;
+            if(settings.ImportBoneNames)
+                jobj.ClassName = node.Name;
             jobj.Flags = JOBJ_FLAG.CLASSICAL_SCALING;
             jobj.TX = translation.X;
             jobj.TY = translation.Y;
@@ -665,8 +674,8 @@ namespace HSDRawViewer.Converters
                 if (mesh.HasTextureCoords(0) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
-                //if (mesh.HasTextureCoords(1))
-                //    Attributes.Add(GXAttribName.GX_VA_TEX1);
+                if ((mesh.HasTextureCoords(1) || dobj.Mobj.Textures.List.Count > 1) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX1);
 
                 var vertices = new List<GX_Vertex>();
                 var jobjList = new List<HSD_JOBJ[]>(vertices.Count);
@@ -877,8 +886,17 @@ namespace HSDRawViewer.Converters
                     if (File.Exists(material.TextureDiffuse.FilePath))
                         texturePath = material.TextureDiffuse.FilePath;
 
+                    var mobjPath = Path.Combine(cache.FolderPath, Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
+                    
+                    if(settings.ImportMOBJ && File.Exists(mobjPath))
+                    {
+                        var dat = new HSDRaw.HSDRawFile(mobjPath);
+                        Mobj._s = dat.Roots[0].Data._s;
+                        return Mobj;
+                    }
+                    else
                     /// special mobj loading
-                    if(Path.GetExtension(texturePath).ToLower() == ".mobj")
+                    if (Path.GetExtension(texturePath).ToLower() == ".mobj")
                     {
                         var dat = new HSDRaw.HSDRawFile(texturePath);
                         Mobj._s = dat.Roots[0].Data._s;

@@ -8,6 +8,7 @@ using OpenTK;
 using HSDRawViewer.Rendering;
 using HSDRaw.GX;
 using System.Drawing;
+using HSDRaw;
 
 namespace HSDRawViewer.Converters
 {
@@ -19,6 +20,8 @@ namespace HSDRawViewer.Converters
         public bool Optimize { get; set; } = true;
 
         public bool FlipUVs { get; set; } = false;
+
+        public bool ExportMOBJs { get; set; } = false;
 
         public bool ExportTransformedUVs { get => ModelExporter.TransformUVS; set => ModelExporter.TransformUVS = value; }
 
@@ -121,6 +124,13 @@ namespace HSDRawViewer.Converters
             return mex.WriteRootNode(root, new ModelExportSettings(), new Dictionary<int, string>(), nodeToJOBJ);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="scene"></param>
+        /// <param name="settings"></param>
+        /// <param name="nodeToJOBJ"></param>
         private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
             using (DAEWriter writer = new DAEWriter(filePath, true))
@@ -197,7 +207,7 @@ namespace HSDRawViewer.Converters
                         foreach (var face in mesh.Faces)
                         {
                             for (var k = 0; k < 3; k++)
-                                triangles.Add((uint)(vertexOffset + face.Indices[2 - k]));
+                                triangles.Add((uint)(vertexOffset + face.Indices[k]));
                         }
 
                         if (mesh.HasBones)
@@ -230,7 +240,7 @@ namespace HSDRawViewer.Converters
                             uv0.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[0], settings.FlipUVs));
 
                         if (mesh.HasTextureCoords(1))
-                            uv0.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs));
+                            uv1.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs));
 
                         if (mesh.HasVertexColors(0))
                             clr0.AddRange(ToFloatArray(mesh.VertexColorChannels[0]));
@@ -473,6 +483,17 @@ namespace HSDRawViewer.Converters
                                     using (Bitmap img = TOBJConverter.ToBitmap(t))
                                         img.Save(settings.Directory + name + ".png");
                                     imageToName.Add(t.ImageData.ImageData, name);
+
+                                    if (settings.ExportMOBJs)
+                                    {
+                                        HSDRawFile mobjFile = new HSDRawFile();
+                                        mobjFile.Roots.Add(new HSDRootNode()
+                                        {
+                                            Name = name,
+                                            Data = dobj.Mobj
+                                        });
+                                        mobjFile.Save(settings.Directory + name + ".mobj");
+                                    }
                                 }
                             }
 
@@ -517,7 +538,7 @@ namespace HSDRawViewer.Converters
 
             Dictionary<HSD_JOBJ, Bone> jobjToBone = new Dictionary<HSD_JOBJ, Bone>();
 
-            if (envelopes != null)
+            //if (envelopes != null)
             {
                 foreach(var jobj in Jobjs)
                 {
@@ -587,6 +608,13 @@ namespace HSDRawViewer.Converters
                 foreach (var v in verts)
                 {
                     vIndex++;
+                    if (parent != null && jobjToIndex[parent] != 0)
+                    {
+                        var vertexWeight = new VertexWeight();
+                        vertexWeight.VertexID = vIndex;
+                        vertexWeight.Weight = 1;
+                        jobjToBone[parent].VertexWeights.Add(vertexWeight);
+                    }
                     if (singleBind != null)
                     {
                         var vertexWeight = new VertexWeight();
@@ -610,12 +638,12 @@ namespace HSDRawViewer.Converters
                                     jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
                                 }
 
-                                if (en.EnvelopeCount == 1 && jobjToIndex[parent] == 0 && !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED))
+                                if (en.EnvelopeCount == 1) //&& jobjToIndex[parent] == 0 && !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED))
                                     weight = WorldTransforms[jobjToIndex[en.JOBJs[0]]];
 
                                 break;
                             case GXAttribName.GX_VA_POS:
-                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS),  !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED) ? parentTransform : Matrix4.Identity);
+                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED) ? parentTransform : Matrix4.Identity);
                                 vert = Vector3.TransformPosition(vert, weight);
                                 vert = Vector3.TransformPosition(vert, singleBindTransform);
                                 m.Vertices.Add(new Vector3D(vert.X, vert.Y, vert.Z));

@@ -92,6 +92,7 @@
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
             this.installFighterButton = new System.Windows.Forms.ToolStripButton();
             this.uninstallFighterButton = new System.Windows.Forms.ToolStripButton();
+            this.buttonCopyMoveLogic = new System.Windows.Forms.Button();
             this.mainTabControl.SuspendLayout();
             this.tabPageFighter.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -186,6 +187,7 @@
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.propertyGrid2);
+            this.tabPage4.Controls.Add(this.buttonCopyMoveLogic);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
@@ -197,10 +199,10 @@
             // propertyGrid2
             // 
             this.propertyGrid2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid2.Location = new System.Drawing.Point(3, 3);
+            this.propertyGrid2.Location = new System.Drawing.Point(3, 26);
             this.propertyGrid2.Name = "propertyGrid2";
             this.propertyGrid2.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid2.Size = new System.Drawing.Size(571, 219);
+            this.propertyGrid2.Size = new System.Drawing.Size(571, 196);
             this.propertyGrid2.TabIndex = 1;
             // 
             // groupBox1
@@ -835,6 +837,17 @@
             this.uninstallFighterButton.Text = "Uninstall Fighter";
             this.uninstallFighterButton.Click += new System.EventHandler(this.uninstallFighterButton_Click);
             // 
+            // buttonCopyMoveLogic
+            // 
+            this.buttonCopyMoveLogic.Dock = System.Windows.Forms.DockStyle.Top;
+            this.buttonCopyMoveLogic.Location = new System.Drawing.Point(3, 3);
+            this.buttonCopyMoveLogic.Name = "buttonCopyMoveLogic";
+            this.buttonCopyMoveLogic.Size = new System.Drawing.Size(571, 23);
+            this.buttonCopyMoveLogic.TabIndex = 2;
+            this.buttonCopyMoveLogic.Text = "Copy Move Logic to Clipboard";
+            this.buttonCopyMoveLogic.UseVisualStyleBackColor = true;
+            this.buttonCopyMoveLogic.Click += new System.EventHandler(this.buttonCopyMoveLogic_Click);
+            // 
             // MexDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -959,5 +972,6 @@
         private ArrayMemberEditor addedIconEditor;
         private System.Windows.Forms.ToolStripButton removeIconButton;
         private System.Windows.Forms.ToolStripButton saveMnSlChrButton;
+        private System.Windows.Forms.Button buttonCopyMoveLogic;
     }
 }
