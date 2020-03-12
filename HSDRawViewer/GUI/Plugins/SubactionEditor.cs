@@ -179,6 +179,8 @@ namespace HSDRawViewer.GUI
                     {
                         if (parent.Accessor is SBM_FighterData plDat)
                         {
+                            ModelScale = plDat.Attributes.ModelScale;
+
                             if (plDat.Hurtboxes != null)
                                 Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
 
@@ -951,12 +953,12 @@ namespace HSDRawViewer.GUI
             else
                 return;
 
+            JOBJManager.ModelScale = ModelScale;
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
             JOBJManager.HideDOBJs(HiddenDOBJIndices);
+            JOBJManager.RenderBones = false;
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
-
-            JOBJManager.RenderBones = false;
 
             previewBox.Visible = true;
         }
@@ -978,7 +980,11 @@ namespace HSDRawViewer.GUI
 
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var boneID = hb.BoneID;
+                if (boneID == 0)
+                    boneID = 1;
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
+                transform = transform.ClearScale();
                 var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                 previousPosition.Add(hb.ID, pos);
             }
@@ -988,6 +994,7 @@ namespace HSDRawViewer.GUI
 
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
+        private float ModelScale = 1f;
 
         /// <summary>
         /// 
@@ -1015,7 +1022,13 @@ namespace HSDRawViewer.GUI
             
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1 / 2) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var boneID = hb.BoneID;
+                if (boneID == 0)
+                    boneID = 1;
+
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
+
+                transform = transform.ClearScale();
 
                 float alpha = 0.4f;
                 Vector3 hbColor = HitboxColor;

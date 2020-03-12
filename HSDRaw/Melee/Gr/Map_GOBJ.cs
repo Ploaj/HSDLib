@@ -3,7 +3,7 @@ using HSDRaw.Common.Animation;
 
 namespace HSDRaw.Melee.Gr
 {
-    public class Map_GOBJ : HSDAccessor
+    public class SBM_Map_GOBJ : HSDAccessor
     {
         public override int TrimmedSize => 0x34;
 
@@ -36,11 +36,45 @@ namespace HSDRaw.Melee.Gr
         }
         /*
         0x1C Unknown
-		0x20 Unknown
-		0x24 Unknown
+        */
+
+
+        public SBM_Map_GOBJ_CollisionLink[] CollisionLinks
+        {
+            get
+            {
+                return _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x20)?.Array;
+            }
+            set
+            {
+                if(value == null || value.Length == 0)
+                {
+                    _s.SetInt32(0x24, value.Length);
+                    _s.SetReference(0x20, null);
+                }
+                else
+                {
+                    _s.SetInt32(0x24, value.Length);
+                    _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x20).Array = value;
+                }
+            }
+        }
+
+        /*
 		0x28 Unknown visibility?
 		0x2C Unknown
 		0x30 Unknown
         */
+    }
+
+    public class SBM_Map_GOBJ_CollisionLink : HSDAccessor
+    {
+        public override int TrimmedSize => 0x06;
+
+        public short CollisionIndex { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
+
+        public short UnknownIndex { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
+
+        public short JOBJIndex { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
     }
 }

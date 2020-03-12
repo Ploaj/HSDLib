@@ -79,7 +79,7 @@ namespace HSDRawViewer
             { typeof(HSD_TexAnim), "anim_texture" },
             { typeof(SBM_Map_Head), "group" },
             { typeof(SBM_GeneralPoints), "group" },
-            { typeof(Map_GOBJ), "group" },
+            { typeof(SBM_Map_GOBJ), "group" },
             { typeof(SBM_EffectModel), "group" },
             { typeof(SBM_EffectTable), "table" },
             { typeof(SBM_ArticlePointer), "group" },
@@ -398,7 +398,7 @@ namespace HSDRawViewer
 #region Special
 
         /// <summary>
-        /// Opens a <see cref="Map_GOBJ"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
+        /// Opens a <see cref="SBM_Map_GOBJ"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
         /// </summary>
         public void ImportModelGroup()
         {
@@ -407,7 +407,7 @@ namespace HSDRawViewer
             {
                 var group = head.ModelGroups.Array.ToList();
 
-                group.Add(new Map_GOBJ() { _s = file.Roots[0].Data._s });
+                group.Add(new SBM_Map_GOBJ() { _s = file.Roots[0].Data._s });
 
                 head.ModelGroups.Array = group.ToArray();
 
