@@ -133,7 +133,7 @@ namespace HSDRawViewer.Converters
         /// <param name="nodeToJOBJ"></param>
         private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
-            using (DAEWriter writer = new DAEWriter(filePath, true))
+            using (DAEWriter writer = new DAEWriter(filePath, settings.Optimize))
             {
                 var path = System.IO.Path.GetDirectoryName(filePath) + '\\';
 
@@ -180,7 +180,7 @@ namespace HSDRawViewer.Converters
                     var node = scene.RootNode.Children[i];
 
                     writer.StartGeometryMesh(node.Name);
-
+                    
                     List<uint> triangles = new List<uint>();
                     List<float> vertices = new List<float>();
                     List<float> nrm = new List<float>();
@@ -207,7 +207,9 @@ namespace HSDRawViewer.Converters
                         foreach (var face in mesh.Faces)
                         {
                             for (var k = 0; k < 3; k++)
-                                triangles.Add((uint)(vertexOffset + face.Indices[k]));
+                            {
+                                triangles.Add((uint)(vertexOffset + face.Indices[2-k]));
+                            }
                         }
 
                         if (mesh.HasBones)
@@ -250,6 +252,10 @@ namespace HSDRawViewer.Converters
 
                     }
 
+                    // invert normals
+                    for (int n = 0; n < nrm.Count; n++)
+                        nrm[n] *= -1;
+                    
                     var triArr = triangles.ToArray();
                     
                     writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.POSITION, vertices.ToArray(), triArr);

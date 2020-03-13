@@ -162,7 +162,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public string KirbyCapSymbol { get; set; }
 
         [DisplayName("Kirby Costumes"), Category("4 - Kirby"), Description("")]
-        public MEX_KirbyCostume KirbySpecialCostumes { get; set; }
+        public MEX_CostumeFileSymbol[] KirbySpecialCostumes { get; set; }
 
         [DisplayName("Kirby Effect ID"), Category("4 - Kirby"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int KirbyEffectID { get; set; }
@@ -223,7 +223,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             KirbyCapFileName = mexData.KirbyData.CapFiles[internalId].FileName;
             KirbyCapSymbol = mexData.KirbyData.CapFiles[internalId].Symbol;
-            KirbySpecialCostumes = mexData.KirbyData.KirbyCostumes[internalId];
+            KirbySpecialCostumes = mexData.KirbyData.KirbyCostumes[internalId]?.Array;
             KirbyEffectID = mexData.KirbyData.EffectIDs[internalId].Value;
 
             if (!IsSpecialCharacterInternal(mexData, internalId))
@@ -279,11 +279,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             else
                 mexData.KirbyData.CapFiles.Set(internalId, new MEX_KirbyCapFiles());
 
-            mexData.KirbyData.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
+            if(KirbySpecialCostumes != null)
+            {
+                mexData.KirbyData.KirbyCostumes.Set(internalId, new MEX_KirbyCostume() { Array = KirbySpecialCostumes });
+                mexData.KirbyData.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
+            }
+            else
+                mexData.KirbyData.KirbyCostumes.Set(internalId, null);
 
             if (KirbySpecialCostumes != null)
-                mexData.KirbyData.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
-
             mexData.KirbyData.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()

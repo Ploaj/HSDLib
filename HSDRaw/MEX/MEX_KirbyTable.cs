@@ -78,7 +78,7 @@ namespace HSDRaw.MEX
 
     }
 
-    public class MEX_KirbyCostume : HSDFixedLengthPointerArrayAccessor<HSD_String>
+    public class MEX_KirbyCostume : HSDArrayAccessor<MEX_CostumeFileSymbol>
     {
 
     }

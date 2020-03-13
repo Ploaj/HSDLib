@@ -215,10 +215,8 @@
 - code: 26
   name: Set Body Collision State
   parameters:
-  - name: Unknown
-    bitCount: 24
   - name: Body State
-    bitCount: 2    
+    bitCount: 26
     enums:
     - Normal
     - Invulnerable
@@ -237,13 +235,8 @@
   parameters:
   - name: Bone Id
     bitCount: 8
-  - name: Destroy On Exit
-    bitCount: 1
-    enums:
-    - false
-    - true
   - name: Collision State
-    bitCount: 17
+    bitCount: 18
 
 - code: 29
   name: Enable Jab Followup

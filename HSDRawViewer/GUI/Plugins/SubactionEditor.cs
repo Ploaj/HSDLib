@@ -1037,7 +1037,7 @@ namespace HSDRawViewer.GUI
                     hbColor = GrabboxColor;
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
-                if (renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition.ContainsKey(hb.ID))
+                if (renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
                 {
                     var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                     var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size);

@@ -45,7 +45,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private void RefreshList()
         {
-            if (aobj == null)
+            if (aobj == null || aobj.FObjDesc == null)
                 return;
             
             treeView1.Nodes.Clear();
