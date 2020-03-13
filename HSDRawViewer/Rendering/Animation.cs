@@ -1,6 +1,8 @@
-﻿using HSDRaw.Common.Animation;
+﻿using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HSDRawViewer.Rendering
 {
@@ -33,6 +35,13 @@ namespace HSDRawViewer.Rendering
         public List<HSDRaw.Tools.FOBJKey> Keys;
         public JointTrackType TrackType;
 
+        public int FrameCount
+        {
+            get
+            {
+                return (int)Keys.Max(e => e.Frame);
+            }
+        }
 
         public AnimState GetState(float Frame)
         {
@@ -247,6 +256,110 @@ namespace HSDRawViewer.Rendering
     public class AnimNode
     {
         public List<AnimTrack> Tracks = new List<AnimTrack>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tree"></param>
+        /// <returns></returns>
+        public static List<AnimNode> FromFigaTree(HSD_FigaTree tree)
+        {
+            List<AnimNode> Nodes = new List<AnimNode>();
+            foreach (var tracks in tree.Nodes)
+            {
+                AnimNode n = new AnimNode();
+                foreach (HSD_Track t in tracks.Tracks)
+                {
+                    AnimTrack track = new AnimTrack();
+                    track.TrackType = t.FOBJ.JointTrackType;
+                    track.Keys = t.GetKeys();
+                    n.Tracks.Add(track);
+                }
+                Nodes.Add(n);
+            }
+            return Nodes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="frameCount"></param>
+        /// <returns></returns>
+        public static HSD_FigaTree ToFigaTree(List<AnimNode> nodes, int frameCount)
+        {
+            HSD_FigaTree tree = new HSD_FigaTree();
+            tree.FrameCount = frameCount;
+            tree.Nodes = nodes.Select(e =>
+            {
+                var fn = new FigaTreeNode();
+
+                foreach (var t in e.Tracks)
+                {
+                    HSD_Track track = new HSD_Track();
+                    HSD_FOBJ fobj = new HSD_FOBJ();
+                    fobj.SetKeys(t.Keys, t.TrackType);
+                    track.FOBJ = fobj;
+                    fn.Tracks.Add(track);
+                }
+
+                return fn;
+            }).ToList();
+            return tree;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="nodes"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        public static HSD_AnimJoint ToAnimJoint(HSD_JOBJ root, List<AnimNode> nodes, AOBJ_Flags flags)
+        {
+            index = 0;
+            return ToAnimJointRecursive(root, nodes, flags);
+        }
+
+        private static int index = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="nodes"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        private static HSD_AnimJoint ToAnimJointRecursive(HSD_JOBJ root, List<AnimNode> nodes, AOBJ_Flags flags)
+        {
+            HSD_AnimJoint joint = new HSD_AnimJoint();
+            var n = nodes[index++];
+
+            if (n.Tracks.Count > 0)
+            {
+                joint.AOBJ = new HSD_AOBJ();
+                joint.AOBJ.Flags = flags;
+            }
+            foreach(var t in n.Tracks)
+            {
+                joint.AOBJ.EndFrame = Math.Max(joint.AOBJ.EndFrame, t.FrameCount);
+
+                HSD_FOBJDesc fobj = new HSD_FOBJDesc();
+                fobj.SetKeys(t.Keys, (byte)t.TrackType);
+
+                if (joint.AOBJ.FObjDesc == null)
+                    joint.AOBJ.FObjDesc = fobj;
+                else
+                    joint.AOBJ.FObjDesc.Add(fobj);
+            }
+
+            foreach(var c in root.Children)
+            {
+                joint.AddChild(ToAnimJointRecursive(c, nodes, flags));
+            }
+
+            return joint;
+        }
     }
 
 }

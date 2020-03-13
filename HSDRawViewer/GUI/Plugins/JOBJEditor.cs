@@ -14,6 +14,7 @@ using System.Linq;
 using HSDRaw.Tools;
 using HSDRaw.GX;
 using System.Drawing;
+using HSDRaw;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -199,6 +200,20 @@ namespace HSDRawViewer.GUI.Plugins
                 if (v == ob)
                     return true;
             return false;
+        }
+
+        public void LoadAnimation(List<AnimNode> Nodes)
+        {
+            var vp = viewport; //PluginManager.GetCommonViewport();
+            vp.AnimationTrackEnabled = true;
+            vp.Frame = 0;
+            var fCount = 0;
+            foreach (var n in Nodes)
+                foreach (var t in n.Tracks)
+                    fCount = Math.Max(fCount, t.FrameCount);
+            vp.MaxFrame = fCount;
+            JOBJManager.Nodes.Clear();
+            JOBJManager.Nodes.AddRange(Nodes);
         }
 
         public void LoadAnimation(HSD_FigaTree tree)
@@ -701,17 +716,24 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim (*.dat*.anim)|*.dat;*.anim");
 
             if(f != null)
             {
-                var dat = new HSDRaw.HSDRawFile(f);
-                
-                if(dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
-                    LoadAnimation(tree);
+                if(Path.GetExtension(f).ToLower().Equals(".anim"))
+                {
+                    LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f));
+                }
+                else
+                {
+                    var dat = new HSDRaw.HSDRawFile(f);
 
-                if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
-                    LoadAnimation(joint);
+                    if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
+                        LoadAnimation(tree);
+
+                    if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
+                        LoadAnimation(joint);
+                }
             }
         }
 
@@ -722,6 +744,10 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void exportAsANIMToolStripMenuItem_Click(object sender, EventArgs e)
         {
+        }
+
+        private void mayaANIMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -730,10 +756,74 @@ namespace HSDRawViewer.GUI.Plugins
 
             var f = Tools.FileIO.SaveFile("Supported Formats (*.anim)|*.anim");
 
-            if(f != null)
+            if (f != null)
             {
                 ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Nodes);
             }
+        }
+
+        public class FigaTreeSettings
+        {
+            [DisplayName("Symbol Name"), Description("Name of animation used by the game")]
+            public string Symbol { get; set; } = "_figatree";
+        }
+
+        private void figaTreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+            {
+                MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+            var setting = new FigaTreeSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Figatree Settings", setting))
+                if (f != null && d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile animFile = new HSDRawFile();
+                    animFile.Roots.Add(new HSDRootNode()
+                    {
+                        Data = AnimNode.ToFigaTree(JOBJManager.Nodes, (int)viewport.MaxFrame),
+                        Name = setting.Symbol
+                    });
+                    animFile.Save(f);
+                }
+        }
+
+
+        public class AnimJointSettings
+        {
+            [DisplayName("Symbol Name"), Description("Should end in _animjoint")]
+            public string Symbol { get; set; } = "_animjoint";
+
+            [DisplayName("Flags"), Description("")]
+            public AOBJ_Flags Flags { get; set; } = AOBJ_Flags.ANIM_LOOP;
+        }
+        private void animJointToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+            {
+                MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+
+            var setting = new AnimJointSettings();
+
+            using (PropertyDialog d = new PropertyDialog("AnimJoint Settings", setting))
+                if (f != null && d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile animFile = new HSDRawFile();
+                    animFile.Roots.Add(new HSDRootNode()
+                    {
+                        Data = AnimNode.ToAnimJoint(JOBJManager.GetJOBJ(0), JOBJManager.Nodes, setting.Flags),
+                        Name = setting.Symbol
+                    });
+                    animFile.Save(f);
+                }
         }
     }
 }
