@@ -37,7 +37,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="nodes"></param>
-        public static void ExportToMayaAnim(string filePath, List<AnimNode> nodes)
+        public static void ExportToMayaAnim(string filePath, AnimManager animation)
         {
             MayaAnim a = new MayaAnim();
 
@@ -46,7 +46,7 @@ namespace HSDRawViewer.Converters
             
             int nodeIndex = 0;
             int frameCount = 0;
-            foreach(var n in nodes)
+            foreach(var n in animation.Nodes)
             {
                 MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
                 mnode.name = "JOBJ_" + nodeIndex;
@@ -137,7 +137,7 @@ namespace HSDRawViewer.Converters
             }
 
             // set framecount
-            a.header.endTime = frameCount + 1;
+            a.header.endTime = animation.FrameCount + 1;
 
             // save to file
             a.Save(filePath);
@@ -147,12 +147,13 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        public static List<AnimNode> ImportFromMayaAnim(string filePath)
+        public static AnimManager ImportFromMayaAnim(string filePath)
         {
             var mayaFile = new MayaAnim();
             mayaFile.Open(filePath);
 
-            List<AnimNode> Nodes = new List<AnimNode>();
+            AnimManager animation = new AnimManager();
+            animation.FrameCount = mayaFile.header.endTime - 1;
 
             // process and encode FOBJ keys
             foreach(var mNode in mayaFile.Nodes)
@@ -216,7 +217,7 @@ namespace HSDRawViewer.Converters
 
                     node.Tracks.Add(t);
                 }
-                Nodes.Add(node);
+                animation.Nodes.Add(node);
             }
 
             // linear, const, and step are straight forward:
@@ -227,7 +228,7 @@ namespace HSDRawViewer.Converters
             // if output tan is not equal to next frames input, add SPL operation to use new spline
             // if output slope is 0, use SLP0? TODO: find slp0 to test with
 
-            return Nodes;
+            return animation;
         }
     }
 

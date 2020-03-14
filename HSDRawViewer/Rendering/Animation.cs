@@ -6,6 +6,160 @@ using System.Linq;
 
 namespace HSDRawViewer.Rendering
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AnimManager
+    {
+        public List<AnimNode> Nodes = new List<AnimNode>();
+
+        public float FrameCount;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tree"></param>
+        /// <returns></returns>
+        public void FromFigaTree(HSD_FigaTree tree)
+        {
+            FrameCount = tree.FrameCount;
+            Nodes = new List<AnimNode>();
+            foreach (var tracks in tree.Nodes)
+            {
+                AnimNode n = new AnimNode();
+                foreach (HSD_Track t in tracks.Tracks)
+                {
+                    AnimTrack track = new AnimTrack();
+                    track.TrackType = t.FOBJ.JointTrackType;
+                    track.Keys = t.GetKeys();
+                    n.Tracks.Add(track);
+                }
+                Nodes.Add(n);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="frameCount"></param>
+        /// <returns></returns>
+        public HSD_FigaTree ToFigaTree()
+        {
+            HSD_FigaTree tree = new HSD_FigaTree();
+            tree.FrameCount = FrameCount;
+            tree.Nodes = Nodes.Select(e =>
+            {
+                var fn = new FigaTreeNode();
+
+                foreach (var t in e.Tracks)
+                {
+                    HSD_Track track = new HSD_Track();
+                    HSD_FOBJ fobj = new HSD_FOBJ();
+                    fobj.SetKeys(t.Keys, t.TrackType);
+                    track.FOBJ = fobj;
+                    fn.Tracks.Add(track);
+                }
+
+                return fn;
+            }).ToList();
+            return tree;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public void FromAnimJoint(HSD_AnimJoint joint)
+        {
+            Nodes.Clear();
+            FrameCount = 0;
+            if (joint == null)
+                return;
+            foreach (var j in joint.BreathFirstList)
+            {
+                AnimNode n = new AnimNode();
+                if (j.AOBJ != null)
+                {
+                    FrameCount = (int)Math.Max(FrameCount, j.AOBJ.EndFrame);
+
+                    foreach (var fdesc in j.AOBJ.FObjDesc.List)
+                    {
+                        AnimTrack track = new AnimTrack();
+                        track.TrackType = fdesc.JointTrackType;
+                        track.Keys = fdesc.GetDecodedKeys();
+                        n.Tracks.Add(track);
+                    }
+                }
+                Nodes.Add(n);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="nodes"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        public HSD_AnimJoint ToAnimJoint(HSD_JOBJ root, AOBJ_Flags flags)
+        {
+            index = 0;
+            return ToAnimJointRecursive(root, flags);
+        }
+
+        private int index = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="nodes"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
+        private HSD_AnimJoint ToAnimJointRecursive(HSD_JOBJ root, AOBJ_Flags flags)
+        {
+            HSD_AnimJoint joint = new HSD_AnimJoint();
+            var n = Nodes[index++];
+
+            if (n.Tracks.Count > 0)
+            {
+                joint.AOBJ = new HSD_AOBJ();
+                joint.AOBJ.Flags = flags;
+            }
+            foreach (var t in n.Tracks)
+            {
+                joint.AOBJ.EndFrame = Math.Max(joint.AOBJ.EndFrame, t.FrameCount);
+
+                HSD_FOBJDesc fobj = new HSD_FOBJDesc();
+                fobj.SetKeys(t.Keys, (byte)t.TrackType);
+
+                if (joint.AOBJ.FObjDesc == null)
+                    joint.AOBJ.FObjDesc = fobj;
+                else
+                    joint.AOBJ.FObjDesc.Add(fobj);
+            }
+
+            foreach (var c in root.Children)
+            {
+                joint.AddChild(ToAnimJointRecursive(c, flags));
+            }
+
+            return joint;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AnimNode
+    {
+        public List<AnimTrack> Tracks = new List<AnimTrack>();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class AnimTrack
     {
         public class AnimState
@@ -131,95 +285,27 @@ namespace HSDRawViewer.Rendering
 
         public float GetValue(float Frame)
         {
-            // register
-            float p0 = 0;
-            float p1 = 0;
-            float d0 = 0;
-            float d1 = 0;
-            float t0 = 0;
-            float t1 = 0;
-            GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
-            GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
+            var state = GetState(Frame);
+            
+            if (state.t0 == state.t1 || state.op_intrp == GXInterpolationType.HSD_A_OP_CON || state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
+                return state.p0;
 
-            // get current frame state
-            for (int i = 0; i < Keys.Count; i++)
-            {
-                op_intrp = op;
-                op = Keys[i].InterpolationType;
-                
-                switch (op)
-                {
-                    case GXInterpolationType.HSD_A_OP_CON:
-                        p0 = p1;
-                        p1 = Keys[i].Value;
-                        if(op_intrp != GXInterpolationType.HSD_A_OP_SLP)
-                        {
-                            d0 = d1;
-                            d1 = 0;
-                        }
-                        t0 = t1;
-                        t1 = Keys[i].Frame;
-                        break;
-                    case GXInterpolationType.HSD_A_OP_LIN:
-                        p0 = p1;
-                        p1 = Keys[i].Value;
-                        if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
-                        {
-                            d0 = d1;
-                            d1 = 0;
-                        }
-                        t0 = t1;
-                        t1 = Keys[i].Frame;
-                        break;
-                    case GXInterpolationType.HSD_A_OP_SPL0:
-                        p0 = p1;
-                        d0 = d1;
-                        p1 = Keys[i].Value;
-                        d1 = 0;
-                        t0 = t1;
-                        t1 = Keys[i].Frame;
-                        break;
-                    case GXInterpolationType.HSD_A_OP_SPL:
-                        p0 = p1;
-                        p1 = Keys[i].Value;
-                        d0 = d1;
-                        d1 = Keys[i].Tan;
-                        t0 = t1;
-                        t1 = Keys[i].Frame;
-                        break;
-                    case GXInterpolationType.HSD_A_OP_SLP:
-                        d0 = d1;
-                        d1 = Keys[i].Tan;
-                        break;
-                    case GXInterpolationType.HSD_A_OP_KEY:
-                        p1 = Keys[i].Value;
-                        p0 = Keys[i].Value;
-                        break;
-                }
+            float FrameDiff = Frame - state.t0;
+            float Weight = FrameDiff / (state.t1 - state.t0);
 
-                if (t1 > Frame && Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
-                    break;
+            if (state.op_intrp == GXInterpolationType.HSD_A_OP_LIN)
+                return AnimationHelperInterpolation.Lerp(state.p0, state.p1, Weight);
 
-                op_intrp = Keys[i].InterpolationType;
-            }
+            if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
+                return  AnimationHelperInterpolation.Herp(state.p0, state.p1, state.d0, state.d1, FrameDiff, Weight);
 
-
-            if (t0 == t1 || op_intrp == GXInterpolationType.HSD_A_OP_CON || op_intrp == GXInterpolationType.HSD_A_OP_KEY)
-                return p0;
-
-            float FrameDiff = Frame - t0;
-            float Weight = FrameDiff / (t1 - t0);
-
-            if (op_intrp == GXInterpolationType.HSD_A_OP_LIN)
-                return AnimationHelperInterpolation.Lerp(p0, p1, Weight);
-
-            if (op_intrp == GXInterpolationType.HSD_A_OP_SPL || op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || op_intrp == GXInterpolationType.HSD_A_OP_SLP)
-                return  AnimationHelperInterpolation.Herp(p0, p1, d0, d1, FrameDiff, Weight);
-
-            return p0;
+            return state.p0;
         }
     }
-
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public class AnimationHelperInterpolation
     {
         public static float Lerp(float LHS, float RHS, float Weight)
@@ -252,114 +338,4 @@ namespace HSDRawViewer.Rendering
             return d1 * fVar4 + d0 * (time + (fVar4 - fVar1 * fterm)) + p0 * (1.0f + (fVar2 - fVar3)) + p1 * (-fVar2 + fVar3);
         }
     }
-
-    public class AnimNode
-    {
-        public List<AnimTrack> Tracks = new List<AnimTrack>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="tree"></param>
-        /// <returns></returns>
-        public static List<AnimNode> FromFigaTree(HSD_FigaTree tree)
-        {
-            List<AnimNode> Nodes = new List<AnimNode>();
-            foreach (var tracks in tree.Nodes)
-            {
-                AnimNode n = new AnimNode();
-                foreach (HSD_Track t in tracks.Tracks)
-                {
-                    AnimTrack track = new AnimTrack();
-                    track.TrackType = t.FOBJ.JointTrackType;
-                    track.Keys = t.GetKeys();
-                    n.Tracks.Add(track);
-                }
-                Nodes.Add(n);
-            }
-            return Nodes;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nodes"></param>
-        /// <param name="frameCount"></param>
-        /// <returns></returns>
-        public static HSD_FigaTree ToFigaTree(List<AnimNode> nodes, int frameCount)
-        {
-            HSD_FigaTree tree = new HSD_FigaTree();
-            tree.FrameCount = frameCount;
-            tree.Nodes = nodes.Select(e =>
-            {
-                var fn = new FigaTreeNode();
-
-                foreach (var t in e.Tracks)
-                {
-                    HSD_Track track = new HSD_Track();
-                    HSD_FOBJ fobj = new HSD_FOBJ();
-                    fobj.SetKeys(t.Keys, t.TrackType);
-                    track.FOBJ = fobj;
-                    fn.Tracks.Add(track);
-                }
-
-                return fn;
-            }).ToList();
-            return tree;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="root"></param>
-        /// <param name="nodes"></param>
-        /// <param name="flags"></param>
-        /// <returns></returns>
-        public static HSD_AnimJoint ToAnimJoint(HSD_JOBJ root, List<AnimNode> nodes, AOBJ_Flags flags)
-        {
-            index = 0;
-            return ToAnimJointRecursive(root, nodes, flags);
-        }
-
-        private static int index = 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="root"></param>
-        /// <param name="nodes"></param>
-        /// <param name="flags"></param>
-        /// <returns></returns>
-        private static HSD_AnimJoint ToAnimJointRecursive(HSD_JOBJ root, List<AnimNode> nodes, AOBJ_Flags flags)
-        {
-            HSD_AnimJoint joint = new HSD_AnimJoint();
-            var n = nodes[index++];
-
-            if (n.Tracks.Count > 0)
-            {
-                joint.AOBJ = new HSD_AOBJ();
-                joint.AOBJ.Flags = flags;
-            }
-            foreach(var t in n.Tracks)
-            {
-                joint.AOBJ.EndFrame = Math.Max(joint.AOBJ.EndFrame, t.FrameCount);
-
-                HSD_FOBJDesc fobj = new HSD_FOBJDesc();
-                fobj.SetKeys(t.Keys, (byte)t.TrackType);
-
-                if (joint.AOBJ.FObjDesc == null)
-                    joint.AOBJ.FObjDesc = fobj;
-                else
-                    joint.AOBJ.FObjDesc.Add(fobj);
-            }
-
-            foreach(var c in root.Children)
-            {
-                joint.AddChild(ToAnimJointRecursive(c, nodes, flags));
-            }
-
-            return joint;
-        }
-    }
-
 }

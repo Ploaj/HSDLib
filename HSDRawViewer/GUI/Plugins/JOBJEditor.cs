@@ -202,18 +202,13 @@ namespace HSDRawViewer.GUI.Plugins
             return false;
         }
 
-        public void LoadAnimation(List<AnimNode> Nodes)
+        public void LoadAnimation(AnimManager animation)
         {
             var vp = viewport; //PluginManager.GetCommonViewport();
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
-            var fCount = 0;
-            foreach (var n in Nodes)
-                foreach (var t in n.Tracks)
-                    fCount = Math.Max(fCount, t.FrameCount);
-            vp.MaxFrame = fCount;
-            JOBJManager.Nodes.Clear();
-            JOBJManager.Nodes.AddRange(Nodes);
+            vp.MaxFrame = animation.FrameCount;
+            JOBJManager.Animation = animation;
         }
 
         public void LoadAnimation(HSD_FigaTree tree)
@@ -227,10 +222,11 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void LoadAnimation(HSD_AnimJoint joint)
         {
+            JOBJManager.SetAnimJoint(joint);
             var vp = viewport; //PluginManager.GetCommonViewport();
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
-            vp.MaxFrame = JOBJManager.SetAnimJoint(joint);
+            vp.MaxFrame = JOBJManager.Animation.FrameCount;
         }
 
         public void Draw(Camera cam, int windowWidth, int windowHeight)
@@ -725,6 +721,7 @@ namespace HSDRawViewer.GUI.Plugins
                     LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f));
                 }
                 else
+                if (Path.GetExtension(f).ToLower().Equals(".dat"))
                 {
                     var dat = new HSDRaw.HSDRawFile(f);
 
@@ -748,7 +745,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void mayaANIMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+            if (JOBJManager.Animation == null || JOBJManager.Animation.Nodes.Count == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -758,7 +755,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             if (f != null)
             {
-                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Nodes);
+                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation);
             }
         }
 
@@ -770,7 +767,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void figaTreeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+            if (JOBJManager.Animation == null || JOBJManager.Animation.Nodes.Count == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -785,7 +782,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRawFile animFile = new HSDRawFile();
                     animFile.Roots.Add(new HSDRootNode()
                     {
-                        Data = AnimNode.ToFigaTree(JOBJManager.Nodes, (int)viewport.MaxFrame),
+                        Data = JOBJManager.Animation.ToFigaTree(),
                         Name = setting.Symbol
                     });
                     animFile.Save(f);
@@ -803,7 +800,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
         private void animJointToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+            if (JOBJManager.Animation == null || JOBJManager.Animation.Nodes.Count == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -819,7 +816,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRawFile animFile = new HSDRawFile();
                     animFile.Roots.Add(new HSDRootNode()
                     {
-                        Data = AnimNode.ToAnimJoint(JOBJManager.GetJOBJ(0), JOBJManager.Nodes, setting.Flags),
+                        Data = JOBJManager.Animation.ToAnimJoint(JOBJManager.GetJOBJ(0), setting.Flags),
                         Name = setting.Symbol
                     });
                     animFile.Save(f);

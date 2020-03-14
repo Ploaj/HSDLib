@@ -371,9 +371,9 @@ namespace HSDRawViewer.Rendering
             float SY = jobj.SY;
             float SZ = jobj.SZ;
 
-            if (animatedBoneIndex != -1 && animatedBoneIndex < Nodes.Count)
+            if (animatedBoneIndex != -1 && animatedBoneIndex < Animation.Nodes.Count)
             {
-                AnimNode node = Nodes[animatedBoneIndex];
+                AnimNode node = Animation.Nodes[animatedBoneIndex];
                 foreach (AnimTrack t in node.Tracks)
                 {
                     switch (t.TrackType)
@@ -432,36 +432,15 @@ namespace HSDRawViewer.Rendering
 
         #region Animation Loader
 
-        public List<AnimNode> Nodes = new List<AnimNode>();
+        public AnimManager Animation = new AnimManager();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="joint"></param>
-        public int SetAnimJoint(HSD_AnimJoint joint)
+        public void SetAnimJoint(HSD_AnimJoint joint)
         {
-            Nodes.Clear();
-            int max = 0;
-            if (joint == null)
-                return 0;
-            foreach (var j in joint.BreathFirstList)
-            {
-                AnimNode n = new AnimNode();
-                if (j.AOBJ != null)
-                {
-                    max = (int)Math.Max(max, j.AOBJ.EndFrame);
-
-                    foreach (var fdesc in j.AOBJ.FObjDesc.List)
-                    {
-                        AnimTrack track = new AnimTrack();
-                        track.TrackType = fdesc.JointTrackType;
-                        track.Keys = fdesc.GetDecodedKeys();
-                        n.Tracks.Add(track);
-                    }
-                }
-                Nodes.Add(n);
-            }
-            return max;
+            Animation.FromAnimJoint(joint);
         }
 
         /// <summary>
@@ -469,22 +448,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void SetFigaTree(HSD_FigaTree tree)
         {
-            Nodes.Clear();
-            if (tree == null)
-                return;
-
-            foreach (var tracks in tree.Nodes)
-            {
-                AnimNode n = new AnimNode();
-                foreach (HSD_Track t in tracks.Tracks)
-                {
-                    AnimTrack track = new AnimTrack();
-                    track.TrackType = t.FOBJ.JointTrackType;
-                    track.Keys = t.GetKeys();
-                    n.Tracks.Add(track);
-                }
-                Nodes.Add(n);
-            }
+            Animation.FromFigaTree(tree);
         }
 
         /// <summary>
