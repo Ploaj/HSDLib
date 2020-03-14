@@ -29,7 +29,7 @@ uniform float alpha;
 
 // flags
 uniform int dfNone;
-uniform int enableMaterial;
+uniform int useMaterialLighting;
 uniform int enableDiffuse;
 uniform int enableSpecular;
 uniform int useVertexColor;
@@ -92,7 +92,7 @@ vec4 DiffusePass(vec3 N, vec3 V)
 	vec4 diffuseTerm = vec4(1);
 
     float lambert = clamp(dot(N, V), 0, 1);
-	if(N.x == 0 && N.y == 0 && N.z == 0)
+	if(useVertexColor == 1 || useMaterialLighting == 1)
 		lambert = 1;
 	
 	vec4 colorPass = vec4(1);
@@ -106,13 +106,13 @@ vec4 DiffusePass(vec3 N, vec3 V)
 		diffuseTerm.a = colorPass.a;
 	}
 	
-	//if(enableMaterial == 1)
+	if (useVertexColor == 0)
 	{
 		diffuseTerm.rgb = clamp(diffuseTerm.rgb, ambientColor.rgb * colorPass.rgb, vec3(1));
 	
 		diffuseTerm.rgb *= diffuseColor.rgb;
-	}
 
+	}
 	diffuseTerm.rgb *= lambert;
 
 	return diffuseTerm;

@@ -334,7 +334,7 @@ namespace HSDRawViewer.Rendering
             shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
             shader.SetBoolToInt("enableSpecular", mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
             shader.SetBoolToInt("enableDiffuse", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
-            shader.SetBoolToInt("enableMaterial", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
+            shader.SetBoolToInt("useMaterialLighting", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
             shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
 
 

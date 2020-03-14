@@ -120,7 +120,7 @@ namespace HSDRawViewer.Converters
                         {
                             animkey.t1 = state.d0;
                             animkey.t2 = state.d0;
-                            if (nextSlope)
+                            if (nextSlope && prevState != null)
                                 animkey.t1 = prevState.d1;
                             animkey.intan = "spline";
                             animkey.outtan = "spline";

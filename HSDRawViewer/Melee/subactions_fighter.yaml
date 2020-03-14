@@ -248,11 +248,12 @@
   name: Change Model State
   parameters:
   - name: Struct ID
-    bitCount: 6
+    bitCount: 7
   - name: Unknown
-    bitCount: 12
+    bitCount: 11
   - name: Object ID
     bitCount: 8
+    signed: true
 
 - code: 32
   name: Revert Models
@@ -406,16 +407,22 @@
     bitCount: 12
 
 - code: 42
-  name: Related to Parasol Item?
+  name: Change Held Items Action State
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: Value1
+    bitCount: 13
+  - name: Value2
+    bitCount: 13
 
 - code: 43
   name: Rumble
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: Flag
+    bitCount: 1
+  - name: Value1
+    bitCount: 12
+  - name: Value2
+    bitCount: 13
 
 - code: 44
   name: Set flag 0x221E to 20
@@ -476,12 +483,12 @@
     bitCount: 26
 
 - code: 52
-  name: Continuation Control
+  name: Footsnap Behavior
   parameters:
   - name: Unknown
     bitCount: 26
     
-- code: 52
+- code: 53
   name: Set flag 0x2225 to 10
   parameters:
   - name: Unknown

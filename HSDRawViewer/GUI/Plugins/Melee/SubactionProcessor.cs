@@ -214,7 +214,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         Hitboxes.Clear();
                         break;
                     case 26 << 2:
-                        BodyCollisionState = cmd.Parameters[1];
+                        BodyCollisionState = cmd.Parameters[0];
                         break;
                     case 27 << 2:
                         // i don't really know how many bone to assume...
