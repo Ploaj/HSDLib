@@ -702,7 +702,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void clearAnimButton_Click(object sender, EventArgs e)
         {
             viewport.AnimationTrackEnabled = false;
-            JOBJManager.SetFigaTree(null);
+            JOBJManager.Animation = null;
         }
 
         /// <summary>

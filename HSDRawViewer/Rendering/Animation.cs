@@ -22,6 +22,9 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public void FromFigaTree(HSD_FigaTree tree)
         {
+            if (tree == null)
+                return;
+
             FrameCount = tree.FrameCount;
             Nodes = new List<AnimNode>();
             foreach (var tracks in tree.Nodes)

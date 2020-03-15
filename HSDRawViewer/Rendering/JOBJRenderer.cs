@@ -371,7 +371,7 @@ namespace HSDRawViewer.Rendering
             float SY = jobj.SY;
             float SZ = jobj.SZ;
 
-            if (animatedBoneIndex != -1 && animatedBoneIndex < Animation.Nodes.Count)
+            if (animatedBoneIndex != -1 && Animation != null && animatedBoneIndex < Animation.Nodes.Count)
             {
                 AnimNode node = Animation.Nodes[animatedBoneIndex];
                 foreach (AnimTrack t in node.Tracks)
@@ -440,6 +440,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="joint"></param>
         public void SetAnimJoint(HSD_AnimJoint joint)
         {
+            Animation = new AnimManager();
             Animation.FromAnimJoint(joint);
         }
 
@@ -448,6 +449,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void SetFigaTree(HSD_FigaTree tree)
         {
+            Animation = new AnimManager();
             Animation.FromFigaTree(tree);
         }
 

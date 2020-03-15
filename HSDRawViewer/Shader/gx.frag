@@ -2,21 +2,34 @@
 
 in vec3 vertPosition;
 in vec3 normal;
+in float spec;
 in vec2 texcoord0;
+in vec2 texcoord1;
 in vec4 vertexColor;
 
 out vec4 fragColor;
 
 
 // textures
-uniform int enableTexDiffuse;
-uniform sampler2D diffuseTex;
-uniform int difColorType;
-uniform int difAlphaType;
-uniform int diffuseCoordType;
-uniform vec2 diffuseUVScale;
-uniform int diffuseMirrorFix;
-uniform mat4 difTransform;
+uniform int hasTEX0;
+uniform sampler2D TEX0;
+uniform int TEX0Operation;
+uniform int TEX0ColorType;
+uniform int TEX0AlphaType;
+uniform int TEX0CoordType;
+uniform vec2 TEX0UVScale;
+uniform int TEX0MirrorFix;
+uniform mat4 TEX0Transform;
+
+uniform int hasTEX1;
+uniform sampler2D TEX1;
+uniform int TEX1Operation;
+uniform int TEX1ColorType;
+uniform int TEX1AlphaType;
+uniform int TEX1CoordType;
+uniform vec2 TEX1UVScale;
+uniform int TEX1MirrorFix;
+uniform mat4 TEX1Transform;
 
 
 // material
@@ -30,9 +43,9 @@ uniform float alpha;
 // flags
 uniform int dfNone;
 uniform int useMaterialLighting;
+uniform int useVertexColor;
 uniform int enableDiffuse;
 uniform int enableSpecular;
-uniform int useVertexColor;
 
 
 // Non rendering system
@@ -56,7 +69,8 @@ vec2 GetSphereCoords(vec3 N)
 ///
 vec2 GetCoordType(int coordType, vec2 tex0)
 {
-	if(coordType == 1) //COORD_REFLECTION
+	//COORD_REFLECTION
+	if(coordType == 1) 
 		return GetSphereCoords(normal);
 
 	//COORD_UV
@@ -66,7 +80,7 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 ///
 ///
 ///
-vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, mat4 uvTransform, vec2 uvscale, int coordType, int mirrorFix, sampler2D tex, int colorMixType, int alphaMixType)
+vec4 MixTextureColor(sampler2D tex, vec2 texCoord, mat4 uvTransform, vec2 uvscale, int coordType, int mirrorFix)
 {
     vec4 clr = vec4(1);
 
@@ -85,79 +99,106 @@ vec4 MixTextureColor(vec4 materialColor, vec2 texCoord, mat4 uvTransform, vec2 u
 }
 
 ///
-/// basic lambert diffuse
 ///
-vec4 DiffusePass(vec3 N, vec3 V)
+///
+vec4 DiffusePass(sampler2D tex, vec2 texcoord, mat4 transform, vec2 uvScale, int coordType, int mirrorFix)
 {
 	vec4 diffuseTerm = vec4(1);
-
-    float lambert = clamp(dot(N, V), 0, 1);
-	if(useVertexColor == 1 || useMaterialLighting == 1)
-		lambert = 1;
 	
-	vec4 colorPass = vec4(1);
+	vec4 colorPass = MixTextureColor(tex, texcoord, transform, uvScale, coordType, mirrorFix);
 
-    if (enableTexDiffuse == 1)
-	{
-		colorPass = MixTextureColor(diffuseTerm, texcoord0, difTransform, diffuseUVScale, diffuseCoordType, diffuseMirrorFix, diffuseTex, difColorType, difAlphaType);
+	diffuseTerm = colorPass;
 
-		diffuseTerm.rgb = colorPass.rgb;
-
-		diffuseTerm.a = colorPass.a;
-	}
-	
 	if (useVertexColor == 0)
 	{
-		diffuseTerm.rgb = clamp(diffuseTerm.rgb, ambientColor.rgb * colorPass.rgb, vec3(1));
+		//diffuseTerm.rgb = clamp(diffuseTerm.rgb, ambientColor.rgb * colorPass.rgb, vec3(1));
 	
-		diffuseTerm.rgb *= diffuseColor.rgb;
-
+		//diffuseTerm.rgb *= diffuseColor.rgb;
 	}
-	diffuseTerm.rgb *= lambert;
 
 	return diffuseTerm;
 }
 
 ///
-/// This is usally a reflection map
 ///
-/*vec3 ColorMapExtPass(vec3 N, vec3 V)
+///
+vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 {
-    vec4 Map = vec4(0);
+	if(useVertexColor)
+		return vertexColor;
+		
+	if(useMaterialLighting == 1 || enableDiffuse == 0)
+		return vec4(1, 1, 1, 1);
 
-    vec2 Coords = GetCoordType(extCoordType, tex0);
+    float lambert = clamp(dot(N, V), 0, 1);
+	vec3 clr = vec3(lambert) * diffuseColor.rgb;
+	return vec4(clr, 1);
+}
 
-    if (hasExt== 1)
-        Map = texture(extTex, Coords * extScale);
+///
+///
+///
+vec4 GetSpecularMaterial(vec3 V, vec3 N)
+{
+	if(useMaterialLighting == 1 || enableSpecular == 0)
+		return vec4(0, 0, 0, 0);
+	
+    float phong = pow(spec, shinniness);
 
-    return Map.rgb;
-}*/
+    vec3 specularTerm = vec3(phong) * specularColor.rgb;
+
+	return vec4(specularTerm, 1);
+}
+
 
 ///
 /// Main mixing function
 ///
 void main()
 {
+	if(colorOverride == 1)
+	{
+		fragColor = vec4(1, 1, 1, 1);
+		return;
+	}
+
 	// get vectors
 	vec3 V = normalize(vertPosition - cameraPos);
-    vec3 N = normalize(normal);
 
 	fragColor = vec4(0, 0, 0, 1);
 
-	vec4 diffusePass = DiffusePass(N, V);
+	vec4 diffusePass = diffuseColor;
+	vec4 specularPass = specularColor;
 
-	fragColor.rgb += diffusePass.rgb;// * enableDiffuse;
+	if(hasTEX0 == 1)
+	{
+		vec4 pass = DiffusePass(TEX0, texcoord0, TEX0Transform, TEX0UVScale, TEX0CoordType, TEX0MirrorFix) * 1.5;
+		if(TEX0Operation == 0) // Blend
+		{
+			diffusePass.rgb *= pass.rgb;//clamp(pass.rgb, ambientColor.rgb * pass.rgb, vec3(1));
+			//diffusePass.rgb *= diffuseColor.rgb;
+		}
+		if(TEX0Operation == 1 && pass.a > 0) // Replace
+			diffusePass.rgb = pass.rgb;
+	}
+	if(hasTEX1 == 1)
+	{
+		vec4 pass = DiffusePass(TEX1, texcoord1, TEX1Transform, TEX1UVScale, TEX1CoordType, TEX1MirrorFix);
+		if(TEX1Operation == 1 && pass.a > 0) // Replace
+			diffusePass = pass;
+		if(TEX1Operation == 2) // Add
+			diffusePass += pass;
+		if(TEX1Operation == 3) // Subtract
+			diffusePass -= pass;
+	}
 
+	fragColor.rgb += diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb
+					+ specularPass.rgb * GetSpecularMaterial(normalize(normal), V).rgb;
+	fragColor.rgb = clamp(fragColor.rgb, ambientColor.rgb * fragColor.rgb, vec3(1));
 	fragColor.a = diffusePass.a;
 
 	if(dfNone == 0)
 		fragColor.a *= alpha;
 
-	if(useVertexColor == 1)
-		fragColor *= vertexColor;
-
 	fragColor.xyz *= overlayColor;
-
-	if(colorOverride == 1)
-		fragColor = vec4(1, 1, 1, 1);
 }

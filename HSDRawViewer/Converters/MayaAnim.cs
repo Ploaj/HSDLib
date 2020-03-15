@@ -165,9 +165,12 @@ namespace HSDRawViewer.Converters
                     t.Keys = new List<FOBJKey>();
                     t.TrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
                     
-
-                    foreach(var mKey in mTrack.keys)
+                    
+                    for(int i = 0; i < mTrack.keys.Count; i++)
                     {
+                        var mKey = mTrack.keys[i];
+                        var mKeyNext = i + 1 < mTrack.keys.Count ? mTrack.keys[i + 1] : mTrack.keys[i];
+
                         var k = new FOBJKey();
                         k.Frame = mKey.input - 1;
                         k.Value = mKey.output;
@@ -190,20 +193,26 @@ namespace HSDRawViewer.Converters
                                 k.InterpolationType = GXInterpolationType.HSD_A_OP_SPL;
                                 k.Tan = mKey.t1;
 
+                                if((mKeyNext.input - mKey.input) <= 1) // optimization
+                                {
+                                    t.Keys.Add(k);
+                                }
+                                else
                                 if(mKey.t2 == 0)
+                                {
                                     k.InterpolationType = GXInterpolationType.HSD_A_OP_SPL0;
-
+                                    t.Keys.Add(k);
+                                }
+                                else
                                 if (mKey.t1 != mKey.t2)
                                 {
-                                    k.Tan = mKey.t1;
                                     t.Keys.Add(k);
 
                                     var slp = new FOBJKey();
-                                    slp.Frame = k.Frame;
+                                    slp.Frame = mKeyNext.input - 1;
                                     slp.InterpolationType = GXInterpolationType.HSD_A_OP_SLP;
                                     slp.Tan = mKey.t2;
                                     t.Keys.Add(slp);
-
                                 }
                                 else
                                 {
