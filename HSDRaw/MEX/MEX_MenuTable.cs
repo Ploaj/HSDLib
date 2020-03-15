@@ -13,7 +13,7 @@ namespace HSDRaw.MEX
 
     public class MEX_StageIconData : HSDAccessor
     {
-        public override int TrimmedSize => 0x1C;
+        public override int TrimmedSize => 0x20;
 
         [Browsable(false)]
         public int RuntimeJOBJPointer { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
@@ -23,12 +23,19 @@ namespace HSDRaw.MEX
         
         public byte IconState { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
         public byte PreviewID { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
-        public byte RandomID { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
-        public byte InternalID { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
+        public byte PositionJOBJID { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
+
+        private byte _internal { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
+        public int InternalID { get => _s.GetInt32(0x1C); set { _s.SetInt32(0x1C, value); } }
 
         public float CursorX { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
         public float CursorY { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
         public float OutlineX { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
         public float OutlineY { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+
+        public override string ToString()
+        {
+            return "ID: " + InternalID;
+        }
     }
 }

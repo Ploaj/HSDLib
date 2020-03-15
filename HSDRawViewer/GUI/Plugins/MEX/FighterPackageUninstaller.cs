@@ -16,12 +16,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     public class FighterPackageUninstaller : ProgressClass
     {
         private int internalID;
-        private MEXEntry fighter;
+        private MEXFighterEntry fighter;
         private MexDataEditor editor;
         private List<Tuple<HSDRawFile, string, bool>> editedFiles = new List<Tuple<HSDRawFile, string, bool>>();
         private List<SEMEntry> SemEntries = new List<SEMEntry>();
 
-        public FighterPackageUninstaller(int internalID, MEXEntry fighter, MexDataEditor editor)
+        public FighterPackageUninstaller(int internalID, MEXFighterEntry fighter, MexDataEditor editor)
         {
             this.internalID = internalID;
             this.fighter = fighter;
@@ -219,7 +219,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
         /// <param name="internalID"></param>
-        private void RemoveUI(MEXEntry fighter, MexDataEditor editor, int internalID)
+        private void RemoveUI(MEXFighterEntry fighter, MexDataEditor editor, int internalID)
         {
             Console.WriteLine("Removing UI");
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);

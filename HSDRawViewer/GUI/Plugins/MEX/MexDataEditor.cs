@@ -5,6 +5,7 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.Melee.Pl;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
+using HSDRaw.MEX.Stages;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Sound;
 using OpenTK;
@@ -139,12 +140,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private DataNode _node;
         public MEX_Data _data { get { if (_node.Accessor is MEX_Data data) return data; else return null; } }
 
-        public BindingList<MEXEntry> FighterEntries = new BindingList<MEXEntry>();
+        public BindingList<MEXFighterEntry> FighterEntries = new BindingList<MEXFighterEntry>();
+        public MEXStageEntry[] StageEntries { get; set; }
+        public MEX_StageIDTable[] StageIDs { get; set; }
 
         public MEX_EffectEntry[] Effects { get; set; }
+
         public MEX_FighterEffect[] MEX_Effects { get; set; }
 
         public MEX_CSSIconEntry[] Icons { get; set; }
+        public MEX_StageIconData[] StageIcons { get; set; }
         
         public HSD_String[] Music { get; set; }
         public MEXPlaylistEntry[] MenuPlaylist { get; set; }
@@ -186,7 +191,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             FighterEntries.Clear();
             for(int i = 0; i < _data.MetaData.NumOfInternalIDs; i++)
             {
-                FighterEntries.Add(new MEXEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
+                FighterEntries.Add(new MEXFighterEntry().LoadData(_data, i, MEXIdConverter.ToExternalID(i, _data.MetaData.NumOfInternalIDs)));
             }
 
 
@@ -197,6 +202,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 Icons[i] = MEX_CSSIconEntry.FromIcon(_data.MenuTable.CSSIconData.Icons[i]);
             }
             cssIconEditor.SetArrayFromProperty(this, "Icons");
+
+            StageIcons = _data.MenuTable.SSSIconData.Array;
+            sssEditor.SetArrayFromProperty(this, "StageIcons");
 
 
             // Music------------------------------------
@@ -244,6 +252,21 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             ItemMEX = _data.ItemTable.MEXItems.Array;
             mexItemEditor.SetArrayFromProperty(this, "ItemMEX");
             mexItemEditor.ItemIndexOffset = MEXItemOffset;
+
+            // Stages
+            StageEntries = new MEXStageEntry[_data.StageFunctions.Length];
+            for(int i = 0; i < StageEntries.Length; i++)
+            {
+                StageEntries[i] = new MEXStageEntry()
+                {
+                    Stage = _data.StageFunctions[i],
+                    Reverb = _data.StageData.ReverbTable[i]
+                };
+            }
+            stageEditor.SetArrayFromProperty(this, "StageEntries");
+
+            StageIDs = _data.StageData.StageIDTable.Array;
+            stageIDEditor.SetArrayFromProperty(this, "StageIDs");
         }
 
         /// <summary>
@@ -392,6 +415,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             for (int i = 0; i < ico.Length; i++)
                 ico[i] = Icons[i].ToIcon();
             _data.MenuTable.CSSIconData.Icons = ico;
+            
+            _data.MetaData.NumOfSSSIcons = StageIcons.Length;
+            _data.MenuTable.SSSIconData.Array = StageIcons;
         }
 
         /// <summary>
@@ -407,6 +433,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.ItemTable._s.GetCreateReference<HSDAccessor>(0x18)._s.Resize(Math.Max(4, ItemMEX.Length * 4));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SaveStageData()
+        {
+            _data.StageFunctions.Array = StageEntries.Select(e => e.Stage).ToArray();
+            _data.StageData.ReverbTable.Array = StageEntries.Select(e => e.Reverb).ToArray();
+            _data.StageData.StageIDTable.Array = StageIDs;
+        }
+
         #region Events
 
         /// <summary>
@@ -417,7 +453,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void fighterList_SelectedIndexChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = fighterList.SelectedItem;
-            propertyGrid2.SelectedObject = (fighterList.SelectedItem as MEXEntry).Functions;
+            propertyGrid2.SelectedObject = (fighterList.SelectedItem as MEXFighterEntry).Functions;
         }
 
         #endregion
@@ -430,8 +466,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SaveEffectData();
             SaveIconData();
             SaveMusicData();
+            SaveStageData();
         }
-        
+
+
+        private void saveStageButton_Click(object sender, EventArgs e)
+        {
+            SaveStageData();
+        }
+
         private void saveMusicButton_Click(object sender, EventArgs e)
         {
             SaveMusicData();
@@ -709,7 +752,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="e"></param>
         private void cloneButton_Click(object sender, EventArgs e)
         {
-            if(fighterList.SelectedItem is MEXEntry me)
+            if(fighterList.SelectedItem is MEXFighterEntry me)
             {
                 var clone = ObjectExtensions.Copy(me);
                 // give unique name
@@ -755,7 +798,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            if(fighterList.SelectedItem is MEXEntry mex)
+            if(fighterList.SelectedItem is MEXFighterEntry mex)
             {
                 var f = Tools.FileIO.SaveFile("YAML (*.yaml)|*.yaml", mex.NameText + ".yaml");
                 if (f != null)
@@ -775,7 +818,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var f = Tools.FileIO.OpenFile("YAML (*.yaml)|*.yaml");
             if (f != null)
             {
-                FighterEntries.Insert(FighterEntries.Count - 6, MEXEntry.DeserializeFile(f));
+                FighterEntries.Insert(FighterEntries.Count - 6, MEXFighterEntry.DeserializeFile(f));
             }
 
         }
@@ -1156,7 +1199,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         private void uninstallFighterButton_Click(object sender, EventArgs e)
         {
-            if(IsExtendedFighter(fighterList.SelectedIndex) && fighterList.SelectedItem is MEXEntry en)
+            if(IsExtendedFighter(fighterList.SelectedIndex) && fighterList.SelectedItem is MEXFighterEntry en)
             {
                 using (ProgressBarDisplay d = new ProgressBarDisplay(new FighterPackageUninstaller(fighterList.SelectedIndex, en, this)))
                 {
@@ -1182,7 +1225,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="e"></param>
         /// <returns>internal ID</returns>
-        public int AddEntry(MEXEntry e)
+        public int AddEntry(MEXFighterEntry e)
         {
             FighterEntries.Insert(FighterEntries.Count - 6, e);
             return FighterEntries.Count - 6;
@@ -1279,7 +1322,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="e"></param>
         private void buttonCopyMoveLogic_Click(object sender, EventArgs e)
         {
-            if(fighterList.SelectedItem is MEXEntry fighter)
+            if(fighterList.SelectedItem is MEXFighterEntry fighter)
             {
                 var moveLogic = fighter.Functions.MoveLogic;
 

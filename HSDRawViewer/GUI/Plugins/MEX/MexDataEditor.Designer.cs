@@ -35,6 +35,7 @@
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.propertyGrid2 = new System.Windows.Forms.PropertyGrid();
+            this.buttonCopyMoveLogic = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.fighterList = new System.Windows.Forms.ListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -92,7 +93,16 @@
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
             this.installFighterButton = new System.Windows.Forms.ToolStripButton();
             this.uninstallFighterButton = new System.Windows.Forms.ToolStripButton();
-            this.buttonCopyMoveLogic = new System.Windows.Forms.Button();
+            this.tabPageStage = new System.Windows.Forms.TabPage();
+            this.toolStrip7 = new System.Windows.Forms.ToolStrip();
+            this.stageEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.saveStageButton = new System.Windows.Forms.ToolStripButton();
+            this.tabControl3 = new System.Windows.Forms.TabControl();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.stageIDEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.tabPage9 = new System.Windows.Forms.TabPage();
+            this.sssEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.mainTabControl.SuspendLayout();
             this.tabPageFighter.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -123,11 +133,18 @@
             this.tabPage8.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.toolStrip6.SuspendLayout();
+            this.tabPageStage.SuspendLayout();
+            this.toolStrip7.SuspendLayout();
+            this.tabControl3.SuspendLayout();
+            this.tabPage5.SuspendLayout();
+            this.tabPage6.SuspendLayout();
+            this.tabPage9.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTabControl
             // 
             this.mainTabControl.Controls.Add(this.tabPageFighter);
+            this.mainTabControl.Controls.Add(this.tabPageStage);
             this.mainTabControl.Controls.Add(this.tabPageItem);
             this.mainTabControl.Controls.Add(this.tabPageEffects);
             this.mainTabControl.Controls.Add(this.tabPageCSS);
@@ -204,6 +221,17 @@
             this.propertyGrid2.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.propertyGrid2.Size = new System.Drawing.Size(571, 196);
             this.propertyGrid2.TabIndex = 1;
+            // 
+            // buttonCopyMoveLogic
+            // 
+            this.buttonCopyMoveLogic.Dock = System.Windows.Forms.DockStyle.Top;
+            this.buttonCopyMoveLogic.Location = new System.Drawing.Point(3, 3);
+            this.buttonCopyMoveLogic.Name = "buttonCopyMoveLogic";
+            this.buttonCopyMoveLogic.Size = new System.Drawing.Size(571, 23);
+            this.buttonCopyMoveLogic.TabIndex = 2;
+            this.buttonCopyMoveLogic.Text = "Copy Move Logic to Clipboard";
+            this.buttonCopyMoveLogic.UseVisualStyleBackColor = true;
+            this.buttonCopyMoveLogic.Click += new System.EventHandler(this.buttonCopyMoveLogic_Click);
             // 
             // groupBox1
             // 
@@ -534,7 +562,7 @@
             this.tabPageCSS.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageCSS.Size = new System.Drawing.Size(791, 282);
             this.tabPageCSS.TabIndex = 2;
-            this.tabPageCSS.Text = "CSS";
+            this.tabPageCSS.Text = "Select Menu";
             this.tabPageCSS.UseVisualStyleBackColor = true;
             // 
             // groupBox2
@@ -605,6 +633,7 @@
             // 
             this.cssIconTabControl.Controls.Add(this.tabPage1);
             this.cssIconTabControl.Controls.Add(this.tabPage2);
+            this.cssIconTabControl.Controls.Add(this.tabPage9);
             this.cssIconTabControl.Dock = System.Windows.Forms.DockStyle.Left;
             this.cssIconTabControl.Location = new System.Drawing.Point(3, 16);
             this.cssIconTabControl.Name = "cssIconTabControl";
@@ -620,7 +649,7 @@
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(192, 206);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Icon Collision";
+            this.tabPage1.Text = "CSS";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // cssIconEditor
@@ -642,7 +671,7 @@
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(192, 206);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Added Icons";
+            this.tabPage2.Text = "CSS Added";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // addedIconEditor
@@ -837,16 +866,111 @@
             this.uninstallFighterButton.Text = "Uninstall Fighter";
             this.uninstallFighterButton.Click += new System.EventHandler(this.uninstallFighterButton_Click);
             // 
-            // buttonCopyMoveLogic
+            // tabPageStage
             // 
-            this.buttonCopyMoveLogic.Dock = System.Windows.Forms.DockStyle.Top;
-            this.buttonCopyMoveLogic.Location = new System.Drawing.Point(3, 3);
-            this.buttonCopyMoveLogic.Name = "buttonCopyMoveLogic";
-            this.buttonCopyMoveLogic.Size = new System.Drawing.Size(571, 23);
-            this.buttonCopyMoveLogic.TabIndex = 2;
-            this.buttonCopyMoveLogic.Text = "Copy Move Logic to Clipboard";
-            this.buttonCopyMoveLogic.UseVisualStyleBackColor = true;
-            this.buttonCopyMoveLogic.Click += new System.EventHandler(this.buttonCopyMoveLogic_Click);
+            this.tabPageStage.Controls.Add(this.tabControl3);
+            this.tabPageStage.Controls.Add(this.toolStrip7);
+            this.tabPageStage.Location = new System.Drawing.Point(4, 22);
+            this.tabPageStage.Name = "tabPageStage";
+            this.tabPageStage.Size = new System.Drawing.Size(791, 282);
+            this.tabPageStage.TabIndex = 6;
+            this.tabPageStage.Text = "Stages";
+            this.tabPageStage.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip7
+            // 
+            this.toolStrip7.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveStageButton});
+            this.toolStrip7.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip7.Name = "toolStrip7";
+            this.toolStrip7.Size = new System.Drawing.Size(791, 25);
+            this.toolStrip7.TabIndex = 0;
+            this.toolStrip7.Text = "toolStrip7";
+            // 
+            // stageEditor
+            // 
+            this.stageEditor.DisplayItemIndices = true;
+            this.stageEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageEditor.EnablePropertyViewDescription = true;
+            this.stageEditor.ItemIndexOffset = 0;
+            this.stageEditor.Location = new System.Drawing.Point(3, 3);
+            this.stageEditor.Name = "stageEditor";
+            this.stageEditor.Size = new System.Drawing.Size(777, 225);
+            this.stageEditor.TabIndex = 1;
+            // 
+            // saveStageButton
+            // 
+            this.saveStageButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
+            this.saveStageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.saveStageButton.Name = "saveStageButton";
+            this.saveStageButton.Size = new System.Drawing.Size(132, 22);
+            this.saveStageButton.Text = "Save Stage Changes";
+            this.saveStageButton.Click += new System.EventHandler(this.saveStageButton_Click);
+            // 
+            // tabControl3
+            // 
+            this.tabControl3.Controls.Add(this.tabPage5);
+            this.tabControl3.Controls.Add(this.tabPage6);
+            this.tabControl3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl3.Location = new System.Drawing.Point(0, 25);
+            this.tabControl3.Name = "tabControl3";
+            this.tabControl3.SelectedIndex = 0;
+            this.tabControl3.Size = new System.Drawing.Size(791, 257);
+            this.tabControl3.TabIndex = 2;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.stageEditor);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(783, 231);
+            this.tabPage5.TabIndex = 0;
+            this.tabPage5.Text = "Stages";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.stageIDEditor);
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage6.Size = new System.Drawing.Size(783, 231);
+            this.tabPage6.TabIndex = 1;
+            this.tabPage6.Text = "StageIDs";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // stageIDEditor
+            // 
+            this.stageIDEditor.DisplayItemIndices = true;
+            this.stageIDEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageIDEditor.EnablePropertyViewDescription = true;
+            this.stageIDEditor.ItemIndexOffset = 0;
+            this.stageIDEditor.Location = new System.Drawing.Point(3, 3);
+            this.stageIDEditor.Name = "stageIDEditor";
+            this.stageIDEditor.Size = new System.Drawing.Size(777, 225);
+            this.stageIDEditor.TabIndex = 0;
+            // 
+            // tabPage9
+            // 
+            this.tabPage9.Controls.Add(this.sssEditor);
+            this.tabPage9.Location = new System.Drawing.Point(4, 22);
+            this.tabPage9.Name = "tabPage9";
+            this.tabPage9.Size = new System.Drawing.Size(192, 206);
+            this.tabPage9.TabIndex = 2;
+            this.tabPage9.Text = "SSS";
+            this.tabPage9.UseVisualStyleBackColor = true;
+            // 
+            // sssEditor
+            // 
+            this.sssEditor.DisplayItemIndices = false;
+            this.sssEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sssEditor.EnablePropertyViewDescription = true;
+            this.sssEditor.ItemIndexOffset = 0;
+            this.sssEditor.Location = new System.Drawing.Point(0, 0);
+            this.sssEditor.Name = "sssEditor";
+            this.sssEditor.Size = new System.Drawing.Size(192, 206);
+            this.sssEditor.TabIndex = 0;
             // 
             // MexDataEditor
             // 
@@ -901,6 +1025,14 @@
             this.toolStrip2.PerformLayout();
             this.toolStrip6.ResumeLayout(false);
             this.toolStrip6.PerformLayout();
+            this.tabPageStage.ResumeLayout(false);
+            this.tabPageStage.PerformLayout();
+            this.toolStrip7.ResumeLayout(false);
+            this.toolStrip7.PerformLayout();
+            this.tabControl3.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
+            this.tabPage6.ResumeLayout(false);
+            this.tabPage9.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -973,5 +1105,15 @@
         private System.Windows.Forms.ToolStripButton removeIconButton;
         private System.Windows.Forms.ToolStripButton saveMnSlChrButton;
         private System.Windows.Forms.Button buttonCopyMoveLogic;
+        private System.Windows.Forms.TabPage tabPageStage;
+        private ArrayMemberEditor stageEditor;
+        private System.Windows.Forms.ToolStrip toolStrip7;
+        private System.Windows.Forms.ToolStripButton saveStageButton;
+        private System.Windows.Forms.TabControl tabControl3;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.TabPage tabPage6;
+        private ArrayMemberEditor stageIDEditor;
+        private System.Windows.Forms.TabPage tabPage9;
+        private ArrayMemberEditor sssEditor;
     }
 }

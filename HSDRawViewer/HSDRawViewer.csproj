@@ -241,8 +241,9 @@
     <Compile Include="GUI\Plugins\MEX\MexDataEditor.Designer.cs">
       <DependentUpon>MexDataEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\MEX\MEXEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXFighterEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXPlaylistEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXStageEntry.cs" />
     <Compile Include="GUI\ProgressBarDisplay.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -63,7 +63,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     }
 
     [Serializable]
-    public class MEXEntry
+    public class MEXFighterEntry
     {
         [DisplayName("Name"), Category("0 - General"), Description("Name used for CSS screen")]
         public string NameText { get; set; }
@@ -134,7 +134,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Effect File"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int EffectIndex { get; set; }
 
-        [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter"), TypeConverter(typeof(SSMIDConverter))]
+        [DisplayName("SSM"), Category("3 - Misc"), Description("Index of SSM file for this fighter"), TypeConverter(typeof(SSMIDConverter))]
         public int SSMIndex { get; set; }
 
         [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
@@ -189,7 +189,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             return b;
         }
 
-        public MEXEntry LoadData(MEX_Data mexData, int internalId, int externalID)
+        public MEXFighterEntry LoadData(MEX_Data mexData, int internalId, int externalID)
         {
             Functions.LoadData(mexData, internalId, externalID);
 
@@ -355,14 +355,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static MEXEntry DeserializeFile(string filePath)
+        public static MEXFighterEntry DeserializeFile(string filePath)
         {
             var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
             .Build();
 
-            return deserializer.Deserialize<MEXEntry>(File.ReadAllText(filePath));
+            return deserializer.Deserialize<MEXFighterEntry>(File.ReadAllText(filePath));
         }
 
         /// <summary>
@@ -370,14 +370,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static MEXEntry Deserialize(string data)
+        public static MEXFighterEntry Deserialize(string data)
         {
             var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
             .Build();
 
-            return deserializer.Deserialize<MEXEntry>(data);
+            return deserializer.Deserialize<MEXFighterEntry>(data);
         }
 
         /// <summary>

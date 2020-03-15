@@ -19,6 +19,11 @@
         public int Unknown1 { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
         public int Unknown2 { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+
+        public override string ToString()
+        {
+            return "StageID: " + StageID;
+        }
     }
 
     public class MEX_StageReverb : HSDAccessor
@@ -27,8 +32,8 @@
 
         public byte SSMID { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
-        public byte Reverb { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+        public byte Reverb { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
-        public byte Unknown { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+        public byte Unknown { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
     }
 }

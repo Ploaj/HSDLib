@@ -57,7 +57,8 @@ namespace HSDRaw.MEX.Stages
         [TypeConverter(typeof(HexType))]
         public uint OnUnk { get => (uint)_s.GetInt32(0x0C); set => _s.SetInt32(0x0C, (int)value); }
 
-        public int Bitflags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        [TypeConverter(typeof(HexType))]
+        public uint Bitflags { get => (uint)_s.GetInt32(0x10); set => _s.SetInt32(0x10, (int)value); }
         
     }
 
