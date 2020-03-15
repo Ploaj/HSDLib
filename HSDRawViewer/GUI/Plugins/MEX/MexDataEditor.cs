@@ -191,10 +191,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
 
             // CSS------------------------------------
-            Icons = new MEX_CSSIconEntry[_data.CSSIconData.Icons.Length];
+            Icons = new MEX_CSSIconEntry[_data.MenuTable.CSSIconData.Icons.Length];
             for(int i = 0; i < Icons.Length; i++)
             {
-                Icons[i] = MEX_CSSIconEntry.FromIcon(_data.CSSIconData.Icons[i]);
+                Icons[i] = MEX_CSSIconEntry.FromIcon(_data.MenuTable.CSSIconData.Icons[i]);
             }
             cssIconEditor.SetArrayFromProperty(this, "Icons");
 
@@ -391,7 +391,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             MEX_CSSIcon[] ico = new MEX_CSSIcon[Icons.Length];
             for (int i = 0; i < ico.Length; i++)
                 ico[i] = Icons[i].ToIcon();
-            _data.CSSIconData.Icons = ico;
+            _data.MenuTable.CSSIconData.Icons = ico;
         }
 
         /// <summary>

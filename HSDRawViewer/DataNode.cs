@@ -11,6 +11,7 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Melee.Ef;
 using HSDRaw.Melee;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Stages;
 
 namespace HSDRawViewer
 {
@@ -98,6 +99,8 @@ namespace HSDRawViewer
             { typeof(MEX_KirbyTable), "table" },
             { typeof(MEX_KirbyFunctionTable), "table" },
             { typeof(MEX_ItemTables), "table" },
+            { typeof(MEX_MenuTable), "table" },
+            { typeof(MEX_StageData), "table" },
             { typeof(MEX_Data), "kabii" },
             { typeof(MEX_Meta), "fuma" },
         };

@@ -450,7 +450,7 @@ namespace HSDRaw
         /// <param name="bufferAlign"></param>
         public void Save(Stream stream, bool bufferAlign = true, bool optimize = true)
         {
-            if (Roots[0].Data is MEX_Data)
+            if (Roots.Count > 0 && Roots[0].Data is MEX_Data)
                 bufferAlign = false;
 
             // gather all structs--------------------------------------------------------------------------
