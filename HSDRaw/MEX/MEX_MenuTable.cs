@@ -20,22 +20,25 @@ namespace HSDRaw.MEX
 
         [Browsable(false)]
         public int Unknown { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
-        
+
+        [Browsable(false)]
         public byte IconState { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
-        public byte PreviewID { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
-        public byte PositionJOBJID { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
 
-        private byte _internal { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
-        public int InternalID { get => _s.GetInt32(0x1C); set { _s.SetInt32(0x1C, value); } }
+        public byte PreviewModelID { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
 
-        public float CursorX { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
-        public float CursorY { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
-        public float OutlineX { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
-        public float OutlineY { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        public byte TextureID { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
+
+        private byte _oldExternalID { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
+        public int ExternalID { get => _s.GetInt32(0x1C); set { _s.SetInt32(0x1C, value); } }
+
+        public float CursorWidth { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
+        public float CursorHeight { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+        public float OutlineWidth { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+        public float OutlineHeight { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
 
         public override string ToString()
         {
-            return "ID: " + InternalID;
+            return "ID: " + ExternalID;
         }
     }
 }

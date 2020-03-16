@@ -381,11 +381,11 @@ namespace HSDRawViewer.GUI.Plugins
 
                     var bmp = new Bitmap(f);
 
-                    if (beforeW != bmp.Width || beforeH != bmp.Height)
+                    /*if (beforeW != bmp.Width || beforeH != bmp.Height)
                     {
                         MessageBox.Show($"Error the texture size does not match\n{beforeW}x{beforeH} -> {bmp.Width}x{bmp.Height}");
                         return;
-                    }
+                    }*/
 
                     bmp.Dispose();
 
@@ -478,11 +478,11 @@ namespace HSDRawViewer.GUI.Plugins
                         tobj = new HSD_TOBJ();
                         TOBJConverter.InjectBitmap(tobj, fi, texFormat, palFormat);
 
-                        if (tobj.ImageData.Width != tobjs[0].ImageData.Width || tobj.ImageData.Height != tobjs[0].ImageData.Height)
+                        /*if (tobj.ImageData.Width != tobjs[0].ImageData.Width || tobj.ImageData.Height != tobjs[0].ImageData.Height)
                         {
                             MessageBox.Show($"Error the texture size does not match\n{tobj.ImageData.Width}x{tobj.ImageData.Height} -> {tobjs[0].ImageData.Width}x{tobjs[0].ImageData.Height}");
                             return;
-                        }
+                        }*/
 
                         tobjs = InsertAt(tobjs, tobj, tobjs.Length);
                     }

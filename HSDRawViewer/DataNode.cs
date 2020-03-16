@@ -27,6 +27,14 @@ namespace HSDRawViewer
         private string ArrayName { get; set; }
         private int ArrayIndex { get; set; }
 
+        public string StructPath
+        {
+            get
+            {
+                return (Parent != null ? ((DataNode)Parent).StructPath : "") + MainForm.Instance.GetStructLocation(Accessor._s) + ": " + Text;
+            }
+        }
+
         public HSDAccessor Accessor { get => _accessor;
             set
             {

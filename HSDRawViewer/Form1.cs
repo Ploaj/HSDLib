@@ -46,6 +46,11 @@ namespace HSDRawViewer
                 Instance = new MainForm();
         }
 
+        public int GetStructLocation(HSDStruct str)
+        {
+            return RawHSDFile.GetOffsetFromStruct(str);
+        }
+        
         public MainForm()
         {
             InitializeComponent();

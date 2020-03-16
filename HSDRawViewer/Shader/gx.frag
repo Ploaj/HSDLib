@@ -124,7 +124,7 @@ vec4 DiffusePass(sampler2D tex, vec2 texcoord, mat4 transform, vec2 uvScale, int
 ///
 vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 {
-	if(useVertexColor)
+	if(useVertexColor == 1)
 		return vertexColor;
 		
 	if(useMaterialLighting == 1 || enableDiffuse == 0)

@@ -51,17 +51,24 @@ namespace HSDRaw.Common.Animation
         /// <returns>-1 is TOBJ is inavlid format and new index otherwise</returns>
         public int AddImage(HSD_TOBJ tobj)
         {
+            if (tobj == null)
+                return -1;
+
             if (ImageCount > 0 && tobj.ImageData.Format != ImageBuffers[0].Data.Format)
                 return -1;
 
             if (TlutCount > 0 && tobj.TlutData != null && tobj.TlutData.Format != TlutBuffers[0].Data.Format)
                 return -1;
 
+            if (ImageBuffers == null)
+                ImageBuffers = new HSDArrayAccessor<HSD_TexBuffer>();
             ImageBuffers.Add(new HSD_TexBuffer() { Data = tobj.ImageData });
             ImageCount++;
 
             if(tobj.TlutData != null)
             {
+                if (TlutBuffers == null)
+                    TlutBuffers = new HSDArrayAccessor<HSD_TlutBuffer>();
                 TlutBuffers.Add(new HSD_TlutBuffer() { Data = tobj.TlutData });
                 TlutCount++;
             }
@@ -86,6 +93,27 @@ namespace HSDRaw.Common.Animation
                 TlutBuffers.RemoveAt(index);
                 TlutCount--;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public HSD_TOBJ[] ToTOBJs()
+        {
+            HSD_TOBJ[] tobj = new HSD_TOBJ[ImageCount];
+
+            for(int i = 0; i < tobj.Length; i++)
+            {
+                tobj[i] = new HSD_TOBJ()
+                {
+                    ImageData = ImageBuffers[i].Data,
+                };
+                if (i < TlutCount)
+                    tobj[i].TlutData = TlutBuffers[i].Data;
+            }
+
+            return tobj;
         }
     }
 

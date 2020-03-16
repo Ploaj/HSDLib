@@ -14,6 +14,7 @@ using HSDRaw.AirRide.Gr.Data;
 using System.Diagnostics;
 using HSDRaw.Melee;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Stages;
 
 namespace HSDRaw
 {
@@ -854,6 +855,13 @@ namespace HSDRaw
             if (rootString.StartsWith("mexData"))
             {
                 var acc = new MEX_Data();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("mexMapData"))
+            {
+                var acc = new MEX_mexMapData();
                 acc._s = str;
                 a = acc;
             }
