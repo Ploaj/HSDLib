@@ -21,6 +21,8 @@ namespace HSDRawViewer.GUI
 
         private bool ReadyToRender = false;
 
+        public bool LoopPlayback { get => cbLoop.Checked; set => cbLoop.Checked = value; }
+
         public float Frame
         {
             get
@@ -138,7 +140,7 @@ namespace HSDRawViewer.GUI
                 
                 if (buttonPlay.Text == "Pause")
                 {
-                    if(!(!cbLoop.Checked && Frame == MaxFrame))
+                    if(!(!LoopPlayback && Frame == MaxFrame))
                     {
                         Frame++;
                     }
@@ -249,17 +251,24 @@ namespace HSDRawViewer.GUI
             if (nudFrame.InvokeRequired && !nudFrame.IsDisposed)
             {
                 var d = new SafeUpdateFrame(UpdateFrame);
-                nudFrame.Invoke(d, new object[] { frame });
+                try
+                {
+                    nudFrame.Invoke(d, new object[] { frame });
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
             else
             {
                 if (frame < 0)
                     frame = 0;
-                if (frame >= nudFrame.Maximum)
+                if (frame > nudFrame.Maximum)
                 {
-                    if (!cbLoop.Checked)
+                    if (!LoopPlayback)
                     {
-                        Pause();
+                        Stop();
                     }
                     frame = 0;
                     _frame = 0;
@@ -350,15 +359,27 @@ namespace HSDRawViewer.GUI
 
         private void buttonPlay_Click(object sender, EventArgs e)
         {
-            Pause();
+            Play();
         }
 
-        private void Pause()
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Play()
         {
             if (buttonPlay.Text == "Play")
                 buttonPlay.Text = "Pause";
             else
                 buttonPlay.Text = "Play";
+        }
+
+        /// <summary>
+        /// Stops animation and resets to frame 0
+        /// </summary>
+        public void Stop()
+        {
+            buttonPlay.Text = "Pause";
+            Frame = 0;
         }
 
         /// <summary>

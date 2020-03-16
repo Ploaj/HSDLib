@@ -6,6 +6,7 @@ using HSDRaw.Melee.Pl;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
 using HSDRaw.MEX.Stages;
+using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Sound;
 using OpenTK;
@@ -37,13 +38,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             fighterList.DataSource = FighterEntries;
 
-            JOBJManager.RenderBones = false;
+            MnSlChrJOBJManager.RenderBones = false;
 
             viewport = new ViewportControl();
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
             viewport.EnableFloor = false;
+            viewport.MaxFrame = 1600;
             groupBox2.Controls.Add(viewport);
             viewport.RefreshSize();
             viewport.BringToFront();
@@ -64,10 +66,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             addedIconEditor.SelectedObjectChanged += (sender, args) =>
             {
-                JOBJManager.DOBJManager.SelectedDOBJ = null;
+                MnSlChrJOBJManager.DOBJManager.SelectedDOBJ = null;
                 if (MenuFile != null && addedIconEditor.SelectedObject is AddedIcon ico)
                 {
-                    JOBJManager.DOBJManager.SelectedDOBJ = ico.jobj.Dobj;
+                    MnSlChrJOBJManager.DOBJManager.SelectedDOBJ = ico.jobj.Dobj;
+                }
+            };
+
+            sssEditor.SelectedObjectChanged += (sender, args) =>
+            {
+                if (StageMenuFile != null && sssEditor.SelectedObject is MEXStageIconEntry ico && ico.MapSpace != null)
+                {
+                    MnSlMapJOBJManager.SelectetedJOBJ = ico.MapSpace.JOBJ;
                 }
             };
 
@@ -120,7 +130,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             FormClosing += (sender, args) =>
             {
-                JOBJManager.ClearRenderingCache();
+                MnSlChrJOBJManager.ClearRenderingCache();
+                MnSlMapJOBJManager.ClearRenderingCache();
                 viewport.Dispose();
             };
         }
@@ -149,7 +160,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public MEX_FighterEffect[] MEX_Effects { get; set; }
 
         public MEX_CSSIconEntry[] Icons { get; set; }
-        public MEX_StageIconData[] StageIcons { get; set; }
+        public MEXStageIconEntry[] StageIcons { get; set; }
         
         public HSD_String[] Music { get; set; }
         public MEXPlaylistEntry[] MenuPlaylist { get; set; }
@@ -164,9 +175,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private JOBJManager JOBJManager = new JOBJManager();
+        private JOBJManager MnSlChrJOBJManager = new JOBJManager();
+        private JOBJManager MnSlMapJOBJManager = new JOBJManager();
 
         private ViewportControl viewport;
+
+        #region Loading and Saving Data
 
         /// <summary>
         /// 
@@ -203,7 +217,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
             cssIconEditor.SetArrayFromProperty(this, "Icons");
 
-            StageIcons = _data.MenuTable.SSSIconData.Array;
+            StageIcons = _data.MenuTable.SSSIconData.Array.Select(e=>new MEXStageIconEntry() { IconData = e }).ToArray();
             sssEditor.SetArrayFromProperty(this, "StageIcons");
 
 
@@ -417,7 +431,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.MenuTable.CSSIconData.Icons = ico;
             
             _data.MetaData.NumOfSSSIcons = StageIcons.Length;
-            _data.MenuTable.SSSIconData.Array = StageIcons;
+            _data.MenuTable.SSSIconData.Array = StageIcons.Select(e => e.IconData).ToArray();
         }
 
         /// <summary>
@@ -443,6 +457,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.StageData.StageIDTable.Array = StageIDs;
         }
 
+        #endregion
+
         #region Events
 
         /// <summary>
@@ -467,6 +483,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SaveIconData();
             SaveMusicData();
             SaveStageData();
+            SaveMenuFiles();
         }
 
 
@@ -488,6 +505,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void buttonSaveCSS_Click(object sender, EventArgs e)
         {
             SaveIconData();
+            SaveMenuFiles();
         }
 
         private void saveItemButton_Click(object sender, EventArgs e)
@@ -496,14 +514,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         }
 
         #endregion
-
-
+        
         #region IconRendering
+
+        private HSDRawFile StageMenuFile;
+        private string StageMenuFilePath;
 
         private HSDRawFile MenuFile;
         private string MenuFilePath;
 
         public AddedIcon[] AddedIcons;
+
+        private bool CSSSelected => cssIconTabControl.SelectedIndex <= 1;
 
         public class AddedIcon
         {
@@ -523,7 +545,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 return $"{X} {Y} {Z}";
             }
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -535,31 +557,50 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (!viewport.Visible)
                 return;
 
-            JOBJManager.Render(cam);
-
-            foreach(var i in Icons)
+            if(CSSSelected)
             {
-                i.Render(cssIconEditor.SelectedObject == (object)i);
+                MnSlChrJOBJManager.Render(cam);
+
+                foreach (var i in Icons)
+                {
+                    i.Render(cssIconEditor.SelectedObject == (object)i);
+                }
             }
+            else if (StageMenuFile != null)
+            {
+                MnSlMapJOBJManager.Frame = viewport.Frame;
+                MnSlMapJOBJManager.Render(cam);
+
+                if(sssEditor.SelectedObject is MEXStageIconEntry ico)
+                {
+                    var transform = MnSlMapJOBJManager.GetWorldTransform(sssEditor.SelectedIndex + 1);
+                    Vector3 point = Vector3.TransformPosition(Vector3.Zero, transform);
+                    DrawShape.DrawRectangle(point.X - ico.Width, point.Y - ico.Height, point.X + ico.Width, point.Y + ico.Height, 3, MEX_CSSIconEntry.SelectedIconColor);
+                }
+            }
+
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void SaveMenuFile()
+        private void SaveMenuFiles()
         {
-            if (MenuFile != null)
+            if (MenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(MenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
                 MenuFile.Save(MenuFilePath);
+
+            if (StageMenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(StageMenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+                StageMenuFile.Save(StageMenuFilePath);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void LoadModel(HSD_JOBJ jobj)
+        private void LoadChrModel(JOBJManager JOBJManager, HSD_JOBJ jobj)
         {
             JOBJManager.ClearRenderingCache();
             JOBJManager.SetJOBJ(jobj);
-            mnslchrToolStrip.Visible = true;
+
             addedIconEditor.Visible = true;
             if (!viewport.Visible)
                 viewport.Visible = true;
@@ -572,10 +613,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (jobj.Children.Length >= 13)
             {
-                addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[12]) + 1;
-                for (int i = 0; i < jobj.Children[12].Children.Length; i++)
+                addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[13]) + 1;
+                for (int i = 0; i < jobj.Children[13].Children.Length; i++)
                 {
-                    addedIconEditor.AddItem(new AddedIcon(jobj.Children[12].Children[i]));
+                    addedIconEditor.AddItem(new AddedIcon(jobj.Children[13].Children[i]));
                 }
             }
         }
@@ -583,17 +624,59 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <summary>
         /// 
         /// </summary>
-        private void UnloadMenuFile()
+        private void UnloadMenuFiles()
         {
-            if(MenuFile != null)
             {
-                JOBJManager.ClearRenderingCache();
+                MnSlChrJOBJManager.ClearRenderingCache();
+                MnSlMapJOBJManager.ClearRenderingCache();
+
                 mnslchrToolStrip.Visible = false;
-                viewport.Visible = false;
+                mnslmapToolStrip.Visible = false;
+
+                sssEditor.Visible = false;
                 addedIconEditor.Visible = false;
+                viewport.Visible = false;
+
                 MenuFile = null;
+                StageMenuFile = null;
+
+                MenuFilePath = "";
+                StageMenuFilePath = "";
+
+                foreach (var v in StageIcons)
+                    v.MapSpace = null;
+
                 addedIconEditor.SetArrayFromProperty(null, null);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DisplayMenuToolStrip()
+        {
+            mnslchrToolStrip.Visible = false;
+            mnslmapToolStrip.Visible = false;
+            viewport.AnimationTrackEnabled = false;
+            if (CSSSelected && MenuFile != null)
+            {
+                mnslchrToolStrip.Visible = true;
+            }
+            if (!CSSSelected && StageMenuFile != null)
+            {
+                mnslmapToolStrip.Visible = true;
+                viewport.AnimationTrackEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cssIconTabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            DisplayMenuToolStrip();
         }
 
         /// <summary>
@@ -603,7 +686,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="e"></param>
         private void saveMnSlChrButton_Click(object sender, EventArgs e)
         {
-            SaveMenuFile();
+            SaveMenuFiles();
         }
 
         /// <summary>
@@ -667,12 +750,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (setSelectedIcon && cssIconEditor.SelectedObject is MEX_CSSIconEntry ico)
             {
-                JOBJManager.ClearRenderingCache();
-                JOBJManager.UpdateNoRender();
+                MnSlChrJOBJManager.ClearRenderingCache();
+                MnSlChrJOBJManager.UpdateNoRender();
                 addedIconEditor.AddItem(new AddedIcon(iconClone));
                 iconClone.TX = ico.X;
                 iconClone.TY = ico.Y;
-                ico.JointID = JOBJManager.IndexOf(iconClone);
+                ico.JointID = MnSlChrJOBJManager.IndexOf(iconClone);
             }
         }
 
@@ -699,11 +782,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 chrsel.MenuAnimation.Children[17 - 1].RemoveChildAt(index);
                 chrsel.MenuMaterialAnimation.Children[17 - 1].RemoveChildAt(index);
 
-                chrsel.SingleMenuModel.Children[13 - 1].RemoveChildAt(index);
-                chrsel.SingleMenuAnimation.Children[13 - 1].RemoveChildAt(index);
-                chrsel.SingleMenuMaterialAnimation.Children[13 - 1].RemoveChildAt(index);
+                chrsel.SingleMenuModel.Children[13].RemoveChildAt(index);
+                chrsel.SingleMenuAnimation.Children[13].RemoveChildAt(index);
+                chrsel.SingleMenuMaterialAnimation.Children[13].RemoveChildAt(index);
 
-                JOBJManager.ClearRenderingCache();
+                MnSlChrJOBJManager.ClearRenderingCache();
             }
         }
 
@@ -720,9 +803,81 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MenuFilePath = filePath;
                 MenuFile = hsd;
 
-                LoadModel(tab.SingleMenuModel);
-                JOBJManager.SetAnimJoint(tab.SingleMenuAnimation);
-                JOBJManager.Frame = 600;
+                DisplayMenuToolStrip();
+
+                LoadChrModel(MnSlChrJOBJManager, tab.SingleMenuModel);
+                MnSlChrJOBJManager.SetAnimJoint(tab.SingleMenuAnimation);
+                MnSlChrJOBJManager.Frame = 600;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void LoadMnSlMap(string filePath)
+        {
+            HSDRawFile hsd = new HSDRawFile(filePath);
+
+            var org = hsd["MnSelectStageDataTable"];
+            var mex = hsd["mexMapData"];
+
+            if (org != null && mex == null)
+            {
+                MessageBox.Show("MexMapData symbol not found. One will now be generated", "Symbol Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                hsd.Roots.Add(new HSDRootNode()
+                {
+                    Name = "mexMapData",
+                    Data = MexMapGenerator.GenerateMexMap(org.Data as SBM_MnSelectStageDataTable)
+                });
+                mex = hsd["mexMapData"];
+            }
+
+            if (mex != null)
+            {
+                var mexMap = mex.Data as MEX_mexMapData;
+
+                StageMenuFilePath = filePath;
+                StageMenuFile = hsd;
+
+                DisplayMenuToolStrip();
+
+                sssEditor.Visible = true;
+
+                RefreshMnSlMapRendering(mexMap);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mexMap"></param>
+        private void RefreshMnSlMapRendering(MEX_mexMapData mexMap)
+        {
+            var cloned = HSDAccessor.DeepClone<HSD_JOBJ>(mexMap.PositionModel);
+            var tobjs = mexMap.IconMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+            var tobjanim = mexMap.IconMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
+
+            for (int i = 0; i < cloned.Children.Length; i++)
+            {
+                var icon = HSDAccessor.DeepClone<HSD_DOBJ>(mexMap.IconModel.Child.Dobj);
+                if ((int)tobjanim[i].Value + 2 < tobjs.Length)
+                    icon.Next.Mobj.Textures = tobjs[(int)tobjanim[i].Value + 2];
+                cloned.Children[i].Dobj = icon;
+            }
+
+            MnSlMapJOBJManager.ClearRenderingCache();
+            MnSlMapJOBJManager.SetJOBJ(cloned);
+            MnSlMapJOBJManager.SetAnimJoint(mexMap.PositionAnimJoint);
+            viewport.Frame = 1600;
+
+            var spaces = MexMapGenerator.LoadMexMapDataFromSymbol(mexMap);
+            for (int i = 0; i < StageIcons.Length; i++)
+            {
+                if (i < spaces.Count)
+                    StageIcons[i].MapSpace = spaces[i];
+                else
+                    StageIcons[i].MapSpace = new MexMapSpace();
             }
         }
 
@@ -738,6 +893,156 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (f != null)
             {
                 LoadMnSlChr(f);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonImportMnSlMap_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+
+            if (f != null)
+            {
+                LoadMnSlMap(f);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RegenerateMnSlMapAnimation()
+        {
+            var mexMap = MexMapGenerator.GenerateMexMap(StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable, StageIcons.Select(e=>e.MapSpace));
+            StageMenuFile.Roots[1].Data = mexMap;
+            RefreshMnSlMapRendering(mexMap);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void regenerateAnimationButton_Click(object sender, EventArgs e)
+        {
+            RegenerateMnSlMapAnimation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importStageIconButton_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+            if (f != null)
+            {
+                using (Bitmap bmp = new Bitmap(f))
+                {
+                    var tobj = TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB565);
+
+                    if (sssEditor.SelectedObject is MEXStageIconEntry ico)
+                    {
+                        ico.MapSpace.TOBJ = tobj;
+                        MnSlMapJOBJManager.ClearRenderingCache();
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Viewport Controls
+
+        public void ScreenClick(MouseButtons button, PickInformation pick)
+        {
+            if (CSSSelected && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            {
+                if (button == MouseButtons.Right && MousePrevDown)
+                {
+                    icon.X = oldPosition.X;
+                    icon.Y = oldPosition.Y;
+                    MousePrevDown = false;
+                }
+            }
+        }
+
+        public void ScreenDoubleClick(PickInformation pick)
+        {
+            var planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+
+            if (CSSSelected)
+                foreach (var i in Icons)
+                {
+                    if (i.ToRect().Contains(planePoint.X, planePoint.Y))
+                    {
+                        cssIconEditor.SelectObject(i);
+                        break;
+                    }
+                }
+        }
+
+        private bool MousePrevDown = false;
+        private Vector3 prevPlanePoint = Vector3.Zero;
+        private Vector2 oldPosition = Vector2.Zero;
+        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        {
+            var mouseDown = OpenTK.Input.Mouse.GetState().IsButtonDown(OpenTK.Input.MouseButton.Left);
+
+            if (CSSSelected && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            {
+                if (mouseDown &&
+                    viewport.IsAltAction)
+                {
+                    var planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+                    if (!MousePrevDown)
+                    {
+                        oldPosition = new Vector2(icon.X, icon.Y);
+                        prevPlanePoint = planePoint;
+                    }
+                    if (icon.ToRect().Contains(prevPlanePoint.X, prevPlanePoint.Y))
+                    {
+                        icon.X -= prevPlanePoint.X - planePoint.X;
+                        icon.Y -= prevPlanePoint.Y - planePoint.Y;
+                        SnapAlignIcon(icon);
+                    }
+                    prevPlanePoint = planePoint;
+                }
+            }
+
+            MousePrevDown = mouseDown;
+        }
+
+        public void ScreenSelectArea(PickInformation start, PickInformation end)
+        {
+
+        }
+
+        private float SnapDelta = 0.15f;
+
+        private void SnapAlignIcon(MEX_CSSIconEntry icon)
+        {
+            foreach (var i in Icons)
+            {
+                if (i == icon)
+                    continue;
+
+                // if distance between part of rect is less than threshold, snap to it
+                if (Math.Abs(icon.X - (i.X + i.Width)) < SnapDelta) icon.X = i.X + i.Width;
+                if (Math.Abs(icon.X - i.X) < SnapDelta) icon.X = i.X;
+
+                if (Math.Abs((icon.X + icon.Width) - (i.X + i.Width)) < SnapDelta) icon.X = i.X + i.Width - icon.Width;
+                if (Math.Abs((icon.X + icon.Width) - i.X) < SnapDelta) icon.X = i.X - icon.Width;
+
+                if (Math.Abs(icon.Y - (i.Y - i.Height)) < SnapDelta) icon.Y = i.Y - i.Height;
+                if (Math.Abs(icon.Y - i.Y) < SnapDelta) icon.Y = i.Y;
+
+                if (Math.Abs((icon.Y - icon.Height) - (i.Y - i.Height)) < SnapDelta) icon.Y = i.Y - i.Height + icon.Height;
+                if (Math.Abs((icon.Y - icon.Height) - i.Y) < SnapDelta) icon.Y = i.Y + icon.Height;
             }
         }
 
@@ -1025,95 +1330,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 mexItemEditor.AddItem(stageItemEditor.SelectedObject);
         }
 
-
-
-
-        public void ScreenClick(MouseButtons button, PickInformation pick)
-        {
-            if (cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
-            {
-                if (button == MouseButtons.Right && MousePrevDown)
-                {
-                    icon.X = oldPosition.X;
-                    icon.Y = oldPosition.Y;
-                    MousePrevDown = false;
-                }
-            }
-        }
-
-        public void ScreenDoubleClick(PickInformation pick)
-        {
-            var planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
-            foreach (var i in Icons)
-            {
-                if(i.ToRect().Contains(planePoint.X, planePoint.Y))
-                {
-                    cssIconEditor.SelectObject(i);
-                    break;
-                }
-            }
-        }
-
-        private bool MousePrevDown = false;
-        private Vector3 prevPlanePoint = Vector3.Zero;
-        private Vector2 oldPosition = Vector2.Zero;
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
-        {
-            var mouseDown = OpenTK.Input.Mouse.GetState().IsButtonDown(OpenTK.Input.MouseButton.Left);
-            
-            if (cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
-            {
-                if (mouseDown &&
-                    viewport.IsAltAction)
-                {
-                    var planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
-                    if (!MousePrevDown)
-                    {
-                        oldPosition = new Vector2(icon.X, icon.Y);
-                        prevPlanePoint = planePoint;
-                    }
-                    if (icon.ToRect().Contains(prevPlanePoint.X, prevPlanePoint.Y))
-                    {
-                        icon.X -= prevPlanePoint.X - planePoint.X;
-                        icon.Y -= prevPlanePoint.Y - planePoint.Y;
-                        SnapAlignIcon(icon);
-                    }
-                    prevPlanePoint = planePoint;
-                }
-            }
-
-            MousePrevDown = mouseDown;
-        }
-
-        public void ScreenSelectArea(PickInformation start, PickInformation end)
-        {
-
-        }
-
-        private float SnapDelta = 0.15f;
-
-        private void SnapAlignIcon(MEX_CSSIconEntry icon)
-        {
-            foreach(var i in Icons)
-            {
-                if (i == icon)
-                    continue;
-
-                // if distance between part of rect is less than threshold, snap to it
-                if (Math.Abs(icon.X - (i.X + i.Width)) < SnapDelta) icon.X = i.X + i.Width;
-                if (Math.Abs(icon.X - i.X) < SnapDelta) icon.X = i.X;
-
-                if (Math.Abs((icon.X + icon.Width) - (i.X + i.Width)) < SnapDelta) icon.X = i.X + i.Width - icon.Width;
-                if (Math.Abs((icon.X + icon.Width) - i.X) < SnapDelta) icon.X = i.X - icon.Width;
-
-                if (Math.Abs(icon.Y - (i.Y - i.Height)) < SnapDelta) icon.Y = i.Y - i.Height;
-                if (Math.Abs(icon.Y - i.Y) < SnapDelta) icon.Y = i.Y;
-
-                if (Math.Abs((icon.Y - icon.Height) - (i.Y - i.Height)) < SnapDelta) icon.Y = i.Y - i.Height + icon.Height;
-                if (Math.Abs((icon.Y - icon.Height) - i.Y) < SnapDelta) icon.Y = i.Y + icon.Height;
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -1170,13 +1386,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         #endregion
 
+        #region Fighter Installation
+
         private void installFighterButton_Click(object sender, EventArgs e)
         {
             var f = Tools.FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
             if(f != null)
             {
                 bool openMenuFile = MenuFile != null;
-                UnloadMenuFile(); // for editing
+                UnloadMenuFiles(); // for editing
 
                 using (ProgressBarDisplay d = new ProgressBarDisplay (new FighterPackageInstaller(f, this)))
                 {
@@ -1315,6 +1533,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             musicListEditor.RemoveAt(index);
         }
 
+    #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -1371,5 +1591,6 @@ static struct MoveLogic move_logic[] = {
                 MessageBox.Show("Move Logic Table Copied to Clipboard");
             }
         }
+
     }
 }

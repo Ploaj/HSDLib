@@ -29,6 +29,7 @@ namespace HSDRawViewer.GUI
         private object _object;
         
         public object SelectedObject => elementList.SelectedItem;
+        public int SelectedIndex => elementList.SelectedIndex;
 
         public event EventHandler SelectedObjectChanged;
         public event EventHandler DoubleClickedNode;

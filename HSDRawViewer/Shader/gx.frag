@@ -172,7 +172,7 @@ void main()
 
 	if(hasTEX0 == 1)
 	{
-		vec4 pass = DiffusePass(TEX0, texcoord0, TEX0Transform, TEX0UVScale, TEX0CoordType, TEX0MirrorFix) * 1.5;
+		vec4 pass = DiffusePass(TEX0, texcoord0, TEX0Transform, TEX0UVScale, TEX0CoordType, TEX0MirrorFix);
 		if(TEX0Operation == 0) // Blend
 		{
 			diffusePass.rgb *= pass.rgb;//clamp(pass.rgb, ambientColor.rgb * pass.rgb, vec3(1));

@@ -231,6 +231,7 @@
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXCSSIconEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\DefaultItemNames.cs" />
     <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
     <Compile Include="GUI\Plugins\MEX\FighterPackageInstaller.cs" />
@@ -245,6 +246,7 @@
     <Compile Include="GUI\Plugins\MEX\MEXFighterEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXPlaylistEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXStageEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXStageIconEntry.cs" />
     <Compile Include="GUI\ProgressBarDisplay.cs">
       <SubType>Form</SubType>
     </Compile>

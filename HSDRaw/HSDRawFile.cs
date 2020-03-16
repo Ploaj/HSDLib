@@ -43,6 +43,14 @@ namespace HSDRaw
         private List<HSDStruct> _structCache = new List<HSDStruct>();
         private Dictionary<HSDStruct, int> _structCacheToOffset = new Dictionary<HSDStruct, int>();
 
+        public HSDRootNode this[string i]
+        {
+            get
+            {
+                return Roots.Find(e => e.Name == i);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
