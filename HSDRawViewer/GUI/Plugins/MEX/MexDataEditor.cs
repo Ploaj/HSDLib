@@ -274,7 +274,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 StageEntries[i] = new MEXStageEntry()
                 {
                     Stage = _data.StageFunctions[i],
-                    Reverb = _data.StageData.ReverbTable[i]
+                    Reverb = _data.StageData.ReverbTable[i],
+                    Collision = _data.StageData.CollisionTable[i]
                 };
             }
             stageEditor.SetArrayFromProperty(this, "StageEntries");
@@ -454,6 +455,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             _data.StageFunctions.Array = StageEntries.Select(e => e.Stage).ToArray();
             _data.StageData.ReverbTable.Array = StageEntries.Select(e => e.Reverb).ToArray();
+            _data.StageData.CollisionTable.Array = StageEntries.Select(e => e.Collision).ToArray();
             _data.StageData.StageIDTable.Array = StageIDs;
         }
 
@@ -575,7 +577,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 {
                     var transform = MnSlMapJOBJManager.GetWorldTransform(sssEditor.SelectedIndex + 1);
                     Vector3 point = Vector3.TransformPosition(Vector3.Zero, transform);
-                    DrawShape.DrawRectangle(point.X - ico.Width, point.Y - ico.Height, point.X + ico.Width, point.Y + ico.Height, 3, MEX_CSSIconEntry.SelectedIconColor);
+                    DrawShape.DrawRectangle(point.X - ico.Width, point.Y + ico.Height, point.X + ico.Width, point.Y - ico.Height, 2, MEX_CSSIconEntry.SelectedIconColor);
                 }
             }
 
@@ -611,7 +613,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             addedIconEditor.SetArrayFromProperty(this, "AddedIcons");
 
 
-            if (jobj.Children.Length >= 13)
+            if (jobj.Children.Length > 13)
             {
                 addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[13]) + 1;
                 for (int i = 0; i < jobj.Children[13].Children.Length; i++)
@@ -984,6 +986,21 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                         break;
                     }
                 }
+            else
+            {
+                int index = 0;
+                foreach (var i in StageIcons)
+                {
+                    var transform = MnSlMapJOBJManager.GetWorldTransform(index++ + 1);
+                    Vector3 point = Vector3.TransformPosition(Vector3.Zero, transform);
+                    var rect = new RectangleF(point.X - i.Width, point.Y - i.Height, i.Width * 2, i.Height * 2);
+                    if (rect.Contains(planePoint.X, planePoint.Y))
+                    {
+                        sssEditor.SelectObject(i);
+                        break;
+                    }
+                }
+            }
         }
 
         private bool MousePrevDown = false;

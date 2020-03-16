@@ -13,9 +13,8 @@ out vec4 fragColor;
 // textures
 uniform int hasTEX0;
 uniform sampler2D TEX0;
-uniform int TEX0Operation;
-uniform int TEX0ColorType;
-uniform int TEX0AlphaType;
+uniform int TEX0ColorOperation;
+uniform int TEX0AlphaOperation;
 uniform int TEX0CoordType;
 uniform vec2 TEX0UVScale;
 uniform int TEX0MirrorFix;
@@ -23,9 +22,8 @@ uniform mat4 TEX0Transform;
 
 uniform int hasTEX1;
 uniform sampler2D TEX1;
-uniform int TEX1Operation;
-uniform int TEX1ColorType;
-uniform int TEX1AlphaType;
+uniform int TEX1ColorOperation;
+uniform int TEX1AlphaOperation;
 uniform int TEX1CoordType;
 uniform vec2 TEX1UVScale;
 uniform int TEX1MirrorFix;
@@ -173,23 +171,33 @@ void main()
 	if(hasTEX0 == 1)
 	{
 		vec4 pass = DiffusePass(TEX0, texcoord0, TEX0Transform, TEX0UVScale, TEX0CoordType, TEX0MirrorFix);
-		if(TEX0Operation == 0) // Blend
+		if(TEX0ColorOperation == 0) // Blend
 		{
 			diffusePass.rgb *= pass.rgb;//clamp(pass.rgb, ambientColor.rgb * pass.rgb, vec3(1));
 			//diffusePass.rgb *= diffuseColor.rgb;
 		}
-		if(TEX0Operation == 1 && pass.a > 0) // Replace
+		if(TEX0ColorOperation == 1 && pass.a > 0) // Replace
 			diffusePass.rgb = pass.rgb;
+			
+		if(TEX0AlphaOperation == 0) // Blend
+			diffusePass.a *= pass.a;
+		if(TEX0AlphaOperation == 1) //A dd
+			diffusePass.a = pass.a;
 	}
 	if(hasTEX1 == 1)
 	{
 		vec4 pass = DiffusePass(TEX1, texcoord1, TEX1Transform, TEX1UVScale, TEX1CoordType, TEX1MirrorFix);
-		if(TEX1Operation == 1 && pass.a > 0) // Replace
+		if(TEX1ColorOperation == 1 && pass.a > 0) // Replace
 			diffusePass = pass;
-		if(TEX1Operation == 2) // Add
+		if(TEX1ColorOperation == 2) // Add
 			diffusePass += pass;
-		if(TEX1Operation == 3) // Subtract
+		if(TEX1ColorOperation == 3) // Subtract
 			diffusePass -= pass;
+			
+		if(TEX1AlphaOperation == 0) // Blend
+			diffusePass.a *= pass.a;
+		if(TEX1AlphaOperation == 1) //A dd
+			diffusePass.a = pass.a;
 	}
 
 	fragColor.rgb += diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb

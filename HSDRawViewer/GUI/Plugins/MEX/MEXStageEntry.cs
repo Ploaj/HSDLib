@@ -9,9 +9,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     {
         public MEX_Stage Stage = new MEX_Stage();
         public MEX_StageReverb Reverb = new MEX_StageReverb();
+        public MEX_StageCollision Collision = new MEX_StageCollision();
 
         [Category("0 - General"), DisplayName("Internal ID"), Description("")]
-        public int InternalID { get => Stage.StageInternalID; set => Stage.StageInternalID = value; }
+        public int InternalID { get => Stage.StageInternalID; set { Stage.StageInternalID = value; Collision.InternalID = value; } }
 
         [Category("0 - General"), DisplayName("File Path"), Description("")]
         public string FileName { get => Stage.StageFileName; set => Stage.StageFileName = value; }
@@ -62,6 +63,24 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 }
             }
         }
+
+        /*[Category("1 - Extra"), DisplayName("Collisions"), Description("")]
+        public MEX_StageCollisionData[] CollisionData
+        {
+            get => Collision.Data?.Array;
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    Stage.GOBJFunctions = null;
+                }
+                else
+                {
+                    Collision.Data = new HSDRaw.HSDFixedLengthPointerArrayAccessor<MEX_StageCollisionData>();
+                    Collision.Data.Array = value;
+                }
+            }
+        }*/
 
         [Category("2 - Functions"), DisplayName("OnStageInit"), Description(""), TypeConverter(typeof(HexType))]
         public uint OnStageInit { get => Stage.OnStageInit; set => Stage.OnStageInit = value; }

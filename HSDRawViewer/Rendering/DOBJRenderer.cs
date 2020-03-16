@@ -346,9 +346,8 @@ namespace HSDRawViewer.Rendering
             for(int index = 0; index < 2; index++)
             {
                 shader.SetInt($"TEX{index}", index);
-                shader.SetInt($"TEX{index}Operation", 0);
-                shader.SetInt($"TEX{index}ColorType", 0);
-                shader.SetInt($"TEX{index}AlphaType", 0);
+                shader.SetInt($"TEX{index}ColorOperation", 0);
+                shader.SetInt($"TEX{index}AlphaOperation", 0);
                 shader.SetInt($"TEX{index}CoordType", 0);
                 shader.SetBoolToInt($"TEX{index}MirrorFix", false);
                 shader.SetVector2($"TEX{index}UVScale", 1, 1);
@@ -399,6 +398,14 @@ namespace HSDRawViewer.Rendering
                     if (tex.Flags.HasFlag(TOBJ_FLAGS.COLORMAP_SUB))
                         operation = 3;
 
+                    int aoperation = 0;
+                    if (tex.Flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_REPLACE))
+                        aoperation = 1;
+                    if (tex.Flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ADD))
+                        aoperation = 2;
+                    if (tex.Flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_SUB))
+                        aoperation = 3;
+
                     var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
                         Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
                         Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
@@ -406,9 +413,8 @@ namespace HSDRawViewer.Rendering
                     transform.Invert();
                     
                     shader.SetInt($"TEX{index}", index);
-                    shader.SetInt($"TEX{index}Operation", operation);
-                    shader.SetInt($"TEX{index}ColorType", 0);
-                    shader.SetInt($"TEX{index}AlphaType", 0);
+                    shader.SetInt($"TEX{index}ColorOperation", operation);
+                    shader.SetInt($"TEX{index}AlphaOperation", aoperation);
                     shader.SetInt($"TEX{index}CoordType", coordType);
                     shader.SetBoolToInt($"TEX{index}MirrorFix", mirrorY);
                     shader.SetVector2($"TEX{index}UVScale", wscale, hscale);
