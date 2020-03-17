@@ -286,8 +286,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
             else
                 mexData.KirbyData.KirbyCostumes.Set(internalId, null);
-
-            if (KirbySpecialCostumes != null)
+            
             mexData.KirbyData.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
