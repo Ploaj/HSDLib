@@ -51,6 +51,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [Description("Y")]
         public float Y { get => CheckMapSpace() ? MapSpace.Y : 0; set { if (CheckMapSpace()) MapSpace.Y = value; } }
 
+        [Description("Z")]
+        public float Z { get => CheckMapSpace() ? MapSpace.Z : 0; set { if (CheckMapSpace()) MapSpace.Z = value; } }
+
         [Description("Motion")]
         public MexMapAnimType Motion { get => CheckMapSpace() ? MapSpace.AnimType : 0; set { if (CheckMapSpace()) MapSpace.AnimType = value; } }
 

@@ -1,17 +1,29 @@
 ﻿using HSDRaw.MEX;
 using HSDRaw.MEX.Stages;
-using HSDRawViewer.Converters;
 using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
 {
+    public class MEXStageExternalEntry
+    {
+        public MEX_StageIDTable IDTable = new MEX_StageIDTable();
+        
+        [DisplayName("Stage Internal ID"), Description(""), TypeConverter(typeof(StageInternalIDConverter))]
+        public int StageInternalID { get => IDTable.StageID; set { IDTable.StageID = value; } }
+
+        public override string ToString()
+        {
+            return StageInternalID < MEXConverter.stageIDValues.Count ? MEXConverter.stageIDValues[StageInternalID] : "StageID" + StageInternalID;
+        }
+    }
+
     public class MEXStageEntry
     {
         public MEX_Stage Stage = new MEX_Stage();
         public MEX_StageReverb Reverb = new MEX_StageReverb();
         public MEX_StageCollision Collision = new MEX_StageCollision();
 
-        [Category("0 - General"), DisplayName("Internal ID"), Description("")]
+        [Browsable(false), Category("0 - General"), DisplayName("Internal ID"), Description("")]
         public int InternalID { get => Stage.StageInternalID; set { Stage.StageInternalID = value; Collision.InternalID = value; } }
 
         [Category("0 - General"), DisplayName("File Path"), Description("")]

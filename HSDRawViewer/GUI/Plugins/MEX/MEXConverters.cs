@@ -15,6 +15,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public static List<string> internalIDValues { get; } = new List<string>();
 
+        public static List<string> stageIDValues { get; } = new List<string>();
+
         public static List<string> externalIDValues
         {
             get
@@ -209,5 +211,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     public class EffectIDConverter : NullIDConverter
     {
         public override List<string> values { get => MEXConverter.effectValues; }
+    }
+
+    public class StageInternalIDConverter : NullIDConverter
+    {
+        public override List<string> values { get => MEXConverter.stageIDValues; }
     }
 }

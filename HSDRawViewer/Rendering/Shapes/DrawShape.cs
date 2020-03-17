@@ -44,7 +44,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="c"></param>
         public static void DrawRectangle(float x, float y, float x2, float y2, Color c)
         {
-            DrawRectangle(x, y, x2, y2, 1, c);
+            DrawRectangle(x, y, x2, y2, 0, 1, c);
         }
 
         /// <summary>
@@ -55,7 +55,20 @@ namespace HSDRawViewer.Rendering
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <param name="c"></param>
-        public static void DrawRectangle(float x, float y, float x2, float y2, float thickness, Color c)
+        public static void DrawRectangle(float x, float y, float x2, float y2, float z, Color c)
+        {
+            DrawRectangle(x, y, x2, y2, z, 1, c);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
+        public static void DrawRectangle(float x, float y, float x2, float y2, float z, float thickness, Color c)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
@@ -65,10 +78,10 @@ namespace HSDRawViewer.Rendering
             GL.Color4(c);
             GL.Begin(PrimitiveType.Quads);
 
-            GL.Vertex2(x, y);
-            GL.Vertex2(x2, y);
-            GL.Vertex2(x2, y2);
-            GL.Vertex2(x, y2);
+            GL.Vertex3(x, y, z);
+            GL.Vertex3(x2, y, z);
+            GL.Vertex3(x2, y2, z);
+            GL.Vertex3(x, y2, z);
 
             GL.End();
 
@@ -76,10 +89,10 @@ namespace HSDRawViewer.Rendering
             GL.Color4(1f, 1f, 1f, 1f);
             GL.Begin(PrimitiveType.LineLoop);
 
-            GL.Vertex2(x, y);
-            GL.Vertex2(x2, y);
-            GL.Vertex2(x2, y2);
-            GL.Vertex2(x, y2);
+            GL.Vertex3(x, y, z);
+            GL.Vertex3(x2, y, z);
+            GL.Vertex3(x2, y2, z);
+            GL.Vertex3(x, y2, z);
 
             GL.End();
             GL.PopAttrib();

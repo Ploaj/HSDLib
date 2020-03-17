@@ -28,6 +28,7 @@ namespace HSDRawViewer.Converters
 
         public float X { get => JOBJ.TX; set => JOBJ.TX = value; }
         public float Y { get => JOBJ.TY; set => JOBJ.TY = value; }
+        public float Z { get => JOBJ.TZ; set => JOBJ.TZ = value; }
         public float SX { get => JOBJ.SX; set => JOBJ.SX = value; }
         public float SY { get => JOBJ.SY; set => JOBJ.SY = value; }
 
@@ -235,8 +236,10 @@ namespace HSDRawViewer.Converters
                     childIndex = unswizzle[i];
 
                 HSD_TOBJ tobj = null;
-                var anim = stage.PositionAnimation.Children[childIndex].AOBJ.FObjDesc.GetDecodedKeys();
+                var anim = stage.PositionAnimation.Children[childIndex].AOBJ.FObjDesc;
+                var keys = anim.GetDecodedKeys();
                 var Y = stage.PositionModel.Children[childIndex].TY;
+                var Z = stage.PositionModel.Children[childIndex].TZ;
                 var SX = 1f;
                 var SY = 1f;
 
@@ -258,26 +261,33 @@ namespace HSDRawViewer.Converters
                 else
                 {
                     tobj = tex0[texunswizzle[i] + 2];
-                    spaces.Add(new MexMapSpace()
+                    var space2 = new MexMapSpace()
                     {
-                        X = anim[anim.Count - 1].Value,
+                        X = keys[keys.Count - 1].Value,
                         Y = Y,
+                        Z = Z,
                         TOBJ = tobj,
                         AnimType = MexMapAnimType.SlideInFromRight
-                    });
+                    };
+                    SetAnimFromFOBJ(space2, anim);
+                    spaces.Add(space2);
                     Y -= 5.6f;
+                    Z = 0;
                     tobj = tex0_extra[texunswizzle[i] + 2];
                 }
 
-                spaces.Add(new MexMapSpace()
+                var space = new MexMapSpace()
                 {
-                    X = anim[anim.Count - 1].Value,
+                    X = keys[keys.Count - 1].Value,
                     Y = Y,
+                    Z = Z,
                     SX = SX,
                     SY = SY,
                     TOBJ = tobj,
                     AnimType = MexMapAnimType.SlideInFromRight
-                });
+                };
+                SetAnimFromFOBJ(space, anim);
+                spaces.Add(space);
             }
             return spaces;
         }
@@ -307,54 +317,64 @@ namespace HSDRawViewer.Converters
                 // assume anim type
                 if(aobj != null && aobj.FObjDesc != null)
                 {
-                    var fobjs = aobj.FObjDesc.List;
-
-                    var hasScaX = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_SCAX);
-                    var hasScaY = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_SCAY);
-                    var hasTraX = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAX);
-                    var hasTraY = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAY);
-                    var hasRotY = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_ROTY);
-                    var hasRotZ = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_ROTZ);
-
-                    var keys = fobjs[0].GetDecodedKeys();
-                    if (keys.Count >= 3)
-                    {
-                        var startValue = keys[0].Value;
-                        var endValue = keys[keys.Count - 1].Value;
-                        space.EndFrame = (int)keys[keys.Count - 2].Frame;
-                        space.StartFrame = (int)keys[keys.Count - 3].Frame;
-
-                        if (hasScaX && hasScaY)
-                        {
-                            if (hasRotZ)
-                                space.AnimType = MexMapAnimType.SpinIn;
-                            else
-                            if (hasRotY)
-                                space.AnimType = MexMapAnimType.FlipIn;
-                            else
-                                space.AnimType = MexMapAnimType.GrowFromNothing;
-                        }
-                        else if (hasTraX)
-                        {
-                            if (startValue < endValue)
-                                space.AnimType = MexMapAnimType.SlideInFromLeft;
-                            else
-                                space.AnimType = MexMapAnimType.SlideInFromRight;
-                        }
-                        else if (hasTraY)
-                        {
-                            if (startValue < endValue)
-                                space.AnimType = MexMapAnimType.SlideInFromBottom;
-                            else
-                                space.AnimType = MexMapAnimType.SlideInFromTop;
-                        }
-                    }
+                    SetAnimFromFOBJ(space, aobj.FObjDesc);
                 }
 
                 spaces.Add(space);
             }
 
             return spaces;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="fobj"></param>
+        private static void SetAnimFromFOBJ(MexMapSpace space, HSD_FOBJDesc fobj)
+        {
+            var fobjs = fobj.List;
+
+            var hasScaX = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_SCAX);
+            var hasScaY = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_SCAY);
+            var hasTraX = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAX);
+            var hasTraY = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAY);
+            var hasRotY = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_ROTY);
+            var hasRotZ = fobjs.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_ROTZ);
+
+            var keys = fobj.GetDecodedKeys();
+            if (keys.Count >= 3)
+            {
+                var startValue = keys[0].Value;
+                var endValue = keys[keys.Count - 1].Value;
+                space.EndFrame = (int)keys[keys.Count - 2].Frame;
+                space.StartFrame = (int)keys[keys.Count - 3].Frame;
+
+                if (hasScaX && hasScaY)
+                {
+                    if (hasRotZ)
+                        space.AnimType = MexMapAnimType.SpinIn;
+                    else
+                    if (hasRotY)
+                        space.AnimType = MexMapAnimType.FlipIn;
+                    else
+                        space.AnimType = MexMapAnimType.GrowFromNothing;
+                }
+                else if (hasTraX)
+                {
+                    if (startValue < endValue)
+                        space.AnimType = MexMapAnimType.SlideInFromLeft;
+                    else
+                        space.AnimType = MexMapAnimType.SlideInFromRight;
+                }
+                else if (hasTraY)
+                {
+                    if (startValue < endValue)
+                        space.AnimType = MexMapAnimType.SlideInFromBottom;
+                    else
+                        space.AnimType = MexMapAnimType.SlideInFromTop;
+                }
+            }
         }
     }
 }

@@ -128,6 +128,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MEXConverter.effectValues.AddRange(Effects.Select(e=>e.FileName));
             };
 
+            stageEditor.ArrayUpdated += (sender, args) =>
+            {
+                MEXConverter.stageIDValues.Clear();
+                MEXConverter.stageIDValues.AddRange(StageEntries.Select(e=>e.InternalID + " - " + e.FileName));
+            };
+
             FormClosing += (sender, args) =>
             {
                 MnSlChrJOBJManager.ClearRenderingCache();
@@ -153,7 +159,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public BindingList<MEXFighterEntry> FighterEntries = new BindingList<MEXFighterEntry>();
         public MEXStageEntry[] StageEntries { get; set; }
-        public MEX_StageIDTable[] StageIDs { get; set; }
+        public MEXStageExternalEntry[] StageIDs { get; set; }
 
         public MEX_EffectEntry[] Effects { get; set; }
 
@@ -280,7 +286,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
             stageEditor.SetArrayFromProperty(this, "StageEntries");
 
-            StageIDs = _data.StageData.StageIDTable.Array;
+            StageIDs = _data.StageData.StageIDTable.Array.Select(e=>new MEXStageExternalEntry() { IDTable = e }).ToArray();
             stageIDEditor.SetArrayFromProperty(this, "StageIDs");
         }
 
@@ -453,10 +459,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         private void SaveStageData()
         {
+            for (int i = 0; i < StageEntries.Length; i++)
+                StageEntries[i].InternalID = i;
             _data.StageFunctions.Array = StageEntries.Select(e => e.Stage).ToArray();
             _data.StageData.ReverbTable.Array = StageEntries.Select(e => e.Reverb).ToArray();
             _data.StageData.CollisionTable.Array = StageEntries.Select(e => e.Collision).ToArray();
-            _data.StageData.StageIDTable.Array = StageIDs;
+            _data.StageData.StageIDTable.Array = StageIDs.Select(e => e.IDTable).ToArray();
         }
 
         #endregion
@@ -577,7 +585,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 {
                     var transform = MnSlMapJOBJManager.GetWorldTransform(sssEditor.SelectedIndex + 1);
                     Vector3 point = Vector3.TransformPosition(Vector3.Zero, transform);
-                    DrawShape.DrawRectangle(point.X - ico.Width, point.Y + ico.Height, point.X + ico.Width, point.Y - ico.Height, 2, MEX_CSSIconEntry.SelectedIconColor);
+                    DrawShape.DrawRectangle(point.X - ico.Width, point.Y + ico.Height, point.X + ico.Width, point.Y - ico.Height, point.Z, 2, MEX_CSSIconEntry.SelectedIconColor);
                 }
             }
 
@@ -991,6 +999,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 int index = 0;
                 foreach (var i in StageIcons)
                 {
+                    planePoint = pick.GetPlaneIntersection(Vector3.UnitZ, new Vector3(0, 0, i.Z));
                     var transform = MnSlMapJOBJManager.GetWorldTransform(index++ + 1);
                     Vector3 point = Vector3.TransformPosition(Vector3.Zero, transform);
                     var rect = new RectangleF(point.X - i.Width, point.Y - i.Height, i.Width * 2, i.Height * 2);
