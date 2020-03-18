@@ -15,13 +15,13 @@ namespace HSDRaw.Melee.Mn
 
         public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public HSD_JOBJ IconModel { get => _s.GetReference<HSD_JOBJ>(0x10); set => _s.SetReference(0x10, value); }
+        public HSD_JOBJ IconLargeModel { get => _s.GetReference<HSD_JOBJ>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSD_AnimJoint IconAnimation { get => _s.GetReference<HSD_AnimJoint>(0x14); set => _s.SetReference(0x14, value); }
+        public HSD_AnimJoint IconLargeAnimJoint { get => _s.GetReference<HSD_AnimJoint>(0x14); set => _s.SetReference(0x14, value); }
 
-        public HSD_MatAnimJoint IconMaterialAnimation { get => _s.GetReference<HSD_MatAnimJoint>(0x18); set => _s.SetReference(0x18, value); }
+        public HSD_MatAnimJoint IconLargeMatAnimJoint { get => _s.GetReference<HSD_MatAnimJoint>(0x18); set => _s.SetReference(0x18, value); }
 
-        public HSD_ShapeAnimJoint IconShapeAnimation { get => _s.GetReference<HSD_ShapeAnimJoint>(0x1C); set => _s.SetReference(0x1C, value); }
+        public HSD_ShapeAnimJoint IconLargeShapeAnimJoint { get => _s.GetReference<HSD_ShapeAnimJoint>(0x1C); set => _s.SetReference(0x1C, value); }
 
         public HSD_JOBJ RandomIconModel { get => _s.GetReference<HSD_JOBJ>(0x20); set => _s.SetReference(0x20, value); }
 
@@ -31,29 +31,29 @@ namespace HSDRaw.Melee.Mn
 
         public HSD_ShapeAnimJoint RandomIconShapeAnimation { get => _s.GetReference<HSD_ShapeAnimJoint>(0x2C); set => _s.SetReference(0x2C, value); }
 
-        public HSD_JOBJ Icon2Model { get => _s.GetReference<HSD_JOBJ>(0x30); set => _s.SetReference(0x30, value); }
+        public HSD_JOBJ IconSpecialModel { get => _s.GetReference<HSD_JOBJ>(0x30); set => _s.SetReference(0x30, value); }
 
-        public HSD_AnimJoint Icon2Animation { get => _s.GetReference<HSD_AnimJoint>(0x34); set => _s.SetReference(0x34, value); }
+        public HSD_AnimJoint IconSpecialAnimJoint { get => _s.GetReference<HSD_AnimJoint>(0x34); set => _s.SetReference(0x34, value); }
 
-        public HSD_MatAnimJoint Icon2MaterialAnimation { get => _s.GetReference<HSD_MatAnimJoint>(0x38); set => _s.SetReference(0x38, value); }
+        public HSD_MatAnimJoint IconSpecialMatAnimJoint { get => _s.GetReference<HSD_MatAnimJoint>(0x38); set => _s.SetReference(0x38, value); }
 
-        public HSD_ShapeAnimJoint Icon2ShapeAnimation { get => _s.GetReference<HSD_ShapeAnimJoint>(0x3C); set => _s.SetReference(0x3C, value); }
+        public HSD_ShapeAnimJoint IconSpecialShapeAnimJoint { get => _s.GetReference<HSD_ShapeAnimJoint>(0x3C); set => _s.SetReference(0x3C, value); }
 
-        public HSD_JOBJ StageSelectModel { get => _s.GetReference<HSD_JOBJ>(0x40); set => _s.SetReference(0x40, value); }
+        public HSD_JOBJ StageNameModel { get => _s.GetReference<HSD_JOBJ>(0x40); set => _s.SetReference(0x40, value); }
 
-        public HSD_AnimJoint StageSelectAnimation { get => _s.GetReference<HSD_AnimJoint>(0x44); set => _s.SetReference(0x44, value); }
+        public HSD_AnimJoint StageNameAnimJoint { get => _s.GetReference<HSD_AnimJoint>(0x44); set => _s.SetReference(0x44, value); }
 
-        public HSD_MatAnimJoint StageSelectMaterialAnimation { get => _s.GetReference<HSD_MatAnimJoint>(0x48); set => _s.SetReference(0x48, value); }
+        public HSD_MatAnimJoint StageNameMatAnimJoint { get => _s.GetReference<HSD_MatAnimJoint>(0x48); set => _s.SetReference(0x48, value); }
 
-        public HSD_ShapeAnimJoint StageSelectShapeAnimation { get => _s.GetReference<HSD_ShapeAnimJoint>(0x4C); set => _s.SetReference(0x4C, value); }
+        public HSD_ShapeAnimJoint StageNameShapeAnimJoint { get => _s.GetReference<HSD_ShapeAnimJoint>(0x4C); set => _s.SetReference(0x4C, value); }
 
-        public HSD_JOBJ Icon3Model { get => _s.GetReference<HSD_JOBJ>(0x50); set => _s.SetReference(0x50, value); }
+        public HSD_JOBJ IconDoubleModel { get => _s.GetReference<HSD_JOBJ>(0x50); set => _s.SetReference(0x50, value); }
 
-        public HSD_AnimJoint Icon3Animation { get => _s.GetReference<HSD_AnimJoint>(0x54); set => _s.SetReference(0x54, value); }
+        public HSD_AnimJoint IconDoubleAnimJoint { get => _s.GetReference<HSD_AnimJoint>(0x54); set => _s.SetReference(0x54, value); }
 
-        public HSD_MatAnimJoint Icon3MaterialAnimation { get => _s.GetReference<HSD_MatAnimJoint>(0x58); set => _s.SetReference(0x58, value); }
+        public HSD_MatAnimJoint IconDoubleMatAnimJoint { get => _s.GetReference<HSD_MatAnimJoint>(0x58); set => _s.SetReference(0x58, value); }
 
-        public HSD_ShapeAnimJoint Icon3ShapeAnimation { get => _s.GetReference<HSD_ShapeAnimJoint>(0x5C); set => _s.SetReference(0x5C, value); }
+        public HSD_ShapeAnimJoint IconDoubleShapeAnimJoint { get => _s.GetReference<HSD_ShapeAnimJoint>(0x5C); set => _s.SetReference(0x5C, value); }
 
         public HSD_JOBJ StageSelect2Model { get => _s.GetReference<HSD_JOBJ>(0x60); set => _s.SetReference(0x60, value); }
 

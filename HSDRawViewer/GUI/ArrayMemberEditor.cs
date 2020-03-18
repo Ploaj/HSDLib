@@ -171,11 +171,13 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
-        private void Reset()
+        public void Reset()
         {
+            elementList.BeginUpdate();
             Items.Clear();
             foreach(var obj in (object[])Property.GetValue(_object))
                 Items.Add(obj);
+            elementList.EndUpdate();
         }
 
         /// <summary>
@@ -241,8 +243,8 @@ namespace HSDRawViewer.GUI
 
                 var i = elementList.SelectedIndex;
                 object moveItem = elementList.Items[i];
-                elementList.Items.Remove(moveItem);
-                elementList.Items.Insert(i - 1, moveItem);
+                Items.Remove(moveItem);
+                Items.Insert(i - 1, moveItem);
                 elementList.SetSelected(i - 1, true);
 
                 elementList.EndUpdate();
@@ -264,8 +266,8 @@ namespace HSDRawViewer.GUI
                 var i = elementList.SelectedIndex;
 
                 object moveItem = elementList.Items[i];
-                elementList.Items.Remove(moveItem);
-                elementList.Items.Insert(i + 1, moveItem);
+                Items.Remove(moveItem);
+                Items.Insert(i + 1, moveItem);
                 elementList.SetSelected(i + 1, true);
 
                 elementList.EndUpdate();

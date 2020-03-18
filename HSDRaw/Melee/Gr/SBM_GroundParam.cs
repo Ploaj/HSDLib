@@ -10,7 +10,7 @@ namespace HSDRaw.Melee.Gr
 
         public float DeltaCam1 { get => _s.GetFloat(0x4); set => _s.SetFloat(0x4, value); }
 
-        public float FieldOfView { get => _s.GetFloat(0x8); set => _s.SetFloat(0x8, value); }
+        public short FieldOfView { get => _s.GetInt16(0x8); set => _s.SetInt16(0x8, value); }
 
         public int CameraDistanceMin { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
@@ -36,15 +36,15 @@ namespace HSDRaw.Melee.Gr
 
         public int PauseMaxZ { get => _s.GetInt32(0x38); set => _s.SetInt32(0x38, value); }
 
-        public float Unknown2 { get => _s.GetFloat(0x3c); set => _s.SetFloat(0x3c, value); }
+        public float PauseMaxAngleUp { get => _s.GetFloat(0x3c); set => _s.SetFloat(0x3c, value); }
 
-        public float PauseMaxAngleUp { get => _s.GetFloat(0x40); set => _s.SetFloat(0x40, value); }
+        public float PauseMaxAngleDown { get => _s.GetFloat(0x40); set => _s.SetFloat(0x40, value); }
 
         public float PauseMaxAngleLeft { get => _s.GetFloat(0x44); set => _s.SetFloat(0x44, value); }
 
         public float PauseMaxAngleRight { get => _s.GetFloat(0x48); set => _s.SetFloat(0x48, value); }
 
-        public float PauseMaxAngleDown { get => _s.GetFloat(0x4c); set => _s.SetFloat(0x4c, value); }
+        public float Unknown2 { get => _s.GetFloat(0x4c); set => _s.SetFloat(0x4c, value); }
 
         public float FixedCamX { get => _s.GetFloat(0x50); set => _s.SetFloat(0x50, value); }
 

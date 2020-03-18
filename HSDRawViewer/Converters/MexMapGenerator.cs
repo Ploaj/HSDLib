@@ -23,7 +23,8 @@ namespace HSDRawViewer.Converters
 
     public class MexMapSpace
     {
-        public HSD_TOBJ TOBJ;
+        public HSD_TOBJ IconTOBJ;
+        public HSD_TOBJ NameTOBJ;
         public HSD_JOBJ JOBJ = new HSD_JOBJ() { SX = 1, SY = 1, SZ = 1, Flags = JOBJ_FLAG.CLASSICAL_SCALING };
 
         public float X { get => JOBJ.TX; set => JOBJ.TX = value; }
@@ -69,22 +70,33 @@ namespace HSDRawViewer.Converters
             List<FOBJKey> Keys = new List<FOBJKey>();
 
             {
-                var tobjs = stage.IconMaterialAnimation.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+                var tobjs = stage.IconLargeMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
                 var index = texanim.AddImage(tobjs[0]);
                 Keys.Add(new FOBJKey() { Frame = index, Value = index, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
                 index = texanim.AddImage(tobjs[1]);
                 Keys.Add(new FOBJKey() { Frame = index, Value = index, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
             }
 
+            var nameTextures = new HSD_TexAnim();
+            List<FOBJKey> nameKeys = new List<FOBJKey>();
+            
             foreach (var v in MapSpaces)
             {
-                var index = texanim.AddImage(v.TOBJ);
+                var index = texanim.AddImage(v.IconTOBJ);
                 if (index == -1)
                     index = 0;
                 Keys.Add(new FOBJKey() { Frame = index, Value = index, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+
+                index = nameTextures.AddImage(v.NameTOBJ);
+                if (index == -1)
+                    index = 0;
+                nameKeys.Add(new FOBJKey() { Frame = index, Value = index, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+
                 v.JOBJ.Next = null;
                 v.JOBJ.Child = null;
+
                 root.AddChild(v.JOBJ);
+
                 animRoot.AddChild(GenerateAnimJoint(v));
             }
             Keys.Add(new FOBJKey() { Frame = 1600, Value = 0, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
@@ -97,19 +109,27 @@ namespace HSDRawViewer.Converters
             texanim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();
             texanim.AnimationObject.FObjDesc.Next.SetKeys(Keys, (byte)TexTrackType.HSD_A_T_TCLT);
 
-            var iconJOBJ = HSDAccessor.DeepClone<HSD_JOBJ>(stage.Icon3Model);
+            var iconJOBJ = HSDAccessor.DeepClone<HSD_JOBJ>(stage.IconDoubleModel);
             iconJOBJ.Child = iconJOBJ.Child.Next;
-            var iconAnimJoint = HSDAccessor.DeepClone<HSD_AnimJoint>(stage.Icon3Animation);
+            var iconAnimJoint = HSDAccessor.DeepClone<HSD_AnimJoint>(stage.IconDoubleAnimJoint);
             iconAnimJoint.Child = iconAnimJoint.Child.Next;
-            var iconMatAnimJoint = HSDAccessor.DeepClone<HSD_MatAnimJoint>(stage.Icon3MaterialAnimation);
+            var iconMatAnimJoint = HSDAccessor.DeepClone<HSD_MatAnimJoint>(stage.IconDoubleMatAnimJoint);
             iconMatAnimJoint.Child = iconMatAnimJoint.Child.Next;
             iconMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation = texanim;
+
+            var iconNameAnim = HSDAccessor.DeepClone<HSD_MatAnimJoint>(stage.StageNameMatAnimJoint);
+            nameTextures.AnimationObject = new HSD_AOBJ();
+            nameTextures.AnimationObject.EndFrame = 1600;
+            nameTextures.AnimationObject.FObjDesc = new HSD_FOBJDesc();
+            nameTextures.AnimationObject.FObjDesc.SetKeys(nameKeys, (byte)TexTrackType.HSD_A_T_TIMG);
+            iconNameAnim.Child.Child.MaterialAnimation.TextureAnimation = nameTextures;
 
             mapData.IconModel = iconJOBJ;
             mapData.IconAnimJoint = iconAnimJoint;
             mapData.IconMatAnimJoint = iconMatAnimJoint;
             mapData.PositionModel = root;
             mapData.PositionAnimJoint = animRoot;
+            mapData.StageNameMaterialAnimation = iconNameAnim;
 
             return mapData;
         }
@@ -220,10 +240,13 @@ namespace HSDRawViewer.Converters
         {
             List<MexMapSpace> spaces = new List<MexMapSpace>();
 
-            var tex0 = stage.Icon3MaterialAnimation.Child.Next.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
-            var tex0_extra = stage.Icon3MaterialAnimation.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
-            var tex1 = stage.IconMaterialAnimation.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
-            var tex2 = stage.Icon2MaterialAnimation.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+            var tex0 = stage.IconDoubleMatAnimJoint.Child.Next.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+            var tex0_extra = stage.IconDoubleMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+            var tex1 = stage.IconLargeMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+            var tex2 = stage.IconSpecialMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
+
+            var nameTOBJs = stage.StageNameMatAnimJoint.Child.Child.MaterialAnimation.TextureAnimation.ToTOBJs();
+            var nameTOBJsAnim = stage.StageNameMatAnimJoint.Child.Child.MaterialAnimation.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
 
             var g1 = tex0.Length - 2;
             var g2 = tex0.Length - 2 + tex1.Length - 2;
@@ -236,18 +259,26 @@ namespace HSDRawViewer.Converters
                     childIndex = unswizzle[i];
 
                 HSD_TOBJ tobj = null;
+                HSD_TOBJ nametobj = null;
                 var anim = stage.PositionAnimation.Children[childIndex].AOBJ.FObjDesc;
                 var keys = anim.GetDecodedKeys();
                 var Y = stage.PositionModel.Children[childIndex].TY;
                 var Z = stage.PositionModel.Children[childIndex].TZ;
                 var SX = 1f;
                 var SY = 1f;
+                bool random = false;
+                int nameTex = i;
 
                 if (i >= g3)
-                    tobj = null; // RandomIcon
+                {
+                    //RandomIcon
+                    nametobj = nameTOBJs[(int)nameTOBJsAnim[nameTOBJsAnim.Count - 1].Value];
+                    random = true;
+                }
                 else
                 if (i >= g2)
                 {
+                    nametobj = nameTOBJs[(int)nameTOBJsAnim[24 + (i - g2)].Value];
                     tobj = tex2[i - g2 + 2];
                     SX = 0.8f;
                     SY = 0.8f;
@@ -255,25 +286,30 @@ namespace HSDRawViewer.Converters
                 else
                 if (i >= g1)
                 {
+                    nametobj = nameTOBJs[(int)nameTOBJsAnim[22 + texunswizzle[i - g1]].Value];
                     tobj = tex1[i - g1 + 2];
                     SY = 1.1f;
                 }
                 else
                 {
                     tobj = tex0[texunswizzle[i] + 2];
+                    nametobj = nameTOBJs[(int)nameTOBJsAnim[texunswizzle[i]].Value * 2];
                     var space2 = new MexMapSpace()
                     {
                         X = keys[keys.Count - 1].Value,
                         Y = Y,
                         Z = Z,
-                        TOBJ = tobj,
+                        IconTOBJ = tobj,
+                        NameTOBJ = nametobj,
                         AnimType = MexMapAnimType.SlideInFromRight
                     };
                     SetAnimFromFOBJ(space2, anim);
                     spaces.Add(space2);
+
                     Y -= 5.6f;
                     Z = 0;
                     tobj = tex0_extra[texunswizzle[i] + 2];
+                    nametobj = nameTOBJs[(int)nameTOBJsAnim[texunswizzle[i]].Value * 2 + 1];
                 }
 
                 var space = new MexMapSpace()
@@ -283,7 +319,9 @@ namespace HSDRawViewer.Converters
                     Z = Z,
                     SX = SX,
                     SY = SY,
-                    TOBJ = tobj,
+                    //Random = random,
+                    IconTOBJ = tobj,
+                    NameTOBJ = nametobj,
                     AnimType = MexMapAnimType.SlideInFromRight
                 };
                 SetAnimFromFOBJ(space, anim);
@@ -297,28 +335,31 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static List<MexMapSpace> LoadMexMapDataFromSymbol(MEX_mexMapData data)
+        public static List<MexMapSpace> LoadMexMapDataFromSymbol(SBM_MnSelectStageDataTable stageTable, MEX_mexMapData data)
         {
             List<MexMapSpace> spaces = new List<MexMapSpace>();
 
             var tobjs = data.IconMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.ToTOBJs();
             var tobjanim = data.IconMatAnimJoint.Child.MaterialAnimation.Next.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
 
+            var nametobjs = data.StageNameMaterialAnimation.Child.Child.MaterialAnimation.TextureAnimation.ToTOBJs();
+            var nametobjanim = data.StageNameMaterialAnimation.Child.Child.MaterialAnimation.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
+
             for (int i = 0; i < data.PositionModel.Children.Length; i++)
             {
-                var tobj = tobjs[(int)tobjanim[i + 2].Value];
                 var jobj = data.PositionModel.Children[i];
                 var aobj = data.PositionAnimJoint.Children[i].AOBJ;
 
                 MexMapSpace space = new MexMapSpace();
-                space.TOBJ = tobj;
+                space.IconTOBJ = tobjs[(int)tobjanim[i + 2].Value];
+                space.NameTOBJ = nametobjs[(int)tobjanim[i].Value];
                 space.JOBJ = jobj;
+                //if (i == 0)
+                 //   space.Random = true;
 
                 // assume anim type
                 if(aobj != null && aobj.FObjDesc != null)
-                {
                     SetAnimFromFOBJ(space, aobj.FObjDesc);
-                }
 
                 spaces.Add(space);
             }

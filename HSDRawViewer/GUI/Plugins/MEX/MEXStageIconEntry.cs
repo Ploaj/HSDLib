@@ -7,6 +7,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     public class MEXStageIconEntry
     {
         public MexMapSpace MapSpace = new MexMapSpace();
+
         public MEX_StageIconData IconData = new MEX_StageIconData();
         
         [Description("PreviewID for name texture and mini-model")]

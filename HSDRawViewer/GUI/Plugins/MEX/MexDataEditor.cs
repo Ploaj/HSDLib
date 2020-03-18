@@ -134,6 +134,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MEXConverter.stageIDValues.AddRange(StageEntries.Select(e=>e.InternalID + " - " + e.FileName));
             };
 
+            sssEditor.SelectedObjectChanged += (sender, args) =>
+            {
+                RefreshStageNameRendering();
+            };
+
             FormClosing += (sender, args) =>
             {
                 MnSlChrJOBJManager.ClearRenderingCache();
@@ -180,9 +185,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private int MEXItemOffset = 0;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
-
-        private JOBJManager MnSlChrJOBJManager = new JOBJManager();
-        private JOBJManager MnSlMapJOBJManager = new JOBJManager();
 
         private ViewportControl viewport;
 
@@ -536,6 +538,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public AddedIcon[] AddedIcons;
 
         private bool CSSSelected => cssIconTabControl.SelectedIndex <= 1;
+        
+        private JOBJManager MnSlChrJOBJManager = new JOBJManager();
+        private JOBJManager MnSlMapJOBJManager = new JOBJManager();
+        private JOBJManager MnSlNameJOBJManager = new JOBJManager();
 
         public class AddedIcon
         {
@@ -581,6 +587,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MnSlMapJOBJManager.Frame = viewport.Frame;
                 MnSlMapJOBJManager.Render(cam);
 
+                MnSlNameJOBJManager.Render(cam);
+
                 if(sssEditor.SelectedObject is MEXStageIconEntry ico)
                 {
                     var transform = MnSlMapJOBJManager.GetWorldTransform(sssEditor.SelectedIndex + 1);
@@ -600,7 +608,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 MenuFile.Save(MenuFilePath);
 
             if (StageMenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(StageMenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                RegenerateMnSlMapAnimation();
                 StageMenuFile.Save(StageMenuFilePath);
+            }
         }
 
         /// <summary>
@@ -619,8 +630,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             AddedIcons = new AddedIcon[0];
             addedIconEditor.SetArrayFromProperty(this, "AddedIcons");
-
-
+            
             if (jobj.Children.Length > 13)
             {
                 addedIconEditor.ItemIndexOffset = JOBJManager.IndexOf(jobj.Children[13]) + 1;
@@ -639,6 +649,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 MnSlChrJOBJManager.ClearRenderingCache();
                 MnSlMapJOBJManager.ClearRenderingCache();
+                MnSlNameJOBJManager.ClearRenderingCache();
 
                 mnslchrToolStrip.Visible = false;
                 mnslmapToolStrip.Visible = false;
@@ -855,6 +866,17 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 sssEditor.Visible = true;
 
                 RefreshMnSlMapRendering(mexMap);
+                
+                var spaces = MexMapGenerator.LoadMexMapDataFromSymbol(hsd.Roots[0].Data as SBM_MnSelectStageDataTable, mexMap);
+                for (int i = 0; i < StageIcons.Length; i++)
+                {
+                    if (i < spaces.Count)
+                        StageIcons[i].MapSpace = spaces[i];
+                    else
+                        StageIcons[i].MapSpace = new MexMapSpace();
+                }
+
+                RefreshStageNameRendering();
             }
         }
 
@@ -880,15 +902,30 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             MnSlMapJOBJManager.SetJOBJ(cloned);
             MnSlMapJOBJManager.SetAnimJoint(mexMap.PositionAnimJoint);
             viewport.Frame = 1600;
+        }
 
-            var spaces = MexMapGenerator.LoadMexMapDataFromSymbol(mexMap);
-            for (int i = 0; i < StageIcons.Length; i++)
-            {
-                if (i < spaces.Count)
-                    StageIcons[i].MapSpace = spaces[i];
-                else
-                    StageIcons[i].MapSpace = new MexMapSpace();
-            }
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RefreshStageNameRendering()
+        {
+            if (StageMenuFile == null)
+                return;
+
+            var stage = StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable;
+
+            if (stage == null)
+                return;
+
+            var cloned = HSDAccessor.DeepClone<HSD_JOBJ>(stage.StageNameModel);
+
+            if (sssEditor.SelectedObject is MEXStageIconEntry entry)
+                cloned.Child.Child.Dobj.Mobj.Textures = entry.MapSpace.NameTOBJ;
+
+            MnSlNameJOBJManager.ClearRenderingCache();
+            MnSlNameJOBJManager.SetJOBJ(cloned);
+            MnSlNameJOBJManager.SetAnimJoint(stage.StageNameAnimJoint);
+            MnSlNameJOBJManager.Frame = 10;
         }
 
         /// <summary>
@@ -926,6 +963,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         private void RegenerateMnSlMapAnimation()
         {
+            StageIcons = StageIcons.ToList().OrderBy(e => e.ExternalID == 0).ToArray();
+            sssEditor.Reset();
+
             var mexMap = MexMapGenerator.GenerateMexMap(StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable, StageIcons.Select(e=>e.MapSpace));
             StageMenuFile.Roots[1].Data = mexMap;
             RefreshMnSlMapRendering(mexMap);
@@ -957,7 +997,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                     if (sssEditor.SelectedObject is MEXStageIconEntry ico)
                     {
-                        ico.MapSpace.TOBJ = tobj;
+                        ico.MapSpace.IconTOBJ = tobj;
                         MnSlMapJOBJManager.ClearRenderingCache();
                     }
                 }
