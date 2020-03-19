@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MexDataEditor));
             this.mainTabControl = new System.Windows.Forms.TabControl();
             this.tabPageFighter = new System.Windows.Forms.TabPage();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -47,29 +48,21 @@
             this.tabPageStage = new System.Windows.Forms.TabPage();
             this.tabControl3 = new System.Windows.Forms.TabControl();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.stageEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.stageIDEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip7 = new System.Windows.Forms.ToolStrip();
             this.saveStageButton = new System.Windows.Forms.ToolStripButton();
             this.tabPageItem = new System.Windows.Forms.TabPage();
             this.itemTabs = new System.Windows.Forms.TabControl();
             this.tabPageItemCommon = new System.Windows.Forms.TabPage();
-            this.commonItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPageItemFighter = new System.Windows.Forms.TabPage();
-            this.fighterItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPageItemPokemon = new System.Windows.Forms.TabPage();
-            this.pokemonItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPageItemStages = new System.Windows.Forms.TabPage();
-            this.stageItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPageMexItems = new System.Windows.Forms.TabPage();
-            this.mexItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip5 = new System.Windows.Forms.ToolStrip();
             this.saveItemButton = new System.Windows.Forms.ToolStripButton();
             this.mexItemCloneButton = new System.Windows.Forms.ToolStripButton();
             this.itemExportButton = new System.Windows.Forms.ToolStripButton();
             this.tabPageEffects = new System.Windows.Forms.TabPage();
-            this.effectEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip3 = new System.Windows.Forms.ToolStrip();
             this.saveEffectButton = new System.Windows.Forms.ToolStripButton();
             this.tabPageCSS = new System.Windows.Forms.TabPage();
@@ -81,11 +74,8 @@
             this.removeIconButton = new System.Windows.Forms.ToolStripButton();
             this.cssIconTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.addedIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage9 = new System.Windows.Forms.TabPage();
-            this.sssEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.buttonSaveCSS = new System.Windows.Forms.ToolStripButton();
             this.buttonImportMnSlcChr = new System.Windows.Forms.ToolStripButton();
@@ -93,19 +83,32 @@
             this.tabPageMusic = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.musicListEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage8 = new System.Windows.Forms.TabPage();
-            this.menuPlaylistEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.saveMusicButton = new System.Windows.Forms.ToolStripButton();
             this.createHPSButton = new System.Windows.Forms.ToolStripButton();
-            this.musicDSPPlayer = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.toolStrip6 = new System.Windows.Forms.ToolStrip();
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
             this.installFighterButton = new System.Windows.Forms.ToolStripButton();
             this.uninstallFighterButton = new System.Windows.Forms.ToolStripButton();
             this.importStageIconButton = new System.Windows.Forms.ToolStripButton();
+            this.stageEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.stageIDEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.commonItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.fighterItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.pokemonItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.stageItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.mexItemEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.effectEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.addedIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.sssEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.musicListEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.menuPlaylistEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.musicDSPPlayer = new HSDRawViewer.GUI.Extra.DSPViewer();
+            this.makeNameTagButton = new System.Windows.Forms.ToolStripButton();
+            this.loadHSDCamButton = new System.Windows.Forms.ToolStripButton();
             this.mainTabControl.SuspendLayout();
             this.tabPageFighter.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -352,17 +355,6 @@
             this.tabPage5.Text = "Stages";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
-            // stageEditor
-            // 
-            this.stageEditor.DisplayItemIndices = true;
-            this.stageEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.stageEditor.EnablePropertyViewDescription = true;
-            this.stageEditor.ItemIndexOffset = 0;
-            this.stageEditor.Location = new System.Drawing.Point(3, 3);
-            this.stageEditor.Name = "stageEditor";
-            this.stageEditor.Size = new System.Drawing.Size(777, 225);
-            this.stageEditor.TabIndex = 1;
-            // 
             // tabPage6
             // 
             this.tabPage6.Controls.Add(this.stageIDEditor);
@@ -373,17 +365,6 @@
             this.tabPage6.TabIndex = 1;
             this.tabPage6.Text = "StageIDs";
             this.tabPage6.UseVisualStyleBackColor = true;
-            // 
-            // stageIDEditor
-            // 
-            this.stageIDEditor.DisplayItemIndices = true;
-            this.stageIDEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.stageIDEditor.EnablePropertyViewDescription = true;
-            this.stageIDEditor.ItemIndexOffset = 0;
-            this.stageIDEditor.Location = new System.Drawing.Point(3, 3);
-            this.stageIDEditor.Name = "stageIDEditor";
-            this.stageIDEditor.Size = new System.Drawing.Size(777, 225);
-            this.stageIDEditor.TabIndex = 0;
             // 
             // toolStrip7
             // 
@@ -441,22 +422,6 @@
             this.tabPageItemCommon.Text = "Common";
             this.tabPageItemCommon.UseVisualStyleBackColor = true;
             // 
-            // commonItemEditor
-            // 
-            this.commonItemEditor.CanAdd = false;
-            this.commonItemEditor.CanClone = false;
-            this.commonItemEditor.CanMove = false;
-            this.commonItemEditor.CanRemove = false;
-            this.commonItemEditor.DisplayItemIndices = true;
-            this.commonItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.commonItemEditor.EnablePropertyViewDescription = true;
-            this.commonItemEditor.EnableToolStrip = false;
-            this.commonItemEditor.ItemIndexOffset = 0;
-            this.commonItemEditor.Location = new System.Drawing.Point(3, 3);
-            this.commonItemEditor.Name = "commonItemEditor";
-            this.commonItemEditor.Size = new System.Drawing.Size(771, 219);
-            this.commonItemEditor.TabIndex = 1;
-            // 
             // tabPageItemFighter
             // 
             this.tabPageItemFighter.Controls.Add(this.fighterItemEditor);
@@ -467,22 +432,6 @@
             this.tabPageItemFighter.TabIndex = 1;
             this.tabPageItemFighter.Text = "Fighter";
             this.tabPageItemFighter.UseVisualStyleBackColor = true;
-            // 
-            // fighterItemEditor
-            // 
-            this.fighterItemEditor.CanAdd = false;
-            this.fighterItemEditor.CanClone = false;
-            this.fighterItemEditor.CanMove = false;
-            this.fighterItemEditor.CanRemove = false;
-            this.fighterItemEditor.DisplayItemIndices = true;
-            this.fighterItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fighterItemEditor.EnablePropertyViewDescription = true;
-            this.fighterItemEditor.EnableToolStrip = false;
-            this.fighterItemEditor.ItemIndexOffset = 0;
-            this.fighterItemEditor.Location = new System.Drawing.Point(3, 3);
-            this.fighterItemEditor.Name = "fighterItemEditor";
-            this.fighterItemEditor.Size = new System.Drawing.Size(771, 219);
-            this.fighterItemEditor.TabIndex = 2;
             // 
             // tabPageItemPokemon
             // 
@@ -495,22 +444,6 @@
             this.tabPageItemPokemon.Text = "Pokemon";
             this.tabPageItemPokemon.UseVisualStyleBackColor = true;
             // 
-            // pokemonItemEditor
-            // 
-            this.pokemonItemEditor.CanAdd = false;
-            this.pokemonItemEditor.CanClone = false;
-            this.pokemonItemEditor.CanMove = false;
-            this.pokemonItemEditor.CanRemove = false;
-            this.pokemonItemEditor.DisplayItemIndices = true;
-            this.pokemonItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pokemonItemEditor.EnablePropertyViewDescription = true;
-            this.pokemonItemEditor.EnableToolStrip = false;
-            this.pokemonItemEditor.ItemIndexOffset = 0;
-            this.pokemonItemEditor.Location = new System.Drawing.Point(3, 3);
-            this.pokemonItemEditor.Name = "pokemonItemEditor";
-            this.pokemonItemEditor.Size = new System.Drawing.Size(771, 219);
-            this.pokemonItemEditor.TabIndex = 2;
-            // 
             // tabPageItemStages
             // 
             this.tabPageItemStages.Controls.Add(this.stageItemEditor);
@@ -522,22 +455,6 @@
             this.tabPageItemStages.Text = "Stages";
             this.tabPageItemStages.UseVisualStyleBackColor = true;
             // 
-            // stageItemEditor
-            // 
-            this.stageItemEditor.CanAdd = false;
-            this.stageItemEditor.CanClone = false;
-            this.stageItemEditor.CanMove = false;
-            this.stageItemEditor.CanRemove = false;
-            this.stageItemEditor.DisplayItemIndices = true;
-            this.stageItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.stageItemEditor.EnablePropertyViewDescription = true;
-            this.stageItemEditor.EnableToolStrip = false;
-            this.stageItemEditor.ItemIndexOffset = 0;
-            this.stageItemEditor.Location = new System.Drawing.Point(3, 3);
-            this.stageItemEditor.Name = "stageItemEditor";
-            this.stageItemEditor.Size = new System.Drawing.Size(771, 219);
-            this.stageItemEditor.TabIndex = 2;
-            // 
             // tabPageMexItems
             // 
             this.tabPageMexItems.Controls.Add(this.mexItemEditor);
@@ -548,18 +465,6 @@
             this.tabPageMexItems.TabIndex = 4;
             this.tabPageMexItems.Text = "MEX Items";
             this.tabPageMexItems.UseVisualStyleBackColor = true;
-            // 
-            // mexItemEditor
-            // 
-            this.mexItemEditor.CanMove = false;
-            this.mexItemEditor.DisplayItemIndices = true;
-            this.mexItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mexItemEditor.EnablePropertyViewDescription = true;
-            this.mexItemEditor.ItemIndexOffset = 0;
-            this.mexItemEditor.Location = new System.Drawing.Point(3, 3);
-            this.mexItemEditor.Name = "mexItemEditor";
-            this.mexItemEditor.Size = new System.Drawing.Size(771, 219);
-            this.mexItemEditor.TabIndex = 3;
             // 
             // toolStrip5
             // 
@@ -612,17 +517,6 @@
             this.tabPageEffects.Text = "Effects";
             this.tabPageEffects.UseVisualStyleBackColor = true;
             // 
-            // effectEditor
-            // 
-            this.effectEditor.DisplayItemIndices = true;
-            this.effectEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.effectEditor.EnablePropertyViewDescription = true;
-            this.effectEditor.ItemIndexOffset = 0;
-            this.effectEditor.Location = new System.Drawing.Point(3, 28);
-            this.effectEditor.Name = "effectEditor";
-            this.effectEditor.Size = new System.Drawing.Size(785, 251);
-            this.effectEditor.TabIndex = 1;
-            // 
             // toolStrip3
             // 
             this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -671,7 +565,9 @@
             // 
             this.mnslmapToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.regenerateAnimationButton,
-            this.importStageIconButton});
+            this.importStageIconButton,
+            this.makeNameTagButton,
+            this.loadHSDCamButton});
             this.mnslmapToolStrip.Location = new System.Drawing.Point(203, 16);
             this.mnslmapToolStrip.Name = "mnslmapToolStrip";
             this.mnslmapToolStrip.Size = new System.Drawing.Size(579, 25);
@@ -742,17 +638,6 @@
             this.tabPage1.Text = "CSS";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // cssIconEditor
-            // 
-            this.cssIconEditor.DisplayItemIndices = false;
-            this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cssIconEditor.EnablePropertyViewDescription = true;
-            this.cssIconEditor.ItemIndexOffset = 0;
-            this.cssIconEditor.Location = new System.Drawing.Point(3, 3);
-            this.cssIconEditor.Name = "cssIconEditor";
-            this.cssIconEditor.Size = new System.Drawing.Size(186, 200);
-            this.cssIconEditor.TabIndex = 0;
-            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.addedIconEditor);
@@ -764,23 +649,6 @@
             this.tabPage2.Text = "CSS Added";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // addedIconEditor
-            // 
-            this.addedIconEditor.CanAdd = false;
-            this.addedIconEditor.CanClone = false;
-            this.addedIconEditor.CanMove = false;
-            this.addedIconEditor.CanRemove = false;
-            this.addedIconEditor.DisplayItemIndices = true;
-            this.addedIconEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.addedIconEditor.EnablePropertyViewDescription = true;
-            this.addedIconEditor.EnableToolStrip = false;
-            this.addedIconEditor.ItemIndexOffset = 0;
-            this.addedIconEditor.Location = new System.Drawing.Point(3, 3);
-            this.addedIconEditor.Name = "addedIconEditor";
-            this.addedIconEditor.Size = new System.Drawing.Size(186, 200);
-            this.addedIconEditor.TabIndex = 0;
-            this.addedIconEditor.Visible = false;
-            // 
             // tabPage9
             // 
             this.tabPage9.Controls.Add(this.sssEditor);
@@ -790,18 +658,6 @@
             this.tabPage9.TabIndex = 2;
             this.tabPage9.Text = "SSS";
             this.tabPage9.UseVisualStyleBackColor = true;
-            // 
-            // sssEditor
-            // 
-            this.sssEditor.DisplayItemIndices = true;
-            this.sssEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sssEditor.EnablePropertyViewDescription = true;
-            this.sssEditor.ItemIndexOffset = 0;
-            this.sssEditor.Location = new System.Drawing.Point(0, 0);
-            this.sssEditor.Name = "sssEditor";
-            this.sssEditor.Size = new System.Drawing.Size(192, 206);
-            this.sssEditor.TabIndex = 0;
-            this.sssEditor.Visible = false;
             // 
             // toolStrip4
             // 
@@ -878,17 +734,6 @@
             this.tabPage7.Text = "Music Files";
             this.tabPage7.UseVisualStyleBackColor = true;
             // 
-            // musicListEditor
-            // 
-            this.musicListEditor.DisplayItemIndices = true;
-            this.musicListEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.musicListEditor.EnablePropertyViewDescription = true;
-            this.musicListEditor.ItemIndexOffset = 0;
-            this.musicListEditor.Location = new System.Drawing.Point(3, 3);
-            this.musicListEditor.Name = "musicListEditor";
-            this.musicListEditor.Size = new System.Drawing.Size(399, 219);
-            this.musicListEditor.TabIndex = 4;
-            // 
             // tabPage8
             // 
             this.tabPage8.Controls.Add(this.menuPlaylistEditor);
@@ -899,17 +744,6 @@
             this.tabPage8.TabIndex = 1;
             this.tabPage8.Text = "Menu Playlist";
             this.tabPage8.UseVisualStyleBackColor = true;
-            // 
-            // menuPlaylistEditor
-            // 
-            this.menuPlaylistEditor.DisplayItemIndices = true;
-            this.menuPlaylistEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.menuPlaylistEditor.EnablePropertyViewDescription = true;
-            this.menuPlaylistEditor.ItemIndexOffset = 0;
-            this.menuPlaylistEditor.Location = new System.Drawing.Point(3, 3);
-            this.menuPlaylistEditor.Name = "menuPlaylistEditor";
-            this.menuPlaylistEditor.Size = new System.Drawing.Size(399, 219);
-            this.menuPlaylistEditor.TabIndex = 0;
             // 
             // splitter1
             // 
@@ -948,16 +782,6 @@
             this.createHPSButton.Size = new System.Drawing.Size(151, 22);
             this.createHPSButton.Text = "Create HPS From File(s)";
             this.createHPSButton.Click += new System.EventHandler(this.createHPSButton_Click);
-            // 
-            // musicDSPPlayer
-            // 
-            this.musicDSPPlayer.Dock = System.Windows.Forms.DockStyle.Right;
-            this.musicDSPPlayer.DSP = null;
-            this.musicDSPPlayer.Location = new System.Drawing.Point(419, 3);
-            this.musicDSPPlayer.Name = "musicDSPPlayer";
-            this.musicDSPPlayer.ReplaceButtonVisible = false;
-            this.musicDSPPlayer.Size = new System.Drawing.Size(369, 276);
-            this.musicDSPPlayer.TabIndex = 5;
             // 
             // toolStrip6
             // 
@@ -1006,6 +830,206 @@
             this.importStageIconButton.Size = new System.Drawing.Size(125, 22);
             this.importStageIconButton.Text = "Import Icon Image";
             this.importStageIconButton.Click += new System.EventHandler(this.importStageIconButton_Click);
+            // 
+            // stageEditor
+            // 
+            this.stageEditor.DisplayItemIndices = true;
+            this.stageEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageEditor.EnablePropertyViewDescription = true;
+            this.stageEditor.ItemIndexOffset = 0;
+            this.stageEditor.Location = new System.Drawing.Point(3, 3);
+            this.stageEditor.Name = "stageEditor";
+            this.stageEditor.Size = new System.Drawing.Size(777, 225);
+            this.stageEditor.TabIndex = 1;
+            // 
+            // stageIDEditor
+            // 
+            this.stageIDEditor.DisplayItemIndices = true;
+            this.stageIDEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageIDEditor.EnablePropertyViewDescription = true;
+            this.stageIDEditor.ItemIndexOffset = 0;
+            this.stageIDEditor.Location = new System.Drawing.Point(3, 3);
+            this.stageIDEditor.Name = "stageIDEditor";
+            this.stageIDEditor.Size = new System.Drawing.Size(777, 225);
+            this.stageIDEditor.TabIndex = 0;
+            // 
+            // commonItemEditor
+            // 
+            this.commonItemEditor.CanAdd = false;
+            this.commonItemEditor.CanClone = false;
+            this.commonItemEditor.CanMove = false;
+            this.commonItemEditor.CanRemove = false;
+            this.commonItemEditor.DisplayItemIndices = true;
+            this.commonItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.commonItemEditor.EnablePropertyViewDescription = true;
+            this.commonItemEditor.EnableToolStrip = false;
+            this.commonItemEditor.ItemIndexOffset = 0;
+            this.commonItemEditor.Location = new System.Drawing.Point(3, 3);
+            this.commonItemEditor.Name = "commonItemEditor";
+            this.commonItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.commonItemEditor.TabIndex = 1;
+            // 
+            // fighterItemEditor
+            // 
+            this.fighterItemEditor.CanAdd = false;
+            this.fighterItemEditor.CanClone = false;
+            this.fighterItemEditor.CanMove = false;
+            this.fighterItemEditor.CanRemove = false;
+            this.fighterItemEditor.DisplayItemIndices = true;
+            this.fighterItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fighterItemEditor.EnablePropertyViewDescription = true;
+            this.fighterItemEditor.EnableToolStrip = false;
+            this.fighterItemEditor.ItemIndexOffset = 0;
+            this.fighterItemEditor.Location = new System.Drawing.Point(3, 3);
+            this.fighterItemEditor.Name = "fighterItemEditor";
+            this.fighterItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.fighterItemEditor.TabIndex = 2;
+            // 
+            // pokemonItemEditor
+            // 
+            this.pokemonItemEditor.CanAdd = false;
+            this.pokemonItemEditor.CanClone = false;
+            this.pokemonItemEditor.CanMove = false;
+            this.pokemonItemEditor.CanRemove = false;
+            this.pokemonItemEditor.DisplayItemIndices = true;
+            this.pokemonItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pokemonItemEditor.EnablePropertyViewDescription = true;
+            this.pokemonItemEditor.EnableToolStrip = false;
+            this.pokemonItemEditor.ItemIndexOffset = 0;
+            this.pokemonItemEditor.Location = new System.Drawing.Point(3, 3);
+            this.pokemonItemEditor.Name = "pokemonItemEditor";
+            this.pokemonItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.pokemonItemEditor.TabIndex = 2;
+            // 
+            // stageItemEditor
+            // 
+            this.stageItemEditor.CanAdd = false;
+            this.stageItemEditor.CanClone = false;
+            this.stageItemEditor.CanMove = false;
+            this.stageItemEditor.CanRemove = false;
+            this.stageItemEditor.DisplayItemIndices = true;
+            this.stageItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageItemEditor.EnablePropertyViewDescription = true;
+            this.stageItemEditor.EnableToolStrip = false;
+            this.stageItemEditor.ItemIndexOffset = 0;
+            this.stageItemEditor.Location = new System.Drawing.Point(3, 3);
+            this.stageItemEditor.Name = "stageItemEditor";
+            this.stageItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.stageItemEditor.TabIndex = 2;
+            // 
+            // mexItemEditor
+            // 
+            this.mexItemEditor.CanMove = false;
+            this.mexItemEditor.DisplayItemIndices = true;
+            this.mexItemEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mexItemEditor.EnablePropertyViewDescription = true;
+            this.mexItemEditor.ItemIndexOffset = 0;
+            this.mexItemEditor.Location = new System.Drawing.Point(3, 3);
+            this.mexItemEditor.Name = "mexItemEditor";
+            this.mexItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.mexItemEditor.TabIndex = 3;
+            // 
+            // effectEditor
+            // 
+            this.effectEditor.DisplayItemIndices = true;
+            this.effectEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.effectEditor.EnablePropertyViewDescription = true;
+            this.effectEditor.ItemIndexOffset = 0;
+            this.effectEditor.Location = new System.Drawing.Point(3, 28);
+            this.effectEditor.Name = "effectEditor";
+            this.effectEditor.Size = new System.Drawing.Size(785, 251);
+            this.effectEditor.TabIndex = 1;
+            // 
+            // cssIconEditor
+            // 
+            this.cssIconEditor.DisplayItemIndices = false;
+            this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cssIconEditor.EnablePropertyViewDescription = true;
+            this.cssIconEditor.ItemIndexOffset = 0;
+            this.cssIconEditor.Location = new System.Drawing.Point(3, 3);
+            this.cssIconEditor.Name = "cssIconEditor";
+            this.cssIconEditor.Size = new System.Drawing.Size(186, 200);
+            this.cssIconEditor.TabIndex = 0;
+            // 
+            // addedIconEditor
+            // 
+            this.addedIconEditor.CanAdd = false;
+            this.addedIconEditor.CanClone = false;
+            this.addedIconEditor.CanMove = false;
+            this.addedIconEditor.CanRemove = false;
+            this.addedIconEditor.DisplayItemIndices = true;
+            this.addedIconEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.addedIconEditor.EnablePropertyViewDescription = true;
+            this.addedIconEditor.EnableToolStrip = false;
+            this.addedIconEditor.ItemIndexOffset = 0;
+            this.addedIconEditor.Location = new System.Drawing.Point(3, 3);
+            this.addedIconEditor.Name = "addedIconEditor";
+            this.addedIconEditor.Size = new System.Drawing.Size(186, 200);
+            this.addedIconEditor.TabIndex = 0;
+            this.addedIconEditor.Visible = false;
+            // 
+            // sssEditor
+            // 
+            this.sssEditor.DisplayItemIndices = true;
+            this.sssEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sssEditor.EnablePropertyViewDescription = true;
+            this.sssEditor.ItemIndexOffset = 0;
+            this.sssEditor.Location = new System.Drawing.Point(0, 0);
+            this.sssEditor.Name = "sssEditor";
+            this.sssEditor.Size = new System.Drawing.Size(192, 206);
+            this.sssEditor.TabIndex = 0;
+            this.sssEditor.Visible = false;
+            // 
+            // musicListEditor
+            // 
+            this.musicListEditor.DisplayItemIndices = true;
+            this.musicListEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.musicListEditor.EnablePropertyViewDescription = true;
+            this.musicListEditor.ItemIndexOffset = 0;
+            this.musicListEditor.Location = new System.Drawing.Point(3, 3);
+            this.musicListEditor.Name = "musicListEditor";
+            this.musicListEditor.Size = new System.Drawing.Size(399, 219);
+            this.musicListEditor.TabIndex = 4;
+            // 
+            // menuPlaylistEditor
+            // 
+            this.menuPlaylistEditor.DisplayItemIndices = true;
+            this.menuPlaylistEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.menuPlaylistEditor.EnablePropertyViewDescription = true;
+            this.menuPlaylistEditor.ItemIndexOffset = 0;
+            this.menuPlaylistEditor.Location = new System.Drawing.Point(3, 3);
+            this.menuPlaylistEditor.Name = "menuPlaylistEditor";
+            this.menuPlaylistEditor.Size = new System.Drawing.Size(399, 219);
+            this.menuPlaylistEditor.TabIndex = 0;
+            // 
+            // musicDSPPlayer
+            // 
+            this.musicDSPPlayer.Dock = System.Windows.Forms.DockStyle.Right;
+            this.musicDSPPlayer.DSP = null;
+            this.musicDSPPlayer.Location = new System.Drawing.Point(419, 3);
+            this.musicDSPPlayer.Name = "musicDSPPlayer";
+            this.musicDSPPlayer.ReplaceButtonVisible = false;
+            this.musicDSPPlayer.Size = new System.Drawing.Size(369, 276);
+            this.musicDSPPlayer.TabIndex = 5;
+            // 
+            // makeNameTagButton
+            // 
+            this.makeNameTagButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
+            this.makeNameTagButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.makeNameTagButton.Name = "makeNameTagButton";
+            this.makeNameTagButton.Size = new System.Drawing.Size(130, 22);
+            this.makeNameTagButton.Text = "Generate Name Tag";
+            this.makeNameTagButton.Click += new System.EventHandler(this.makeNameTagButton_Click);
+            // 
+            // loadHSDCamButton
+            // 
+            this.loadHSDCamButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.loadHSDCamButton.Image = ((System.Drawing.Image)(resources.GetObject("loadHSDCamButton.Image")));
+            this.loadHSDCamButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.loadHSDCamButton.Name = "loadHSDCamButton";
+            this.loadHSDCamButton.Size = new System.Drawing.Size(23, 22);
+            this.loadHSDCamButton.Text = "Load HSD Camera";
+            this.loadHSDCamButton.Click += new System.EventHandler(this.toolStripButton1_Click_1);
             // 
             // MexDataEditor
             // 
@@ -1155,5 +1179,7 @@
         private System.Windows.Forms.ToolStrip mnslmapToolStrip;
         private System.Windows.Forms.ToolStripButton regenerateAnimationButton;
         private System.Windows.Forms.ToolStripButton importStageIconButton;
+        private System.Windows.Forms.ToolStripButton makeNameTagButton;
+        private System.Windows.Forms.ToolStripButton loadHSDCamButton;
     }
 }

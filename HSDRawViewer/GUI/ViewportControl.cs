@@ -17,6 +17,7 @@ namespace HSDRawViewer.GUI
     /// </summary>
     public partial class ViewportControl : UserControl
     {
+        public Camera Camera { get => _camera; }
         private Camera _camera;
 
         private bool ReadyToRender = false;
@@ -584,6 +585,28 @@ namespace HSDRawViewer.GUI
             pbTimer.Stop();
             pbTimer.Interval = (1000f / (float)nudPlaybackSpeed.Value);
             pbTimer.Start();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hsdCam"></param>
+        public void LoadHSDCamera(HSDRaw.Common.HSD_Camera hsdCam)
+        {
+            if (hsdCam.ProjectionType != 1)
+                return;
+
+            _camera.RenderWidth = hsdCam.ViewportRight;
+            _camera.RenderHeight = hsdCam.ViewportBottom;
+
+            _camera.RotationYRadians = 0;
+            _camera.RotationYRadians = 0;
+
+            _camera.Translation = new Vector3(hsdCam.CamInfo1.V1, hsdCam.CamInfo1.V2, -hsdCam.CamInfo1.V3/3);
+            _camera.FovRadians = hsdCam.FieldOfView;
+
+            _camera.FarClipPlane = hsdCam.FarClip;
+            _camera.NearClipPlane = hsdCam.NearClip;
         }
     }
 }

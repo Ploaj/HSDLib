@@ -572,6 +572,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             if (!viewport.Visible)
                 return;
+            
+            // camera view
+            DrawShape.DrawRectangle(32.51167f, -24.38375f, -32.51167f, 24.38375f, Color.Transparent);
 
             if(CSSSelected)
             {
@@ -856,6 +859,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (mex != null)
             {
+                //var cam = (hsd.Roots[0].Data as SBM_MnSelectStageDataTable).Camera;
+
+                //viewport.LoadHSDCamera(cam);
+
                 var mexMap = mex.Data as MEX_mexMapData;
 
                 StageMenuFilePath = filePath;
@@ -1658,5 +1665,46 @@ static struct MoveLogic move_logic[] = {
             }
         }
 
+        public class NameTagSettings
+        {
+            public string StageName { get; set; } = "";
+            public string Location { get; set; } = "";
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void makeNameTagButton_Click(object sender, EventArgs e)
+        {
+            if(sssEditor.SelectedObject is MEXStageIconEntry entry)
+            {
+                var settings = new NameTagSettings();
+                using (PropertyDialog d = new PropertyDialog("Name Tag Settings", settings))
+                {
+                    if (d.ShowDialog() == DialogResult.OK)
+                    {
+                        using (Bitmap bmp = MexMapGenerator.GenerateStageName(settings.StageName, settings.Location))
+                        {
+                            if (bmp == null)
+                            {
+                                MessageBox.Show("Could not find fonts \"Palatino Linotype\" and/or \"A-OTF Folk Pro H\"", "Font not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                            entry.MapSpace.NameTOBJ = TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.I4, HSDRaw.GX.GXTlutFmt.IA8);
+                            RefreshStageNameRendering();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void toolStripButton1_Click_1(object sender, EventArgs e)
+        {
+            var cam = (StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable).Camera;
+
+            viewport.LoadHSDCamera(cam);
+        }
     }
 }

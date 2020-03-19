@@ -5,7 +5,10 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.MEX.Stages;
 using HSDRaw.Tools;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Converters
 {
@@ -416,6 +419,69 @@ namespace HSDRawViewer.Converters
                         space.AnimType = MexMapAnimType.SlideInFromTop;
                 }
             }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public static Bitmap GenerateStageName(string name, string location)
+        {
+            /*using (PrivateFontCollection coll = new PrivateFontCollection())
+            {
+                // new Font(ApplicationSettings.FolkProFont, 30, FontStyle.Italic);
+                //new Font(ApplicationSettings.Palatino, 15);
+            }*/
+            Font font = null;
+            Font font2 = null;
+            using (InstalledFontCollection installedFontCollection = new InstalledFontCollection())
+            {
+                font = new Font(installedFontCollection.Families.FirstOrDefault(e => e.Name.Equals("A-OTF Folk Pro H")), 30, FontStyle.Italic);
+                font2 = new Font(installedFontCollection.Families.FirstOrDefault(e=>e.Name.Equals("Palatino Linotype")), 13, FontStyle.Bold);
+            }
+
+            if(font == null || font2 == null)
+                return null;
+
+            Bitmap bmp = new Bitmap(224, 56);
+
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                {
+                    g.FillRectangle(new SolidBrush(Color.Black), new RectangleF(0, 0, bmp.Width, bmp.Height));
+                }
+                {
+                    var stringWidth = TextRenderer.MeasureText(location, font2).Width - 13;
+                    var scale = 0.95f;
+                    var newwidth = stringWidth * scale;
+                    g.ResetTransform();
+                    g.ScaleTransform(scale, 1);
+                    g.DrawString(location, font2, new SolidBrush(Color.White), (224 / 2) / scale, -4, stringFormat);
+                }
+                {
+                    var stringWidth = TextRenderer.MeasureText(name, font).Width;
+                    var scale = 0.75f;
+                    var newwidth = stringWidth * scale;
+                    if (newwidth > bmp.Width)
+                    {
+                        scale = (bmp.Width * 0.9f) / stringWidth;
+                        newwidth = stringWidth * scale;
+                    }
+                    g.ResetTransform();
+                    g.ScaleTransform(scale, 1);
+                    g.DrawString(name, font, new SolidBrush(Color.White), (224 / 2) / scale, 3, stringFormat);
+                }
+            }
+
+            font.Dispose();
+            font2.Dispose();
+            stringFormat.Dispose();
+
+            return bmp;
         }
     }
 }
