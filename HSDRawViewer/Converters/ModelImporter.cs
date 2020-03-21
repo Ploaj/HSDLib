@@ -10,7 +10,6 @@ using HSDRaw.Tools;
 using HSDRaw.GX;
 using System.ComponentModel;
 using HSDRawViewer.GUI;
-using System.Linq;
 
 namespace HSDRawViewer.Converters
 {
@@ -33,81 +32,243 @@ namespace HSDRawViewer.Converters
     /// </summary>
     public class ModelImportSettings
     {
-        // Options
-        [Category("Importing Options")]
-        public bool FlipUVs { get; set; } = false;
-
-        [Category("Importing Options")]
-        public bool SmoothNormals { get; set; } = false;
-
-        [Category("Importing Options")]
-        public bool InvertNormals { get; set; } = false;
-
-        [Category("Importing Options")]
+        [Category("Importing Options"), DisplayName("Flip Faces"), Description("Flips direction of faces, useful if model imports inside out")]
         public bool FlipFaces { get; set; } = false;
 
-        [Category("Importing Options")]
-        public bool SetScaleToOne { get; set; } = false;
+        [Category("Importing Options"), DisplayName("Flip UVs"), Description("Flips UVs on the Y axis, useful if textures are upside down")]
+        public bool FlipUVs { get; set; } = false;
 
-        [Category("Importing Options")]
-        public ShadingType ShadingType{ get; set; } = ShadingType.Material;
+        [Category("Importing Options"), DisplayName("Flip Normals"), Description("Flips direction of normals, useful if model is all black with textures")]
+        public bool InvertNormals { get; set; } = false;
 
-        [Category("Importing Options")]
-        public bool ImportMaterialInfo { get; set; } = false;
+        //[Category("Importing Options"), DisplayName("Smooth Normals"), Description("Applies normal smoothing")]
+        //public bool SmoothNormals { get; set; } = false;
+        
 
-
-        [Category("Importing Options")]
+        [Category("Importing Options"), DisplayName("Import Bone Names"), Description("Stores bone names in JOBJs")]
         public bool ImportBoneNames { get; set; } = false;
         
-        [Category("Importing Options")]
-        public bool ImportTexture { get; set; } = true;
-
-        [Category("Importing Options")]
-        public bool ImportMOBJ { get; set; } = false;
-        
-
-        [DisplayName("Use Triangle Strips"), Description("Slower to import, but better optimized for game"), Category("Importing Options")]
+        [Category("Importing Options"), DisplayName("Use Triangle Strips"), Description("Slower to import, but better optimized for game")]
         public bool UseStrips { get; set; } = true;
 
-        [DisplayName("Force Merge Objects"), Category("Importing Options"), Description("Reduces number of DOBJs by forces mesh groups to use one material")]
+        [Category("Importing Options"), DisplayName("Force Merge Objects"), Description("Reduces number of DOBJs by forcing mesh groups to be grouped by material")]
         public ForceGroupModes ForceMergeObjects { get; set; } = ForceGroupModes.None;
 
-        [Category("Importing Options")]
+        [Category("Importing Options"), DisplayName("Scale"), Description("Amount to scale model by when importing")]
         public float Scale { get; set; } = 1;
 
-        //[Category("Importing Options"), Description("Attempts to keep JOBJ and DOBJ matching original model")]
-        //public bool TryToUseExistingStructure { get; set; } = true;
+        [Category("Importing Options"), DisplayName("Set Joint Scale to 1"), Description("Sets all joint scaling to 1, 1, 1")]
+        public bool SetScaleToOne { get; set; } = false;
 
-
-        [Category("Vertex Attribute Options")]
+        [Category("Importing Options"), DisplayName("Import Rigging"), Description("Import rigging from model file")]
         public bool ImportRigging { get; set; } = true;
 
-        [Category("Vertex Attribute Options")]
+        
+
+        [Category("Material Options"), DisplayName("Shading Type"), Description("Type of shading to use: vertex color or material (phong)")]
+        public ShadingType ShadingType { get; set; } = ShadingType.Material;
+
+        [Category("Material Options"), DisplayName("Import MOBJs"), Description("Imports .mobj files from file")]
+        public bool ImportMOBJ { get; set; } = false;
+
+        [Category("Material Options"), DisplayName("Import Material Info"), Description("Imports the material info from model file. NOT recommended")]
+        public bool ImportMaterialInfo { get; set; } = false;
+
+        [Category("Material Options"), DisplayName("Always Import Normals"), Description("Imports normals even if using vertex color shading type")]
+        public bool AlwaysImportNormals { get; set; } = true;
+
+
+
+        [Category("Material Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha color from vertex colors")]
         public bool ImportVertexAlpha { get; set; } = false;
 
+        [Category("Material Vertex Color Options"), DisplayName("Multiply by 2"), Description("Multiplies vertex colors by 2")]
+        public bool MultiplyVertexColorBy2 { get; set; } = false;
 
-        //[Category("Texture Options"), Description("Texture Type is inferred from filename i.e. Image_CMP.png")]
-        //public bool TextureFormatFromName { get; set; } = true;
 
-        [Category("Texture Options")]
-        public GXTexFmt TextureFormat { get; set; } = GXTexFmt.RGB565;
 
-        [Category("Texture Options")]
+        [Category("Texture Options"), DisplayName("Import Textures"), Description("Imports textures from model file if they exist.")]
+        public bool ImportTexture { get; set; } = true;
+
+        [Category("Texture Options"), DisplayName("Texture Format"), Description("The format to store the texture data in.")]
+        public GXTexFmt TextureFormat { get; set; } = GXTexFmt.CI8;
+
+        [Category("Texture Options"), DisplayName("Palette Format"), Description("Palette format used with CI8 and CI4.")]
         public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB565;
 
 
-        [DisplayName("Apply Fighter Transform (Melee Fighter Only)"), Category("Misc"), Description("Applies fighter transforms for use with Super Smash Bros. Melee")]
+
+        [Category("Misc"), DisplayName("Apply Fighter Transform (Melee Fighter Only)"), Description("Applies fighter transforms for use with Super Smash Bros. Melee")]
         public bool ZeroOutRotationsAndApplyFighterTransforms { get; set; } = false;
         
-        [DisplayName("Apply Naruto GNT Materials"), Category("Misc"), Description("Applys Material Style used in Naruto Clash of Ninja games")]
+        [Category("Misc"), DisplayName("Apply Naruto GNT Materials"), Description("Applys Material Style used in Naruto Clash of Ninja games")]
         public bool ApplyNarutoMaterials { get; set; } = false;
     }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ModelProcessCache
+    {
+        // Folder path to search for external files like textures
+        public string FolderPath;
+
+        // this tool automatically splits triangle lists into stripped pobjs
+        public POBJ_Generator POBJGen = new POBJ_Generator();
+
+        // cache the jobj names to their respective jobj
+        public Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
+
+        // SingleBoundJOBJ bound vertices need to be inverted by their parent bone
+        public Dictionary<HSD_JOBJ, Matrix4> jobjToInverseTransform = new Dictionary<HSD_JOBJ, Matrix4>();
+        public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
+
+        // mesh nodes need to be processed after the jobjs
+        public List<Node> MeshNodes = new List<Node>();
+
+        // Indicates jobjs that need the SKELETON flag set along with inverted transform
+        public List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
+
+        // keeps matches texture path to dobj for better grouping options
+        public Dictionary<string, HSD_DOBJ> TextureToDOBJ = new Dictionary<string, HSD_DOBJ>();
+    }
+
+
 
     /// <summary>
     /// Static class for importing 3d model information
     /// </summary>
-    public class ModelImporter
+    public class ModelImporter : ProgressClass
     {
+        private string FilePath;
+        private ModelImportSettings Settings;
+        public HSD_JOBJ NewModel;
+
+        public ModelImporter(string filePath, ModelImportSettings settings)
+        {
+            FilePath = filePath;
+            Settings = settings;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="w"></param>
+        public override void Work(BackgroundWorker w)
+        {
+            // settings
+            if (Settings == null)
+                Settings = new ModelImportSettings();
+
+            ModelProcessCache cache = new ModelProcessCache();
+
+            cache.POBJGen.UseTriangleStrips = Settings.UseStrips;
+
+            cache.FolderPath = Path.GetDirectoryName(FilePath);
+
+            var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
+                | PostProcessSteps.Triangulate
+                | PostProcessSteps.LimitBoneWeights
+                | PostProcessSteps.CalculateTangentSpace;
+
+            if (!Settings.FlipFaces)
+                processFlags |= PostProcessSteps.FlipWindingOrder;
+
+            if (Settings.FlipUVs)
+                processFlags |= PostProcessSteps.FlipUVs;
+
+            //if (Settings.SmoothNormals)
+            //    processFlags |= PostProcessSteps.GenerateSmoothNormals;
+            
+            ProgressStatus = "Importing Model with Assimp...";
+            w.ReportProgress(0);
+            // import
+            AssimpContext importer = new AssimpContext();
+            //if (Settings.SmoothNormals)
+            //    importer.SetConfig(new NormalSmoothingAngleConfig(80.0f));
+            importer.SetConfig(new VertexBoneWeightLimitConfig(4));
+            var importmodel = importer.ImportFile(FilePath, processFlags);
+            
+            ProgressStatus = "Processing Nodes...";
+            w.ReportProgress(30);
+            // process nodes
+            var rootNode = importmodel.RootNode;
+            var rootjobj = RecursiveProcess(cache, Settings, importmodel, importmodel.RootNode);
+
+            // Clear rotations
+            if (Settings.ZeroOutRotationsAndApplyFighterTransforms)
+            {
+                ProgressStatus = "Clearing Rotations...";
+                ZeroOutRotations(cache, rootjobj);
+            }
+
+            // get root of skeleton
+            rootjobj = rootjobj.Child;
+            rootjobj.Flags = 0;
+
+            rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;
+
+            // no need for excess nodes
+            //if (filePath.ToLower().EndsWith(".obj"))
+            rootjobj.Next = null;
+
+            // process mesh
+            ProgressStatus = "Processing Mesh...";
+            foreach (var mesh in cache.MeshNodes)
+            {
+                var Dobj = GetMeshes(cache, Settings, importmodel, mesh, rootjobj);
+
+                if (rootjobj.Dobj == null)
+                    rootjobj.Dobj = Dobj;
+                else
+                    rootjobj.Dobj.Add(Dobj);
+
+                ProgressStatus = $"Processing Mesh {rootjobj.Dobj.List.Count} {cache.MeshNodes.Count + 1}...";
+                w.ReportProgress((int)(30 + 60 * (rootjobj.Dobj.List.Count / (float)cache.MeshNodes.Count)));
+
+                rootjobj.Flags |= JOBJ_FLAG.OPA;
+
+                //TODO:
+                //if (c.Flags.HasFlag(JOBJ_FLAG.OPA) || c.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
+                //    jobj.Flags |= JOBJ_FLAG.ROOT_OPA;
+
+                if (!rootjobj.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && Settings.ShadingType == ShadingType.Material)// settings.ShadingType == ShadingType.Material)
+                {
+                    rootjobj.Flags |= JOBJ_FLAG.LIGHTING;
+                    //foreach (var dobj in rootjobj.Dobj.List)
+                    //    dobj.Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
+                }
+            }
+
+            // SKELETON 
+            if (cache.EnvelopedJOBJs.Count > 0)
+                rootjobj.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
+
+            foreach (var jobj in cache.EnvelopedJOBJs)
+            {
+                ProgressStatus = "Generating Inverse Transforms...";
+                jobj.Flags |= JOBJ_FLAG.SKELETON;
+                jobj.InverseWorldTransform = Matrix4ToHSDMatrix(cache.jobjToInverseTransform[jobj]);
+            }
+
+            if (Settings.ApplyNarutoMaterials)
+            {
+                ProgressStatus = "Applying Naruto Materials...";
+                ApplyNarutoMaterials(rootjobj);
+            }
+
+            // SAVE POBJ buffers
+            ProgressStatus = "Generating and compressing vertex buffers...";
+            w.ReportProgress(90);
+            cache.POBJGen.SaveChanges();
+
+            // done
+            NewModel = rootjobj;
+            ProgressStatus = "Done!";
+            w.ReportProgress(100);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -123,150 +284,20 @@ namespace HSDRawViewer.Converters
                 {
                     if(d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        var newroot = ImportModel(f, settings);
+                        ModelImporter imp = new ModelImporter(f, settings);
+
+                        using (ProgressBarDisplay pb = new ProgressBarDisplay(imp))
+                        {
+                            pb.DoWork();
+                            pb.ShowDialog();
+                        }
+
+                        var newroot = imp.NewModel;
 
                         toReplace._s.SetFromStruct(newroot._s);
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private class ProcessingCache
-        {
-            // Folder path to search for external files like textures
-            public string FolderPath;
-            
-            // this tool automatically splits triangle lists into stripped pobjs
-            public POBJ_Generator POBJGen = new POBJ_Generator();
-
-            // cache the jobj names to their respective jobj
-            public Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
-
-            // SingleBoundJOBJ bound vertices need to be inverted by their parent bone
-            public Dictionary<HSD_JOBJ, Matrix4> jobjToInverseTransform = new Dictionary<HSD_JOBJ, Matrix4>();
-            public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
-
-            // mesh nodes need to be processed after the jobjs
-            public List<Node> MeshNodes = new List<Node>();
-
-            // Indicates jobjs that need the SKELETON flag set along with inverted transform
-            public List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
-
-            // keeps matches texture path to dobj for better grouping options
-            public Dictionary<string, HSD_DOBJ> TextureToDOBJ = new Dictionary<string, HSD_DOBJ>();
-        }
-
-        /// <summary>
-        /// Imports supported model format into Root JOBJ
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static HSD_JOBJ ImportModel(string filePath, ModelImportSettings settings = null)
-        {
-            // settings
-            if(settings == null)
-                settings = new ModelImportSettings();
-
-            ProcessingCache cache = new ProcessingCache();
-
-            cache.POBJGen.UseTriangleStrips = settings.UseStrips;
-
-            cache.FolderPath = Path.GetDirectoryName(filePath);
-
-            var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
-                | PostProcessSteps.Triangulate
-                | PostProcessSteps.LimitBoneWeights
-                | PostProcessSteps.CalculateTangentSpace;
-
-            if (settings.FlipFaces)
-                processFlags |= PostProcessSteps.FlipWindingOrder;
-
-            if (settings.FlipUVs)
-                processFlags |= PostProcessSteps.FlipUVs;
-
-            if (settings.SmoothNormals)
-                processFlags |= PostProcessSteps.GenerateSmoothNormals;
-
-            System.Diagnostics.Debug.WriteLine("Importing Model...");
-            // import
-            AssimpContext importer = new AssimpContext();
-            if(settings.SmoothNormals)
-                importer.SetConfig(new NormalSmoothingAngleConfig(80.0f));
-            importer.SetConfig(new VertexBoneWeightLimitConfig(4));
-            var importmodel = importer.ImportFile(filePath, processFlags);
-
-            System.Diagnostics.Debug.WriteLine("Processing Nodes...");
-            // process nodes
-            var rootNode = importmodel.RootNode;
-            var rootjobj = RecursiveProcess(cache, settings, importmodel, importmodel.RootNode);
-
-            // Clear rotations
-            if(settings.ZeroOutRotationsAndApplyFighterTransforms)
-                ZeroOutRotations(cache, rootjobj);
-
-            // get root of skeleton
-            rootjobj = rootjobj.Child;
-            rootjobj.Flags = 0;
-
-            rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;
-
-            // no need for excess nodes
-            //if (filePath.ToLower().EndsWith(".obj"))
-                rootjobj.Next = null;
-
-            // process mesh
-            System.Diagnostics.Debug.WriteLine("Processing Mesh...");
-            foreach (var mesh in cache.MeshNodes)
-            {
-                var Dobj = GetMeshes(cache, settings, importmodel, mesh, rootjobj);
-
-                if (rootjobj.Dobj == null)
-                    rootjobj.Dobj = Dobj;
-                else
-                    rootjobj.Dobj.Add(Dobj);
-
-                System.Diagnostics.Debug.WriteLine($"Processing Mesh {rootjobj.Dobj.List.Count} {cache.MeshNodes.Count + 1}...");
-
-                rootjobj.Flags |= JOBJ_FLAG.OPA;
-
-                //TODO:
-                //if (c.Flags.HasFlag(JOBJ_FLAG.OPA) || c.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
-                //    jobj.Flags |= JOBJ_FLAG.ROOT_OPA;
-
-                if (settings.ShadingType == ShadingType.Material)
-                {
-                    rootjobj.Flags |= JOBJ_FLAG.LIGHTING;
-                    //foreach (var dobj in rootjobj.Dobj.List)
-                    //    dobj.Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
-                }
-            }
-            
-            // SKELETON 
-            if (cache.EnvelopedJOBJs.Count > 0)
-                rootjobj.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
-
-            foreach (var jobj in cache.EnvelopedJOBJs)
-            {
-                jobj.Flags |= JOBJ_FLAG.SKELETON;
-                jobj.InverseWorldTransform = Matrix4ToHSDMatrix(cache.jobjToInverseTransform[jobj]);
-            }
-
-            if (settings.ApplyNarutoMaterials)
-            {
-                ApplyNarutoMaterials(rootjobj);
-            }
-
-            // SAVE POBJ buffers
-            System.Diagnostics.Debug.WriteLine("Saving Changes...");
-            cache.POBJGen.SaveChanges();
-
-            System.Diagnostics.Debug.WriteLine("Done!");
-
-            // done
-            return rootjobj;
         }
         
         /// <summary>
@@ -353,7 +384,7 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        private static void ZeroOutRotations(ProcessingCache cache, HSD_JOBJ root)
+        private static void ZeroOutRotations(ModelProcessCache cache, HSD_JOBJ root)
         {
             Dictionary<HSD_JOBJ, Matrix4> newWorldMatrices = new Dictionary<HSD_JOBJ, Matrix4>();
 
@@ -426,7 +457,7 @@ namespace HSDRawViewer.Converters
         /// <param name="newWorldMatrices"></param>
         /// <param name="root"></param>
         /// <param name="parentTransform"></param>
-        private static void ZeroOutRotations(ProcessingCache cache, Dictionary<HSD_JOBJ, Matrix4> newWorldMatrices, HSD_JOBJ root, Matrix4 oldParent, Matrix4 parentTransform)
+        private static void ZeroOutRotations(ModelProcessCache cache, Dictionary<HSD_JOBJ, Matrix4> newWorldMatrices, HSD_JOBJ root, Matrix4 oldParent, Matrix4 parentTransform)
         {
             var targetPoint = Vector3.TransformPosition(Vector3.Zero, cache.jobjToWorldTransform[root]);
 
@@ -493,7 +524,7 @@ namespace HSDRawViewer.Converters
         /// <param name="scene"></param>
         /// <param name="node"></param>
         /// <returns></returns>
-        private static HSD_JOBJ RecursiveProcess(ProcessingCache cache, ModelImportSettings settings, Scene scene, Node node)
+        private static HSD_JOBJ RecursiveProcess(ModelProcessCache cache, ModelImportSettings settings, Scene scene, Node node)
         {
             if (node.Name.EndsWith("_end"))
                 return null;
@@ -505,8 +536,7 @@ namespace HSDRawViewer.Converters
             var translation = new Vector3(tr.X, tr.Y, tr.Z);
             var scale = new Vector3(s.X, s.Y, s.Z);
             var rotation = Math3D.ToEulerAngles(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W).Inverted());
-
-            Console.WriteLine(scale.ToString());
+            
             if (settings.SetScaleToOne)
                 scale = Vector3.One;
 
@@ -555,12 +585,14 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <returns></returns>
-        private static HSD_DOBJ GetMeshes(ProcessingCache cache, ModelImportSettings settings, Scene scene, Node node, HSD_JOBJ rootnode)
+        private static HSD_DOBJ GetMeshes(ModelProcessCache cache, ModelImportSettings settings, Scene scene, Node node, HSD_JOBJ rootnode)
         {
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
 
             Console.WriteLine("Processing " + node.Name);
+
+            ShadingType matType = settings.ShadingType;
 
             foreach (int index in node.MeshIndices)
             {
@@ -568,7 +600,7 @@ namespace HSDRawViewer.Converters
                 var material = scene.Materials[mesh.MaterialIndex];
 
                 Console.WriteLine(mesh.Name + " " + material.Name);
-                Console.WriteLine(cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]].ToString());
+                //Console.WriteLine(cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]].ToString());
 
                 // Generate DOBJ
                 HSD_DOBJ dobj = new HSD_DOBJ();
@@ -589,7 +621,7 @@ namespace HSDRawViewer.Converters
                         prev.Next = dobj;
                     prev = dobj;
                     
-                    dobj.Mobj = GenerateMaterial(cache, settings, material);
+                    dobj.Mobj = GenerateMaterial(cache, settings, material, matType);
                     if(settings.ForceMergeObjects == ForceGroupModes.Texture &&
                         material.HasTextureDiffuse && 
                         settings.ImportTexture)
@@ -626,7 +658,7 @@ namespace HSDRawViewer.Converters
                 // todo: rigging
                 List<HSD_JOBJ>[] jobjs = new List<HSD_JOBJ>[mesh.Vertices.Count];
                 List<float>[] weights = new List<float>[mesh.Vertices.Count];
-                if (mesh.HasBones)
+                if (mesh.HasBones && settings.ImportRigging)
                 {
                     Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
 
@@ -658,23 +690,24 @@ namespace HSDRawViewer.Converters
 
                 if (mesh.HasVertices)
                     Attributes.Add(GXAttribName.GX_VA_POS);
-                
-                if (mesh.HasVertexColors(0) && settings.ShadingType == ShadingType.VertexColor)
+
+                if (mesh.HasVertexColors(0) && matType == ShadingType.VertexColor)
                     Attributes.Add(GXAttribName.GX_VA_CLR0);
 
                 //if (mesh.HasVertexColors(1) && settings.ImportVertexColors)
                 //    Attributes.Add(GXAttribName.GX_VA_CLR1);
 
-                if (!hasBump && mesh.HasNormals && settings.ShadingType == ShadingType.Material)
+                if (hasBump)
+                    Attributes.Add(GXAttribName.GX_VA_NBT);
+                else
+                if (mesh.HasNormals && (matType == ShadingType.Material || settings.AlwaysImportNormals))
                     Attributes.Add(GXAttribName.GX_VA_NRM);
 
-                if(hasBump)
-                    Attributes.Add(GXAttribName.GX_VA_NBT);
 
                 if (mesh.HasTextureCoords(0) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
-                if ((mesh.HasTextureCoords(1) || dobj.Mobj.Textures.List.Count > 1) && !hasReflection)
+                if ((mesh.HasTextureCoords(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX1);
 
                 var vertices = new List<GX_Vertex>();
@@ -703,7 +736,6 @@ namespace HSDRawViewer.Converters
                     if (faceMode != PrimitiveType.Triangle)
                     {
                         continue;
-                        //throw new NotSupportedException($"Non triangle primitive types not supported at this time {faceMode}");
                     }
 
                     for (int i = 0; i < face.IndexCount; i++)
@@ -723,9 +755,10 @@ namespace HSDRawViewer.Converters
                         tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[rootnode]);
                         tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[rootnode]);
 
-                        if (mesh.HasBones)
+                        if (mesh.HasBones && settings.ImportRigging)
                         {
-                            if (jobjs[indicie] == null) //  unbound verts
+                            //  unbound verts
+                            if (jobjs[indicie] == null) 
                             {
                                 jobjs[indicie] = new List<HSD_JOBJ>();
                                 weights[indicie] = new List<float>();
@@ -734,14 +767,15 @@ namespace HSDRawViewer.Converters
                             jobjList.Add(jobjs[indicie].ToArray());
                             wList.Add(weights[indicie].ToArray());
 
-                            // Single Binds Get Inverted
-
+                            // tan and bitan
+                            // TODO; tan is weird
                             if (mesh.HasTangentBasis)
                             {
                                 tktan = new Vector3(mesh.Tangents[indicie].X, mesh.Tangents[indicie].Y, mesh.Tangents[indicie].Z);
                                 tkbitan = new Vector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
                             }
 
+                            // Single Binds Get Inverted
                             if (jobjs[indicie].Count == 1 || (weights[indicie].Count > 0 && weights[indicie][0] == 1))
                             {
                                 tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[jobjs[indicie][0]]);
@@ -786,16 +820,16 @@ namespace HSDRawViewer.Converters
 
                         if (mesh.HasVertexColors(0))
                             vertex.CLR0 = new GXColor4(
-                                mesh.VertexColorChannels[0][indicie].R,
-                                mesh.VertexColorChannels[0][indicie].G,
-                                mesh.VertexColorChannels[0][indicie].B,
+                                mesh.VertexColorChannels[0][indicie].R * (settings.MultiplyVertexColorBy2 ? 2 : 1),
+                                mesh.VertexColorChannels[0][indicie].G * (settings.MultiplyVertexColorBy2 ? 2 : 1),
+                                mesh.VertexColorChannels[0][indicie].B * (settings.MultiplyVertexColorBy2 ? 2 : 1),
                                 settings.ImportVertexAlpha ? mesh.VertexColorChannels[0][indicie].A : 1);
 
                         if (mesh.HasVertexColors(1))
                             vertex.CLR0 = new GXColor4(
-                                mesh.VertexColorChannels[1][indicie].R,
-                                mesh.VertexColorChannels[1][indicie].G,
-                                mesh.VertexColorChannels[1][indicie].B,
+                                mesh.VertexColorChannels[1][indicie].R * (settings.MultiplyVertexColorBy2 ? 2 : 1),
+                                mesh.VertexColorChannels[1][indicie].G * (settings.MultiplyVertexColorBy2 ? 2 : 1),
+                                mesh.VertexColorChannels[1][indicie].B * (settings.MultiplyVertexColorBy2 ? 2 : 1),
                                 settings.ImportVertexAlpha ? mesh.VertexColorChannels[1][indicie].A : 1);
 
                         vertices.Add(vertex);
@@ -804,12 +838,12 @@ namespace HSDRawViewer.Converters
                 }
 
                 HSD_POBJ pobj = null;
-                if (mesh.HasBones)
-                {
+
+                if (mesh.HasBones && settings.ImportRigging)
                     pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, wList);
-                }
                 else
                     pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
+
                 if(pobj != null)
                 {
                     if (dobj.Pobj == null)
@@ -829,7 +863,7 @@ namespace HSDRawViewer.Converters
         /// <param name="settings"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        private static HSD_MOBJ GenerateMaterial(ProcessingCache cache, ModelImportSettings settings, Material material)
+        private static HSD_MOBJ GenerateMaterial(ModelProcessCache cache, ModelImportSettings settings, Material material, ShadingType matType)
         {
             var Mobj = new HSD_MOBJ();
             Mobj.Material = new HSD_Material();
@@ -842,7 +876,7 @@ namespace HSDRawViewer.Converters
             Mobj.Material.Shininess = 50;
             Mobj.Material.Alpha = 1;
             Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT;
-            if (settings.ImportVertexAlpha)
+            if (matType == ShadingType.VertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE_VTX;
             else
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE_MAT;
@@ -886,6 +920,9 @@ namespace HSDRawViewer.Converters
                     if (File.Exists(material.TextureDiffuse.FilePath))
                         texturePath = material.TextureDiffuse.FilePath;
 
+                    if (File.Exists(texturePath + ".png"))
+                        texturePath = texturePath + ".png";
+
                     var mobjPath = Path.Combine(cache.FolderPath, Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
                     
                     if(settings.ImportMOBJ && File.Exists(mobjPath))
@@ -910,7 +947,7 @@ namespace HSDRawViewer.Converters
                         var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, settings.TextureFormat, settings.PaletteFormat);
                         tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV;
 
-                        if(settings.ShadingType == ShadingType.VertexColor || settings.ShadingType == ShadingType.Material)
+                        if(matType == ShadingType.VertexColor || matType == ShadingType.Material)
                         {
                             tobj.Flags |= TOBJ_FLAGS.COLORMAP_MODULATE;
                         }

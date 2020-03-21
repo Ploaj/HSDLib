@@ -33,6 +33,16 @@
             A = a;
         }
 
+        public byte[] ToBytes()
+        {
+            return new byte[] {
+                (byte) (R > 1 ? 0xFF : R * 0xFF),
+                (byte) (G > 1 ? 0xFF : G * 0xFF),
+                (byte) (B > 1 ? 0xFF : B * 0xFF),
+                (byte) (A > 1 ? 0xFF : A * 0xFF)
+                };
+        }
+
         public override string ToString()
         {
             return $"({R}, {G}, {B}, {A})";

@@ -366,7 +366,11 @@ namespace HSDRawViewer.GUI.Plugins
                     {
                         if (settings.ShowDialog() == DialogResult.OK)
                         {
-                            TOBJConverter.InjectBitmap(tobjs[index], f, settings.TextureFormat, settings.PaletteFormat);
+                            using (Bitmap bmp = new Bitmap(f))
+                            {
+                                settings.ApplySettings(bmp);
+                                TOBJConverter.InjectBitmap(tobjs[index], bmp, settings.TextureFormat, settings.PaletteFormat);
+                            }
                         }
                         else
                         {
