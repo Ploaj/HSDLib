@@ -877,9 +877,9 @@ namespace HSDRawViewer.Converters
             Mobj.Material.Alpha = 1;
             Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT;
             if (matType == ShadingType.VertexColor)
-                Mobj.RenderFlags |= RENDER_MODE.DIFFUSE_VTX;
+                Mobj.RenderFlags |= RENDER_MODE.VERTEX;
             else
-                Mobj.RenderFlags |= RENDER_MODE.DIFFUSE_MAT;
+                Mobj.RenderFlags |= RENDER_MODE.CONSTANT;
 
             // Properties
             if (settings.ImportMaterialInfo)

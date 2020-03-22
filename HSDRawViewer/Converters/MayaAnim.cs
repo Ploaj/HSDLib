@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -173,9 +174,10 @@ namespace HSDRawViewer.Converters
 
                         var k = new FOBJKey();
                         k.Frame = mKey.input - 1;
-                        k.Value = mKey.output;
+                        k.Value = (mTrack.IsAngular() && mayaFile.header.angularUnit == "deg") ? MathHelper.DegreesToRadians(mKey.output) : mKey.output;
                         switch (mKey.outtan)
                         {
+                            case "auto":
                             case "linear":
                                 k.InterpolationType = GXInterpolationType.HSD_A_OP_LIN;
 
@@ -219,6 +221,9 @@ namespace HSDRawViewer.Converters
                                     t.Keys.Add(k);
                                 }
 
+                                break;
+                            default:
+                                Console.WriteLine(mKey.outtan + " not supported!");
                                 break;
                         }
 

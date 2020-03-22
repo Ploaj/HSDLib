@@ -44,7 +44,7 @@ uniform float alpha;
 
 // flags
 uniform int dfNone;
-//uniform int useMaterialLighting;
+uniform int useConstant;
 uniform int useVertexColor;
 uniform int enableDiffuse;
 uniform int enableSpecular;
@@ -102,9 +102,6 @@ vec4 MixTextureColor(sampler2D tex, vec2 texCoord, mat4 uvTransform, vec2 uvscal
 ///
 vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 {
-	if(useVertexColor == 1)
-		return vertexColor;
-		
 	if(enableDiffuse == 0)
 		return vec4(1, 1, 1, 1);
 
@@ -118,9 +115,6 @@ vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 ///
 vec4 GetSpecularMaterial(vec3 V, vec3 N)
 {
-	if(useVertexColor == 1)
-		return vec4(0, 0, 0, 1);
-
 	if(enableSpecular == 0)
 		return vec4(0, 0, 0, 1);
 	
@@ -260,7 +254,9 @@ void main()
 
 	fragColor.a = diffusePass.a;
 
-	//if(dfNone == 0)
+	if(useVertexColor == 1)
+		fragColor *= vertexColor;
+
 	fragColor.a *= alpha;
 		
 	fragColor.xyz *= overlayColor;

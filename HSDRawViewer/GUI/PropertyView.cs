@@ -114,6 +114,7 @@ namespace HSDRawViewer.GUI
                 return Poker.accessor;
             }
         }
+        private DataNode Node;
 
         public PropertyView()
         {
@@ -146,10 +147,14 @@ namespace HSDRawViewer.GUI
             offsetBox.Text = LastGoodOffset;
         }
 
-        public void SetAccessor(HSDAccessor accessor)
+        public void SetNode(DataNode node)
         {
+            var accessor = node.Accessor;
+
             if (accessor == null)
                 return;
+
+            Node = node;
 
             Poker.accessor = accessor;
             propertyGrid1.SelectedObject = accessor;
@@ -165,13 +170,19 @@ namespace HSDRawViewer.GUI
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             if (accessor != null)
+            {
+                Node?.NotifyChange();
                 SetBytes();
+            }
         }
 
         private void propertyGrid2_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             if (accessor != null)
+            {
+                Node?.NotifyChange();
                 SetBytes();
+            }
         }
 
         private void SetBytes()

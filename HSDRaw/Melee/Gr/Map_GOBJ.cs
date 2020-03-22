@@ -23,8 +23,6 @@ namespace HSDRaw.Melee.Gr
 
         public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x1C); set => _s.SetReference(0x1C, value); }
         
-        public int CollisionLinkCount { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
-
         public HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink> CollisionLinks
         {
             get
@@ -45,13 +43,36 @@ namespace HSDRaw.Melee.Gr
                 }
             }
         }
-        
+
+        public int CollisionLinkCount { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
 
         /*
 		0x28 Unknown visibility?
-		0x2C Unknown
-		0x30 Unknown
         */
+
+        public HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink> CollisionLinks2
+        {
+            get
+            {
+                return _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x2C);
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    CollisionLinkCount2 = 0;
+                    _s.SetReference(0x2C, null);
+                }
+                else
+                {
+                    CollisionLinkCount2 = value.Length;
+                    _s.SetReference(0x2C, value);
+                }
+            }
+        }
+
+        public int CollisionLinkCount2 { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }
+
     }
 
     public class SBM_Map_GOBJ_CollisionLink : HSDAccessor

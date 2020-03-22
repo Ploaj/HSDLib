@@ -350,13 +350,35 @@ namespace HSDRawViewer.Rendering
             if (parent != null)
                 world = local * parent.WorldTransform;
 
-            if(cam != null && root.Flags.HasFlag(JOBJ_FLAG.BILLBOARD))
+            if(cam != null && 
+                (root.Flags & (JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.PBILLBOARD)) != 0)
             {
                 var pos = Vector3.TransformPosition(Vector3.Zero, world);
-
                 var campos = (cam.RotationMatrix * new Vector4(cam.Translation, 1)).Xyz;
 
-                world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                if(root.Flags.HasFlag(JOBJ_FLAG.BILLBOARD))
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+
+                if (root.Flags.HasFlag(JOBJ_FLAG.VBILLBOARD))
+                {
+                    pos.Y = 0;
+                    campos.Y = 0;
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                }
+
+                if (root.Flags.HasFlag(JOBJ_FLAG.HBILLBOARD))
+                {
+                    pos.X = 0;
+                    campos.X = 0;
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                }
+
+                if (root.Flags.HasFlag(JOBJ_FLAG.RBILLBOARD))
+                {
+                    pos.Z = 0;
+                    campos.Z = 0;
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                }
             }
 
             if (!jobjToCache.ContainsKey(root))

@@ -182,13 +182,13 @@ namespace HSDRawViewer
             {
                 if (cast == null)
                 {
-                    _nodePropertyViewer.SetAccessor(n.Accessor);
+                    _nodePropertyViewer.SetNode(n);
                 }
                 else
                 {
                     cast._s = n.Accessor._s;
                     n.Accessor = cast;
-                    _nodePropertyViewer.SetAccessor(cast);
+                    _nodePropertyViewer.SetNode(n);
                 }
                 SelectedDataNode = n;
 

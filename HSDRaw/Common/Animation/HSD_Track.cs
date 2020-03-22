@@ -24,8 +24,8 @@ namespace HSDRaw.Common.Animation
             set
             {
                 _s.SetEmbededStruct(0x04, value._s);
-                if (value == null)
-                    DataLength = (short)value._s.Length;
+                if (value != null && value.Buffer != null)
+                    DataLength = (short)value.Buffer.Length;
                 else
                     DataLength = 0;
             }

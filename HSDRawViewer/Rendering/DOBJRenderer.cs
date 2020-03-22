@@ -152,7 +152,7 @@ namespace HSDRawViewer.Rendering
             GXShader.SetMatrix4x4("sphereMatrix", ref sphereMatrix);
 
             if (mobj != null)
-                BindMOBJ(GXShader, mobj);
+                BindMOBJ(GXShader, mobj, parentJOBJ);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, DOBJtoBuffer[dobj]);
 
@@ -296,7 +296,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="mobj"></param>
-        private void BindMOBJ(Shader shader, HSD_MOBJ mobj)
+        private void BindMOBJ(Shader shader, HSD_MOBJ mobj, HSD_JOBJ parentJOBJ)
         {
             GL.Enable(EnableCap.Texture2D);
 
@@ -329,15 +329,16 @@ namespace HSDRawViewer.Rendering
                 shader.SetFloat("alpha", color.Alpha);
             }
 
-            
-            shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
-            shader.SetBoolToInt("enableSpecular", mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
-            shader.SetBoolToInt("enableDiffuse", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
-            shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
-            //shader.SetBoolToInt("useMaterialLighting", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
+            var enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);
 
-            shader.SetBoolToInt("hasTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0));
-            shader.SetBoolToInt("hasTEX1", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX1));
+            shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
+            shader.SetBoolToInt("enableSpecular", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SPECULAR) && mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
+            shader.SetBoolToInt("enableDiffuse", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
+            shader.SetBoolToInt("useConstant", mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT));
+            shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.VERTEX));
+
+            shader.SetBoolToInt("hasTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) || enableAll);
+            shader.SetBoolToInt("hasTEX1", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX1) || enableAll);
 
             var id = Matrix4.Identity;
 

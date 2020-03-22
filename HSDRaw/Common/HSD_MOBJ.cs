@@ -7,10 +7,9 @@ namespace HSDRaw.Common
     [Flags]
     public enum RENDER_MODE
     {
-        DIFFUSE_MAT0 = (0 << 0),
-        DIFFUSE_MAT = (1 << 0),
-        DIFFUSE_VTX = (2 << 0),
-        DIFFSE_BOTH = (3 << 0),
+        CONSTANT = (1 << 0),
+        VERTEX = (1 << 1),
+        BOTH = CONSTANT | VERTEX,
         DIFFUSE = (1 << 2),
         SPECULAR = (1 << 3),
         TEX0 = (1 << 4),
@@ -28,9 +27,10 @@ namespace HSDRaw.Common
         ALPHA_BOTH = (3 << 13),
         SHADOW = (1 << 26),
         ZMODE_ALWAYS = (1 << 27),
+        DF_ALL = (1 << 28),
         DF_NONE = (1 << 29),
         XLU = (1 << 30),
-        USER = (1 << 31)
+        USER = (1 << 31),
     }
 
     [Flags]

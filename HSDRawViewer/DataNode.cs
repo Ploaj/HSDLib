@@ -405,6 +405,22 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public void NotifyChange()
+        {
+            if (Parent != null && Parent is DataNode parent && IsArrayMember)
+            {
+                var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+
+                var arr = prop.GetValue(parent.Accessor) as object[];
+
+                arr[ArrayIndex] = Accessor;
+
+                prop.SetValue(parent.Accessor, arr);
+            }
+        }
 
 #region Special
 

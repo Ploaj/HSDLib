@@ -51,6 +51,7 @@ namespace HSDRawViewer.Rendering
         {
             HSD_FigaTree tree = new HSD_FigaTree();
             tree.FrameCount = FrameCount;
+            tree.Type = 1;
             tree.Nodes = Nodes.Select(e =>
             {
                 var fn = new FigaTreeNode();

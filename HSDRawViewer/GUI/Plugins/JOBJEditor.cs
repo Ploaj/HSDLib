@@ -27,7 +27,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public DrawOrder DrawOrder => DrawOrder.First;
 
-        private bool SelectDOBJ { get => (toolStripComboBox1.SelectedIndex == 1); }
+        private bool SelectDOBJ { get => (toolStripComboBox2.SelectedIndex == 1); }
 
         private Dictionary<int, string> BoneLabelMap = new Dictionary<int, string>();
 
@@ -44,7 +44,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             listDOBJ.DataSource = dobjList;
 
-            toolStripComboBox1.SelectedIndex = 0;
+            toolStripComboBox2.SelectedIndex = 0;
 
             treeJOBJ.AfterSelect += (sender, args) =>
             {
@@ -235,7 +235,7 @@ namespace HSDRawViewer.GUI.Plugins
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             JOBJManager.Frame = viewport.Frame;
-            JOBJManager.DOBJManager.OutlineSelected = showOutlineToolStripMenuItem.Checked;
+            JOBJManager.DOBJManager.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
             JOBJManager.Render(cam);
         }
 
@@ -245,17 +245,17 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(toolStripComboBox1.SelectedIndex == 0)
+            if(toolStripComboBox2.SelectedIndex == 0)
             {
                 JOBJManager.RenderObjects = true;
                 JOBJManager.DOBJManager.OnlyRenderSelected = false;
             }
-            if (toolStripComboBox1.SelectedIndex == 1)
+            if (toolStripComboBox2.SelectedIndex == 1)
             {
                 JOBJManager.RenderObjects = true;
                 JOBJManager.DOBJManager.OnlyRenderSelected = true;
             }
-            if (toolStripComboBox1.SelectedIndex == 2)
+            if (toolStripComboBox2.SelectedIndex == 2)
             {
                 JOBJManager.RenderObjects = false;
                 JOBJManager.DOBJManager.OnlyRenderSelected = false;
@@ -264,7 +264,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            JOBJManager.RenderBones = toolStripButton1.Checked;
+            JOBJManager.RenderBones = showBonesToolStrip.Checked;
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -320,7 +320,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void mainRender_CheckStateChanged(object sender, EventArgs e)
         {
-            if (mainRender.Checked)
+            if (showInViewportToolStripMenuItem.Checked)
             {
                 PluginManager.GetCommonViewport().AddRenderer(this);
             }
@@ -404,7 +404,7 @@ namespace HSDRawViewer.GUI.Plugins
                         {
                             Mobj = new HSD_MOBJ()
                             {
-                                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT,
+                                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT,
                                 Material = new HSD_Material()
                                 {
                                     DiffuseColor = Color.White,
@@ -578,7 +578,7 @@ namespace HSDRawViewer.GUI.Plugins
                         Shininess = 50,
                         Alpha = 1
                     },
-                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT
+                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT
                 };
 
                 foreach (var pobj in con.DOBJ.Pobj.List)
