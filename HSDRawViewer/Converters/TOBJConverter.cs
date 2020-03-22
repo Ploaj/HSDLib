@@ -36,6 +36,7 @@ namespace HSDRawViewer.Converters
             var TOBJ = new HSD_TOBJ()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
                 HScale = 1,
                 WScale = 1,
                 WrapS = GXWrapMode.CLAMP,
@@ -61,6 +62,7 @@ namespace HSDRawViewer.Converters
             var TOBJ = new HSD_TOBJ()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
                 HScale = 1,
                 WScale = 1,
                 WrapS = GXWrapMode.CLAMP,
@@ -112,6 +114,7 @@ namespace HSDRawViewer.Converters
             var TOBJ = new HSD_TOBJ()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
                 HScale = 1,
                 WScale = 1,
                 WrapS = GXWrapMode.CLAMP,

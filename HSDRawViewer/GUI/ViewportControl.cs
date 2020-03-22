@@ -401,7 +401,7 @@ namespace HSDRawViewer.GUI
         {
             if (!ReadyToRender)
                 return;
-
+            
             panel1.MakeCurrent();
             GL.Viewport(0, 0, panel1.Width, panel1.Height);
 

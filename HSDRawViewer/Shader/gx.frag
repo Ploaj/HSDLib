@@ -85,8 +85,6 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 ///
 vec4 MixTextureColor(sampler2D tex, vec2 texCoord, mat4 uvTransform, vec2 uvscale, int coordType, int mirrorFix)
 {
-    vec4 clr = vec4(1);
-
     vec2 coords = GetCoordType(coordType, texCoord);
 
 	coords = (uvTransform * vec4(coords.x, coords.y, 0, 1)).xy;
@@ -96,9 +94,7 @@ vec4 MixTextureColor(sampler2D tex, vec2 texCoord, mat4 uvTransform, vec2 uvscal
 	if(mirrorFix == 1) // GX OPENGL difference
 		coords.y += 1;
 
-    clr = texture(tex, coords);
-
-    return clr;
+    return texture(tex, coords);
 }
 
 ///
@@ -113,8 +109,8 @@ vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 		return vec4(1, 1, 1, 1);
 
     float lambert = clamp(dot(N, V), 0, 1);
-	vec3 clr = vec3(lambert);
-	return vec4(clr, 1);
+
+	return vec4(vec3(lambert), 1);
 }
 
 ///
@@ -130,9 +126,7 @@ vec4 GetSpecularMaterial(vec3 V, vec3 N)
 	
     float phong = pow(spec, shinniness);
 
-    vec3 specularTerm = vec3(phong);
-
-	return vec4(specularTerm, 1);
+	return vec4(vec3(phong), 1);
 }
 
 ///
@@ -142,45 +136,47 @@ vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D 
 {
 	vec4 pass = MixTextureColor(tex, texCoord, uvTransform, uvscale, coordType, mirrorFix);
 
-	if(operation == 0) // Modulate
+	if(operation == 1) // Modulate
 		passColor.rgb *= pass.rgb;
 
-	if(operation == 1) // Replace
+	if(operation == 2) // Replace
 		passColor.rgb = pass.rgb;
 
-	if(operation == 2) // Blend
+	if(operation == 3) // Blend
 		passColor.rgb = mix(passColor, pass, blend).rgb;
 
-	if(operation == 3) // Add
+	if(operation == 4) // Add
 		passColor.rgb += pass.rgb;
 
-	if(operation == 4) // Subtract
+	if(operation == 5) // Subtract
 		passColor.rgb -= pass.rgb;
 
-	//if(operation == 5) // Pass
+	//if(operation == 6) // Pass
 			
-	// 6 Alpha Mask
+	if(operation == 7 && pass.a != 0) // Alpha Mask
+		passColor.rgb = pass.rgb;
 
-	// 7 RGB Mask
+	// 8 RGB Mask
 
 	
-	if(alphaOperation == 0) // Modulate
+	if(alphaOperation == 1) // Modulate
 		passColor.a *= pass.a;
 		
-	if(alphaOperation == 1) // Replace
+	if(alphaOperation == 2) // Replace
 		passColor.a = pass.a;
+		
+	if(alphaOperation == 3) // Blend
+		passColor.a = mix(passColor.a, pass.a, blend);
 
-	if(alphaOperation == 2) //Add
+	if(alphaOperation == 4) //Add
 		passColor.a += pass.a;
 
-	if(alphaOperation == 3) //Subtract
+	if(alphaOperation == 5) //Subtract
 		passColor.a -= pass.a;
 
-	//if(alphaOperation == 4) //Pass
+	//if(alphaOperation == 6) //Pass
 	
-	// 5 Alpha Mask
-
-	// 6 RGB Mask
+	// 7 Alpha Mask
 
 	return passColor;
 }
@@ -264,8 +260,8 @@ void main()
 
 	fragColor.a = diffusePass.a;
 
-	if(dfNone == 0)
-		fragColor.a *= alpha;
+	//if(dfNone == 0)
+	fragColor.a *= alpha;
 		
 	fragColor.xyz *= overlayColor;
 
@@ -273,12 +269,13 @@ void main()
 	{
 	case 1: fragColor = vec4(vec3(0.5) + normal / 2, 1); break;
 	case 2: fragColor = vertexColor; break;
-	case 3: fragColor = vec4(texcoord0, 0, 1); break;
-	case 4: fragColor = vec4(texcoord1, 0, 1); break;
+	case 3: fragColor = vec4(texcoord0.x, 0, texcoord0.y, 1); break;
+	case 4: fragColor = vec4(texcoord1.x, 0, texcoord1.y, 1); break;
 	case 5: fragColor = ambientPass; break;
 	case 6: fragColor = diffusePass; break;
 	case 7: fragColor = specularPass; break;
 	case 8: fragColor = extPass; break;
+	case 9: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
+	case 10: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
 	}
-
 }

@@ -19,14 +19,14 @@ namespace HSDRaw.MEX
         public int RuntimeJOBJPointer { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
         [Browsable(false)]
-        public int Unknown { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public int WasRandomlySelected { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
         [Browsable(false)]
         public byte IconState { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
 
         public byte PreviewModelID { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
 
-        public byte TextureID { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
+        public byte RandomStageSelectID { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
 
         private byte _oldExternalID { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
         public int ExternalID { get => _s.GetInt32(0x1C); set { _s.SetInt32(0x1C, value); } }

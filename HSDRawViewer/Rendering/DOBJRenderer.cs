@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Runtime.InteropServices;
 
 namespace HSDRawViewer.Rendering
 {
@@ -125,9 +124,9 @@ namespace HSDRawViewer.Rendering
 
             var mvp = camera.MvpMatrix;
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
-
-            Vector3 camPos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
-            GXShader.SetVector3("cameraPos", camPos);
+            
+            var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
+            GXShader.SetVector3("cameraPos", campos);
 
             Matrix4 single = Matrix4.Identity;
             if (parentJOBJ != null && jobjManager != null)
@@ -174,15 +173,8 @@ namespace HSDRawViewer.Rendering
 
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
-
-            if (selected)
-            {
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("colorOverride"), 1);
-            }
-            else
-            {
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("colorOverride"), 0);
-            }
+            
+            GXShader.SetBoolToInt("colorOverride", selected);
 
             foreach (var p in DOBJtoPOBJCache[dobj])
             {
@@ -410,31 +402,39 @@ namespace HSDRawViewer.Rendering
                     if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SHADOW))
                         lightType = 4;
 
-                    int colorOP = 0; // MODULATE
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_REPLACE))
+                    int colorOP = 0; // NONE
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_MODULATE))
                         colorOP = 1;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_BLEND))
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_REPLACE))
                         colorOP = 2;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ADD))
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_BLEND))
                         colorOP = 3;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_SUB))
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ADD))
                         colorOP = 4;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_PASS))
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_SUB))
                         colorOP = 5;
-                    //TOBJ_FLAGS.COLORMAP_ALPHA_MASK
-                    //TOBJ_FLAGS.COLORMAP_RGB_MASK
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_PASS))
+                        colorOP = 6;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ALPHA_MASK))
+                        colorOP = 7;
+                    /*if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_RGB_MASK))
+                        colorOP = 8;*/
 
-                    int alphaOP = 0; // MODULATE
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_REPLACE))
+                    int alphaOP = 0; // NONE
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_MODULATE))
                         alphaOP = 1;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ADD))
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_REPLACE))
                         alphaOP = 2;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_SUB))
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_BLEND))
                         alphaOP = 3;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_PASS))
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ADD))
                         alphaOP = 4;
-                    //if (tex.Flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ALPHA_MASK))
-                    //    aoperation = 5;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_SUB))
+                        alphaOP = 5;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_PASS))
+                        alphaOP = 6;
+                    //if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ALPHA_MASK))
+                    //    alphaOP = 7;
 
                     var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
                         Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *

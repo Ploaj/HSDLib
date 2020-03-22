@@ -320,7 +320,6 @@
     </Compile>
     <Compile Include="Sound\HPS.cs" />
     <Compile Include="Sound\SEM.cs" />
-    <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />

@@ -901,7 +901,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             {
                 var icon = HSDAccessor.DeepClone<HSD_DOBJ>(mexMap.IconModel.Child.Dobj);
                 if ((int)tobjanim[i].Value + 2 < tobjs.Length)
+                {
                     icon.Next.Mobj.Textures = tobjs[(int)tobjanim[i].Value + 2];
+                    icon.Next.Mobj.Textures.Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE;
+                }
                 cloned.Children[i].Dobj = icon;
             }
 
@@ -927,7 +930,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             var cloned = HSDAccessor.DeepClone<HSD_JOBJ>(stage.StageNameModel);
 
             if (sssEditor.SelectedObject is MEXStageIconEntry entry)
+            {
                 cloned.Child.Child.Dobj.Mobj.Textures = entry.MapSpace.NameTOBJ;
+                cloned.Child.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE;
+            }
 
             MnSlNameJOBJManager.ClearRenderingCache();
             MnSlNameJOBJManager.SetJOBJ(cloned);

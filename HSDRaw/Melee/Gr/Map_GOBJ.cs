@@ -17,48 +17,35 @@ namespace HSDRaw.Melee.Gr
         
         public HSD_Camera Camera { get => _s.GetReference<HSD_Camera>(0x10); set => _s.SetReference(0x10, value); }
 
-        //0x14 Unknown 0x0C??
+        //0x14 Unknown 0x0C?? shape anim joint?
 
         public HSDNullPointerArrayAccessor<HSD_Light> Lights { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_Light>>(0x18); set => _s.SetReference(0x18, value); }
 
-        public bool LoopAnimation {
-            get
-            {
-                var r = _s.GetReference<HSDAccessor>(0x28);
-                if (r == null)
-                    return true;
-                return r._s.GetByte(0) == 1;
-            }
-            set
-            {
-                _s.GetCreateReference<HSDAccessor>(0x28)._s.SetData(new byte[] { (byte)(value ? 1 : 0), 0, 0, 0});
-            }
-        }
-        /*
-        0x1C Unknown
-        */
+        public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x1C); set => _s.SetReference(0x1C, value); }
+        
+        public int CollisionLinkCount { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
 
-
-        public SBM_Map_GOBJ_CollisionLink[] CollisionLinks
+        public HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink> CollisionLinks
         {
             get
             {
-                return _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x20)?.Array;
+                return _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x20);
             }
             set
             {
                 if(value == null || value.Length == 0)
                 {
-                    _s.SetInt32(0x24, value.Length);
+                    CollisionLinkCount = 0;
                     _s.SetReference(0x20, null);
                 }
                 else
                 {
-                    _s.SetInt32(0x24, value.Length);
-                    _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x20).Array = value;
+                    CollisionLinkCount = value.Length;
+                    _s.SetReference(0x20, value);
                 }
             }
         }
+        
 
         /*
 		0x28 Unknown visibility?

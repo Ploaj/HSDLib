@@ -30,8 +30,6 @@ namespace HSDRawViewer
 
         private HSDRawFile RawHSDFile = new HSDRawFile();
 
-        private Dictionary<string, StructData> stringToStruct = new Dictionary<string, StructData>();
-
         public static DataNode SelectedDataNode { get; internal set; } = null;
 
         public static bool RefreshNode = false;

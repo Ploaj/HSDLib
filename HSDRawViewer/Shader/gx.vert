@@ -45,12 +45,6 @@ void main()
 		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
 	}
 
-	texcoord0 = GX_VA_TEX0;
-
-	texcoord1 = GX_VA_TEX1;
-
-	vertexColor = GX_VA_CLR0;
-
 	if (hasEnvelopes == 1)
 	{
 		int matrixIndex = int(PNMTXIDX / 3);
@@ -80,6 +74,12 @@ void main()
 	}
 	
 	vertPosition = pos.xyz;
+
+	texcoord0 = GX_VA_TEX0;
+
+	texcoord1 = GX_VA_TEX1;
+
+	vertexColor = GX_VA_CLR0;
 	
 	vec3 V = normalize(vertPosition - cameraPos);
     spec = clamp(dot(normal, V), 0, 1);
