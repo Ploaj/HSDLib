@@ -39,6 +39,9 @@ namespace HSDRawViewer.GUI.Plugins
 
             JOBJManager = new JOBJManager();
 
+            renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
+            renderModeBox.SelectedIndex = 0;
+
             listDOBJ.DataSource = dobjList;
 
             toolStripComboBox1.SelectedIndex = 0;
@@ -284,7 +287,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void vertexColorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJManager.DOBJManager.RenderVertexColor = renderVertexColorsToolStripMenuItem.Checked;
+            //JOBJManager.DOBJManager.RenderVertexColor = renderVertexColorsToolStripMenuItem.Checked;
         }
 
         /// <summary>
@@ -836,6 +839,21 @@ namespace HSDRawViewer.GUI.Plugins
                     });
                     animFile.Save(f);
                 }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void renderModeBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(JOBJManager != null)
+            {
+                RenderMode mode = JOBJManager.RenderMode;
+                Enum.TryParse<RenderMode>(renderModeBox.Text, out mode);
+                JOBJManager.RenderMode = mode;
+            }
         }
     }
 }

@@ -7,6 +7,18 @@ using HSDRaw.Common.Animation;
 
 namespace HSDRawViewer.Rendering
 {
+    public enum RenderMode
+    {
+        Default,
+        Normals,
+        VertexColor,
+        UV0,
+        UV1,
+        Ambient,
+        Diffuse,
+        Specular,
+        Ext,
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -31,6 +43,8 @@ namespace HSDRawViewer.Rendering
         public DOBJManager DOBJManager = new DOBJManager();
 
         public bool EnableDepth { get; set; } = true;
+
+        public RenderMode RenderMode { get; set; } = RenderMode.Normals;
 
         public float ModelScale { get => _modelScale;
             set
@@ -250,9 +264,14 @@ namespace HSDRawViewer.Rendering
                 }
             }
 
+            GL.PopAttrib();
+
+
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
             GL.Disable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
-            // Render Bones
+
             if (RenderBones)
                 foreach (var b in jobjToCache)
                 {

@@ -42,7 +42,6 @@
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.showOutlineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renderVertexColorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,6 +56,9 @@
             this.animfileDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.importFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportAsANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mayaANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.figaTreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.animJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAnimButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.previewBox = new System.Windows.Forms.GroupBox();
@@ -68,9 +70,8 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.mainRender = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.mayaANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.figaTreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.animJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -209,7 +210,6 @@
             this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showOutlineToolStripMenuItem,
-            this.renderVertexColorsToolStripMenuItem,
             this.toolStripSeparator1,
             this.createOutlineMeshToolStripMenuItem,
             this.addDummyDOBJToolStripMenuItem,
@@ -228,16 +228,6 @@
             this.showOutlineToolStripMenuItem.Name = "showOutlineToolStripMenuItem";
             this.showOutlineToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.showOutlineToolStripMenuItem.Text = "Show Selected Outline";
-            // 
-            // renderVertexColorsToolStripMenuItem
-            // 
-            this.renderVertexColorsToolStripMenuItem.Checked = true;
-            this.renderVertexColorsToolStripMenuItem.CheckOnClick = true;
-            this.renderVertexColorsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.renderVertexColorsToolStripMenuItem.Name = "renderVertexColorsToolStripMenuItem";
-            this.renderVertexColorsToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.renderVertexColorsToolStripMenuItem.Text = "Render Vertex Colors";
-            this.renderVertexColorsToolStripMenuItem.Click += new System.EventHandler(this.vertexColorsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -348,7 +338,7 @@
             // importFromFileToolStripMenuItem
             // 
             this.importFromFileToolStripMenuItem.Name = "importFromFileToolStripMenuItem";
-            this.importFromFileToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.importFromFileToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.importFromFileToolStripMenuItem.Text = "Import";
             this.importFromFileToolStripMenuItem.Click += new System.EventHandler(this.importFromFileToolStripMenuItem_Click);
             // 
@@ -359,9 +349,30 @@
             this.figaTreeToolStripMenuItem,
             this.animJointToolStripMenuItem});
             this.exportAsANIMToolStripMenuItem.Name = "exportAsANIMToolStripMenuItem";
-            this.exportAsANIMToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exportAsANIMToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
             this.exportAsANIMToolStripMenuItem.Text = "Export";
             this.exportAsANIMToolStripMenuItem.Click += new System.EventHandler(this.exportAsANIMToolStripMenuItem_Click);
+            // 
+            // mayaANIMToolStripMenuItem
+            // 
+            this.mayaANIMToolStripMenuItem.Name = "mayaANIMToolStripMenuItem";
+            this.mayaANIMToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.mayaANIMToolStripMenuItem.Text = "Maya ANIM";
+            this.mayaANIMToolStripMenuItem.Click += new System.EventHandler(this.mayaANIMToolStripMenuItem_Click);
+            // 
+            // figaTreeToolStripMenuItem
+            // 
+            this.figaTreeToolStripMenuItem.Name = "figaTreeToolStripMenuItem";
+            this.figaTreeToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.figaTreeToolStripMenuItem.Text = "FigaTree";
+            this.figaTreeToolStripMenuItem.Click += new System.EventHandler(this.figaTreeToolStripMenuItem_Click);
+            // 
+            // animJointToolStripMenuItem
+            // 
+            this.animJointToolStripMenuItem.Name = "animJointToolStripMenuItem";
+            this.animJointToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.animJointToolStripMenuItem.Text = "AnimJoint";
+            this.animJointToolStripMenuItem.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
             // 
             // clearAnimButton
             // 
@@ -408,7 +419,9 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton2,
             this.toolStripButton2,
-            this.mainRender});
+            this.mainRender,
+            this.toolStripLabel2,
+            this.renderModeBox});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(767, 25);
@@ -471,26 +484,18 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // mayaANIMToolStripMenuItem
+            // toolStripLabel2
             // 
-            this.mayaANIMToolStripMenuItem.Name = "mayaANIMToolStripMenuItem";
-            this.mayaANIMToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.mayaANIMToolStripMenuItem.Text = "Maya ANIM";
-            this.mayaANIMToolStripMenuItem.Click += new System.EventHandler(this.mayaANIMToolStripMenuItem_Click);
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            this.toolStripLabel2.Size = new System.Drawing.Size(81, 22);
+            this.toolStripLabel2.Text = "Render Mode:";
             // 
-            // figaTreeToolStripMenuItem
+            // renderModeBox
             // 
-            this.figaTreeToolStripMenuItem.Name = "figaTreeToolStripMenuItem";
-            this.figaTreeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.figaTreeToolStripMenuItem.Text = "FigaTree";
-            this.figaTreeToolStripMenuItem.Click += new System.EventHandler(this.figaTreeToolStripMenuItem_Click);
-            // 
-            // animJointToolStripMenuItem
-            // 
-            this.animJointToolStripMenuItem.Name = "animJointToolStripMenuItem";
-            this.animJointToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.animJointToolStripMenuItem.Text = "AnimJoint";
-            this.animJointToolStripMenuItem.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
+            this.renderModeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.renderModeBox.Name = "renderModeBox";
+            this.renderModeBox.Size = new System.Drawing.Size(121, 25);
+            this.renderModeBox.SelectedIndexChanged += new System.EventHandler(this.renderModeBox_SelectedIndexChanged);
             // 
             // JOBJEditor
             // 
@@ -552,7 +557,6 @@
         private System.Windows.Forms.ToolStripButton mainRender;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton3;
         private System.Windows.Forms.ToolStripMenuItem addDummyDOBJToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem renderVertexColorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonMoveUp;
         private System.Windows.Forms.ToolStripButton buttonMoveDown;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
@@ -571,5 +575,7 @@
         private System.Windows.Forms.ToolStripMenuItem mayaANIMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem figaTreeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem animJointToolStripMenuItem;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripComboBox renderModeBox;
     }
 }
