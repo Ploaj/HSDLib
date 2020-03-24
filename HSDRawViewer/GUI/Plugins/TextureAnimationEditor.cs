@@ -141,6 +141,7 @@ namespace HSDRawViewer.GUI.Plugins
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
+            viewport.EnableHelpDisplay = false;
             Controls.Add(viewport);
             viewport.BringToFront();
 

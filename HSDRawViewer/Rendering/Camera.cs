@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using System;
+using System.ComponentModel;
 
 namespace HSDRawViewer.Rendering
 {
@@ -11,6 +12,7 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// The position of the camera in scene units, taking into account translation and rotation.
         /// </summary>
+        [Browsable(false)]
         public Vector3 TransformedPosition { get; private set; }
 
         /// <summary>
@@ -21,6 +23,7 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// The translation component of the camera's transforms in scene units.
         /// </summary>
+        [Browsable(false)]
         public Vector3 Translation
         {
             get => translation;
@@ -32,9 +35,14 @@ namespace HSDRawViewer.Rendering
         }
         private Vector3 translation = new Vector3(0, 10, -80);
 
+        public float X { get => translation.X; set => Translation = new Vector3(value, translation.Y, translation.Z); }
+        public float Y { get => translation.Y; set => Translation = new Vector3(translation.X, value, translation.Z); }
+        public float Z { get => translation.Z; set => Translation = new Vector3(translation.X, translation.Y, value); }
+
         /// <summary>
         /// The scale for all objects. Defaults to 1.
         /// </summary>
+        [Browsable(false)]
         public float Scale
         {
             get => scale;
@@ -192,6 +200,7 @@ namespace HSDRawViewer.Rendering
         /// The width of the viewport or rendered region in pixels.
         /// Values less than 1 are set to 1.
         /// </summary>
+        [Browsable(false)]
         public int RenderWidth
         {
             get => renderWidth;
@@ -207,6 +216,8 @@ namespace HSDRawViewer.Rendering
         /// The height of the viewport or rendered region in pixels.
         /// Values less than 1 are set to 1.
         /// </summary>
+        /// 
+        [Browsable(false)]
         public int RenderHeight
         {
             get => renderHeight;

@@ -302,6 +302,7 @@
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DOBJRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
+    <Compile Include="Rendering\Renderers\TextRenderer.cs" />
     <Compile Include="Rendering\Shapes\DrawShape.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />

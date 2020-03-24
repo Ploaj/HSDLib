@@ -932,7 +932,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (sssEditor.SelectedObject is MEXStageIconEntry entry)
             {
                 cloned.Child.Child.Dobj.Mobj.Textures = entry.MapSpace.NameTOBJ;
-                cloned.Child.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE;
+                cloned.Child.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE;
             }
 
             MnSlNameJOBJManager.ClearRenderingCache();
@@ -1706,11 +1706,68 @@ static struct MoveLogic move_logic[] = {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButton1_Click_1(object sender, EventArgs e)
         {
             var cam = (StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable).Camera;
 
             viewport.LoadHSDCamera(cam);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tabControl3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            mapGOBJCopyButton.Visible = tabControl3.SelectedIndex == 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mapGOBJCopyButton_Click(object sender, EventArgs e)
+        {
+            if (stageEditor.SelectedObject is MEXStageEntry entry)
+            {
+                var functions = entry.GOBJFunctions;
+                
+                StringBuilder table = new StringBuilder();
+
+                foreach (var m in functions)
+                {
+                    //table.AppendLine("\t// " + (fighterData != null && m.AnimationID != -1 && fighterData.SubActionTable.Subactions[m.AnimationID].Name != null ? System.Text.RegularExpressions.Regex.Replace(fighterData.SubActionTable.Subactions[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
+
+                    table.AppendLine(string.Format(
+                        "\t{{" +
+                        "\n\t\t0x{0, -10}// Bitflags" +
+                        "\n\t\t0x{1, -10}// OnCreation" +
+                        "\n\t\t0x{2, -10}// OnDeletion" +
+                        "\n\t\t0x{3, -10}// OnFrame" +
+                        "\n\t\t0x{4, -10}// OnUnk" +
+                        "\n\t}},",
+                m.Bitflags.ToString("X") + ",",
+                m.OnCreation.ToString("X") + ",",
+                m.OnDeletion.ToString("X") + ",",
+                m.OnFrame.ToString("X") + ",",
+                m.OnUnk.ToString("X") + ","
+                ));
+                }
+
+                Clipboard.SetText(
+                    @"__attribute__((used))
+static struct MapGOBJ map_gobjs[] = {
+" + table.ToString() + @"}; ");
+
+                MessageBox.Show("Map GOBJ Functions Copied to Clipboard");
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using OpenTK;
 using System.Linq;
 using OpenTK.Input;
 using System.Timers;
+using HSDRawViewer.Rendering.Renderers;
 
 namespace HSDRawViewer.GUI
 {
@@ -21,6 +22,8 @@ namespace HSDRawViewer.GUI
         private Camera _camera;
 
         private bool ReadyToRender = false;
+
+        public bool EnableHelpDisplay { get; set; } = true;
 
         public bool LoopPlayback { get => cbLoop.Checked; set => cbLoop.Checked = value; }
 
@@ -157,9 +160,14 @@ namespace HSDRawViewer.GUI
 
             panel1.KeyDown += (sender, args) =>
             {
-                if(args.Alt && args.KeyCode == Keys.R)
+                if (args.Alt && args.KeyCode == Keys.R)
                 {
                     _camera.RestoreDefault();
+                }
+                if (args.Alt && args.KeyCode == Keys.C)
+                {
+                    using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
+                        d.ShowDialog();
                 }
             };
 
@@ -453,7 +461,20 @@ namespace HSDRawViewer.GUI
                 GL.Vertex2(x1, y2);
                 GL.End();
             }
-            
+
+            if(EnableHelpDisplay)
+            {
+                if (IsAltAction)
+                {
+                    GLTextRenderer.RenderText(_camera, "R - Reset Camera", 0, 0);
+                    GLTextRenderer.RenderText(_camera, "C - Open Camera Settings", 0, 16);
+                }
+                else
+                {
+                    GLTextRenderer.RenderText(_camera, "Alt+", 0, 0);
+                }
+            }
+
             panel1.SwapBuffers();
         }
 

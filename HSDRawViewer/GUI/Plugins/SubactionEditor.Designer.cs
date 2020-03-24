@@ -64,11 +64,15 @@
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+            this.hitboxDisplayButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
+            this.previewBox.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.toolStrip3.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitter1
@@ -267,6 +271,7 @@
             // 
             // previewBox
             // 
+            this.previewBox.Controls.Add(this.toolStrip3);
             this.previewBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.previewBox.Location = new System.Drawing.Point(3, 130);
             this.previewBox.Name = "previewBox";
@@ -434,6 +439,28 @@
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
+            // toolStrip3
+            // 
+            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.hitboxDisplayButton});
+            this.toolStrip3.Location = new System.Drawing.Point(3, 16);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(514, 25);
+            this.toolStrip3.TabIndex = 0;
+            this.toolStrip3.Text = "toolStrip3";
+            // 
+            // hitboxDisplayButton
+            // 
+            this.hitboxDisplayButton.Checked = true;
+            this.hitboxDisplayButton.CheckOnClick = true;
+            this.hitboxDisplayButton.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.hitboxDisplayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.hitboxDisplayButton.Image = ((System.Drawing.Image)(resources.GetObject("hitboxDisplayButton.Image")));
+            this.hitboxDisplayButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.hitboxDisplayButton.Name = "hitboxDisplayButton";
+            this.hitboxDisplayButton.Size = new System.Drawing.Size(112, 22);
+            this.hitboxDisplayButton.Text = "Display Hitbox Info";
+            // 
             // SubactionEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -447,12 +474,16 @@
             this.groupBox1.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
+            this.previewBox.ResumeLayout(false);
+            this.previewBox.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.toolStrip3.ResumeLayout(false);
+            this.toolStrip3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -493,5 +524,7 @@
         private System.Windows.Forms.Splitter splitter3;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+        private System.Windows.Forms.ToolStrip toolStrip3;
+        private System.Windows.Forms.ToolStripButton hitboxDisplayButton;
     }
 }

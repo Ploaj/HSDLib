@@ -145,5 +145,102 @@ namespace HSDRawViewer.Rendering
             GL.PopMatrix();
             GL.PopAttrib();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="length"></param>
+        /// <param name="angle"></param>
+        public static void DrawAngleLine(Camera cam, Matrix4 transform, float length, float angle)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Disable(EnableCap.DepthTest);
+
+            var arrowSize = length / 8f;
+
+            var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+
+            var rot = Matrix4.CreateRotationX(-angle);
+            var start = pos;
+            var end = start + Vector3.TransformNormal(new Vector3(0, 0, length), rot);
+
+            GL.LineWidth(2f);
+            GL.Color3(Color.White);
+            
+            GL.Begin(PrimitiveType.Lines);
+            
+            GL.Vertex3(start);
+            GL.Vertex3(end);
+
+            GL.Vertex3(end);
+            GL.Vertex3(start + Vector3.TransformNormal(new Vector3(0, -arrowSize, length - arrowSize), rot));
+
+            GL.Vertex3(end);
+            GL.Vertex3(start + Vector3.TransformNormal(new Vector3(0, arrowSize, length - arrowSize), rot));
+
+            GL.End();
+            
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="length"></param>
+        public static void DrawSakuraiAngle(Camera cam, Matrix4 transform, float length)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Disable(EnableCap.DepthTest);
+
+            var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+
+            var arrowSize = length / 3;
+
+            var campos = (cam.RotationMatrix * new Vector4(cam.Translation, 1)).Xyz;
+            var world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+
+            GL.LineWidth(2f);
+            GL.Color3(Color.White);
+
+            GL.PushMatrix();
+            GL.MultMatrix(ref world);
+            DrawCircleOutline(Vector3.Zero, arrowSize, 16);
+            GL.PopMatrix();
+
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <param name="precision"></param>
+        private static void DrawCircleOutline(Vector3 center, float radius, uint precision)
+        {
+            float theta = 2.0f * (float)Math.PI / precision;
+            float cosine = (float)Math.Cos(theta);
+            float sine = (float)Math.Sin(theta);
+
+            float x = radius;
+            float y = 0;
+
+            GL.Begin(PrimitiveType.LineStrip);
+            for (int i = 0; i < precision + 1; i++)
+            {
+                GL.Vertex3(x + center.X, y + center.Y, center.Z);
+
+                //apply the rotation matrix
+                var temp = x;
+                x = cosine * x - sine * y;
+                y = sine * temp + cosine * y;
+            }
+            GL.End();
+        }
+
     }
 }

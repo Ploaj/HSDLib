@@ -1047,6 +1047,14 @@ namespace HSDRawViewer.GUI
                 {
                     DrawShape.DrawSphere(transform, hb.Size, 16, 16, hbColor, alpha);
                 }
+                if (hitboxDisplayButton.Checked)
+                {
+                    if (hb.Angle != 361)
+                        DrawShape.DrawAngleLine(cam, transform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
+                    else
+                        DrawShape.DrawSakuraiAngle(cam, transform, hb.Size);
+                    GLTextRenderer.RenderText(cam, hb.ID.ToString(), transform, StringAlignment.Center, true);
+                }
             }
             
         }

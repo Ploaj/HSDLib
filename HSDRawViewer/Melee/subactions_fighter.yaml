@@ -249,10 +249,10 @@
   parameters:
   - name: Struct ID
     bitCount: 7
-  - name: Unknown
-    bitCount: 11
+  - name: ExtraBitNonsense
+    bitCount: 1
   - name: Object ID
-    bitCount: 8
+    bitCount: 18
     signed: true
 
 - code: 32

@@ -15,6 +15,7 @@ using HSDRaw.Tools;
 using HSDRaw.GX;
 using System.Drawing;
 using HSDRaw;
+using HSDRawViewer.Rendering.Renderers;
 
 namespace HSDRawViewer.GUI.Plugins
 {
