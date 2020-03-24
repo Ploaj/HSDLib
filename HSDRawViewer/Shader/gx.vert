@@ -16,8 +16,7 @@ out vec4 vertexColor;
 
 uniform mat4 mvp;
 
-uniform int isRootBound;
-uniform int notInverted;
+uniform int enableParentTransform;
 uniform mat4 singleBind;
 
 uniform vec3 cameraPos;
@@ -39,7 +38,7 @@ void main()
 	
 	normal = GX_VA_NRM;
 
-	if(notInverted == 0)
+	if(enableParentTransform == 1)
 	{
 		pos = singleBind * pos;
 		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
@@ -48,8 +47,8 @@ void main()
 	if (hasEnvelopes == 1)
 	{
 		int matrixIndex = int(PNMTXIDX / 3);
-
-		if(weights[matrixIndex].x == 1 && (isRootBound == 1 || notInverted == 1))
+		
+		if(weights[matrixIndex].x == 1 && enableParentTransform == 1)
 		{
 			pos = transforms[int(envelopeIndex[matrixIndex].x)] * vec4(pos.xyz, 1);
 			normal = (inverse(transpose(transforms[int(envelopeIndex[matrixIndex].x)])) * vec4(normal, 1)).xyz;

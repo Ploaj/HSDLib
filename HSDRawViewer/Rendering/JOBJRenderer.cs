@@ -361,23 +361,26 @@ namespace HSDRawViewer.Rendering
 
                 if (root.Flags.HasFlag(JOBJ_FLAG.VBILLBOARD))
                 {
+                    var temp = pos.Y;
                     pos.Y = 0;
                     campos.Y = 0;
-                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, temp, 0);
                 }
 
                 if (root.Flags.HasFlag(JOBJ_FLAG.HBILLBOARD))
                 {
+                    var temp = pos.X;
                     pos.X = 0;
                     campos.X = 0;
-                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(temp, 0, 0);
                 }
 
                 if (root.Flags.HasFlag(JOBJ_FLAG.RBILLBOARD))
                 {
+                    var temp = pos.Z;
                     pos.Z = 0;
                     campos.Z = 0;
-                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, 0, temp);
                 }
             }
 
@@ -389,6 +392,10 @@ namespace HSDRawViewer.Rendering
                     Index = jobjToCache.Count,
                     InvertedTransform = world.Inverted()
                 };
+                if (root.Flags.HasFlag(JOBJ_FLAG.SKELETON) && root.InverseWorldTransform != null)
+                {
+                    jcache.InvertedTransform = HSDMatrixToTKMatrix(root.InverseWorldTransform);
+                }
                 jobjToCache.Add(root, jcache);
             }
 
@@ -525,6 +532,23 @@ namespace HSDRawViewer.Rendering
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="Z"></param>
+        /// <returns></returns>
+        private static Matrix4 HSDMatrixToTKMatrix(HSD_Matrix4x3 mat)
+        {
+            return new Matrix4(
+                mat.M11, mat.M21, mat.M31, 0,
+                mat.M12, mat.M22, mat.M32, 0,
+                mat.M13, mat.M23, mat.M33, 0,
+                mat.M14, mat.M24, mat.M34, 1);
         }
 
         #endregion

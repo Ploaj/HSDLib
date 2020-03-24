@@ -192,7 +192,6 @@ void main()
 	vec4 ambientPass = ambientColor;
 	vec4 diffusePass = diffuseColor;
 	vec4 specularPass = specularColor;
-	vec4 extPass = vec4(1, 1, 1, 1);
 
 	if(hasTEX0 == 1)
 	{
@@ -200,7 +199,6 @@ void main()
 		if(TEX0LightType == 0) col = ambientPass;
 		if(TEX0LightType == 1) col = diffusePass;
 		if(TEX0LightType == 2) col = specularPass;
-		if(TEX0LightType == 3) col = extPass;
 
 		col = ColorMap_Pass(
 		col, 
@@ -217,7 +215,6 @@ void main()
 		if(TEX0LightType == 0) ambientPass = col;
 		if(TEX0LightType == 1) diffusePass = col;
 		if(TEX0LightType == 2) specularPass = col;
-		if(TEX0LightType == 3) extPass = col;
 	}
 	if(hasTEX1 == 1)
 	{
@@ -225,7 +222,6 @@ void main()
 		if(TEX1LightType == 0) col = ambientPass;
 		if(TEX1LightType == 1) col = diffusePass;
 		if(TEX1LightType == 2) col = specularPass;
-		if(TEX1LightType == 3) col =  extPass;
 
 		col = ColorMap_Pass(
 		col, 
@@ -242,15 +238,66 @@ void main()
 		if(TEX1LightType == 0) ambientPass = col;
 		if(TEX1LightType == 1) diffusePass = col;
 		if(TEX1LightType == 2) specularPass = col;
-		if(TEX1LightType == 3) extPass = col;
 	}
 
 	fragColor.rgb = diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb
 					+ specularPass.rgb * GetSpecularMaterial(normalize(normal), V).rgb;
 
-	fragColor.rgb *= extPass.rgb;
-
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));
+
+	vec4 extColor = vec4(1, 1, 1, 1);
+	if(hasTEX0 == 1 && TEX0LightType == 3)
+	{
+		extColor = ColorMap_Pass(
+		extColor, 
+		TEX0ColorOperation, 
+		TEX0AlphaOperation, 
+		TEX0,
+		texcoord0, 
+		TEX0Transform, 
+		TEX0UVScale, 
+		TEX0CoordType, 
+		TEX0MirrorFix,
+		TEX0Blend);
+
+		fragColor = ColorMap_Pass(
+		fragColor, 
+		TEX0ColorOperation, 
+		TEX0AlphaOperation, 
+		TEX0,
+		texcoord0, 
+		TEX0Transform, 
+		TEX0UVScale, 
+		TEX0CoordType, 
+		TEX0MirrorFix,
+		TEX0Blend);
+	}
+	if(hasTEX1 == 1 && TEX1LightType == 3)
+	{
+		extColor = ColorMap_Pass(
+		extColor, 
+		TEX1ColorOperation, 
+		TEX1AlphaOperation, 
+		TEX1,
+		texcoord1, 
+		TEX1Transform, 
+		TEX1UVScale, 
+		TEX1CoordType, 
+		TEX1MirrorFix,
+		TEX1Blend);
+
+		fragColor = ColorMap_Pass(
+		fragColor, 
+		TEX1ColorOperation, 
+		TEX1AlphaOperation, 
+		TEX1,
+		texcoord1, 
+		TEX1Transform, 
+		TEX1UVScale, 
+		TEX1CoordType, 
+		TEX1MirrorFix,
+		TEX1Blend);
+	}
 
 	fragColor.a = diffusePass.a;
 
@@ -270,7 +317,7 @@ void main()
 	case 5: fragColor = ambientPass; break;
 	case 6: fragColor = diffusePass; break;
 	case 7: fragColor = specularPass; break;
-	case 8: fragColor = extPass; break;
+	case 8: fragColor = extColor; break;
 	case 9: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
 	case 10: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
 	}

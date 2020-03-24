@@ -13,13 +13,6 @@ using HSDRawViewer.GUI;
 
 namespace HSDRawViewer.Converters
 {
-    public enum ShadingType
-    {
-        None,
-        Material,
-        VertexColor
-    }
-
     public enum ForceGroupModes
     {
         None,
@@ -64,19 +57,21 @@ namespace HSDRawViewer.Converters
         public bool ImportRigging { get; set; } = true;
 
         
-
-        [Category("Material Options"), DisplayName("Shading Type"), Description("Type of shading to use: vertex color or material (phong)")]
-        public ShadingType ShadingType { get; set; } = ShadingType.Material;
-
+        
         [Category("Material Options"), DisplayName("Import MOBJs"), Description("Imports .mobj files from file")]
         public bool ImportMOBJ { get; set; } = false;
 
         [Category("Material Options"), DisplayName("Import Material Info"), Description("Imports the material info from model file. NOT recommended")]
         public bool ImportMaterialInfo { get; set; } = false;
 
-        [Category("Material Options"), DisplayName("Always Import Normals"), Description("Imports normals even if using vertex color shading type")]
-        public bool AlwaysImportNormals { get; set; } = true;
+        [Category("Material Options"), DisplayName("Import Normals"), Description("")]
+        public bool ImportNormals { get; set; } = true;
+        
+        [Category("Material Options"), DisplayName("Import Vertex Colors"), Description("")]
+        public bool ImportVertexColor { get; set; } = false;
 
+        [Category("Material Options"), DisplayName("Enable Diffuse"), Description("")]
+        public bool EnableDiffuse { get; set; } = true;
 
 
         [Category("Material Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha color from vertex colors")]
@@ -233,11 +228,9 @@ namespace HSDRawViewer.Converters
                 //if (c.Flags.HasFlag(JOBJ_FLAG.OPA) || c.Flags.HasFlag(JOBJ_FLAG.ROOT_OPA))
                 //    jobj.Flags |= JOBJ_FLAG.ROOT_OPA;
 
-                if (!rootjobj.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && Settings.ShadingType == ShadingType.Material)// settings.ShadingType == ShadingType.Material)
+                if (!rootjobj.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && Settings.EnableDiffuse)
                 {
                     rootjobj.Flags |= JOBJ_FLAG.LIGHTING;
-                    //foreach (var dobj in rootjobj.Dobj.List)
-                    //    dobj.Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
                 }
             }
 
@@ -592,8 +585,6 @@ namespace HSDRawViewer.Converters
 
             Console.WriteLine("Processing " + node.Name);
 
-            ShadingType matType = settings.ShadingType;
-
             foreach (int index in node.MeshIndices)
             {
                 Mesh mesh = scene.Meshes[index];
@@ -621,7 +612,7 @@ namespace HSDRawViewer.Converters
                         prev.Next = dobj;
                     prev = dobj;
                     
-                    dobj.Mobj = GenerateMaterial(cache, settings, material, matType);
+                    dobj.Mobj = GenerateMaterial(cache, settings, material);
                     if(settings.ForceMergeObjects == ForceGroupModes.Texture &&
                         material.HasTextureDiffuse && 
                         settings.ImportTexture)
@@ -688,20 +679,20 @@ namespace HSDRawViewer.Converters
                 if (hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
+
                 if (mesh.HasVertices)
                     Attributes.Add(GXAttribName.GX_VA_POS);
 
-                if (mesh.HasVertexColors(0) && matType == ShadingType.VertexColor)
-                    Attributes.Add(GXAttribName.GX_VA_CLR0);
-
-                //if (mesh.HasVertexColors(1) && settings.ImportVertexColors)
-                //    Attributes.Add(GXAttribName.GX_VA_CLR1);
 
                 if (hasBump)
                     Attributes.Add(GXAttribName.GX_VA_NBT);
                 else
-                if (mesh.HasNormals && (matType == ShadingType.Material || settings.AlwaysImportNormals))
+                if (mesh.HasNormals && settings.ImportNormals)
                     Attributes.Add(GXAttribName.GX_VA_NRM);
+
+
+                if (mesh.HasVertexColors(0) && settings.ImportVertexColor)
+                    Attributes.Add(GXAttribName.GX_VA_CLR0);
 
 
                 if (mesh.HasTextureCoords(0) && !hasReflection)
@@ -863,7 +854,7 @@ namespace HSDRawViewer.Converters
         /// <param name="settings"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        private static HSD_MOBJ GenerateMaterial(ModelProcessCache cache, ModelImportSettings settings, Material material, ShadingType matType)
+        private static HSD_MOBJ GenerateMaterial(ModelProcessCache cache, ModelImportSettings settings, Material material)
         {
             var Mobj = new HSD_MOBJ();
             Mobj.Material = new HSD_Material();
@@ -876,10 +867,13 @@ namespace HSDRawViewer.Converters
             Mobj.Material.Shininess = 50;
             Mobj.Material.Alpha = 1;
             Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT;
-            if (matType == ShadingType.VertexColor)
+            if (settings.ImportVertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
             else
                 Mobj.RenderFlags |= RENDER_MODE.CONSTANT;
+
+            if (settings.EnableDiffuse)
+                Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
 
             // Properties
             if (settings.ImportMaterialInfo)
@@ -945,17 +939,8 @@ namespace HSDRawViewer.Converters
                         Mobj.RenderFlags |= RENDER_MODE.TEX0;
 
                         var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, settings.TextureFormat, settings.PaletteFormat);
-                        tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV;
-
-                        if(matType == ShadingType.VertexColor || matType == ShadingType.Material)
-                        {
-                            tobj.Flags |= TOBJ_FLAGS.COLORMAP_MODULATE;
-                        }
-                        else
-                        {
-                            tobj.Flags |= TOBJ_FLAGS.COLORMAP_REPLACE;
-                        }
-
+                        tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
+                        
                         tobj.GXTexGenSrc = 4;
                         tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
 

@@ -644,12 +644,12 @@ namespace HSDRawViewer.Converters
                                     jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
                                 }
 
-                                if (en.EnvelopeCount == 1) //&& jobjToIndex[parent] == 0 && !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED))
+                                if (en.EnvelopeCount == 1) 
                                     weight = WorldTransforms[jobjToIndex[en.JOBJs[0]]];
 
                                 break;
                             case GXAttribName.GX_VA_POS:
-                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED) ? parentTransform : Matrix4.Identity);
+                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.PARENTTRANSFORM) ? parentTransform : Matrix4.Identity);
                                 vert = Vector3.TransformPosition(vert, weight);
                                 vert = Vector3.TransformPosition(vert, singleBindTransform);
                                 m.Vertices.Add(new Vector3D(vert.X, vert.Y, vert.Z));

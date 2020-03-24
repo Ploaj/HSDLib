@@ -128,14 +128,13 @@ namespace HSDRawViewer.Rendering
             var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
             GXShader.SetVector3("cameraPos", campos);
 
+            //GXShader.SetBoolToInt("envelopeModel", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL));
+
             Matrix4 single = Matrix4.Identity;
             if (parentJOBJ != null && jobjManager != null)
                 single = jobjManager.GetWorldTransform(parentJOBJ);
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
-
-            var rootJOBJ = jobjManager.GetJOBJ(0);
-            GXShader.SetBoolToInt("isRootBound", parentJOBJ?._s == rootJOBJ?._s);
-
+            
             GXShader.SetWorldTransformBones(jobjManager.GetWorldTransforms());
             //GXShader.SetBindTransformBones(jobjManager.GetBindTransforms());
 
@@ -183,10 +182,9 @@ namespace HSDRawViewer.Rendering
 
                 var we = p.Weights;
                 GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
-
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("hasEnvelopes"), p.HasWeighting ? 1 : 0);
-
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("notInverted"), p.Flag.HasFlag(POBJ_FLAG.NOTINVERTED) ? 1 : 0);
+                
+                GXShader.SetBoolToInt("hasEnvelopes", p.HasWeighting);
+                GXShader.SetBoolToInt("enableParentTransform", !p.Flag.HasFlag(POBJ_FLAG.PARENTTRANSFORM));
 
                 GL.Enable(EnableCap.CullFace);
                 if (selected)
