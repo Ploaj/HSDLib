@@ -1740,30 +1740,30 @@ static struct MoveLogic move_logic[] = {
                 var functions = entry.GOBJFunctions;
                 
                 StringBuilder table = new StringBuilder();
-
+                int index = 0;
                 foreach (var m in functions)
                 {
-                    //table.AppendLine("\t// " + (fighterData != null && m.AnimationID != -1 && fighterData.SubActionTable.Subactions[m.AnimationID].Name != null ? System.Text.RegularExpressions.Regex.Replace(fighterData.SubActionTable.Subactions[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
+                    table.AppendLine("\t// map gobj " + index++);
 
                     table.AppendLine(string.Format(
                         "\t{{" +
-                        "\n\t\t0x{0, -10}// Bitflags" +
-                        "\n\t\t0x{1, -10}// OnCreation" +
-                        "\n\t\t0x{2, -10}// OnDeletion" +
-                        "\n\t\t0x{3, -10}// OnFrame" +
-                        "\n\t\t0x{4, -10}// OnUnk" +
+                        "\n\t\t0x{0, -10}// OnCreation" +
+                        "\n\t\t0x{1, -10}// OnDeletion" +
+                        "\n\t\t0x{2, -10}// OnFrame" +
+                        "\n\t\t0x{3, -10}// OnUnk" +
+                        "\n\t\t0x{4, -10}// Bitflags" +
                         "\n\t}},",
-                m.Bitflags.ToString("X") + ",",
                 m.OnCreation.ToString("X") + ",",
                 m.OnDeletion.ToString("X") + ",",
                 m.OnFrame.ToString("X") + ",",
-                m.OnUnk.ToString("X") + ","
+                m.OnUnk.ToString("X") + ",",
+                m.Bitflags.ToString("X") + ","
                 ));
                 }
 
                 Clipboard.SetText(
                     @"__attribute__((used))
-static struct MapGOBJ map_gobjs[] = {
+static struct map_GOBJDesc map_gobjs[] = {
 " + table.ToString() + @"}; ");
 
                 MessageBox.Show("Map GOBJ Functions Copied to Clipboard");
