@@ -1,4 +1,5 @@
-﻿using HSDRaw.MEX;
+﻿using HSDRaw.Common;
+using HSDRaw.MEX;
 using HSDRaw.MEX.Stages;
 using System.ComponentModel;
 
@@ -23,6 +24,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public MEX_StageReverb Reverb = new MEX_StageReverb();
         public MEX_StageCollision Collision = new MEX_StageCollision();
 
+        public MEX_EffectTypeLookup EffectLookup = new MEX_EffectTypeLookup();
+        public MEX_ItemLookup ItemLookup = new MEX_ItemLookup();
+
         [Browsable(false), Category("0 - General"), DisplayName("Internal ID"), Description("")]
         public int InternalID { get => Stage.StageInternalID; set { Stage.StageInternalID = value; Collision.InternalID = value; } }
 
@@ -40,6 +44,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         [Category("0 - General"), DisplayName("Unknown Sound Data"), Description("")]
         public int Unknown { get => Reverb.Unknown; set => Reverb.Unknown = (byte)value; }
+
+
+        [Category("1 - Extra"), DisplayName("MEX Items"),Description("MEX Item lookup for Stage")]
+        public HSD_UShort[] Items { get => ItemLookup.Entries; set => ItemLookup.Entries = value; }
+
+        [Category("1 - Extra"), DisplayName("MEX Effects"), Description("MEX Effect lookup for Stage")]
+        public MEXEffectType[] Effects { get => EffectLookup.Entries; set => EffectLookup.Entries = value; }
+
 
         [Category("1 - Extra"), DisplayName("Moving Collision Points"), Description("")]
         public MEX_MovingCollisionPoint[] MovingCollisions

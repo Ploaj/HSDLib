@@ -416,8 +416,8 @@ namespace HSDRawViewer.Rendering
                         colorOP = 6;
                     if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ALPHA_MASK))
                         colorOP = 7;
-                    /*if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_RGB_MASK))
-                        colorOP = 8;*/
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_RGB_MASK))
+                        colorOP = 8;
 
                     int alphaOP = 0; // NONE
                     if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_MODULATE))
@@ -432,8 +432,8 @@ namespace HSDRawViewer.Rendering
                         alphaOP = 5;
                     if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_PASS))
                         alphaOP = 6;
-                    //if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ALPHA_MASK))
-                    //    alphaOP = 7;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ALPHA_MASK))
+                        alphaOP = 7;
 
                     var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
                         Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *

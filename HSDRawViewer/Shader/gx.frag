@@ -137,7 +137,7 @@ vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D 
 		passColor.rgb = pass.rgb;
 
 	if(operation == 3) // Blend
-		passColor.rgb = mix(passColor, pass, blend).rgb;
+		passColor.rgb = mix(passColor.rgb, pass.rgb, blend);//passColor.rgb * (1 - blend) + pass.rgb * blend;
 
 	if(operation == 4) // Add
 		passColor.rgb += pass.rgb;
@@ -149,8 +149,24 @@ vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D 
 			
 	if(operation == 7 && pass.a != 0) // Alpha Mask
 		passColor.rgb = pass.rgb;
-
-	// 8 RGB Mask
+		
+	//TODO: I don't know what this is
+	if(operation == 8) // 8 RGB Mask 
+	{
+		if(pass.r != 0)
+			passColor.r = pass.r;
+		else
+			passColor.r = 0;
+		if(pass.g != 0)
+			passColor.g = pass.g;
+		else
+			passColor.g = 0;
+		if(pass.b != 0)
+			passColor.b = pass.b;
+		else
+			passColor.b = 0;
+	}
+	
 
 	
 	if(alphaOperation == 1) // Modulate
@@ -170,7 +186,8 @@ vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D 
 
 	//if(alphaOperation == 6) //Pass
 	
-	// 7 Alpha Mask
+	if(alphaOperation == 7 && pass.a != 0) //Alpha Mask
+		passColor.a = pass.a;
 
 	return passColor;
 }

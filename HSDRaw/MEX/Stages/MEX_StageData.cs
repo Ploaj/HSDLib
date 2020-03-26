@@ -2,13 +2,18 @@
 {
     public class MEX_StageData : HSDAccessor
     {
-        public override int TrimmedSize => 0xC;
+        public override int TrimmedSize => 0x14;
 
         public HSDArrayAccessor<MEX_StageIDTable> StageIDTable { get => _s.GetReference<HSDArrayAccessor<MEX_StageIDTable>>(0x00); set => _s.SetReference(0x00, value); }
 
         public HSDArrayAccessor<MEX_StageReverb> ReverbTable { get => _s.GetReference<HSDArrayAccessor<MEX_StageReverb>>(0x04); set => _s.SetReference(0x04, value); }
 
         public HSDArrayAccessor<MEX_StageCollision> CollisionTable { get => _s.GetReference<HSDArrayAccessor<MEX_StageCollision>>(0x08); set => _s.SetReference(0x08, value); }
+
+        public HSDArrayAccessor<MEX_ItemLookup> StageItemLookup { get => _s.GetReference<HSDArrayAccessor<MEX_ItemLookup>>(0x0C); set => _s.SetReference(0x0C, value); }
+
+        public HSDArrayAccessor<MEX_EffectTypeLookup> StageEffectLookup { get => _s.GetReference<HSDArrayAccessor<MEX_EffectTypeLookup>>(0x10); set => _s.SetReference(0x10, value); }
+
     }
 
     public class MEX_StageIDTable : HSDAccessor

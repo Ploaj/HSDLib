@@ -295,6 +295,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
+            if (KeyFrames.Count == 0)
+                return;
+
             e.Graphics.FillRectangle(backBrush, e.ClipRectangle);
 
             var graphOffsetX = 50;

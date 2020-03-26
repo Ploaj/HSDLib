@@ -168,7 +168,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public MEX_EffectEntry[] Effects { get; set; }
 
-        public MEX_FighterEffect[] MEX_Effects { get; set; }
+        public MEX_EffectTypeLookup[] MEX_Effects { get; set; }
 
         public MEX_CSSIconEntry[] Icons { get; set; }
         public MEXStageIconEntry[] StageIcons { get; set; }
@@ -283,7 +283,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 {
                     Stage = _data.StageFunctions[i],
                     Reverb = _data.StageData.ReverbTable[i],
-                    Collision = _data.StageData.CollisionTable[i]
+                    Collision = _data.StageData.CollisionTable[i],
+                    ItemLookup = _data.StageData.StageItemLookup[i],
+                    EffectLookup = _data.StageData.StageEffectLookup[i]
                 };
             }
             stageEditor.SetArrayFromProperty(this, "StageEntries");
@@ -319,8 +321,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             d.FighterData.DefineIDs.Array = new MEX_CharDefineIDs[0];
             d.FighterData.WallJump.Array = new HSD_Byte[0];
             d.FighterData.RstRuntime.Array = new MEX_RstRuntime[0];
-            d.FighterData.FighterItemLookup.Array = new MEX_FighterItem[0];
-            d.FighterData.FighterEffectLookup.Array = new MEX_FighterEffect[0];
+            d.FighterData.FighterItemLookup.Array = new MEX_ItemLookup[0];
+            d.FighterData.FighterEffectLookup.Array = new MEX_EffectTypeLookup[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
@@ -466,6 +468,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.StageFunctions.Array = StageEntries.Select(e => e.Stage).ToArray();
             _data.StageData.ReverbTable.Array = StageEntries.Select(e => e.Reverb).ToArray();
             _data.StageData.CollisionTable.Array = StageEntries.Select(e => e.Collision).ToArray();
+            _data.StageData.StageItemLookup.Array = StageEntries.Select(e => e.ItemLookup).ToArray();
+            _data.StageData.StageEffectLookup.Array = StageEntries.Select(e => e.EffectLookup).ToArray();
+
             _data.StageData.StageIDTable.Array = StageIDs.Select(e => e.IDTable).ToArray();
         }
 
@@ -931,8 +936,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             if (sssEditor.SelectedObject is MEXStageIconEntry entry)
             {
-                cloned.Child.Child.Dobj.Mobj.Textures = entry.MapSpace.NameTOBJ;
-                cloned.Child.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE;
+                cloned.Child.Child.Dobj.Mobj.Textures.ImageData = entry.MapSpace.NameTOBJ.ImageData;
+                if(entry.MapSpace.NameTOBJ.TlutData != null)
+                    cloned.Child.Child.Dobj.Mobj.Textures.TlutData = entry.MapSpace.NameTOBJ.TlutData;
             }
 
             MnSlNameJOBJManager.ClearRenderingCache();

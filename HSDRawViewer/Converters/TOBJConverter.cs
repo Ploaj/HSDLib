@@ -199,6 +199,9 @@ namespace HSDRawViewer.Converters
         /// <param name="bmp"></param>
         private static Bitmap ReduceColors(Bitmap bitmap, int colorCount)
         {
+            if (bitmap.Width <= 16 && bitmap.Height <= 16) // no need
+                return bitmap;
+
             var quantizer = new WuQuantizer();
             using (var quantized = quantizer.QuantizeImage(bitmap, 1, 1, colorCount))
             {

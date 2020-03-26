@@ -99,7 +99,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (treeView1.SelectedNode?.Tag is HSD_FOBJDesc desc)
             {
-                desc.SetKeys(keyEditor.GetFOBJKeys(), (byte)(cbAnimationType.SelectedItem));
+                desc.SetKeys(keyEditor.GetFOBJKeys(), (byte)(cbAnimationType.SelectedIndex + 1));
                 treeView1.SelectedNode.Text = desc.TrackType.ToString();
             }
         }

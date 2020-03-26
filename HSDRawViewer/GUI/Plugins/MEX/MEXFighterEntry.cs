@@ -257,8 +257,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
             mexData.FighterData.RstRuntime.Set(internalId, new MEX_RstRuntime() { AnimMax = RstAnimCount });
 
-            mexData.FighterData.FighterItemLookup.Set(internalId, new MEX_FighterItem() { Entries = MEXItems });
-            mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_FighterEffect() { Entries = MEXEffects });
+            mexData.FighterData.FighterItemLookup.Set(internalId, new MEX_ItemLookup() { Entries = MEXItems });
+            mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_EffectTypeLookup() { Entries = MEXEffects });
 
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 
