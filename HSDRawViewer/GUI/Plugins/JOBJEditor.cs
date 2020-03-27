@@ -16,6 +16,7 @@ using HSDRaw.GX;
 using System.Drawing;
 using HSDRaw;
 using HSDRawViewer.Rendering.Renderers;
+using System.Drawing.Design;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -208,7 +209,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void LoadAnimation(AnimManager animation)
         {
-            var vp = viewport; //PluginManager.GetCommonViewport();
+            var vp = viewport;
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = animation.FrameCount;
@@ -217,7 +218,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void LoadAnimation(HSD_FigaTree tree)
         {
-            var vp = viewport; //PluginManager.GetCommonViewport();
+            var vp = viewport; 
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = tree.FrameCount;
@@ -227,12 +228,31 @@ namespace HSDRawViewer.GUI.Plugins
         public void LoadAnimation(HSD_AnimJoint joint)
         {
             JOBJManager.SetAnimJoint(joint);
-            var vp = viewport; //PluginManager.GetCommonViewport();
+            var vp = viewport; 
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = JOBJManager.Animation.FrameCount;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="motFiles"></param>
+        public void LoadAnimation(short[] jointTable, MOT_FILE motFile)
+        {
+            var vp = viewport; 
+            vp.AnimationTrackEnabled = true;
+            vp.Frame = 0;
+            vp.MaxFrame = motFile.EndTime * 60;
+            JOBJManager.SetMOT(jointTable, motFile);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             JOBJManager.Frame = viewport.Frame;
@@ -731,11 +751,19 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim (*.dat*.anim)|*.dat;*.anim");
+            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta)|*.dat;*.anim;*.mota;*.gnta");
 
-            if(f != null)
+            if (f != null)
             {
-                if(Path.GetExtension(f).ToLower().Equals(".anim"))
+                if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta"))
+                {
+                    var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");
+
+                    if(jointTable != null)
+                        LoadAnimation(MOTLoader.GetJointTable(jointTable), new MOT_FILE(f));
+                }
+                else
+                if (Path.GetExtension(f).ToLower().Equals(".anim"))
                 {
                     LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f));
                 }
@@ -764,7 +792,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void mayaANIMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || JOBJManager.Animation.Nodes.Count == 0)
+            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -786,7 +814,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void figaTreeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || JOBJManager.Animation.Nodes.Count == 0)
+            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -819,7 +847,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
         private void animJointToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || JOBJManager.Animation.Nodes.Count == 0)
+            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;

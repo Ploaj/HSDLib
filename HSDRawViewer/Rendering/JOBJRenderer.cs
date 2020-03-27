@@ -4,6 +4,7 @@ using HSDRaw.Common;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using HSDRaw.Common.Animation;
+using HSDRawViewer.Converters;
 
 namespace HSDRawViewer.Rendering
 {
@@ -421,41 +422,16 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         private Matrix4 CreateLocalTransform(HSD_JOBJ jobj, int animatedBoneIndex = -1)
         {
-            float TX = jobj.TX;
-            float TY = jobj.TY;
-            float TZ = jobj.TZ;
-            float RX = jobj.RX;
-            float RY = jobj.RY;
-            float RZ = jobj.RZ;
-            float SX = jobj.SX;
-            float SY = jobj.SY;
-            float SZ = jobj.SZ;
+            Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
+                Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
 
-            if (animatedBoneIndex != -1 && Animation != null && animatedBoneIndex < Animation.Nodes.Count)
+            if (animatedBoneIndex != -1 && Animation != null)
             {
-                AnimNode node = Animation.Nodes[animatedBoneIndex];
-                foreach (AnimTrack t in node.Tracks)
-                {
-                    switch (t.TrackType)
-                    {
-                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(Frame); break;
-                    }
-                }
+                Transform = Animation.GetAnimatedState(Frame, animatedBoneIndex, jobj);
                 animatedBoneIndex++;
             }
-
-            Matrix4 Transform = Matrix4.CreateScale(SX, SY, SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
-                Matrix4.CreateTranslation(TX, TY, TZ);
-
+            
             return Transform;
         }
 
@@ -512,6 +488,16 @@ namespace HSDRawViewer.Rendering
             Animation = new AnimManager();
             Animation.FromFigaTree(tree);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetMOT(short[] jointTable, MOT_FILE file)
+        {
+            Animation = new AnimManager();
+            Animation.SetMOT(jointTable, file);
+        }
+
 
         /// <summary>
         /// Hides DOBJs with given indices

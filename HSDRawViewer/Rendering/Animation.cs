@@ -1,5 +1,8 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
+using HSDRawViewer.Converters;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +14,115 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public class AnimManager
     {
-        public List<AnimNode> Nodes = new List<AnimNode>();
+        public int NodeCount { get => Nodes.Count; }
 
-        public float FrameCount;
-        
+        public List<AnimNode> Nodes { get; internal set; } = new List<AnimNode>();
+
+        public float FrameCount = 0;
+
+        private int index = 0;
+
+        private MOT_FILE _motFile;
+        private short[] _motJointTable;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jointTable"></param>
+        /// <param name="file"></param>
+        public void SetMOT(short[] jointTable, MOT_FILE file)
+        {
+            _motFile = file;
+            _motJointTable = jointTable;
+            FrameCount = (int)Math.Ceiling(_motFile.EndTime * 60);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="boneIndex"></param>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public Matrix4 GetAnimatedState(float frame, int boneIndex, HSD_JOBJ jobj)
+        {
+            float TX = jobj.TX;
+            float TY = jobj.TY;
+            float TZ = jobj.TZ;
+            float RX = jobj.RX;
+            float RY = jobj.RY;
+            float RZ = jobj.RZ;
+            float SX = jobj.SX;
+            float SY = jobj.SY;
+            float SZ = jobj.SZ;
+
+            Quaternion rotationOverride = Quaternion.Identity;
+            bool overrideRotation = false;
+
+            if(_motFile != null)
+            {
+                var joints = _motFile.Joints.FindAll(e => e.BoneID >= 0 && e.BoneID < _motJointTable.Length && _motJointTable[e.BoneID] == boneIndex);
+
+                foreach (var j in joints)
+                {
+                    var key = j.GetKey(frame / 60f);
+
+                    if (j.TrackFlag.HasFlag(MOT_FLAGS.TRANSLATE))
+                    {
+                        TX += key.X;
+                        TY += key.Y;
+                        TZ += key.Z;
+                    }
+                    if (j.TrackFlag.HasFlag(MOT_FLAGS.SCALE))
+                    {
+                        SX += key.X;
+                        SY += key.Y;
+                        SZ += key.Z;
+                    }
+                    if (j.TrackFlag.HasFlag(MOT_FLAGS.ROTATE))
+                    {
+                        overrideRotation = true;
+                        rotationOverride = Math3D.FromEulerAngles(RZ, RY, RX);
+
+                        var dir = new Vector3(key.X, key.Y, key.Z);
+                        var angle = key.W;
+
+                        float rot_angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitX, dir));
+                        if (Math.Abs(rot_angle) > 0.000001f)
+                        {
+                            Vector3 rot_axis = Vector3.Cross(Vector3.UnitX, dir).Normalized();
+                            rotationOverride *= Quaternion.FromAxisAngle(rot_axis, rot_angle);
+                        }
+
+                        rotationOverride *= Quaternion.FromEulerAngles(angle * (float)Math.PI / 180, 0, 0);
+                    }
+                }
+            }
+            else if(boneIndex < Nodes.Count)
+            {
+                AnimNode node = Nodes[boneIndex];
+                foreach (AnimTrack t in node.Tracks)
+                {
+                    switch (t.TrackType)
+                    {
+                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(frame); break;
+                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(frame); break;
+                    }
+                }
+            }
+
+            return Matrix4.CreateScale(SX, SY, SZ) *
+                Matrix4.CreateFromQuaternion(overrideRotation ? rotationOverride : Math3D.FromEulerAngles(RZ, RY, RX)) *
+                Matrix4.CreateTranslation(TX, TY, TZ);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -112,8 +220,6 @@ namespace HSDRawViewer.Rendering
             return ToAnimJointRecursive(root, flags);
         }
 
-        private int index = 0;
-
         /// <summary>
         /// 
         /// </summary>
@@ -190,7 +296,7 @@ namespace HSDRawViewer.Rendering
             }
         }
 
-        public List<HSDRaw.Tools.FOBJKey> Keys;
+        public List<FOBJKey> Keys;
         public JointTrackType TrackType;
 
         public int FrameCount
