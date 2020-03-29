@@ -710,7 +710,7 @@ namespace HSDRawViewer.GUI.Plugins
             listBox1.SelectedIndex = 0;
         }
 
-        private void SaveCollData()
+        public void SaveCollData()
         {
             // remove fake lines
             var fake = Lines.Where(e => e.CollisionFlag == 0).ToArray();

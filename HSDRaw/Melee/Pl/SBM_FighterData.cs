@@ -51,7 +51,7 @@ namespace HSDRaw.Melee.Pl
 
         public HSDAccessor Unknown0x50 { get => _s.GetReference<HSDAccessor>(0x50); set => _s.SetReference(0x50, value); }
 
-        public HSDAccessor Unknown0x54 { get => _s.GetReference<HSDAccessor>(0x54); set => _s.SetReference(0x54, value); }
+        public SBM_FighterBoneIDs FighterBoneTable { get => _s.GetReference<SBM_FighterBoneIDs>(0x54); set => _s.SetReference(0x54, value); }
 
         public HSDAccessor Unknown0x58 { get => _s.GetReference<HSDAccessor>(0x58); set => _s.SetReference(0x58, value); }
 

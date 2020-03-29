@@ -3,7 +3,7 @@ using HSDRaw.Common.Animation;
 
 namespace HSDRaw.Melee.Gr
 {
-    public class Map_GOBJ : HSDAccessor
+    public class SBM_Map_GOBJ : HSDAccessor
     {
         public override int TrimmedSize => 0x34;
 
@@ -17,30 +17,72 @@ namespace HSDRaw.Melee.Gr
         
         public HSD_Camera Camera { get => _s.GetReference<HSD_Camera>(0x10); set => _s.SetReference(0x10, value); }
 
-        //0x14 Unknown 0x0C??
+        //0x14 Unknown 0x0C?? shape anim joint?
 
         public HSDNullPointerArrayAccessor<HSD_Light> Lights { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_Light>>(0x18); set => _s.SetReference(0x18, value); }
 
-        public bool LoopAnimation {
+        public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x1C); set => _s.SetReference(0x1C, value); }
+        
+        public HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink> CollisionLinks
+        {
             get
             {
-                var r = _s.GetReference<HSDAccessor>(0x28);
-                if (r == null)
-                    return true;
-                return r._s.GetByte(0) == 1;
+                return _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x20);
             }
             set
             {
-                _s.GetCreateReference<HSDAccessor>(0x28)._s.SetData(new byte[] { (byte)(value ? 1 : 0), 0, 0, 0});
+                if(value == null || value.Length == 0)
+                {
+                    CollisionLinkCount = 0;
+                    _s.SetReference(0x20, null);
+                }
+                else
+                {
+                    CollisionLinkCount = value.Length;
+                    _s.SetReference(0x20, value);
+                }
             }
         }
+
+        public int CollisionLinkCount { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
+
         /*
-        0x1C Unknown
-		0x20 Unknown
-		0x24 Unknown
 		0x28 Unknown visibility?
-		0x2C Unknown
-		0x30 Unknown
         */
+
+        public HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink> CollisionLinks2
+        {
+            get
+            {
+                return _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ_CollisionLink>>(0x2C);
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    CollisionLinkCount2 = 0;
+                    _s.SetReference(0x2C, null);
+                }
+                else
+                {
+                    CollisionLinkCount2 = value.Length;
+                    _s.SetReference(0x2C, value);
+                }
+            }
+        }
+
+        public int CollisionLinkCount2 { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }
+
+    }
+
+    public class SBM_Map_GOBJ_CollisionLink : HSDAccessor
+    {
+        public override int TrimmedSize => 0x06;
+
+        public short CollisionIndex { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
+
+        public short UnknownIndex { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
+
+        public short JOBJIndex { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
     }
 }

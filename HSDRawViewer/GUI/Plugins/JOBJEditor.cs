@@ -14,6 +14,9 @@ using System.Linq;
 using HSDRaw.Tools;
 using HSDRaw.GX;
 using System.Drawing;
+using HSDRaw;
+using HSDRawViewer.Rendering.Renderers;
+using System.Drawing.Design;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -26,7 +29,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public DrawOrder DrawOrder => DrawOrder.First;
 
-        private bool SelectDOBJ { get => (toolStripComboBox1.SelectedIndex == 1); }
+        private bool SelectDOBJ { get => (toolStripComboBox2.SelectedIndex == 1); }
 
         private Dictionary<int, string> BoneLabelMap = new Dictionary<int, string>();
 
@@ -38,9 +41,12 @@ namespace HSDRawViewer.GUI.Plugins
 
             JOBJManager = new JOBJManager();
 
+            renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
+            renderModeBox.SelectedIndex = 0;
+
             listDOBJ.DataSource = dobjList;
 
-            toolStripComboBox1.SelectedIndex = 0;
+            toolStripComboBox2.SelectedIndex = 0;
 
             treeJOBJ.AfterSelect += (sender, args) =>
             {
@@ -201,9 +207,18 @@ namespace HSDRawViewer.GUI.Plugins
             return false;
         }
 
+        public void LoadAnimation(AnimManager animation)
+        {
+            var vp = viewport;
+            vp.AnimationTrackEnabled = true;
+            vp.Frame = 0;
+            vp.MaxFrame = animation.FrameCount;
+            JOBJManager.Animation = animation;
+        }
+
         public void LoadAnimation(HSD_FigaTree tree)
         {
-            var vp = viewport; //PluginManager.GetCommonViewport();
+            var vp = viewport; 
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = tree.FrameCount;
@@ -212,16 +227,36 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void LoadAnimation(HSD_AnimJoint joint)
         {
-            var vp = viewport; //PluginManager.GetCommonViewport();
+            JOBJManager.SetAnimJoint(joint);
+            var vp = viewport; 
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
-            vp.MaxFrame = JOBJManager.SetAnimJoint(joint);
+            vp.MaxFrame = JOBJManager.Animation.FrameCount;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="motFiles"></param>
+        public void LoadAnimation(short[] jointTable, MOT_FILE motFile)
+        {
+            var vp = viewport; 
+            vp.AnimationTrackEnabled = true;
+            vp.Frame = 0;
+            vp.MaxFrame = motFile.EndTime * 60;
+            JOBJManager.SetMOT(jointTable, motFile);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             JOBJManager.Frame = viewport.Frame;
-            JOBJManager.DOBJManager.OutlineSelected = showOutlineToolStripMenuItem.Checked;
+            JOBJManager.DOBJManager.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
             JOBJManager.Render(cam);
         }
 
@@ -231,17 +266,17 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(toolStripComboBox1.SelectedIndex == 0)
+            if(toolStripComboBox2.SelectedIndex == 0)
             {
                 JOBJManager.RenderObjects = true;
                 JOBJManager.DOBJManager.OnlyRenderSelected = false;
             }
-            if (toolStripComboBox1.SelectedIndex == 1)
+            if (toolStripComboBox2.SelectedIndex == 1)
             {
                 JOBJManager.RenderObjects = true;
                 JOBJManager.DOBJManager.OnlyRenderSelected = true;
             }
-            if (toolStripComboBox1.SelectedIndex == 2)
+            if (toolStripComboBox2.SelectedIndex == 2)
             {
                 JOBJManager.RenderObjects = false;
                 JOBJManager.DOBJManager.OnlyRenderSelected = false;
@@ -250,7 +285,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            JOBJManager.RenderBones = toolStripButton1.Checked;
+            JOBJManager.RenderBones = showBonesToolStrip.Checked;
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -273,7 +308,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void vertexColorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJManager.DOBJManager.RenderVertexColor = renderVertexColorsToolStripMenuItem.Checked;
+            //JOBJManager.DOBJManager.RenderVertexColor = renderVertexColorsToolStripMenuItem.Checked;
         }
 
         /// <summary>
@@ -306,7 +341,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void mainRender_CheckStateChanged(object sender, EventArgs e)
         {
-            if (mainRender.Checked)
+            if (showInViewportToolStripMenuItem.Checked)
             {
                 PluginManager.GetCommonViewport().AddRenderer(this);
             }
@@ -366,6 +401,13 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+
+        public class DummyDOBJSetting
+        {
+            [DisplayName("Number to Generate"), Description("")]
+            public int NumberToGenerate { get; set; } = 1;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -373,20 +415,28 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void addDummyDOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            root.Dobj.Add(new HSD_DOBJ()
+            var setting = new DummyDOBJSetting();
+            using (PropertyDialog d = new PropertyDialog("Add Dummy DOBJs", setting))
             {
-                Mobj = new HSD_MOBJ()
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT,
-                    Material = new HSD_Material()
-                    {
-                        DiffuseColor = Color.White,
-                        SpecularColor = Color.White,
-                        AmbientColor = Color.White,
-                        Shininess = 50
-                    }
+                    for (int i = 0; i < setting.NumberToGenerate; i++)
+                        root.Dobj.Add(new HSD_DOBJ()
+                        {
+                            Mobj = new HSD_MOBJ()
+                            {
+                                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT,
+                                Material = new HSD_Material()
+                                {
+                                    DiffuseColor = Color.White,
+                                    SpecularColor = Color.White,
+                                    AmbientColor = Color.White,
+                                    Shininess = 50
+                                }
+                            }
+                        });
                 }
-            });
+            }
 
             RefreshGUI();
         }
@@ -549,7 +599,7 @@ namespace HSDRawViewer.GUI.Plugins
                         Shininess = 50,
                         Alpha = 1
                     },
-                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT
+                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT
                 };
 
                 foreach (var pobj in con.DOBJ.Pobj.List)
@@ -691,7 +741,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void clearAnimButton_Click(object sender, EventArgs e)
         {
             viewport.AnimationTrackEnabled = false;
-            JOBJManager.SetFigaTree(null);
+            JOBJManager.Animation = null;
         }
 
         /// <summary>
@@ -701,17 +751,33 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta)|*.dat;*.anim;*.mota;*.gnta");
 
-            if(f != null)
+            if (f != null)
             {
-                var dat = new HSDRaw.HSDRawFile(f);
-                
-                if(dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
-                    LoadAnimation(tree);
+                if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta"))
+                {
+                    var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");
 
-                if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
-                    LoadAnimation(joint);
+                    if(jointTable != null)
+                        LoadAnimation(MOTLoader.GetJointTable(jointTable), new MOT_FILE(f));
+                }
+                else
+                if (Path.GetExtension(f).ToLower().Equals(".anim"))
+                {
+                    LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f));
+                }
+                else
+                if (Path.GetExtension(f).ToLower().Equals(".dat"))
+                {
+                    var dat = new HSDRaw.HSDRawFile(f);
+
+                    if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
+                        LoadAnimation(tree);
+
+                    if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
+                        LoadAnimation(joint);
+                }
             }
         }
 
@@ -722,7 +788,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void exportAsANIMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Nodes == null || JOBJManager.Nodes.Count == 0)
+        }
+
+        private void mayaANIMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -730,9 +800,88 @@ namespace HSDRawViewer.GUI.Plugins
 
             var f = Tools.FileIO.SaveFile("Supported Formats (*.anim)|*.anim");
 
-            if(f != null)
+            if (f != null)
             {
-                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Nodes);
+                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation);
+            }
+        }
+
+        public class FigaTreeSettings
+        {
+            [DisplayName("Symbol Name"), Description("Name of animation used by the game")]
+            public string Symbol { get; set; } = "_figatree";
+        }
+
+        private void figaTreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
+            {
+                MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+            var setting = new FigaTreeSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Figatree Settings", setting))
+                if (f != null && d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile animFile = new HSDRawFile();
+                    animFile.Roots.Add(new HSDRootNode()
+                    {
+                        Data = JOBJManager.Animation.ToFigaTree(),
+                        Name = setting.Symbol
+                    });
+                    animFile.Save(f);
+                }
+        }
+
+
+        public class AnimJointSettings
+        {
+            [DisplayName("Symbol Name"), Description("Should end in _animjoint")]
+            public string Symbol { get; set; } = "_animjoint";
+
+            [DisplayName("Flags"), Description("")]
+            public AOBJ_Flags Flags { get; set; } = AOBJ_Flags.ANIM_LOOP;
+        }
+        private void animJointToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
+            {
+                MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+
+            var setting = new AnimJointSettings();
+
+            using (PropertyDialog d = new PropertyDialog("AnimJoint Settings", setting))
+                if (f != null && d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile animFile = new HSDRawFile();
+                    animFile.Roots.Add(new HSDRootNode()
+                    {
+                        Data = JOBJManager.Animation.ToAnimJoint(JOBJManager.GetJOBJ(0), setting.Flags),
+                        Name = setting.Symbol
+                    });
+                    animFile.Save(f);
+                }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void renderModeBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(JOBJManager != null)
+            {
+                RenderMode mode = JOBJManager.RenderMode;
+                Enum.TryParse<RenderMode>(renderModeBox.Text, out mode);
+                JOBJManager.RenderMode = mode;
             }
         }
     }

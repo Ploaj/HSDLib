@@ -443,14 +443,6 @@ namespace HSDRawViewer.Converters
                     MeshIdToMaterial.Add(CurrentGeometryID, CurrentMaterial);
                     CurrentMaterial = "";
                 }
-                writer.WriteAttributeString("count", Position.Item3.Length.ToString());
-                WriteInput("VERTEX", $"{verticesid}", 0);
-                int offset = 1;
-                foreach (var v in GeometrySources)
-                    if (v.Item2 != VERTEX_SEMANTIC.POSITION)
-                    {
-                        WriteInput(v.Item2.ToString(), $"{v.Item1}", offset++, v.Item4);
-                    }
                 // write p
                 StringBuilder p = new StringBuilder();
                 for (int i = 0; i < Position.Item3.Length; i++)
@@ -458,10 +450,20 @@ namespace HSDRawViewer.Converters
                     p.Append(Position.Item3[i] + " ");
                     foreach (var v in GeometrySources)
                         if (v.Item2 != VERTEX_SEMANTIC.POSITION)
+                        {
                             p.Append(v.Item3[i] + " ");
+                        }
                 }
+                writer.WriteAttributeString("count", (Position.Item3.Length / 3).ToString());
+                WriteInput("VERTEX", $"{verticesid}", 0);
+                int offset = 1;
+                foreach (var v in GeometrySources)
+                    if (v.Item2 != VERTEX_SEMANTIC.POSITION)
+                    {
+                        WriteInput(v.Item2.ToString(), $"{v.Item1}", offset++, v.Item4);
+                    }
                 writer.WriteStartElement("p");
-                writer.WriteString(p.ToString());
+                writer.WriteString(p.ToString().TrimEnd());
                 writer.WriteEndElement();
 
                 writer.WriteEndElement();
@@ -685,13 +687,8 @@ namespace HSDRawViewer.Converters
                 // now writing out the counts and such...
                 //vcount
                 {
-                    StringBuilder values = new StringBuilder();
-                    foreach (var v in BoneWeight.Item1)
-                    {
-                        values.Append($"{v.Count} ");
-                    }
                     writer.WriteStartElement("vcount");
-                    writer.WriteString(values.ToString());
+                    writer.WriteString(string.Join(" ", BoneWeight.Item1.Select(e=>e.Count)));
                     writer.WriteEndElement();
                 }
 
@@ -812,7 +809,7 @@ namespace HSDRawViewer.Converters
         public void CreateVisualNodeSection()
         {
             BeginVisualNodeSection();
-            writer.WriteStartElement("node");
+            /*writer.WriteStartElement("node");
             writer.WriteAttributeString("id", "Armature");
             writer.WriteAttributeString("name", "Armature");
             writer.WriteAttributeString("type", "NODE");
@@ -820,13 +817,13 @@ namespace HSDRawViewer.Converters
             writer.WriteStartElement("matrix");
             writer.WriteAttributeString("sid", "transform");
             writer.WriteString("1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1");
-            writer.WriteEndElement();
+            writer.WriteEndElement();*/
 
             foreach (var joint in Joints)
                 if (joint.Parent == -1)
                     RecursivlyWriteJoints(joint);
 
-            writer.WriteEndElement();
+            //writer.WriteEndElement();
 
             // write geometry nodes
 

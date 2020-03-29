@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Common.Animation;
 using System;
+using System.Drawing;
 
 namespace HSDRaw.Common
 {
@@ -61,11 +62,44 @@ namespace HSDRaw.Common
         public byte ColorB { get => _s.GetByte(0x0E); set => _s.SetByte(0x0E, value); }
         public byte ColorAlpha { get => _s.GetByte(0x0F); set => _s.SetByte(0x0F, value); }
 
+        public Color LightColor {
+            get => _s.GetColorRGBA(0x0C);
+            set => _s.SetColorRGBA(0x0C, value);
+        }
+
         public HSD_LOBJPoint Position { get => _s.GetReference<HSD_LOBJPoint>(0x10); set => _s.SetReference(0x10, value); }
 
         //public int Unknown { get; set; } // TODO: this is pointer
 
-        public HSD_Float PointSpotData { get => _s.GetReference<HSD_Float>(0x18); set => _s.SetReference(0x18, value); }
+        public HSD_Float InfiniteData
+        {
+            get => Flags.HasFlag(LOBJ_Flags.LOBJ_INFINITE) ? _s.GetReference<HSD_Float>(0x18) : null;
+            set
+            {
+                _s.SetReference(0x18, value);
+                Flags &= ~LOBJ_Flags.LOBJ_POINT;
+                Flags |= LOBJ_Flags.LOBJ_INFINITE;
+            }
+        }
+        public HSD_PointSpotData PointSpotData
+        {
+            get => Flags.HasFlag(LOBJ_Flags.LOBJ_POINT) ? _s.GetReference<HSD_PointSpotData>(0x18) : null;
+            set
+            {
+                _s.SetReference(0x18, value);
+                Flags &= ~LOBJ_Flags.LOBJ_INFINITE;
+                Flags |= LOBJ_Flags.LOBJ_POINT;
+            }
+        }
+    }
+
+    public class HSD_PointSpotData : HSDAccessor
+    {
+        public override int TrimmedSize => 0x0C;
+        
+        public float RangeMin { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+        public float RangeMax { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+        public int Flag { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
     }
 
     public class HSD_LOBJPoint : HSDAccessor

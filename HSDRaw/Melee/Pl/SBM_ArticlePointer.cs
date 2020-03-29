@@ -86,6 +86,6 @@ namespace HSDRaw.Melee.Pl
 
         public HSDAccessor Parameters { get => _s.GetReference<HSDAccessor>(0x08); set => _s.SetReference(0x08, value); }
 
-        public SBM_SubactionData SubactionScript { get => _s.GetReference<SBM_SubactionData>(0x0C); set => _s.SetReference(0x0C, value); }
+        public SBM_ItemSubactionData SubactionScript { get => _s.GetReference<SBM_ItemSubactionData>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 }

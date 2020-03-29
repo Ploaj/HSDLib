@@ -33,7 +33,7 @@ namespace HSDRawViewer.Rendering
             GL.End();
             GL.PopAttrib();
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -44,6 +44,32 @@ namespace HSDRawViewer.Rendering
         /// <param name="c"></param>
         public static void DrawRectangle(float x, float y, float x2, float y2, Color c)
         {
+            DrawRectangle(x, y, x2, y2, 0, 1, c);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
+        public static void DrawRectangle(float x, float y, float x2, float y2, float z, Color c)
+        {
+            DrawRectangle(x, y, x2, y2, z, 1, c);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
+        public static void DrawRectangle(float x, float y, float x2, float y2, float z, float thickness, Color c)
+        {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
             GL.Enable(EnableCap.Blend);
@@ -52,21 +78,21 @@ namespace HSDRawViewer.Rendering
             GL.Color4(c);
             GL.Begin(PrimitiveType.Quads);
 
-            GL.Vertex2(x, y);
-            GL.Vertex2(x2, y);
-            GL.Vertex2(x2, y2);
-            GL.Vertex2(x, y2);
+            GL.Vertex3(x, y, z);
+            GL.Vertex3(x2, y, z);
+            GL.Vertex3(x2, y2, z);
+            GL.Vertex3(x, y2, z);
 
             GL.End();
 
-            GL.LineWidth(1f);
+            GL.LineWidth(thickness);
             GL.Color4(1f, 1f, 1f, 1f);
             GL.Begin(PrimitiveType.LineLoop);
 
-            GL.Vertex2(x, y);
-            GL.Vertex2(x2, y);
-            GL.Vertex2(x2, y2);
-            GL.Vertex2(x, y2);
+            GL.Vertex3(x, y, z);
+            GL.Vertex3(x2, y, z);
+            GL.Vertex3(x2, y2, z);
+            GL.Vertex3(x, y2, z);
 
             GL.End();
             GL.PopAttrib();
@@ -119,5 +145,102 @@ namespace HSDRawViewer.Rendering
             GL.PopMatrix();
             GL.PopAttrib();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="length"></param>
+        /// <param name="angle"></param>
+        public static void DrawAngleLine(Camera cam, Matrix4 transform, float length, float angle)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Disable(EnableCap.DepthTest);
+
+            var arrowSize = length / 8f;
+
+            var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+
+            var rot = Matrix4.CreateRotationX(-angle);
+            var start = pos;
+            var end = start + Vector3.TransformNormal(new Vector3(0, 0, length), rot);
+
+            GL.LineWidth(2f);
+            GL.Color3(Color.White);
+            
+            GL.Begin(PrimitiveType.Lines);
+            
+            GL.Vertex3(start);
+            GL.Vertex3(end);
+
+            GL.Vertex3(end);
+            GL.Vertex3(start + Vector3.TransformNormal(new Vector3(0, -arrowSize, length - arrowSize), rot));
+
+            GL.Vertex3(end);
+            GL.Vertex3(start + Vector3.TransformNormal(new Vector3(0, arrowSize, length - arrowSize), rot));
+
+            GL.End();
+            
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="length"></param>
+        public static void DrawSakuraiAngle(Camera cam, Matrix4 transform, float length)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Disable(EnableCap.DepthTest);
+
+            var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+
+            var arrowSize = length / 3;
+
+            var campos = (cam.RotationMatrix * new Vector4(cam.Translation, 1)).Xyz;
+            var world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+
+            GL.LineWidth(2f);
+            GL.Color3(Color.White);
+
+            GL.PushMatrix();
+            GL.MultMatrix(ref world);
+            DrawCircleOutline(Vector3.Zero, arrowSize, 16);
+            GL.PopMatrix();
+
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <param name="precision"></param>
+        private static void DrawCircleOutline(Vector3 center, float radius, uint precision)
+        {
+            float theta = 2.0f * (float)Math.PI / precision;
+            float cosine = (float)Math.Cos(theta);
+            float sine = (float)Math.Sin(theta);
+
+            float x = radius;
+            float y = 0;
+
+            GL.Begin(PrimitiveType.LineStrip);
+            for (int i = 0; i < precision + 1; i++)
+            {
+                GL.Vertex3(x + center.X, y + center.Y, center.Z);
+
+                //apply the rotation matrix
+                var temp = x;
+                x = cosine * x - sine * y;
+                y = sine * temp + cosine * y;
+            }
+            GL.End();
+        }
+
     }
 }

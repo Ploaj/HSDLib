@@ -4,9 +4,24 @@ using HSDRaw.Common;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using HSDRaw.Common.Animation;
+using HSDRawViewer.Converters;
 
 namespace HSDRawViewer.Rendering
 {
+    public enum RenderMode
+    {
+        Default,
+        Normals,
+        VertexColor,
+        UV0,
+        UV1,
+        AmbientColor,
+        DiffuseColor,
+        SpecularColor,
+        ExtColor,
+        DiffusePass,
+        SpecularPass,
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -29,6 +44,10 @@ namespace HSDRawViewer.Rendering
         private HSD_JOBJ RootJOBJ { get; set; }
 
         public DOBJManager DOBJManager = new DOBJManager();
+
+        public bool EnableDepth { get; set; } = true;
+
+        public RenderMode RenderMode { get; set; } = RenderMode.Default;
 
         public float ModelScale { get => _modelScale;
             set
@@ -197,15 +216,20 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void Render(Camera cam)
+        public void Render(Camera camera)
         {
-            UpdateTransforms(RootJOBJ);
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            UpdateTransforms(RootJOBJ, cam: camera);
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Front);
 
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Lequal);
+            if (EnableDepth)
+            {
+                GL.Enable(EnableCap.DepthTest);
+                GL.DepthFunc(DepthFunction.Lequal);
+            }
 
             // Render DOBJS
             if (RenderObjects)
@@ -224,7 +248,7 @@ namespace HSDRawViewer.Rendering
                             if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
                                 XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ>(dobj, b.Key));
                             else
-                                DOBJManager.RenderDOBJShader(cam, dobj, b.Key, this);
+                                DOBJManager.RenderDOBJShader(camera, dobj, b.Key, this);
                         }
                     }
                 }
@@ -232,25 +256,32 @@ namespace HSDRawViewer.Rendering
                 // render xlu lookups last
                 foreach(var xlu in XLU)
                 {
-                    DOBJManager.RenderDOBJShader(cam, xlu.Item1, xlu.Item2, this);
+                    DOBJManager.RenderDOBJShader(camera, xlu.Item1, xlu.Item2, this);
                 }
 
                 GL.Disable(EnableCap.DepthTest);
 
                 if (DOBJManager.SelectedDOBJ != null && DOBJManager.OutlineSelected)
                 {
-                    DOBJManager.RenderDOBJShader(cam, DOBJManager.SelectedDOBJ, parent, this, true);
+                    DOBJManager.RenderDOBJShader(camera, DOBJManager.SelectedDOBJ, parent, this, true);
                 }
             }
 
+            GL.PopAttrib();
+
+
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
             GL.Disable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
-            // Render Bones
+
             if (RenderBones)
                 foreach (var b in jobjToCache)
                 {
                     RenderBone(b.Value, b.Key.Equals(SelectetedJOBJ));
                 }
+
+            GL.PopAttrib();
         }
 
         /// <summary>
@@ -305,7 +336,7 @@ namespace HSDRawViewer.Rendering
         /// Updates the transforms
         /// </summary>
         /// <param name="root"></param>
-        private void UpdateTransforms(HSD_JOBJ root, JOBJCache parent = null)
+        private void UpdateTransforms(HSD_JOBJ root, JOBJCache parent = null, Camera cam = null)
         {
             if (root == null)
                 return;
@@ -316,8 +347,43 @@ namespace HSDRawViewer.Rendering
 
             var local = CreateLocalTransform(root, index);
             var world = local;
+
             if (parent != null)
                 world = local * parent.WorldTransform;
+
+            if(cam != null && 
+                (root.Flags & (JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.PBILLBOARD)) != 0)
+            {
+                var pos = Vector3.TransformPosition(Vector3.Zero, world);
+                var campos = (cam.RotationMatrix * new Vector4(cam.Translation, 1)).Xyz;
+
+                if(root.Flags.HasFlag(JOBJ_FLAG.BILLBOARD))
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+
+                if (root.Flags.HasFlag(JOBJ_FLAG.VBILLBOARD))
+                {
+                    var temp = pos.Y;
+                    pos.Y = 0;
+                    campos.Y = 0;
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, temp, 0);
+                }
+
+                if (root.Flags.HasFlag(JOBJ_FLAG.HBILLBOARD))
+                {
+                    var temp = pos.X;
+                    pos.X = 0;
+                    campos.X = 0;
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(temp, 0, 0);
+                }
+
+                if (root.Flags.HasFlag(JOBJ_FLAG.RBILLBOARD))
+                {
+                    var temp = pos.Z;
+                    pos.Z = 0;
+                    campos.Z = 0;
+                    world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, 0, temp);
+                }
+            }
 
             if (!jobjToCache.ContainsKey(root))
             {
@@ -327,6 +393,10 @@ namespace HSDRawViewer.Rendering
                     Index = jobjToCache.Count,
                     InvertedTransform = world.Inverted()
                 };
+                if (root.Flags.HasFlag(JOBJ_FLAG.SKELETON) && root.InverseWorldTransform != null)
+                {
+                    jcache.InvertedTransform = HSDMatrixToTKMatrix(root.InverseWorldTransform);
+                }
                 jobjToCache.Add(root, jcache);
             }
 
@@ -341,7 +411,7 @@ namespace HSDRawViewer.Rendering
 
             foreach (var child in root.Children)
             {
-                UpdateTransforms(child, jobjToCache[root]);
+                UpdateTransforms(child, jobjToCache[root], cam);
             }
         }
 
@@ -352,41 +422,16 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         private Matrix4 CreateLocalTransform(HSD_JOBJ jobj, int animatedBoneIndex = -1)
         {
-            float TX = jobj.TX;
-            float TY = jobj.TY;
-            float TZ = jobj.TZ;
-            float RX = jobj.RX;
-            float RY = jobj.RY;
-            float RZ = jobj.RZ;
-            float SX = jobj.SX;
-            float SY = jobj.SY;
-            float SZ = jobj.SZ;
+            Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
+                Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
 
-            if (animatedBoneIndex != -1 && animatedBoneIndex < Nodes.Count)
+            if (animatedBoneIndex != -1 && Animation != null)
             {
-                AnimNode node = Nodes[animatedBoneIndex];
-                foreach (AnimTrack t in node.Tracks)
-                {
-                    switch (t.TrackType)
-                    {
-                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(Frame); break;
-                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(Frame); break;
-                    }
-                }
+                Transform = Animation.GetAnimatedState(Frame, animatedBoneIndex, jobj);
                 animatedBoneIndex++;
             }
-
-            Matrix4 Transform = Matrix4.CreateScale(SX, SY, SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
-                Matrix4.CreateTranslation(TX, TY, TZ);
-
+            
             return Transform;
         }
 
@@ -423,36 +468,16 @@ namespace HSDRawViewer.Rendering
 
         #region Animation Loader
 
-        public List<AnimNode> Nodes = new List<AnimNode>();
+        public AnimManager Animation = new AnimManager();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="joint"></param>
-        public int SetAnimJoint(HSD_AnimJoint joint)
+        public void SetAnimJoint(HSD_AnimJoint joint)
         {
-            Nodes.Clear();
-            int max = 0;
-            if (joint == null)
-                return 0;
-            foreach (var j in joint.BreathFirstList)
-            {
-                AnimNode n = new AnimNode();
-                if (j.AOBJ != null)
-                {
-                    max = (int)Math.Max(max, j.AOBJ.EndFrame);
-
-                    foreach (var fdesc in j.AOBJ.FObjDesc.List)
-                    {
-                        AnimTrack track = new AnimTrack();
-                        track.TrackType = fdesc.AnimationType;
-                        track.Keys = fdesc.GetDecodedKeys();
-                        n.Tracks.Add(track);
-                    }
-                }
-                Nodes.Add(n);
-            }
-            return max;
+            Animation = new AnimManager();
+            Animation.FromAnimJoint(joint);
         }
 
         /// <summary>
@@ -460,23 +485,19 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void SetFigaTree(HSD_FigaTree tree)
         {
-            Nodes.Clear();
-            if (tree == null)
-                return;
-
-            foreach (var tracks in tree.Nodes)
-            {
-                AnimNode n = new AnimNode();
-                foreach (HSD_Track t in tracks.Tracks)
-                {
-                    AnimTrack track = new AnimTrack();
-                    track.TrackType = t.FOBJ.JointTrackType;
-                    track.Keys = t.GetKeys();
-                    n.Tracks.Add(track);
-                }
-                Nodes.Add(n);
-            }
+            Animation = new AnimManager();
+            Animation.FromFigaTree(tree);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetMOT(short[] jointTable, MOT_FILE file)
+        {
+            Animation = new AnimManager();
+            Animation.SetMOT(jointTable, file);
+        }
+
 
         /// <summary>
         /// Hides DOBJs with given indices
@@ -497,6 +518,23 @@ namespace HSDRawViewer.Rendering
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="Z"></param>
+        /// <returns></returns>
+        private static Matrix4 HSDMatrixToTKMatrix(HSD_Matrix4x3 mat)
+        {
+            return new Matrix4(
+                mat.M11, mat.M21, mat.M31, 0,
+                mat.M12, mat.M22, mat.M32, 0,
+                mat.M13, mat.M23, mat.M33, 0,
+                mat.M14, mat.M24, mat.M34, 1);
         }
 
         #endregion

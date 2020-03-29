@@ -59,10 +59,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="str"></param>
-        public void SetStruct(HSDStruct str)
+        public void SetStruct(HSDStruct str, SubactionGroup subGroup)
         {
             Struct = str;
-            Commands = GetCommands(Struct);
+            Commands = GetCommands(Struct, subGroup);
             ResetState();
             SetFrame(0);
         }
@@ -71,8 +71,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="data"></param>
-        private List<Command> GetCommands(HSDStruct str, Dictionary<HSDStruct, List<Command>> structToComman = null)
+        private List<Command> GetCommands(HSDStruct str, SubactionGroup subGroup, Dictionary<HSDStruct, List<Command>> structToComman = null)
         {
+            if (subGroup != SubactionGroup.Fighter)
+                return new List<Command>();
+
             if(structToComman == null)
                 structToComman = new Dictionary<HSDStruct, List<Command>>();
 
@@ -86,7 +89,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction(data[i]);
+                var sa = SubactionManager.GetSubaction(data[i], subGroup);
 
                 var cmd = new Command();
 
@@ -100,7 +103,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             if(r.Value != str) // prevent self reference
                             {
                                 cmd.Reference = r.Value;
-                                cmd.ReferenceCommands = GetCommands(cmd.Reference, structToComman);
+                                cmd.ReferenceCommands = GetCommands(cmd.Reference, subGroup, structToComman);
                             }
                         }
                 }
@@ -190,8 +193,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         {
                             ID = cmd.Parameters[0],
                             BoneID = cmd.Parameters[2],
-                            Size = ((short)cmd.Parameters[5] >> 7) / 2,
-                            Point1 = new Vector3(cmd.Parameters[6] >> 7, cmd.Parameters[7] >> 7, cmd.Parameters[8] >> 7),
+                            Size = ((short)cmd.Parameters[5] / 256f),
+                            Point1 = new Vector3(cmd.Parameters[6] / 256f, cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f),
+                            Angle = cmd.Parameters[9],
                             Element = cmd.Parameters[15]
                         });
                         break;
@@ -211,7 +215,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         Hitboxes.Clear();
                         break;
                     case 26 << 2:
-                        BodyCollisionState = cmd.Parameters[1];
+                        BodyCollisionState = cmd.Parameters[0];
                         break;
                     case 27 << 2:
                         // i don't really know how many bone to assume...
@@ -259,6 +263,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public int ID;
         public int BoneID;
         public float Size;
+        public int Angle;
         public int Element;
         public Vector3 Point1;
         public Vector3 Point2;

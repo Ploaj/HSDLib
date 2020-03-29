@@ -62,13 +62,20 @@ namespace HSDRawViewer.GUI
 
             public HSDStruct Reference;
 
+            private SubactionGroup SubactionGroup = SubactionGroup.Fighter;
+
+            public SubActionScript(SubactionGroup SubactionGroup)
+            {
+                this.SubactionGroup = SubactionGroup;
+            }
+
             public string Name
             {
                 get
                 {
                     Bitreader r = new Bitreader(data);
 
-                    var sa = SubactionManager.GetSubaction((byte)r.Read(8));
+                    var sa = SubactionManager.GetSubaction((byte)r.Read(8), SubactionGroup);
 
                     return sa.Name;
                 }
@@ -78,7 +85,7 @@ namespace HSDRawViewer.GUI
             {
                 get
                 {
-                    var sa = SubactionManager.GetSubaction(data[0]);
+                    var sa = SubactionManager.GetSubaction(data[0], SubactionGroup);
 
                     StringBuilder sb = new StringBuilder();
 
@@ -116,7 +123,7 @@ namespace HSDRawViewer.GUI
 
             public SubActionScript Clone()
             {
-                return new SubActionScript()
+                return new SubActionScript(SubactionGroup)
                 {
                     data = (byte[])data.Clone(),
                     Reference = Reference
@@ -126,7 +133,7 @@ namespace HSDRawViewer.GUI
 
         public DockState DefaultDockState => DockState.Document;
 
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_SubactionData) };
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) };
 
         public DataNode Node
         {
@@ -134,7 +141,22 @@ namespace HSDRawViewer.GUI
             set
             {
                 _node = value;
-                if (value.Accessor is SBM_SubactionData sudata)
+                if (value.Accessor is SBM_ItemSubactionData suidata)
+                {
+                    SubactionGroup = SubactionGroup.Item;
+                    SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
+                    {
+                        new SBM_FighterSubAction()
+                        {
+                            SubAction = suidata,
+                            Name = "Script"
+                        }
+                    };
+
+                    LoadActions(su);
+                    RefreshActionList();
+                }else
+                if (value.Accessor is SBM_FighterSubactionData sudata)
                 {
                     SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
                     {
@@ -147,7 +169,7 @@ namespace HSDRawViewer.GUI
 
                     LoadActions(su);
                     RefreshActionList();
-                }
+                }else
                 if(value.Accessor is SBM_SubActionTable SubactionTable)
                 {
                     LoadActions(SubactionTable.Subactions);
@@ -157,6 +179,8 @@ namespace HSDRawViewer.GUI
                     {
                         if (parent.Accessor is SBM_FighterData plDat)
                         {
+                            ModelScale = plDat.Attributes.ModelScale;
+
                             if (plDat.Hurtboxes != null)
                                 Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
 
@@ -186,6 +210,8 @@ namespace HSDRawViewer.GUI
         private DataNode _node;
 
         private readonly List<Action> AllScripts = new List<Action>();
+
+        public SubactionGroup SubactionGroup = SubactionGroup.Fighter;
 
         /// <summary>
         /// 
@@ -329,15 +355,15 @@ namespace HSDRawViewer.GUI
         {
             var data = script._struct.GetData();
 
-            SubactionProcess.SetStruct(script._struct);
+            SubactionProcess.SetStruct(script._struct, SubactionGroup);
 
             subActionList.Items.Clear();
             subActionList.BeginUpdate();
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction((byte)(data[i]));
+                var sa = SubactionManager.GetSubaction((byte)(data[i]), SubactionGroup);
 
-                var sas = new SubActionScript();
+                var sas = new SubActionScript(SubactionGroup);
 
                 foreach (var r in script._struct.References)
                 {
@@ -431,7 +457,7 @@ namespace HSDRawViewer.GUI
                 }
                 
                 a._struct.SetData(scriptData.ToArray());
-                SubactionProcess.SetStruct(a._struct);
+                SubactionProcess.SetStruct(a._struct, SubactionGroup);
             }
         }
 
@@ -501,7 +527,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var ac = new SubActionScript()
+            var ac = new SubActionScript(SubactionGroup)
             {
                 data = new byte[] { 0, 0, 0, 0 }
             };
@@ -559,12 +585,12 @@ namespace HSDRawViewer.GUI
             {
                 using (SubActionPanel p = new SubActionPanel(AllScripts))
                 {
-                    p.LoadData(sa.data, sa.Reference);
+                    p.LoadData(sa.data, sa.Reference, SubactionGroup);
                     if (p.ShowDialog() == DialogResult.OK)
                     {
                         sa.data = p.Data;
 
-                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0])).HasPointer)
+                        if (sa.data.Length > 0 && SubactionManager.GetSubaction((byte)(sa.data[0]), SubactionGroup).HasPointer)
                             sa.Reference = p.Reference;
                         else
                             sa.Reference = null;
@@ -645,7 +671,7 @@ namespace HSDRawViewer.GUI
             {
                 if(subActionList.Items[e.Index] is SubActionScript script)
                 {
-                    var sa = SubactionManager.GetSubaction(script.data[0]);
+                    var sa = SubactionManager.GetSubaction(script.data[0], SubactionGroup);
                     e.Graphics.DrawString(e.Index + ". " + script.Name + (toolStripComboBox1.SelectedIndex == 2 ? "(" + string.Join(", ", script.Parameters) + ")" : ""), e.Font, new SolidBrush(sa.IsCustom ? Color.DarkOrange : Color.DarkBlue), e.Bounds);
                     int i = 1;
                     if (toolStripComboBox1.SelectedIndex == 0)
@@ -927,12 +953,12 @@ namespace HSDRawViewer.GUI
             else
                 return;
 
+            JOBJManager.ModelScale = ModelScale;
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
             JOBJManager.HideDOBJs(HiddenDOBJIndices);
+            JOBJManager.RenderBones = false;
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
-
-            JOBJManager.RenderBones = false;
 
             previewBox.Visible = true;
         }
@@ -954,7 +980,11 @@ namespace HSDRawViewer.GUI
 
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var boneID = hb.BoneID;
+                if (boneID == 0)
+                    boneID = 1;
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
+                transform = transform.ClearScale();
                 var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                 previousPosition.Add(hb.ID, pos);
             }
@@ -964,6 +994,7 @@ namespace HSDRawViewer.GUI
 
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
+        private float ModelScale = 1f;
 
         /// <summary>
         /// 
@@ -991,7 +1022,13 @@ namespace HSDRawViewer.GUI
             
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var transform = Matrix4.CreateTranslation(hb.Point1 / 2) * JOBJManager.GetWorldTransform(hb.BoneID).ClearScale();
+                var boneID = hb.BoneID;
+                if (boneID == 0)
+                    boneID = 1;
+
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
+
+                transform = transform.ClearScale();
 
                 float alpha = 0.4f;
                 Vector3 hbColor = HitboxColor;
@@ -1000,7 +1037,7 @@ namespace HSDRawViewer.GUI
                     hbColor = GrabboxColor;
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
-                if (renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition.ContainsKey(hb.ID))
+                if (renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
                 {
                     var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                     var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size);
@@ -1009,6 +1046,14 @@ namespace HSDRawViewer.GUI
                 else
                 {
                     DrawShape.DrawSphere(transform, hb.Size, 16, 16, hbColor, alpha);
+                }
+                if (hitboxDisplayButton.Checked)
+                {
+                    if (hb.Angle != 361)
+                        DrawShape.DrawAngleLine(cam, transform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
+                    else
+                        DrawShape.DrawSakuraiAngle(cam, transform, hb.Size);
+                    GLTextRenderer.RenderText(cam, hb.ID.ToString(), transform, StringAlignment.Center, true);
                 }
             }
             

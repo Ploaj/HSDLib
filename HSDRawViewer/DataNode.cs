@@ -11,6 +11,7 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Melee.Ef;
 using HSDRaw.Melee;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Stages;
 
 namespace HSDRawViewer
 {
@@ -25,6 +26,14 @@ namespace HSDRawViewer
         public bool IsArrayMember { get; internal set; } = false;
         private string ArrayName { get; set; }
         private int ArrayIndex { get; set; }
+
+        public string StructPath
+        {
+            get
+            {
+                return (Parent != null ? ((DataNode)Parent).StructPath : "") + MainForm.Instance.GetStructLocation(Accessor._s) + ": " + Text;
+            }
+        }
 
         public HSDAccessor Accessor { get => _accessor;
             set
@@ -79,7 +88,7 @@ namespace HSDRawViewer
             { typeof(HSD_TexAnim), "anim_texture" },
             { typeof(SBM_Map_Head), "group" },
             { typeof(SBM_GeneralPoints), "group" },
-            { typeof(Map_GOBJ), "group" },
+            { typeof(SBM_Map_GOBJ), "group" },
             { typeof(SBM_EffectModel), "group" },
             { typeof(SBM_EffectTable), "table" },
             { typeof(SBM_ArticlePointer), "group" },
@@ -96,7 +105,10 @@ namespace HSDRawViewer
             { typeof(MEX_FighterFunctionTable), "table" },
             { typeof(MEX_BGMStruct), "table" },
             { typeof(MEX_KirbyTable), "table" },
+            { typeof(MEX_KirbyFunctionTable), "table" },
             { typeof(MEX_ItemTables), "table" },
+            { typeof(MEX_MenuTable), "table" },
+            { typeof(MEX_StageData), "table" },
             { typeof(MEX_Data), "kabii" },
             { typeof(MEX_Meta), "fuma" },
         };
@@ -393,11 +405,27 @@ namespace HSDRawViewer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public void NotifyChange()
+        {
+            if (Parent != null && Parent is DataNode parent && IsArrayMember)
+            {
+                var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+
+                var arr = prop.GetValue(parent.Accessor) as object[];
+
+                arr[ArrayIndex] = Accessor;
+
+                prop.SetValue(parent.Accessor, arr);
+            }
+        }
 
 #region Special
 
         /// <summary>
-        /// Opens a <see cref="Map_GOBJ"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
+        /// Opens a <see cref="SBM_Map_GOBJ"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
         /// </summary>
         public void ImportModelGroup()
         {
@@ -406,7 +434,7 @@ namespace HSDRawViewer
             {
                 var group = head.ModelGroups.Array.ToList();
 
-                group.Add(new Map_GOBJ() { _s = file.Roots[0].Data._s });
+                group.Add(new SBM_Map_GOBJ() { _s = file.Roots[0].Data._s });
 
                 head.ModelGroups.Array = group.ToArray();
 

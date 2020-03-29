@@ -145,6 +145,15 @@ namespace HSDRaw.Common
             }
         }
 
+        public override void New()
+        {
+            base.New();
+            SX = 1;
+            SY = 1;
+            SZ = 1;
+            WScale = 1;
+            HScale = 1;
+        }
 
         public override bool Equals(object obj)
         {

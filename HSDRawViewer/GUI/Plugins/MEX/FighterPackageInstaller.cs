@@ -50,7 +50,6 @@ namespace HSDRawViewer.GUI.Plugins.MEX
          *! /Item/item**.dat
          *! /Kirby/PlKbCp**.dat
          * /Kirby/EfKb**.dat
-         * /Kirby/effect.txt
          * /Kirby/sfx**.dsp
          *! /Sound/narrator.dsp
          *! /Sound/sem.yaml (wait until personal sound id is added)
@@ -109,14 +108,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 if (string.IsNullOrEmpty(fighterYAMLPath))
                     return;
 
-                MEXEntry mexEntry = null;
+                MEXFighterEntry mexEntry = null;
 
                 using (MemoryStream zos = new MemoryStream())
                 {
                     pack[fighterYAMLPath].Extract(zos);
                     zos.Position = 0;
                     using (StreamReader r = new StreamReader(zos))
-                        mexEntry = MEXEntry.Deserialize(r.ReadToEnd());
+                        mexEntry = MEXFighterEntry.Deserialize(r.ReadToEnd());
                 }
 
                 if (mexEntry == null)
@@ -230,7 +229,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
         /// <returns></returns>
-        private void ImportItemData(ZipFile pack, MEXEntry fighter)
+        private void ImportItemData(ZipFile pack, MEXFighterEntry fighter)
         {
             Console.WriteLine($"Importing Item Data...");
 
@@ -266,7 +265,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
         /// <returns>Dictionary to maps old id values to new values</returns>
-        private void GenerateEffectFile(ZipFile pack, MEXEntry fighter)
+        private void GenerateEffectFile(ZipFile pack, MEXFighterEntry fighter)
         {
             Console.WriteLine($"Generating Effect File...");
 
@@ -330,7 +329,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="fighter"></param>
         /// <param name="editor"></param>
         /// <returns>Dictionary to maps old sound id values to new values</returns>
-        private void ImportSoundData(ZipFile pack, MEXEntry fighter, string semFile)
+        private void ImportSoundData(ZipFile pack, MEXFighterEntry fighter, string semFile)
         {
             Console.WriteLine($"Importing Sound Data...");
 
@@ -413,7 +412,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <summary>
         /// 
         /// </summary>
-        private void InstallUI(ZipFile pack, MEXEntry fighter)
+        private void InstallUI(ZipFile pack, MEXFighterEntry fighter)
         {
             Console.WriteLine($"Installing UI data...");
 
@@ -436,18 +435,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             HSD_JOBJ emblemModel = null;
             if(emblemPack != null)
             {
+                EmblemModel model;
                 using (MemoryStream stream = new MemoryStream())
                 {
                     emblemPack.Extract(stream);
                     stream.Position = 0;
-                    emblemModel = Converters.EmblemConverter.GenerateEmblemModel(stream);
+                    model = Converters.EmblemConverter.GenerateEmblemModelFromOBJ(stream);
                 }
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    emblemPack.Extract(stream);
-                    stream.Position = 0;
-                    emblemTexture = Converters.EmblemConverter.GenerateEmblemIconImage(stream);
-                }
+                emblemModel = Converters.EmblemConverter.GenerateEmblemModel(model);
+                emblemTexture = Converters.EmblemConverter.GenerateEmblemIconImage(model);
             }
 
             // Load Misc Name Tags and icons
@@ -571,7 +567,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="datPath"></param>
         /// <param name="pack"></param>
-        private void InjectCharSelectImages(ZipFile pack, string datPath, HSD_TOBJ[] icons, HSD_TOBJ emblemTexture, MEXEntry fighter, int stride, int groupID)
+        private void InjectCharSelectImages(ZipFile pack, string datPath, HSD_TOBJ[] icons, HSD_TOBJ emblemTexture, MEXFighterEntry fighter, int stride, int groupID)
         {
             var cssFile = new HSDRawFile(datPath);
 
@@ -680,7 +676,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// <param name="pack"></param>
         /// <param name="fighter"></param>
         /// <param name="mexData"></param>
-        private static void ExtractFiles(ZipFile pack, MEXEntry fighter, MexDataEditor mexData)
+        private static void ExtractFiles(ZipFile pack, MEXFighterEntry fighter, MexDataEditor mexData)
         {
             Console.WriteLine($"Copying files to directory...");
 

@@ -30,8 +30,6 @@ namespace HSDRawViewer
 
         private HSDRawFile RawHSDFile = new HSDRawFile();
 
-        private Dictionary<string, StructData> stringToStruct = new Dictionary<string, StructData>();
-
         public static DataNode SelectedDataNode { get; internal set; } = null;
 
         public static bool RefreshNode = false;
@@ -46,6 +44,11 @@ namespace HSDRawViewer
                 Instance = new MainForm();
         }
 
+        public int GetStructLocation(HSDStruct str)
+        {
+            return RawHSDFile.GetOffsetFromStruct(str);
+        }
+        
         public MainForm()
         {
             InitializeComponent();
@@ -179,13 +182,13 @@ namespace HSDRawViewer
             {
                 if (cast == null)
                 {
-                    _nodePropertyViewer.SetAccessor(n.Accessor);
+                    _nodePropertyViewer.SetNode(n);
                 }
                 else
                 {
                     cast._s = n.Accessor._s;
                     n.Accessor = cast;
-                    _nodePropertyViewer.SetAccessor(cast);
+                    _nodePropertyViewer.SetNode(n);
                 }
                 SelectedDataNode = n;
 
@@ -286,6 +289,15 @@ namespace HSDRawViewer
                 RawHSDFile.Save(f);
                 OpenFile(f);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SaveDAT()
+        {
+            if(RawHSDFile != null)
+                RawHSDFile.Save(FilePath);
         }
 
         /// <summary>

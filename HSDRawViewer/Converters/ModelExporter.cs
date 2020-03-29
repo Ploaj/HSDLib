@@ -7,9 +7,8 @@ using HSDRawViewer.GUI;
 using OpenTK;
 using HSDRawViewer.Rendering;
 using HSDRaw.GX;
-using System.Windows.Forms;
 using System.Drawing;
-using Assimp.Unmanaged;
+using HSDRaw;
 
 namespace HSDRawViewer.Converters
 {
@@ -22,6 +21,12 @@ namespace HSDRawViewer.Converters
 
         public bool FlipUVs { get; set; } = false;
 
+        public bool ExportMOBJs { get; set; } = false;
+
+        public bool ExportTransformedUVs { get => ModelExporter.TransformUVS; set => ModelExporter.TransformUVS = value; }
+
+        public bool ExportScaledUVs { get => ModelExporter.ScaleUVs; set => ModelExporter.ScaleUVs = value; }
+
         public string Directory;
     }
 
@@ -31,6 +36,9 @@ namespace HSDRawViewer.Converters
     public class ModelExporter
     {
         public static readonly string[] SupportedFormats = { ".dae" };
+
+        public static bool TransformUVS { get; set; }
+        public static bool ScaleUVs { get; set; }
 
         public static void ExportFile(HSD_JOBJ rootJOBJ, Dictionary<int, string> boneLabels = null)
         {
@@ -116,9 +124,16 @@ namespace HSDRawViewer.Converters
             return mex.WriteRootNode(root, new ModelExportSettings(), new Dictionary<int, string>(), nodeToJOBJ);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="scene"></param>
+        /// <param name="settings"></param>
+        /// <param name="nodeToJOBJ"></param>
         private static void ExportCustomDAE(string filePath, Scene scene, ModelExportSettings settings, Dictionary<Node, HSD_JOBJ> nodeToJOBJ)
         {
-            using (DAEWriter writer = new DAEWriter(filePath, true))
+            using (DAEWriter writer = new DAEWriter(filePath, settings.Optimize))
             {
                 var path = System.IO.Path.GetDirectoryName(filePath) + '\\';
 
@@ -165,7 +180,7 @@ namespace HSDRawViewer.Converters
                     var node = scene.RootNode.Children[i];
 
                     writer.StartGeometryMesh(node.Name);
-
+                    
                     List<uint> triangles = new List<uint>();
                     List<float> vertices = new List<float>();
                     List<float> nrm = new List<float>();
@@ -192,7 +207,9 @@ namespace HSDRawViewer.Converters
                         foreach (var face in mesh.Faces)
                         {
                             for (var k = 0; k < 3; k++)
-                                triangles.Add((uint)(vertexOffset + face.Indices[2 - k]));
+                            {
+                                triangles.Add((uint)(vertexOffset + face.Indices[2-k]));
+                            }
                         }
 
                         if (mesh.HasBones)
@@ -225,7 +242,7 @@ namespace HSDRawViewer.Converters
                             uv0.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[0], settings.FlipUVs));
 
                         if (mesh.HasTextureCoords(1))
-                            uv0.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs));
+                            uv1.AddRange(ToUVFloatArray(mesh.TextureCoordinateChannels[1], settings.FlipUVs));
 
                         if (mesh.HasVertexColors(0))
                             clr0.AddRange(ToFloatArray(mesh.VertexColorChannels[0]));
@@ -235,6 +252,10 @@ namespace HSDRawViewer.Converters
 
                     }
 
+                    // invert normals
+                    for (int n = 0; n < nrm.Count; n++)
+                        nrm[n] *= -1;
+                    
                     var triArr = triangles.ToArray();
                     
                     writer.WriteGeometrySource(node.Name, DAEWriter.VERTEX_SEMANTIC.POSITION, vertices.ToArray(), triArr);
@@ -444,7 +465,7 @@ namespace HSDRawViewer.Converters
                             foreach (var pobj in dobj.Pobj.List)
                             {
                                 dobjNode.MeshIndices.Add(Scene.Meshes.Count);
-                                var mesh = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ);
+                                var mesh = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ, dobj.Mobj);
                                 mesh.Name = dobjNode.Name + "_POBJ_" + pindex++;
                                 mesh.MaterialIndex = Scene.MaterialCount;
                                 Scene.Meshes.Add(mesh);
@@ -468,6 +489,17 @@ namespace HSDRawViewer.Converters
                                     using (Bitmap img = TOBJConverter.ToBitmap(t))
                                         img.Save(settings.Directory + name + ".png");
                                     imageToName.Add(t.ImageData.ImageData, name);
+
+                                    if (settings.ExportMOBJs)
+                                    {
+                                        HSDRawFile mobjFile = new HSDRawFile();
+                                        mobjFile.Roots.Add(new HSDRootNode()
+                                        {
+                                            Name = name,
+                                            Data = dobj.Mobj
+                                        });
+                                        mobjFile.Save(settings.Directory + name + ".mobj");
+                                    }
                                 }
                             }
 
@@ -491,7 +523,7 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="pobj"></param>
-        private Mesh ProcessPOBJ(HSD_POBJ pobj, HSD_JOBJ parent, HSD_JOBJ singleBind)
+        private Mesh ProcessPOBJ(HSD_POBJ pobj, HSD_JOBJ parent, HSD_JOBJ singleBind, HSD_MOBJ mobj)
         {
             Mesh m = new Mesh();
             m.Name = "pobj";
@@ -512,7 +544,7 @@ namespace HSDRawViewer.Converters
 
             Dictionary<HSD_JOBJ, Bone> jobjToBone = new Dictionary<HSD_JOBJ, Bone>();
 
-            if (envelopes != null)
+            //if (envelopes != null)
             {
                 foreach(var jobj in Jobjs)
                 {
@@ -582,6 +614,13 @@ namespace HSDRawViewer.Converters
                 foreach (var v in verts)
                 {
                     vIndex++;
+                    if (parent != null && jobjToIndex[parent] != 0)
+                    {
+                        var vertexWeight = new VertexWeight();
+                        vertexWeight.VertexID = vIndex;
+                        vertexWeight.Weight = 1;
+                        jobjToBone[parent].VertexWeights.Add(vertexWeight);
+                    }
                     if (singleBind != null)
                     {
                         var vertexWeight = new VertexWeight();
@@ -605,12 +644,12 @@ namespace HSDRawViewer.Converters
                                     jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
                                 }
 
-                                if (en.EnvelopeCount == 1 && jobjToIndex[parent] == 0 && !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED))
+                                if (en.EnvelopeCount == 1) 
                                     weight = WorldTransforms[jobjToIndex[en.JOBJs[0]]];
 
                                 break;
                             case GXAttribName.GX_VA_POS:
-                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS),  !pobj.Flags.HasFlag(POBJ_FLAG.NOTINVERTED) ? parentTransform : Matrix4.Identity);
+                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.PARENTTRANSFORM) ? parentTransform : Matrix4.Identity);
                                 vert = Vector3.TransformPosition(vert, weight);
                                 vert = Vector3.TransformPosition(vert, singleBindTransform);
                                 m.Vertices.Add(new Vector3D(vert.X, vert.Y, vert.Z));
@@ -628,28 +667,28 @@ namespace HSDRawViewer.Converters
                                 m.VertexColorChannels[1].Add(new Color4D(v.CLR1.R, v.CLR1.G, v.CLR1.B, v.CLR1.A));
                                 break;
                             case GXAttribName.GX_VA_TEX0:
-                                m.TextureCoordinateChannels[0].Add(new Vector3D(v.TEX0.X, v.TEX0.Y, 1));
+                                m.TextureCoordinateChannels[0].Add(ProcessUVTransform(v.TEX0, mobj, 0));
                                 break;
                             case GXAttribName.GX_VA_TEX1:
-                                m.TextureCoordinateChannels[1].Add(new Vector3D(v.TEX1.X, v.TEX1.Y, 1));
+                                m.TextureCoordinateChannels[1].Add(ProcessUVTransform(v.TEX1, mobj, 1));
                                 break;
                             case GXAttribName.GX_VA_TEX2:
-                                m.TextureCoordinateChannels[2].Add(new Vector3D(v.TEX2.X, v.TEX2.Y, 1));
+                                m.TextureCoordinateChannels[2].Add(ProcessUVTransform(v.TEX2, mobj, 2));
                                 break;
                             case GXAttribName.GX_VA_TEX3:
-                                m.TextureCoordinateChannels[3].Add(new Vector3D(v.TEX3.X, v.TEX3.Y, 1));
+                                m.TextureCoordinateChannels[3].Add(ProcessUVTransform(v.TEX3, mobj, 3));
                                 break;
                             case GXAttribName.GX_VA_TEX4:
-                                m.TextureCoordinateChannels[4].Add(new Vector3D(v.TEX4.X, v.TEX4.Y, 1));
+                                m.TextureCoordinateChannels[4].Add(ProcessUVTransform(v.TEX4, mobj, 4));
                                 break;
                             case GXAttribName.GX_VA_TEX5:
-                                m.TextureCoordinateChannels[5].Add(new Vector3D(v.TEX5.X, v.TEX5.Y, 1));
+                                m.TextureCoordinateChannels[5].Add(ProcessUVTransform(v.TEX5, mobj, 5));
                                 break;
                             case GXAttribName.GX_VA_TEX6:
-                                m.TextureCoordinateChannels[6].Add(new Vector3D(v.TEX6.X, v.TEX6.Y, 1));
+                                m.TextureCoordinateChannels[6].Add(ProcessUVTransform(v.TEX6, mobj, 6));
                                 break;
                             case GXAttribName.GX_VA_TEX7:
-                                m.TextureCoordinateChannels[7].Add(new Vector3D(v.TEX7.X, v.TEX7.Y, 1));
+                                m.TextureCoordinateChannels[7].Add(ProcessUVTransform(v.TEX7, mobj, 7));
                                 break;
                         }
                     }
@@ -657,6 +696,40 @@ namespace HSDRawViewer.Converters
             }
 
             return m;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private static Vector3D ProcessUVTransform(GXVector2 gvVec, HSD_MOBJ mobj, int texIndex)
+        {
+            if (mobj == null)
+                return new Vector3D(gvVec.X, gvVec.Y, 1);
+
+            var tex = mobj.Textures.List[texIndex];
+
+            var uv = new Vector3(gvVec.X, gvVec.Y, 0);
+
+            if (TransformUVS)
+            {
+                var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
+                    Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
+                    Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+
+                transform.Invert();
+
+                uv = Vector3.TransformPosition(uv, transform);
+            }
+
+            if (ScaleUVs)
+            {
+
+                var scale = new Vector2(tex.WScale, tex.HScale);
+                uv.Xy *= scale;
+            }
+
+            return new Vector3D(uv.X, uv.Y, 1);
         }
 
     }

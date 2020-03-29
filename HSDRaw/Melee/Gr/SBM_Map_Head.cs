@@ -16,9 +16,9 @@ namespace HSDRaw.Melee.Gr
             }
         }
 
-        public HSDArrayAccessor<Map_GOBJ> ModelGroups
+        public HSDArrayAccessor<SBM_Map_GOBJ> ModelGroups
         {
-            get => _s.GetReference<HSDArrayAccessor<Map_GOBJ>>(0x08);
+            get => _s.GetReference<HSDArrayAccessor<SBM_Map_GOBJ>>(0x08);
             set
             {
                 _s.SetInt32(0x0C, value.Length);

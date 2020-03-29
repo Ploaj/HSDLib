@@ -40,7 +40,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private class PointLink
         {
-            public PointType Type { get; set; } = PointType.GlobalPlayerRespawn;
+            public PointType Type { get; set; } = PointType.Player1Respawn;
 
             public float X { get => JOBJ.TX; set => JOBJ.TX = value; }
 
@@ -155,7 +155,10 @@ namespace HSDRawViewer.GUI.Plugins
                     case PointType.Player2Spawn:
                     case PointType.Player3Spawn:
                     case PointType.Player4Spawn:
-                    case PointType.GlobalPlayerRespawn:
+                    case PointType.Player1Respawn:
+                    case PointType.Player2Respawn:
+                    case PointType.Player3Respawn:
+                    case PointType.Player4Respawn:
                         RenderSpawn(point, selected);
                         break;
                     default:

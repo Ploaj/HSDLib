@@ -83,7 +83,7 @@ namespace HSDRaw.Melee.Pl
 
         public float ShieldBreakInitialVelocity { get => _s.GetFloat(0x094); set => _s.SetFloat(0x94, value); }
 
-        public float RapidJapWindow { get => _s.GetFloat(0x098); set => _s.SetFloat(0x98, value); }
+        public int RapidJapWindow { get => _s.GetInt32(0x098); set => _s.SetInt32(0x98, value); }
 
         public float ClankSpeedMultiplier { get => _s.GetFloat(0x09C); set => _s.SetFloat(0x9C, value); }
 
@@ -189,7 +189,7 @@ namespace HSDRaw.Melee.Pl
 
         public float Unknown0x168 { get => _s.GetFloat(0x168); set => _s.SetFloat(0x168, value); }
 
-        public float CameraZoomTargetBone { get => _s.GetFloat(0x16C); set => _s.SetFloat(0x16c, value); }
+        public int CameraZoomTargetBone { get => _s.GetInt32(0x16C); set => _s.SetInt32(0x16C, value); }
 
         public float MagnifiedXSway { get => _s.GetFloat(0x170); set => _s.SetFloat(0x170, value); }
 

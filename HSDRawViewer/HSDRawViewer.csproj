@@ -136,9 +136,11 @@
     <Compile Include="Converters\DAEWriter.cs" />
     <Compile Include="Converters\EmblemConverter.cs" />
     <Compile Include="Converters\MayaAnim.cs" />
+    <Compile Include="Converters\MexMapGenerator.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\ModeltoCollData.cs" />
+    <Compile Include="Converters\MOTLoader.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
@@ -230,6 +232,7 @@
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXCSSIconEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\DefaultItemNames.cs" />
     <Compile Include="GUI\Plugins\MEX\ExpandedSSM.cs" />
     <Compile Include="GUI\Plugins\MEX\FighterPackageInstaller.cs" />
@@ -241,8 +244,10 @@
     <Compile Include="GUI\Plugins\MEX\MexDataEditor.Designer.cs">
       <DependentUpon>MexDataEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\MEX\MEXEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXFighterEntry.cs" />
     <Compile Include="GUI\Plugins\MEX\MEXPlaylistEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXStageEntry.cs" />
+    <Compile Include="GUI\Plugins\MEX\MEXStageIconEntry.cs" />
     <Compile Include="GUI\ProgressBarDisplay.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -298,6 +303,7 @@
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DOBJRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
+    <Compile Include="Rendering\Renderers\TextRenderer.cs" />
     <Compile Include="Rendering\Shapes\DrawShape.cs" />
     <Compile Include="Rendering\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />
@@ -316,7 +322,6 @@
     </Compile>
     <Compile Include="Sound\HPS.cs" />
     <Compile Include="Sound\SEM.cs" />
-    <Compile Include="StructData.cs" />
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
@@ -328,6 +333,12 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Melee\subactions_fighter.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Melee\subactions_item.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\ts_importfile.png" />
     <None Include="Resources\ts_exportfile.png" />
     <None Include="Resources\ts_clone.png" />
@@ -345,7 +356,7 @@
     <None Include="Resources\ts_add.png" />
     <None Include="Resources\ts_up.png" />
     <None Include="Resources\ts_down.png" />
-    <None Include="Melee\subactions.yaml">
+    <None Include="Melee\subactions_control.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Melee\subactions_custom.yaml">

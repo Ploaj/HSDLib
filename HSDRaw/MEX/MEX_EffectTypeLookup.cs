@@ -10,7 +10,7 @@
         Effect_FollowJointPos_GroundOrientation,
     }
 
-    public class MEX_FighterEffect : HSDAccessor
+    public class MEX_EffectTypeLookup : HSDAccessor
     {
         public override int TrimmedSize => 0x8;
 
@@ -20,7 +20,13 @@
         {
             get
             {
-                var arr = _s.GetCreateReference<HSDAccessor>(0x04)._s.GetData();
+                var ar = _s.GetReference<HSDAccessor>(0x04);
+
+                if (ar == null)
+                    return new MEXEffectType[0];
+
+                var arr = ar._s.GetData();
+
                 MEXEffectType[] types = new MEXEffectType[Count];
                 for (int i = 0; i < Count; i++)
                     types[i] = (MEXEffectType)arr[i];
@@ -28,11 +34,19 @@
             }
             set
             {
-                Count = value.Length;
-                byte[] data = new byte[Count];
-                for (int i = 0; i < value.Length; i++)
-                    data[i] = (byte)value[i];
-                _s.GetCreateReference<HSDAccessor>(0x04)._s.SetData(data);
+                if(value == null || value.Length == 0)
+                {
+                    Count = 0;
+                    _s.SetReference(0x04, null);
+                }
+                else
+                {
+                    Count = value.Length;
+                    byte[] data = new byte[Count];
+                    for (int i = 0; i < value.Length; i++)
+                        data[i] = (byte)value[i];
+                    _s.GetCreateReference<HSDAccessor>(0x04)._s.SetData(data);
+                }
             }
         }
     }

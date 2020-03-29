@@ -1,9 +1,12 @@
 ﻿using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 
 namespace HSDRawViewer.Converters
 {
@@ -35,7 +38,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="nodes"></param>
-        public static void ExportToMayaAnim(string filePath, List<AnimNode> nodes)
+        public static void ExportToMayaAnim(string filePath, AnimManager animation)
         {
             MayaAnim a = new MayaAnim();
 
@@ -44,7 +47,7 @@ namespace HSDRawViewer.Converters
             
             int nodeIndex = 0;
             int frameCount = 0;
-            foreach(var n in nodes)
+            foreach(var n in animation.Nodes)
             {
                 MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
                 mnode.name = "JOBJ_" + nodeIndex;
@@ -62,7 +65,8 @@ namespace HSDRawViewer.Converters
 
                     if(mtrack.IsAngular())
                         mtrack.output = MayaAnim.OutputType.angular;
-                    
+
+                    AnimTrack.AnimState prevState = null;
                     for (int i = 0; i < t.Keys.Count; i++)
                     {
                         // get maximum frame to use as framecount
@@ -70,8 +74,6 @@ namespace HSDRawViewer.Converters
 
                         // get current state at this key frame
                         var state = t.GetState(t.Keys[i].Frame);
-
-
                         bool nextSlope = i + 1 < t.Keys.Count && t.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
 
                         // Debug
@@ -119,12 +121,14 @@ namespace HSDRawViewer.Converters
                         {
                             animkey.t1 = state.d0;
                             animkey.t2 = state.d0;
-                            if (nextSlope)
-                                animkey.t2 = state.d1;
+                            if (nextSlope && prevState != null)
+                                animkey.t1 = prevState.d1;
                             animkey.intan = "spline";
                             animkey.outtan = "spline";
                         }
 
+                        prevState = state;
+                        
                         // add final key
                         mtrack.keys.Add(animkey);
                     }
@@ -134,7 +138,7 @@ namespace HSDRawViewer.Converters
             }
 
             // set framecount
-            a.header.endTime = frameCount + 1;
+            a.header.endTime = animation.FrameCount + 1;
 
             // save to file
             a.Save(filePath);
@@ -144,12 +148,91 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        public static void ImportFromMayaAnim(string filePath)
+        public static AnimManager ImportFromMayaAnim(string filePath)
         {
             var mayaFile = new MayaAnim();
             mayaFile.Open(filePath);
 
+            AnimManager animation = new AnimManager();
+            animation.FrameCount = mayaFile.header.endTime - 1;
+
             // process and encode FOBJ keys
+            foreach(var mNode in mayaFile.Nodes)
+            {
+                AnimNode node = new AnimNode();
+                foreach(var mTrack in mNode.atts)
+                {
+                    AnimTrack t = new AnimTrack();
+                    t.Keys = new List<FOBJKey>();
+                    t.TrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
+                    
+                    
+                    for(int i = 0; i < mTrack.keys.Count; i++)
+                    {
+                        var mKey = mTrack.keys[i];
+                        var mKeyNext = i + 1 < mTrack.keys.Count ? mTrack.keys[i + 1] : mTrack.keys[i];
+
+                        var k = new FOBJKey();
+                        k.Frame = mKey.input - 1;
+                        k.Value = (mTrack.IsAngular() && mayaFile.header.angularUnit == "deg") ? MathHelper.DegreesToRadians(mKey.output) : mKey.output;
+                        switch (mKey.outtan)
+                        {
+                            case "auto":
+                            case "linear":
+                                k.InterpolationType = GXInterpolationType.HSD_A_OP_LIN;
+
+                                t.Keys.Add(k);
+                                break;
+                            case "step":
+                                if(mTrack.keys.Count == 1)
+                                    k.InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
+                                else
+                                    k.InterpolationType = GXInterpolationType.HSD_A_OP_CON;
+
+                                t.Keys.Add(k);
+                                break;
+                            case "spline":
+                                k.InterpolationType = GXInterpolationType.HSD_A_OP_SPL;
+                                k.Tan = mKey.t1;
+
+                                if((mKeyNext.input - mKey.input) <= 1) // optimization
+                                {
+                                    t.Keys.Add(k);
+                                }
+                                else
+                                if(mKey.t2 == 0)
+                                {
+                                    k.InterpolationType = GXInterpolationType.HSD_A_OP_SPL0;
+                                    t.Keys.Add(k);
+                                }
+                                else
+                                if (mKey.t1 != mKey.t2)
+                                {
+                                    t.Keys.Add(k);
+
+                                    var slp = new FOBJKey();
+                                    slp.Frame = mKeyNext.input - 1;
+                                    slp.InterpolationType = GXInterpolationType.HSD_A_OP_SLP;
+                                    slp.Tan = mKey.t2;
+                                    t.Keys.Add(slp);
+                                }
+                                else
+                                {
+                                    t.Keys.Add(k);
+                                }
+
+                                break;
+                            default:
+                                Console.WriteLine(mKey.outtan + " not supported!");
+                                break;
+                        }
+
+                    }
+
+                    node.Tracks.Add(t);
+                }
+                animation.Nodes.Add(node);
+            }
 
             // linear, const, and step are straight forward:
             // if only one value, use KEY
@@ -159,7 +242,7 @@ namespace HSDRawViewer.Converters
             // if output tan is not equal to next frames input, add SPL operation to use new spline
             // if output slope is 0, use SLP0? TODO: find slp0 to test with
 
-            // return nodes
+            return animation;
         }
     }
 
@@ -354,19 +437,25 @@ namespace HSDRawViewer.Converters
                             header.endTime = float.Parse(args[1]);
                             break;
                         case "anim":
-                            if (args.Length != 7)
-                                continue;
-                            var currentNode = Nodes.Find(e => e.name.Equals(args[3]));
+                            var nodeName = "";
+                            if (args.Length == 7)
+                                nodeName = args[3];
+                            else
+                                nodeName = args[1];
+                            var currentNode = Nodes.Find(e => e.name.Equals(nodeName));
                             if (currentNode == null)
                             {
                                 currentNode = new MayaNode();
-                                currentNode.name = args[3];
+                                currentNode.name = nodeName;
                                 Nodes.Add(currentNode);
                             }
                             currentData = new MayaTrack();
-                            currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
-                            currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
-                            currentNode.atts.Add(currentData);
+                            if (args.Length == 7)
+                            {
+                                currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
+                                currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
+                                currentNode.atts.Add(currentData);
+                            }
                             break;
                         case "animData":
                             if (currentData == null)
@@ -410,12 +499,12 @@ namespace HSDRawViewer.Converters
                                                 key.outtan = keyArgs[3];
                                             }
 
-                                            if (key.intan == "fixed")
+                                            if (keyArgs.Length > 8)
                                             {
                                                 key.t1 = float.Parse(keyArgs[7]);
                                                 key.w1 = float.Parse(keyArgs[8]);
                                             }
-                                            if (key.outtan == "fixed" && keyArgs.Length > 9)
+                                            if (keyArgs.Length > 10)
                                             {
                                                 key.t2 = float.Parse(keyArgs[9]);
                                                 key.w2 = float.Parse(keyArgs[10]);

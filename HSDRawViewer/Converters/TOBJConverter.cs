@@ -36,6 +36,7 @@ namespace HSDRawViewer.Converters
             var TOBJ = new HSD_TOBJ()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
                 HScale = 1,
                 WScale = 1,
                 WrapS = GXWrapMode.CLAMP,
@@ -61,6 +62,7 @@ namespace HSDRawViewer.Converters
             var TOBJ = new HSD_TOBJ()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
                 HScale = 1,
                 WScale = 1,
                 WrapS = GXWrapMode.CLAMP,
@@ -78,10 +80,12 @@ namespace HSDRawViewer.Converters
                 using (TextureImportDialog settings = new TextureImportDialog())
                 {
                     if (settings.ShowDialog() == DialogResult.OK)
-                    {
-                        InjectBitmap(TOBJ, f, settings.TextureFormat, settings.PaletteFormat);
-                        return TOBJ;
-                    }
+                        using (Bitmap bmp = new Bitmap(f))
+                        {
+                            settings.ApplySettings(bmp);
+                            TOBJConverter.InjectBitmap(TOBJ, bmp, settings.TextureFormat, settings.PaletteFormat);
+                            return TOBJ;
+                        }
                 }
             }
 
@@ -97,9 +101,8 @@ namespace HSDRawViewer.Converters
         /// <param name="palFormat"></param>
         public static void InjectBitmap(HSD_TOBJ tobj, string filepath, GXTexFmt imgFormat, GXTlutFmt palFormat)
         {
-            Bitmap bmp = new Bitmap(filepath);
-            InjectBitmap(tobj, bmp, imgFormat, palFormat);
-            bmp.Dispose();
+            using (Bitmap bmp = new Bitmap(filepath))
+                InjectBitmap(tobj, bmp, imgFormat, palFormat);
         }
 
         /// <summary>
@@ -111,6 +114,7 @@ namespace HSDRawViewer.Converters
             var TOBJ = new HSD_TOBJ()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
                 HScale = 1,
                 WScale = 1,
                 WrapS = GXWrapMode.CLAMP,
@@ -172,7 +176,7 @@ namespace HSDRawViewer.Converters
 
                 using (var origImage = TexHelper.Instance.LoadFromWICMemory(unmanagedPointer, bytes.Length, WIC_FLAGS.NONE))
                 {
-                    var scratch = origImage.Compress(0, DXGI_FORMAT.BC1_UNORM_SRGB, TEX_COMPRESS_FLAGS.DEFAULT, 1);
+                    var scratch = origImage.Compress(0, DXGI_FORMAT.BC1_UNORM, TEX_COMPRESS_FLAGS.DEFAULT, 1);
                     var ptr = scratch.GetPixels();
                     var length = scratch.GetPixelsSize();
                     byte[] data = new byte[length];
@@ -195,6 +199,9 @@ namespace HSDRawViewer.Converters
         /// <param name="bmp"></param>
         private static Bitmap ReduceColors(Bitmap bitmap, int colorCount)
         {
+            if (bitmap.Width <= 16 && bitmap.Height <= 16) // no need
+                return bitmap;
+
             var quantizer = new WuQuantizer();
             using (var quantized = quantizer.QuantizeImage(bitmap, 1, 1, colorCount))
             {

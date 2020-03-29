@@ -43,6 +43,8 @@
             this.buttonCopy = new System.Windows.Forms.ToolStripButton();
             this.buttonPaste = new System.Windows.Forms.ToolStripButton();
             this.buttonReplace = new System.Windows.Forms.ToolStripButton();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.previewBox = new System.Windows.Forms.GroupBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -62,13 +64,15 @@
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+            this.hitboxDisplayButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
+            this.previewBox.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.toolStrip3.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitter1
@@ -238,6 +242,23 @@
             this.buttonReplace.Text = "Replace";
             this.buttonReplace.Click += new System.EventHandler(this.buttonReplace_Click);
             // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(35, 22);
+            this.toolStripLabel1.Text = "View:";
+            // 
+            // toolStripComboBox1
+            // 
+            this.toolStripComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.toolStripComboBox1.Items.AddRange(new object[] {
+            "Extended",
+            "Simple",
+            "Simple (Descriptive)"});
+            this.toolStripComboBox1.Name = "toolStripComboBox1";
+            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
+            this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -250,6 +271,7 @@
             // 
             // previewBox
             // 
+            this.previewBox.Controls.Add(this.toolStrip3);
             this.previewBox.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.previewBox.Location = new System.Drawing.Point(3, 130);
             this.previewBox.Name = "previewBox";
@@ -417,22 +439,27 @@
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
-            // toolStripComboBox1
+            // toolStrip3
             // 
-            this.toolStripComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.toolStripComboBox1.Items.AddRange(new object[] {
-            "Extended",
-            "Simple",
-            "Simple (Descriptive)"});
-            this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
-            this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
+            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.hitboxDisplayButton});
+            this.toolStrip3.Location = new System.Drawing.Point(3, 16);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(514, 25);
+            this.toolStrip3.TabIndex = 0;
+            this.toolStrip3.Text = "toolStrip3";
             // 
-            // toolStripLabel1
+            // hitboxDisplayButton
             // 
-            this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(35, 22);
-            this.toolStripLabel1.Text = "View:";
+            this.hitboxDisplayButton.Checked = true;
+            this.hitboxDisplayButton.CheckOnClick = true;
+            this.hitboxDisplayButton.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.hitboxDisplayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.hitboxDisplayButton.Image = ((System.Drawing.Image)(resources.GetObject("hitboxDisplayButton.Image")));
+            this.hitboxDisplayButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.hitboxDisplayButton.Name = "hitboxDisplayButton";
+            this.hitboxDisplayButton.Size = new System.Drawing.Size(112, 22);
+            this.hitboxDisplayButton.Text = "Display Hitbox Info";
             // 
             // SubactionEditor
             // 
@@ -447,12 +474,16 @@
             this.groupBox1.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
+            this.previewBox.ResumeLayout(false);
+            this.previewBox.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.toolStrip3.ResumeLayout(false);
+            this.toolStrip3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -493,5 +524,7 @@
         private System.Windows.Forms.Splitter splitter3;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+        private System.Windows.Forms.ToolStrip toolStrip3;
+        private System.Windows.Forms.ToolStripButton hitboxDisplayButton;
     }
 }

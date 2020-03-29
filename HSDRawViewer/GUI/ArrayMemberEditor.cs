@@ -29,6 +29,7 @@ namespace HSDRawViewer.GUI
         private object _object;
         
         public object SelectedObject => elementList.SelectedItem;
+        public int SelectedIndex => elementList.SelectedIndex;
 
         public event EventHandler SelectedObjectChanged;
         public event EventHandler DoubleClickedNode;
@@ -107,6 +108,8 @@ namespace HSDRawViewer.GUI
             return elementList.Items;
         }
 
+        private BindingList<object> Items = new BindingList<object>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -126,10 +129,10 @@ namespace HSDRawViewer.GUI
         /// <returns></returns>
         public T[] ToArray<T>()
         {
-            T[] o = new T[elementList.Items.Count];
+            T[] o = new T[Items.Count];
 
-            for (int i = 0; i < elementList.Items.Count; i++)
-                o[i] = (T)elementList.Items[i];
+            for (int i = 0; i < Items.Count; i++)
+                o[i] = (T)Items[i];
 
             return o;
         }
@@ -140,6 +143,8 @@ namespace HSDRawViewer.GUI
         public ArrayMemberEditor()
         {
             InitializeComponent();
+
+            elementList.DataSource = Items;
         }
 
         /// <summary>
@@ -149,6 +154,12 @@ namespace HSDRawViewer.GUI
         /// <param name="propertyName"></param>
         public void SetArrayFromProperty(object obj, string propertyName)
         {
+            if(obj == null)
+            {
+                Object = null;
+                Property = null;
+                return;
+            }
             Property = obj.GetType().GetProperty(propertyName);
             if (Property != null && Property.PropertyType.IsArray)
             {
@@ -160,10 +171,13 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
-        private void Reset()
+        public void Reset()
         {
-            elementList.Items.Clear();
-            elementList.Items.AddRange((object[])Property.GetValue(_object));
+            elementList.BeginUpdate();
+            Items.Clear();
+            foreach(var obj in (object[])Property.GetValue(_object))
+                Items.Add(obj);
+            elementList.EndUpdate();
         }
 
         /// <summary>
@@ -185,7 +199,8 @@ namespace HSDRawViewer.GUI
         private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             // refresh display
-            elementList.Items[elementList.SelectedIndex] = elementList.Items[elementList.SelectedIndex];
+            Items[elementList.SelectedIndex] = Items[elementList.SelectedIndex];
+
             // save changes
             MakeChanges();
         }
@@ -210,7 +225,7 @@ namespace HSDRawViewer.GUI
             var ob = Activator.CreateInstance(Property.PropertyType.GetElementType());
             if(ob != null)
             {
-                elementList.Items.Add(ob);
+                Items.Add(ob);
                 MakeChanges();
             }
         }
@@ -228,8 +243,8 @@ namespace HSDRawViewer.GUI
 
                 var i = elementList.SelectedIndex;
                 object moveItem = elementList.Items[i];
-                elementList.Items.Remove(moveItem);
-                elementList.Items.Insert(i - 1, moveItem);
+                Items.Remove(moveItem);
+                Items.Insert(i - 1, moveItem);
                 elementList.SetSelected(i - 1, true);
 
                 elementList.EndUpdate();
@@ -251,8 +266,8 @@ namespace HSDRawViewer.GUI
                 var i = elementList.SelectedIndex;
 
                 object moveItem = elementList.Items[i];
-                elementList.Items.Remove(moveItem);
-                elementList.Items.Insert(i + 1, moveItem);
+                Items.Remove(moveItem);
+                Items.Insert(i + 1, moveItem);
                 elementList.SetSelected(i + 1, true);
 
                 elementList.EndUpdate();
@@ -317,7 +332,7 @@ namespace HSDRawViewer.GUI
         {
             if (o == null)
                 return;
-            elementList.Items.Add(o);
+            Items.Add(o);
             MakeChanges();
         }
 
@@ -331,7 +346,9 @@ namespace HSDRawViewer.GUI
             if (elementList.SelectedItem == null)
                 return;
 
-            elementList.Items.Add(ObjectExtensions.Copy(elementList.SelectedItem));
+            Items.Add(ObjectExtensions.Copy(elementList.SelectedItem));
+
+            elementList.SelectedIndex = Items.Count - 1;
 
             MakeChanges();
         }
@@ -400,9 +417,27 @@ namespace HSDRawViewer.GUI
             if (index != -1)
             {
                 OnItemRemove?.Invoke(new RemovedItemEventArgs() { Index = index });
-                elementList.Items.RemoveAt(index);
+                Items.RemoveAt(index);
                 MakeChanges();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public int IndexOf(object o)
+        {
+            return Items.IndexOf(o);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public new void ResetBindings()
+        {
+            Items.ResetBindings();
         }
     }
 }

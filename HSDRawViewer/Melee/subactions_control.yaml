@@ -1,0 +1,56 @@
+﻿- code: 0
+  name: End Of Script
+
+- code: 1
+  name: Synchronous Timer
+  parameters:
+  - name: Frame
+    bitCount: 26
+
+- code: 2
+  name: Asynchronous Timer
+  parameters:
+  - name: Frame
+    bitCount: 26
+
+- code: 3
+  name: Set Loop
+  parameters:
+  - name: Count
+    bitCount: 26
+
+- code: 4
+  name: Execute Loop
+
+- code: 5
+  name: Subroutine
+  parameters:
+  - name: Target
+    bitCount: 26
+  - name: Pointer
+    bitCount: 32
+    hex: true
+
+- code: 6
+  name: Return
+
+- code: 7
+  name: Go To
+  parameters:
+  - name: Target
+    bitCount: 26
+  - name: Pointer
+    bitCount: 32
+    hex: true
+
+- code: 8
+  name: Set Timer Animation
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 9
+  name: Unknown0x09
+  parameters:
+  - name: Unknown
+    bitCount: 26

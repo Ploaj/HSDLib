@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
+using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
@@ -12,11 +13,21 @@ namespace HSDRawViewer.Rendering
         private List<int> Textures = new List<int>();
         private List<Vector2> TextureSizes = new List<Vector2>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public int Get(int index)
         {
             return Textures[index];
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index1"></param>
+        /// <param name="index2"></param>
         public void Swap(int index1, int index2)
         {
             var t = Textures[index1];
@@ -24,7 +35,35 @@ namespace HSDRawViewer.Rendering
             Textures[index2] = t;
         }
 
-        public void Add(byte[] rgba, int width, int height)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp"></param>
+        public int Add(Bitmap bmp)
+        {
+            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+            System.Drawing.Imaging.BitmapData bmpData =
+             bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
+             System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            
+            IntPtr ptr = bmpData.Scan0;
+            
+            int bytes = bmpData.Stride * bmp.Height;
+            byte[] rgbValues = new byte[bytes];
+            
+            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes); bmp.UnlockBits(bmpData);
+
+            return Add(rgbValues, bmp.Width, bmp.Height);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rgba"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns>Index of Texture</returns>
+        public int Add(byte[] rgba, int width, int height)
         {
             OpenTKResources.MakeCurrentDummy();
 
@@ -43,8 +82,12 @@ namespace HSDRawViewer.Rendering
             
             Textures.Add(texid);
             TextureSizes.Add(new Vector2(width, height));
+            return Textures.Count - 1;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void ClearTextures()
         {
             foreach(var tex in Textures)
@@ -53,7 +96,26 @@ namespace HSDRawViewer.Rendering
             }
             Textures.Clear();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public Vector2 GetTextureSize(int index)
+        {
+            if (index < TextureSizes.Count)
+                return TextureSizes[index];
+
+            return Vector2.Zero;
+        }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sizeOfChecker"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         private static void RenderCheckerBack(int sizeOfChecker, float width, float height)
         {
             float wAmt = width / sizeOfChecker;
@@ -76,11 +138,23 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
+        /// <param name="actualSize"></param>
         public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize)
         {
             RenderTexture(index, windowWidth, windowHeight, actualSize, (int)TextureSizes[index].X, (int)TextureSizes[index].Y);
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public static void RenderCheckerBack(int windowWidth, int windowHeight)
         {
             GL.PushMatrix();
@@ -90,6 +164,15 @@ namespace HSDRawViewer.Rendering
             RenderCheckerBack(64, windowWidth, windowHeight);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
+        /// <param name="actualSize"></param>
+        /// <param name="actualWidth"></param>
+        /// <param name="actualHeight"></param>
         public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize, int actualWidth, int actualHeight)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);

@@ -20,15 +20,18 @@ namespace HSDRaw.MEX
 
         [DisplayName("CSS Icon Count")]
         public int NumOfCSSIcons { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        
+        [DisplayName("SSS Icon Count")]
+        public int NumOfSSSIcons { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         [DisplayName("SSM Count")]
-        public int NumOfSSMs { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int NumOfSSMs { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
         [DisplayName("BGM Count")]
-        public int NumOfMusic { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int NumOfMusic { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
         
         [DisplayName("Effect Count")]
-        public int NumOfEffects { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        public int NumOfEffects { get => _s.GetInt32(0x1C); set => _s.SetInt32(0x1C, value); }
     }
 
 }

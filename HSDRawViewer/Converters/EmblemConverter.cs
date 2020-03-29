@@ -7,12 +7,20 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters
 {
+    public class EmblemModel
+    {
+        public List<float[]> v = new List<float[]>();
+        public List<int[]> f = new List<int[]>();
+
+        public Vector2 xRange;
+        public Vector2 yRange;
+
+        public float aspectX;
+        public float aspectY;
+    }
     class EmblemConverter
     {
         /// <summary>
@@ -23,10 +31,10 @@ namespace HSDRawViewer.Converters
         /// <param name="YRange"></param>
         /// <param name="aspectX"></param>
         /// <param name="aspectY"></param>
-        private static void ParseOBJModel(Stream objFileStream, out List<float[]> v, out List<int[]> f, out Vector2 XRange, out Vector2 YRange, out float aspectX, out float aspectY)
+        public static EmblemModel GenerateEmblemModelFromOBJ(Stream objFileStream)
         {
-             v = new List<float[]>();
-             f = new List<int[]>();
+             var v = new List<float[]>();
+             var f = new List<int[]>();
 
             float MAXX = float.MinValue, MINX = float.MaxValue;
             float MAXY = float.MinValue, MINY = float.MaxValue;
@@ -58,17 +66,24 @@ namespace HSDRawViewer.Converters
                     }
                 }
 
-                aspectX = Math.Abs(MAXX - MINX) / Math.Abs(MAXY - MINY);
-                aspectY = Math.Abs(MAXY - MINY) / Math.Abs(MAXX - MINX);
+                float aspectX = Math.Abs(MAXX - MINX) / Math.Abs(MAXY - MINY);
+                float aspectY = Math.Abs(MAXY - MINY) / Math.Abs(MAXX - MINX);
 
                 if (aspectX < 1)
                     aspectY = 1;
 
                 if (aspectY < 1)
                     aspectX = 1;
-
-                XRange = new Vector2(MINX, MAXX);
-                YRange = new Vector2(MINY, MAXY);
+                
+                return new EmblemModel()
+                {
+                    v = v,
+                    f = f,
+                    aspectX = aspectX,
+                    aspectY = aspectY,
+                    xRange = new Vector2(MINX, MAXX),
+                    yRange = new Vector2(MINY, MAXY)
+                };
             }
         }
 
@@ -77,24 +92,15 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="objFileStream"></param>
         /// <returns></returns>
-        public static HSD_JOBJ GenerateEmblemModel(Stream objFileStream)
+        public static HSD_JOBJ GenerateEmblemModel(EmblemModel model)
         {
-            List<float[]> v = new List<float[]>();
-            List<int[]> f = new List<int[]>();
-
-            Vector2 xRange, yRange;
-
-            float aspectx, aspecty;
-
-            ParseOBJModel(objFileStream, out v, out f, out xRange, out yRange, out aspectx, out aspecty);
-
             List<GX_Vertex> vertexList = new List<GX_Vertex>();
-            foreach (var ve in f)
+            foreach (var ve in model.f)
             {
                 foreach(var i in ve)
                 {
-                    var x = ((v[i - 1][0] - xRange.X) / Math.Abs(xRange.Y - xRange.X)) * aspectx;
-                    var y = (1 - (v[i - 1][2] - yRange.X) / Math.Abs(xRange.Y - yRange.X)) * aspecty;
+                    var x = ((model.v[i - 1][0] - model.xRange.X) / Math.Abs(model.xRange.Y - model.xRange.X)) * model.aspectX;
+                    var y = (1 - (model.v[i - 1][2] - model.yRange.X) / Math.Abs(model.xRange.Y - model.yRange.X)) * model.aspectY;
 
                     vertexList.Add(new GX_Vertex()
                     {
@@ -113,7 +119,7 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ dobj = new HSD_DOBJ();
             dobj.Mobj = new HSD_MOBJ()
             {
-                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE_MAT | RENDER_MODE.DF_NONE | RENDER_MODE.XLU,
+                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT | RENDER_MODE.DF_NONE | RENDER_MODE.XLU,
                 Material = new HSD_Material()
                 {
                     Alpha = 0.6f,
@@ -139,22 +145,13 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="objFileStream"></param>
         /// <returns></returns>
-        public static HSD_TOBJ GenerateEmblemIconImage(Stream objFileStream)
+        public static HSD_TOBJ GenerateEmblemIconImage(EmblemModel model)
         {
-            List<float[]> v = new List<float[]>();
-            List<int[]> f = new List<int[]>();
-
-            Vector2 xRange, yRange;
-
-            float aspectx, aspecty;
-
-            ParseOBJModel(objFileStream, out v, out f, out xRange, out yRange, out aspectx, out aspecty);
-
             // normalize range
-            foreach (var ve in v)
+            foreach (var ve in model.v)
             {
-                ve[0] = ((ve[0] - xRange.X) / Math.Abs(xRange.Y - xRange.X)) * aspectx;
-                ve[2] = (1 - (ve[2] - yRange.X) / Math.Abs(xRange.Y - yRange.X)) * aspecty;
+                ve[0] = ((ve[0] - model.xRange.X) / Math.Abs(model.xRange.Y - model.xRange.X)) * model.aspectX;
+                ve[2] = (1 - (ve[2] - model.yRange.X) / Math.Abs(model.xRange.Y - model.yRange.X)) * model.aspectY;
             }
 
             using (Bitmap b = new Bitmap(80, 64))
@@ -164,12 +161,12 @@ namespace HSDRawViewer.Converters
 
                 int icoWidth = 64, icoHeight = 64;
 
-                if (aspectx < 1)
+                if (model.aspectX < 1)
                 {
                     icoWidth = b.Height;
                     icoHeight = b.Height;
                 }
-                if (aspecty < 1)
+                if (model.aspectY < 1)
                 {
                     icoWidth = b.Width;
                     icoHeight = b.Width;
@@ -186,12 +183,12 @@ namespace HSDRawViewer.Converters
                     g.FillRectangle(brushback, 0, 0, b.Width, b.Height);
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                     GraphicsPath path = new GraphicsPath();
-                    foreach (var ve in f)
+                    foreach (var ve in model.f)
                     {
                         path.AddPolygon(new PointF[] {
-                            new PointF(xoff + v[ve[0] - 1][0] * icoWidth , yoff - v[ve[0] - 1][2] * icoHeight ),
-                            new PointF(xoff + v[ve[1] - 1][0] * icoWidth , yoff - v[ve[1] - 1][2] * icoHeight ),
-                            new PointF(xoff + v[ve[2] - 1][0] * icoWidth , yoff - v[ve[2] - 1][2] * icoHeight ) });
+                            new PointF(xoff + model.v[ve[0] - 1][0] * icoWidth , yoff - model.v[ve[0] - 1][2] * icoHeight ),
+                            new PointF(xoff + model.v[ve[1] - 1][0] * icoWidth , yoff - model.v[ve[1] - 1][2] * icoHeight ),
+                            new PointF(xoff + model.v[ve[2] - 1][0] * icoWidth , yoff - model.v[ve[2] - 1][2] * icoHeight ) });
                     }
                     g.FillPath(brush, path);
                 }

@@ -1,61 +1,4 @@
-﻿- code: 0
-  name: End Of Script
-
-- code: 1
-  name: Synchronous Timer
-  parameters:
-  - name: Frame
-    bitCount: 26
-
-- code: 2
-  name: Asynchronous Timer
-  parameters:
-  - name: Frame
-    bitCount: 26
-
-- code: 3
-  name: Set Loop
-  parameters:
-  - name: Count
-    bitCount: 26
-
-- code: 4
-  name: Execute Loop
-
-- code: 5
-  name: Subroutine
-  parameters:
-  - name: Target
-    bitCount: 26
-  - name: Pointer
-    bitCount: 32
-    hex: true
-
-- code: 6
-  name: Return
-
-- code: 7
-  name: Go To
-  parameters:
-  - name: Target
-    bitCount: 26
-  - name: Pointer
-    bitCount: 32
-    hex: true
-
-- code: 8
-  name: Set Timer Animation
-  parameters:
-  - name: Unknown
-    bitCount: 26
-
-- code: 9
-  name: Unknown0x09
-  parameters:
-  - name: Unknown
-    bitCount: 26
-
-- code: 10
+﻿- code: 10
   name: Graphic Effect
   parameters:
   - name: Bone ID
@@ -273,7 +216,7 @@
   name: Set Body Collision State
   parameters:
   - name: Body State
-    bitCount: 26    
+    bitCount: 26
     enums:
     - Normal
     - Invulnerable
@@ -305,11 +248,12 @@
   name: Change Model State
   parameters:
   - name: Struct ID
-    bitCount: 6
-  - name: Unknown
-    bitCount: 12
+    bitCount: 7
+  - name: ExtraBitNonsense
+    bitCount: 1
   - name: Object ID
-    bitCount: 8
+    bitCount: 18
+    signed: true
 
 - code: 32
   name: Revert Models
@@ -463,16 +407,22 @@
     bitCount: 12
 
 - code: 42
-  name: Related to Parasol Item?
+  name: Change Held Items Action State
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: Value1
+    bitCount: 13
+  - name: Value2
+    bitCount: 13
 
 - code: 43
   name: Rumble
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: Flag
+    bitCount: 1
+  - name: Value1
+    bitCount: 12
+  - name: Value2
+    bitCount: 13
 
 - code: 44
   name: Set flag 0x221E to 20
@@ -533,12 +483,12 @@
     bitCount: 26
 
 - code: 52
-  name: Continuation Control
+  name: Footsnap Behavior
   parameters:
   - name: Unknown
     bitCount: 26
-    
-- code: 52
+
+- code: 53
   name: Set flag 0x2225 to 10
   parameters:
   - name: Unknown
@@ -649,7 +599,7 @@
     - Starts brownish then fades to white then to normal
     - Flashing White with Electric
     - Nothing
-    - No Aura but Flashing Electric Effects 
+    - No Aura but Flashing Electric Effects
     - Fast Flashing Electric Aura (AWESOME!)
     - Flashing Blue Aura with Electric Effects and Lens Flares (AWESOME!)
     - Fast Flashing White Aura
@@ -659,7 +609,7 @@
     - Very Fast White and then Bluegreen Aura (Maybe Early Shine Aura?)
     - Flashing Bluegreen Aura with Electric Effects at feet
     - Flashing Green with Flashing Lens Flares (AWESOME!)
-    - Starts full Black then fades to normal 
+    - Starts full Black then fades to normal
     - Starts Orangered and then fades to normal
     - Brief White Aura in the middle of the charge
     - Whiter and Whiter Aura over time (Ends before smash is fully charged) (AWESOME!)
@@ -683,7 +633,7 @@
     - Brief White Aura
     - Brief White Aura then progressively gets more and more Blueish Purplish
     - Glows light red or pink
-    - Starts full Black then fades to alittle less black 
+    - Starts full Black then fades to alittle less black
     - Black Tint for the whole charge
     - Nothing
     - Yellower and Yellower Aura over time (Ends with smash) (Awesome!)
@@ -691,7 +641,7 @@
     - Flashing Orangered with Flashing Smoke (AWESOME!)
     - Flashing White Aura with Stars and Lens Flares (I think like eatting a maximum tomato) (AWESOME!)
     - Produces Sparkles (Like the sparkles behind Captain Falcon's Up B)
-    - Flashing Yellow with Flashing Large Lens Flare 
+    - Flashing Yellow with Flashing Large Lens Flare
     - "No Aura, but Yellow Lighting from the front"
     - Nothing
     - Yellow Aura that fades away
@@ -714,7 +664,7 @@
   - name: Unknown
     bitCount: 26
     hex: true
-    
+
 - code: 58
   name: Aesthetic Wind Effect
   parameters:

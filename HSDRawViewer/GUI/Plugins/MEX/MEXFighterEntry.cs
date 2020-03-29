@@ -63,7 +63,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
     }
 
     [Serializable]
-    public class MEXEntry
+    public class MEXFighterEntry
     {
         [DisplayName("Name"), Category("0 - General"), Description("Name used for CSS screen")]
         public string NameText { get; set; }
@@ -134,7 +134,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         [DisplayName("Effect File"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int EffectIndex { get; set; }
 
-        [DisplayName("SSM ID"), Category("3 - Misc"), Description("Index of SSM file for this fighter"), TypeConverter(typeof(SSMIDConverter))]
+        [DisplayName("SSM"), Category("3 - Misc"), Description("Index of SSM file for this fighter"), TypeConverter(typeof(SSMIDConverter))]
         public int SSMIndex { get; set; }
 
         [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
@@ -162,7 +162,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public string KirbyCapSymbol { get; set; }
 
         [DisplayName("Kirby Costumes"), Category("4 - Kirby"), Description("")]
-        public MEX_KirbyCostume KirbySpecialCostumes { get; set; }
+        public MEX_CostumeFileSymbol[] KirbySpecialCostumes { get; set; }
 
         [DisplayName("Kirby Effect ID"), Category("4 - Kirby"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int KirbyEffectID { get; set; }
@@ -189,7 +189,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             return b;
         }
 
-        public MEXEntry LoadData(MEX_Data mexData, int internalId, int externalID)
+        public MEXFighterEntry LoadData(MEX_Data mexData, int internalId, int externalID)
         {
             Functions.LoadData(mexData, internalId, externalID);
 
@@ -221,10 +221,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SubCharacterInternalID = (sbyte)mexData.FighterData.DefineIDs[externalID].SubCharacterInternalID;
             SubCharacterBehavior = mexData.FighterData.DefineIDs[externalID].SubCharacterBehavior;
 
-            KirbyCapFileName = mexData.KirbyTable.CapFiles[internalId].FileName;
-            KirbyCapSymbol = mexData.KirbyTable.CapFiles[internalId].Symbol;
-            KirbySpecialCostumes = mexData.KirbyTable.KirbyCostumes[internalId];
-            KirbyEffectID = mexData.KirbyTable.EffectIDs[internalId].Value;
+            KirbyCapFileName = mexData.KirbyData.CapFiles[internalId].FileName;
+            KirbyCapSymbol = mexData.KirbyData.CapFiles[internalId].Symbol;
+            KirbySpecialCostumes = mexData.KirbyData.KirbyCostumes[internalId]?.Array;
+            KirbyEffectID = mexData.KirbyData.EffectIDs[internalId].Value;
 
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
@@ -257,8 +257,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterData.AnimCount.Set(internalId, new MEX_AnimCount() { AnimCount = AnimCount });
             mexData.FighterData.RstRuntime.Set(internalId, new MEX_RstRuntime() { AnimMax = RstAnimCount });
 
-            mexData.FighterData.FighterItemLookup.Set(internalId, new MEX_FighterItem() { Entries = MEXItems });
-            mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_FighterEffect() { Entries = MEXEffects });
+            mexData.FighterData.FighterItemLookup.Set(internalId, new MEX_ItemLookup() { Entries = MEXItems });
+            mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_EffectTypeLookup() { Entries = MEXEffects });
 
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 
@@ -271,20 +271,23 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             
             // Saving Kirby Elements
             if (!string.IsNullOrEmpty(KirbyCapFileName))
-                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
+                mexData.KirbyData.CapFiles.Set(internalId, new MEX_KirbyCapFiles()
                 {
                     FileName = KirbyCapFileName,
                     Symbol = KirbyCapSymbol
                 });
             else
-                mexData.KirbyTable.CapFiles.Set(internalId, new MEX_KirbyCapFiles());
+                mexData.KirbyData.CapFiles.Set(internalId, new MEX_KirbyCapFiles());
 
-            mexData.KirbyTable.KirbyCostumes.Set(internalId, KirbySpecialCostumes);
-
-            if (KirbySpecialCostumes != null)
-                mexData.KirbyTable.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
-
-            mexData.KirbyTable.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
+            if(KirbySpecialCostumes != null)
+            {
+                mexData.KirbyData.KirbyCostumes.Set(internalId, new MEX_KirbyCostume() { Array = KirbySpecialCostumes });
+                mexData.KirbyData.CostumeRuntime._s.SetReferenceStruct(internalId * 4, new HSDStruct(GenerateSpecialBuffer(0x30, NameText)));
+            }
+            else
+                mexData.KirbyData.KirbyCostumes.Set(internalId, null);
+            
+            mexData.KirbyData.EffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
@@ -351,14 +354,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static MEXEntry DeserializeFile(string filePath)
+        public static MEXFighterEntry DeserializeFile(string filePath)
         {
             var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
             .Build();
 
-            return deserializer.Deserialize<MEXEntry>(File.ReadAllText(filePath));
+            return deserializer.Deserialize<MEXFighterEntry>(File.ReadAllText(filePath));
         }
 
         /// <summary>
@@ -366,14 +369,14 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static MEXEntry Deserialize(string data)
+        public static MEXFighterEntry Deserialize(string data)
         {
             var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
             .Build();
 
-            return deserializer.Deserialize<MEXEntry>(data);
+            return deserializer.Deserialize<MEXFighterEntry>(data);
         }
 
         /// <summary>
@@ -577,12 +580,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             EnterDoubleJump = mexData.FighterFunctions.enterSpecialDoubleJump[internalId].Value;
             EnterTether = mexData.FighterFunctions.enterTether[internalId].Value;
 
-            KirbyOnSwallow = mexData.KirbyTable.KirbyHatFunctions[internalId].HatAdd;
-            KirbyOnLoseAbility = mexData.KirbyTable.KirbyHatFunctions[internalId].HatRemove;
-            KirbySpecialN = mexData.KirbyTable.KirbySpecialN[internalId].Value;
-            KirbySpecialNAir = mexData.KirbyTable.KirbySpecialNAir[internalId].Value;
-            KirbyOnHit = mexData.KirbyTable.KirbyOnHit[internalId].Value;
-            KirbyOnItemInit = mexData.KirbyTable.KirbyOnItemInit[internalId].Value;
+            KirbyOnSwallow = mexData.KirbyFunctions.OnAbilityGain[internalId].Value;
+            KirbyOnLoseAbility = mexData.KirbyFunctions.OnAbilityLose[internalId].Value;
+            KirbySpecialN = mexData.KirbyFunctions.KirbySpecialN[internalId].Value;
+            KirbySpecialNAir = mexData.KirbyFunctions.KirbySpecialNAir[internalId].Value;
+            KirbyOnHit = mexData.KirbyFunctions.KirbyOnHit[internalId].Value;
+            KirbyOnItemInit = mexData.KirbyFunctions.KirbyOnItemInit[internalId].Value;
 
             return this;
         }
@@ -630,97 +633,15 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             mexData.FighterFunctions.enterSpecialDoubleJump.Set(internalId, new HSD_UInt() { Value = EnterDoubleJump });
             mexData.FighterFunctions.enterTether.Set(internalId, new HSD_UInt() { Value = EnterTether });
 
-            mexData.KirbyTable.KirbyHatFunctions.Set(internalId, new MEX_KirbyHatLoad()
-            {
-                HatAdd = KirbyOnSwallow,
-                HatRemove = KirbyOnLoseAbility
-            });
-            mexData.KirbyTable.KirbySpecialN.Set(internalId, new HSD_UInt() { Value = KirbySpecialN });
-            mexData.KirbyTable.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
-            mexData.KirbyTable.KirbyOnHit.Set(internalId, new HSD_UInt() { Value = KirbyOnHit });
-            mexData.KirbyTable.KirbyOnItemInit.Set(internalId, new HSD_UInt() { Value = KirbyOnItemInit });
+            mexData.KirbyFunctions.OnAbilityGain.Set(internalId, new HSD_UInt() { Value = KirbyOnSwallow });
+            mexData.KirbyFunctions.OnAbilityLose.Set(internalId, new HSD_UInt() { Value = KirbyOnLoseAbility });
+            mexData.KirbyFunctions.KirbySpecialN.Set(internalId, new HSD_UInt() { Value = KirbySpecialN });
+            mexData.KirbyFunctions.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
+            mexData.KirbyFunctions.KirbyOnHit.Set(internalId, new HSD_UInt() { Value = KirbyOnHit });
+            mexData.KirbyFunctions.KirbyOnItemInit.Set(internalId, new HSD_UInt() { Value = KirbyOnItemInit });
         }
     }
     
-    /// <summary>
-    /// use proxy class for make selecting character id easier
-    /// </summary>
-    public class MEX_CSSIconEntry
-    {
-        [Description("Joint ID on the CSS to use for Icon Flash Animation")]
-        public int JointID { get; set; }
-
-        [DisplayName("Fighter"), TypeConverter(typeof(FighterExternalIDConverter))]
-        public int FighterExternalID { get; set; }
-
-        [Description("Starting X Coord")]
-        public float X { get; set; }
-
-        [Description("Ending X Coord")]
-        public float Y { get; set; }
-
-        [Description("Starting Y Coord")]
-        public float Width { get; set; }
-
-        [Description("Ending Y Coord")]
-        public float Height { get; set; }
-
-        public static MEX_CSSIconEntry FromIcon(MEX_CSSIcon icon)
-        {
-            return new MEX_CSSIconEntry()
-            {
-                JointID = icon.JointID,
-                FighterExternalID = icon.ExternalCharID,
-                X = icon.X1,
-                Y = icon.Y1,
-                Width = icon.X2 - icon.X1,
-                Height = icon.Y1 - icon.Y2
-            };
-        }
-
-        public MEX_CSSIcon ToIcon()
-        {
-            return new MEX_CSSIcon()
-            {
-                JointID = (byte)JointID,
-                UnkID = (byte)JointID,
-                ExternalCharID = (byte)FighterExternalID,
-                CharUNKID = (byte)(FighterExternalID - (FighterExternalID > 18 ? 1 : 0)),
-                X1 = X,
-                Y1 = Y,
-                X2 = X + Width,
-                Y2 = Y - Height
-            };
-        }
-
-        private static Color IconColor = Color.FromArgb(128, 255, 0, 0);
-
-        private static Color SelectedIconColor = Color.FromArgb(128, 255, 255, 0);
-
-        public void Render(bool selected)
-        {
-            if (selected)
-                DrawShape.DrawRectangle(X, Y, X + Width, Y - Height, SelectedIconColor);
-            else
-                DrawShape.DrawRectangle(X, Y, X + Width, Y - Height, IconColor);
-        }
-
-        public RectangleF ToRect()
-        {
-            return new RectangleF(X, Y - Height, Width, Height);
-        }
-
-        public override string ToString()
-        {
-            return String.Format("{0}\t X:{1} Y:{2} W:{3} H:{4}",
-                MEXConverter.externalIDValues[FighterExternalID + 1],
-                X,
-                Y,
-                Width,
-                Height);
-        }
-    }
-
     public class MEXTypeInspector : TypeInspectorSkeleton
     {
         private readonly ITypeInspector _innerTypeDescriptor;

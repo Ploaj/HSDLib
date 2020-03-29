@@ -324,11 +324,10 @@ namespace HSDRaw.Tools
                     switch (b)
                     {
                         case GXAttribName.GX_VA_CLR0:
-                            //ig.Indices[i] = GetIndex(b, new float[] { v.CLR0.R, v.CLR0.G, v.CLR0.B, v.CLR0.A });
-                            ig.Clr0 = new byte[] { (byte)(v.CLR0.R * 0xFF), (byte)(v.CLR0.G * 0xFF), (byte)(v.CLR0.B * 0xFF), (byte)(v.CLR0.A * 0xFF) };
+                            ig.Clr0 = v.CLR0.ToBytes();
                             break;
                         case GXAttribName.GX_VA_CLR1:
-                            ig.Clr1 = new byte[] { (byte)(v.CLR1.R * 0xFF), (byte)(v.CLR1.G * 0xFF), (byte)(v.CLR1.B * 0xFF), (byte)(v.CLR1.A * 0xFF) };
+                            ig.Clr1 = v.CLR1.ToBytes();
                             break;
                         case GXAttribName.GX_VA_PNMTXIDX:
                             ig.Indices[i] = v.PNMTXIDX;

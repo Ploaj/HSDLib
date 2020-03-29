@@ -17,16 +17,13 @@ namespace HSDRawViewer.GUI.Plugins
 
         private List<SubactionEditor.Action> AllActions;
 
+        private SubactionGroup SubactionGroup = SubactionGroup.Fighter;
+
         public SubActionPanel(List<SubactionEditor.Action> AllActions)
         {
             this.AllActions = AllActions;
 
             InitializeComponent();
-
-            foreach(var v in SubactionManager.Subactions)
-            {
-                comboBox1.Items.Add(v.Name);
-            }
             
             PointerBox = new ComboBox();
             PointerBox.Dock = DockStyle.Fill;
@@ -41,14 +38,22 @@ namespace HSDRawViewer.GUI.Plugins
             };
         }
 
-        public void LoadData(byte[] b, HSDStruct reference)
+        public void LoadData(byte[] b, HSDStruct reference, SubactionGroup group)
         {
+            SubactionGroup = group;
+
+            comboBox1.Items.Clear();
+            foreach (var v in SubactionManager.GetGroup(SubactionGroup))
+            {
+                comboBox1.Items.Add(v.Name);
+            }
+
             Data = b;
             Reference = reference;
 
             PointerBox.SelectedItem = AllActions.Find(e => e._struct == Reference);
             
-            var sa = SubactionManager.GetSubaction(Data[0]);
+            var sa = SubactionManager.GetSubaction(Data[0], SubactionGroup);
 
             comboBox1.SelectedItem = sa.Name;
 
@@ -149,7 +154,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public byte[] CompileAction()
         {
-            var sa = SubactionManager.Subactions[comboBox1.SelectedIndex];
+            var sa = SubactionManager.GetGroup(SubactionGroup)[comboBox1.SelectedIndex];
             
             int[] values = new int[sa.Parameters.Length];
             for(int i = 0; i < sa.Parameters.Length; i++)
@@ -169,7 +174,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void comboBox1_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            CreateParamEditor(SubactionManager.GetSubaction(comboBox1.SelectedItem as string));
+            CreateParamEditor(SubactionManager.GetSubaction(comboBox1.SelectedItem as string, SubactionGroup));
         }
 
         private void buttonSave_Click(object sender, System.EventArgs e)

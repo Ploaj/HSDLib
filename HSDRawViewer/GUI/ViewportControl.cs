@@ -8,6 +8,7 @@ using OpenTK;
 using System.Linq;
 using OpenTK.Input;
 using System.Timers;
+using HSDRawViewer.Rendering.Renderers;
 
 namespace HSDRawViewer.GUI
 {
@@ -17,9 +18,14 @@ namespace HSDRawViewer.GUI
     /// </summary>
     public partial class ViewportControl : UserControl
     {
+        public Camera Camera { get => _camera; }
         private Camera _camera;
 
         private bool ReadyToRender = false;
+
+        public bool EnableHelpDisplay { get; set; } = true;
+
+        public bool LoopPlayback { get => cbLoop.Checked; set => cbLoop.Checked = value; }
 
         public float Frame
         {
@@ -97,8 +103,8 @@ namespace HSDRawViewer.GUI
         private Vector2 mouseStart;
         private Vector2 mouseEnd;
 
-        private Vector2 prevPos;
-        private Vector2 deltaPos;
+        private Vector2 PrevCursorPos;
+        private Vector2 DeltaCursorPos;
 
         public bool EnableCrossHair = false;
         private Vector3 CrossHair = new Vector3();
@@ -135,18 +141,10 @@ namespace HSDRawViewer.GUI
             
             PlayerTimer = (sender, args) =>
             {
-                var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
-
-                if (prevPos == null)
-                    prevPos = pos;
-
-                deltaPos = prevPos - pos;
-
-                prevPos = pos;
                 
                 if (buttonPlay.Text == "Pause")
                 {
-                    if(!(!cbLoop.Checked && Frame == MaxFrame))
+                    if(!(!LoopPlayback && Frame == MaxFrame))
                     {
                         Frame++;
                     }
@@ -162,9 +160,14 @@ namespace HSDRawViewer.GUI
 
             panel1.KeyDown += (sender, args) =>
             {
-                if(args.Alt && args.KeyCode == Keys.R)
+                if (args.Alt && args.KeyCode == Keys.R)
                 {
                     _camera.RestoreDefault();
+                }
+                if (args.Alt && args.KeyCode == Keys.C)
+                {
+                    using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
+                        d.ShowDialog();
                 }
             };
 
@@ -204,7 +207,7 @@ namespace HSDRawViewer.GUI
                 
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                         inter.ScreenDrag(GetScreenPosition(point), deltaPos.X * 40, deltaPos.Y * 40);
+                         inter.ScreenDrag(GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
             };
 
             panel1.MouseUp += (sender, args) =>
@@ -254,18 +257,27 @@ namespace HSDRawViewer.GUI
         private delegate void SafeUpdateFrame(decimal frame);
         private void UpdateFrame(decimal frame)
         {
-            if (nudFrame.InvokeRequired)
+            if (nudFrame.InvokeRequired && !nudFrame.IsDisposed)
             {
                 var d = new SafeUpdateFrame(UpdateFrame);
-                nudFrame.Invoke(d, new object[] { frame });
+                try
+                {
+                    nudFrame.Invoke(d, new object[] { frame });
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
             else
             {
-                if (frame >= nudFrame.Maximum)
+                if (frame < 0)
+                    frame = 0;
+                if (frame > nudFrame.Maximum)
                 {
-                    if (!cbLoop.Checked)
+                    if (!LoopPlayback)
                     {
-                        Pause();
+                        Stop();
                     }
                     frame = 0;
                     _frame = 0;
@@ -356,15 +368,27 @@ namespace HSDRawViewer.GUI
 
         private void buttonPlay_Click(object sender, EventArgs e)
         {
-            Pause();
+            Play();
         }
 
-        private void Pause()
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Play()
         {
             if (buttonPlay.Text == "Play")
                 buttonPlay.Text = "Pause";
             else
                 buttonPlay.Text = "Play";
+        }
+
+        /// <summary>
+        /// Stops animation and resets to frame 0
+        /// </summary>
+        public void Stop()
+        {
+            buttonPlay.Text = "Pause";
+            Frame = 0;
         }
 
         /// <summary>
@@ -385,7 +409,7 @@ namespace HSDRawViewer.GUI
         {
             if (!ReadyToRender)
                 return;
-
+            
             panel1.MakeCurrent();
             GL.Viewport(0, 0, panel1.Width, panel1.Height);
 
@@ -437,7 +461,20 @@ namespace HSDRawViewer.GUI
                 GL.Vertex2(x1, y2);
                 GL.End();
             }
-            
+
+            if(EnableHelpDisplay)
+            {
+                if (IsAltAction)
+                {
+                    GLTextRenderer.RenderText(_camera, "R - Reset Camera", 0, 0);
+                    GLTextRenderer.RenderText(_camera, "C - Open Camera Settings", 0, 16);
+                }
+                else
+                {
+                    GLTextRenderer.RenderText(_camera, "Alt+", 0, 0);
+                }
+            }
+
             panel1.SwapBuffers();
         }
 
@@ -522,9 +559,26 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void panel1_MouseEnter(object sender, EventArgs e)
+        {
+            PrevCursorPos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void panel1_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            mouseEnd = new Vector2(e.X, e.Y);
+            var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+
+            if (PrevCursorPos == null)
+                PrevCursorPos = pos;
+
+            DeltaCursorPos = PrevCursorPos - pos;
+
+            PrevCursorPos = pos;
 
             if (!Frozen)
             {
@@ -532,12 +586,12 @@ namespace HSDRawViewer.GUI
                 var speedpane = 0.75f;
                 if (e.Button == MouseButtons.Right)
                 {
-                    _camera.Pan(-deltaPos.X * speedpane, -deltaPos.Y * speedpane);
+                    _camera.Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
                 }
                 if (e.Button == MouseButtons.Left && !Lock2D)
                 {
-                    _camera.RotationXDegrees -= deltaPos.Y * speed;
-                    _camera.RotationYDegrees -= deltaPos.X * speed;
+                    _camera.RotationXDegrees -= DeltaCursorPos.Y * speed;
+                    _camera.RotationYDegrees -= DeltaCursorPos.X * speed;
                 }
             }
         }
@@ -552,6 +606,28 @@ namespace HSDRawViewer.GUI
             pbTimer.Stop();
             pbTimer.Interval = (1000f / (float)nudPlaybackSpeed.Value);
             pbTimer.Start();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hsdCam"></param>
+        public void LoadHSDCamera(HSDRaw.Common.HSD_Camera hsdCam)
+        {
+            if (hsdCam.ProjectionType != 1)
+                return;
+
+            _camera.RenderWidth = hsdCam.ViewportRight;
+            _camera.RenderHeight = hsdCam.ViewportBottom;
+
+            _camera.RotationYRadians = 0;
+            _camera.RotationYRadians = 0;
+
+            _camera.Translation = new Vector3(hsdCam.CamInfo1.V1, hsdCam.CamInfo1.V2, -hsdCam.CamInfo1.V3/3);
+            _camera.FovRadians = hsdCam.FieldOfView;
+
+            _camera.FarClipPlane = hsdCam.FarClip;
+            _camera.NearClipPlane = hsdCam.NearClip;
         }
     }
 }

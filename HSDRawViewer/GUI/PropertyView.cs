@@ -4,26 +4,125 @@ using WeifenLuo.WinFormsUI.Docking;
 using System.Text.RegularExpressions;
 using Be.Windows.Forms;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace HSDRawViewer.GUI
 {
     public partial class PropertyView : DockContent
     {
+        public class PropertyPoke
+        {
+            public HSDAccessor accessor;
+            public uint CurrentOffset = 0;
+            
+            [Category("Types")]
+            public float Float
+            {
+                get
+                {
+                    if (accessor != null && CurrentOffset + 4 <= accessor._s.Length)
+                        return accessor._s.GetFloat((int)CurrentOffset);
+                    else
+                        return 0;
+                }
+                set
+                {
+                    if (accessor != null && CurrentOffset + 4 <= accessor._s.Length)
+                        accessor._s.SetFloat((int)CurrentOffset, value);
+                }
+            }
+
+            [Category("Types")]
+            public int Int
+            {
+                get
+                {
+                    if (accessor != null && CurrentOffset + 4 <= accessor._s.Length)
+                        return accessor._s.GetInt32((int)CurrentOffset);
+                    else
+                        return 0;
+                }
+                set
+                {
+                    if (accessor != null && CurrentOffset + 4 <= accessor._s.Length)
+                        accessor._s.SetInt32((int)CurrentOffset, value);
+                }
+            }
+            
+            [Category("Types")]
+            public uint UInt
+            {
+                get => (uint)Int;
+                set => Int = (int)value;
+            }
+            
+            [Category("Types")]
+            public short Short
+            {
+                get
+                {
+                    if (accessor != null && CurrentOffset + 4 <= accessor._s.Length)
+                        return accessor._s.GetInt16((int)CurrentOffset);
+                    else
+                        return 0;
+                }
+                set
+                {
+                    if (accessor != null && CurrentOffset + 4 <= accessor._s.Length)
+                        accessor._s.SetInt16((int)CurrentOffset, value);
+                }
+            }
+
+            [Category("Types")]
+            public ushort UShort
+            {
+                get => (ushort)Short;
+                set => Short = (short)value;
+            }
+
+            [Category("Types")]
+            public sbyte SByte
+            {
+                get => (sbyte)Byte;
+                set => Byte = (byte)value;
+            }
+
+            [Category("Types")]
+            public byte Byte
+            {
+                get
+                {
+                    if (accessor != null && CurrentOffset + 1 <= accessor._s.Length)
+                        return accessor._s.GetByte((int)CurrentOffset);
+                    else
+                        return 0;
+                }
+                set
+                {
+                    if (accessor != null && CurrentOffset + 1 <= accessor._s.Length)
+                        accessor._s.SetByte((int)CurrentOffset, value);
+                }
+            }
+        }
+
+        private PropertyPoke Poker = new PropertyPoke();
+
         private HSDAccessor accessor
         {
             get
             {
-                if (propertyGrid1.SelectedObject is HSDAccessor a)
-                    return a;
-                return null;
+                return Poker.accessor;
             }
         }
+        private DataNode Node;
 
         public PropertyView()
         {
             InitializeComponent();
 
             Text = "Property View";
+
+            propertyGrid2.SelectedObject = Poker;
 
             hexbox.SelectionStartChanged += (sender, args) =>
             {
@@ -48,11 +147,16 @@ namespace HSDRawViewer.GUI
             offsetBox.Text = LastGoodOffset;
         }
 
-        public void SetAccessor(HSDAccessor accessor)
+        public void SetNode(DataNode node)
         {
+            var accessor = node.Accessor;
+
             if (accessor == null)
                 return;
 
+            Node = node;
+
+            Poker.accessor = accessor;
             propertyGrid1.SelectedObject = accessor;
             SetBytes();
 
@@ -65,8 +169,20 @@ namespace HSDRawViewer.GUI
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            if (propertyGrid1.SelectedObject is HSDAccessor accessor)
+            if (accessor != null)
+            {
+                Node?.NotifyChange();
                 SetBytes();
+            }
+        }
+
+        private void propertyGrid2_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            if (accessor != null)
+            {
+                Node?.NotifyChange();
+                SetBytes();
+            }
         }
 
         private void SetBytes()
@@ -144,10 +260,10 @@ namespace HSDRawViewer.GUI
                     accessor._s.Resize((int)hexbox.ByteProvider.Length);
                 }
             };
+            UpdateValues();
         }
 
         private string LastGoodOffset = "0x00000000";
-        private uint CurrentOffset = 0;
 
         private void offsetBox_TextChanged(object sender, System.EventArgs e)
         { 
@@ -155,7 +271,7 @@ namespace HSDRawViewer.GUI
             if (Regex.Match(offsetBox.Text, @"^0[xX][0-9a-fA-F]{1,8}$").Success)
             {
                 LastGoodOffset = offsetBox.Text;
-                CurrentOffset = uint.Parse(offsetBox.Text.ToLower().Replace("0x", ""), System.Globalization.NumberStyles.HexNumber);
+                Poker.CurrentOffset = uint.Parse(offsetBox.Text.ToLower().Replace("0x", ""), System.Globalization.NumberStyles.HexNumber);
                 UpdateValues();
                 return;
             }
@@ -184,129 +300,10 @@ namespace HSDRawViewer.GUI
             }
             return false;
         }
-
-        private void UpdateValues()
+        
+        public void UpdateValues()
         {
-            // disable all buttons
-            buttonInt16.Enabled = false;
-            buttonInt32.Enabled = false;
-            buttonFloat.Enabled = false;
-
-            floatBox.Text = "0";
-            ByteBox.Text = "0";
-            Int16Box.Text = "0";
-            Int32Box.Text = "0";
-
-            if (accessor == null || CurrentOffset < 0)
-                return;
-
-            if (CurrentOffset + 1 > accessor._s.Length || IsReference(CurrentOffset, 1))
-                return;
-
-            buttonByte.Enabled = true;
-            ByteBox.Text = accessor._s.GetByte((int)CurrentOffset).ToString();
-
-            if (CurrentOffset + 2 > accessor._s.Length || IsReference(CurrentOffset, 2))
-                return;
-
-            buttonInt16.Enabled = true;
-            Int16Box.Text = accessor._s.GetInt16((int)CurrentOffset).ToString();
-
-            if (CurrentOffset + 4 > accessor._s.Length || IsReference(CurrentOffset, 4))
-                return;
-
-            buttonInt32.Enabled = true;
-            buttonFloat.Enabled = true;
-            Int32Box.Text = accessor._s.GetInt32((int)CurrentOffset).ToString();
-            floatBox.Text = accessor._s.GetFloat((int)CurrentOffset).ToString();
-        }
-
-        private string prevFloat = "0";
-        private void floatBox_TextChanged(object sender, System.EventArgs e)
-        {
-            float f;
-            if (float.TryParse(floatBox.Text, out f))
-            {
-                prevFloat = floatBox.Text;
-            }
-            else
-                floatBox.Text = prevFloat;
-        }
-
-        private string prevInt32 = "0";
-        private void Int32Box_TextChanged(object sender, System.EventArgs e)
-        {
-            int f;
-            if (int.TryParse(Int32Box.Text, out f))
-            {
-                prevInt32 = Int32Box.Text;
-            }
-            else
-                Int32Box.Text = prevInt32;
-        }
-
-        private string prevInt16 = "0";
-        private void Int16Box_TextChanged(object sender, System.EventArgs e)
-        {
-            short f;
-            if (short.TryParse(Int16Box.Text, out f))
-            {
-                prevInt16 = Int16Box.Text;
-            }
-            else
-                Int16Box.Text = prevInt16;
-        }
-
-        private void buttonFloat_Click(object sender, System.EventArgs e)
-        {
-            if(accessor != null)
-            {
-                accessor._s.SetFloat((int)CurrentOffset, float.Parse(floatBox.Text));
-                SetAccessor(accessor);
-                UpdateValues();
-            }
-        }
-
-        private void buttonInt32_Click(object sender, System.EventArgs e)
-        {
-            if (accessor != null)
-            {
-                accessor._s.SetInt32((int)CurrentOffset, int.Parse(Int32Box.Text));
-                SetAccessor(accessor);
-                UpdateValues();
-            }
-        }
-
-        private void buttonInt16_Click(object sender, System.EventArgs e)
-        {
-            if (accessor != null)
-            {
-                accessor._s.SetInt16((int)CurrentOffset, short.Parse(Int16Box.Text));
-                SetAccessor(accessor);
-                UpdateValues();
-            }
-        }
-
-        private string prevByte = "";
-        private void ByteBox_TextChanged(object sender, System.EventArgs e)
-        {
-            byte f;
-            if (byte.TryParse(ByteBox.Text, out f))
-            {
-                prevByte = ByteBox.Text;
-            }
-            else
-                ByteBox.Text = prevByte;
-        }
-
-        private void buttonByte_Click(object sender, System.EventArgs e)
-        {
-            if (accessor != null)
-            {
-                accessor._s.SetByte((int)CurrentOffset, byte.Parse(ByteBox.Text));
-                SetAccessor(accessor);
-                UpdateValues();
-            }
+            propertyGrid2.Refresh();
         }
 
         /// <summary>
@@ -324,22 +321,22 @@ namespace HSDRawViewer.GUI
 
                     if (f != null)
                     {
-                        if (CurrentOffset >= accessor._s.Length)
-                            accessor._s.Resize((int)CurrentOffset + 4);
+                        if (Poker.CurrentOffset >= accessor._s.Length)
+                            accessor._s.Resize((int)Poker.CurrentOffset + 4);
 
                         if (f.ToLower().EndsWith(".dat"))
                         {
                             var datFile = new HSDRawFile(f);
                             
-                            accessor._s.SetReferenceStruct((int)CurrentOffset, datFile.Roots[0].Data._s);
+                            accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, datFile.Roots[0].Data._s);
                         }
                         else
-                        accessor._s.SetReferenceStruct((int)CurrentOffset, new HSDStruct(System.IO.File.ReadAllBytes(f)));
+                        accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, new HSDStruct(System.IO.File.ReadAllBytes(f)));
                     }
                 }
                 if (e.KeyCode == Keys.OemMinus)
                 {
-                    accessor._s.SetReference((int)CurrentOffset, null);
+                    accessor._s.SetReference((int)Poker.CurrentOffset, null);
                 }
             }
         }

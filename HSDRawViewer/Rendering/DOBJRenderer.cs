@@ -103,13 +103,13 @@ namespace HSDRawViewer.Rendering
 
             if (OnlyRenderSelected && SelectedDOBJ != null && SelectedDOBJ._s != dobj._s)
                 return;
-            
+
             var mobj = dobj.Mobj;
             var pobjs = dobj.Pobj.List;
 
-            if(!DOBJtoBuffer.ContainsKey(dobj))
+            if (!DOBJtoBuffer.ContainsKey(dobj))
                 LoadDOBJ(dobj, jobjManager);
-            
+
             if (!DOBJtoBuffer.ContainsKey(dobj))
                 return;
 
@@ -124,38 +124,34 @@ namespace HSDRawViewer.Rendering
 
             var mvp = camera.MvpMatrix;
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
+            
+            var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
+            GXShader.SetVector3("cameraPos", campos);
 
-            Vector3 camPos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
-            GXShader.SetVector3("cameraPos", camPos);
+            //GXShader.SetBoolToInt("envelopeModel", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL));
 
             Matrix4 single = Matrix4.Identity;
             if (parentJOBJ != null && jobjManager != null)
                 single = jobjManager.GetWorldTransform(parentJOBJ);
             GL.UniformMatrix4(GXShader.GetVertexAttributeUniformLocation("singleBind"), false, ref single);
-
-            var rootJOBJ = jobjManager.GetJOBJ(0);
-            GXShader.SetBoolToInt("isRootBound", parentJOBJ?._s == rootJOBJ?._s);
-
+            
             GXShader.SetWorldTransformBones(jobjManager.GetWorldTransforms());
             //GXShader.SetBindTransformBones(jobjManager.GetBindTransforms());
 
             var tb = jobjManager.GetBindTransforms();
             if (tb.Length > 0)
                 GXShader.SetMatrix4x4("binds", tb);
-            
-            GL.Uniform3(GXShader.GetVertexAttributeUniformLocation("overlayColor"), OverlayColor);
+
+            GXShader.SetVector3("overlayColor", OverlayColor);
+            GXShader.SetInt("renderOverride", (int)jobjManager.RenderMode);
 
             Matrix4 sphereMatrix = camera.ModelViewMatrix;
             sphereMatrix.Invert();
             sphereMatrix.Transpose();
             GXShader.SetMatrix4x4("sphereMatrix", ref sphereMatrix);
 
-            float wscale = 1;
-            float hscale = 1;
-            bool mirrorX = false;
-            bool mirrorY = false;
             if (mobj != null)
-                BindMOBJ(GXShader, mobj, out wscale, out hscale, out mirrorX, out mirrorY);
+                BindMOBJ(GXShader, mobj, parentJOBJ);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, DOBJtoBuffer[dobj]);
 
@@ -173,17 +169,11 @@ namespace HSDRawViewer.Rendering
 
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
+
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
             
-            if (selected)
-            {
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("colorOverride"), 1);
-                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-            }
-            else
-            {
-                GL.PolygonMode(MaterialFace.Back, PolygonMode.Fill);
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("colorOverride"), 0);
-            }
+            GXShader.SetBoolToInt("colorOverride", selected);
 
             foreach (var p in DOBJtoPOBJCache[dobj])
             {
@@ -193,12 +183,23 @@ namespace HSDRawViewer.Rendering
                 var we = p.Weights;
                 GL.Uniform4(GXShader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
                 
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("hasEnvelopes"), p.HasWeighting ? 1 : 0);
+                GXShader.SetBoolToInt("hasEnvelopes", p.HasWeighting);
+                GXShader.SetBoolToInt("enableParentTransform", !p.Flag.HasFlag(POBJ_FLAG.PARENTTRANSFORM));
 
-                GL.Uniform1(GXShader.GetVertexAttributeUniformLocation("notInverted"), p.Flag.HasFlag(POBJ_FLAG.NOTINVERTED) ? 1 : 0);
-
+                GL.Enable(EnableCap.CullFace);
+                if (selected)
+                    GL.PolygonMode(MaterialFace.Back, PolygonMode.Line);
+                else
                 if (p.Flag.HasFlag(POBJ_FLAG.CULLFRONT))
                     GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
+                else
+                if (p.Flag.HasFlag(POBJ_FLAG.CULLBACK))
+                    GL.PolygonMode(MaterialFace.Back, PolygonMode.Fill);
+                else
+                {
+                    GL.Disable(EnableCap.CullFace);
+                    //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+                }
 
                 foreach (var dl in p.DisplayLists)
                     GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
@@ -208,6 +209,7 @@ namespace HSDRawViewer.Rendering
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
@@ -292,7 +294,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="mobj"></param>
-        private void BindMOBJ(Shader shader, HSD_MOBJ mobj, out float wscale, out float hscale, out bool mirrorX, out bool mirrorY)
+        private void BindMOBJ(Shader shader, HSD_MOBJ mobj, HSD_JOBJ parentJOBJ)
         {
             GL.Enable(EnableCap.Texture2D);
 
@@ -302,10 +304,6 @@ namespace HSDRawViewer.Rendering
             GL.Enable(EnableCap.AlphaTest);
             GL.AlphaFunc(AlphaFunction.Greater, 0f);
             
-            wscale = 1;
-            hscale = 1;
-            mirrorX = false;
-            mirrorY = false;
             if (mobj == null)
                 return;
 
@@ -329,26 +327,41 @@ namespace HSDRawViewer.Rendering
                 shader.SetFloat("alpha", color.Alpha);
             }
 
-            shader.SetBoolToInt("enableTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0));
+            var enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);
+
             shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
-            shader.SetBoolToInt("enableSpecular", mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
-            shader.SetBoolToInt("enableDiffuse", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
-            shader.SetBoolToInt("enableMaterial", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
-            shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
+            shader.SetBoolToInt("enableSpecular", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SPECULAR) && mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
+            shader.SetBoolToInt("enableDiffuse", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
+            shader.SetBoolToInt("useConstant", mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT));
+            shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.VERTEX));
 
-            shader.SetInt("enableTexDiffuse", 0);
-            shader.SetInt("texDiffuse", 0);
-            shader.SetInt("difColorType", 0);
-            shader.SetInt("difAlphaType", 0);
-            shader.SetInt("diffuseCoordType", 0);
-            shader.SetVector2("diffuseUVScale", 1, 1);
+            shader.SetBoolToInt("hasTEX0", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) || enableAll);
+            shader.SetBoolToInt("hasTEX1", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX1) || enableAll);
 
+            var id = Matrix4.Identity;
+
+            for(int index = 0; index < 2; index++)
+            {
+                shader.SetInt($"TEX{index}", index);
+                shader.SetInt($"TEX{index}LightType", 0);
+                shader.SetInt($"TEX{index}ColorOperation", 0);
+                shader.SetInt($"TEX{index}AlphaOperation", 0);
+                shader.SetInt($"TEX{index}CoordType", 0);
+                shader.SetInt($"TEX{index}Blend", 1);
+                shader.SetBoolToInt($"TEX{index}MirrorFix", false);
+                shader.SetVector2($"TEX{index}UVScale", 1, 1);
+                shader.SetMatrix4x4($"TEX{index}Transform", ref id);
+            }
 
             // Bind Textures
             if (mobj.Textures != null)
             {
+                int index = -1;
                 foreach (var tex in mobj.Textures.List)
                 {
+                    index++;
+                    if (index > 1)
+                        break;
                     if (tex.ImageData == null)
                         continue;
 
@@ -360,34 +373,88 @@ namespace HSDRawViewer.Rendering
 
                     var texid = TextureManager.Get(imageBufferTextureIndex[tex.ImageData.ImageData]);
 
-                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.ActiveTexture(TextureUnit.Texture0 + index);
                     GL.BindTexture(TextureTarget.Texture2D, texid);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GXTranslator.toWrapMode(tex.WrapS));
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GXTranslator.toWrapMode(tex.WrapT));
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GXTranslator.toMagFilter(tex.MagFilter));
 
-                    wscale = tex.WScale;
-                    hscale = tex.HScale;
+                    var wscale = tex.WScale;
+                    var hscale = tex.HScale;
 
-                    mirrorX = tex.WrapS == GXWrapMode.MIRROR;
-                    mirrorY = tex.WrapT == GXWrapMode.MIRROR;
+                    var mirrorX = tex.WrapS == GXWrapMode.MIRROR;
+                    var mirrorY = tex.WrapT == GXWrapMode.MIRROR;
 
-                    int coordType = 0;
-                    if (tex.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
+                    var flags = tex.Flags;
+
+                    int coordType = 0; // coord UV
+                    if (flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
                         coordType = 1;
 
-                    shader.SetInt("enableTexDiffuse", 1);
-                    shader.SetInt("diffuseTex", 0);
-                    shader.SetInt("difColorType", 0);
-                    shader.SetInt("difAlphaType", 0);
-                    shader.SetInt("diffuseCoordType", coordType);
-                    shader.SetBoolToInt("diffuseMirrorFix", mirrorY);
-                    shader.SetVector2("diffuseUVScale", wscale, hscale);
+                    var lightType = 0; // ambient
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_DIFFUSE))
+                        lightType = 1;
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SPECULAR))
+                        lightType = 2;
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_EXT))
+                        lightType = 3;
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SHADOW))
+                        lightType = 4;
 
-                    break;
+                    int colorOP = 0; // NONE
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_MODULATE))
+                        colorOP = 1;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_REPLACE))
+                        colorOP = 2;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_BLEND))
+                        colorOP = 3;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ADD))
+                        colorOP = 4;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_SUB))
+                        colorOP = 5;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_PASS))
+                        colorOP = 6;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ALPHA_MASK))
+                        colorOP = 7;
+                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_RGB_MASK))
+                        colorOP = 8;
+
+                    int alphaOP = 0; // NONE
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_MODULATE))
+                        alphaOP = 1;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_REPLACE))
+                        alphaOP = 2;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_BLEND))
+                        alphaOP = 3;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ADD))
+                        alphaOP = 4;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_SUB))
+                        alphaOP = 5;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_PASS))
+                        alphaOP = 6;
+                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ALPHA_MASK))
+                        alphaOP = 7;
+
+                    var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
+                        Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
+                        Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+
+                    transform.Invert();
+                    
+                    shader.SetInt($"TEX{index}", index);
+                    shader.SetInt($"TEX{index}LightType", lightType);
+                    shader.SetInt($"TEX{index}ColorOperation", colorOP);
+                    shader.SetInt($"TEX{index}AlphaOperation", alphaOP);
+                    shader.SetInt($"TEX{index}CoordType", coordType);
+                    shader.SetFloat($"TEX{index}Blend", tex.Blending);
+                    shader.SetBoolToInt($"TEX{index}MirrorFix", mirrorY);
+                    shader.SetVector2($"TEX{index}UVScale", wscale, hscale);
+                    shader.SetMatrix4x4($"TEX{index}Transform", ref transform);
                 }
             }
         }
         #endregion
+        
+
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Globalization;
 using System.Linq;
 
@@ -69,9 +70,8 @@ namespace HSDRawViewer
                         AudioDevices.Add(device);
                     }
                 }
+                DefaultDevice = mmdeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
             }
-
-            DefaultDevice = AudioDevices[0];
         }
 
 

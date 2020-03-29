@@ -14,6 +14,7 @@ using HSDRaw.AirRide.Gr.Data;
 using System.Diagnostics;
 using HSDRaw.Melee;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Stages;
 
 namespace HSDRaw
 {
@@ -41,6 +42,14 @@ namespace HSDRaw
         /// </summary>
         private List<HSDStruct> _structCache = new List<HSDStruct>();
         private Dictionary<HSDStruct, int> _structCacheToOffset = new Dictionary<HSDStruct, int>();
+
+        public HSDRootNode this[string i]
+        {
+            get
+            {
+                return Roots.Find(e => e.Name == i);
+            }
+        }
 
         /// <summary>
         /// 
@@ -450,7 +459,7 @@ namespace HSDRaw
         /// <param name="bufferAlign"></param>
         public void Save(Stream stream, bool bufferAlign = true, bool optimize = true)
         {
-            if (Roots[0].Data is MEX_Data)
+            if (Roots.Count > 0 && Roots[0].Data is MEX_Data)
                 bufferAlign = false;
 
             // gather all structs--------------------------------------------------------------------------
@@ -854,6 +863,13 @@ namespace HSDRaw
             if (rootString.StartsWith("mexData"))
             {
                 var acc = new MEX_Data();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("mexMapData"))
+            {
+                var acc = new MEX_mexMapData();
                 acc._s = str;
                 a = acc;
             }

@@ -140,18 +140,46 @@ namespace HSDRawViewer.Tools
         public bool HasEnums => Enums != null && Enums.Length > 0;
     }
 
+    public enum SubactionGroup
+    {
+        Fighter, 
+        Item
+    }
+
     public class SubactionManager
     {
-        public static List<Subaction> Subactions
+        public static List<Subaction> FighterSubactions
         {
             get
             {
-                if (_subactions == null)
+                if (_fighterSubactions == null)
                     LoadFromFile();
-                return _subactions;
+                return _fighterSubactions;
             }
         }
-        private static List<Subaction> _subactions;
+        private static List<Subaction> _fighterSubactions;
+
+        public static List<Subaction> ItemSubactions
+        {
+            get
+            {
+                if (_itemSubactions == null)
+                    LoadFromFile();
+                return _itemSubactions;
+            }
+        }
+        private static List<Subaction> _itemSubactions;
+
+        public static List<Subaction> CustomSubactions
+        {
+            get
+            {
+                if (_customSubactions == null)
+                    LoadFromFile();
+                return _customSubactions;
+            }
+        }
+        private static List<Subaction> _customSubactions;
 
         /// <summary>
         /// 
@@ -163,29 +191,57 @@ namespace HSDRawViewer.Tools
                 .Build();
 
             string sa = "";
+            string fsa = "";
+            string isa = "";
             string csa = "";
 
-            if (File.Exists(@"Melee\subactions.yaml"))
-                sa = File.ReadAllText(@"Melee\subactions.yaml");
+            if (File.Exists(@"Melee\subactions_control.yaml"))
+                sa = File.ReadAllText(@"Melee\subactions_control.yaml");
+
+            if (File.Exists(@"Melee\subactions_fighter.yaml"))
+                fsa = File.ReadAllText(@"Melee\subactions_fighter.yaml");
+
+            if (File.Exists(@"Melee\subactions_item.yaml"))
+                isa = File.ReadAllText(@"Melee\subactions_item.yaml");
 
             if (File.Exists(@"Melee\subactions_custom.yaml"))
                 csa = File.ReadAllText(@"Melee\subactions_custom.yaml");
 
             var subs = deserializer.Deserialize<Subaction[]>(sa);
+            var fsubs = deserializer.Deserialize<Subaction[]>(fsa);
+            var isubs = deserializer.Deserialize<Subaction[]>(isa);
             var customsubs = deserializer.Deserialize<Subaction[]>(csa);
 
-            _subactions = new List<Subaction>();
             if (subs != null && subs.Length != 0)
             {
                 foreach (var s in subs)
                     s.Code <<= 2;
-                _subactions.AddRange(subs);
+
+                _fighterSubactions = new List<Subaction>();
+                if (fsubs != null && fsubs.Length != 0)
+                {
+                    foreach (var s in fsubs)
+                        s.Code <<= 2;
+                    _fighterSubactions.AddRange(subs);
+                    _fighterSubactions.AddRange(fsubs);
+                }
+
+                _itemSubactions = new List<Subaction>();
+                if (subs != null && subs.Length != 0)
+                {
+                    foreach (var s in isubs)
+                        s.Code <<= 2;
+                    _itemSubactions.AddRange(subs);
+                    _itemSubactions.AddRange(isubs);
+                }
             }
-            if(customsubs != null && customsubs.Length != 0)
+
+            _customSubactions = new List<Subaction>();
+            if (customsubs != null && customsubs.Length != 0)
             {
                 foreach (var s in customsubs)
                     s.IsCustom = true;
-                _subactions.AddRange(customsubs);
+                _customSubactions.AddRange(customsubs);
             }
         }
 
@@ -194,12 +250,12 @@ namespace HSDRawViewer.Tools
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static Subaction GetSubaction(byte code)
+        public static Subaction GetSubaction(byte code, SubactionGroup group)
         {
-            var sa = Subactions.Find(e => e.Code == code && e.IsCustom);
+            var sa = CustomSubactions.Find(e => e.Code == code && e.IsCustom);
 
             if (sa == null)
-                sa = Subactions.Find(e => e.Code == (code & 0xFC) && !e.IsCustom);
+                sa = GetGroup(group).Find(e => e.Code == (code & 0xFC) && !e.IsCustom);
 
             return sa;
         }
@@ -209,9 +265,25 @@ namespace HSDRawViewer.Tools
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static Subaction GetSubaction(string name)
+        public static Subaction GetSubaction(string name, SubactionGroup group)
         {
-            return Subactions.Find(e => e.Name == name);
+            return GetGroup(group).Find(e => e.Name == name);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="group"></param>
+        /// <returns></returns>
+        public static List<Subaction> GetGroup(SubactionGroup group)
+        {
+            switch (group)
+            {
+                case SubactionGroup.Item:
+                    return ItemSubactions;
+                default:
+                    return FighterSubactions;
+            }
         }
     }
 
