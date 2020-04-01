@@ -1640,10 +1640,11 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 StringBuilder table = new StringBuilder();
 
+                int index = 341;
                 foreach(var m in moveLogic)
                 {
-                    table.AppendLine("\t// " + (fighterData != null && m.AnimationID != -1 && fighterData.SubActionTable.Subactions[m.AnimationID].Name != null ? System.Text.RegularExpressions.Regex.Replace(fighterData.SubActionTable.Subactions[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
-
+                    table.AppendLine($"\t// State: {index} - " + (fighterData != null && m.AnimationID != -1 && fighterData.SubActionTable.Subactions[m.AnimationID].Name != null ? System.Text.RegularExpressions.Regex.Replace(fighterData.SubActionTable.Subactions[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
+                    index++;
                     table.AppendLine(string.Format(
                         "\t{{" +
                         "\n\t\t{0, -12}// AnimationID" +
@@ -1774,6 +1775,51 @@ static struct map_GOBJDesc map_gobjs[] = {
 
                 MessageBox.Show("Map GOBJ Functions Copied to Clipboard");
             }
+        }
+
+        private void cpyLogicToClipButton_Click(object sender, EventArgs e)
+        {
+            MEX_Item item = null;
+            if (itemTabs.SelectedIndex == 0 && commonItemEditor.SelectedObject is MEX_Item it)
+                item = it;
+            if (itemTabs.SelectedIndex == 1 && fighterItemEditor.SelectedObject is MEX_Item it2)
+                item = it2;
+            if (itemTabs.SelectedIndex == 2 && pokemonItemEditor.SelectedObject is MEX_Item it3)
+                item = it3;
+            if (itemTabs.SelectedIndex == 3 && stageItemEditor.SelectedObject is MEX_Item it4)
+                item = it4;
+            if (itemTabs.SelectedIndex == 4 && mexItemEditor.SelectedObject is MEX_Item it5)
+                item = it5;
+
+            if (item == null)
+                return;
+
+            StringBuilder table = new StringBuilder();
+            int index = 0;
+            foreach (var m in item.ItemStates)
+            {
+                table.AppendLine("\t// State " + index++);
+
+                table.AppendLine(string.Format(
+                    "\t{{" +
+                    "\n\t\t0x{0, -10}// AnimID" +
+                    "\n\t\t0x{1, -10}// AnimationCallback" +
+                    "\n\t\t0x{2, -10}// PhysicsCallback" +
+                    "\n\t\t0x{3, -10}// CollisionCallback" +
+                    "\n\t}},",
+            m.AnimID.ToString("X") + ",",
+            m.AnimationCallback.ToString("X") + ",",
+            m.PhysicsCallback.ToString("X") + ",",
+            m.CollisionCallback.ToString("X") + ","
+            ));
+            }
+
+            Clipboard.SetText(
+                @"__attribute__((used))
+static struct ItemState item_states[] = {
+" + table.ToString() + @"}; ");
+
+            MessageBox.Show("Item State Table Copied to Clipboard");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;

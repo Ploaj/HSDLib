@@ -53,6 +53,7 @@
             this.stageIDEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip7 = new System.Windows.Forms.ToolStrip();
             this.saveStageButton = new System.Windows.Forms.ToolStripButton();
+            this.mapGOBJCopyButton = new System.Windows.Forms.ToolStripButton();
             this.tabPageItem = new System.Windows.Forms.TabPage();
             this.itemTabs = new System.Windows.Forms.TabControl();
             this.tabPageItemCommon = new System.Windows.Forms.TabPage();
@@ -109,7 +110,7 @@
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
             this.installFighterButton = new System.Windows.Forms.ToolStripButton();
             this.uninstallFighterButton = new System.Windows.Forms.ToolStripButton();
-            this.mapGOBJCopyButton = new System.Windows.Forms.ToolStripButton();
+            this.cpyLogicToClipButton = new System.Windows.Forms.ToolStripButton();
             this.mainTabControl.SuspendLayout();
             this.tabPageFighter.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -410,6 +411,15 @@
             this.saveStageButton.Text = "Save Stage Changes";
             this.saveStageButton.Click += new System.EventHandler(this.saveStageButton_Click);
             // 
+            // mapGOBJCopyButton
+            // 
+            this.mapGOBJCopyButton.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
+            this.mapGOBJCopyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mapGOBJCopyButton.Name = "mapGOBJCopyButton";
+            this.mapGOBJCopyButton.Size = new System.Drawing.Size(187, 22);
+            this.mapGOBJCopyButton.Text = "Copy Map GOBJs to Clipboard";
+            this.mapGOBJCopyButton.Click += new System.EventHandler(this.mapGOBJCopyButton_Click);
+            // 
             // tabPageItem
             // 
             this.tabPageItem.Controls.Add(this.itemTabs);
@@ -572,7 +582,8 @@
             this.toolStrip5.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveItemButton,
             this.mexItemCloneButton,
-            this.itemExportButton});
+            this.itemExportButton,
+            this.cpyLogicToClipButton});
             this.toolStrip5.Location = new System.Drawing.Point(3, 3);
             this.toolStrip5.Name = "toolStrip5";
             this.toolStrip5.Size = new System.Drawing.Size(785, 25);
@@ -1034,14 +1045,14 @@
             this.uninstallFighterButton.Text = "Uninstall Fighter";
             this.uninstallFighterButton.Click += new System.EventHandler(this.uninstallFighterButton_Click);
             // 
-            // mapGOBJCopyButton
+            // cpyLogicToClipButton
             // 
-            this.mapGOBJCopyButton.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
-            this.mapGOBJCopyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.mapGOBJCopyButton.Name = "mapGOBJCopyButton";
-            this.mapGOBJCopyButton.Size = new System.Drawing.Size(187, 22);
-            this.mapGOBJCopyButton.Text = "Copy Map GOBJs to Clipboard";
-            this.mapGOBJCopyButton.Click += new System.EventHandler(this.mapGOBJCopyButton_Click);
+            this.cpyLogicToClipButton.Image = global::HSDRawViewer.Properties.Resources.ts_clone;
+            this.cpyLogicToClipButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cpyLogicToClipButton.Name = "cpyLogicToClipButton";
+            this.cpyLogicToClipButton.Size = new System.Drawing.Size(156, 22);
+            this.cpyLogicToClipButton.Text = "Copy Logic to Clipboard";
+            this.cpyLogicToClipButton.Click += new System.EventHandler(this.cpyLogicToClipButton_Click);
             // 
             // MexDataEditor
             // 
@@ -1194,5 +1205,6 @@
         private System.Windows.Forms.ToolStripButton makeNameTagButton;
         private System.Windows.Forms.ToolStripButton loadHSDCamButton;
         private System.Windows.Forms.ToolStripButton mapGOBJCopyButton;
+        private System.Windows.Forms.ToolStripButton cpyLogicToClipButton;
     }
 }

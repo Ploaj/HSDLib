@@ -583,6 +583,8 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
 
+            var skeleton = rootnode.BreathFirstList;
+
             Console.WriteLine("Processing " + node.Name);
 
             foreach (int index in node.MeshIndices)
@@ -656,6 +658,9 @@ namespace HSDRawViewer.Converters
                     foreach (var v in mesh.Bones)
                     {
                         var jobj = cache.NameToJOBJ[v.Name];
+
+                        if (!skeleton.Contains(jobj))
+                            jobj = skeleton[0];
 
                         if (!cache.EnvelopedJOBJs.Contains(jobj))
                             cache.EnvelopedJOBJs.Add(jobj);
