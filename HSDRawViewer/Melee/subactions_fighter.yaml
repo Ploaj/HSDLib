@@ -487,7 +487,7 @@
   parameters:
   - name: Unknown
     bitCount: 26
-    
+
 - code: 53
   name: Set flag 0x2225 to 10
   parameters:
@@ -599,7 +599,7 @@
     - Starts brownish then fades to white then to normal
     - Flashing White with Electric
     - Nothing
-    - No Aura but Flashing Electric Effects 
+    - No Aura but Flashing Electric Effects
     - Fast Flashing Electric Aura (AWESOME!)
     - Flashing Blue Aura with Electric Effects and Lens Flares (AWESOME!)
     - Fast Flashing White Aura
@@ -609,7 +609,7 @@
     - Very Fast White and then Bluegreen Aura (Maybe Early Shine Aura?)
     - Flashing Bluegreen Aura with Electric Effects at feet
     - Flashing Green with Flashing Lens Flares (AWESOME!)
-    - Starts full Black then fades to normal 
+    - Starts full Black then fades to normal
     - Starts Orangered and then fades to normal
     - Brief White Aura in the middle of the charge
     - Whiter and Whiter Aura over time (Ends before smash is fully charged) (AWESOME!)
@@ -633,7 +633,7 @@
     - Brief White Aura
     - Brief White Aura then progressively gets more and more Blueish Purplish
     - Glows light red or pink
-    - Starts full Black then fades to alittle less black 
+    - Starts full Black then fades to alittle less black
     - Black Tint for the whole charge
     - Nothing
     - Yellower and Yellower Aura over time (Ends with smash) (Awesome!)
@@ -641,7 +641,7 @@
     - Flashing Orangered with Flashing Smoke (AWESOME!)
     - Flashing White Aura with Stars and Lens Flares (I think like eatting a maximum tomato) (AWESOME!)
     - Produces Sparkles (Like the sparkles behind Captain Falcon's Up B)
-    - Flashing Yellow with Flashing Large Lens Flare 
+    - Flashing Yellow with Flashing Large Lens Flare
     - "No Aura, but Yellow Lighting from the front"
     - Nothing
     - Yellow Aura that fades away
@@ -664,7 +664,7 @@
   - name: Unknown
     bitCount: 26
     hex: true
-    
+
 - code: 58
   name: Aesthetic Wind Effect
   parameters:
