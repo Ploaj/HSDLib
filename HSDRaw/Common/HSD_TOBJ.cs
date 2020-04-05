@@ -27,6 +27,7 @@ namespace HSDRaw.Common
         COLORMAP_PASS = (6 << 16),
         COLORMAP_ADD = (7 << 16),
         COLORMAP_SUB = (8 << 16),
+        ALPHAMAP_NONE = (0 << 16),
         ALPHAMAP_ALPHA_MASK = (1 << 20),
         ALPHAMAP_BLEND = (2 << 20),
         ALPHAMAP_MODULATE = (3 << 20),

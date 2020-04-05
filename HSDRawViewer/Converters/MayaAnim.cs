@@ -76,13 +76,7 @@ namespace HSDRawViewer.Converters
                         // get current state at this key frame
                         var state = t.GetState(t.Keys[i].Frame);
                         bool nextSlope = i + 1 < t.Keys.Count && t.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
-
-                        // Debug
-                        /*if (mnode.name == "JOBJ_99" && mtrack.type == MayaAnim.TrackType.rotateX)
-                        {
-                            Console.WriteLine($"{t.Keys[i].Frame} {t.Keys[i].Value} {t.Keys[i].Tan} {t.Keys[i].InterpolationType} {nextSlope}");
-                            Console.WriteLine($"{state.t0} {state.t1} {state.p0} {state.p1} {state.d0} {state.d1} {state.op_intrp}");
-                        }*/
+                        
                         if (t.Keys[i].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
                             continue;
 
@@ -161,21 +155,26 @@ namespace HSDRawViewer.Converters
             foreach(var mNode in mayaFile.Nodes)
             {
                 AnimNode node = new AnimNode();
-                foreach(var mTrack in mNode.atts)
+                Console.WriteLine(mNode.name);
+                foreach (var mTrack in mNode.atts)
                 {
                     AnimTrack t = new AnimTrack();
                     t.Keys = new List<FOBJKey>();
                     t.TrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
+
+                    Console.WriteLine("\t" + mTrack.type);
+
+                    var degrees = mayaFile.header.angularUnit == "deg";
+                    var trackUnit = (mTrack.IsAngular() && degrees);
                     
-                    
-                    for(int i = 0; i < mTrack.keys.Count; i++)
+                    for (int i = 0; i < mTrack.keys.Count; i++)
                     {
                         var mKey = mTrack.keys[i];
                         var mKeyNext = i + 1 < mTrack.keys.Count ? mTrack.keys[i + 1] : mTrack.keys[i];
 
                         var k = new FOBJKey();
                         k.Frame = mKey.input - 1;
-                        k.Value = (mTrack.IsAngular() && mayaFile.header.angularUnit == "deg") ? MathHelper.DegreesToRadians(mKey.output) : mKey.output;
+                        k.Value = trackUnit ? MathHelper.DegreesToRadians(mKey.output) : mKey.output;
                         switch (mKey.outtan)
                         {
                             case "auto":
@@ -192,12 +191,14 @@ namespace HSDRawViewer.Converters
 
                                 t.Keys.Add(k);
                                 break;
+                            case "fixed":
                             case "spline":
                                 k.InterpolationType = GXInterpolationType.HSD_A_OP_SPL;
-                                k.Tan = mKey.t1;
+                                k.Tan = degrees ? MathHelper.DegreesToRadians(mKey.t1) : mKey.t1;
 
                                 if((mKeyNext.input - mKey.input) <= 1) // optimization
                                 {
+                                    //k.InterpolationType = GXInterpolationType.HSD_A_OP_LIN;
                                     t.Keys.Add(k);
                                 }
                                 else
@@ -214,7 +215,7 @@ namespace HSDRawViewer.Converters
                                     var slp = new FOBJKey();
                                     slp.Frame = mKeyNext.input - 1;
                                     slp.InterpolationType = GXInterpolationType.HSD_A_OP_SLP;
-                                    slp.Tan = mKey.t2;
+                                    slp.Tan = degrees ? MathHelper.DegreesToRadians(mKey.t2) : mKey.t2;
                                     t.Keys.Add(slp);
                                 }
                                 else
@@ -227,6 +228,9 @@ namespace HSDRawViewer.Converters
                                 Console.WriteLine(mKey.outtan + " not supported!");
                                 break;
                         }
+
+                        foreach (var key in t.Keys)
+                            Console.WriteLine($"\t\t{key.Frame} {key.Value}");
 
                     }
 
@@ -511,7 +515,8 @@ namespace HSDRawViewer.Converters
                                                 key.w2 = float.Parse(keyArgs[10]);
                                             }
 
-                                            currentData.keys.Add(key);
+                                            if(key.input <= header.endTime)
+                                                currentData.keys.Add(key);
 
                                             keyLine = r.ReadLine();
                                         }

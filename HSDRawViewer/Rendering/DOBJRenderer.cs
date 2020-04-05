@@ -386,11 +386,7 @@ namespace HSDRawViewer.Rendering
                     var mirrorY = tex.WrapT == GXWrapMode.MIRROR;
 
                     var flags = tex.Flags;
-
-                    int coordType = 0; // coord UV
-                    if (flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
-                        coordType = 1;
-
+                    
                     var lightType = 0; // ambient
                     if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_DIFFUSE))
                         lightType = 1;
@@ -401,39 +397,9 @@ namespace HSDRawViewer.Rendering
                     if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SHADOW))
                         lightType = 4;
 
-                    int colorOP = 0; // NONE
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_MODULATE))
-                        colorOP = 1;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_REPLACE))
-                        colorOP = 2;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_BLEND))
-                        colorOP = 3;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ADD))
-                        colorOP = 4;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_SUB))
-                        colorOP = 5;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_PASS))
-                        colorOP = 6;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_ALPHA_MASK))
-                        colorOP = 7;
-                    if (flags.HasFlag(TOBJ_FLAGS.COLORMAP_RGB_MASK))
-                        colorOP = 8;
-
-                    int alphaOP = 0; // NONE
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_MODULATE))
-                        alphaOP = 1;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_REPLACE))
-                        alphaOP = 2;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_BLEND))
-                        alphaOP = 3;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ADD))
-                        alphaOP = 4;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_SUB))
-                        alphaOP = 5;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_PASS))
-                        alphaOP = 6;
-                    if (flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_ALPHA_MASK))
-                        alphaOP = 7;
+                    int coordType = (int)flags & 0xF;
+                    int colorOP = ((int)flags >> 16) & 0xF;
+                    int alphaOP = ((int)flags >> 20) & 0xF;
 
                     var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
                         Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *

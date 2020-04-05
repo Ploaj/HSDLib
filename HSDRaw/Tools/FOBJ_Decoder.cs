@@ -27,6 +27,8 @@ namespace HSDRaw.Tools
 
         public FOBJFrameDecoder(HSD_FOBJ FOBJ)
         {
+            if (FOBJ.Buffer == null)
+                FOBJ.SetKeys(new List<FOBJKey>() { new FOBJKey() }, JointTrackType.HSD_A_J_ROTX);
             Stream = new MemoryStream(FOBJ.Buffer);
             Reader = new BinaryReaderExt(Stream);
             this.FOBJ = FOBJ;

@@ -398,7 +398,7 @@ namespace HSDRawViewer.Rendering
             var state = GetState(Frame);
             
             if (state.t0 == state.t1 || state.op_intrp == GXInterpolationType.HSD_A_OP_CON || state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
-                return state.p0;
+                return state.p1;
 
             float FrameDiff = Frame - state.t0;
             float Weight = FrameDiff / (state.t1 - state.t0);
