@@ -18,7 +18,7 @@ namespace HSDRaw.Common
         LIGHTMAP_AMBIENT = (1 << 6),
         LIGHTMAP_EXT = (1 << 7),
         LIGHTMAP_SHADOW = (1 << 8),
-        COLORMAP_NONE = (0 << 16),
+        //COLORMAP_NONE = (0 << 16),
         COLORMAP_ALPHA_MASK = (1 << 16),
         COLORMAP_RGB_MASK = (2 << 16),
         COLORMAP_BLEND = (3 << 16),
@@ -27,7 +27,7 @@ namespace HSDRaw.Common
         COLORMAP_PASS = (6 << 16),
         COLORMAP_ADD = (7 << 16),
         COLORMAP_SUB = (8 << 16),
-        ALPHAMAP_NONE = (0 << 16),
+        //ALPHAMAP_NONE = (0 << 20),
         ALPHAMAP_ALPHA_MASK = (1 << 20),
         ALPHAMAP_BLEND = (2 << 20),
         ALPHAMAP_MODULATE = (3 << 20),
@@ -209,48 +209,5 @@ namespace HSDRaw.Common
         public bool BiasClamp { get => _s.GetByte(0x08) == 1; set => _s.SetByte(0x08, (byte)(value ? 1 : 0)); }
         public bool EnableEdgeLOD { get => _s.GetByte(0x09) == 1; set => _s.SetByte(0x09, (byte)(value ? 1 : 0)); }
         public GXAnisotropy Anisotropy { get => (GXAnisotropy)_s.GetInt32(0x0A); set => _s.SetInt32(0x0A, (int)value); }
-    }
-
-    public class HSD_TOBJ_TEV : HSDAccessor
-    {
-        public override int TrimmedSize { get; } = 0x20;
-
-        public byte color_op { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
-
-        public byte alpha_op { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
-
-        public byte color_bias { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
-
-        public byte alpha_bias { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
-
-        public byte color_scale { get => _s.GetByte(0x04); set => _s.SetByte(0x04, value); }
-
-        public byte alpha_scale { get => _s.GetByte(0x05); set => _s.SetByte(0x05, value); }
-
-        public byte color_clamp { get => _s.GetByte(0x06); set => _s.SetByte(0x06, value); }
-
-        public byte color_a { get => _s.GetByte(0x07); set => _s.SetByte(0x07, value); }
-
-        public byte color_b { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
-
-        public byte color_c { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
-
-        public byte color_d { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
-
-        public byte alpha_a { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
-
-        public byte alpha_b { get => _s.GetByte(0x0C); set => _s.SetByte(0x0C, value); }
-
-        public byte alpha_c { get => _s.GetByte(0x0D); set => _s.SetByte(0x0D, value); }
-
-        public byte alpha_d { get => _s.GetByte(0x0E); set => _s.SetByte(0x0E, value); }
-
-        public int konst { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
-
-        public int tev0 { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
-
-        public int tev1 { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
-
-        public int active { get => _s.GetInt32(0x1C); set => _s.SetInt32(0x1C, value); }
     }
 }

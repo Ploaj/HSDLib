@@ -1,11 +1,11 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -155,14 +155,14 @@ namespace HSDRawViewer.Converters
             foreach(var mNode in mayaFile.Nodes)
             {
                 AnimNode node = new AnimNode();
-                Console.WriteLine(mNode.name);
+                Debug.WriteLine(mNode.name);
                 foreach (var mTrack in mNode.atts)
                 {
                     AnimTrack t = new AnimTrack();
                     t.Keys = new List<FOBJKey>();
                     t.TrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
 
-                    Console.WriteLine("\t" + mTrack.type);
+                    Debug.WriteLine("\t" + mTrack.type);
 
                     var degrees = mayaFile.header.angularUnit == "deg";
                     var trackUnit = (mTrack.IsAngular() && degrees);
@@ -230,7 +230,7 @@ namespace HSDRawViewer.Converters
                         }
 
                         foreach (var key in t.Keys)
-                            Console.WriteLine($"\t\t{key.Frame} {key.Value}");
+                            Debug.WriteLine($"\t\t{key.Frame} {key.Value}");
 
                     }
 

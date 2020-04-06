@@ -1,6 +1,8 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Sounds;
 using HSDRaw.MEX.Stages;
+using System.Linq;
 using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.Plugins.MEX
@@ -26,6 +28,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         public MEX_EffectTypeLookup EffectLookup = new MEX_EffectTypeLookup();
         public MEX_ItemLookup ItemLookup = new MEX_ItemLookup();
+        public MEXPlaylistEntry[] Playlist = new MEXPlaylistEntry[0];
 
         [Browsable(false), Category("0 - General"), DisplayName("Internal ID"), Description("")]
         public int InternalID { get => Stage.StageInternalID; set { Stage.StageInternalID = value; Collision.InternalID = value; } }
@@ -44,6 +47,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
         [Category("0 - General"), DisplayName("Unknown Sound Data"), Description("")]
         public int Unknown { get => Reverb.Unknown; set => Reverb.Unknown = (byte)value; }
+        
+        [Category("0 - General"), DisplayName("Song Playlist"), Description("")]
+        public MEXPlaylistEntry[] PlaylistEntries { get => Playlist; set => Playlist = value; }
 
 
         [Category("1 - Extra"), DisplayName("MEX Items"),Description("MEX Item lookup for Stage")]
@@ -130,6 +136,18 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         public override string ToString()
         {
             return FileName == null ? "" : FileName;
+        }
+
+        public MEX_Playlist GetPlaylist()
+        {
+            return new MEX_Playlist()
+            {
+                MenuPlayListCount = Playlist.Length,
+                MenuPlaylist = new HSDRaw.HSDArrayAccessor<MEX_PlaylistItem>()
+                {
+                    Array = Playlist.Select(e => new MEX_PlaylistItem() { HPSID = (ushort)e.MusicID, ChanceToPlay = e.PlayChanceValue }).ToArray()
+                }
+            };
         }
     }
 }

@@ -5,6 +5,7 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.Melee.Pl;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
+using HSDRaw.MEX.Sounds;
 using HSDRaw.MEX.Stages;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
@@ -277,6 +278,16 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             // Stages
             StageEntries = new MEXStageEntry[_data.StageFunctions.Length];
+
+            if (_data.StageData._s.Length < _data.StageData.TrimmedSize)
+                _data.StageData._s.Resize(_data.StageData.TrimmedSize);
+
+            if(_data.StageData.StagePlaylists == null)
+            {
+                _data.StageData.StagePlaylists = new HSDArrayAccessor<MEX_Playlist>();
+                _data.StageData.StagePlaylists.Array = new MEX_Playlist[_data.StageData.StageIDTable.Length].Select(e=>new MEX_Playlist()).ToArray();
+            }
+
             for(int i = 0; i < StageEntries.Length; i++)
             {
                 StageEntries[i] = new MEXStageEntry()
@@ -285,8 +296,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     Reverb = _data.StageData.ReverbTable[i],
                     Collision = _data.StageData.CollisionTable[i],
                     ItemLookup = _data.StageData.StageItemLookup[i],
-                    EffectLookup = _data.StageData.StageEffectLookup[i]
+                    EffectLookup = _data.StageData.StageEffectLookup[i],
                 };
+                if(_data.StageData.StagePlaylists[i] != null && _data.StageData.StagePlaylists[i].MenuPlayListCount > 0)
+                {
+                    StageEntries[i].Playlist = _data.StageData.StagePlaylists[i].MenuPlaylist.Array.Select(e => new MEXPlaylistEntry() { MusicID = e.HPSID, PlayChance = e.ChanceToPlay.ToString() }).ToArray();
+                }
             }
             stageEditor.SetArrayFromProperty(this, "StageEntries");
 
@@ -417,12 +432,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             foreach (var v in Music)
                 _data.MusicTable.BackgroundMusicStrings.Add(v);
 
-            _data.MusicTable.MenuPlaylist.Array = new MEX_MenuPlaylistItem[0];
+            _data.MusicTable.MenuPlaylist.Array = new MEX_PlaylistItem[0];
             _data.MusicTable.MenuPlayListCount = MenuPlaylist.Length;
             for(int i = 0; i < MenuPlaylist.Length; i++)
             {
                 var v = MenuPlaylist[i];
-                _data.MusicTable.MenuPlaylist.Set(i, new MEX_MenuPlaylistItem()
+                _data.MusicTable.MenuPlaylist.Set(i, new MEX_PlaylistItem()
                 {
                     HPSID = (ushort)v.MusicID,
                     ChanceToPlay = v.PlayChanceValue
@@ -470,6 +485,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             _data.StageData.CollisionTable.Array = StageEntries.Select(e => e.Collision).ToArray();
             _data.StageData.StageItemLookup.Array = StageEntries.Select(e => e.ItemLookup).ToArray();
             _data.StageData.StageEffectLookup.Array = StageEntries.Select(e => e.EffectLookup).ToArray();
+            _data.StageData.StagePlaylists.Array = StageEntries.Select(e => e.GetPlaylist()).ToArray();
 
             _data.StageData.StageIDTable.Array = StageIDs.Select(e => e.IDTable).ToArray();
         }

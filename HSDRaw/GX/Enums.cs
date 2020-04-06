@@ -236,4 +236,52 @@
         GX_BL_DSTCLR = GX_BL_SRCCLR,
         GX_BL_INVDSTCLR = GX_BL_INVSRCCLR
     }
+
+    public enum TevColorOp
+    {
+        Add = 0,
+        Subtract = 1,
+
+        CompR8Greater = 8,
+        CompR8Equal = 9,
+        CompGR16Greater = 10,
+        CompGR16Equal = 11,
+        CompBGR24Greater = 12,
+        CompBGR24Equal = 13,
+        CompRGB8Greater = 14,
+        CompRGB8Equal = 15,
+
+        //GX_TEV_COMP_A8_GT = GX_TEV_COMP_RGB8_GT, // for alpha channel
+        //GX_TEV_COMP_A8_EQ = GX_TEV_COMP_RGB8_EQ  // for alpha channel
+    }
+
+    public enum TevAlphaOp
+    {
+        Add = 0,
+        Subtract = 1,
+
+        CompR8Greater = 8,
+        CompR8Equal = 9,
+        CompGR16Greater = 10,
+        CompGR16Equal = 11,
+        CompBGR24Greater = 12,
+        CompBGR24Equal = 13,
+        CompA8Greater = 14,
+        CompA8Equal = 15,
+    }
+
+    public enum TevScale
+    {
+        GX_CS_SCALE_1,
+        GX_CS_SCALE_2,
+        GX_CS_SCALE_4,
+        GX_CS_DIVIDE_2
+    }
+
+    public enum TevBias
+    {
+        GX_TB_ZERO,
+        GX_TB_ADDHALF,
+        GX_TB_SUBHALF
+    }
 }
