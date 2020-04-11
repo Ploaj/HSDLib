@@ -169,10 +169,10 @@ vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D 
 	//if(operation == 6) // Pass
 
 	if(operation == 7) // Add
-		passColor.rgb += pass.rgb;
+		passColor.rgb += pass.rgb * pass.a;
 
 	if(operation == 8) // Subtract
-		passColor.rgb -= pass.rgb;
+		passColor.rgb -= pass.rgb * pass.a;
 			
 	
 	

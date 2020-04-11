@@ -969,7 +969,7 @@ namespace HSDRawViewer.GUI
         /// <returns></returns>
         private Dictionary<int, Vector3> CalculatePreviousState()
         {
-            if (viewport.Frame == 0 || !renderHitboxInterpolationToolStripMenuItem.Checked)
+            if (viewport.Frame == 0 || !displayInterpolationButton.Checked)
                 return null;
 
             Dictionary<int, Vector3> previousPosition = new Dictionary<int, Vector3>();
@@ -1017,7 +1017,7 @@ namespace HSDRawViewer.GUI
             else
                 JOBJManager.Render(cam);
 
-            if (renderHurtboxsToolStripMenuItem.Checked)
+            if (hurtboxDisplayButton.Checked)
                 HurtboxRenderer.Render(JOBJManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
             
             foreach (var hb in SubactionProcess.Hitboxes)
@@ -1037,7 +1037,7 @@ namespace HSDRawViewer.GUI
                     hbColor = GrabboxColor;
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
-                if (renderHitboxInterpolationToolStripMenuItem.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
+                if (displayInterpolationButton.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
                 {
                     var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                     var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size);

@@ -47,6 +47,7 @@ namespace HSDRawViewer.Rendering
         {
             public POBJ_FLAG Flag;
 
+            public int EnvelopeCount = 0;
             public Vector4[] Envelopes = new Vector4[10];
             public Vector4[] Weights = new Vector4[10];
 
@@ -185,6 +186,7 @@ namespace HSDRawViewer.Rendering
                 
                 GXShader.SetBoolToInt("hasEnvelopes", p.HasWeighting);
                 GXShader.SetBoolToInt("enableParentTransform", !p.Flag.HasFlag(POBJ_FLAG.PARENTTRANSFORM));
+                //GXShader.SetInt("envelopeCount", p.EnvelopeCount);
 
                 GL.Enable(EnableCap.CullFace);
                 if (selected)
@@ -256,6 +258,7 @@ namespace HSDRawViewer.Rendering
                     pobjCache.Weights[eni] = w;
                     pobjCache.Envelopes[eni] = b;
                     eni++;
+                    pobjCache.EnvelopeCount = v.EnvelopeCount;
                     pobjCache.HasWeighting = v.EnvelopeCount > 0;
                 }
 
@@ -392,10 +395,12 @@ namespace HSDRawViewer.Rendering
                         lightType = 1;
                     if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SPECULAR))
                         lightType = 2;
-                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_EXT))
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_AMBIENT))
                         lightType = 3;
-                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SHADOW))
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_EXT))
                         lightType = 4;
+                    if (flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SHADOW))
+                        lightType = 5;
 
                     int coordType = (int)flags & 0xF;
                     int colorOP = ((int)flags >> 16) & 0xF;

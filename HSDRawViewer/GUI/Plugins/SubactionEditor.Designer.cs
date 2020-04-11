@@ -47,6 +47,8 @@
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.previewBox = new System.Windows.Forms.GroupBox();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+            this.hitboxDisplayButton = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonGoto = new System.Windows.Forms.Button();
             this.referenceLabel = new System.Windows.Forms.Label();
@@ -57,22 +59,19 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.renderHitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renderHurtboxsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
-            this.hitboxDisplayButton = new System.Windows.Forms.ToolStripButton();
+            this.displayInterpolationButton = new System.Windows.Forms.ToolStripButton();
+            this.hurtboxDisplayButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
+            this.toolStrip3.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.toolStrip3.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitter1
@@ -281,6 +280,28 @@
             this.previewBox.Text = "Preview";
             this.previewBox.Visible = false;
             // 
+            // toolStrip3
+            // 
+            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.hitboxDisplayButton,
+            this.displayInterpolationButton,
+            this.hurtboxDisplayButton});
+            this.toolStrip3.Location = new System.Drawing.Point(3, 16);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(514, 25);
+            this.toolStrip3.TabIndex = 0;
+            this.toolStrip3.Text = "toolStrip3";
+            // 
+            // hitboxDisplayButton
+            // 
+            this.hitboxDisplayButton.CheckOnClick = true;
+            this.hitboxDisplayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.hitboxDisplayButton.Image = ((System.Drawing.Image)(resources.GetObject("hitboxDisplayButton.Image")));
+            this.hitboxDisplayButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.hitboxDisplayButton.Name = "hitboxDisplayButton";
+            this.hitboxDisplayButton.Size = new System.Drawing.Size(112, 22);
+            this.hitboxDisplayButton.Text = "Display Hitbox Info";
+            // 
             // panel1
             // 
             this.panel1.AutoSize = true;
@@ -372,9 +393,6 @@
             this.editDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.editDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadPlayerFilesToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.renderHitboxInterpolationToolStripMenuItem,
-            this.renderHurtboxsToolStripMenuItem,
             this.toolStripSeparator2,
             this.createNewSubroutineToolStripMenuItem,
             this.clearAllActionsToolStripMenuItem});
@@ -390,25 +408,6 @@
             this.loadPlayerFilesToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
             this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Rendering Files";
             this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(218, 6);
-            // 
-            // renderHitboxInterpolationToolStripMenuItem
-            // 
-            this.renderHitboxInterpolationToolStripMenuItem.CheckOnClick = true;
-            this.renderHitboxInterpolationToolStripMenuItem.Name = "renderHitboxInterpolationToolStripMenuItem";
-            this.renderHitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.renderHitboxInterpolationToolStripMenuItem.Text = "Render Hitbox Interpolation";
-            // 
-            // renderHurtboxsToolStripMenuItem
-            // 
-            this.renderHurtboxsToolStripMenuItem.CheckOnClick = true;
-            this.renderHurtboxsToolStripMenuItem.Name = "renderHurtboxsToolStripMenuItem";
-            this.renderHurtboxsToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
-            this.renderHurtboxsToolStripMenuItem.Text = "Render Hurtboxes";
             // 
             // toolStripSeparator2
             // 
@@ -439,27 +438,25 @@
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
-            // toolStrip3
+            // displayInterpolationButton
             // 
-            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.hitboxDisplayButton});
-            this.toolStrip3.Location = new System.Drawing.Point(3, 16);
-            this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(514, 25);
-            this.toolStrip3.TabIndex = 0;
-            this.toolStrip3.Text = "toolStrip3";
+            this.displayInterpolationButton.CheckOnClick = true;
+            this.displayInterpolationButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.displayInterpolationButton.Image = ((System.Drawing.Image)(resources.GetObject("displayInterpolationButton.Image")));
+            this.displayInterpolationButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.displayInterpolationButton.Name = "displayInterpolationButton";
+            this.displayInterpolationButton.Size = new System.Drawing.Size(120, 22);
+            this.displayInterpolationButton.Text = "Display Interpolation";
             // 
-            // hitboxDisplayButton
+            // hurtboxDisplayButton
             // 
-            this.hitboxDisplayButton.Checked = true;
-            this.hitboxDisplayButton.CheckOnClick = true;
-            this.hitboxDisplayButton.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.hitboxDisplayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.hitboxDisplayButton.Image = ((System.Drawing.Image)(resources.GetObject("hitboxDisplayButton.Image")));
-            this.hitboxDisplayButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.hitboxDisplayButton.Name = "hitboxDisplayButton";
-            this.hitboxDisplayButton.Size = new System.Drawing.Size(112, 22);
-            this.hitboxDisplayButton.Text = "Display Hitbox Info";
+            this.hurtboxDisplayButton.CheckOnClick = true;
+            this.hurtboxDisplayButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.hurtboxDisplayButton.Image = ((System.Drawing.Image)(resources.GetObject("hurtboxDisplayButton.Image")));
+            this.hurtboxDisplayButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.hurtboxDisplayButton.Name = "hurtboxDisplayButton";
+            this.hurtboxDisplayButton.Size = new System.Drawing.Size(107, 22);
+            this.hurtboxDisplayButton.Text = "Display Hurtboxes";
             // 
             // SubactionEditor
             // 
@@ -476,14 +473,14 @@
             this.toolStrip2.PerformLayout();
             this.previewBox.ResumeLayout(false);
             this.previewBox.PerformLayout();
+            this.toolStrip3.ResumeLayout(false);
+            this.toolStrip3.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.toolStrip3.ResumeLayout(false);
-            this.toolStrip3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -514,10 +511,7 @@
         private System.Windows.Forms.GroupBox previewBox;
         private System.Windows.Forms.ToolStripMenuItem loadPlayerFilesToolStripMenuItem;
         private System.Windows.Forms.Splitter splitter2;
-        private System.Windows.Forms.ToolStripMenuItem renderHitboxInterpolationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem renderHurtboxsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createNewSubroutineToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton buttonReplace;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
@@ -526,5 +520,7 @@
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripButton hitboxDisplayButton;
+        private System.Windows.Forms.ToolStripButton displayInterpolationButton;
+        private System.Windows.Forms.ToolStripButton hurtboxDisplayButton;
     }
 }

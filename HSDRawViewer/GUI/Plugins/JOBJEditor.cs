@@ -884,5 +884,59 @@ namespace HSDRawViewer.GUI.Plugins
                 JOBJManager.RenderMode = mode;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class EditAnimationSettings
+        {
+            [Category("Scale Options"), DisplayName("Scale Factor"), Description("If set to 1 use New End Frame value to scale")]
+            public float ScaleFactor { get; set; } = 1;
+
+            [Category("Scale Options"), DisplayName("New End Frame"), Description("")]
+            public int NewEndFrame { get; set; }
+
+
+            [Category("Trim Options"), DisplayName("Start Frame"), Description("")]
+            public int StartFrame { get; set; }
+
+            [Category("Trim Options"), DisplayName("End Frame"), Description("")]
+            public int EndFrame { get; set; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editAnimationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(JOBJManager.Animation == null)
+                return;
+
+            var settings = new EditAnimationSettings();
+            settings.EndFrame = (int)JOBJManager.Animation.FrameCount;
+            settings.NewEndFrame = (int)JOBJManager.Animation.FrameCount;
+            using (PropertyDialog d = new PropertyDialog("Animation Edit Options", settings))
+            {
+                if(d.ShowDialog() == DialogResult.OK)
+                {
+                    // Scale animation
+                    if (settings.ScaleFactor == 1 && settings.NewEndFrame != JOBJManager.Animation.FrameCount)
+                    {
+                        JOBJManager.Animation.ScaleToLength(settings.NewEndFrame);
+                        settings.EndFrame = settings.NewEndFrame;
+                    }
+                    else
+                        JOBJManager.Animation.ScaleBy(settings.ScaleFactor);
+
+                    // trim animation
+                    JOBJManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
+
+                    // reload edited animation
+                    LoadAnimation(JOBJManager.Animation);
+                }
+            }
+        }
     }
 }

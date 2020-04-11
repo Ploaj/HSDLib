@@ -40,6 +40,7 @@
             this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editMaterialButton = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
             this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
@@ -50,9 +51,6 @@
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.splitter1 = new System.Windows.Forms.Splitter();
-            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-            this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.importBoneLabelINIToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -61,14 +59,17 @@
             this.asMayaANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asAnimJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
+            this.showInViewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showBonesToolStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.showSelectionOutlineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
-            this.editMaterialButton = new System.Windows.Forms.ToolStripButton();
-            this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
-            this.showBonesToolStrip = new System.Windows.Forms.ToolStripMenuItem();
-            this.showInViewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showSelectionOutlineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitter1 = new System.Windows.Forms.Splitter();
+            this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -190,6 +191,15 @@
             this.clearAllPOBJsToolStripMenuItem.Text = "Clear All POBJs";
             this.clearAllPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearAllPOBJsToolStripMenuItem_Click);
             // 
+            // editMaterialButton
+            // 
+            this.editMaterialButton.Image = global::HSDRawViewer.Properties.Resources.ico_mobj;
+            this.editMaterialButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.editMaterialButton.Name = "editMaterialButton";
+            this.editMaterialButton.Size = new System.Drawing.Size(93, 22);
+            this.editMaterialButton.Text = "Edit Material";
+            this.editMaterialButton.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
             // buttonMoveUp
             // 
             this.buttonMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -276,6 +286,7 @@
             this.toolStripSeparator3,
             this.importAnimationToolStripMenuItem,
             this.exportAnimationToolStripMenuItem,
+            this.editAnimationToolStripMenuItem,
             this.clearAnimationToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -296,28 +307,6 @@
             this.exportModelToFileToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.exportModelToFileToolStripMenuItem.Text = "Export Model To File";
             this.exportModelToFileToolStripMenuItem.Click += new System.EventHandler(this.exportModelToFileToolStripMenuItem_Click);
-            // 
-            // splitter1
-            // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter1.Location = new System.Drawing.Point(0, 182);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(767, 3);
-            this.splitter1.TabIndex = 8;
-            this.splitter1.TabStop = false;
-            // 
-            // toolStripLabel2
-            // 
-            this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(81, 22);
-            this.toolStripLabel2.Text = "Render Mode:";
-            // 
-            // renderModeBox
-            // 
-            this.renderModeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.renderModeBox.Name = "renderModeBox";
-            this.renderModeBox.Size = new System.Drawing.Size(121, 25);
-            this.renderModeBox.SelectedIndexChanged += new System.EventHandler(this.renderModeBox_SelectedIndexChanged);
             // 
             // toolStripSeparator2
             // 
@@ -374,6 +363,66 @@
             this.asAnimJointToolStripMenuItem.Text = "As AnimJoint";
             this.asAnimJointToolStripMenuItem.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
             // 
+            // clearAnimationToolStripMenuItem
+            // 
+            this.clearAnimationToolStripMenuItem.Name = "clearAnimationToolStripMenuItem";
+            this.clearAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.clearAnimationToolStripMenuItem.Text = "Clear Animation";
+            this.clearAnimationToolStripMenuItem.Click += new System.EventHandler(this.clearAnimButton_Click);
+            // 
+            // renderDropDown
+            // 
+            this.renderDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.renderDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showInViewportToolStripMenuItem,
+            this.showBonesToolStrip,
+            this.showSelectionOutlineToolStripMenuItem});
+            this.renderDropDown.Image = ((System.Drawing.Image)(resources.GetObject("renderDropDown.Image")));
+            this.renderDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.renderDropDown.Name = "renderDropDown";
+            this.renderDropDown.Size = new System.Drawing.Size(45, 22);
+            this.renderDropDown.Text = "View";
+            // 
+            // showInViewportToolStripMenuItem
+            // 
+            this.showInViewportToolStripMenuItem.CheckOnClick = true;
+            this.showInViewportToolStripMenuItem.Name = "showInViewportToolStripMenuItem";
+            this.showInViewportToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.showInViewportToolStripMenuItem.Text = "Show in Viewport";
+            this.showInViewportToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.mainRender_CheckStateChanged);
+            // 
+            // showBonesToolStrip
+            // 
+            this.showBonesToolStrip.Checked = true;
+            this.showBonesToolStrip.CheckOnClick = true;
+            this.showBonesToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showBonesToolStrip.Name = "showBonesToolStrip";
+            this.showBonesToolStrip.Size = new System.Drawing.Size(196, 22);
+            this.showBonesToolStrip.Text = "Show Bones";
+            this.showBonesToolStrip.Click += new System.EventHandler(this.toolStripButton1_Click);
+            // 
+            // showSelectionOutlineToolStripMenuItem
+            // 
+            this.showSelectionOutlineToolStripMenuItem.Checked = true;
+            this.showSelectionOutlineToolStripMenuItem.CheckOnClick = true;
+            this.showSelectionOutlineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showSelectionOutlineToolStripMenuItem.Name = "showSelectionOutlineToolStripMenuItem";
+            this.showSelectionOutlineToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.showSelectionOutlineToolStripMenuItem.Text = "Show Selection Outline";
+            // 
+            // toolStripLabel2
+            // 
+            this.toolStripLabel2.Name = "toolStripLabel2";
+            this.toolStripLabel2.Size = new System.Drawing.Size(81, 22);
+            this.toolStripLabel2.Text = "Render Mode:";
+            // 
+            // renderModeBox
+            // 
+            this.renderModeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.renderModeBox.Name = "renderModeBox";
+            this.renderModeBox.Size = new System.Drawing.Size(121, 25);
+            this.renderModeBox.SelectedIndexChanged += new System.EventHandler(this.renderModeBox_SelectedIndexChanged);
+            // 
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
@@ -391,61 +440,21 @@
             this.toolStripComboBox2.Size = new System.Drawing.Size(121, 25);
             this.toolStripComboBox2.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
-            // editMaterialButton
+            // splitter1
             // 
-            this.editMaterialButton.Image = global::HSDRawViewer.Properties.Resources.ico_mobj;
-            this.editMaterialButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.editMaterialButton.Name = "editMaterialButton";
-            this.editMaterialButton.Size = new System.Drawing.Size(93, 22);
-            this.editMaterialButton.Text = "Edit Material";
-            this.editMaterialButton.Click += new System.EventHandler(this.toolStripButton2_Click);
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter1.Location = new System.Drawing.Point(0, 182);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(767, 3);
+            this.splitter1.TabIndex = 8;
+            this.splitter1.TabStop = false;
             // 
-            // renderDropDown
+            // editAnimationToolStripMenuItem
             // 
-            this.renderDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.renderDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showInViewportToolStripMenuItem,
-            this.showBonesToolStrip,
-            this.showSelectionOutlineToolStripMenuItem});
-            this.renderDropDown.Image = ((System.Drawing.Image)(resources.GetObject("renderDropDown.Image")));
-            this.renderDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.renderDropDown.Name = "renderDropDown";
-            this.renderDropDown.Size = new System.Drawing.Size(45, 22);
-            this.renderDropDown.Text = "View";
-            // 
-            // showBonesToolStrip
-            // 
-            this.showBonesToolStrip.Checked = true;
-            this.showBonesToolStrip.CheckOnClick = true;
-            this.showBonesToolStrip.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.showBonesToolStrip.Name = "showBonesToolStrip";
-            this.showBonesToolStrip.Size = new System.Drawing.Size(196, 22);
-            this.showBonesToolStrip.Text = "Show Bones";
-            this.showBonesToolStrip.Click += new System.EventHandler(this.toolStripButton1_Click);
-            // 
-            // showInViewportToolStripMenuItem
-            // 
-            this.showInViewportToolStripMenuItem.CheckOnClick = true;
-            this.showInViewportToolStripMenuItem.Name = "showInViewportToolStripMenuItem";
-            this.showInViewportToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.showInViewportToolStripMenuItem.Text = "Show in Viewport";
-            this.showInViewportToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.mainRender_CheckStateChanged);
-            // 
-            // showSelectionOutlineToolStripMenuItem
-            // 
-            this.showSelectionOutlineToolStripMenuItem.Checked = true;
-            this.showSelectionOutlineToolStripMenuItem.CheckOnClick = true;
-            this.showSelectionOutlineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.showSelectionOutlineToolStripMenuItem.Name = "showSelectionOutlineToolStripMenuItem";
-            this.showSelectionOutlineToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.showSelectionOutlineToolStripMenuItem.Text = "Show Selection Outline";
-            // 
-            // clearAnimationToolStripMenuItem
-            // 
-            this.clearAnimationToolStripMenuItem.Name = "clearAnimationToolStripMenuItem";
-            this.clearAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.clearAnimationToolStripMenuItem.Text = "Clear Animation";
-            this.clearAnimationToolStripMenuItem.Click += new System.EventHandler(this.clearAnimButton_Click);
+            this.editAnimationToolStripMenuItem.Name = "editAnimationToolStripMenuItem";
+            this.editAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.editAnimationToolStripMenuItem.Text = "Edit Animation";
+            this.editAnimationToolStripMenuItem.Click += new System.EventHandler(this.editAnimationToolStripMenuItem_Click);
             // 
             // JOBJEditor
             // 
@@ -517,5 +526,6 @@
         private System.Windows.Forms.ToolStripMenuItem showInViewportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showSelectionOutlineToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearAnimationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editAnimationToolStripMenuItem;
     }
 }
