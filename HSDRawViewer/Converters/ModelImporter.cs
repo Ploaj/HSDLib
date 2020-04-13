@@ -330,7 +330,7 @@ namespace HSDRawViewer.Converters
                 if (j.Dobj != null)
                     foreach (var d in j.Dobj.List)
                     {
-                        d.Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE;
+                        d.Mobj.RenderFlags = RENDER_MODE.DIFFUSE;
                         if (d.Mobj.Textures != null)
                             d.Mobj.RenderFlags |= RENDER_MODE.TEX0;
 
@@ -871,7 +871,6 @@ namespace HSDRawViewer.Converters
             Mobj.Material.SpecularColor = System.Drawing.Color.White;
             Mobj.Material.Shininess = 50;
             Mobj.Material.Alpha = 1;
-            Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT;
             if (settings.ImportVertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
             else

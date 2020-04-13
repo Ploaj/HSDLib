@@ -33,3 +33,27 @@
   - name: Move Logic
     bitCount: 32
     hex: true
+
+- code: 0xFF
+  name: Reflect Box
+  parameters:
+  - name: Enable
+    bitCount: 8
+    enums:
+    - Disable
+    - Enable
+  - name: Radius
+    bitCount: 16
+    hex: true
+  - name: Damage Multiplier
+    bitCount: 16
+    hex: true
+  - name: Projectile Speed
+    bitCount: 16
+    hex: true
+  - name: X Position
+    bitCount: 16
+    hex: true
+  - name: Y Position
+    bitCount: 16
+    hex: true

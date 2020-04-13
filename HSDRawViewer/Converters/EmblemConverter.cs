@@ -119,7 +119,7 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ dobj = new HSD_DOBJ();
             dobj.Mobj = new HSD_MOBJ()
             {
-                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT | RENDER_MODE.DF_NONE | RENDER_MODE.XLU,
+                RenderFlags = RENDER_MODE.CONSTANT | RENDER_MODE.NO_ZUPDATE | RENDER_MODE.XLU,
                 Material = new HSD_Material()
                 {
                     Alpha = 0.6f,

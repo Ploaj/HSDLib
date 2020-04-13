@@ -332,7 +332,7 @@ namespace HSDRawViewer.Rendering
 
             var enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);
 
-            shader.SetBoolToInt("dfNone", mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
+            shader.SetBoolToInt("no_zupdate", mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE));
             shader.SetBoolToInt("enableSpecular", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SPECULAR) && mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
             shader.SetBoolToInt("enableDiffuse", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
             shader.SetBoolToInt("useConstant", mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT));

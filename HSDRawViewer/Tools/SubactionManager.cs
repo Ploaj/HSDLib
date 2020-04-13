@@ -242,6 +242,7 @@ namespace HSDRawViewer.Tools
                 foreach (var s in customsubs)
                     s.IsCustom = true;
                 _customSubactions.AddRange(customsubs);
+                _fighterSubactions.AddRange(customsubs);
             }
         }
 

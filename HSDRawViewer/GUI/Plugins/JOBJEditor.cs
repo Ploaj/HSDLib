@@ -425,7 +425,7 @@ namespace HSDRawViewer.GUI.Plugins
                         {
                             Mobj = new HSD_MOBJ()
                             {
-                                RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT,
+                                RenderFlags = RENDER_MODE.CONSTANT,
                                 Material = new HSD_Material()
                                 {
                                     DiffuseColor = Color.White,
@@ -599,7 +599,7 @@ namespace HSDRawViewer.GUI.Plugins
                         Shininess = 50,
                         Alpha = 1
                     },
-                    RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.CONSTANT
+                    RenderFlags = RENDER_MODE.CONSTANT
                 };
 
                 foreach (var pobj in con.DOBJ.Pobj.List)

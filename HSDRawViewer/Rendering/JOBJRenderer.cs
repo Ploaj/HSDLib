@@ -49,6 +49,8 @@ namespace HSDRawViewer.Rendering
 
         public RenderMode RenderMode { get; set; } = RenderMode.Default;
 
+        public int JointCount { get => jobjToCache.Count; }
+
         public float ModelScale { get => _modelScale;
             set
             {
@@ -67,10 +69,30 @@ namespace HSDRawViewer.Rendering
             public Matrix4 InvertedTransform;
             public Matrix4 BindTransform;
 
+            public bool SkipWorldUpdate = false;
+
             public int Index;
         }
 
         private Dictionary<HSD_JOBJ, JOBJCache> jobjToCache = new Dictionary<HSD_JOBJ, JOBJCache>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="transform"></param>
+        public void SetWorldTransform(int index, Matrix4 transform)
+        {
+            foreach (var v in jobjToCache)
+                if (v.Value.Index == index)
+                {
+                    v.Value.SkipWorldUpdate = true;
+                    v.Value.WorldTransform = transform;
+                    UpdateNoRender();
+                    v.Value.SkipWorldUpdate = false;
+                    break;
+                }
+        }
 
         /// <summary>
         /// Gets the world transform from the bone index
@@ -216,11 +238,12 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void Render(Camera camera)
+        public void Render(Camera camera, bool update = true)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
-            UpdateTransforms(RootJOBJ, cam: camera);
+            if(update)
+                UpdateTransforms(RootJOBJ, cam: camera);
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Front);
@@ -406,7 +429,8 @@ namespace HSDRawViewer.Rendering
             var cache = jobjToCache[root];
 
             cache.LocalTransform = local;
-            cache.WorldTransform = world;
+            if(!cache.SkipWorldUpdate)
+                cache.WorldTransform = world;
             cache.BindTransform = cache.InvertedTransform * world;
 
             foreach (var child in root.Children)

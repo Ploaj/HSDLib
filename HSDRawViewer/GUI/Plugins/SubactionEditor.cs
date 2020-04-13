@@ -903,6 +903,7 @@ namespace HSDRawViewer.GUI
         private ViewportControl viewport;
 
         private JOBJManager JOBJManager = new JOBJManager();
+        private JOBJManager ThrowDummyManager = new JOBJManager();
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -992,6 +993,7 @@ namespace HSDRawViewer.GUI
             return previousPosition;
         }
 
+        private static Vector3 throwDummyColor = new Vector3(0, 1, 1);
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private float ModelScale = 1f;
@@ -1056,6 +1058,21 @@ namespace HSDRawViewer.GUI
                     GLTextRenderer.RenderText(cam, hb.ID.ToString(), transform, StringAlignment.Center, true);
                 }
             }
+
+            if(displayThrowModel.Checked && !SubactionProcess.ThrownFighter && ThrowDummyManager.JointCount > 0)
+            {
+                if(viewport.Frame < ThrowDummyManager.Animation.FrameCount)
+                    ThrowDummyManager.Frame = viewport.Frame;
+                ThrowDummyManager.SetWorldTransform(4, JOBJManager.GetWorldTransform(JOBJManager.JointCount - 2));
+                ThrowDummyManager.Render(cam, false);
+
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(35), 1.5f, 16, 16, throwDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(4), 1.5f, 16, 16, throwDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(10), 1f, 16, 16, throwDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(15), 1f, 16, 16, throwDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(22), 1f, 16, 16, throwDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, throwDummyColor, 0.5f);
+            }
             
         }
 
@@ -1076,8 +1093,40 @@ namespace HSDRawViewer.GUI
             var anim = new HSDRawFile(f);
             if(anim.Roots[0].Data is HSD_FigaTree tree)
             {
+                var name = new Action() { Text = anim.Roots[0].Name }.ToString();
+
                 JOBJManager.SetFigaTree(tree);
                 viewport.MaxFrame = tree.FrameCount;
+                
+                ThrowDummyManager.ClearRenderingCache();
+                ThrowDummyManager = new JOBJManager();
+                if (name.Contains("Throw") && !name.Contains("Taro"))
+                {
+                    // find thrown anim
+                    Action throwAction = null;
+                    foreach (Action a in actionList.Items)
+                    {
+                        if(a.Text.Contains("Taro") && a.Text.Contains(name) && !a.Text.Equals(anim.Roots[0].Name))
+                        {
+                            throwAction = a;
+                            break;
+                        }
+                    } 
+
+                    if (throwAction != null)
+                    {
+                        // load throw dummy
+                        ThrowDummyManager.SetJOBJ(DummyThrowModel.GenerateThrowDummy());
+
+                        // load throw animation
+                        var tf = new byte[throwAction.AnimSize];
+                        Array.Copy(AJBuffer, throwAction.AnimOffset, tf, 0, tf.Length);
+                        var tanim = new HSDRawFile(tf);
+                        if (tanim.Roots[0].Data is HSD_FigaTree tree2)
+                            ThrowDummyManager.SetFigaTree(tree2);
+                    }
+
+                }
             }
         }
 
@@ -1141,6 +1190,43 @@ namespace HSDRawViewer.GUI
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             SaveSubactionChanges();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void actionList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            try
+            {
+                e.DrawBackground();
+
+                var brush = ApplicationSettings.SystemWindowTextColorBrush;
+
+                var itemText = ((ListBox)sender).Items[e.Index].ToString();
+
+                if (!itemText.StartsWith("Subroutine"))
+                {
+                    var indText = e.Index.ToString() + ".";
+
+                    var indSize = TextRenderer.MeasureText(indText, e.Font);
+                    var indexBound = new Rectangle(e.Bounds.X, e.Bounds.Y, indSize.Width, indSize.Height);
+                    var textBound = new Rectangle(e.Bounds.X + indSize.Width, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
+
+                    e.Graphics.DrawString(indText, e.Font, ApplicationSettings.SystemGrayTextColorBrush, indexBound, StringFormat.GenericDefault);
+                    e.Graphics.DrawString(itemText, e.Font, brush, textBound, StringFormat.GenericDefault);
+                }
+                else
+                    e.Graphics.DrawString(itemText, e.Font, brush, e.Bounds, StringFormat.GenericDefault);
+
+                e.DrawFocusRectangle();
+            }
+            catch
+            {
+
+            }
         }
     }
 }

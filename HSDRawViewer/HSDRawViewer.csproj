@@ -230,6 +230,7 @@
       <DependentUpon>JOBJEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\CollDataItems.cs" />
+    <Compile Include="GUI\Plugins\Melee\DummyThrowModel.cs" />
     <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.cs">
       <SubType>Form</SubType>
     </Compile>

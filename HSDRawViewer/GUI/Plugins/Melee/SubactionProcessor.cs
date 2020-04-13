@@ -32,6 +32,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public int BodyCollisionState { get; internal set; } = 0;
 
+        public bool ThrownFighter { get; internal set; } = false;
+
         public Dictionary<int, int> BoneCollisionStates = new Dictionary<int, int>();
 
         private HSDStruct Struct;
@@ -53,6 +55,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             BoneCollisionStates.Clear();
             OverlayColor = Vector3.One;
             CharacterInvisibility = false;
+            ThrownFighter = false;
         }
         
         /// <summary>
@@ -139,10 +142,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public void SetFrame(float frame)
         {
             Hitboxes.Clear();
-            BoneCollisionStates.Clear();
-            BodyCollisionState = 0;
-            if (frame == 0)
-                ResetState();
+            ResetState();
             CommandHashes.Clear();
             SetFrame(frame, 0, Commands);
         }
@@ -213,6 +213,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 16 << 2:
                         Hitboxes.Clear();
+                        break;
+                    case 20 << 2: // throw
+                        ThrownFighter = true;
                         break;
                     case 26 << 2:
                         BodyCollisionState = cmd.Parameters[0];
