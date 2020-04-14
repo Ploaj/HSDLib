@@ -357,8 +357,8 @@ namespace HSDRawViewer.GUI
 
             SubactionProcess.SetStruct(script._struct, SubactionGroup);
 
-            subActionList.Items.Clear();
             subActionList.BeginUpdate();
+            subActionList.Items.Clear();
             for (int i = 0; i < data.Length;)
             {
                 var sa = SubactionManager.GetSubaction((byte)(data[i]), SubactionGroup);
@@ -652,10 +652,7 @@ namespace HSDRawViewer.GUI
             if(e.Index != -1 && subActionList.Items[e.Index] is SubActionScript script)
             {
                 var length = script.Parameters.Count();
-                e.ItemHeight = subActionList.Font.Height *
-                    (toolStripComboBox1.SelectedIndex != 0
-                    ? 1 :
-                    (script.Parameters.Equals("") ? 1 : length + 1));
+                e.ItemHeight = subActionList.Font.Height * (toolStripComboBox1.SelectedIndex != 0 ? 1 : length + 1);
             }
         }
 
@@ -993,7 +990,7 @@ namespace HSDRawViewer.GUI
             return previousPosition;
         }
 
-        private static Vector3 throwDummyColor = new Vector3(0, 1, 1);
+        private static Vector3 ThrowDummyColor = new Vector3(0, 1, 1);
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private float ModelScale = 1f;
@@ -1066,12 +1063,12 @@ namespace HSDRawViewer.GUI
                 ThrowDummyManager.SetWorldTransform(4, JOBJManager.GetWorldTransform(JOBJManager.JointCount - 2));
                 ThrowDummyManager.Render(cam, false);
 
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(35), 1.5f, 16, 16, throwDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(4), 1.5f, 16, 16, throwDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(10), 1f, 16, 16, throwDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(15), 1f, 16, 16, throwDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(22), 1f, 16, 16, throwDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, throwDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(35), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(4), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(10), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(15), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(22), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, ThrowDummyColor, 0.5f);
             }
             
         }

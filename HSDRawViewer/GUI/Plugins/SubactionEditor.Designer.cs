@@ -51,6 +51,7 @@
             this.hitboxDisplayButton = new System.Windows.Forms.ToolStripButton();
             this.displayInterpolationButton = new System.Windows.Forms.ToolStripButton();
             this.hurtboxDisplayButton = new System.Windows.Forms.ToolStripButton();
+            this.displayThrowModel = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.buttonGoto = new System.Windows.Forms.Button();
             this.referenceLabel = new System.Windows.Forms.Label();
@@ -65,7 +66,6 @@
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.displayThrowModel = new System.Windows.Forms.ToolStripButton();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
@@ -115,7 +115,7 @@
             this.subActionList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.subActionList.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.subActionList.FormattingEnabled = true;
-            this.subActionList.HorizontalExtent = 1000;
+            this.subActionList.HorizontalExtent = 2000;
             this.subActionList.HorizontalScrollbar = true;
             this.subActionList.ItemHeight = 16;
             this.subActionList.Location = new System.Drawing.Point(3, 70);
@@ -324,6 +324,18 @@
             this.hurtboxDisplayButton.Size = new System.Drawing.Size(107, 22);
             this.hurtboxDisplayButton.Text = "Display Hurtboxes";
             // 
+            // displayThrowModel
+            // 
+            this.displayThrowModel.Checked = true;
+            this.displayThrowModel.CheckOnClick = true;
+            this.displayThrowModel.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.displayThrowModel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.displayThrowModel.Image = ((System.Drawing.Image)(resources.GetObject("displayThrowModel.Image")));
+            this.displayThrowModel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.displayThrowModel.Name = "displayThrowModel";
+            this.displayThrowModel.Size = new System.Drawing.Size(122, 22);
+            this.displayThrowModel.Text = "Display Throw Model";
+            // 
             // panel1
             // 
             this.panel1.AutoSize = true;
@@ -461,18 +473,6 @@
             this.propertyGrid1.Size = new System.Drawing.Size(191, 174);
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
-            // 
-            // displayThrowModel
-            // 
-            this.displayThrowModel.Checked = true;
-            this.displayThrowModel.CheckOnClick = true;
-            this.displayThrowModel.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.displayThrowModel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.displayThrowModel.Image = ((System.Drawing.Image)(resources.GetObject("displayThrowModel.Image")));
-            this.displayThrowModel.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.displayThrowModel.Name = "displayThrowModel";
-            this.displayThrowModel.Size = new System.Drawing.Size(122, 22);
-            this.displayThrowModel.Text = "Display Throw Model";
             // 
             // SubactionEditor
             // 
