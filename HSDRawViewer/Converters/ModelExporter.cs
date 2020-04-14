@@ -425,6 +425,17 @@ namespace HSDRawViewer.Converters
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
                 Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
 
+            if (jobj.InverseWorldTransform != null)
+            {
+                var mat = jobj.InverseWorldTransform;
+                var inv = new Matrix4(
+                    mat.M11, mat.M21, mat.M31, 0,
+                    mat.M12, mat.M22, mat.M32, 0,
+                    mat.M13, mat.M23, mat.M33, 0,
+                    mat.M14, mat.M24, mat.M34, 1).Inverted();
+                Transform = inv * parentTransform.Inverted();
+            }
+
             var worldTransform = Transform * parentTransform;
             
             JobjNodes.Add(root);
@@ -652,13 +663,15 @@ namespace HSDRawViewer.Converters
                                 break;
                             case GXAttribName.GX_VA_POS:
                                 var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.PARENTTRANSFORM) ? Matrix4.Identity : parentTransform);
-                                vert = Vector3.TransformPosition(vert, weight);
+                                if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                                    vert = Vector3.TransformPosition(vert, weight);
                                 vert = Vector3.TransformPosition(vert, singleBindTransform);
                                 m.Vertices.Add(new Vector3D(vert.X, vert.Y, vert.Z));
                                 break;
                             case GXAttribName.GX_VA_NRM:
-                                var nrm = Vector3.TransformNormal(GXTranslator.toVector3(v.NRM), parentTransform);
-                                nrm = Vector3.TransformNormal(nrm, weight);
+                                var nrm = Vector3.TransformNormal(GXTranslator.toVector3(v.NRM), pobj.Flags.HasFlag(POBJ_FLAG.PARENTTRANSFORM) ? Matrix4.Identity : parentTransform);
+                                if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                                    nrm = Vector3.TransformNormal(nrm, weight);
                                 nrm = Vector3.TransformNormal(nrm, singleBindTransform);
                                 m.Normals.Add(new Vector3D(nrm.X, nrm.Y, nrm.Z));
                                 break;
