@@ -1,4 +1,5 @@
-﻿using HSDRaw.MEX.Stages;
+﻿using HSDRaw.MEX.Menus;
+using HSDRaw.MEX.Stages;
 
 namespace HSDRaw.MEX
 {

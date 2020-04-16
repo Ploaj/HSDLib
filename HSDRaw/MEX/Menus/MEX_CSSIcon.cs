@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace HSDRaw.MEX
+namespace HSDRaw.MEX.Menus
 {
     public enum Status
     {

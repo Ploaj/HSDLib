@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.Melee
+﻿using System;
+
+namespace HSDRaw.Melee
 {
     public class SBM_BoneTableBank : HSDFixedLengthPointerArrayAccessor<SBM_BoneTables>
     {
@@ -122,28 +124,26 @@
         private void CreateReverseLookup()
         {
             var d = CommonAttribute._s.GetData();
-            var reverseTable = _s.GetCreateReference<HSDAccessor>(0x00);
-            reverseTable._s.Resize(4);
+            var boneCount = 0;
             for (int i = 0; i < 0x36; i++)
             {
                 var boneIndex = d[i];
                 if (boneIndex != 255)
                 {
-                    if ((i + 1) > _s.GetInt32(0x08))
-                        _s.SetInt32(0x08, (i + 1));
-
-                    if (boneIndex > reverseTable._s.Length)
-                    {
-                        int newSize = boneIndex;
-                        if (newSize % 4 != 0)
-                            newSize += 4 - (newSize % 4);
-                        reverseTable._s.Resize(newSize);
-                    }
+                    boneCount = Math.Max(boneCount, boneIndex + 1);
                 }
             }
 
+            _s.SetInt32(0x08, boneCount);
+
+            var reverseTable = _s.GetCreateReference<HSDAccessor>(0x00);
+            reverseTable._s.Resize(boneCount);
+
             for (int i = 0; i < reverseTable._s.Length; i++)
                 reverseTable._s.SetByte(i, 0xFF);
+
+            if (reverseTable._s.Length % 4 != 0)
+                reverseTable._s.Resize(reverseTable._s.Length + (4 - (reverseTable._s.Length % 4)));
 
             for (int i = 0; i < 0x36; i++)
                 if (d[i] != 255)

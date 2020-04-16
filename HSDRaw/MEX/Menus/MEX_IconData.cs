@@ -1,4 +1,4 @@
-﻿namespace HSDRaw.MEX
+﻿namespace HSDRaw.MEX.Menus
 {
     public class MEX_IconData : HSDAccessor
     {

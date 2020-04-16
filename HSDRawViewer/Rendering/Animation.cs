@@ -30,31 +30,45 @@ namespace HSDRawViewer.Rendering
         /// Scales animation frames to be new size
         /// </summary>
         /// <param name="newFrameCount"></param>
-        public void ScaleToLength(int newFrameCount)
+        public void ScaleToLength(int newFrameCount, int startFrame, int endFrame)
         {
             if (newFrameCount == FrameCount || newFrameCount == 0)
                 return;
 
-            ScaleBy(newFrameCount / FrameCount);
+            ScaleBy(newFrameCount / FrameCount, startFrame, endFrame);
         }
 
         /// <summary>
         /// Scales the frame keys by given factor
         /// </summary>
         /// <param name="value"></param>
-        public void ScaleBy(float value)
+        public void ScaleBy(float value, int startFrame, int endFrame)
         {
             if (value == 1)
                 return;
             
-            FrameCount = (float)Math.Round(FrameCount * value);
+            var adjust = (endFrame - startFrame) - value * (endFrame - startFrame);
+            FrameCount -= adjust;
             foreach (var n in Nodes)
             {
                 foreach (var t in n.Tracks)
                 {
                     foreach (var k in t.Keys)
-                        k.Frame = (float)Math.Round(k.Frame * value);
+                    {
+                        // scale frames in range
+                        if(k.Frame >= startFrame && k.Frame <= endFrame)
+                        {
+                            k.Frame = (float)Math.Round(k.Frame * value);
+                            //TODO: How do you scale tangent?
+                            k.Tan = Math.Sign(k.Tan) * (float)Math.Log(Math.Abs(k.Tan), value);
+                        }
+                        else
+                        // adjust range
+                        if (k.Frame > endFrame)
+                            k.Frame -= adjust;
+                    }
                     
+                    // remove keys that share frames
                     t.Keys = t.Keys.GroupBy(x => x.Frame).Select(g => g.First()).ToList();
                 }
             }

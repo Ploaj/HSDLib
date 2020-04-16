@@ -890,18 +890,25 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         public class EditAnimationSettings
         {
-            [Category("Scale Options"), DisplayName("Scale Factor"), Description("If set to 1 use New End Frame value to scale")]
-            public float ScaleFactor { get; set; } = 1;
+            [Category("Trim Options"), DisplayName("Trim Animation"), Description("Trimming is done before scaling")]
+            public bool TrimAnimation { get; set; }
 
-            [Category("Scale Options"), DisplayName("New End Frame"), Description("")]
-            public int NewEndFrame { get; set; }
-
-
-            [Category("Trim Options"), DisplayName("Start Frame"), Description("")]
+            [Category("Trim Options"), DisplayName("Start Trim Frame"), Description("")]
             public int StartFrame { get; set; }
 
-            [Category("Trim Options"), DisplayName("End Frame"), Description("")]
+            [Category("Trim Options"), DisplayName("End  Trim Frame"), Description("")]
             public int EndFrame { get; set; }
+
+
+            [Category("Scale Range"), DisplayName("Scale Factor"), Description("")]
+            public float ScaleRangeFactor { get; set; } = 1;
+
+            [Category("Scale Range"), DisplayName("Start Scale Frame"), Description("")]
+            public int ScaleRangeStartFrame { get; set; }
+
+            [Category("Scale Range"), DisplayName("End Scale Frame"), Description("")]
+            public int ScaleRangeEndFrame { get; set; }
+
         }
 
         /// <summary>
@@ -916,23 +923,20 @@ namespace HSDRawViewer.GUI.Plugins
 
             var settings = new EditAnimationSettings();
             settings.EndFrame = (int)JOBJManager.Animation.FrameCount;
-            settings.NewEndFrame = (int)JOBJManager.Animation.FrameCount;
+            settings.ScaleRangeEndFrame = (int)JOBJManager.Animation.FrameCount;
             using (PropertyDialog d = new PropertyDialog("Animation Edit Options", settings))
             {
                 if(d.ShowDialog() == DialogResult.OK)
                 {
-                    // Scale animation
-                    if (settings.ScaleFactor == 1 && settings.NewEndFrame != JOBJManager.Animation.FrameCount)
-                    {
-                        JOBJManager.Animation.ScaleToLength(settings.NewEndFrame);
-                        settings.EndFrame = settings.NewEndFrame;
-                    }
-                    else
-                        JOBJManager.Animation.ScaleBy(settings.ScaleFactor);
-
                     // trim animation
-                    JOBJManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
+                    if(settings.TrimAnimation)
+                        JOBJManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
 
+                    // Scale animation
+                    if (settings.ScaleRangeFactor != 1)
+                        JOBJManager.Animation.ScaleBy(settings.ScaleRangeFactor, settings.ScaleRangeStartFrame, settings.ScaleRangeEndFrame);
+                    
+                    
                     // reload edited animation
                     LoadAnimation(JOBJManager.Animation);
                 }

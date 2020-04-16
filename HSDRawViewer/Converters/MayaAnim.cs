@@ -229,6 +229,9 @@ namespace HSDRawViewer.Converters
                                 break;
                         }
 
+                        if (mTrack.keys.Count == 1)
+                            k.InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
+
                         foreach (var key in t.Keys)
                             Debug.WriteLine($"\t\t{key.Frame} {key.Value}");
 

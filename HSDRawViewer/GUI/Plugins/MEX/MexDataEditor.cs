@@ -5,6 +5,7 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.Melee.Pl;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
+using HSDRaw.MEX.Menus;
 using HSDRaw.MEX.Sounds;
 using HSDRaw.MEX.Stages;
 using HSDRawViewer.Converters;
