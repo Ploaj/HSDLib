@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
     public class MEXConverter
     {

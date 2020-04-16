@@ -5,7 +5,7 @@ using HSDRaw.MEX.Stages;
 using System.Linq;
 using System.ComponentModel;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
     public class MEXStageExternalEntry
     {

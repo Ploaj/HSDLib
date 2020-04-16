@@ -14,7 +14,7 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.Common.Animation;
 using System.ComponentModel;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
     /// <summary>
     /// 
@@ -124,7 +124,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 ProgressStatus = $"Importing  {mexEntry.NameText}...";
                 w.ReportProgress(0);
 
-                var internalID = editor.AddEntry(mexEntry);
+                var internalID = editor.FighterControl.AddEntry(mexEntry);
 
                 ProgressStatus = "Installing Item Data"; w.ReportProgress(10);
                 ImportItemData(pack, mexEntry);
@@ -204,7 +204,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var boneTables = commonData.BoneTables.Array.ToList();
 
                 // This PlCo is invalid since it contains a different number of entries than expected
-                if (boneTables.Count != editor.NumberOfEntries)
+                if (boneTables.Count != editor.FighterControl.NumberOfEntries)
                 {
                     throw new InvalidDataException("PlCo Table was invalid");
                 }
@@ -245,7 +245,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     using (StreamReader r = new StreamReader(s))
                     {
                         // add item entry to mex items
-                        var id = editor.AddMEXItem(r.ReadToEnd());
+                        var id = editor.ItemControl.AddMEXItem(r.ReadToEnd());
 
                         // add it to itemIndices
                         Array.Resize(ref itemIndices, val + 1);
@@ -312,10 +312,10 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
 
             // Add Effect Entries-------------------------------------------
-            MEX_EffectEntry effectFiles = new MEX_EffectEntry();
+            MEXEffectEntry effectFiles = new MEXEffectEntry();
             effectFiles.FileName = effectFileName;
             effectFiles.Symbol = symbol;
-            var effectID = editor.AddMEXEffectFile(effectFiles);
+            var effectID = editor.EffectControl.AddMEXEffectFile(effectFiles);
 
             fighter.EffectIndex = effectID;
             Console.WriteLine("Effect ID:" + effectID);
@@ -402,7 +402,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             if (victory != null)
             {
                 var ffname = $"ff_{fighter.NameText.ToLower()}.hps";
-                fighter.VictoryThemeID = editor.AddMusic(new HSD_String() { Value = ffname });
+                fighter.VictoryThemeID = editor.MusicControl.AddMusic(new HSD_String() { Value = ffname });
 
                 var fffilePath = Path.Combine(root, "audio\\" + ffname);
                 File.WriteAllBytes(fffilePath, GetBytes(victory));
@@ -465,9 +465,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
             
-            int stride = editor.FighterEntries.Count - 3;
-            int internalID = editor.FighterEntries.IndexOf(fighter);
-            var externalId = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count);
+            int stride = editor.FighterControl.FighterEntries.Count - 3;
+            int internalID = editor.FighterControl.FighterEntries.IndexOf(fighter);
+            var externalId = MEXIdConverter.ToExternalID(internalID, editor.FighterControl.FighterEntries.Count);
             int GroupID = externalId - (externalId > 18 ? 1 : 0);
 
             // Inject CSPs and Stock Icons into Character Select

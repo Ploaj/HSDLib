@@ -5,7 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
 
     /// <summary>

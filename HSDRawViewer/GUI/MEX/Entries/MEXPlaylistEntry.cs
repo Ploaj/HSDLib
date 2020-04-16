@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
     public class MEXPlaylistEntry
     {

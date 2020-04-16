@@ -11,7 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
     public class FighterPackageUninstaller : ProgressClass
     {
@@ -33,7 +33,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         /// </summary>
         public override void Work(BackgroundWorker w)
         {
-            if (!editor.FighterEntries.Contains(fighter))
+            if (!editor.FighterControl.FighterEntries.Contains(fighter))
             {
                 w.ReportProgress(100);
                 return;
@@ -55,7 +55,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
             ProgressStatus = "Removing Fighter Entry";
             w.ReportProgress(20);
-            editor.RemoveFighterEntry(internalID);
+            editor.FighterControl.RemoveFighterEntry(internalID);
 
             ProgressStatus = "Removing Items";
             w.ReportProgress(40);
@@ -105,7 +105,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                 var boneTables = commonData.BoneTables.Array.ToList();
 
                 // This PlCo is invalid since it contains a different number of entries than expected
-                if (boneTables.Count - 1 != editor.NumberOfEntries)
+                if (boneTables.Count - 1 != editor.FighterControl.NumberOfEntries)
                 {
                     throw new InvalidDataException("PlCo Table was invalid");
                     //return false;
@@ -139,7 +139,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             it.Reverse();
             
             foreach(var i in it)
-                editor.RemoveMEXItem(i);
+                editor.ItemControl.RemoveMEXItem(i);
         }
 
 
@@ -151,9 +151,9 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         private void RemoveMEXEffects()
         {
             if (fighter.EffectIndex >= 0)
-                editor.SafeRemoveEffectFile(fighter.EffectIndex);
+                editor.EffectControl.SafeRemoveEffectFile(fighter.EffectIndex);
             if(fighter.KirbyEffectID >= 0)
-                editor.SafeRemoveEffectFile(fighter.KirbyEffectID);
+                editor.EffectControl.SafeRemoveEffectFile(fighter.KirbyEffectID);
         }
 
         /// <summary>
@@ -173,13 +173,13 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             SemEntries = SEM.ReadSEMFile(sem, true, editor._data);
 
             // remove narrator call
-            var inUse = editor.FighterEntries.Any(e=>e.AnnouncerCall == fighter.AnnouncerCall);
+            var inUse = editor.FighterControl.FighterEntries.Any(e=>e.AnnouncerCall == fighter.AnnouncerCall);
             if (!inUse)
             {
                 var nameBank = SemEntries.Find(e => e.SoundBank?.Name == "nr_name.ssm");
                 nameBank.RemoveSoundAt(fighter.AnnouncerCall % 10000);
 
-                foreach(var v in editor.FighterEntries)
+                foreach(var v in editor.FighterControl.FighterEntries)
                 {
                     if (v.AnnouncerCall > fighter.AnnouncerCall)
                         v.AnnouncerCall -= 1;
@@ -187,12 +187,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
 
             // remove ssm
-            var ssminUse = editor.FighterEntries.Any(e => e.SSMIndex == fighter.SSMIndex);
+            var ssminUse = editor.FighterControl.FighterEntries.Any(e => e.SSMIndex == fighter.SSMIndex);
             if (!ssminUse)
             {
                 SemEntries.RemoveAt(fighter.SSMIndex);
 
-                foreach (var v in editor.FighterEntries)
+                foreach (var v in editor.FighterControl.FighterEntries)
                 {
                     if (v.SSMIndex > fighter.SSMIndex)
                         v.SSMIndex -= 1;
@@ -200,12 +200,12 @@ namespace HSDRawViewer.GUI.Plugins.MEX
             }
 
             // remove victory theme
-            var vicinUse = editor.FighterEntries.Any(e => e.VictoryThemeID == fighter.VictoryThemeID);
+            var vicinUse = editor.FighterControl.FighterEntries.Any(e => e.VictoryThemeID == fighter.VictoryThemeID);
             if (!vicinUse)
             {
-                editor.RemoveMusicAt(fighter.VictoryThemeID);
+                editor.MusicControl.RemoveMusicAt(fighter.VictoryThemeID);
 
-                foreach (var v in editor.FighterEntries)
+                foreach (var v in editor.FighterControl.FighterEntries)
                 {
                     if (v.VictoryThemeID > fighter.VictoryThemeID)
                         v.VictoryThemeID -= 1;
@@ -223,8 +223,8 @@ namespace HSDRawViewer.GUI.Plugins.MEX
         {
             Console.WriteLine("Removing UI");
             var root = Path.GetDirectoryName(MainForm.Instance.FilePath);
-            int GroupID = MEXIdConverter.ToExternalID(internalID, editor.FighterEntries.Count + 1) - 1;
-            int stride = editor.FighterEntries.Count - 3 + 1;
+            int GroupID = MEXIdConverter.ToExternalID(internalID, editor.FighterControl.FighterEntries.Count + 1) - 1;
+            int stride = editor.FighterControl.FighterEntries.Count - 3 + 1;
 
 
             Console.WriteLine("Removing CSP");
@@ -309,7 +309,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
 
                 // check if any other fighter is using this stock icon
                 // if not, remove it and adjust ids
-                if (!editor.FighterEntries.Any(e => e.InsigniaID == fighter.InsigniaID))
+                if (!editor.FighterControl.FighterEntries.Any(e => e.InsigniaID == fighter.InsigniaID))
                 {
                     var emblemGroup = flmsce.JOBJDescs[0];
                     
@@ -317,7 +317,7 @@ namespace HSDRawViewer.GUI.Plugins.MEX
                     emblemGroup.MaterialAnimations[0].Children[4].RemoveChildAt(fighter.InsigniaID);
                     emblemGroup.RootJoint.Children[4].RemoveChildAt(fighter.InsigniaID);
 
-                    foreach (var f in editor.FighterEntries)
+                    foreach (var f in editor.FighterControl.FighterEntries)
                         if (f.InsigniaID > fighter.InsigniaID)
                             f.InsigniaID--;
                 }

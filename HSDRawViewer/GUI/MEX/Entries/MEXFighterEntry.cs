@@ -2,18 +2,16 @@
 using HSDRaw.Common;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
-using HSDRawViewer.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization.TypeInspectors;
 
-namespace HSDRawViewer.GUI.Plugins.MEX
+namespace HSDRawViewer.GUI.MEX
 {
     public class MEXIdConverter
     {
