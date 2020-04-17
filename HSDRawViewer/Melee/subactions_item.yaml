@@ -93,8 +93,11 @@
     - Screw Attack
     - Poison Flower
     - Nothing (No Graphic)
-  - name: Unk4
+  - name: Hitbox Interaction 2
     bitCount: 1
+    enums:
+    - false
+    - true
   - name: Shield Damage
     bitCount: 7
   - name: Hit Sound Effect
