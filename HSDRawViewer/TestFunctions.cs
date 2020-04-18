@@ -10,6 +10,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using HSDRaw.Melee.Pl;
 using HSDRaw.Tools.Melee;
+using System.Linq;
 
 namespace HSDRawViewer
 {
@@ -25,6 +26,11 @@ namespace HSDRawViewer
 
             var rootJOBJ = (HSD_JOBJ)(file.Roots[0].Data);
 
+            file.Save(path + "_rebuilt.dat");
+        }
+
+        public static void RebuildPOBJs(HSD_JOBJ rootJOBJ)
+        {
             var compressor = new POBJ_Generator();
             foreach (var jobj in rootJOBJ.BreathFirstList)
             {
@@ -33,14 +39,6 @@ namespace HSDRawViewer
                     {
                         if (dobj.Pobj != null)
                         {
-                            GXAttribName[] attributes = null;
-                            if (attributes == null)
-                            {
-                                attributes = new GXAttribName[dobj.Pobj.Attributes.Length - 1];
-                                for (int i = 0; i < attributes.Length; i++)
-                                    attributes[i] = dobj.Pobj.Attributes[i].AttributeName;
-                            }
-
                             List<GX_Vertex> triList = new List<GX_Vertex>();
                             List<HSD_JOBJ[]> bones = new List<HSD_JOBJ[]>();
                             List<float[]> weights = new List<float[]>();
@@ -82,31 +80,11 @@ namespace HSDRawViewer
                                 }
                             }
 
-                            dobj.Pobj = compressor.CreatePOBJsFromTriangleList(triList, attributes, bones, weights);
-
-                            
-                            /*List<GX_Vertex> triList = new List<GX_Vertex>();
-                            foreach (var pobj in dobj.Pobj.List)
-                            {
-                                var dl = pobj.DisplayList;
-                                var newPrimGroup = new List<GX_PrimitiveGroup>();
-                                int offset = 0;
-                                foreach (var g in dl.Primitives)
-                                {
-                                    GX_Vertex[] strip = new GX_Vertex[g.Count];
-                                    for (int i = 0; i < g.Count; i++)
-                                        strip[i] = dl.Vertices[offset + i];
-                                    newPrimGroup.Add(compressor.Compress(g.PrimitiveType, strip, pobj.Attributes));
-                                    offset += g.Count;
-                                }
-                                dl.Primitives = newPrimGroup;
-                                pobj.DisplayList = dl;
-                            }*/
+                            dobj.Pobj = compressor.CreatePOBJsFromTriangleList(triList, dobj.Pobj.Attributes.Select(e=>e.AttributeName).ToArray(), bones, weights);
                         }
                     }
             }
             compressor.SaveChanges();
-            file.Save(path + "_rebuilt.dat");
         }
 
         public static void RebuildFigaTree(string path, string outpath)

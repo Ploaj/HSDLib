@@ -374,6 +374,7 @@ namespace HSDRawViewer.Rendering
                     {
                         imageBufferTextureIndex.Add(tex.ImageData.ImageData, TextureManager.TextureCount);
                         TextureManager.Add(tex.GetDecodedImageData(), tex.ImageData.Width, tex.ImageData.Height);
+                        continue;
                     }
 
                     var texid = TextureManager.Get(imageBufferTextureIndex[tex.ImageData.ImageData]);

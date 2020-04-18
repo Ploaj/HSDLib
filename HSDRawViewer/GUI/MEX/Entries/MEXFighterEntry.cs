@@ -117,6 +117,9 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Vi Wait"), Category("2 - Demo"), Description("")]
         public string DemoWait { get; set; }
 
+        [DisplayName("Target Test Stage"), Category("3 - Misc"), Description("")]
+        public int TargetTestStage { get; set; }
+
         [DisplayName("Result Screen Scale"), Category("3 - Misc"), Description("")]
         public float ResultScreenScale { get; set; }
 
@@ -240,6 +243,7 @@ namespace HSDRawViewer.GUI.MEX
 
                 ResultScreenScale = mexData.FighterData.ResultScale[externalID].Value;
                 VictoryThemeID = mexData.FighterData.VictoryThemeIDs[externalID].Value;
+                TargetTestStage = mexData.FighterData.TargetTestStageLookups[externalID].Value;
             }
 
             return this;
@@ -343,6 +347,7 @@ namespace HSDRawViewer.GUI.MEX
 
                 mexData.FighterData.ResultScale.Set(externalID, new HSD_Float() { Value = ResultScreenScale });
                 mexData.FighterData.VictoryThemeIDs.Set(externalID, new HSD_Int() { Value = VictoryThemeID });
+                mexData.FighterData.TargetTestStageLookups.Set(externalID, new HSD_UShort() { Value = (ushort)TargetTestStage });
             }
 
         }

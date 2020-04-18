@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters
 {
-    public class MEXFighterConverter
+    public class MexFighterConverter
     {
 
         /// <summary>

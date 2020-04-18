@@ -7,6 +7,8 @@ namespace HSDRawViewer.GUI.MEX
 {
     public class MEXConverter
     {
+        public static int FighterIDCount { get => externalIDValues.Count; }
+
         public static List<string> ssmValues { get; } = new List<string>();
 
         public static List<string> effectValues { get; } = new List<string>();

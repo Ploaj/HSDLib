@@ -583,10 +583,10 @@ namespace HSDRaw.Tools
                                 continue;
 
                             int i = (pixel >> 4) * 255 / 15;
-                            output[y1 * width + x1] = (uint)((255 << 0) | (255 << 8) | (255 << 16) | (i << 24));
+                            output[y1 * width + x1] = (uint)((i << 0) | (i << 8) | (i << 16) | (i << 24));
 
                             i = (pixel & 0x0F) * 255 / 15;
-                            if (y1 * width + x1 + 1 < output.Length) output[y1 * width + x1 + 1] = (uint)((255 << 0) | (255 << 8) | (255 << 16) | (i << 24));
+                            if (y1 * width + x1 + 1 < output.Length) output[y1 * width + x1 + 1] = (uint)((i << 0) | (i << 8) | (i << 16) | (i << 24));
                         }
                     }
                 }
@@ -663,7 +663,7 @@ namespace HSDRaw.Tools
                             if (y1 >= height || x1 >= width)
                                 continue;
 
-                            output[y1 * width + x1] = (uint)((255 << 0) | (255 << 8) | (255 << 16) | (pixel << 24));
+                            output[y1 * width + x1] = (uint)((pixel << 0) | (pixel << 8) | (pixel << 16) | (pixel << 24));
                         }
                     }
                 }

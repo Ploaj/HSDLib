@@ -15,6 +15,7 @@ using System.Diagnostics;
 using HSDRaw.Melee;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Stages;
+using HSDRaw.MEX.Menus;
 
 namespace HSDRaw
 {
@@ -870,6 +871,13 @@ namespace HSDRaw
             if (rootString.StartsWith("mexMapData"))
             {
                 var acc = new MEX_mexMapData();
+                acc._s = str;
+                a = acc;
+            }
+            else
+            if (rootString.StartsWith("mexCSSData"))
+            {
+                var acc = new MEX_mexCSSData();
                 acc._s = str;
                 a = acc;
             }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using HSDRaw.Common;
+using System.ComponentModel;
 
 namespace HSDRaw.MEX.Menus
 {
@@ -14,7 +15,7 @@ namespace HSDRaw.MEX.Menus
         public override int TrimmedSize => 0x1C;
 
         [DisplayName("Unknown Char ID"), Description("")]
-        public byte CharUNKID { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+        public byte CSPLookupIndex { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
         [DisplayName("External Char ID"), Description("")]
         public byte ExternalCharID { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
@@ -31,6 +32,9 @@ namespace HSDRaw.MEX.Menus
         [DisplayName("Joint ID"), Description("")]
         public byte JointID { get => _s.GetByte(0x05); set => _s.SetByte(0x05, value); }
 
+        [DisplayName(""), Description("")]
+        public byte MEXICON { get => _s.GetByte(0x06); internal set => _s.SetByte(0x06, value); }
+
         [DisplayName("Sound Effect ID"), Description("")]
         public int SFXID { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
@@ -45,6 +49,30 @@ namespace HSDRaw.MEX.Menus
 
         [DisplayName("Y2"), Description("")]
         public float Y2 { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+
+        /// <summary>
+        /// Converts icon data to MEX Icon data
+        /// </summary>
+        /// <param name="parent"></param>
+        public void ToMEXIcon(HSD_JOBJ parent)
+        {
+            if (MEXICON == 1)
+                return;
+
+            MEXICON = 1;
+
+            var width = X2 - X1;
+            var height = Y1 - Y2;
+
+            // conver to relative
+            X1 = X1 - parent.TX;
+            Y1 = Y1 - parent.TY;
+
+            X2 = width;
+            Y2 = height;
+
+            Y1 -= height;
+        }
 
         public override string ToString()
         {

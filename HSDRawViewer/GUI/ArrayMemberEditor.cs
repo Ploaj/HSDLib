@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Drawing;
 using System.ComponentModel;
 using System.Collections.Generic;
+using static System.Windows.Forms.ListBox;
 
 namespace HSDRawViewer.GUI
 {
@@ -27,7 +28,9 @@ namespace HSDRawViewer.GUI
             }
         }
         private object _object;
-        
+
+        public object[] SelectedObjects => propertyGrid.SelectedObjects;
+        public SelectedIndexCollection SelectedIndices => elementList.SelectedIndices;
         public object SelectedObject => elementList.SelectedItem;
         public int SelectedIndex => elementList.SelectedIndex;
 
@@ -77,6 +80,13 @@ namespace HSDRawViewer.GUI
             set { buttonClone.Visible = value; _canClone = value; }
         }
         private bool _canClone = true;
+
+        [DefaultValue(false)]
+        public SelectionMode SelectionMode
+        {
+            get => elementList.SelectionMode;
+            set => elementList.SelectionMode = value;
+        }
 
         public bool DisplayItemIndices { get; set; } = false;
 
@@ -187,7 +197,15 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void elementList_SelectedValueChanged(object sender, EventArgs e)
         {
-            propertyGrid.SelectedObject = elementList.SelectedItem;
+            if (elementList.SelectedItems != null && elementList.SelectedItems.Count > 0)
+            {
+                object[] selected = new object[elementList.SelectedItems.Count];
+                for (int i = 0; i < selected.Length; i++)
+                    selected[i] = elementList.SelectedItems[i];
+                propertyGrid.SelectedObjects = selected;
+            }
+            else
+                propertyGrid.SelectedObject = elementList.SelectedItem;
             OnSelectedObjectChanged(EventArgs.Empty);
         }
         
@@ -400,11 +418,17 @@ namespace HSDRawViewer.GUI
         /// 
         /// </summary>
         /// <param name="o"></param>
-        public void SelectObject(object o)
+        public void SelectObject(object o, bool multi = false)
         {
             if (elementList.Items.Contains(o))
             {
-                elementList.SelectedItem = o;
+                if(!multi)
+                    elementList.SelectedItems.Clear();
+
+                if (!elementList.SelectedItems.Contains(o))
+                    elementList.SelectedItem = o;
+                else
+                    elementList.SelectedItems.Remove(o);
             }
         }
 

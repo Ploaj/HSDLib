@@ -113,8 +113,7 @@ namespace HSDRawViewer.GUI.MEX
             var f = Tools.FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
             if(f != null)
             {
-                bool openMenuFile = MenuControl.MenuFile != null;
-                MenuControl.UnloadMenuFiles(); // for editing
+                MenuControl.CloseMenuFiles();
 
                 using (ProgressBarDisplay d = new ProgressBarDisplay (new FighterPackageInstaller(f, this)))
                 {

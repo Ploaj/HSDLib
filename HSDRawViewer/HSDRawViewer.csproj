@@ -140,7 +140,8 @@
     <Compile Include="Converters\DAEWriter.cs" />
     <Compile Include="Converters\EmblemConverter.cs" />
     <Compile Include="Converters\MayaAnim.cs" />
-    <Compile Include="Converters\MEXFighterConverter.cs" />
+    <Compile Include="Converters\MexCssGenerator.cs" />
+    <Compile Include="Converters\MexFighterConverter.cs" />
     <Compile Include="Converters\MexMapGenerator.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
@@ -204,6 +205,12 @@
     <Compile Include="GUI\KeyEditor.Designer.cs">
       <DependentUpon>KeyEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXMenuCSSControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXMenuCSSControl.Designer.cs">
+      <DependentUpon>MEXMenuCSSControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\MEX\Controls\MEXEffectControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -227,6 +234,12 @@
     </Compile>
     <Compile Include="GUI\MEX\Controls\MEXMenuControl.Designer.cs">
       <DependentUpon>MEXMenuControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXMenuSSSControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXMenuSSSControl.Designer.cs">
+      <DependentUpon>MEXMenuSSSControl.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\MEX\Controls\MEXMusicControl.cs">
       <SubType>UserControl</SubType>
@@ -446,6 +459,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXMenuControl.resx">
       <DependentUpon>MEXMenuControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MEX\Controls\MEXMenuCSSControl.resx">
+      <DependentUpon>MEXMenuCSSControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MEX\Controls\MEXMenuSSSControl.resx">
+      <DependentUpon>MEXMenuSSSControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXMusicControl.resx">
       <DependentUpon>MEXMusicControl.cs</DependentUpon>

@@ -133,6 +133,17 @@ namespace HSDRaw.Tools
             List<HSD_Envelope> weights = new List<HSD_Envelope>();
             Dictionary<int, int> evToIndex = new Dictionary<int, int>();
 
+            if(Bones == null)
+            {
+                Bones = new List<HSD_JOBJ[]>();
+                Weights = new List<float[]>();
+                foreach(var v in triList)
+                {
+                    Bones.Add(new HSD_JOBJ[0]);
+                    Weights.Add(new float[0]);
+                }
+            }
+
             Dictionary<HSDStruct, int> jobjToIndex = new Dictionary<HSDStruct, int>();
             List<HSD_JOBJ> jobjs = new List<HSD_JOBJ>();
             foreach(var bone in Bones)

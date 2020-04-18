@@ -78,10 +78,12 @@ namespace HSDRawViewer.Rendering
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            
             GL.BindTexture(TextureTarget.Texture2D, 0);
             
             Textures.Add(texid);
             TextureSizes.Add(new Vector2(width, height));
+
             return Textures.Count - 1;
         }
 

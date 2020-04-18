@@ -42,6 +42,19 @@ namespace HSDRawViewer.Rendering
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <param name="c"></param>
+        public static void DrawRectangle(RectangleF rect, Color c)
+        {
+            DrawRectangle(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height, 0, 1, c);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
         public static void DrawRectangle(float x, float y, float x2, float y2, Color c)
         {
             DrawRectangle(x, y, x2, y2, 0, 1, c);
@@ -78,10 +91,10 @@ namespace HSDRawViewer.Rendering
             GL.Color4(c);
             GL.Begin(PrimitiveType.Quads);
 
-            GL.Vertex3(x, y, z);
-            GL.Vertex3(x2, y, z);
-            GL.Vertex3(x2, y2, z);
             GL.Vertex3(x, y2, z);
+            GL.Vertex3(x2, y2, z);
+            GL.Vertex3(x2, y, z);
+            GL.Vertex3(x, y, z);
 
             GL.End();
 
@@ -89,10 +102,10 @@ namespace HSDRawViewer.Rendering
             GL.Color4(1f, 1f, 1f, 1f);
             GL.Begin(PrimitiveType.LineLoop);
 
-            GL.Vertex3(x, y, z);
-            GL.Vertex3(x2, y, z);
-            GL.Vertex3(x2, y2, z);
             GL.Vertex3(x, y2, z);
+            GL.Vertex3(x2, y2, z);
+            GL.Vertex3(x2, y, z);
+            GL.Vertex3(x, y, z);
 
             GL.End();
             GL.PopAttrib();

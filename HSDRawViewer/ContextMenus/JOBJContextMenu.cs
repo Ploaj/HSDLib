@@ -90,7 +90,7 @@ namespace HSDRawViewer.ContextMenus
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        private static HSD_MatAnimJoint GenerateMatAnimJointFromJOBJ(HSD_JOBJ node)
+        public static HSD_MatAnimJoint GenerateMatAnimJointFromJOBJ(HSD_JOBJ node)
         {
             HSD_MatAnimJoint joint = new HSD_MatAnimJoint();
 
@@ -107,6 +107,22 @@ namespace HSDRawViewer.ContextMenus
             {
                 joint.AddChild(GenerateMatAnimJointFromJOBJ(v));
             }
+
+            return joint;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static HSD_AnimJoint GenerateAnimJointFromJOBJ(HSD_JOBJ node)
+        {
+            HSD_AnimJoint joint = new HSD_AnimJoint();
+
+            foreach (var v in node.Children)
+                joint.AddChild(GenerateAnimJointFromJOBJ(v));
 
             return joint;
         }

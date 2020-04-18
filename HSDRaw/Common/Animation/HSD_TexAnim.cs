@@ -1,4 +1,6 @@
 ﻿using HSDRaw.GX;
+using HSDRaw.Tools;
+using System.Collections.Generic;
 
 namespace HSDRaw.Common.Animation
 {
@@ -114,6 +116,37 @@ namespace HSDRaw.Common.Animation
             }
 
             return tobj;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void FromTOBJs(IEnumerable<HSD_TOBJ> tobjs, bool generateAnimation)
+        {
+            ImageBuffers = null;
+            TlutBuffers = null;
+            List<FOBJKey> keys = new List<FOBJKey>();
+            int index = 0;
+            foreach (var t in tobjs)
+            {
+                AddImage(t);
+                keys.Add(new FOBJKey() { Frame = index, Value = index, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                index++;
+            }
+
+            if(generateAnimation)
+            {
+                AnimationObject = new HSD_AOBJ();
+                AnimationObject.EndFrame = index;
+                AnimationObject.Flags = AOBJ_Flags.ANIM_LOOP;
+                AnimationObject.FObjDesc = new HSD_FOBJDesc();
+                AnimationObject.FObjDesc.SetKeys(keys, (byte)TexTrackType.HSD_A_T_TIMG);
+                if (TlutCount != 0)
+                {
+                    AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();
+                    AnimationObject.FObjDesc.Next.SetKeys(keys, (byte)TexTrackType.HSD_A_T_TCLT);
+                }
+            }
         }
     }
 
