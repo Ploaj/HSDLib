@@ -3,7 +3,7 @@ using HSDRaw.Common.Animation;
 
 namespace HSDRaw.MEX.Menus
 {
-    public class MEX_mexCSSData : HSDAccessor
+    public class MEX_mexSelectChr : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
         

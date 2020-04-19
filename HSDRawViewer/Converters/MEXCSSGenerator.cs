@@ -49,7 +49,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="table"></param>
         /// <param name="mex"></param>
-        public static void HookMexNode(SBM_SelectChrDataTable table, MEX_mexCSSData mex)
+        public static void HookMexNode(SBM_SelectChrDataTable table, MEX_mexSelectChr mex)
         { 
             // hook csps
             table.MenuMaterialAnimation.Children[6].Children[0].MaterialAnimation = mex.CSPMatAnim;
@@ -78,7 +78,7 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        public static void SetMexNode(MEX_mexCSSData mex, MEX_CSSIconEntry[] icons)
+        public static void SetMexNode(MEX_mexSelectChr mex, MEX_CSSIconEntry[] icons)
         {
             var posModel = GenerateIconModel(icons);
             mex.IconModel = posModel.Item1;
@@ -120,7 +120,7 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        public static void LoadFromMEXNode(MEX_mexCSSData mex, MEX_CSSIconEntry[] icons)
+        public static void LoadFromMEXNode(MEX_mexSelectChr mex, MEX_CSSIconEntry[] icons)
         {
             var csps = mex.CSPMatAnim.TextureAnimation.ToTOBJs();
             var cspKeys = mex.CSPMatAnim.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
@@ -167,7 +167,7 @@ namespace HSDRawViewer.Converters
         /// <param name="table"></param>
         /// <param name="icons"></param>
         /// <returns></returns>
-        public static MEX_mexCSSData GenerateMEXMapFromVanilla(SBM_SelectChrDataTable table, MEX_CSSIconEntry[] icons)
+        public static MEX_mexSelectChr GenerateMEXMapFromVanilla(SBM_SelectChrDataTable table, MEX_CSSIconEntry[] icons)
         {
             // generate icon model
             var icon_joint = HSDAccessor.DeepClone<HSD_JOBJ>(table.MenuModel.Children[2].Child);
@@ -235,7 +235,7 @@ namespace HSDRawViewer.Converters
             m.ClearRenderingCache();
 
 
-            MEX_mexCSSData mex = new MEX_mexCSSData();
+            MEX_mexSelectChr mex = new MEX_mexSelectChr();
 
             SetMexNode(mex, icons);
             

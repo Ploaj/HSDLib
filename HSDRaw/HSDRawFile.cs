@@ -875,9 +875,9 @@ namespace HSDRaw
                 a = acc;
             }
             else
-            if (rootString.StartsWith("mexCSSData"))
+            if (rootString.StartsWith("mexSelectChr"))
             {
-                var acc = new MEX_mexCSSData();
+                var acc = new MEX_mexSelectChr();
                 acc._s = str;
                 a = acc;
             }

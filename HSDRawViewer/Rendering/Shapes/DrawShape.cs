@@ -10,6 +10,27 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="color"></param>
+        /// <param name="thickness"></param>
+        public static void Line(Vector3 start, Vector3 end, Vector4 color, float thickness)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Color4(color);
+            GL.LineWidth(thickness);
+            GL.Begin(PrimitiveType.Lines);
+            GL.Vertex3(start);
+            GL.Vertex3(end);
+            GL.End();
+
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public static void Floor()
         {
             GL.PushAttrib(AttribMask.AllAttribBits);

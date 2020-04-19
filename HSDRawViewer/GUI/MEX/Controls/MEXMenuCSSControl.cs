@@ -73,8 +73,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (MenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(MenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                MexCssGenerator.SetMexNode((MEX_mexCSSData)MenuFile["mexCSSData"].Data, Icons);
-                MexCssGenerator.HookMexNode((SBM_SelectChrDataTable)MenuFile["MnSelectChrDataTable"].Data, (MEX_mexCSSData)MenuFile["mexCSSData"].Data);
+                MexCssGenerator.SetMexNode((MEX_mexSelectChr)MenuFile["mexSelectChr"].Data, Icons);
+                MexCssGenerator.HookMexNode((SBM_SelectChrDataTable)MenuFile["MnSelectChrDataTable"].Data, (MEX_mexSelectChr)MenuFile["mexSelectChr"].Data);
                 MenuFile.Save(MenuFilePath);
             }
         }
@@ -104,17 +104,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             HSDRawFile hsd = new HSDRawFile(filePath);
 
-            var node = hsd["mexCSSData"];
+            var node = hsd["mexSelectChr"];
 
             if (node == null && hsd.Roots[0].Data is SBM_SelectChrDataTable menu)
             {
-                MessageBox.Show("mexCSSData symbol not found. One will now be generated", "Symbol Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("mexSelectChr symbol not found. One will now be generated", "Symbol Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 hsd.Roots.Add(new HSDRootNode()
                 {
-                    Name = "mexCSSData",
+                    Name = "mexSelectChr",
                     Data = MexCssGenerator.GenerateMEXMapFromVanilla(menu, Icons)
                 });
-                node = hsd["mexCSSData"];
+                node = hsd["mexSelectChr"];
             }
 
             if (node != null && hsd.Roots[0].Data is SBM_SelectChrDataTable tab)
@@ -123,7 +123,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 MenuFile = hsd;
 
                 // mex data node
-                var mex = node.Data as MEX_mexCSSData;
+                var mex = node.Data as MEX_mexSelectChr;
 
                 MexCssGenerator.LoadFromMEXNode(mex, Icons);
 
@@ -205,9 +205,24 @@ namespace HSDRawViewer.GUI.MEX.Controls
             cspJOBJManager.Render(cam);
 
             for (int i = 0; i < Icons.Length; i++)
-                Icons[i].Render(cssIconEditor.SelectedIndices.Contains(i));
+            {
+                var selected = cssIconEditor.SelectedIndices.Contains(i);
+
+                Icons[i].Render(selected);
+
+                if (Dragging && selected)
+                {
+                    var rect = Icons[i].ToRect();
+                    DrawShape.Line(new Vector3(-100, rect.Y, 0), new Vector3(100, rect.Y, 0), SnapColor, 1);
+                    DrawShape.Line(new Vector3(rect.X, -100, 0), new Vector3(rect.X, 100, 0), SnapColor, 1);
+                    DrawShape.Line(new Vector3(-100, rect.Y + rect.Height, 0), new Vector3(100, rect.Y + rect.Height, 0), SnapColor, 1);
+                    DrawShape.Line(new Vector3(rect.X + rect.Width, -100, 0), new Vector3(rect.X + rect.Width, 100, 0), SnapColor, 1);
+                }
+            }
         }
 
+        private static Vector4 SnapColor = new Vector4(1, 1, 0, 1);
+        private bool Dragging = false;
         private bool MousePrevDown = false;
         private Vector3 prevPlanePoint = Vector3.Zero;
 
@@ -223,6 +238,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 foreach(MEX_CSSIconEntry ico in cssIconEditor.SelectedObjects)
                     ico.PopPosition();
                 MousePrevDown = false;
+                Dragging = false;
             }
         }
 
@@ -257,6 +273,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             var mouseDown = OpenTK.Input.Mouse.GetState().IsButtonDown(OpenTK.Input.MouseButton.Left);
 
+            Dragging = false;
+
             if (mouseDown && viewport.IsAltAction)
             {
                 Vector3 DragMove = Vector3.Zero;
@@ -279,6 +297,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 {
                     icon.PositionX -= DragMove.X;
                     icon.PositionY -= DragMove.Y;
+
+                    Dragging = true;
 
                     if (enableSnapAlignmentToolStripMenuItem.Checked && cssIconEditor.SelectedObjects.Length <= 1)
                         SnapAlignIcon(icon);
