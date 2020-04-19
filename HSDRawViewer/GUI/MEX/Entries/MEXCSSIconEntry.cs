@@ -28,10 +28,10 @@ namespace HSDRawViewer.GUI.MEX
         public int FighterExternalID { get => icon.ExternalCharID; set => icon.ExternalCharID = (byte)value; }
 
         [Category("Icon Position"), Description("X Position of Joint")]
-        public float PositionX { get => Joint.TX; set => Joint.TX = value; }
+        public float PositionX { get => Joint.TX; set { icon.X1 += value - Joint.TX; icon.X2 += value - Joint.TX; Joint.TX = value; } }
 
         [Category("Icon Position"), Description("Y Position of Joint")]
-        public float PositionY { get => Joint.TY; set => Joint.TY = value; }
+        public float PositionY { get => Joint.TY; set { icon.Y1 += value - Joint.TY; icon.Y2 += value - Joint.TY; Joint.TY = value; } }
 
         [Category("Icon Position"), Description("Z Position of Joint")]
         public float PositionZ { get => Joint.TZ; set => Joint.TZ = value; }
@@ -45,17 +45,17 @@ namespace HSDRawViewer.GUI.MEX
         [Category("Icon Position"), Description("Z Scale of Joint")]
         public float ScaleZ { get => Joint.SZ; set => Joint.SZ = value; }
 
-        [Category("Icon Collision"), Description("X Offset from Center of Icon")]
-        public float OffsetX { get => icon.X1; set => icon.X1 = value; }
+        [Category("Icon Collision"), Description("X Offset from Joint")]
+        public float OffsetX { get => icon.X1 - PositionX; set { var w = Width; icon.X1 = value + PositionX; Width = w; } }
 
-        [Category("Icon Collision"), Description("Y Offset from Center of Icon")]
-        public float OffsetY { get => icon.Y1; set => icon.Y1 = value; }
+        [Category("Icon Collision"), Description("Y Offset from Joint")]
+        public float OffsetY { get => icon.Y1 - PositionY + Height; set { var h = Height; icon.Y1 = value + PositionY - h; Height = h; } }
 
         [Category("Icon Collision"), Description("Width of Collision")]
-        public float Width { get => icon.X2; set => icon.X2 = value; }
+        public float Width { get => icon.X2 - icon.X1; set => icon.X2 = icon.X1 + Math.Abs(value); }
 
         [Category("Icon Collision"), Description("Height of Collision")]
-        public float Height { get => icon.Y2; set => icon.Y2 = value; }
+        public float Height { get => icon.Y2 - icon.Y1; set => icon.Y2 = icon.Y1 + Math.Abs(value); }
         
         private Stack<Vector3> PositionStack = new Stack<Vector3>();
 
@@ -102,7 +102,7 @@ namespace HSDRawViewer.GUI.MEX
 
         public void Render(bool selected)
         {
-            if (Joint == null || icon == null || icon.MEXICON == 0)
+            if (Joint == null || icon == null)
                 return;
 
             var rect = ToRect();
@@ -115,7 +115,7 @@ namespace HSDRawViewer.GUI.MEX
 
         public RectangleF ToRect()
         {
-            return new RectangleF(Joint.TX + OffsetX, Joint.TY + OffsetY, Width, Height);
+            return new RectangleF(icon.X1, icon.Y1, icon.X2 - icon.X1, icon.Y2 - icon.Y1);
         }
 
         public override string ToString()

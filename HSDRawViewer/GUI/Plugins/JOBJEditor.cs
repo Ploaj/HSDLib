@@ -17,6 +17,7 @@ using System.Drawing;
 using HSDRaw;
 using HSDRawViewer.Rendering.Renderers;
 using System.Drawing.Design;
+using OpenTK;
 
 namespace HSDRawViewer.GUI.Plugins
 {

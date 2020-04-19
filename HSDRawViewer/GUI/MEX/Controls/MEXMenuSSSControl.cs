@@ -172,10 +172,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 DrawShape.DrawRectangle(point.X - ico.Width, point.Y + ico.Height, point.X + ico.Width, point.Y - ico.Height, point.Z, 2, MEX_CSSIconEntry.SelectedIconColor);
             }
         }
-
-        private bool MousePrevDown = false;
+        
         private Vector3 prevPlanePoint = Vector3.Zero;
-        private Vector2 oldPosition = Vector2.Zero;
 
         public void ScreenClick(MouseButtons button, PickInformation pick)
         {
@@ -252,12 +250,15 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         private void RegenerateMnSlMapAnimation()
         {
+            if (StageMenuFile == null)
+                return;
+
             StageIcons = StageIcons.ToList().OrderBy(e => e.ExternalID == 0).ToArray();
             sssEditor.Reset();
 
-            //var mexMap = MexMapGenerator.GenerateMexMap(StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable, StageIcons.Select(e => e.MapSpace));
-            //StageMenuFile.Roots[1].Data = mexMap;
-            //RefreshMnSlMapRendering(mexMap);
+            var mexMap = MexMapGenerator.GenerateMexMap(StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable, StageIcons.Select(e => e.MapSpace));
+            StageMenuFile.Roots[1].Data = mexMap;
+            RefreshMnSlMapRendering(mexMap);
         }
 
         /// <summary>

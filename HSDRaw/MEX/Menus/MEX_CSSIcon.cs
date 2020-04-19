@@ -32,9 +32,6 @@ namespace HSDRaw.MEX.Menus
         [DisplayName("Joint ID"), Description("")]
         public byte JointID { get => _s.GetByte(0x05); set => _s.SetByte(0x05, value); }
 
-        [DisplayName(""), Description("")]
-        public byte MEXICON { get => _s.GetByte(0x06); internal set => _s.SetByte(0x06, value); }
-
         [DisplayName("Sound Effect ID"), Description("")]
         public int SFXID { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
@@ -44,36 +41,12 @@ namespace HSDRaw.MEX.Menus
         [DisplayName("X2"), Description("")]
         public float X2 { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
 
-        [DisplayName("Y1"), Description("")]
-        public float Y1 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
-
         [DisplayName("Y2"), Description("")]
-        public float Y2 { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        public float Y2 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
 
-        /// <summary>
-        /// Converts icon data to MEX Icon data
-        /// </summary>
-        /// <param name="parent"></param>
-        public void ToMEXIcon(HSD_JOBJ parent)
-        {
-            if (MEXICON == 1)
-                return;
-
-            MEXICON = 1;
-
-            var width = X2 - X1;
-            var height = Y1 - Y2;
-
-            // conver to relative
-            X1 = X1 - parent.TX;
-            Y1 = Y1 - parent.TY;
-
-            X2 = width;
-            Y2 = height;
-
-            Y1 -= height;
-        }
-
+        [DisplayName("Y1"), Description("")]
+        public float Y1 { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        
         public override string ToString()
         {
             return $"{ExternalCharID} - ({X1}, {Y1}, {X2}, {Y2})";

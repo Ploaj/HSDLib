@@ -41,6 +41,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
             InitializeComponent();
 
             singleMenuManager.RenderBones = false;
+            cspJOBJManager.RenderBones = false;
+            iconJOBJManager.RenderBones = false;
 
             HandleDestroyed += (sender, args) =>
             {
@@ -311,11 +313,11 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 if (Math.Abs((rect.X + rect.Width) - (coll.X + coll.Width)) < SnapDelta) icon.PositionX = coll.X + coll.Width - rect.Width - icon.OffsetX;
                 if (Math.Abs((rect.X + rect.Width) - coll.X) < SnapDelta) icon.PositionX = coll.X - rect.Width - icon.OffsetX;
 
-                if (Math.Abs(rect.Y - (coll.Y - coll.Height)) < SnapDelta) icon.PositionY = coll.Y - coll.Height - icon.OffsetY;
-                if (Math.Abs(rect.Y - coll.Y) < SnapDelta) icon.PositionY = coll.Y - icon.OffsetY;
+                if (Math.Abs(rect.Y - (coll.Y - coll.Height)) < SnapDelta) icon.PositionY = coll.Y - coll.Height - icon.OffsetY + icon.Height;
+                if (Math.Abs(rect.Y - coll.Y) < SnapDelta) icon.PositionY = coll.Y - icon.OffsetY + icon.Height;
 
-                if (Math.Abs((rect.Y - rect.Height) - (coll.Y - coll.Height)) < SnapDelta) icon.PositionY = coll.Y - coll.Height + rect.Height - icon.OffsetY;
-                if (Math.Abs((rect.Y - rect.Height) - coll.Y) < SnapDelta) icon.PositionY = coll.Y + rect.Height - icon.OffsetY;
+                if (Math.Abs((rect.Y - rect.Height) - (coll.Y - coll.Height)) < SnapDelta) icon.PositionY = coll.Y - coll.Height + rect.Height - icon.OffsetY + icon.Height;
+                if (Math.Abs((rect.Y - rect.Height) - coll.Y) < SnapDelta) icon.PositionY = coll.Y + rect.Height - icon.OffsetY + icon.Height;
             }
         }
 

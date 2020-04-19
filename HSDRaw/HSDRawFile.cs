@@ -132,7 +132,7 @@ namespace HSDRaw
                     // alternate null pointer
                     if (objectOff < 0)
                         continue;
-                    
+
                     relocOffsets.Add(offset, objectOff);
 
                     if (!OffsetContain.Contains(objectOff))

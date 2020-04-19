@@ -39,7 +39,7 @@ void main()
 	
 	normal = GX_VA_NRM;
 
-	if(enableParentTransform == 1)
+	//if(enableParentTransform == 1)
 	{
 		pos = singleBind * pos;
 		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
