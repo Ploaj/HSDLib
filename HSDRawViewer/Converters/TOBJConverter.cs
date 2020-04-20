@@ -142,8 +142,8 @@ namespace HSDRawViewer.Converters
         {
             if (imgFormat != GXTexFmt.CMP)
             {
-                if (imgFormat == GXTexFmt.CI8)
-                    bmp = ReduceColors(bmp, 256);
+               // if (imgFormat == GXTexFmt.CI8) // doesn't work well with alpha
+               //     bmp = ReduceColors(bmp, 256);
                 if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
                     bmp = ReduceColors(bmp, 16);
 
@@ -203,7 +203,7 @@ namespace HSDRawViewer.Converters
                 return bitmap;
 
             var quantizer = new WuQuantizer();
-            using (var quantized = quantizer.QuantizeImage(bitmap, 1, 1, colorCount))
+            using (var quantized = quantizer.QuantizeImage(bitmap, 10, 70, colorCount))
             {
                 return new Bitmap(quantized);
             }

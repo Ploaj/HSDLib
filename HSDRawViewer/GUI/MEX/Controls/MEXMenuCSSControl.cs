@@ -470,7 +470,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                         tobj = Converters.TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
 
                     icon.Joint.Dobj.Next.Mobj.Textures = tobj;
-                    tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE;
+                    tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_BLEND | TOBJ_FLAGS.ALPHAMAP_BLEND;
                 }
             }
         }

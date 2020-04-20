@@ -86,7 +86,7 @@ namespace HSDRawViewer.Converters
             mex.IconMatAnimJoint = posModel.Item3;
 
             // generate csp node
-            var stride = MEXConverter.FighterIDCount + 1;
+            var stride = MEXConverter.FighterIDCount - 3;
             List<FOBJKey> keys = new List<FOBJKey>();
             List<HSD_TOBJ> tobjs = new List<HSD_TOBJ>();
             foreach(var v in icons)
@@ -125,7 +125,7 @@ namespace HSDRawViewer.Converters
             var csps = mex.CSPMatAnim.TextureAnimation.ToTOBJs();
             var cspKeys = mex.CSPMatAnim.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
 
-            var stride = MEXConverter.FighterIDCount + 1;
+            var stride = MEXConverter.FighterIDCount - 3;
 
             var index = 0;
             foreach(var ico in icons)
@@ -197,6 +197,9 @@ namespace HSDRawViewer.Converters
             var stride = 30;
             foreach (var ico in icons)
             {
+                if (joints[ico.icon.JointID].Dobj == null)
+                    continue;
+
                 HSD_JOBJ pos = HSDAccessor.DeepClone<HSD_JOBJ>(icon_joint);
                 pos.Dobj.Pobj.Attributes = icon_joint.Dobj.Pobj.Attributes;
                 pos.Dobj.Next.Pobj.Attributes = icon_joint.Dobj.Pobj.Attributes;
