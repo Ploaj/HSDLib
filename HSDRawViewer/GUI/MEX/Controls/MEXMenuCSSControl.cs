@@ -6,10 +6,8 @@ using HSDRaw;
 using System.IO;
 using HSDRaw.Melee.Mn;
 using HSDRaw.Common;
-using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
 using HSDRaw.MEX.Menus;
-using System.Linq;
 using System.Drawing;
 
 namespace HSDRawViewer.GUI.MEX.Controls

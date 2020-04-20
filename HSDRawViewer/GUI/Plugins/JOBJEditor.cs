@@ -258,7 +258,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             JOBJManager.Frame = viewport.Frame;
             JOBJManager.DOBJManager.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
-            JOBJManager.Render(cam);
+            JOBJManager.Render(cam, false);
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
