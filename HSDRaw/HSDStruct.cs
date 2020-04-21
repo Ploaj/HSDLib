@@ -10,6 +10,7 @@ namespace HSDRaw
     /// <summary>
     /// Manager for handling underlying structure data
     /// </summary>
+    [Serializable]
     public class HSDStruct
     {
         private byte[] _data = new byte[0];

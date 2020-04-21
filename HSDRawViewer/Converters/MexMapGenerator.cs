@@ -282,7 +282,8 @@ namespace HSDRawViewer.Converters
                     g.FillRectangle(new SolidBrush(Color.Black), new RectangleF(0, 0, bmp.Width, bmp.Height));
                 }
                 {
-                    var stringWidth = TextRenderer.MeasureText(location, font2).Width - 13;
+                    SizeF stringSize = g.MeasureString(location, font2, new SizeF(13, 15f), StringFormat.GenericTypographic);
+                    var stringWidth = stringSize.Width;
                     var scale = 0.95f;
                     var newwidth = stringWidth * scale;
                     g.ResetTransform();
@@ -290,7 +291,8 @@ namespace HSDRawViewer.Converters
                     g.DrawString(location, font2, new SolidBrush(Color.White), (224 / 2) / scale, -4, stringFormat);
                 }
                 {
-                    var stringWidth = TextRenderer.MeasureText(name, font).Width;
+                    SizeF stringSize = g.MeasureString(name, font, new SizeF(30, 15f), StringFormat.GenericTypographic);
+                    var stringWidth = stringSize.Width;
                     var scale = 0.75f;
                     var newwidth = stringWidth * scale;
                     if (newwidth > bmp.Width)

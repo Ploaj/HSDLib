@@ -56,6 +56,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        [Serializable]
         public class SubActionScript
         {
             public byte[] data;
@@ -67,6 +68,11 @@ namespace HSDRawViewer.GUI
             public SubActionScript(SubactionGroup SubactionGroup)
             {
                 this.SubactionGroup = SubactionGroup;
+            }
+
+            public SubactionGroup GetGroup()
+            {
+                return SubactionGroup;
             }
 
             public string Name
@@ -653,6 +659,7 @@ namespace HSDRawViewer.GUI
             {
                 var length = script.Parameters.Count();
                 e.ItemHeight = subActionList.Font.Height * (toolStripComboBox1.SelectedIndex != 0 ? 1 : length + 1);
+                e.ItemHeight = Math.Min(e.ItemHeight, 255); // limit
             }
         }
 
@@ -674,6 +681,8 @@ namespace HSDRawViewer.GUI
                     if (toolStripComboBox1.SelectedIndex == 0)
                         foreach (var v in script.Parameters)
                         {
+                            if (e.Bounds.Y + e.Font.Height * i >= e.Bounds.Y + e.Bounds.Height)
+                                break;
                             var bottomRect = new Rectangle(new Point(e.Bounds.X, e.Bounds.Y + e.Font.Height * i), new Size(e.Bounds.Width, e.Bounds.Height));
                             e.Graphics.DrawString("\t" + v, e.Font, new SolidBrush(e.ForeColor), bottomRect);
                             i++;
@@ -728,8 +737,6 @@ namespace HSDRawViewer.GUI
             SaveSubactionChanges();
         }
 
-        private List<SubActionScript> CopiedScripts = new List<SubActionScript>();
-
         /// <summary>
         /// 
         /// </summary>
@@ -770,10 +777,16 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void CopySelected()
         {
-            CopiedScripts.Clear();
+            // Lets say its my data format
+            Clipboard.Clear();
+
+            // get collections of selected scripts
+            var scripts = new List<SubActionScript>();
             foreach (SubActionScript scr in subActionList.SelectedItems)
-                CopiedScripts.Add(scr);
-            CopiedScripts.Reverse();
+                scripts.Add(scr);
+
+            // Put data into clipboard
+            Clipboard.SetData(typeof(List<SubActionScript>).FullName, scripts);
         }
 
         /// <summary>
@@ -781,14 +794,34 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void Paste()
         {
+            // get insert index
             var index = subActionList.SelectedIndex + 1;
             if (index == -1)
                 index = 0;
-            foreach (var v in CopiedScripts)
+
+            // Get data object from the clipboard
+            IDataObject dataObject = Clipboard.GetDataObject();
+            if (dataObject != null)
             {
-                subActionList.Items.Insert(index, v.Clone());
+                // Check if a collection of Slides is in the clipboard
+                string dataFormat = typeof(List<SubActionScript>).FullName;
+                if (dataObject.GetDataPresent(dataFormat))
+                {
+                    // Retrieve slides from the clipboard
+                    List<SubActionScript> scripts = dataObject.GetData(dataFormat) as List<SubActionScript>;
+                    if (scripts != null)
+                    {
+                        // insert scripts
+                        foreach (var v in scripts)
+                            // only paste subactions the belong to this group
+                            if(v.GetGroup() == SubactionGroup)
+                                subActionList.Items.Insert(index, v.Clone());
+
+                        SaveSubactionChanges();
+                    }
+                }
             }
-            SaveSubactionChanges();
+            
         }
 
         /// <summary>

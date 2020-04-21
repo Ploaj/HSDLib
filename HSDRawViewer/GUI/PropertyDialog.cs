@@ -15,6 +15,16 @@ namespace HSDRawViewer.GUI
             propertyGrid1.SelectedObject = propertyObject;
         }
 
+        public PropertyDialog(string name, object[] propertyObjects)
+        {
+            InitializeComponent();
+
+            CenterToScreen();
+
+            Text = name;
+            propertyGrid1.SelectedObjects = propertyObjects;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;

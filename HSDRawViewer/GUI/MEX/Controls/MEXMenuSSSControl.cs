@@ -10,6 +10,7 @@ using HSDRaw;
 using System.IO;
 using HSDRaw.Common;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -318,17 +319,10 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void regenerateAnimationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (sssEditor.SelectedObject is MEXStageIconEntry icon)
+            if (sssEditor.SelectedObjects.Length > 0)
             {
-                using (PropertyDialog d = new PropertyDialog("Menu Animation Generator", icon.Animation))
+                using (PropertyDialog d = new PropertyDialog("Menu Animation Generator", ((MEXStageIconEntry[])sssEditor.SelectedObjects).Select(a => a.Animation)))
                 {
-                    if (d.ShowDialog() == DialogResult.OK)
-                    {
-                        foreach (MEXStageIconEntry ico in sssEditor.SelectedObjects)
-                        {
-                            ico.Animation = ObjectExtensions.Copy<MexMenuAnimation>(icon.Animation); // copy of icon animation
-                        }
-                    }
                 }
             }
         }
