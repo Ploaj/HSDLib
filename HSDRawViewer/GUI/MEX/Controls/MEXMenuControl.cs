@@ -64,10 +64,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
             viewport.EnableFloor = false;
-            viewport.MaxFrame = 1600;
+            viewport.MaxFrame = 100;
+            viewport.Frame = 100;
             groupBox2.Controls.Add(viewport);
             viewport.RefreshSize();
             viewport.BringToFront();
+            viewport.Play();
+            viewport.Load += (sender, args) =>
+            {
+                viewport.Camera.DefaultTranslation = new OpenTK.Vector3(0, 0, -100);
+                viewport.Camera.RestoreDefault();
+            };
 
             CSS.Enabled = false;
             SSS.Enabled = false;
@@ -102,8 +109,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 CSS.Icons[i] = MEX_CSSIconEntry.FromIcon(data.MenuTable.CSSIconData.Icons[i]);
             CSS.cssIconEditor.SetArrayFromProperty(CSS, "Icons");
 
-            SSS.StageIcons = data.MenuTable.SSSIconData.Array.Select(e => new MEXStageIconEntry() { IconData = e }).ToArray();
-            SSS.sssEditor.SetArrayFromProperty(SSS, "StageIcons");
+            SSS.Icons = data.MenuTable.SSSIconData.Array.Select(e => new MEXStageIconEntry() { IconData = e }).ToArray();
+            SSS.sssEditor.SetArrayFromProperty(SSS, "Icons");
         }
 
         /// <summary>
@@ -118,8 +125,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 ico[i] = CSS.Icons[i].ToIcon();
             data.MenuTable.CSSIconData.Icons = ico;
 
-            data.MetaData.NumOfSSSIcons = SSS.StageIcons.Length;
-            data.MenuTable.SSSIconData.Array = SSS.StageIcons.Select(e => e.IconData).ToArray();
+            data.MetaData.NumOfSSSIcons = SSS.Icons.Length;
+            data.MenuTable.SSSIconData.Array = SSS.Icons.Select(e => e.IconData).ToArray();
 
             SaveMenuFiles();
         }
@@ -148,6 +155,25 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
         #region Rendering
 
+
+        private float Frame { get => _frame;
+        set
+            {
+                _frame = value;
+                if (value == -1)
+                {
+                    playButton.Text = "Play";
+                    playButton.Image = Properties.Resources.ts_play;
+                }
+                else
+                {
+                    playButton.Text = "Stop";
+                    playButton.Image = Properties.Resources.ts_stop;
+                }
+            }
+        }
+        private float _frame = -1;
+
         /// <summary>
         /// 
         /// </summary>
@@ -163,9 +189,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
             DrawShape.DrawRectangle(32.51167f, -24.38375f, -32.51167f, 24.38375f, Color.Transparent);
             
             if (CSSSelected)
-                CSS.Render(cam);
+                CSS.Render(cam, Frame);
             else
-                SSS.Render(cam, viewport.Frame);
+                SSS.Render(cam, Frame);
+            
+            if (Frame != -1)
+                Frame++;
+            if (Frame >= 1600)
+                Frame = -1;
 
         }
 
@@ -262,6 +293,19 @@ namespace HSDRawViewer.GUI.MEX.Controls
         private void buttonImportMnSlcChr_Click(object sender, EventArgs e)
         {
             CSS.LoadFile();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void playButton_Click(object sender, EventArgs e)
+        {
+            if (Frame == -1)
+                Frame = 0;
+            else
+                Frame = -1;
         }
     }
 }

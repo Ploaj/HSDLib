@@ -667,7 +667,7 @@ namespace HSDRawViewer.GUI.Plugins
 
                     var newpobj = pobjGen.CreatePOBJsFromTriangleList(newVerties, attrs, dl.Envelopes);
                     foreach(var p in newpobj.List)
-                        p.Flags |= POBJ_FLAG.CULLBACK | POBJ_FLAG.UNKNOWN;
+                        p.Flags |= POBJ_FLAG.CULLBACK | POBJ_FLAG.UNKNOWN1;
                     if (newDOBJ.Pobj == null)
                         newDOBJ.Pobj = newpobj;
                     else

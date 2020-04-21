@@ -134,7 +134,7 @@ namespace HSDRawViewer.Converters
                 if(index < mex.IconModel.Children.Length)
                 {
                     ico.Joint = mex.IconModel.Children[index];
-                    ico.AnimJoint = mex.IconAnimJoint.Children[index];
+                    ico.Animation = MexMenuAnimationGenerator.FromAnimJoint(mex.IconAnimJoint.Children[index], ico.Joint);
                     ico.MatAnimJoint = mex.IconMatAnimJoint.Children[index];
                 }
 
@@ -175,7 +175,7 @@ namespace HSDRawViewer.Converters
             icon_joint.TY = 0;
             icon_joint.TZ = 0;
             icon_joint.Next = null;
-            RegenerateIcon(icon_joint);
+            var center = RegenerateIcon(icon_joint);
 
             var icon_matanim_joint = HSDAccessor.DeepClone<HSD_MatAnimJoint>(table.MenuMaterialAnimation.Children[2].Child);
             icon_matanim_joint.Next = null;
@@ -207,12 +207,12 @@ namespace HSDRawViewer.Converters
                 pos.Dobj.Next.Mobj.Textures = HSDAccessor.DeepClone<HSD_TOBJ>(joints[ico.icon.JointID].Dobj.Next.Mobj.Textures);
 
                 var worldPosition = Vector3.TransformPosition(Vector3.Zero, m.GetWorldTransform(ico.icon.JointID));
-                pos.TX = worldPosition.X;
-                pos.TY = worldPosition.Y;
-                pos.TZ = worldPosition.Z;
+                pos.TX = worldPosition.X + center.X;
+                pos.TY = worldPosition.Y + center.Y;
+                pos.TZ = worldPosition.Z + center.Z;
                 
                 ico.Joint = pos;
-                ico.AnimJoint = new HSD_AnimJoint();
+                ico.Animation = new MexMenuAnimation();
                 ico.MatAnimJoint = HSDAccessor.DeepClone<HSD_MatAnimJoint>(icon_matanim_joint);
 
                 // load csps
@@ -252,8 +252,28 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="rootJOBJ"></param>
-        private static void RegenerateIcon(HSD_JOBJ rootJOBJ)
+        private static Vector3 RegenerateIcon(HSD_JOBJ rootJOBJ)
         {
+            Vector3 Min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 Max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+            foreach (var jobj in rootJOBJ.BreathFirstList)
+                if (jobj.Dobj != null)
+                    foreach (var dobj in jobj.Dobj.List)
+                        if (dobj.Pobj != null)
+                            foreach (var pobj in dobj.Pobj.List)
+                                foreach (var v in pobj.ToDisplayList().Vertices)
+                                {
+                                    Min.X = Math.Min(Min.X, v.POS.X);
+                                    Min.Y = Math.Min(Min.Y, v.POS.Y);
+                                    Min.Z = Math.Min(Min.Z, v.POS.Z);
+                                    Max.X = Math.Max(Max.X, v.POS.X);
+                                    Max.Y = Math.Max(Max.Y, v.POS.Y);
+                                    Max.Z = Math.Max(Max.Z, v.POS.Z);
+                                }
+
+            var center = (Min + Max) / 2;
+
             var compressor = new POBJ_Generator();
             foreach (var jobj in rootJOBJ.BreathFirstList)
             {
@@ -280,6 +300,17 @@ namespace HSDRawViewer.Converters
 
                                     off += pri.Count;
 
+                                    for (int i = 0; i < strip.Count; i++)
+                                    {
+                                        var v = strip[i];
+
+                                        v.POS.X -= center.X;
+                                        v.POS.Y -= center.Y;
+                                        v.POS.Z -= center.Z;
+
+                                        strip[i] = v;
+                                    }
+
                                     triList.AddRange(strip);
                                 }
                             }
@@ -289,6 +320,12 @@ namespace HSDRawViewer.Converters
                     }
             }
             compressor.SaveChanges();
+
+            center.X *= rootJOBJ.SX;
+            center.Y *= rootJOBJ.SY;
+            center.Z *= rootJOBJ.SZ;
+
+            return center;
         }
     }
 }

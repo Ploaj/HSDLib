@@ -68,6 +68,11 @@ namespace HSDRawViewer.Rendering
             DrawRectangle(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height, 0, 1, c);
         }
 
+        public static void DrawRectangle(RectangleF rect, float thickNess, Color c)
+        {
+            DrawRectangle(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height, 0, thickNess, c);
+        }
+
         /// <summary>
         /// 
         /// </summary>

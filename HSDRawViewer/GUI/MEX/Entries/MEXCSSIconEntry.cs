@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.MEX.Menus;
+using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using OpenTK;
 using System;
@@ -10,7 +11,6 @@ using System.Drawing;
 
 namespace HSDRawViewer.GUI.MEX
 {
-
     /// <summary>
     /// use proxy class for make selecting character id easier
     /// </summary>
@@ -21,8 +21,11 @@ namespace HSDRawViewer.GUI.MEX
         public List<HSD_TOBJ> CSPs = new List<HSD_TOBJ>();
 
         public HSD_JOBJ Joint;
-        public HSD_AnimJoint AnimJoint;
         public HSD_MatAnimJoint MatAnimJoint;
+        
+        [Browsable(false)]
+        public HSD_AnimJoint AnimJoint { get => MexMenuAnimationGenerator.GenerateAnimJoint(Animation, Joint); }
+        public MexMenuAnimation Animation;
 
         [Category("Fighter"), DisplayName("Fighter"), TypeConverter(typeof(FighterExternalIDConverter))]
         public int FighterExternalID { get => icon.ExternalCharID; set => icon.ExternalCharID = (byte)value; }
@@ -79,8 +82,9 @@ namespace HSDRawViewer.GUI.MEX
         {
             icon = new MEX_CSSIcon();
             Joint = new HSD_JOBJ() { Flags = JOBJ_FLAG.XLU | JOBJ_FLAG.CLASSICAL_SCALING, SX = 1, SY = 1, SZ = 1 };
-            AnimJoint = new HSD_AnimJoint();
+            //AnimJoint = new HSD_AnimJoint();
             MatAnimJoint = new HSD_MatAnimJoint();
+            Animation = new MexMenuAnimation();
         }
 
         public static MEX_CSSIconEntry FromIcon(MEX_CSSIcon icon)

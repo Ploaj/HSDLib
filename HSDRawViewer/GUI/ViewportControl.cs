@@ -109,6 +109,8 @@ namespace HSDRawViewer.GUI
         public bool EnableCrossHair = false;
         private Vector3 CrossHair = new Vector3();
 
+        public bool IsPlaying { get => (buttonPlay.Text == "Pause"); }
+
         public bool EnableFloor { get; set; } = false;
 
         public ViewportControl()

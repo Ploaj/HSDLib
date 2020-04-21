@@ -46,7 +46,8 @@ namespace HSDRawViewer.GUI
             {
                 var hti = dataGridView1.HitTest(args.X, args.Y);
                 dataGridView1.ClearSelection();
-                dataGridView1.Rows[hti.RowIndex].Selected = true;
+                if(hti != null && hti.RowIndex != -1)
+                    dataGridView1.Rows[hti.RowIndex].Selected = true;
             };
 
             dataGridView1.MouseClick += (sender, args) =>

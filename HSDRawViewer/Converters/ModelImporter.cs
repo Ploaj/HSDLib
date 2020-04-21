@@ -199,7 +199,7 @@ namespace HSDRawViewer.Converters
             }
 
             // get root of skeleton
-            //rootjobj = rootjobj.Child;
+            rootjobj = rootjobj.Child;
             rootjobj.Flags = 0;
 
             rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;

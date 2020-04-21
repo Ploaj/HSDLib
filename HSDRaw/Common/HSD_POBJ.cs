@@ -7,13 +7,13 @@ namespace HSDRaw.Common
     [Flags]
     public enum POBJ_FLAG
     {
-        PARENTTRANSFORM = (1 << 0),
-        UNKNOWN = (1 << 1),
+        UNKNOWN0 = (1 << 0),
+        UNKNOWN1 = (1 << 1),
         ANIM = (1 << 3),
         SHAPEANIM = (1 << 12),
         ENVELOPE = (1 << 13),
-        CULLFRONT = (1 << 14),
-        CULLBACK = (1 << 15)
+        CULLBACK = (1 << 14),
+        CULLFRONT = (1 << 15)
     }
     
     /// <summary>

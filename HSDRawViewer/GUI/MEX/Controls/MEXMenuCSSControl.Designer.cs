@@ -39,6 +39,7 @@
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cspSelectBox = new System.Windows.Forms.ToolStripComboBox();
             this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,7 +60,8 @@
             this.editMenu.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.enableSnapAlignmentToolStripMenuItem,
-            this.replaceIconToolStripMenuItem});
+            this.replaceIconToolStripMenuItem,
+            this.editAnimationToolStripMenuItem});
             this.editMenu.Image = ((System.Drawing.Image)(resources.GetObject("editMenu.Image")));
             this.editMenu.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.editMenu.Name = "editMenu";
@@ -150,6 +152,13 @@
             this.cssIconEditor.SelectedObjectChanged += new System.EventHandler(this.cssIconEditor_SelectedObjectChanged);
             this.cssIconEditor.ArrayUpdated += new System.EventHandler(this.cssIconEditor_ArrayUpdated);
             // 
+            // editAnimationToolStripMenuItem
+            // 
+            this.editAnimationToolStripMenuItem.Name = "editAnimationToolStripMenuItem";
+            this.editAnimationToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.editAnimationToolStripMenuItem.Text = "Edit Animation";
+            this.editAnimationToolStripMenuItem.Click += new System.EventHandler(this.editAnimationToolStripMenuItem_Click);
+            // 
             // MEXMenuCSSControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -177,5 +186,6 @@
         private System.Windows.Forms.ToolStripMenuItem replaceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editAnimationToolStripMenuItem;
     }
 }

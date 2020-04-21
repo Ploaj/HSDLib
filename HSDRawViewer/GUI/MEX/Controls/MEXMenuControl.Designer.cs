@@ -36,6 +36,7 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.playButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -46,7 +47,8 @@
             this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonSaveCSS,
             this.buttonImportMnSlcChr,
-            this.buttonImportMnSlMap});
+            this.buttonImportMnSlMap,
+            this.playButton});
             this.toolStrip4.Location = new System.Drawing.Point(0, 0);
             this.toolStrip4.Name = "toolStrip4";
             this.toolStrip4.Size = new System.Drawing.Size(720, 25);
@@ -122,6 +124,16 @@
             this.tabPage2.Text = "SSS";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // playButton
+            // 
+            this.playButton.Image = global::HSDRawViewer.Properties.Resources.ts_play;
+            this.playButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.playButton.Name = "playButton";
+            this.playButton.Size = new System.Drawing.Size(49, 22);
+            this.playButton.Text = "Play";
+            this.playButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.playButton.Click += new System.EventHandler(this.playButton_Click);
+            // 
             // MEXMenuControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -149,5 +161,6 @@
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.ToolStripButton playButton;
     }
 }

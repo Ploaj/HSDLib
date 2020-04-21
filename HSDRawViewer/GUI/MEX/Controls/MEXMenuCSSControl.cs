@@ -9,6 +9,7 @@ using HSDRaw.Common;
 using HSDRawViewer.Converters;
 using HSDRaw.MEX.Menus;
 using System.Drawing;
+using HSDRaw.Common.Animation;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -71,8 +72,11 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (MenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(MenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
             {
+                // regenerate and hook node
                 MexCssGenerator.SetMexNode((MEX_mexSelectChr)MenuFile["mexSelectChr"].Data, Icons);
                 MexCssGenerator.HookMexNode((SBM_SelectChrDataTable)MenuFile["MnSelectChrDataTable"].Data, (MEX_mexSelectChr)MenuFile["mexSelectChr"].Data);
+
+                // save file
                 MenuFile.Save(MenuFilePath);
             }
         }
@@ -196,8 +200,24 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// 
         /// </summary>
         /// <param name="cam"></param>
-        public void Render(Camera cam)
+        public void Render(Camera cam, float frame)
         {
+            if(frame == 0)
+            {
+                HSD_AnimJoint animJoint = new HSD_AnimJoint();
+                foreach (var i in Icons)
+                {
+                    i.AnimJoint.Next = null;
+                    i.AnimJoint.Child = null;
+                    animJoint.AddChild(i.AnimJoint);
+                }
+                iconJOBJManager.SetAnimJoint(animJoint);
+            }
+            if (frame == -1)
+                iconJOBJManager.SetAnimJoint(null);
+            else
+                iconJOBJManager.Frame = frame;
+
             singleMenuManager.Render(cam);
             iconJOBJManager.Render(cam);
             cspJOBJManager.Render(cam);
@@ -471,6 +491,28 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
                     icon.Joint.Dobj.Next.Mobj.Textures = tobj;
                     tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_BLEND | TOBJ_FLAGS.ALPHAMAP_BLEND;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editAnimationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            {
+                using (PropertyDialog d = new PropertyDialog("Menu Animation Generator", icon.Animation))
+                {
+                    if(d.ShowDialog() == DialogResult.OK)
+                    {
+                        foreach(MEX_CSSIconEntry ico in cssIconEditor.SelectedObjects)
+                        {
+                            ico.Animation = ObjectExtensions.Copy<MexMenuAnimation>(icon.Animation); // copy of icon animation
+                        }
+                    }
                 }
             }
         }

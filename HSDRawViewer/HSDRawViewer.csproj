@@ -143,6 +143,7 @@
     <Compile Include="Converters\MexCssGenerator.cs" />
     <Compile Include="Converters\MexFighterConverter.cs" />
     <Compile Include="Converters\MexMapGenerator.cs" />
+    <Compile Include="Converters\MexMenuAnimationGenerator.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\ModeltoCollData.cs" />

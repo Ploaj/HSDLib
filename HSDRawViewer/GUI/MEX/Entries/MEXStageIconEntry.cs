@@ -1,78 +1,92 @@
-﻿using HSDRaw.MEX;
+﻿using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRaw.MEX.Menus;
 using HSDRawViewer.Converters;
+using OpenTK;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 
 namespace HSDRawViewer.GUI.MEX
 {
     public class MEXStageIconEntry
     {
-        public MexMapSpace MapSpace = new MexMapSpace();
+        public HSD_TOBJ IconTOBJ;
+
+        public HSD_TOBJ NameTOBJ;
+
+        public HSD_JOBJ Joint = new HSD_JOBJ() { SX = 1, SY = 1, SZ = 1, Flags = JOBJ_FLAG.CLASSICAL_SCALING };
+
+        [Browsable(false)]
+        public HSD_AnimJoint AnimJoint { get => MexMenuAnimationGenerator.GenerateAnimJoint(Animation, Joint); }
+        public MexMenuAnimation Animation;
 
         public MEX_StageIconData IconData = new MEX_StageIconData();
         
-        [Description("PreviewID for name texture and mini-model")]
+        [Category("Data"), Description("PreviewID for name texture and mini-model")]
         public byte PreviewID { get => IconData.PreviewModelID; set => IconData.PreviewModelID = value; }
 
-        [DisplayName("External ID")]
+        [Category("Data"), DisplayName("External ID")]
         public int ExternalID { get => IconData.ExternalID; set => IconData.ExternalID = value; }
 
-        [Description("Selection Width")]
+        [Category("Collision"), Description("Selection Width")]
         public float Width { get => IconData.CursorWidth; set => IconData.CursorWidth = value; }
 
-        [Description("Selection Height")]
+        [Category("Collision"), Description("Selection Height")]
         public float Height { get => IconData.CursorHeight; set => IconData.CursorHeight = value; }
 
-        [Description("Icon Width")]
+        [Category("Position"), Description("Position of Joint on X Axis")]
+        public float X { get => Joint.TX; set => Joint.TX = value; }
+
+        [Category("Position"), Description("Position of Joint on Y Axis")]
+        public float Y { get => Joint.TY; set => Joint.TY = value; }
+
+        [Category("Position"), Description("Position of Joint on Z Axis")]
+        public float Z { get => Joint.TZ; set => Joint.TZ = value; }
+
+        [Category("Data"), Description("Icon Width")]
         public float OutlineWidth
         {
             get => IconData.OutlineWidth;
             set
             {
                 IconData.OutlineWidth = value;
-                if (CheckMapSpace())
-                    MapSpace.SX = value;
+                Joint.SX = value;
             }
         }
 
-        [Description("Icon Height")]
+        [Category("Data"), Description("Icon Height")]
         public float OutlineHeight
         {
             get => IconData.OutlineHeight;
             set
             {
                 IconData.OutlineHeight = value;
-                if (CheckMapSpace())
-                    MapSpace.SY = value;
+                Joint.SY = value;
             }
         }
 
-        [Description("X")]
-        public float X { get => CheckMapSpace() ? MapSpace.X : 0; set { if(CheckMapSpace()) MapSpace.X = value; } }
+        private Stack<Vector3> PositionStack = new Stack<Vector3>();
 
-        [Description("Y")]
-        public float Y { get => CheckMapSpace() ? MapSpace.Y : 0; set { if (CheckMapSpace()) MapSpace.Y = value; } }
-
-        [Description("Z")]
-        public float Z { get => CheckMapSpace() ? MapSpace.Z : 0; set { if (CheckMapSpace()) MapSpace.Z = value; } }
-
-        [Description("Motion")]
-        public MexMapAnimType Motion { get => CheckMapSpace() ? MapSpace.AnimType : 0; set { if (CheckMapSpace()) MapSpace.AnimType = value; } }
-
-        [Description("Enter Frame")]
-        public int StartFrame { get => CheckMapSpace() ? MapSpace.StartFrame : 0; set { if (CheckMapSpace()) MapSpace.StartFrame = value; } }
-
-        [Description("End Frame")]
-        public int EndFrame { get => CheckMapSpace() ? MapSpace.EndFrame : 0; set { if (CheckMapSpace()) MapSpace.EndFrame = value; } }
-
-        private bool CheckMapSpace()
+        public void PushPosition()
         {
-            if (MapSpace == null)
-            {
-                return false;
-            }
+            PositionStack.Push(new Vector3(X, Y, Z));
+        }
 
-            return true;
+        public void PopPosition()
+        {
+            if (PositionStack.Count == 0)
+                return;
+
+            var pos = PositionStack.Pop();
+            X = pos.X;
+            Y = pos.Y;
+            Z = pos.Z;
+        }
+
+        public RectangleF ToRectangle()
+        {
+            return new RectangleF(Joint.TX - Width, Joint.TY - Height, Width * 2, Height * 2);
         }
 
         public override string ToString()

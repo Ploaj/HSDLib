@@ -662,14 +662,14 @@ namespace HSDRawViewer.Converters
 
                                 break;
                             case GXAttribName.GX_VA_POS:
-                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.PARENTTRANSFORM) ? Matrix4.Identity : parentTransform);
+                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN0) ? Matrix4.Identity : parentTransform);
                                 if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                                     vert = Vector3.TransformPosition(vert, weight);
                                 vert = Vector3.TransformPosition(vert, singleBindTransform);
                                 m.Vertices.Add(new Vector3D(vert.X, vert.Y, vert.Z));
                                 break;
                             case GXAttribName.GX_VA_NRM:
-                                var nrm = Vector3.TransformNormal(GXTranslator.toVector3(v.NRM), pobj.Flags.HasFlag(POBJ_FLAG.PARENTTRANSFORM) ? Matrix4.Identity : parentTransform);
+                                var nrm = Vector3.TransformNormal(GXTranslator.toVector3(v.NRM), pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN0) ? Matrix4.Identity : parentTransform);
                                 if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                                     nrm = Vector3.TransformNormal(nrm, weight);
                                 nrm = Vector3.TransformNormal(nrm, singleBindTransform);

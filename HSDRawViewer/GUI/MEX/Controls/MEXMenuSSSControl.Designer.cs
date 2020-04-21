@@ -47,6 +47,7 @@
             this.sssEditor.ItemIndexOffset = 0;
             this.sssEditor.Location = new System.Drawing.Point(0, 25);
             this.sssEditor.Name = "sssEditor";
+            this.sssEditor.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.sssEditor.Size = new System.Drawing.Size(300, 375);
             this.sssEditor.TabIndex = 1;
             this.sssEditor.SelectedObjectChanged += new System.EventHandler(this.sssEditor_SelectedObjectChanged);
@@ -79,7 +80,7 @@
             // 
             this.regenerateAnimationToolStripMenuItem.Name = "regenerateAnimationToolStripMenuItem";
             this.regenerateAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.regenerateAnimationToolStripMenuItem.Text = "Regenerate Animation";
+            this.regenerateAnimationToolStripMenuItem.Text = "Edit Animation";
             this.regenerateAnimationToolStripMenuItem.Click += new System.EventHandler(this.regenerateAnimationToolStripMenuItem_Click);
             // 
             // generateNameTagToolStripMenuItem
