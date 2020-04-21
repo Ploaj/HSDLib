@@ -321,8 +321,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (sssEditor.SelectedObjects.Length > 0)
             {
-                using (PropertyDialog d = new PropertyDialog("Menu Animation Generator", ((MEXStageIconEntry[])sssEditor.SelectedObjects).Select(a => a.Animation)))
+                using (PropertyDialog d = new PropertyDialog("Menu Animation Generator", sssEditor.SelectedObjects.Select(a => ((MEXStageIconEntry)a).Animation).ToArray()))
                 {
+                    d.ShowDialog();
                 }
             }
         }
