@@ -8,11 +8,6 @@ using static System.Windows.Forms.ListBox;
 
 namespace HSDRawViewer.GUI
 {
-    public class RemovedItemEventArgs : EventArgs
-    {
-        public int Index { get; set; }
-    }
-
     public partial class ArrayMemberEditor : UserControl
     {
         private PropertyInfo Property { get; set; }
@@ -464,4 +459,10 @@ namespace HSDRawViewer.GUI
             Items.ResetBindings();
         }
     }
+
+    public class RemovedItemEventArgs : EventArgs
+    {
+        public int Index { get; set; }
+    }
+
 }

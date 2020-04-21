@@ -148,6 +148,7 @@
     <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\ModeltoCollData.cs" />
     <Compile Include="Converters\MOTLoader.cs" />
+    <Compile Include="Converters\OutlineGenerator.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />

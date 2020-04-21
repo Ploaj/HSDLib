@@ -115,6 +115,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             public int Index;
             public int JOBJIndex;
+            public int DOBJIndex;
             public HSD_JOBJ ParentJOBJ;
             public HSD_DOBJ DOBJ;
 
@@ -130,8 +131,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             public override string ToString()
             {
-                return $"JOBJ {JOBJIndex} : DOBJ {Index} : POBJs {PolygonCount} : TOBJS {TextureCount} : PP {HasPixelProcessing}" +
-                    $"";
+                return $"{Index}. JOBJ {JOBJIndex} : DOBJ {DOBJIndex} : POBJs {PolygonCount} : TOBJS {TextureCount} : PP {HasPixelProcessing}";
             }
         }
 
@@ -185,7 +185,7 @@ namespace HSDRawViewer.GUI.Plugins
                 int dobjIndex = 0;
                 foreach (var dobj in jobj.Dobj.List)
                 {
-                    dobjList.Add(new DOBJContainer() { DOBJ = dobj, ParentJOBJ = jobj, Index = dobjIndex++, JOBJIndex = jobjToIndex[jobj] } );
+                    dobjList.Add(new DOBJContainer() {Index = dobjList.Count, DOBJ = dobj, ParentJOBJ = jobj, DOBJIndex = dobjIndex++, JOBJIndex = jobjToIndex[jobj] } );
                 }
             }
 
@@ -284,11 +284,21 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             JOBJManager.RenderBones = showBonesToolStrip.Checked;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             using (MOBJEditor m = new MOBJEditor())
@@ -554,17 +564,6 @@ namespace HSDRawViewer.GUI.Plugins
             RefreshGUI();
         }
 
-        private class OutlineSettings
-        {
-            [DisplayName("Outline Thickness"), Description("Thickness of the outline")]
-            public float Size { get; set; } = 0.0375f;
-
-            [DisplayName("Use Triangle Strips"), Description("Slower to generate, but better optimized for in-game")]
-            public bool UseStrips { get; set; } = true;
-            
-            [DisplayName("Outline Color"), Description("Color of Outline")]
-            public Color Color { get; set; } = Color.Black;
-        }
 
         /// <summary>
         /// 
@@ -573,112 +572,16 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void createOutlineMeshToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var settings = new OutlineSettings();
-
-            using (PropertyDialog d = new PropertyDialog("Outline Settings", settings))
-            {
-                if (d.ShowDialog() != DialogResult.OK)
-                    return;
-            }
-
             if (propertyGrid1.SelectedObject is DOBJContainer con)
             {
-                var pobjGen = new POBJ_Generator();
-                pobjGen.UseTriangleStrips = settings.UseStrips;
-
-                var newDOBJ = new HSD_DOBJ();
-                newDOBJ.Mobj = new HSD_MOBJ()
+                var newDOBJ = OutlineGenerator.GenerateOutlineMesh(con.DOBJ);
+                
+                if(newDOBJ != null)
                 {
-                    Material = new HSD_Material()
-                    {
-                        AmbientColor = Color.Black,
-                        SpecularColor = Color.Black,
-                        DiffuseColor = Color.Black,
-                        DIF_A = 255,
-                        SPC_A = 255,
-                        AMB_A = 255,
-                        Shininess = 50,
-                        Alpha = 1
-                    },
-                    RenderFlags = RENDER_MODE.CONSTANT
-                };
+                    con.ParentJOBJ.Dobj.Add(newDOBJ);
 
-                foreach (var pobj in con.DOBJ.Pobj.List)
-                {
-                    var dl = pobj.ToDisplayList();
-
-                    var vertices = dl.Vertices;
-
-                    GXAttribName[] attrs = new GXAttribName[]
-                    {
-                        GXAttribName.GX_VA_PNMTXIDX,
-                        GXAttribName.GX_VA_POS,
-                        GXAttribName.GX_VA_CLR0,
-                        GXAttribName.GX_VA_NULL
-                    };
-
-                    List<GX_Vertex> newVerties = new List<GX_Vertex>();
-
-                    var offset = 0;
-                    foreach (var prim in dl.Primitives)
-                    {
-                        var verts = vertices.GetRange(offset, prim.Count);
-                        offset += prim.Count;
-
-                        switch (prim.PrimitiveType)
-                        {
-                            case GXPrimitiveType.Quads:
-                                verts = TriangleConverter.QuadToList(verts);
-                                break;
-                            case GXPrimitiveType.TriangleStrip:
-                                verts = TriangleConverter.StripToList(verts);
-                                break;
-                            case GXPrimitiveType.Triangles:
-                                break;
-                            default:
-                                Console.WriteLine(prim.PrimitiveType);
-                                break;
-                        }
-
-                        newVerties.AddRange(verts);
-                    }
-
-                    // extrude
-                    for (int i = 0; i < newVerties.Count; i++)
-                    {
-                        var v = newVerties[i];
-                        v.POS.X += v.NRM.X * settings.Size;
-                        v.POS.Y += v.NRM.Y * settings.Size;
-                        v.POS.Z += v.NRM.Z * settings.Size;
-                        v.CLR0.R = settings.Color.R / 255f;
-                        v.CLR0.G = settings.Color.G / 255f;
-                        v.CLR0.B = settings.Color.B / 255f;
-                        v.CLR0.A = settings.Color.A / 255f;
-                        newVerties[i] = v;
-                    }
-
-                    // invert faces
-                    for (int i = 0; i < newVerties.Count; i += 3)
-                    {
-                        var temp = newVerties[i];
-                        newVerties[i] = newVerties[i + 2];
-                        newVerties[i + 2] = temp;
-                    }
-
-                    var newpobj = pobjGen.CreatePOBJsFromTriangleList(newVerties, attrs, dl.Envelopes);
-                    foreach(var p in newpobj.List)
-                        p.Flags |= POBJ_FLAG.CULLBACK | POBJ_FLAG.UNKNOWN1;
-                    if (newDOBJ.Pobj == null)
-                        newDOBJ.Pobj = newpobj;
-                    else
-                        newDOBJ.Pobj.Add(newpobj);
+                    RefreshGUI();
                 }
-
-                pobjGen.SaveChanges();
-
-                con.ParentJOBJ.Dobj.Add(newDOBJ);
-
-                RefreshGUI();
             }
         }
 
@@ -940,6 +843,101 @@ namespace HSDRawViewer.GUI.Plugins
                     
                     // reload edited animation
                     LoadAnimation(JOBJManager.Animation);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void recalculateInverseBindsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            JOBJManager.RecalculateInverseBinds();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void replaceBonesFromFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+
+            if(f != null)
+            {
+                var file = new HSDRawFile(f);
+                if(file.Roots.Count > 0 && file.Roots[0].Data is HSD_JOBJ jobj)
+                {
+                    JOBJManager temp = new JOBJManager();
+                    temp.SetJOBJ(jobj);
+                    temp.UpdateNoRender();
+
+                    if(temp.JointCount == JOBJManager.JointCount)
+                    {
+                        for(int i = 0; i < temp.JointCount; i++)
+                        {
+                            var old = JOBJManager.GetJOBJ(i);
+                            var n = temp.GetJOBJ(i);
+                            old.TX = n.TX; old.TY = n.TY; old.TZ = n.TZ;
+                            old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
+                            old.SX = n.SX; old.SY = n.SY; old.SZ = n.SZ;
+
+                            if (old.InverseWorldTransform != null)
+                            {
+                                if(n.InverseWorldTransform == null)
+                                    old.InverseWorldTransform = JOBJManager.TKMatixToHSDMatrix(temp.GetWorldTransform(n).Inverted());
+                                else
+                                    old.InverseWorldTransform = n.InverseWorldTransform;
+                            }
+                        }
+                        MessageBox.Show("Skeleton Replaced");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            {
+                var f = Tools.FileIO.SaveFile("MOBJ (*.mobj)|*.mobj");
+
+                if (f != null)
+                {
+                    HSDRawFile file = new HSDRawFile();
+                    file.Roots.Add(new HSDRootNode() { Name = "mobj", Data = con.DOBJ.Mobj });
+                    file.Save(f);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            {
+                var f = Tools.FileIO.OpenFile("MOBJ (*.mobj)|*.mobj");
+
+                if (f != null)
+                {
+                    HSDRawFile file = new HSDRawFile(f);
+
+                    if (file.Roots.Count > 0 && file.Roots[0].Data is HSD_MOBJ mobj)
+                        con.DOBJ.Mobj = mobj;
+
+                    JOBJManager.ClearRenderingCache();
                 }
             }
         }
