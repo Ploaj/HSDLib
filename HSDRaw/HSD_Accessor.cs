@@ -34,11 +34,12 @@ namespace HSDRaw
         /// <summary>
         /// Warning: Experimental DO not use
         /// </summary>
-        public int Trim()
+        public virtual int Trim()
         {
             var trimmed = 0;
 
-            if (TrimmedSize != -1 && _s.Length > TrimmedSize)
+            if (TrimmedSize != -1 && _s.Length > TrimmedSize 
+                && GetType() != typeof(Common.HSD_DOBJ)) // skip dobj for unknown reasons
             {
                 System.Diagnostics.Debug.WriteLine(GetType().Name + ": 0x" + _s.Length.ToString("X") + " => 0x" + TrimmedSize.ToString("X"));
                 trimmed += _s.Length - TrimmedSize;
@@ -49,11 +50,16 @@ namespace HSDRaw
             {
                 if (v.PropertyType.IsSubclassOf(typeof(HSDAccessor)) && v.GetIndexParameters().Length == 0 && v.GetValue(this) is HSDAccessor ac)
                 {
-                    trimmed += ac.Trim();
+                    if(ac != this)
+                        trimmed += ac.Trim();
+                }
+                if (v.PropertyType.IsArray && v.GetValue(this) is HSDAccessor[] arr)
+                {
+                    foreach (var ai in arr)
+                        if(ai != this)
+                            trimmed += ai.Trim();
                 }
             }
-
-            System.Diagnostics.Debug.WriteLine("Trimmed " + trimmed.ToString("X"));
 
             return trimmed;
         }

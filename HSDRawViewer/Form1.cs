@@ -783,6 +783,22 @@ namespace HSDRawViewer
         {
             ApplicationSettings.SelectAudioPlaybackDevice();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void trimExcessDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var trimmed = 0;
+            foreach(DataNode d in treeView1.Nodes)
+            {
+                if(d.Accessor != null)
+                    trimmed += d.Accessor.Trim();
+            }
+            MessageBox.Show($"Trimmed 0x{trimmed.ToString("X")} bytes", "Trimmed File");
+        }
     }
     
 }

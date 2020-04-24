@@ -454,6 +454,15 @@ namespace HSDRaw
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public void TrimData()
+        {
+            foreach (var r in Roots)
+                r.Data.Trim();
+        }
+
+        /// <summary>
         /// saves dat data to stream with optional alignment
         /// </summary>
         /// <param name="stream"></param>
@@ -464,8 +473,7 @@ namespace HSDRaw
                 bufferAlign = false;
 
             if (trim)
-                foreach (var r in Roots)
-                    r.Data.Trim();
+                TrimData();
 
             // gather all structs--------------------------------------------------------------------------
             var allStructs = GetAllStructs();

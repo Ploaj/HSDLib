@@ -55,6 +55,7 @@
             this.showHideButton = new System.Windows.Forms.Button();
             this.nodeBox = new System.Windows.Forms.GroupBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.trimExcessDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.nodeBox.SuspendLayout();
             this.SuspendLayout();
@@ -137,7 +138,8 @@
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addRootFromFileToolStripMenuItem1,
             this.addRootFromFileToolStripMenuItem,
-            this.addRootFromTypeToolStripMenuItem});
+            this.addRootFromTypeToolStripMenuItem,
+            this.trimExcessDataToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
@@ -178,7 +180,7 @@
             this.propertyViewToolStripMenuItem.CheckOnClick = true;
             this.propertyViewToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.propertyViewToolStripMenuItem.Name = "propertyViewToolStripMenuItem";
-            this.propertyViewToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.propertyViewToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.propertyViewToolStripMenuItem.Text = "Property View";
             this.propertyViewToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.propertyViewToolStripMenuItem_CheckStateChanged);
             // 
@@ -188,7 +190,7 @@
             this.viewportToolStripMenuItem.CheckOnClick = true;
             this.viewportToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.viewportToolStripMenuItem.Name = "viewportToolStripMenuItem";
-            this.viewportToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.viewportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.viewportToolStripMenuItem.Text = "Viewport";
             this.viewportToolStripMenuItem.CheckedChanged += new System.EventHandler(this.viewportToolStripMenuItem_CheckedChanged);
             // 
@@ -205,21 +207,21 @@
             // aJToolToolStripMenuItem
             // 
             this.aJToolToolStripMenuItem.Name = "aJToolToolStripMenuItem";
-            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.aJToolToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aJToolToolStripMenuItem.Text = "AJ Tool";
             this.aJToolToolStripMenuItem.Click += new System.EventHandler(this.aJToolToolStripMenuItem_Click);
             // 
             // sSMEditorToolStripMenuItem
             // 
             this.sSMEditorToolStripMenuItem.Name = "sSMEditorToolStripMenuItem";
-            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.sSMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.sSMEditorToolStripMenuItem.Text = "SSM Editor";
             this.sSMEditorToolStripMenuItem.Click += new System.EventHandler(this.sSMEditorToolStripMenuItem_Click);
             // 
             // sEMEditorToolStripMenuItem
             // 
             this.sEMEditorToolStripMenuItem.Name = "sEMEditorToolStripMenuItem";
-            this.sEMEditorToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.sEMEditorToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.sEMEditorToolStripMenuItem.Text = "SEM Editor";
             this.sEMEditorToolStripMenuItem.Click += new System.EventHandler(this.sEMEditorToolStripMenuItem_Click);
             // 
@@ -291,6 +293,13 @@
             this.splitter1.TabIndex = 12;
             this.splitter1.TabStop = false;
             // 
+            // trimExcessDataToolStripMenuItem
+            // 
+            this.trimExcessDataToolStripMenuItem.Name = "trimExcessDataToolStripMenuItem";
+            this.trimExcessDataToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.trimExcessDataToolStripMenuItem.Text = "Trim Excess Data";
+            this.trimExcessDataToolStripMenuItem.Click += new System.EventHandler(this.trimExcessDataToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -348,6 +357,7 @@
         private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem selectAudioPlaybackDeviceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem trimExcessDataToolStripMenuItem;
     }
 }
 

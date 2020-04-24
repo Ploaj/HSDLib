@@ -185,6 +185,16 @@ namespace HSDRaw.Common
 
         public float MinLOD { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
         public float MaxLOD { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+
+        public override int Trim()
+        {
+            if (_s.References.ContainsKey(0x00))
+                _s.References[0x00].IsTextureBuffer = true;
+
+            //Console.WriteLine("Trimmed Image " + Width + " " + Height);
+
+            return base.Trim();
+        }
     }
 
     public class HSD_Tlut : HSDAccessor
@@ -198,11 +208,19 @@ namespace HSDRaw.Common
         public int GXTlut { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
         public short ColorCount { get => _s.GetInt16(0x0C); set => _s.SetInt16(0x0C, value); }
+
+        public override int Trim()
+        {
+            if (_s.References.ContainsKey(0x00))
+                _s.References[0x00].IsTextureBuffer = true;
+
+            return base.Trim();
+        }
     }
 
     public class HSD_TOBJ_LOD : HSDAccessor
     {
-        public override int TrimmedSize { get; } = 0xC;
+        public override int TrimmedSize { get; } = 0x10;
 
         public GXTexFilter MinFilter { get => (GXTexFilter)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
         public float Bias { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
