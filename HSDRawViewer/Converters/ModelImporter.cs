@@ -584,7 +584,6 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ prev = null;
 
             var skeleton = rootnode.BreathFirstList;
-
             Console.WriteLine("Processing " + node.Name);
 
             foreach (int index in node.MeshIndices)
@@ -651,6 +650,7 @@ namespace HSDRawViewer.Converters
                 // todo: rigging
                 List<HSD_JOBJ>[] jobjs = new List<HSD_JOBJ>[mesh.Vertices.Count];
                 List<float>[] weights = new List<float>[mesh.Vertices.Count];
+                List<Matrix4>[] binds = new List<Matrix4>[mesh.Vertices.Count];
                 if (mesh.HasBones && settings.ImportRigging)
                 {
                     Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
@@ -672,10 +672,22 @@ namespace HSDRawViewer.Converters
                                     jobjs[vw.VertexID] = new List<HSD_JOBJ>();
                                 if (weights[vw.VertexID] == null)
                                     weights[vw.VertexID] = new List<float>();
-                                if(vw.Weight > 0)
+                                if (binds[vw.VertexID] == null)
+                                    binds[vw.VertexID] = new List<Matrix4>();
+                                if (vw.Weight > 0)
                                 {
                                     jobjs[vw.VertexID].Add(jobj);
                                     weights[vw.VertexID].Add(vw.Weight);
+                                    var t = v.OffsetMatrix;
+                                    /*binds[vw.VertexID].Add(new Matrix4(t.A1, t.A2, t.A3, t.A4,
+                                        t.B1, t.B2, t.B3, t.B4,
+                                        t.C1, t.C2, t.C3, t.C4,
+                                        t.D1, t.D2, t.D3, t.D4));*/
+                                    binds[vw.VertexID].Add(new Matrix4(
+                                        t.A1, t.B1, t.C1, t.D1,
+                                        t.A2, t.B2, t.C2, t.D2,
+                                        t.A3, t.B3, t.C3, t.D3,
+                                        t.A4, t.B4, t.C4, t.D4));
                                 }
                             }
                     }
@@ -771,18 +783,16 @@ namespace HSDRawViewer.Converters
                                 tkbitan = new Vector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
                             }
 
-                            // Single Binds Get Inverted
-                            if (jobjs[indicie].Count == 1 || (weights[indicie].Count > 0 && weights[indicie][0] == 1))
+                            // for weird binds
+                            var bindv = Vector3.Zero;
+                            var bindvn = Vector3.Zero;
+                            for (int k = 0; k < binds[indicie].Count; k++)
                             {
-                                tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[jobjs[indicie][0]]);
-                                tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[jobjs[indicie][0]]);
-                                
-                                if (mesh.HasTangentBasis)
-                                {
-                                    tktan = Vector3.TransformNormal(tktan, cache.jobjToInverseTransform[jobjs[indicie][0]]);
-                                    tkbitan = Vector3.TransformNormal(tkbitan, cache.jobjToInverseTransform[jobjs[indicie][0]]);
-                                }
+                                bindv += Vector3.TransformPosition(tkvert, binds[indicie][k]) * weights[indicie][k];
+                                bindvn += Vector3.TransformNormal(tknrm, binds[indicie][k]) * weights[indicie][k];
                             }
+                            tkvert = bindv;
+                            tknrm = bindvn;
                         }
 
                         if (mesh.HasVertices)
@@ -873,8 +883,6 @@ namespace HSDRawViewer.Converters
             Mobj.Material.Alpha = 1;
             if (settings.ImportVertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
-            else
-                Mobj.RenderFlags |= RENDER_MODE.CONSTANT;
 
             if (settings.EnableDiffuse)
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;

@@ -60,7 +60,7 @@ namespace HSDRawViewer.Rendering
                         {
                             k.Frame = (float)Math.Round(k.Frame * value);
                             //TODO: How do you scale tangent?
-                            k.Tan = Math.Sign(k.Tan) * (float)Math.Log(Math.Abs(k.Tan), value);
+                            k.Tan *= value;// Math.Sign(k.Tan) * (float)Math.Log(Math.Abs(k.Tan), value);
                         }
                         else
                         // adjust range

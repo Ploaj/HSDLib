@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI
@@ -30,7 +31,7 @@ namespace HSDRawViewer.GUI
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             //resultLabel.Text = (e.ProgressPercentage.ToString() + "%");
-            progressBar1.Value = e.ProgressPercentage;
+            progressBar1.Value = Math.Min(100, e.ProgressPercentage);
             Text = ProgressClass.ProgressStatus;
         }
 
