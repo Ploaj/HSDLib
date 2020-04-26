@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.GUI;
 using HSDRawViewer.Rendering;
 using OpenTK;
 using System;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Converters
 {
@@ -41,6 +43,12 @@ namespace HSDRawViewer.Converters
         /// <param name="nodes"></param>
         public static void ExportToMayaAnim(string filePath, AnimManager animation)
         {
+            using (PropertyDialog d = new PropertyDialog("Maya Settings", MayaSettings))
+            {
+                if (d.ShowDialog() != DialogResult.OK)
+                    return;
+            }
+
             MayaAnim a = new MayaAnim();
 
             if (!MayaSettings.UseRadians)
@@ -123,7 +131,13 @@ namespace HSDRawViewer.Converters
                         }
 
                         prevState = state;
-                        
+
+                        if (mtrack.IsAngular() && !MayaSettings.UseRadians)
+                        {
+                            animkey.output = MathHelper.RadiansToDegrees(animkey.output);
+                            //TODO: are slopes supposed to be degrees as well?
+                        }
+
                         // add final key
                         mtrack.keys.Add(animkey);
                     }

@@ -426,8 +426,8 @@ namespace HSDRawViewer.Converters
             Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
                 Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
-
-            if (jobj.InverseWorldTransform != null && !settings.ExportBindPose)
+            
+            if (jobj.InverseWorldTransform != null && settings.ExportBindPose)
             {
                 var mat = jobj.InverseWorldTransform;
                 var inv = new Matrix4(
