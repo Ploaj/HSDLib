@@ -285,13 +285,11 @@
   - name: Knockback Growth
     bitCount: 9
   - name: Weight Knockback
-    bitCount: 7
+    bitCount: 9
   - name: Unknown2
     bitCount: 5
   - name: Base Knockback
     bitCount: 9
-  - name: Unknown3
-    bitCount: 2
   - name: Element
     bitCount: 4
     enums:

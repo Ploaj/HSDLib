@@ -5,7 +5,7 @@
     /// </summary>
     public class HSD_Camera : HSDAccessor
     {
-        public override int TrimmedSize => 0x38;
+        public override int TrimmedSize => 0x3C;
 
         public string ClassName { get => _s.GetString(0x00); set => _s.SetString(0x00, value); }
         public short Flags { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }

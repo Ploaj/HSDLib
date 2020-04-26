@@ -56,7 +56,7 @@ namespace HSDRaw
                 if (v.PropertyType.IsArray && v.GetValue(this) is HSDAccessor[] arr)
                 {
                     foreach (var ai in arr)
-                        if(ai != this)
+                        if(ai != null && ai != this)
                             trimmed += ai.Trim();
                 }
             }

@@ -212,12 +212,7 @@ namespace HSDRawViewer.Converters
             ProgressStatus = "Processing Mesh...";
             foreach (var mesh in cache.MeshNodes)
             {
-                var Dobj = GetMeshes(cache, Settings, importmodel, mesh, rootjobj);
-
-                if (rootjobj.Dobj == null)
-                    rootjobj.Dobj = Dobj;
-                else
-                    rootjobj.Dobj.Add(Dobj);
+                ProcessMesh(cache, Settings, importmodel, mesh, rootjobj);
 
                 ProgressStatus = $"Processing Mesh {rootjobj.Dobj.List.Count} {cache.MeshNodes.Count + 1}...";
                 w.ReportProgress((int)(30 + 60 * (rootjobj.Dobj.List.Count / (float)cache.MeshNodes.Count)));
@@ -522,32 +517,31 @@ namespace HSDRawViewer.Converters
             if (node.Name.EndsWith("_end"))
                 return null;
 
-            // node transform's translation is bugged
-            Vector3D tr, s;
-            Assimp.Quaternion q;
-            node.Transform.Decompose(out s, out q, out tr);
-            var translation = new Vector3(tr.X, tr.Y, tr.Z);
-            var scale = new Vector3(s.X, s.Y, s.Z);
-            var rotation = Math3D.ToEulerAngles(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W).Inverted());
+            var t = node.Transform;
+            var transform = new OpenTK.Matrix4(
+                                        t.A1, t.B1, t.C1, t.D1,
+                                        t.A2, t.B2, t.C2, t.D2,
+                                        t.A3, t.B3, t.C3, t.D3,
+                                        t.A4, t.B4, t.C4, t.D4);
             
+            var translation = transform.ExtractTranslation();
+            var scale = transform.ExtractScale();
+            var rotation = Math3D.ToEulerAngles(transform.ExtractRotation().Inverted());
+
             if (settings.SetScaleToOne)
                 scale = Vector3.One;
 
             translation *= settings.Scale;
-
-            var t = Matrix4.CreateScale(scale) 
-                * Matrix4.CreateFromQuaternion(new OpenTK.Quaternion(q.X, q.Y, q.Z, q.W)) 
-                * Matrix4.CreateTranslation(translation);
-
+            
             HSD_JOBJ jobj = new HSD_JOBJ();
 
             if (node.Parent != null && node.Parent != scene.RootNode)
             {
-                t = t * cache.jobjToWorldTransform[cache.NameToJOBJ[node.Parent.Name]];
+                transform = transform * cache.jobjToWorldTransform[cache.NameToJOBJ[node.Parent.Name]];
             }
             cache.NameToJOBJ.Add(node.Name, jobj);
-            cache.jobjToWorldTransform.Add(jobj, t);
-            cache.jobjToInverseTransform.Add(jobj, t.Inverted());
+            cache.jobjToWorldTransform.Add(jobj, transform);
+            cache.jobjToInverseTransform.Add(jobj, transform.Inverted());
 
             if(settings.ImportBoneNames)
                 jobj.ClassName = node.Name;
@@ -578,13 +572,17 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <returns></returns>
-        private static HSD_DOBJ GetMeshes(ModelProcessCache cache, ModelImportSettings settings, Scene scene, Node node, HSD_JOBJ rootnode)
+        private static void ProcessMesh(ModelProcessCache cache, ModelImportSettings settings, Scene scene, Node node, HSD_JOBJ rootnode)
         {
+            HSD_JOBJ parent = rootnode;
+
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
 
             var skeleton = rootnode.BreathFirstList;
             Console.WriteLine("Processing " + node.Name);
+
+            bool singleBinded = node.Name.Contains("SINGLE");
 
             foreach (int index in node.MeshIndices)
             {
@@ -634,6 +632,9 @@ namespace HSDRawViewer.Converters
                 // bump maps need tangents and bitangents
                 var hasBump = false;
 
+                if (node.Name.Contains("REFLECTIVE"))
+                    hasReflection = true;
+
                 if (dobj.Mobj.Textures != null)
                 {
                     foreach (var t in dobj.Mobj.Textures.List)
@@ -653,7 +654,8 @@ namespace HSDRawViewer.Converters
                 List<Matrix4>[] binds = new List<Matrix4>[mesh.Vertices.Count];
                 if (mesh.HasBones && settings.ImportRigging)
                 {
-                    Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
+                    if(!singleBinded)
+                        Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
 
                     foreach (var v in mesh.Bones)
                     {
@@ -679,10 +681,6 @@ namespace HSDRawViewer.Converters
                                     jobjs[vw.VertexID].Add(jobj);
                                     weights[vw.VertexID].Add(vw.Weight);
                                     var t = v.OffsetMatrix;
-                                    /*binds[vw.VertexID].Add(new Matrix4(t.A1, t.A2, t.A3, t.A4,
-                                        t.B1, t.B2, t.B3, t.B4,
-                                        t.C1, t.C2, t.C3, t.C4,
-                                        t.D1, t.D2, t.D3, t.D4));*/
                                     binds[vw.VertexID].Add(new Matrix4(
                                         t.A1, t.B1, t.C1, t.D1,
                                         t.A2, t.B2, t.C2, t.D2,
@@ -760,8 +758,8 @@ namespace HSDRawViewer.Converters
                         tkvert = Vector3.TransformPosition(tkvert, cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]]);
                         tknrm = Vector3.TransformNormal(tknrm, cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]]);
 
-                        tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[rootnode]);
-                        tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[rootnode]);
+                        //tkvert = Vector3.TransformPosition(tkvert, cache.jobjToInverseTransform[rootnode]);
+                        //tknrm = Vector3.TransformNormal(tknrm, cache.jobjToInverseTransform[rootnode]);
 
                         if (mesh.HasBones && settings.ImportRigging)
                         {
@@ -845,10 +843,13 @@ namespace HSDRawViewer.Converters
 
                 HSD_POBJ pobj = null;
 
-                if (mesh.HasBones && settings.ImportRigging)
+                if (mesh.HasBones && settings.ImportRigging && !singleBinded)
                     pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, wList);
                 else
                     pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
+
+                if (singleBinded && jobjList.Count > 0 && jobjList[0].Length > 0)
+                    parent = jobjList[0][0];
 
                 if(pobj != null)
                 {
@@ -860,7 +861,10 @@ namespace HSDRawViewer.Converters
 
             }
 
-            return root;
+            if (parent.Dobj == null)
+                parent.Dobj = root;
+            else
+                parent.Dobj.Add(root);
         }
 
         /// <summary>

@@ -493,6 +493,7 @@ namespace HSDRaw
                     //TODO: this may be bugged?
                     if (_structCache.Contains(s))
                     {
+                        System.Diagnostics.Debug.WriteLine("Removing " + s.Length.ToString("X") + " " + GetOffsetFromStruct(s).ToString("X"));
                         _structCache.Remove(s);
                     }
                 }

@@ -27,7 +27,7 @@ namespace HSDRaw.Common
 
     public class HSD_FogDesc : HSDAccessor
     {
-        public override int TrimmedSize => 0x14;
+        public override int TrimmedSize => 0x18;
 
         public FogType Type { get => (FogType)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
 
