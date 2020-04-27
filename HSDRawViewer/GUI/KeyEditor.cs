@@ -317,7 +317,7 @@ namespace HSDRawViewer.GUI
             if (spaces % 5 != 0)
                 spaces += 5 - (spaces % 5);
 
-            AnimTrack a = new AnimTrack();
+            FOBJ_Player a = new FOBJ_Player();
             a.Keys = GetFOBJKeys();
 
             for (int i = 0; i < KeyFrames.Count; i++)

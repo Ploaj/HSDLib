@@ -358,7 +358,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawHSD.cs" />
-    <Compile Include="Rendering\AnimationTrack.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\DOBJRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />

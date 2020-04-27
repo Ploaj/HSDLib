@@ -93,15 +93,15 @@ namespace HSDRawViewer.Converters
                     int Siso = (flags >> 0x4) & 0x1;
                     
                     AnimNode node = new AnimNode();
-                    AnimTrack trackX = new AnimTrack();
-                    AnimTrack trackY = new AnimTrack();
-                    AnimTrack trackZ = new AnimTrack();
-                    AnimTrack trackRX = new AnimTrack();
-                    AnimTrack trackRY = new AnimTrack();
-                    AnimTrack trackRZ = new AnimTrack();
-                    AnimTrack trackSX = new AnimTrack();
-                    AnimTrack trackSY = new AnimTrack();
-                    AnimTrack trackSZ = new AnimTrack();
+                    FOBJ_Player trackX = new FOBJ_Player();
+                    FOBJ_Player trackY = new FOBJ_Player();
+                    FOBJ_Player trackZ = new FOBJ_Player();
+                    FOBJ_Player trackRX = new FOBJ_Player();
+                    FOBJ_Player trackRY = new FOBJ_Player();
+                    FOBJ_Player trackRZ = new FOBJ_Player();
+                    FOBJ_Player trackSX = new FOBJ_Player();
+                    FOBJ_Player trackSY = new FOBJ_Player();
+                    FOBJ_Player trackSZ = new FOBJ_Player();
 
                     if (hasS == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackX, trackY, trackZ, Siso == 1, SXfixed == 1, SYfixed == 1, SZfixed == 1, s_type, dataOffset);
@@ -137,7 +137,7 @@ namespace HSDRawViewer.Converters
             return anim;
         }
 
-        private static void ReadKeys(BinaryReaderExt r, AnimNode node, int frameCount, AnimTrack xtrack, AnimTrack ytrack, AnimTrack ztrack, bool isIsotrophic, bool isXFixed, bool isYFixed, bool isZFixed, int type, uint dataOffset)
+        private static void ReadKeys(BinaryReaderExt r, AnimNode node, int frameCount, FOBJ_Player xtrack, FOBJ_Player ytrack, FOBJ_Player ztrack, bool isIsotrophic, bool isXFixed, bool isYFixed, bool isZFixed, int type, uint dataOffset)
         {
             if (isIsotrophic)
             {
@@ -178,7 +178,7 @@ namespace HSDRawViewer.Converters
             return i;
         }
 
-        private static void ReadTrack(BinaryReaderExt r, int frameCount, int type, AnimTrack track, uint dataOffset, AnimNode node)
+        private static void ReadTrack(BinaryReaderExt r, int frameCount, int type, FOBJ_Player track, uint dataOffset, AnimNode node)
         {
             var offset = r.ReadUInt32() + dataOffset;
             var temp = r.Position;

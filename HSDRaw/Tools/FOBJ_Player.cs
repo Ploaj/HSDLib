@@ -1,54 +1,73 @@
 ﻿using HSDRaw.Common.Animation;
-using HSDRaw.Tools;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HSDRawViewer.Rendering
+namespace HSDRaw.Tools
 {
     /// <summary>
     /// 
     /// </summary>
-    public class AnimNode
+    public class FOBJAnimState
     {
-        public List<AnimTrack> Tracks = new List<AnimTrack>();
+        public float p0 = 0;
+        public float p1 = 0;
+        public float d0 = 0;
+        public float d1 = 0;
+        public float t0 = 0;
+        public float t1 = 0;
+        public GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
+        public GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
+
+        public override bool Equals(object obj)
+        {
+            if (obj is FOBJAnimState state)
+            {
+                return p0 == state.p0 && p1 == state.p1 &&
+                    d0 == state.d0 && d1 == state.d1 &&
+                    t0 == state.t0 && t1 == state.t1 &&
+                    op == state.op && op_intrp == state.op_intrp;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class AnimTrack
+    public class FOBJ_Player
     {
-        public class AnimState
+        public List<FOBJKey> Keys;
+        public byte TrackType;
+        public JointTrackType JointTrackType { get => (JointTrackType)TrackType; set => TrackType = (byte)value; }
+
+        public FOBJ_Player()
         {
-            public float p0 = 0;
-            public float p1 = 0;
-            public float d0 = 0;
-            public float d1 = 0;
-            public float t0 = 0;
-            public float t1 = 0;
-            public GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
-            public GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
-
-            public override bool Equals(object obj)
-            {
-                if (obj is AnimState state)
-                {
-                    return p0 == state.p0 && p1 == state.p1 &&
-                        d0 == state.d0 && d1 == state.d1 &&
-                        t0 == state.t0 && t1 == state.t1 &&
-                        op == state.op && op_intrp == state.op_intrp;
-                }
-                return false;
-            }
-
-            public override int GetHashCode()
-            {
-                return base.GetHashCode();
-            }
+            Keys = new List<FOBJKey>();
+            JointTrackType = JointTrackType.HSD_A_J_TRAX;
         }
 
-        public List<FOBJKey> Keys;
-        public JointTrackType TrackType;
+        public FOBJ_Player(HSD_FOBJDesc fobj)
+        {
+            Keys = fobj.GetDecodedKeys();
+            TrackType = fobj.TrackType;
+        }
+
+        public FOBJ_Player(HSD_FOBJ fobj)
+        {
+            Keys = fobj.GetDecodedKeys();
+            TrackType = fobj.TrackType;
+        }
+
+        public FOBJ_Player(byte trackType, IEnumerable<FOBJKey> keys)
+        {
+            Keys = keys.ToList();
+            TrackType = trackType;
+        }
 
         public int FrameCount
         {
@@ -58,7 +77,7 @@ namespace HSDRawViewer.Rendering
             }
         }
 
-        public AnimState GetState(float Frame)
+        public FOBJAnimState GetState(float Frame)
         {
             // register
             float p0 = 0;
@@ -131,7 +150,7 @@ namespace HSDRawViewer.Rendering
 
                 op_intrp = Keys[i].InterpolationType;
             }
-            return new AnimState()
+            return new FOBJAnimState()
             {
                 t0 = t0,
                 t1 = t1,
@@ -155,19 +174,19 @@ namespace HSDRawViewer.Rendering
             float Weight = FrameDiff / (state.t1 - state.t0);
 
             if (state.op_intrp == GXInterpolationType.HSD_A_OP_LIN)
-                return AnimationHelperInterpolation.Lerp(state.p0, state.p1, Weight);
+                return AnimationInterpolationHelper.Lerp(state.p0, state.p1, Weight);
 
             if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
-                return AnimationHelperInterpolation.Herp(state.p0, state.p1, state.d0, state.d1, FrameDiff, Weight);
+                return AnimationInterpolationHelper.Herp(state.p0, state.p1, state.d0, state.d1, FrameDiff, Weight);
 
             return state.p0;
         }
     }
-
+    
     /// <summary>
     /// 
     /// </summary>
-    public class AnimationHelperInterpolation
+    public class AnimationInterpolationHelper
     {
         public static float Lerp(float LHS, float RHS, float Weight)
         {

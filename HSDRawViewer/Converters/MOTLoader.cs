@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -287,10 +288,10 @@ namespace HSDRawViewer.Converters
             var weight = (frame - Keys[index].Time) / (Keys[index + 1].Time - Keys[index].Time);
             return new MOT_KEY()
             {
-                X = Rendering.AnimationHelperInterpolation.Lerp(Keys[index].X, Keys[index + 1].X, weight),
-                Y = Rendering.AnimationHelperInterpolation.Lerp(Keys[index].Y, Keys[index + 1].Y, weight),
-                Z = Rendering.AnimationHelperInterpolation.Lerp(Keys[index].Z, Keys[index + 1].Z, weight),
-                W = Rendering.AnimationHelperInterpolation.Lerp(Keys[index].W, Keys[index + 1].W, weight),
+                X = AnimationInterpolationHelper.Lerp(Keys[index].X, Keys[index + 1].X, weight),
+                Y = AnimationInterpolationHelper.Lerp(Keys[index].Y, Keys[index + 1].Y, weight),
+                Z = AnimationInterpolationHelper.Lerp(Keys[index].Z, Keys[index + 1].Z, weight),
+                W = AnimationInterpolationHelper.Lerp(Keys[index].W, Keys[index + 1].W, weight),
             };
         }
     }

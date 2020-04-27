@@ -64,18 +64,18 @@ namespace HSDRawViewer.Converters
                 
                 foreach(var t in n.Tracks)
                 {
-                    if (!jointTrackToMayaTrack.ContainsKey(t.TrackType))
+                    if (!jointTrackToMayaTrack.ContainsKey(t.JointTrackType))
                         continue;
 
                     MayaAnim.MayaTrack mtrack = new MayaAnim.MayaTrack();
                     mnode.atts.Add(mtrack);
 
-                    mtrack.type = jointTrackToMayaTrack[t.TrackType];
+                    mtrack.type = jointTrackToMayaTrack[t.JointTrackType];
 
                     if(mtrack.IsAngular())
                         mtrack.output = MayaAnim.OutputType.angular;
 
-                    AnimTrack.AnimState prevState = null;
+                    FOBJAnimState prevState = null;
                     for (int i = 0; i < t.Keys.Count; i++)
                     {
                         // get maximum frame to use as framecount
@@ -172,9 +172,9 @@ namespace HSDRawViewer.Converters
                 Debug.WriteLine(mNode.name);
                 foreach (var mTrack in mNode.atts)
                 {
-                    AnimTrack t = new AnimTrack();
+                    FOBJ_Player t = new FOBJ_Player();
                     t.Keys = new List<FOBJKey>();
-                    t.TrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
+                    t.JointTrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
 
                     Debug.WriteLine("\t" + mTrack.type);
 

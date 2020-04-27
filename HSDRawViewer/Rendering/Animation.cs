@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
 using HSDRawViewer.Converters;
 using OpenTK;
 using System;
@@ -8,6 +9,14 @@ using System.Linq;
 
 namespace HSDRawViewer.Rendering
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AnimNode
+    {
+        public List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -177,9 +186,9 @@ namespace HSDRawViewer.Rendering
             else if(boneIndex < Nodes.Count)
             {
                 AnimNode node = Nodes[boneIndex];
-                foreach (AnimTrack t in node.Tracks)
+                foreach (FOBJ_Player t in node.Tracks)
                 {
-                    switch (t.TrackType)
+                    switch (t.JointTrackType)
                     {
                         case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(frame); break;
                         case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(frame); break;
@@ -216,10 +225,7 @@ namespace HSDRawViewer.Rendering
                 AnimNode n = new AnimNode();
                 foreach (HSD_Track t in tracks.Tracks)
                 {
-                    AnimTrack track = new AnimTrack();
-                    track.TrackType = t.FOBJ.JointTrackType;
-                    track.Keys = t.GetKeys();
-                    n.Tracks.Add(track);
+                    n.Tracks.Add(new FOBJ_Player(t.FOBJ));
                 }
                 Nodes.Add(n);
             }
@@ -244,7 +250,7 @@ namespace HSDRawViewer.Rendering
                 {
                     HSD_Track track = new HSD_Track();
                     HSD_FOBJ fobj = new HSD_FOBJ();
-                    fobj.SetKeys(t.Keys, t.TrackType);
+                    fobj.SetKeys(t.Keys, t.JointTrackType);
                     track.FOBJ = fobj;
                     fn.Tracks.Add(track);
                 }
@@ -272,12 +278,7 @@ namespace HSDRawViewer.Rendering
                     FrameCount = (int)Math.Max(FrameCount, j.AOBJ.EndFrame);
 
                     foreach (var fdesc in j.AOBJ.FObjDesc.List)
-                    {
-                        AnimTrack track = new AnimTrack();
-                        track.TrackType = fdesc.JointTrackType;
-                        track.Keys = fdesc.GetDecodedKeys();
-                        n.Tracks.Add(track);
-                    }
+                        n.Tracks.Add(new FOBJ_Player(fdesc));
                 }
                 Nodes.Add(n);
             }
