@@ -141,6 +141,8 @@ namespace HSDRawViewer.Rendering
             GXShader.SetWorldTransformBones(jobjManager.GetWorldTransforms());
             //GXShader.SetBindTransformBones(jobjManager.GetBindTransforms());
 
+            GXShader.SetInt("selectedBone", jobjManager.IndexOf(jobjManager.SelectetedJOBJ));
+
             var tb = jobjManager.GetBindTransforms();
             if (tb.Length > 0)
                 GXShader.SetMatrix4x4("binds", tb);

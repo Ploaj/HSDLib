@@ -6,6 +6,8 @@ in float spec;
 in vec2 texcoord0;
 in vec2 texcoord1;
 in vec4 vertexColor;
+in vec4 vbones;
+in vec4 vweights;
 
 out vec4 fragColor;
 
@@ -57,6 +59,7 @@ uniform int colorOverride;
 uniform vec3 overlayColor;
 uniform mat4 sphereMatrix;
 uniform int renderOverride;
+uniform int selectedBone;
 
 ///
 /// Gets spherical UV coords, this is used for reflection effects
@@ -345,5 +348,12 @@ void main()
 	case 8: fragColor = extColor; break;
 	case 9: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
 	case 10: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
+	case 11: 
+		fragColor = vec4(0, 0, 0, 1);
+		for(int i = 0; i < 4 ; i++)
+			if(int(vbones[i]) == selectedBone)
+				fragColor.r += vweights[i];
+		fragColor.gb = fragColor.rr;
+		break;
 	}
 }

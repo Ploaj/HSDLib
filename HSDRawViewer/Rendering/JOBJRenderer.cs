@@ -21,6 +21,7 @@ namespace HSDRawViewer.Rendering
         ExtColor,
         DiffusePass,
         SpecularPass,
+        BoneWeight,
     }
     /// <summary>
     /// 
@@ -179,6 +180,9 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public int IndexOf(HSD_JOBJ jobj)
         {
+            if (jobj == null)
+                return -1;
+
             if (jobjToCache.ContainsKey(jobj))
                 return jobjToCache[jobj].Index;
             else

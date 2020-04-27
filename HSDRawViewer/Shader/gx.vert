@@ -13,6 +13,8 @@ out float spec;
 out vec2 texcoord0;
 out vec2 texcoord1;
 out vec4 vertexColor;
+out vec4 vbones;
+out vec4 vweights;
 
 uniform mat4 mvp;
 
@@ -39,6 +41,9 @@ void main()
 	
 	normal = GX_VA_NRM;
 
+	vbones = vec4(0, 0, 0, 0);
+	vweights = vec4(0, 0, 0, 0);
+
 	if(enableParentTransform == 1) // todo maybe not accurate
 	{
 		pos = singleBind * pos;
@@ -48,8 +53,10 @@ void main()
 	if (hasEnvelopes == 1)
 	{
 		int matrixIndex = int(PNMTXIDX / 3);
+		vbones = envelopeIndex[matrixIndex];
+		vweights = weights[matrixIndex];
 		
-		if(isSkeleton == 1 && weights[matrixIndex].x == 1)
+		if(isSkeleton == 1 && vweights.x == 1)
 		{
 			pos = transforms[int(envelopeIndex[matrixIndex].x)] * vec4(pos.xyz, 1);
 			normal = (inverse(transpose(transforms[int(envelopeIndex[matrixIndex].x)])) * vec4(normal, 1)).xyz;
@@ -61,11 +68,11 @@ void main()
 			int i = 0;
 			for(i = 0; i < 4 ; i+=1)
 			{
-				if(weights[matrixIndex][i] > 0)
+				if(vweights[i] > 0)
 				{
-					mat4 transform = binds[int(envelopeIndex[matrixIndex][i])];
-					skinnedPos += (transform * vec4(pos.xyz, 1) * weights[matrixIndex][i]).xyz;
-					skinnedNrm += (inverse(transpose(transform)) * vec4(normal, 1) * weights[matrixIndex][i]).xyz;
+					mat4 transform = binds[int(vbones[i])];
+					skinnedPos += (transform * vec4(pos.xyz, 1) * vweights[i]).xyz;
+					skinnedNrm += (inverse(transpose(transform)) * vec4(normal, 1) * vweights[i]).xyz;
 				}
 			}
 			pos = vec4(skinnedPos, 1);
