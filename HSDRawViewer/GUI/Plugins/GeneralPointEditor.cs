@@ -32,7 +32,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             FormClosing += (sender, args) =>
             {
-                Renderer.ClearRenderingCache();
+                Renderer.CleanupRendering();
                 PluginManager.GetCommonViewport()?.RemoveRenderer(this);
                 SavePointChanges();
             };

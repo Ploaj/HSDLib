@@ -41,7 +41,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="nodes"></param>
-        public static void ExportToMayaAnim(string filePath, AnimManager animation)
+        public static void ExportToMayaAnim(string filePath, JointAnimManager animation)
         {
             using (PropertyDialog d = new PropertyDialog("Maya Settings", MayaSettings))
             {
@@ -157,12 +157,12 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        public static AnimManager ImportFromMayaAnim(string filePath)
+        public static JointAnimManager ImportFromMayaAnim(string filePath)
         {
             var mayaFile = new MayaAnim();
             mayaFile.Open(filePath);
 
-            AnimManager animation = new AnimManager();
+            JointAnimManager animation = new JointAnimManager();
             animation.FrameCount = mayaFile.header.endTime - 1;
 
             // process and encode FOBJ keys

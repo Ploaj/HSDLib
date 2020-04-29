@@ -31,8 +31,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             InitializeComponent();
 
-            IconJOBJManager.ClearRenderingCache();
-            StageNameJOBJManager.ClearRenderingCache();
+            IconJOBJManager.RefreshRendering = true;
+            StageNameJOBJManager.RefreshRendering = true;
         }
 
         /// <summary>
@@ -72,8 +72,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         public void CloseFile()
         {
-            IconJOBJManager.ClearRenderingCache();
-            StageNameJOBJManager.ClearRenderingCache();
+            IconJOBJManager.CleanupRendering();
+            StageNameJOBJManager.CleanupRendering();
             
             StageMenuFile = null;
             StageMenuFilePath = "";
@@ -130,12 +130,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 MexMapGenerator.LoadIconDataFromSymbol(mexMap, Icons);
 
                 // Load Dummy Icon Model
-                IconJOBJManager.ClearRenderingCache();
+                IconJOBJManager.RefreshRendering = true;
                 var icon = HSDAccessor.DeepClone<HSD_JOBJ>(mexMap.IconModel);
                 IconJOBJManager.SetJOBJ(icon);
 
                 // Load Dummy Stage Name Model
-                StageNameJOBJManager.ClearRenderingCache();
+                StageNameJOBJManager.RefreshRendering = true;
                 var name = HSDAccessor.DeepClone<HSD_JOBJ>(stage.StageNameModel);
                 StageNameJOBJManager.SetJOBJ(name);
                 StageNameJOBJManager.SetAnimJoint(stage.StageNameAnimJoint);
@@ -143,7 +143,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             }
         }
 
-        private Dictionary<MEXStageIconEntry, AnimManager> entryAnimation = new Dictionary<MEXStageIconEntry, AnimManager>();
+        private Dictionary<MEXStageIconEntry, JointAnimManager> entryAnimation = new Dictionary<MEXStageIconEntry, JointAnimManager>();
 
         /// <summary>
         /// 
@@ -162,7 +162,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 // Load Animation
                 foreach (var i in Icons)
                 {
-                    var a = new AnimManager();
+                    var a = new JointAnimManager();
                     a.FromAnimJoint(i.AnimJoint);
                     entryAnimation.Add(i, a);
                 }
@@ -383,7 +383,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     if (sssEditor.SelectedObject is MEXStageIconEntry ico)
                     {
                         ico.IconTOBJ = tobj;
-                        IconJOBJManager.ClearRenderingCache();
+                        IconJOBJManager.RefreshRendering = true;
                     }
                 }
             }

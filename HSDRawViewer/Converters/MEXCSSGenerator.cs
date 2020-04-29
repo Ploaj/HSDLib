@@ -235,9 +235,9 @@ namespace HSDRawViewer.Converters
                     cspIndex++;
                 }
             }
-            m.ClearRenderingCache();
 
-
+            m.RefreshRendering = true;
+            
             MEX_mexSelectChr mex = new MEX_mexSelectChr();
 
             SetMexNode(mex, icons);

@@ -245,7 +245,7 @@ namespace HSDRawViewer.GUI
 
             FormClosing += (sender, args) =>
             {
-                JOBJManager.ClearRenderingCache();
+                JOBJManager.CleanupRendering();
                 viewport.Dispose();
             };
         }
@@ -1127,8 +1127,8 @@ namespace HSDRawViewer.GUI
 
                 JOBJManager.SetFigaTree(tree);
                 viewport.MaxFrame = tree.FrameCount;
-                
-                ThrowDummyManager.ClearRenderingCache();
+
+                ThrowDummyManager.CleanupRendering();
                 ThrowDummyManager = new JOBJManager();
                 if (name.Contains("Throw") && !name.Contains("Taro"))
                 {

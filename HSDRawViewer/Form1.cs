@@ -472,12 +472,16 @@ namespace HSDRawViewer
 
             // Special animation override
             if (SelectedDataNode.Accessor is HSD_AnimJoint
-                || SelectedDataNode.Accessor is HSD_FigaTree)
+                || SelectedDataNode.Accessor is HSD_FigaTree
+                || SelectedDataNode.Accessor is HSD_MatAnimJoint)
             {
                 //foreach (var v in dockPanel.Contents)
                 {
                     if (LastActiveContent is JOBJEditor jedit && jedit.Visible)
                     {
+                        if (SelectedDataNode.Accessor is HSD_MatAnimJoint matjoint)
+                            jedit.LoadAnimation(matjoint);
+
                         if (SelectedDataNode.Accessor is HSD_AnimJoint joint)
                             jedit.LoadAnimation(joint);
 

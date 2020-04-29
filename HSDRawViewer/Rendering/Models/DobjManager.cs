@@ -94,7 +94,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="dobj"></param>
         /// <param name="parentJOBJ"></param>
         /// <param name="jobjManager"></param>
-        public void RenderDOBJShader(Camera camera, HSD_DOBJ dobj, HSD_JOBJ parentJOBJ, JOBJManager jobjManager, bool selected = false)
+        public void RenderDOBJShader(Camera camera, HSD_DOBJ dobj, HSD_JOBJ parentJOBJ, JOBJManager jobjManager, MatAnimManager animation, bool selected = false)
         {
             if (dobj.Pobj == null)
                 return;
@@ -156,7 +156,7 @@ namespace HSDRawViewer.Rendering
             GXShader.SetMatrix4x4("sphereMatrix", ref sphereMatrix);
 
             if (mobj != null)
-                BindMOBJ(GXShader, mobj, parentJOBJ);
+                BindMOBJ(GXShader, mobj, parentJOBJ, animation);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, DOBJtoBuffer[dobj]);
 
@@ -308,7 +308,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="mobj"></param>
-        private void BindMOBJ(Shader shader, HSD_MOBJ mobj, HSD_JOBJ parentJOBJ)
+        private void BindMOBJ(Shader shader, HSD_MOBJ mobj, HSD_JOBJ parentJOBJ, MatAnimManager animation)
         {
             GL.Enable(EnableCap.Texture2D);
 
@@ -334,6 +334,10 @@ namespace HSDRawViewer.Rendering
             var color = mobj.Material;
             if (color != null)
             {
+                if (animation != null)
+                {
+                    color = animation.GetMaterialState(mobj).Item1;
+                }
                 shader.SetVector4("ambientColor", color.AMB_R / 255f, color.AMB_G / 255f, color.AMB_B / 255f, color.AMB_A / 255f);
                 shader.SetVector4("diffuseColor", color.DIF_R / 255f, color.DIF_G / 255f, color.DIF_B / 255f, color.DIF_A / 255f);
                 shader.SetVector4("specularColor", color.SPC_R / 255f, color.SPC_G / 255f, color.SPC_B / 255f, color.SPC_A / 255f);
@@ -374,19 +378,39 @@ namespace HSDRawViewer.Rendering
                 foreach (var tex in mobj.Textures.List)
                 {
                     index++;
+
                     if (index > 1)
                         break;
-                    if (tex.ImageData == null)
+
+                    var renderTex = tex;
+
+                    if (renderTex.ImageData == null)
                         continue;
 
-                    if (!imageBufferTextureIndex.ContainsKey(tex.ImageData.ImageData))
+                    var blending = tex.Blending;
+
+                    var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
+                        Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
+                        Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+
+                    transform.Invert();
+
+                    if (animation != null)
                     {
-                        imageBufferTextureIndex.Add(tex.ImageData.ImageData, TextureManager.TextureCount);
-                        TextureManager.Add(tex.GetDecodedImageData(), tex.ImageData.Width, tex.ImageData.Height);
+                        var state = animation.GetTextureAnimState(renderTex);
+                        renderTex = state.Item1;
+                        blending = state.Item2;
+                        transform = state.Item3;
+                    }
+
+                    if (!imageBufferTextureIndex.ContainsKey(renderTex.ImageData.ImageData))
+                    {
+                        imageBufferTextureIndex.Add(renderTex.ImageData.ImageData, TextureManager.TextureCount);
+                        TextureManager.Add(renderTex.GetDecodedImageData(), renderTex.ImageData.Width, renderTex.ImageData.Height);
                         continue;
                     }
 
-                    var texid = TextureManager.Get(imageBufferTextureIndex[tex.ImageData.ImageData]);
+                    var texid = TextureManager.Get(imageBufferTextureIndex[renderTex.ImageData.ImageData]);
 
                     GL.ActiveTexture(TextureUnit.Texture0 + index);
                     GL.BindTexture(TextureTarget.Texture2D, texid);
@@ -417,19 +441,13 @@ namespace HSDRawViewer.Rendering
                     int coordType = (int)flags & 0xF;
                     int colorOP = ((int)flags >> 16) & 0xF;
                     int alphaOP = ((int)flags >> 20) & 0xF;
-
-                    var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
-                        Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
-                        Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
-
-                    transform.Invert();
                     
                     shader.SetInt($"TEX{index}", index);
                     shader.SetInt($"TEX{index}LightType", lightType);
                     shader.SetInt($"TEX{index}ColorOperation", colorOP);
                     shader.SetInt($"TEX{index}AlphaOperation", alphaOP);
                     shader.SetInt($"TEX{index}CoordType", coordType);
-                    shader.SetFloat($"TEX{index}Blend", tex.Blending);
+                    shader.SetFloat($"TEX{index}Blend", blending);
                     shader.SetBoolToInt($"TEX{index}MirrorFix", mirrorY);
                     shader.SetVector2($"TEX{index}UVScale", wscale, hscale);
                     shader.SetMatrix4x4($"TEX{index}Transform", ref transform);

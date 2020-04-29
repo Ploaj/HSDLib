@@ -87,9 +87,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         public void CloseFile()
         {
-            singleMenuManager.ClearRenderingCache();
-            iconJOBJManager.ClearRenderingCache();
-            cspJOBJManager.ClearRenderingCache();
+            singleMenuManager.CleanupRendering();
+            iconJOBJManager.CleanupRendering();
+            cspJOBJManager.CleanupRendering();
             RenderingClone = null;
             CSPRender = null;
 
@@ -151,12 +151,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 RenderingClone.Children[12].Child = null;
 
                 // setup rendering
-                singleMenuManager.ClearRenderingCache();
+                singleMenuManager.CleanupRendering();
                 singleMenuManager.SetJOBJ(RenderingClone);
                 singleMenuManager.SetAnimJoint(SelectTable.SingleMenuAnimation);
                 singleMenuManager.Frame = 600;
 
-                cspJOBJManager.ClearRenderingCache();
+                cspJOBJManager.CleanupRendering();
                 cspJOBJManager.SetJOBJ(CSPRender);
 
                 RefreshMenuRender();
@@ -178,7 +178,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 CSPRender.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE;
             }
 
-            cspJOBJManager.ClearRenderingCache();
+            cspJOBJManager.RefreshRendering = true;
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             var model = mod.Item1;
 
             // setup rendering
-            iconJOBJManager.ClearRenderingCache();
+            iconJOBJManager.RefreshRendering = true;
             iconJOBJManager.SetJOBJ(mod.Item1);
             iconJOBJManager.SetAnimJoint(mod.Item2);
         }

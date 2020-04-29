@@ -70,7 +70,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             FormClosing += (sender, args) =>
             {
-                JOBJManager.ClearRenderingCache();
+                JOBJManager.CleanupRendering();
                 viewport.Dispose();
                 editor.Dispose();
             };
@@ -103,7 +103,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         private void LoadModel(HSD_JOBJ jobj)
         {
-            JOBJManager.ClearRenderingCache();
+            JOBJManager.RefreshRendering = true;
             JOBJManager.SetJOBJ(jobj);
             if (!viewport.Visible)
                 viewport.Visible = true;

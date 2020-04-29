@@ -16,9 +16,9 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static AnimManager LoadCHR0(string filePath)
+        public static JointAnimManager LoadCHR0(string filePath)
         {
-            AnimManager anim = new AnimManager();
+            JointAnimManager anim = new JointAnimManager();
 
             using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
             {
