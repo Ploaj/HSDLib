@@ -255,8 +255,8 @@ namespace HSDRawViewer.Converters
                     }
 
                     // invert normals
-                    for (int n = 0; n < nrm.Count; n++)
-                        nrm[n] *= -1;
+                    //for (int n = 0; n < nrm.Count; n++)
+                    //    nrm[n] *= -1;
                     
                     var triArr = triangles.ToArray();
                     

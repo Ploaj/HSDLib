@@ -652,6 +652,7 @@ namespace HSDRawViewer.Converters
                 List<HSD_JOBJ>[] jobjs = new List<HSD_JOBJ>[mesh.Vertices.Count];
                 List<float>[] weights = new List<float>[mesh.Vertices.Count];
                 List<Matrix4>[] binds = new List<Matrix4>[mesh.Vertices.Count];
+                List<Matrix4>[] worlds = new List<Matrix4>[mesh.Vertices.Count];
                 if (mesh.HasBones && settings.ImportRigging)
                 {
                     if(!singleBinded)
@@ -676,6 +677,8 @@ namespace HSDRawViewer.Converters
                                     weights[vw.VertexID] = new List<float>();
                                 if (binds[vw.VertexID] == null)
                                     binds[vw.VertexID] = new List<Matrix4>();
+                                if (worlds[vw.VertexID] == null)
+                                    worlds[vw.VertexID] = new List<Matrix4>();
                                 if (vw.Weight > 0)
                                 {
                                     jobjs[vw.VertexID].Add(jobj);
@@ -686,6 +689,7 @@ namespace HSDRawViewer.Converters
                                         t.A2, t.B2, t.C2, t.D2,
                                         t.A3, t.B3, t.C3, t.D3,
                                         t.A4, t.B4, t.C4, t.D4));
+                                    worlds[vw.VertexID].Add(cache.jobjToWorldTransform[cache.NameToJOBJ[v.Name]]);
                                 }
                             }
                     }
@@ -782,15 +786,31 @@ namespace HSDRawViewer.Converters
                             }
 
                             // for weird binds
-                            var bindv = Vector3.Zero;
-                            var bindvn = Vector3.Zero;
-                            for (int k = 0; k < binds[indicie].Count; k++)
+                            if(binds[indicie].Count == 1)
                             {
-                                bindv += Vector3.TransformPosition(tkvert, binds[indicie][k]) * weights[indicie][k];
-                                bindvn += Vector3.TransformNormal(tknrm, binds[indicie][k]) * weights[indicie][k];
+                                var bindv = Vector3.Zero;
+                                var bindvn = Vector3.Zero;
+                                for (int k = 0; k < binds[indicie].Count; k++)
+                                {
+                                    bindv += Vector3.TransformPosition(tkvert, binds[indicie][k]) * weights[indicie][k];
+                                    bindvn += Vector3.TransformNormal(tknrm, binds[indicie][k]) * weights[indicie][k];
+                                }
+                                tkvert = bindv;
+                                tknrm = bindvn;
                             }
-                            tkvert = bindv;
-                            tknrm = bindvn;
+                            else
+                            if (binds[indicie].Count > 1)
+                            {
+                                var bindv = Vector3.Zero;
+                                var bindvn = Vector3.Zero;
+                                for (int k = 0; k < binds[indicie].Count; k++)
+                                {
+                                    bindv += Vector3.TransformPosition(tkvert, binds[indicie][k] * worlds[indicie][k]) * weights[indicie][k];
+                                    bindvn += Vector3.TransformNormal(tknrm, binds[indicie][k] * worlds[indicie][k]) * weights[indicie][k];
+                                }
+                                tkvert = bindv;
+                                tknrm = bindvn;
+                            }
                         }
 
                         if (mesh.HasVertices)
