@@ -192,6 +192,8 @@ namespace HSDRawViewer.Sound
             return b;
         }
 
+        private static int NullEntryID = 55;
+
         /// <summary>
         /// 
         /// </summary>
@@ -203,6 +205,7 @@ namespace HSDRawViewer.Sound
                 mexData.SSMTable.SSM_Flags.Array = new MEX_SSMSizeAndFlags[0];
                 mexData.SSMTable.SSM_LookupTable.Array = new MEX_SSMLookup[0];
 
+                mexData.SSMTable.SSM_SSMFiles.Set(Entries.Count, new HSD_String());// blank entry at end
                 mexData.SSMTable.SSM_Flags.Set(Entries.Count, new MEX_SSMSizeAndFlags());// blank entry at end
                 mexData.SSMTable.SSM_LookupTable.Set(Entries.Count, new MEX_SSMLookup());// blank entry at beginning
 
@@ -265,7 +268,7 @@ namespace HSDRawViewer.Sound
 
                         if(mexData != null)
                         {
-                            mexData.SSMTable.SSM_SSMFiles.Add(new HSD_String() { Value = e.SoundBank.Name });
+                            mexData.SSMTable.SSM_SSMFiles.Set(entryIndex, new HSD_String() { Value = e.SoundBank.Name });
                             mexData.SSMTable.SSM_Flags.Set(entryIndex, new MEX_SSMSizeAndFlags() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
                             var lu = new MEX_SSMLookup();
                             lu._s.SetInt32(0x00, e.SoundBank.GroupFlags);

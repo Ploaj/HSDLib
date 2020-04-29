@@ -294,7 +294,10 @@ namespace HSDRawViewer.GUI.Plugins
             }
 
             if (TEXG != null)
+            {
                 TEXG.SetFromTOBJs(tobjs);
+                Node.Refresh();
+            }
         }
 
         /// <summary>
