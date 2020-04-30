@@ -21,7 +21,7 @@ namespace HSDRawViewer.GUI
         public Camera Camera { get => _camera; }
         private Camera _camera;
 
-        private bool ReadyToRender = false;
+        public bool ReadyToRender { get; internal set; } = false;
 
         public bool EnableHelpDisplay { get; set; } = true;
 

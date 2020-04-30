@@ -239,35 +239,32 @@
 
     public enum TevColorOp
     {
-        Add = 0,
-        Subtract = 1,
+        GX_TEV_ADD = 0,
+        GX_TEV_SUB = 1,
 
-        CompR8Greater = 8,
-        CompR8Equal = 9,
-        CompGR16Greater = 10,
-        CompGR16Equal = 11,
-        CompBGR24Greater = 12,
-        CompBGR24Equal = 13,
-        CompRGB8Greater = 14,
-        CompRGB8Equal = 15,
-
-        //GX_TEV_COMP_A8_GT = GX_TEV_COMP_RGB8_GT, // for alpha channel
-        //GX_TEV_COMP_A8_EQ = GX_TEV_COMP_RGB8_EQ  // for alpha channel
+        GX_TEV_COMP_R8_GT = 8,
+        GX_TEV_COMP_R8_EQ = 9,
+        GX_TEV_COMP_GR16_GT = 10,
+        GX_TEV_COMP_GR16_EQ = 11,
+        GX_TEV_COMP_BGR24_GT = 12,
+        GX_TEV_COMP_BGR24_EQ = 13,
+        GX_TEV_COMP_RGB8_GT = 14,
+        GX_TEV_COMP_RGB8_EQ = 15,
     }
 
     public enum TevAlphaOp
     {
-        Add = 0,
-        Subtract = 1,
+        GX_TEV_ADD = 0,
+        GX_TEV_SUB = 1,
 
-        CompR8Greater = 8,
-        CompR8Equal = 9,
-        CompGR16Greater = 10,
-        CompGR16Equal = 11,
-        CompBGR24Greater = 12,
-        CompBGR24Equal = 13,
-        CompA8Greater = 14,
-        CompA8Equal = 15,
+        GX_TEV_COMP_R8_GT = 8,
+        GX_TEV_COMP_R8_EQ = 9,
+        GX_TEV_COMP_GR16_GT = 10,
+        GX_TEV_COMP_GR16_EQ = 11,
+        GX_TEV_COMP_BGR24_GT = 12,
+        GX_TEV_COMP_BGR24_EQ = 13,
+        GX_TEV_COMP_A8_GT = 14,
+        GX_TEV_COMP_A8_EQ = 15,
     }
 
     public enum TevScale
@@ -283,5 +280,25 @@
         GX_TB_ZERO,
         GX_TB_ADDHALF,
         GX_TB_SUBHALF
+    }
+
+    public enum TevColorIn
+    {
+        GX_CC_CPREV,
+        GX_CC_APREV,
+        GX_CC_C0,
+        GC_CC_A0,
+        GX_CC_C1,
+        GC_CC_A1,
+        GX_CC_C2,
+        GC_CC_A2,
+        GX_CC_TEXC,
+        GX_CC_TEXA,
+        GX_CC_RASC,
+        GX_CC_RASA,
+        GX_CC_ONE,
+        GX_CC_HALF,
+        GX_CC_KONST,
+        GX_CC_ZERO
     }
 }

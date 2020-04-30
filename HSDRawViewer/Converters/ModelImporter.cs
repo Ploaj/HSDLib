@@ -40,7 +40,11 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options"), DisplayName("Import Bone Names"), Description("Stores bone names in JOBJs")]
         public bool ImportBoneNames { get; set; } = false;
-        
+
+        [Category("Importing Options"), DisplayName("Import Mesh Names"), Description("Stores mesh names in DOBJs")]
+        public bool ImportMeshNames { get; set; } = false;
+
+
         [Category("Importing Options"), DisplayName("Use Triangle Strips"), Description("Slower to import, but better optimized for game")]
         public bool UseStrips { get; set; } = true;
 
@@ -594,6 +598,9 @@ namespace HSDRawViewer.Converters
 
                 // Generate DOBJ
                 HSD_DOBJ dobj = new HSD_DOBJ();
+
+                if(settings.ImportMeshNames)
+                    dobj.ClassName = mesh.Name;
 
                 // hack to make dobjs merged by texture
                 if (settings.ImportTexture && 

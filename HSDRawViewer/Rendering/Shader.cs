@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
@@ -181,6 +182,18 @@ namespace HSDRawViewer.Rendering
             }
 
             GL.Uniform4(GetVertexAttributeUniformLocation(uniformName), x, y, z, w);
+        }
+
+
+        public void SetColor(string uniformName, Color col, byte alpha)
+        {
+            if (!vertexAttributeAndUniformLocations.ContainsKey(uniformName) && !invalidUniformNames.Contains(uniformName))
+            {
+                invalidUniformNames.Add(uniformName);
+                return;
+            }
+
+            GL.Uniform4(GetVertexAttributeUniformLocation(uniformName), col.R / 255f, col.G / 255f, col.B / 255f, alpha / 255f);
         }
 
         public void SetMatrix4x4(string uniformName, ref Matrix4 value)

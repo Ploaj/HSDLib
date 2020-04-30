@@ -178,7 +178,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 CSPRender.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE;
             }
 
-            cspJOBJManager.RefreshRendering = true;
+            cspJOBJManager.CleanupRendering();
         }
 
         /// <summary>

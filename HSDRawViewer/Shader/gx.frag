@@ -11,30 +11,53 @@ in vec4 vweights;
 
 out vec4 fragColor;
 
+// textures
+struct TexUnit
+{
+	sampler2D tex;
+	int light_type;
+	int color_operation;
+	int alpha_operation;
+	int coord_type;
+	float blend;
+	vec2 uv_scale;
+	int mirror_fix;
+	mat4 transform;
+};
+
+struct TevUnit
+{
+	int color_op;
+	int alpha_op;
+	int color_bias;
+	int alpha_bias;
+	int color_scale;
+	int alpha_scale;
+	int color_clamp;
+	int alpha_clamp;
+	int color_a;
+	int color_b;
+	int color_c;
+	int color_d;
+	int alpha_a;
+	int alpha_b;
+	int alpha_c;
+	int alpha_d;
+	vec4 konst;
+	vec4 tev0;
+	vec4 tev1;
+};
 
 // textures
 uniform int hasTEX0;
-uniform sampler2D TEX0;
-uniform int TEX0LightType;
-uniform int TEX0ColorOperation;
-uniform int TEX0AlphaOperation;
-uniform int TEX0CoordType;
-uniform float TEX0Blend;
-uniform vec2 TEX0UVScale;
-uniform int TEX0MirrorFix;
-uniform mat4 TEX0Transform;
+uniform int hasTEX0Tev;
+uniform TexUnit TEX0;
+uniform TevUnit TEX0Tev;
 
 uniform int hasTEX1;
-uniform sampler2D TEX1;
-uniform int TEX1LightType;
-uniform int TEX1ColorOperation;
-uniform int TEX1AlphaOperation;
-uniform int TEX1CoordType;
-uniform float TEX1Blend;
-uniform vec2 TEX1UVScale;
-uniform int TEX1MirrorFix;
-uniform mat4 TEX1Transform;
-
+uniform int hasTEX1Tev;
+uniform TexUnit TEX1;
+uniform TevUnit TEX1Tev;
 
 // material
 uniform vec4 ambientColor;
@@ -89,21 +112,163 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 	return tex0;
 }
 
+
+
 ///
-/// Gets the texture color after applying all necessary transforms
+/// Gets the inputs for TEV color operation
 ///
-vec4 MixTextureColor(sampler2D tex, vec2 texCoord, mat4 uvTransform, vec2 uvscale, int coordType, int mirrorFix)
+vec3 GetTEVColorIn(int type, vec4 tex, vec4 konst, vec4 regPrev, vec4 reg0, vec4 reg1)
 {
-    vec2 coords = GetCoordType(coordType, texCoord);
+	switch(type)
+	{
+		case 0: return regPrev.rgb;
+		case 1: return regPrev.aaa;
+		case 2: return reg0.rgb;
+		case 3: return reg0.aaa;
+		case 4: return reg1.rgb;
+		case 5: return reg1.aaa;
+		case 6: return vec3(0); // unused for hsd?
+		case 7: return vec3(0); // unused for hsd?
+		case 8: return tex.rgb;
+		case 9: return tex.aaa;
+		case 10: return vertexColor.rgb;
+		case 11: return vertexColor.aaa;
+		case 12: return vec3(1, 1, 1);
+		case 13: return vec3(0.5, 0.5, 0.5);
+		case 14: return konst.rgb;
+	}
+	return vec3(0);
+}
 
-	coords = (uvTransform * vec4(coords.x, coords.y, 0, 1)).xy;
+///
+/// Gets the value of tev bias
+///
+float GetTEVBias(int bias)
+{
+	switch(bias)
+	{
+	case 0: return 0;
+	case 1: return 0.5;
+	case 2: return -0.5;
+	}
+
+	return 0;
+}
+
+///
+/// Gets the value of tev bias
+///
+float GetTEVScale(int scale)
+{
+	switch(scale)
+	{
+	case 0: return 1;
+	case 1: return 2;
+	case 2: return 4;
+	case 3: return 0.5;
+	}
+
+	return 1;
+}
+
+///
+/// Applys TEV color operation
+///
+vec4 ApplyTEVColorOp(int op, bool is_alpha, float bias, float scale, bool tclamp, vec4 a, vec4 b, vec4 c, vec4 d)
+{
+	vec4 col = vec4(0);
+
+	switch(op)
+	{
+		case 0: 
+			col = (d + ((vec4(1) - c ) * a + c * b) + vec4(bias)) * vec4(scale); 
+			if(tclamp)
+				col = clamp(col, vec4(0), vec4(1));
+			return col;
+		case 1: 
+			col = (d + ((vec4(1) - c ) * a + c * b) + vec4(bias)) * vec4(scale); 
+			if(tclamp)
+				col = clamp(col, vec4(0), vec4(1));
+			return col;
+		case 2: return d + ((a.r > b.r) ? c : col); 
+		case 3: return d + ((a.r == b.r) ? c : col); 
+		case 4: return d + ((a.g > b.g && a.r > b.r) ? c : col); 
+		case 5: return d + ((a.g == b.g && a.r == b.r) ? c : col); 
+		case 6: return d + ((a.b > b.b && a.g > b.g && a.r > b.r) ? c : col); 
+		case 7: return d + ((a.b == b.b && a.g == b.g && a.r == b.r) ? c : col); 
+		case 8: 
+			if(is_alpha)
+				return d + ((a.a > b.a) ? c : col);
+			else
+			{
+				float re = d.r + ((a.r > b.r) ? c.r : 0);
+				float gr = d.g + ((a.g > b.g) ? c.g : 0);
+				float bl = d.b + ((a.b > b.b) ? c.b : 0);
+				return vec4(re, gr, bl, 0);
+			}
+		break;
+		case 9:
+			if(is_alpha)
+				return d + ((a.a == b.a) ? c : col);
+			else
+			{
+				float re = d.r + ((a.r == b.r) ? c.r : 0);
+				float gr = d.g + ((a.g == b.g) ? c.g : 0);
+				float bl = d.b + ((a.b == b.b) ? c.b : 0);
+				return vec4(re, gr, bl, 0);
+			}
+		break;
+	}
+
+	return col;
+}
+
+
+///
+/// 
+///
+vec4 ApplyTev(vec4 texColor, TevUnit tev)
+{
+	vec4 a = ApplyTEVColorOp(
+		tev.color_op, 
+		true, 
+		GetTEVBias(tev.color_bias), 
+		GetTEVScale(tev.color_scale), 
+		tev.color_clamp == 1, 
+		vec4(GetTEVColorIn(tev.color_a, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1),
+		vec4(GetTEVColorIn(tev.color_b, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1),
+		vec4(GetTEVColorIn(tev.color_c, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1),
+		vec4(GetTEVColorIn(tev.color_d, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1));
+		
+	vec4 c = ApplyTEVColorOp(
+		tev.alpha_op, 
+		false, 
+		GetTEVBias(tev.alpha_bias), 
+		GetTEVScale(tev.alpha_scale), 
+		tev.alpha_clamp == 1, 
+		vec4(GetTEVColorIn(tev.alpha_a, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1),
+		vec4(GetTEVColorIn(tev.alpha_b, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1),
+		vec4(GetTEVColorIn(tev.alpha_c, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1),
+		vec4(GetTEVColorIn(tev.alpha_d, texColor, tev.konst, texColor, tev.tev0, tev.tev1), 1));
+
+	return vec4(c.rgb, a.r);
+}
+
+///
+/// Gets the texture color after applying all necessary transforms and TEV
+///
+vec4 MixTextureColor(TexUnit tex, vec2 texCoord)
+{
+    vec2 coords = GetCoordType(tex.coord_type, texCoord);
+
+	coords = (tex.transform * vec4(coords.x, coords.y, 0, 1)).xy;
 	
-	coords *= uvscale;
+	coords *= tex.uv_scale;
 
-	if(mirrorFix == 1) // GX OPENGL difference
+	if(tex.mirror_fix == 1) // GX OPENGL difference
 		coords.y += 1;
 
-    return texture(tex, coords);
+    return texture(tex.tex, coords);
 }
 
 ///
@@ -135,16 +300,18 @@ vec4 GetSpecularMaterial(vec3 V, vec3 N)
 ///
 ///
 ///
-vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D tex, vec2 texCoord, mat4 uvTransform, vec2 uvscale, int coordType, int mirrorFix, float blend)
+vec4 ColorMap_Pass(vec4 passColor, TexUnit tex, bool enableTev, TevUnit tev, vec2 texCoord)
 {
-	vec4 pass = MixTextureColor(tex, texCoord, uvTransform, uvscale, coordType, mirrorFix);
+	vec4 pass = MixTextureColor(tex, texCoord);
 
-	
-	if(operation == 1 && pass.a != 0) // Alpha Mask
+	//if(enableTev)
+	//	pass = ApplyTev(pass, tev);
+
+	if(tex.color_operation == 1 && pass.a != 0) // Alpha Mask
 		passColor.rgb = pass.rgb;
 		
 	//TODO: I don't know what this is
-	if(operation == 2) // 8 RGB Mask 
+	if(tex.color_operation == 2) // 8 RGB Mask 
 	{
 		if(pass.r != 0)
 			passColor.r = pass.r;
@@ -160,43 +327,43 @@ vec4 ColorMap_Pass(vec4 passColor, int operation, int alphaOperation, sampler2D 
 			passColor.b = 0;
 	}
 	
-	if(operation == 3) // Blend
-		passColor.rgb = mix(passColor.rgb, pass.rgb, blend);//passColor.rgb * (1 - blend) + pass.rgb * blend;
+	if(tex.color_operation == 3) // Blend
+		passColor.rgb = mix(passColor.rgb, pass.rgb, tex.blend);
 
-	if(operation == 4) // Modulate
+	if(tex.color_operation == 4) // Modulate
 		passColor.rgb *= pass.rgb;
 
-	if(operation == 5) // Replace
+	if(tex.color_operation == 5) // Replace
 		passColor.rgb = pass.rgb;
 
-	//if(operation == 6) // Pass
+	//if(tex.color_operation == 6) // Pass
 
-	if(operation == 7) // Add
+	if(tex.color_operation == 7) // Add
 		passColor.rgb += pass.rgb * pass.a;
 
-	if(operation == 8) // Subtract
+	if(tex.color_operation == 8) // Subtract
 		passColor.rgb -= pass.rgb * pass.a;
 			
 	
 	
-	if(alphaOperation == 1 && pass.a != 0) //Alpha Mask
+	if(tex.alpha_operation == 1 && pass.a != 0) //Alpha Mask
 		passColor.a = pass.a;
 		
-	if(alphaOperation == 2) // Blend
-		passColor.a = mix(passColor.a, pass.a, blend);
+	if(tex.alpha_operation == 2) // Blend
+		passColor.a = mix(passColor.a, pass.a, tex.blend);
 
-	if(alphaOperation == 3) // Modulate
+	if(tex.alpha_operation == 3) // Modulate
 		passColor.a *= pass.a;
 
-	if(alphaOperation == 4) // Replace
+	if(tex.alpha_operation == 4) // Replace
 		passColor.a = pass.a;
 
-	//if(alphaOperation == 5) //Pass
+	//if(tex.alpha_operation == 5) //Pass
 		
-	if(alphaOperation == 6) //Add
+	if(tex.alpha_operation == 6) //Add
 		passColor.a += pass.a;
 
-	if(alphaOperation == 7) //Subtract
+	if(tex.alpha_operation == 7) //Subtract
 		passColor.a -= pass.a;
 	
 
@@ -214,8 +381,7 @@ void main()
 		return;
 	}
 
-	// get vectors
-	vec3 V = normalize(vertPosition - cameraPos);
+	// color passes
 
 	vec4 ambientPass = ambientColor;
 	vec4 diffusePass = diffuseColor;
@@ -223,119 +389,60 @@ void main()
 
 	if(hasTEX0 == 1)
 	{
-		vec4 col = vec4(0);
-		if(TEX0LightType == 0) col = ambientPass;
-		if(TEX0LightType == 1) col = diffusePass;
-		if(TEX0LightType == 2) col = specularPass;
-
-		col = ColorMap_Pass(
-		col, 
-		TEX0ColorOperation, 
-		TEX0AlphaOperation, 
-		TEX0,
-		texcoord0, 
-		TEX0Transform, 
-		TEX0UVScale, 
-		TEX0CoordType, 
-		TEX0MirrorFix,
-		TEX0Blend);
-
-		if(TEX0LightType == 0) ambientPass = col;
-		if(TEX0LightType == 1) diffusePass = col;
-		if(TEX0LightType == 2) specularPass = col;
+		if(TEX0.light_type == 0) ambientPass = ColorMap_Pass(ambientPass, TEX0, hasTEX0Tev == 1, TEX0Tev, texcoord0);
+		if(TEX0.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX0, hasTEX0Tev == 1, TEX0Tev, texcoord0);
+		if(TEX0.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX0, hasTEX0Tev == 1, TEX0Tev, texcoord0);
 	}
 	if(hasTEX1 == 1)
 	{
-		vec4 col = vec4(0);
-		if(TEX1LightType == 0) col = ambientPass;
-		if(TEX1LightType == 1) col = diffusePass;
-		if(TEX1LightType == 2) col = specularPass;
-
-		col = ColorMap_Pass(
-		col, 
-		TEX1ColorOperation, 
-		TEX1AlphaOperation, 
-		TEX1,
-		texcoord1, 
-		TEX1Transform, 
-		TEX1UVScale, 
-		TEX1CoordType, 
-		TEX1MirrorFix,
-		TEX1Blend);
-		
-		if(TEX1LightType == 0) ambientPass = col;
-		if(TEX1LightType == 1) diffusePass = col;
-		if(TEX1LightType == 2) specularPass = col;
+		if(TEX1.light_type == 0) ambientPass = ColorMap_Pass(ambientPass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
+		if(TEX1.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
+		if(TEX1.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 	}
+	
+
+	// calculate material
+	vec3 V = normalize(vertPosition - cameraPos);
+
 
 	fragColor.rgb = diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb
 					+ specularPass.rgb * GetSpecularMaterial(normalize(normal), V).rgb;
 
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));
 
+
+	// ext light map
 	vec4 extColor = vec4(1, 1, 1, 1);
-	if(hasTEX0 == 1 && TEX0LightType == 4)
+	if(hasTEX0 == 1 && TEX0.light_type == 4)
 	{
-		extColor = ColorMap_Pass(
-		extColor, 
-		TEX0ColorOperation, 
-		TEX0AlphaOperation, 
-		TEX0,
-		texcoord0, 
-		TEX0Transform, 
-		TEX0UVScale, 
-		TEX0CoordType, 
-		TEX0MirrorFix,
-		TEX0Blend);
-
-		fragColor = ColorMap_Pass(
-		fragColor, 
-		TEX0ColorOperation, 
-		TEX0AlphaOperation, 
-		TEX0,
-		texcoord0, 
-		TEX0Transform, 
-		TEX0UVScale, 
-		TEX0CoordType, 
-		TEX0MirrorFix,
-		TEX0Blend);
+		extColor = ColorMap_Pass(extColor, TEX0, hasTEX0Tev == 1, TEX0Tev, texcoord0);
+		fragColor = ColorMap_Pass(fragColor, TEX0, hasTEX0Tev == 1, TEX0Tev, texcoord0);
 	}
-	if(hasTEX1 == 1 && TEX1LightType == 4)
+	if(hasTEX1 == 1 && TEX1.light_type == 4)
 	{
-		extColor = ColorMap_Pass(
-		extColor, 
-		TEX1ColorOperation, 
-		TEX1AlphaOperation, 
-		TEX1,
-		texcoord1, 
-		TEX1Transform, 
-		TEX1UVScale, 
-		TEX1CoordType, 
-		TEX1MirrorFix,
-		TEX1Blend);
-
-		fragColor = ColorMap_Pass(
-		fragColor, 
-		TEX1ColorOperation, 
-		TEX1AlphaOperation, 
-		TEX1,
-		texcoord1, 
-		TEX1Transform, 
-		TEX1UVScale, 
-		TEX1CoordType, 
-		TEX1MirrorFix,
-		TEX1Blend);
+		extColor = ColorMap_Pass(extColor, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
+		fragColor = ColorMap_Pass(fragColor, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 	}
 
+
+	// diffuse alpha
 	fragColor.a = diffusePass.a;
+	
 
+	// material alpha
+	fragColor.a *= alpha;
+
+
+	// vertex color
 	if(useVertexColor == 1)
 		fragColor.rgb *= vertexColor.rgb * vertexColor.aaa;
-
-	fragColor.a *= alpha;
 		
+
+	// gx overlay
 	fragColor.xyz *= overlayColor;
 
+
+	// debug render modes
 	switch(renderOverride)
 	{
 	case 1: fragColor = vec4(vec3(0.5) + normal / 2, 1); break;

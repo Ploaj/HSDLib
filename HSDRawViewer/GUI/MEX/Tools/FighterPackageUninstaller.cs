@@ -228,7 +228,7 @@ namespace HSDRawViewer.GUI.MEX
 
 
             Console.WriteLine("Removing CSP");
-            var chrSelPath = Path.Combine(root, "MnSlChr.usd");
+            /*var chrSelPath = Path.Combine(root, "MnSlChr.usd");
             if (File.Exists(chrSelPath))
             {
                 var cssFile = new HSDRawFile(chrSelPath);
@@ -260,7 +260,7 @@ namespace HSDRawViewer.GUI.MEX
                 }
 
                 editedFiles.Add(new Tuple<HSDRawFile, string, bool>(cssFile, chrSelPath, true));
-            }
+            }*/
 
 
             Console.WriteLine("Removing Icons");

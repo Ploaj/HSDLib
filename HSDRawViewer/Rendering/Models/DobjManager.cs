@@ -358,19 +358,6 @@ namespace HSDRawViewer.Rendering
 
             var id = Matrix4.Identity;
 
-            for(int index = 0; index < 2; index++)
-            {
-                shader.SetInt($"TEX{index}", index);
-                shader.SetInt($"TEX{index}LightType", 0);
-                shader.SetInt($"TEX{index}ColorOperation", 0);
-                shader.SetInt($"TEX{index}AlphaOperation", 0);
-                shader.SetInt($"TEX{index}CoordType", 0);
-                shader.SetInt($"TEX{index}Blend", 1);
-                shader.SetBoolToInt($"TEX{index}MirrorFix", false);
-                shader.SetVector2($"TEX{index}UVScale", 1, 1);
-                shader.SetMatrix4x4($"TEX{index}Transform", ref id);
-            }
-
             // Bind Textures
             if (mobj.Textures != null)
             {
@@ -442,15 +429,42 @@ namespace HSDRawViewer.Rendering
                     int colorOP = ((int)flags >> 16) & 0xF;
                     int alphaOP = ((int)flags >> 20) & 0xF;
                     
-                    shader.SetInt($"TEX{index}", index);
-                    shader.SetInt($"TEX{index}LightType", lightType);
-                    shader.SetInt($"TEX{index}ColorOperation", colorOP);
-                    shader.SetInt($"TEX{index}AlphaOperation", alphaOP);
-                    shader.SetInt($"TEX{index}CoordType", coordType);
-                    shader.SetFloat($"TEX{index}Blend", blending);
-                    shader.SetBoolToInt($"TEX{index}MirrorFix", mirrorY);
-                    shader.SetVector2($"TEX{index}UVScale", wscale, hscale);
-                    shader.SetMatrix4x4($"TEX{index}Transform", ref transform);
+                    shader.SetInt($"TEX{index}.tex", index);
+                    shader.SetInt($"TEX{index}.light_type", lightType);
+                    shader.SetInt($"TEX{index}.color_operation", colorOP);
+                    shader.SetInt($"TEX{index}.alpha_operation", alphaOP);
+                    shader.SetInt($"TEX{index}.coord_type", coordType);
+                    shader.SetFloat($"TEX{index}.blend", blending);
+                    shader.SetBoolToInt($"TEX{index}.mirror_fix", mirrorY);
+                    shader.SetVector2($"TEX{index}.uv_scale", wscale, hscale);
+                    shader.SetMatrix4x4($"TEX{index}.transform", ref transform);
+
+                    var tev = tex.TEV;
+                    shader.SetBoolToInt($"hasTEX{index}Tev", tev != null);
+                    if (tev != null)
+                    {
+                        shader.SetInt($"TEX{index}Tev.color_op", (int)tev.color_op);
+                        shader.SetInt($"TEX{index}Tev.color_bias", (int)tev.color_bias);
+                        shader.SetInt($"TEX{index}Tev.color_scale", (int)tev.color_scale);
+                        shader.SetBoolToInt($"TEX{index}Tev.color_clamp", tev.color_clamp);
+                        shader.SetInt($"TEX{index}Tev.color_a", (int)tev.color_a_in);
+                        shader.SetInt($"TEX{index}Tev.color_b", (int)tev.color_b_in);
+                        shader.SetInt($"TEX{index}Tev.color_c", (int)tev.color_c_in);
+                        shader.SetInt($"TEX{index}Tev.color_d", (int)tev.color_d_in);
+
+                        shader.SetInt($"TEX{index}Tev.alpha_op", (int)tev.alpha_op);
+                        shader.SetInt($"TEX{index}Tev.alpha_bias", (int)tev.alpha_bias);
+                        shader.SetInt($"TEX{index}Tev.alpha_scale", (int)tev.alpha_scale);
+                        shader.SetBoolToInt($"TEX{index}Tev.alpha_clamp", tev.alpha_clamp);
+                        shader.SetInt($"TEX{index}Tev.alpha_a", (int)tev.alpha_a_in);
+                        shader.SetInt($"TEX{index}Tev.alpha_b", (int)tev.alpha_b_in);
+                        shader.SetInt($"TEX{index}Tev.alpha_c", (int)tev.alpha_c_in);
+                        shader.SetInt($"TEX{index}Tev.alpha_d", (int)tev.alpha_d_in);
+
+                        shader.SetColor($"TEX{index}Tev.konst", tev.constant, tev.constantAlpha);
+                        shader.SetColor($"TEX{index}Tev.tev0", tev.tev0, tev.tev0Alpha);
+                        shader.SetColor($"TEX{index}Tev.tev1", tev.tev1, tev.tev1Alpha);
+                    }
                 }
             }
         }

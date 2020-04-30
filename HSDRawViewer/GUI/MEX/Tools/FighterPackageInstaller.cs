@@ -471,9 +471,9 @@ namespace HSDRawViewer.GUI.MEX
             int GroupID = externalId - (externalId > 18 ? 1 : 0);
 
             // Inject CSPs and Stock Icons into Character Select
-            var chrSelPath = Path.Combine(root, "MnSlChr.usd");
-            if (File.Exists(chrSelPath))
-                InjectCharSelectImages(pack, chrSelPath, iconTOBJs, emblemTexture, fighter, stride, GroupID);
+            //var chrSelPath = Path.Combine(root, "MnSlChr.usd");
+            //if (File.Exists(chrSelPath))
+            //    InjectCharSelectImages(pack, chrSelPath, iconTOBJs, emblemTexture, fighter, stride, GroupID);
 
             // Inject Stock Icons into IfAll, GmRst
 

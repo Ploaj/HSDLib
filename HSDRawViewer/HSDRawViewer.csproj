@@ -134,20 +134,20 @@
     <Compile Include="ContextMenus\UnidentifiedContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Converters\CHR0Converter.cs" />
-    <Compile Include="Converters\ConvFOBJ.cs" />
+    <Compile Include="Converters\Animation\CHR0Converter.cs" />
+    <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\ConvSVG.cs" />
     <Compile Include="Converters\DAEWriter.cs" />
-    <Compile Include="Converters\EmblemConverter.cs" />
-    <Compile Include="Converters\MayaAnim.cs" />
-    <Compile Include="Converters\MexCssGenerator.cs" />
-    <Compile Include="Converters\MexFighterConverter.cs" />
-    <Compile Include="Converters\MexMapGenerator.cs" />
-    <Compile Include="Converters\MexMenuAnimationGenerator.cs" />
+    <Compile Include="Converters\Mex\EmblemConverter.cs" />
+    <Compile Include="Converters\Animation\MayaAnim.cs" />
+    <Compile Include="Converters\Mex\MexCssGenerator.cs" />
+    <Compile Include="Converters\Mex\MexFighterConverter.cs" />
+    <Compile Include="Converters\Mex\MexMapGenerator.cs" />
+    <Compile Include="Converters\Mex\MexMenuAnimationGenerator.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\ModeltoCollData.cs" />
-    <Compile Include="Converters\MOTLoader.cs" />
+    <Compile Include="Converters\Animation\MOTLoader.cs" />
     <Compile Include="Converters\OutlineGenerator.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />

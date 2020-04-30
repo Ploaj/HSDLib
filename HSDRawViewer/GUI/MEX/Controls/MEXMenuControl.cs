@@ -182,7 +182,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            if (!viewport.Visible)
+            if (!viewport.Visible && !viewport.ReadyToRender)
                 return;
 
             // camera view

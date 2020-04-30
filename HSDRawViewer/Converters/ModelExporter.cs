@@ -627,7 +627,7 @@ namespace HSDRawViewer.Converters
                 foreach (var v in verts)
                 {
                     vIndex++;
-                    if (parent != null && jobjToIndex[parent] != 0 && !parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                    if (parent != null && jobjToIndex[parent] != 0 && !parent.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL))
                     {
                         var vertexWeight = new VertexWeight();
                         vertexWeight.VertexID = vIndex;

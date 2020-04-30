@@ -4,7 +4,14 @@
     {
         public override int TrimmedSize { get; } = 0x10;
 
-        //public uint NameOffset { get; set; }
+        /// <summary>
+        /// Used for class lookup, but you can put whatever you want here
+        /// </summary>
+        public string ClassName
+        {
+            get => _s.GetString(0x00);
+            set => _s.SetString(0x00, value);
+        }
 
         public override HSD_DOBJ Next { get => _s.GetReference<HSD_DOBJ>(0x04); set => _s.SetReference(0x04, value); }
 
