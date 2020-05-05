@@ -102,7 +102,7 @@ namespace HSDRawViewer.Converters
                         // generate key with time and value
                         var animkey = new MayaAnim.AnimKey()
                         {
-                            input = state.t0 + 1,
+                            input = state.t0,
                             output = state.p0,
                         };
                         
@@ -113,7 +113,7 @@ namespace HSDRawViewer.Converters
                         if (state.op_intrp == GXInterpolationType.HSD_A_OP_CON || 
                             state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
                         {
-                            animkey.intan = "step";
+                            animkey.intan = "auto";
                             animkey.outtan = "step";
                         }
 
@@ -132,10 +132,14 @@ namespace HSDRawViewer.Converters
 
                         prevState = state;
 
+                        animkey.t1 = (float)Math.Atan(MathHelper.RadiansToDegrees(animkey.t1));
+                        animkey.t2 = (float)Math.Atan(MathHelper.RadiansToDegrees(animkey.t2));
+                        
                         if (mtrack.IsAngular() && !MayaSettings.UseRadians)
                         {
                             animkey.output = MathHelper.RadiansToDegrees(animkey.output);
-                            //TODO: are slopes supposed to be degrees as well?
+                            animkey.t1 = MathHelper.RadiansToDegrees(animkey.t1);
+                            animkey.t2 = MathHelper.RadiansToDegrees(animkey.t2);
                         }
 
                         // add final key
@@ -147,7 +151,8 @@ namespace HSDRawViewer.Converters
             }
 
             // set framecount
-            a.header.endTime = animation.FrameCount + 1;
+            a.header.endTime = animation.FrameCount;
+            a.header.startTime = 0;
 
             // save to file
             a.Save(filePath);
@@ -163,7 +168,7 @@ namespace HSDRawViewer.Converters
             mayaFile.Open(filePath);
 
             JointAnimManager animation = new JointAnimManager();
-            animation.FrameCount = mayaFile.header.endTime - 1;
+            animation.FrameCount = mayaFile.header.endTime - mayaFile.header.startTime;
 
             // process and encode FOBJ keys
             foreach(var mNode in mayaFile.Nodes)
@@ -187,7 +192,7 @@ namespace HSDRawViewer.Converters
                         var mKeyNext = i + 1 < mTrack.keys.Count ? mTrack.keys[i + 1] : mTrack.keys[i];
 
                         var k = new FOBJKey();
-                        k.Frame = mKey.input - 1;
+                        k.Frame = mKey.input - mayaFile.header.startTime;
                         k.Value = trackUnit ? MathHelper.DegreesToRadians(mKey.output) : mKey.output;
                         switch (mKey.outtan)
                         {
@@ -208,7 +213,7 @@ namespace HSDRawViewer.Converters
                             case "fixed":
                             case "spline":
                                 k.InterpolationType = GXInterpolationType.HSD_A_OP_SPL;
-                                k.Tan = degrees ? MathHelper.DegreesToRadians(mKey.t1) : mKey.t1;
+                                k.Tan = AngleToTan(mKey.t1, degrees);
 
                                 if((mKeyNext.input - mKey.input) <= 1) // optimization
                                 {
@@ -229,7 +234,7 @@ namespace HSDRawViewer.Converters
                                     var slp = new FOBJKey();
                                     slp.Frame = mKeyNext.input - 1;
                                     slp.InterpolationType = GXInterpolationType.HSD_A_OP_SLP;
-                                    slp.Tan = degrees ? MathHelper.DegreesToRadians(mKey.t2) : mKey.t2;
+                                    slp.Tan = AngleToTan(mKey.t2, degrees);
                                     t.Keys.Add(slp);
                                 }
                                 else
@@ -256,15 +261,19 @@ namespace HSDRawViewer.Converters
                 animation.Nodes.Add(node);
             }
 
-            // linear, const, and step are straight forward:
-            // if only one value, use KEY
-            // for step only out matters?
-
-            // slope notes:
-            // if output tan is not equal to next frames input, add SPL operation to use new spline
-            // if output slope is 0, use SLP0? TODO: find slp0 to test with
-
             return animation;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <param name="degree"></param>
+        /// <returns></returns>
+        public static float AngleToTan(float angle, bool degree)
+        {
+            return (float)(Math.Tan(angle * Math.PI / 180) * (degree ? Math.PI / 180 : 1));
         }
     }
 
@@ -557,7 +566,7 @@ namespace HSDRawViewer.Converters
                 file.WriteLine("timeUnit " + header.timeUnit + ";");
                 file.WriteLine("linearUnit " + header.linearUnit + ";");
                 file.WriteLine("angularUnit " + header.angularUnit + ";");
-                file.WriteLine("startTime " + 1 + ";");
+                file.WriteLine("startTime " + header.startTime + ";");
                 file.WriteLine("endTime " + header.endTime + ";");
 
                 int Row = 0;

@@ -943,8 +943,15 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     HSDRawFile file = new HSDRawFile(f);
 
-                    if (file.Roots.Count > 0 && file.Roots[0].Data is HSD_MOBJ mobj)
-                        con.DOBJ.Mobj = mobj;
+                    if (file.Roots.Count > 0)
+                    {
+                        var mobj = new HSD_MOBJ();
+                        if(file.Roots[0].Data._s.Length >= mobj.TrimmedSize)
+                        {
+                            mobj._s = file.Roots[0].Data._s;
+                            con.DOBJ.Mobj = mobj;
+                        }
+                    }
 
                     JOBJManager.RefreshRendering = true;
                 }

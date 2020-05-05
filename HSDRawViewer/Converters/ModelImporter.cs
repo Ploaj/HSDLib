@@ -520,7 +520,7 @@ namespace HSDRawViewer.Converters
         {
             if (node.Name.EndsWith("_end"))
                 return null;
-
+            
             var t = node.Transform;
             var transform = new OpenTK.Matrix4(
                                         t.A1, t.B1, t.C1, t.D1,
@@ -539,7 +539,7 @@ namespace HSDRawViewer.Converters
             
             HSD_JOBJ jobj = new HSD_JOBJ();
 
-            if (node.Parent != null && node.Parent != scene.RootNode)
+            if (node.Parent != null)
             {
                 transform = transform * cache.jobjToWorldTransform[cache.NameToJOBJ[node.Parent.Name]];
             }

@@ -178,7 +178,7 @@ namespace HSDRawViewer.Sound
                             if(index != -1)
                             {
                                 e.SoundBank.GroupFlags = mexData.SSMTable.SSM_LookupTable[index].EntireFlag;
-                                e.SoundBank.Flag = mexData.SSMTable.SSM_Flags[index].Flag;
+                                e.SoundBank.Flag = mexData.SSMTable.SSM_BufferSizes[index].Flag;
                             }
                         }
 
@@ -206,10 +206,10 @@ namespace HSDRawViewer.Sound
             if(mexData != null)
             {
                 mexData.SSMTable.SSM_SSMFiles.Array = new HSD_String[0];
-                mexData.SSMTable.SSM_Flags.Array = new MEX_SSMSizeAndFlags[0];
+                mexData.SSMTable.SSM_BufferSizes.Array = new MEX_SSMSizeAndFlags[0];
                 mexData.SSMTable.SSM_LookupTable.Array = new MEX_SSMLookup[0];
                 
-                mexData.SSMTable.SSM_Flags.Set(Entries.Count, new MEX_SSMSizeAndFlags());// blank entry at end
+                mexData.SSMTable.SSM_BufferSizes.Set(Entries.Count, new MEX_SSMSizeAndFlags());// blank entry at end
                 mexData.SSMTable.SSM_LookupTable.Set(Entries.Count, new MEX_SSMLookup());// blank entry at beginning
 
                 // generate runtime struct
@@ -272,7 +272,7 @@ namespace HSDRawViewer.Sound
                         if(mexData != null)
                         {
                             mexData.SSMTable.SSM_SSMFiles.Set(entryIndex, new HSD_String() { Value = e.SoundBank.Name });
-                            mexData.SSMTable.SSM_Flags.Set(entryIndex, new MEX_SSMSizeAndFlags() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
+                            mexData.SSMTable.SSM_BufferSizes.Set(entryIndex, new MEX_SSMSizeAndFlags() { Flag = e.SoundBank.Flag, SSMFileSize = bufSize});
                             var lu = new MEX_SSMLookup();
                             lu._s.SetInt32(0x00, e.SoundBank.GroupFlags);
                             mexData.SSMTable.SSM_LookupTable.Set(entryIndex, lu);
