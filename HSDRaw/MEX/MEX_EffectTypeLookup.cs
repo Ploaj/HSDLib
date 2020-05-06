@@ -3,7 +3,9 @@
     public enum MEXEffectType
     {
         Effect_Particle,
+        Effect_DefinePosRot,
         Effect_UseJointPos,
+        Effect_UseJointPosRot,
         Effect_UseJointPos_GroundOrientation,
         Effect_FollowJointPos,
         Effect_FollowJointPosRot,

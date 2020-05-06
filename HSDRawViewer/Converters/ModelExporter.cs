@@ -472,6 +472,9 @@ namespace HSDRawViewer.Converters
                         Node dobjNode = new Node();
                         dobjNode.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}";
 
+                        if (!string.IsNullOrEmpty(dobj.ClassName))
+                            dobjNode.Name = dobj.ClassName;
+
                         if (dobj.Pobj != null)
                         {
                             var pindex = 0;
@@ -654,10 +657,11 @@ namespace HSDRawViewer.Converters
                                     var vertexWeight = new VertexWeight();
                                     vertexWeight.VertexID = vIndex;
                                     vertexWeight.Weight = en.Weights[w];
-                                    jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
+                                    if(jobjToBone.ContainsKey(en.JOBJs[w]))
+                                        jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
                                 }
 
-                                if (en.EnvelopeCount > 0 && en.GetWeightAt(0) == 1)
+                                if (en.EnvelopeCount > 0 && en.GetWeightAt(0) == 1 && jobjToIndex.ContainsKey(en.JOBJs[0]))
                                     weight = WorldTransforms[jobjToIndex[en.JOBJs[0]]];
                                 else
                                     weight = parentTransform;
@@ -729,7 +733,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private static Vector3D ProcessUVTransform(GXVector2 gvVec, HSD_MOBJ mobj, int texIndex)
         {
-            if (mobj == null)
+            if (mobj == null || mobj.Textures == null)
                 return new Vector3D(gvVec.X, gvVec.Y, 1);
 
             var tex = mobj.Textures.List[texIndex];

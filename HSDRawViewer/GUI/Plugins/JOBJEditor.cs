@@ -957,5 +957,19 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void reorientSkeletonForFighterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("Reorient Bones", "This makes changes to bones and cannot be undone", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+            {
+                JOBJTools.ApplyMeleeFighterTransforms(root);
+                JOBJManager.RecalculateInverseBinds();
+            }
+        }
     }
 }

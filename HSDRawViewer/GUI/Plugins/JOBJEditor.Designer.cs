@@ -34,12 +34,20 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.treeJOBJ = new System.Windows.Forms.TreeView();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+            this.jointOptionsDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.recalculateInverseBindsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.replaceBonesFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.materialDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
             this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
@@ -51,8 +59,6 @@
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.importBoneLabelINIToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.importAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asMayaANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,21 +75,18 @@
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
-            this.jointOptionsDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.recalculateInverseBindsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.replaceBonesFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.materialDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importBoneINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.meleeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reorientSkeletonForFighterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.toolStrip3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
-            this.toolStrip3.SuspendLayout();
             this.SuspendLayout();
             // 
             // listDOBJ
@@ -139,6 +142,46 @@
             this.treeJOBJ.Name = "treeJOBJ";
             this.treeJOBJ.Size = new System.Drawing.Size(323, 100);
             this.treeJOBJ.TabIndex = 0;
+            // 
+            // toolStrip3
+            // 
+            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.jointOptionsDropDownButton1});
+            this.toolStrip3.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(323, 25);
+            this.toolStrip3.TabIndex = 1;
+            this.toolStrip3.Text = "toolStrip3";
+            // 
+            // jointOptionsDropDownButton1
+            // 
+            this.jointOptionsDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.jointOptionsDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importBoneINIToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.meleeToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.recalculateInverseBindsToolStripMenuItem,
+            this.replaceBonesFromFileToolStripMenuItem});
+            this.jointOptionsDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("jointOptionsDropDownButton1.Image")));
+            this.jointOptionsDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.jointOptionsDropDownButton1.Name = "jointOptionsDropDownButton1";
+            this.jointOptionsDropDownButton1.Size = new System.Drawing.Size(62, 22);
+            this.jointOptionsDropDownButton1.Text = "Options";
+            // 
+            // recalculateInverseBindsToolStripMenuItem
+            // 
+            this.recalculateInverseBindsToolStripMenuItem.Name = "recalculateInverseBindsToolStripMenuItem";
+            this.recalculateInverseBindsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.recalculateInverseBindsToolStripMenuItem.Text = "Recalculate Inverse Binds";
+            this.recalculateInverseBindsToolStripMenuItem.Click += new System.EventHandler(this.recalculateInverseBindsToolStripMenuItem_Click);
+            // 
+            // replaceBonesFromFileToolStripMenuItem
+            // 
+            this.replaceBonesFromFileToolStripMenuItem.Name = "replaceBonesFromFileToolStripMenuItem";
+            this.replaceBonesFromFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.replaceBonesFromFileToolStripMenuItem.Text = "Replace Bones From File";
+            this.replaceBonesFromFileToolStripMenuItem.Click += new System.EventHandler(this.replaceBonesFromFileToolStripMenuItem_Click);
             // 
             // tabPage2
             // 
@@ -199,6 +242,41 @@
             this.clearAllPOBJsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.clearAllPOBJsToolStripMenuItem.Text = "Clear All POBJs";
             this.clearAllPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearAllPOBJsToolStripMenuItem_Click);
+            // 
+            // materialDropDownButton1
+            // 
+            this.materialDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editToolStripMenuItem,
+            this.importToolStripMenuItem,
+            this.exportToolStripMenuItem});
+            this.materialDropDownButton1.Image = global::HSDRawViewer.Properties.Resources.ico_mobj;
+            this.materialDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.materialDropDownButton1.Name = "materialDropDownButton1";
+            this.materialDropDownButton1.Size = new System.Drawing.Size(79, 22);
+            this.materialDropDownButton1.Text = "Material";
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.editToolStripMenuItem.Text = "Edit";
+            this.editToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
+            // importToolStripMenuItem
+            // 
+            this.importToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Text = "Import";
+            this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
             // buttonMoveUp
             // 
@@ -282,8 +360,6 @@
             this.importModelFromFileToolStripMenuItem,
             this.exportModelToFileToolStripMenuItem,
             this.toolStripSeparator2,
-            this.importBoneLabelINIToolStripMenuItem1,
-            this.toolStripSeparator3,
             this.importAnimationToolStripMenuItem,
             this.exportAnimationToolStripMenuItem,
             this.editAnimationToolStripMenuItem,
@@ -312,18 +388,6 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(196, 6);
-            // 
-            // importBoneLabelINIToolStripMenuItem1
-            // 
-            this.importBoneLabelINIToolStripMenuItem1.Name = "importBoneLabelINIToolStripMenuItem1";
-            this.importBoneLabelINIToolStripMenuItem1.Size = new System.Drawing.Size(199, 22);
-            this.importBoneLabelINIToolStripMenuItem1.Text = "Import Bone Label INI";
-            this.importBoneLabelINIToolStripMenuItem1.Click += new System.EventHandler(this.importBoneLabelINIToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(196, 6);
             // 
             // importAnimationToolStripMenuItem
             // 
@@ -456,76 +520,37 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // toolStrip3
+            // importBoneINIToolStripMenuItem
             // 
-            this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.jointOptionsDropDownButton1});
-            this.toolStrip3.Location = new System.Drawing.Point(3, 3);
-            this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(323, 25);
-            this.toolStrip3.TabIndex = 1;
-            this.toolStrip3.Text = "toolStrip3";
+            this.importBoneINIToolStripMenuItem.Name = "importBoneINIToolStripMenuItem";
+            this.importBoneINIToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.importBoneINIToolStripMenuItem.Text = "Import Bone Label INI";
+            this.importBoneINIToolStripMenuItem.Click += new System.EventHandler(this.importBoneLabelINIToolStripMenuItem_Click);
             // 
-            // jointOptionsDropDownButton1
+            // toolStripSeparator1
             // 
-            this.jointOptionsDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.jointOptionsDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.recalculateInverseBindsToolStripMenuItem,
-            this.replaceBonesFromFileToolStripMenuItem});
-            this.jointOptionsDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("jointOptionsDropDownButton1.Image")));
-            this.jointOptionsDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.jointOptionsDropDownButton1.Name = "jointOptionsDropDownButton1";
-            this.jointOptionsDropDownButton1.Size = new System.Drawing.Size(62, 22);
-            this.jointOptionsDropDownButton1.Text = "Options";
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
             // 
-            // recalculateInverseBindsToolStripMenuItem
+            // meleeToolStripMenuItem
             // 
-            this.recalculateInverseBindsToolStripMenuItem.Name = "recalculateInverseBindsToolStripMenuItem";
-            this.recalculateInverseBindsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.recalculateInverseBindsToolStripMenuItem.Text = "Recalculate Inverse Binds";
-            this.recalculateInverseBindsToolStripMenuItem.Click += new System.EventHandler(this.recalculateInverseBindsToolStripMenuItem_Click);
+            this.meleeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reorientSkeletonForFighterToolStripMenuItem});
+            this.meleeToolStripMenuItem.Name = "meleeToolStripMenuItem";
+            this.meleeToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.meleeToolStripMenuItem.Text = "Melee";
             // 
-            // replaceBonesFromFileToolStripMenuItem
+            // reorientSkeletonForFighterToolStripMenuItem
             // 
-            this.replaceBonesFromFileToolStripMenuItem.Name = "replaceBonesFromFileToolStripMenuItem";
-            this.replaceBonesFromFileToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.replaceBonesFromFileToolStripMenuItem.Text = "Replace Bones From File";
-            this.replaceBonesFromFileToolStripMenuItem.Click += new System.EventHandler(this.replaceBonesFromFileToolStripMenuItem_Click);
+            this.reorientSkeletonForFighterToolStripMenuItem.Name = "reorientSkeletonForFighterToolStripMenuItem";
+            this.reorientSkeletonForFighterToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.reorientSkeletonForFighterToolStripMenuItem.Text = "Reorient Skeleton for Fighter";
+            this.reorientSkeletonForFighterToolStripMenuItem.Click += new System.EventHandler(this.reorientSkeletonForFighterToolStripMenuItem_Click);
             // 
-            // materialDropDownButton1
+            // toolStripSeparator3
             // 
-            this.materialDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editToolStripMenuItem,
-            this.importToolStripMenuItem,
-            this.exportToolStripMenuItem});
-            this.materialDropDownButton1.Image = global::HSDRawViewer.Properties.Resources.ico_mobj;
-            this.materialDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.materialDropDownButton1.Name = "materialDropDownButton1";
-            this.materialDropDownButton1.Size = new System.Drawing.Size(79, 22);
-            this.materialDropDownButton1.Text = "Material";
-            // 
-            // editToolStripMenuItem
-            // 
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.editToolStripMenuItem.Text = "Edit";
-            this.editToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // exportToolStripMenuItem
-            // 
-            this.exportToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.exportToolStripMenuItem.Text = "Export";
-            this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
-            // 
-            // importToolStripMenuItem
-            // 
-            this.importToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
-            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.importToolStripMenuItem.Text = "Import";
-            this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(203, 6);
             // 
             // JOBJEditor
             // 
@@ -544,6 +569,8 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.toolStrip3.ResumeLayout(false);
+            this.toolStrip3.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
@@ -551,8 +578,6 @@
             this.groupBox1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.toolStrip3.ResumeLayout(false);
-            this.toolStrip3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -585,8 +610,6 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripComboBox renderModeBox;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem importBoneLabelINIToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem importAnimationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportAnimationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem asMayaANIMToolStripMenuItem;
@@ -608,5 +631,10 @@
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importBoneINIToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem meleeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reorientSkeletonForFighterToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }

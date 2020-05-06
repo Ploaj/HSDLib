@@ -138,6 +138,7 @@
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\ConvSVG.cs" />
     <Compile Include="Converters\DAEWriter.cs" />
+    <Compile Include="Converters\JOBJTools.cs" />
     <Compile Include="Converters\Mex\EmblemConverter.cs" />
     <Compile Include="Converters\Animation\MayaAnim.cs" />
     <Compile Include="Converters\Mex\MexCssGenerator.cs" />
@@ -158,7 +159,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ArrayMemberEditor.cs" />
+    <Compile Include="GUI\ArrayMemberEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="GUI\ArrayMemberEditor.Designer.cs">
       <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
     </Compile>
