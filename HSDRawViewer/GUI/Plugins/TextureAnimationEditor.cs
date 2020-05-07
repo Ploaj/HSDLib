@@ -366,38 +366,14 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 if (tobjs.Length == 1)
                 {
-                    using (TextureImportDialog settings = new TextureImportDialog())
-                    {
-                        if (settings.ShowDialog() == DialogResult.OK)
-                        {
-                            using (Bitmap bmp = new Bitmap(f))
-                            {
-                                settings.ApplySettings(bmp);
-                                TOBJConverter.InjectBitmap(tobjs[index], bmp, settings.TextureFormat, settings.PaletteFormat);
-                            }
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
+                    TOBJConverter.InjectBitmap(f, tobjs[index]);
                 }
                 else
                 {
                     var beforeH = tobjs[index].ImageData.Height;
                     var beforeW = tobjs[index].ImageData.Width;
 
-                    var bmp = new Bitmap(f);
-
-                    /*if (beforeW != bmp.Width || beforeH != bmp.Height)
-                    {
-                        MessageBox.Show($"Error the texture size does not match\n{beforeW}x{beforeH} -> {bmp.Width}x{bmp.Height}");
-                        return;
-                    }*/
-
-                    bmp.Dispose();
-
-                    TOBJConverter.InjectBitmap(tobjs[index], f, tobjs[index].ImageData.Format, tobjs[index].TlutData != null ? tobjs[index].TlutData.Format : GXTlutFmt.IA8);
+                    TOBJConverter.InjectBitmap(f, tobjs[index], tobjs[index].ImageData.Format, tobjs[index].TlutData != null ? tobjs[index].TlutData.Format : GXTlutFmt.IA8);
                 }
             }
             else
@@ -465,7 +441,7 @@ namespace HSDRawViewer.GUI.Plugins
                             foreach(var fi in f)
                             {
                                 tobj = new HSD_TOBJ();
-                                TOBJConverter.InjectBitmap(tobj, fi, texFormat, palFormat);
+                                TOBJConverter.InjectBitmap(fi, tobj, texFormat, palFormat);
                                 tobjs[ti++] = tobj;
                             }
                         }
@@ -484,7 +460,7 @@ namespace HSDRawViewer.GUI.Plugins
                     foreach(var fi in f)
                     {
                         tobj = new HSD_TOBJ();
-                        TOBJConverter.InjectBitmap(tobj, fi, texFormat, palFormat);
+                        TOBJConverter.InjectBitmap(fi, tobj, texFormat, palFormat);
 
                         /*if (tobj.ImageData.Width != tobjs[0].ImageData.Width || tobj.ImageData.Height != tobjs[0].ImageData.Height)
                         {
@@ -700,7 +676,7 @@ namespace HSDRawViewer.GUI.Plugins
                         {
                             images[i] = new HSD_TOBJ();
                             var image = bmp.Clone(new Rectangle(bmp.Width / td.ImageCount * i, 0, bmp.Width / td.ImageCount, bmp.Height), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            TOBJConverter.InjectBitmap(images[i], image, td.TextureFormat, td.PaletteFormat);
+                            TOBJConverter.InjectBitmap(image, images[i], td.TextureFormat, td.PaletteFormat);
                             image.Dispose();
                         }
                         bmp.Dispose();
@@ -769,7 +745,7 @@ namespace HSDRawViewer.GUI.Plugins
                             else
                             {
                                 HSD_TOBJ temp = new HSD_TOBJ();
-                                TOBJConverter.InjectBitmap(temp, f, td.TextureFormat, td.PaletteFormat);
+                                TOBJConverter.InjectBitmap(f, temp, td.TextureFormat, td.PaletteFormat);
 
                                 HSD_TexBuffer buf = new HSD_TexBuffer();
                                 buf.Data = temp.ImageData;
