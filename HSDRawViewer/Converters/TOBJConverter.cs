@@ -74,7 +74,7 @@ namespace HSDRawViewer.Converters
                 Blending = 1
             };
 
-            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 using (TextureImportDialog settings = new TextureImportDialog())

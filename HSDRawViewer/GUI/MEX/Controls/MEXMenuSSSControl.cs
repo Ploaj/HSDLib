@@ -373,7 +373,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void importNewIconImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 using (Bitmap bmp = new Bitmap(f))

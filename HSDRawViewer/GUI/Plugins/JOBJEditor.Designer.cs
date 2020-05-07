@@ -36,6 +36,11 @@
             this.treeJOBJ = new System.Windows.Forms.TreeView();
             this.toolStrip3 = new System.Windows.Forms.ToolStrip();
             this.jointOptionsDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.importBoneINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.meleeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reorientSkeletonForFighterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.recalculateInverseBindsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceBonesFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -75,11 +80,7 @@
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.importBoneINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.meleeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reorientSkeletonForFighterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportBoneLabelINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -158,6 +159,7 @@
             this.jointOptionsDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.jointOptionsDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importBoneINIToolStripMenuItem,
+            this.exportBoneLabelINIToolStripMenuItem,
             this.toolStripSeparator1,
             this.meleeToolStripMenuItem,
             this.toolStripSeparator3,
@@ -168,6 +170,38 @@
             this.jointOptionsDropDownButton1.Name = "jointOptionsDropDownButton1";
             this.jointOptionsDropDownButton1.Size = new System.Drawing.Size(62, 22);
             this.jointOptionsDropDownButton1.Text = "Options";
+            // 
+            // importBoneINIToolStripMenuItem
+            // 
+            this.importBoneINIToolStripMenuItem.Name = "importBoneINIToolStripMenuItem";
+            this.importBoneINIToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.importBoneINIToolStripMenuItem.Text = "Import Bone Label INI";
+            this.importBoneINIToolStripMenuItem.Click += new System.EventHandler(this.importBoneLabelINIToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
+            // 
+            // meleeToolStripMenuItem
+            // 
+            this.meleeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reorientSkeletonForFighterToolStripMenuItem});
+            this.meleeToolStripMenuItem.Name = "meleeToolStripMenuItem";
+            this.meleeToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.meleeToolStripMenuItem.Text = "Melee";
+            // 
+            // reorientSkeletonForFighterToolStripMenuItem
+            // 
+            this.reorientSkeletonForFighterToolStripMenuItem.Name = "reorientSkeletonForFighterToolStripMenuItem";
+            this.reorientSkeletonForFighterToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.reorientSkeletonForFighterToolStripMenuItem.Text = "Reorient Skeleton for Fighter";
+            this.reorientSkeletonForFighterToolStripMenuItem.Click += new System.EventHandler(this.reorientSkeletonForFighterToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(203, 6);
             // 
             // recalculateInverseBindsToolStripMenuItem
             // 
@@ -520,37 +554,12 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // importBoneINIToolStripMenuItem
+            // exportBoneLabelINIToolStripMenuItem
             // 
-            this.importBoneINIToolStripMenuItem.Name = "importBoneINIToolStripMenuItem";
-            this.importBoneINIToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.importBoneINIToolStripMenuItem.Text = "Import Bone Label INI";
-            this.importBoneINIToolStripMenuItem.Click += new System.EventHandler(this.importBoneLabelINIToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
-            // 
-            // meleeToolStripMenuItem
-            // 
-            this.meleeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.reorientSkeletonForFighterToolStripMenuItem});
-            this.meleeToolStripMenuItem.Name = "meleeToolStripMenuItem";
-            this.meleeToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.meleeToolStripMenuItem.Text = "Melee";
-            // 
-            // reorientSkeletonForFighterToolStripMenuItem
-            // 
-            this.reorientSkeletonForFighterToolStripMenuItem.Name = "reorientSkeletonForFighterToolStripMenuItem";
-            this.reorientSkeletonForFighterToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.reorientSkeletonForFighterToolStripMenuItem.Text = "Reorient Skeleton for Fighter";
-            this.reorientSkeletonForFighterToolStripMenuItem.Click += new System.EventHandler(this.reorientSkeletonForFighterToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(203, 6);
+            this.exportBoneLabelINIToolStripMenuItem.Name = "exportBoneLabelINIToolStripMenuItem";
+            this.exportBoneLabelINIToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.exportBoneLabelINIToolStripMenuItem.Text = "Export Bone Label INI";
+            this.exportBoneLabelINIToolStripMenuItem.Click += new System.EventHandler(this.exportBoneLabelINIToolStripMenuItem_Click);
             // 
             // JOBJEditor
             // 
@@ -636,5 +645,6 @@
         private System.Windows.Forms.ToolStripMenuItem meleeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reorientSkeletonForFighterToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem exportBoneLabelINIToolStripMenuItem;
     }
 }

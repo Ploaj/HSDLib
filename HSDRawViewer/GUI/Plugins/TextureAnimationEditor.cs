@@ -361,7 +361,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             var tobjs = GetTOBJs();
 
-            var f = Tools.FileIO.OpenFile("PNG (.png)|*.png");
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 if (tobjs.Length == 1)
@@ -446,7 +446,7 @@ namespace HSDRawViewer.GUI.Plugins
             var tobjs = GetTOBJs();
 
             HSD_TOBJ tobj;
-            var f = Tools.FileIO.OpenFiles("PNG (.png)|*.png");
+            var f = Tools.FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 GXTexFmt texFormat = GXTexFmt.CMP;
@@ -622,7 +622,7 @@ namespace HSDRawViewer.GUI.Plugins
             if ((textureList.SelectedIndices == null || textureList.SelectedIndices.Count == 0) && TOBJ == null)
                 return;
 
-            var f = Tools.FileIO.SaveFile("PNG (.png)|*.png");
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 var ind = textureList.SelectedIndices.Count > 0 ? textureList.SelectedIndices[0] : 0;
@@ -639,7 +639,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void exportAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("PNG (*.png)|*.png");
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 var i = 0;
@@ -660,7 +660,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (TEXG == null)
                 return;
-            var f = Tools.FileIO.SaveFile("PNG (*.png)|*.png");
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 var bitmap = new Bitmap(TEXG.Width * TEXG.ImageCount, TEXG.Height);
@@ -685,7 +685,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (TEXG == null)
                 return;
-            var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 using (TextureImportDialog td = new TextureImportDialog())
@@ -717,7 +717,7 @@ namespace HSDRawViewer.GUI.Plugins
             if (TexAnim == null)
                 return;
 
-            var f = Tools.FileIO.SaveFile("PNG (*.png)|*.png");
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 for (int i = 0; i < TexAnim.ImageCount; i++)
@@ -747,7 +747,7 @@ namespace HSDRawViewer.GUI.Plugins
             if (TexAnim == null)
                 return;
 
-            var files = Tools.FileIO.OpenFiles("PNG (*.png)|*.png");
+            var files = Tools.FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
             if (files != null)
             {
                 using (TextureImportDialog td = new TextureImportDialog())

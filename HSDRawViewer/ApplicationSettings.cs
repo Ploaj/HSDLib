@@ -29,6 +29,9 @@ namespace HSDRawViewer
         public static string HSDFileFilter { get; } = "HSD DAT Archive File|*.dat;*.usd";
 
         [Browsable(false)]
+        public static string ImageFileFilter { get; } = "Supported Image Formats|*.png;*.bmp;*.jpg;*.jpeg";
+        
+        [Browsable(false)]
         public static List<Type> HSDTypes { get; internal set; } = new List<Type>();
 
         [Browsable(false)]

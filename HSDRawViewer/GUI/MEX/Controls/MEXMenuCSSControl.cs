@@ -422,7 +422,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
-                var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (f != null)
                 {
@@ -445,7 +445,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
-                var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (f != null)
                 {
@@ -482,7 +482,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
-                var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
+                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (f != null)
                 {

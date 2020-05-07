@@ -971,5 +971,37 @@ namespace HSDRawViewer.GUI.Plugins
                 JOBJManager.RecalculateInverseBinds();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportBoneLabelINIToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.SaveFile("Label INI (*.ini)|*.ini");
+
+            if (f != null)
+            {
+                using (FileStream stream = new FileStream(f, FileMode.Create))
+                using (StreamWriter w = new StreamWriter(stream))
+                    if (BoneLabelMap.Count > 0)
+                    {
+                        foreach (var b in BoneLabelMap)
+                            w.WriteLine($"JOBJ_{b.Key}={b.Value}");
+                    }
+                    else
+                    {
+                        var bones = root.BreathFirstList;
+                        var ji = 0;
+                        foreach(var j in bones)
+                        {
+                            if (!string.IsNullOrEmpty(j.ClassName))
+                                w.WriteLine($"JOBJ_{ji}={j.ClassName}");
+                            ji++;
+                        }
+                    }
+            }
+        }
     }
 }

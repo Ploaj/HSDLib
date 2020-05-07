@@ -848,7 +848,7 @@ namespace HSDRawViewer.Converters
                         return Mobj;
                     }
                     else
-                    if (File.Exists(texturePath) && texturePath.EndsWith(".png"))
+                    if (File.Exists(texturePath) && (texturePath.ToLower().EndsWith(".png") || texturePath.ToLower().EndsWith(".bmp")))
                     {
                         Mobj.RenderFlags |= RENDER_MODE.TEX0;
 
