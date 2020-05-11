@@ -198,7 +198,8 @@ namespace HSDRawViewer.Converters
             var rootjobj = RecursiveProcess(cache, Settings, importmodel, importmodel.RootNode);
             
             // get root of skeleton
-            rootjobj = rootjobj.Child;
+            if(rootjobj.Child != null)
+                rootjobj = rootjobj.Child;
             rootjobj.Flags = 0;
 
             rootjobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;

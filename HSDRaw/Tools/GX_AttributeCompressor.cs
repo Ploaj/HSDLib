@@ -89,7 +89,13 @@ namespace HSDRaw.Tools
                     break;
                 case GXAttribName.GX_VA_CLR0:
                 case GXAttribName.GX_VA_CLR1:
-                    attr.CompCount = GXCompCnt.ClrRGB;
+                    if (attr.CompType == GXCompType.RGBA4 ||
+                        attr.CompType == GXCompType.RGBA6 ||
+                        attr.CompType == GXCompType.RGBA8 ||
+                        attr.CompType == GXCompType.RGBX8)
+                        attr.CompCount = GXCompCnt.ClrRGBA;
+                    else
+                        attr.CompCount = GXCompCnt.ClrRGB;
                     break;
                 default:
                     throw new NotSupportedException($"{attr.AttributeName} not supported for optimizing");

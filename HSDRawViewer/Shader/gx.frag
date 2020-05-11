@@ -346,8 +346,8 @@ vec4 ColorMap_Pass(vec4 passColor, TexUnit tex, bool enableTev, TevUnit tev, vec
 			
 	
 	
-	if(tex.alpha_operation == 1 && pass.a != 0) //Alpha Mask
-		passColor.a = pass.a;
+	//if(tex.alpha_operation == 1 && pass.a != 0) //Alpha Mask
+	//	passColor.a = pass.a;
 		
 	if(tex.alpha_operation == 2) // Blend
 		passColor.a = mix(passColor.a, pass.a, tex.blend);

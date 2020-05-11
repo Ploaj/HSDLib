@@ -86,7 +86,7 @@ namespace HSDRawViewer.GUI.Plugins
                 var vl = new List<CollLine>();
                 foreach (var l in Lines)
                 {
-                    if (cbShowAllGroups.Checked || l.Group == SelectedLineGroup)
+                    if (showAllCheckBox.Checked || l.Group == SelectedLineGroup)
                         vl.Add(l);
                 }
                 return vl;
@@ -100,7 +100,7 @@ namespace HSDRawViewer.GUI.Plugins
                 var vl = new List<CollVertex>();
                 foreach (var l in Lines)
                 {
-                    if (cbShowAllGroups.Checked && l.Group != SelectedLineGroup)
+                    if (showAllCheckBox.Checked && l.Group != SelectedLineGroup)
                         continue;
                     if (!vl.Contains(l.v1))
                         vl.Add(l.v1);
@@ -413,7 +413,7 @@ namespace HSDRawViewer.GUI.Plugins
                 var alpha = 0.25f;
                 if (line.Group == SelectedLineGroup)
                     alpha = 1;
-                else if (!cbShowAllGroups.Checked)
+                else if (!showAllCheckBox.Checked)
                     continue;
 
                 if (IsSelected(line))// && Blink)
@@ -489,7 +489,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             foreach (var v in Lines)
             {
-                if (v.Group != SelectedLineGroup && !cbShowAllGroups.Checked)
+                if (v.Group != SelectedLineGroup && !showAllCheckBox.Checked)
                     continue;
 
                 if (IsSelected(v.v1)) //&& Blink)
@@ -961,5 +961,17 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
         #endregion
+
+        private void flipDirectionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var lines = SelectedGroupLines;
+
+            foreach(var l in lines)
+            {
+                var temp = l.v1;
+                l.v1 = l.v2;
+                l.v2 = temp;
+            }
+        }
     }
 }

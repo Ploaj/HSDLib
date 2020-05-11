@@ -45,22 +45,26 @@
             this.cbSelectType = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.buttonAddGroup = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.buttonCalculateRange = new System.Windows.Forms.Button();
-            this.cbShowAllGroups = new System.Windows.Forms.CheckBox();
             this.cbRenderModes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Groups = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listLines = new System.Windows.Forms.ListBox();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.addGroupButton = new System.Windows.Forms.ToolStripButton();
+            this.optionsDropDown = new System.Windows.Forms.ToolStripDropDownButton();
+            this.showAllCheckBox = new System.Windows.Forms.ToolStripButton();
+            this.calculateRangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.flipDirectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.Groups.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolBox
@@ -224,16 +228,6 @@
             this.propertyGrid1.Size = new System.Drawing.Size(264, 178);
             this.propertyGrid1.TabIndex = 4;
             // 
-            // buttonAddGroup
-            // 
-            this.buttonAddGroup.Location = new System.Drawing.Point(3, 4);
-            this.buttonAddGroup.Name = "buttonAddGroup";
-            this.buttonAddGroup.Size = new System.Drawing.Size(37, 23);
-            this.buttonAddGroup.TabIndex = 5;
-            this.buttonAddGroup.Text = "+";
-            this.buttonAddGroup.UseVisualStyleBackColor = true;
-            this.buttonAddGroup.Click += new System.EventHandler(this.buttonAddGroup_Click);
-            // 
             // saveButton
             // 
             this.saveButton.Location = new System.Drawing.Point(6, 4);
@@ -253,28 +247,6 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(259, 82);
             this.listBox1.TabIndex = 0;
-            // 
-            // buttonCalculateRange
-            // 
-            this.buttonCalculateRange.Location = new System.Drawing.Point(46, 4);
-            this.buttonCalculateRange.Name = "buttonCalculateRange";
-            this.buttonCalculateRange.Size = new System.Drawing.Size(95, 23);
-            this.buttonCalculateRange.TabIndex = 6;
-            this.buttonCalculateRange.Text = "Calculate Range";
-            this.buttonCalculateRange.UseVisualStyleBackColor = true;
-            this.buttonCalculateRange.Click += new System.EventHandler(this.buttonCalculateRange_Click);
-            // 
-            // cbShowAllGroups
-            // 
-            this.cbShowAllGroups.AutoSize = true;
-            this.cbShowAllGroups.Checked = true;
-            this.cbShowAllGroups.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbShowAllGroups.Location = new System.Drawing.Point(147, 10);
-            this.cbShowAllGroups.Name = "cbShowAllGroups";
-            this.cbShowAllGroups.Size = new System.Drawing.Size(67, 17);
-            this.cbShowAllGroups.TabIndex = 8;
-            this.cbShowAllGroups.Text = "Show All";
-            this.cbShowAllGroups.UseVisualStyleBackColor = true;
             // 
             // cbRenderModes
             // 
@@ -314,9 +286,7 @@
             // 
             // Groups
             // 
-            this.Groups.Controls.Add(this.buttonCalculateRange);
-            this.Groups.Controls.Add(this.buttonAddGroup);
-            this.Groups.Controls.Add(this.cbShowAllGroups);
+            this.Groups.Controls.Add(this.toolStrip2);
             this.Groups.Controls.Add(this.listBox1);
             this.Groups.Location = new System.Drawing.Point(4, 22);
             this.Groups.Name = "Groups";
@@ -347,6 +317,66 @@
             this.listLines.Size = new System.Drawing.Size(253, 109);
             this.listLines.TabIndex = 0;
             // 
+            // toolStrip2
+            // 
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.optionsDropDown,
+            this.addGroupButton,
+            this.showAllCheckBox});
+            this.toolStrip2.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(253, 25);
+            this.toolStrip2.TabIndex = 10;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // addGroupButton
+            // 
+            this.addGroupButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.addGroupButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
+            this.addGroupButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.addGroupButton.Name = "addGroupButton";
+            this.addGroupButton.Size = new System.Drawing.Size(23, 22);
+            this.addGroupButton.Text = "Add Group";
+            this.addGroupButton.Click += new System.EventHandler(this.buttonAddGroup_Click);
+            // 
+            // optionsDropDown
+            // 
+            this.optionsDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.optionsDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.calculateRangeToolStripMenuItem,
+            this.flipDirectionToolStripMenuItem});
+            this.optionsDropDown.Image = ((System.Drawing.Image)(resources.GetObject("optionsDropDown.Image")));
+            this.optionsDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.optionsDropDown.Name = "optionsDropDown";
+            this.optionsDropDown.Size = new System.Drawing.Size(62, 22);
+            this.optionsDropDown.Text = "Options";
+            // 
+            // showAllCheckBox
+            // 
+            this.showAllCheckBox.Checked = true;
+            this.showAllCheckBox.CheckOnClick = true;
+            this.showAllCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showAllCheckBox.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.showAllCheckBox.Image = ((System.Drawing.Image)(resources.GetObject("showAllCheckBox.Image")));
+            this.showAllCheckBox.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.showAllCheckBox.Name = "showAllCheckBox";
+            this.showAllCheckBox.Size = new System.Drawing.Size(57, 22);
+            this.showAllCheckBox.Text = "Show All";
+            // 
+            // calculateRangeToolStripMenuItem
+            // 
+            this.calculateRangeToolStripMenuItem.Name = "calculateRangeToolStripMenuItem";
+            this.calculateRangeToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.calculateRangeToolStripMenuItem.Text = "Calculate Range";
+            this.calculateRangeToolStripMenuItem.Click += new System.EventHandler(this.buttonCalculateRange_Click);
+            // 
+            // flipDirectionToolStripMenuItem
+            // 
+            this.flipDirectionToolStripMenuItem.Name = "flipDirectionToolStripMenuItem";
+            this.flipDirectionToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.flipDirectionToolStripMenuItem.Text = "Flip Direction";
+            this.flipDirectionToolStripMenuItem.Click += new System.EventHandler(this.flipDirectionToolStripMenuItem_Click);
+            // 
             // CollDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -366,6 +396,8 @@
             this.Groups.ResumeLayout(false);
             this.Groups.PerformLayout();
             this.tabPage2.ResumeLayout(false);
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -378,9 +410,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbSelectType;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
-        private System.Windows.Forms.Button buttonAddGroup;
-        private System.Windows.Forms.Button buttonCalculateRange;
-        private System.Windows.Forms.CheckBox cbShowAllGroups;
         private System.Windows.Forms.ComboBox cbRenderModes;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolStrip toolStrip1;
@@ -399,5 +428,11 @@
         private System.Windows.Forms.TabPage Groups;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ListBox listLines;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripDropDownButton optionsDropDown;
+        private System.Windows.Forms.ToolStripButton addGroupButton;
+        private System.Windows.Forms.ToolStripButton showAllCheckBox;
+        private System.Windows.Forms.ToolStripMenuItem calculateRangeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem flipDirectionToolStripMenuItem;
     }
 }

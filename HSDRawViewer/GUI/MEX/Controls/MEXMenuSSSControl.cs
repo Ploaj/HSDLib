@@ -60,7 +60,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
             if (StageMenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(StageMenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 // regenerate and dump node
-                StageMenuFile["mexStageData"].Data = MexMapGenerator.GenerateMexMap(StageMenuFile["MnSelectStageDataTable"].Data as SBM_MnSelectStageDataTable, Icons);
+                var node = MexMapGenerator.GenerateMexMap(StageMenuFile["MnSelectStageDataTable"].Data as SBM_MnSelectStageDataTable, Icons);
+
+                if (StageMenuFile.Roots.Exists(e => e.Name.Equals("mexMapData")))
+                    StageMenuFile["mexMapData"].Data = node;
+                else
+                    StageMenuFile.Roots.Add(new HSDRootNode() { Name = "mexMapData", Data = node });
 
                 // save file
                 StageMenuFile.Save(StageMenuFilePath);

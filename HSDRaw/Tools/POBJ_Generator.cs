@@ -12,6 +12,8 @@ namespace HSDRaw.Tools
     /// </summary>
     public class POBJ_Generator
     {
+        public bool UseVertexAlpha { get; set; } = false;
+
         public bool UseTriangleStrips { get; set; } = true;
 
         private Dictionary<GXAttribName, Dictionary<int, int>> nameToIndexHash = new Dictionary<GXAttribName, Dictionary<int, int>>();
@@ -62,14 +64,19 @@ namespace HSDRaw.Tools
             {
                 if(!nameToAttr.ContainsKey(names[i]))
                 {
-                    nameToAttr.Add(names[i], new GX_Attribute()
+                    var attr = new GX_Attribute()
                     {
                         AttributeName = names[i],
                         AttributeType = GXAttribType.GX_DIRECT,
                         CompType = GXCompType.RGB8,
                         Stride = 4,
                         CompCount = GXCompCnt.ClrRGB
-                    });
+                    };
+                    if (UseVertexAlpha &&
+                        (names[i].Equals(GXAttribName.GX_VA_CLR0) || names[i].Equals(GXAttribName.GX_VA_CLR1)))
+                        attr.CompType = GXCompType.RGBA8;
+                    Console.WriteLine(names[i] + " " + attr.CompType);
+                    nameToAttr.Add(names[i], attr);
                 }
                 attrs[i] = nameToAttr[names[i]];
             }

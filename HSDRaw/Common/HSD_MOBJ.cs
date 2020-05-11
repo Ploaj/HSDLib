@@ -25,6 +25,8 @@ namespace HSDRaw.Common
         ALPHA_MAT = (1 << 13),
         ALPHA_VTX = (2 << 13),
         ALPHA_BOTH = (3 << 13),
+        ZOFST = (1 << 24),
+        EFFECT = (1 << 25),
         SHADOW = (1 << 26),
         ZMODE_ALWAYS = (1 << 27),
         DF_ALL = (1 << 28),
