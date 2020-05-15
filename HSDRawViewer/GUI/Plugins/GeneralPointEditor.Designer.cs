@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeneralPointEditor));
             this.PointList = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
@@ -36,6 +37,8 @@
             this.buttonRemove = new System.Windows.Forms.ToolStripButton();
             this.buttonUp = new System.Windows.Forms.ToolStripButton();
             this.buttonDown = new System.Windows.Forms.ToolStripButton();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.importPointsFromSSFFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -77,6 +80,7 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDropDownButton1,
             this.buttonAdd,
             this.buttonRemove,
             this.buttonUp,
@@ -127,6 +131,24 @@
             this.buttonDown.Text = "Move Point Down";
             this.buttonDown.Click += new System.EventHandler(this.buttonDown_Click);
             // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importPointsFromSSFFileToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(38, 22);
+            this.toolStripDropDownButton1.Text = "File";
+            // 
+            // importPointsFromSSFFileToolStripMenuItem
+            // 
+            this.importPointsFromSSFFileToolStripMenuItem.Name = "importPointsFromSSFFileToolStripMenuItem";
+            this.importPointsFromSSFFileToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.importPointsFromSSFFileToolStripMenuItem.Text = "Import Points From SSF File";
+            this.importPointsFromSSFFileToolStripMenuItem.Click += new System.EventHandler(this.importPointsFromSSFFileToolStripMenuItem_Click);
+            // 
             // GeneralPointEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -156,5 +178,7 @@
         private System.Windows.Forms.ToolStripButton buttonRemove;
         private System.Windows.Forms.ToolStripButton buttonUp;
         private System.Windows.Forms.ToolStripButton buttonDown;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem importPointsFromSSFFileToolStripMenuItem;
     }
 }

@@ -136,7 +136,7 @@
     </Compile>
     <Compile Include="Converters\Animation\CHR0Converter.cs" />
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
-    <Compile Include="Converters\ConvSVG.cs" />
+    <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\DAEWriter.cs" />
     <Compile Include="Converters\JOBJTools.cs" />
     <Compile Include="Converters\Mex\EmblemConverter.cs" />
@@ -147,10 +147,12 @@
     <Compile Include="Converters\Mex\MexMenuAnimationGenerator.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
-    <Compile Include="Converters\ModeltoCollData.cs" />
+    <Compile Include="Converters\SBM\ModeltoCollData.cs" />
     <Compile Include="Converters\Animation\MOTLoader.cs" />
     <Compile Include="Converters\OutlineGenerator.cs" />
     <Compile Include="Converters\PlayStruct.cs" />
+    <Compile Include="Converters\SBM\SSF.cs" />
+    <Compile Include="Converters\SBM\SSFConverter.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
     <Compile Include="Form1.cs">

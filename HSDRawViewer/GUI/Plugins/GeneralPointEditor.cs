@@ -10,6 +10,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using OpenTK.Input;
 using System.Collections.Generic;
+using HSDRawViewer.Converters.Melee;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -79,7 +80,7 @@ namespace HSDRawViewer.GUI.Plugins
         private SBM_GeneralPoints GeneralPoints;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
-        
+
         private BindingList<PointLink> PointLinks = new BindingList<PointLink>();
 
         private JOBJManager Renderer = new JOBJManager();
@@ -98,7 +99,7 @@ namespace HSDRawViewer.GUI.Plugins
             Vector3 MinDeath = Vector3.Zero, MaxDeath = Vector3.Zero;
             bool CamSelected = false, DeathSelected = false;
 
-            foreach(var v in PointLinks)
+            foreach (var v in PointLinks)
             {
                 var selected = (propertyGrid1.SelectedObject == v);
 
@@ -108,7 +109,7 @@ namespace HSDRawViewer.GUI.Plugins
                 switch (v.Type)
                 {
                     case PointType.TopLeftBoundary:
-                        if(selected)
+                        if (selected)
                             CamSelected = true;
                         MinCam = point;
                         break;
@@ -167,7 +168,7 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
 
-            if(MinCam != Vector3.Zero && MaxCam != Vector3.Zero)
+            if (MinCam != Vector3.Zero && MaxCam != Vector3.Zero)
                 RenderBounds(MinCam, MaxCam, new Vector3(0.5f, 0.75f, 0.75f), CamSelected);
 
             if (MinDeath != Vector3.Zero && MaxDeath != Vector3.Zero)
@@ -178,7 +179,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public void ScreenClick(MouseButtons button, PickInformation pick)
         {
-            if(button == MouseButtons.Right && 
+            if (button == MouseButtons.Right &&
                 dragging &&
                 propertyGrid1.SelectedObject is PointLink point)
             {
@@ -191,14 +192,14 @@ namespace HSDRawViewer.GUI.Plugins
         {
             var selected = false;
             var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
-            foreach(var v in PointLinks)
+            foreach (var v in PointLinks)
             {
                 var t = Renderer.GetWorldTransform(v.JOBJ);
                 var point = Vector3.TransformPosition(Vector3.Zero, t);
 
                 var close = Vector3.Zero;
 
-                if(Math3D.FastDistance(point, Picked, RenderSize))
+                if (Math3D.FastDistance(point, Picked, RenderSize))
                 {
                     PointList.SelectedItem = v;
                     //propertyGrid1.SelectedObject = v;
@@ -242,9 +243,10 @@ namespace HSDRawViewer.GUI.Plugins
         {
             var jobj = GeneralPoints.JOBJReference.BreathFirstList;
 
-            foreach(var v in GeneralPoints.Points)
+            foreach (var v in GeneralPoints.Points)
             {
-                PointLinks.Add(new PointLink() {
+                PointLinks.Add(new PointLink()
+                {
                     Type = v.Type,
                     JOBJ = jobj[v.JOBJIndex]
                 });
@@ -259,8 +261,8 @@ namespace HSDRawViewer.GUI.Plugins
 
             SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[list.Count];
             var jobjs = GeneralPoints.JOBJReference.BreathFirstList;
-            
-            for(int i = 0; i < p.Length; i++)
+
+            for (int i = 0; i < p.Length; i++)
             {
                 p[i] = new SBM_GeneralPointInfo()
                 {
@@ -375,7 +377,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void RenderItem(Vector3 position, bool selected)
         {
-            if(selected)
+            if (selected)
                 GL.Color3(1f, 1f, 0f);
             else
                 GL.Color3(0.5f, 0.5f, 1f);
@@ -477,5 +479,57 @@ namespace HSDRawViewer.GUI.Plugins
 
         #endregion
 
+        private void importPointsFromSSFFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("Smash Stage File (.ssf)|*.ssf;");
+
+            if (f != null)
+            {
+                var ssf = SSF.Open(f);
+
+                PointLinks = new BindingList<PointLink>();
+
+                foreach (var p in ssf.Points)
+                {
+                    var pl = new PointLink()
+                    {
+                        JOBJ = new HSD_JOBJ(),
+                        X = p.X,
+                        Y = p.Y
+                    };
+                    switch (p.Tag.ToLower())
+                    {
+                        case "blaststart": pl.Type = PointType.TopLeftBlastZone; break;
+                        case "blastend": pl.Type = PointType.BottomRightBlastZone; break;
+                        case "camerastart": pl.Type = PointType.TopLeftBlastZone; break;
+                        case "cameraend": pl.Type = PointType.BottomRightBlastZone; break;
+                        case "spawn0": pl.Type = PointType.Player1Spawn; break;
+                        case "spawn1": pl.Type = PointType.Player2Spawn; break;
+                        case "spawn2": pl.Type = PointType.Player3Spawn; break;
+                        case "spawn3": pl.Type = PointType.Player4Spawn; break;
+                        case "respawn0": pl.Type = PointType.Player1Respawn; break;
+                        case "respawn1": pl.Type = PointType.Player2Respawn; break;
+                        case "respawn2": pl.Type = PointType.Player3Respawn; break;
+                        case "respawn3": pl.Type = PointType.Player4Respawn; break;
+                        default:
+                            pl = null;
+                            break;
+                    }
+                    if (pl != null)
+                        PointLinks.Add(pl);
+                }
+
+                GeneralPoints.JOBJReference.Child = null;
+                GeneralPoints.JOBJReference.Next = null;
+
+                foreach (var p in PointLinks)
+                    GeneralPoints.JOBJReference.AddChild(p.JOBJ);
+
+                SavePointChanges();
+
+                PointLinks.ResetBindings();
+                PointList.Invalidate();
+            }
+        }
     }
 }
