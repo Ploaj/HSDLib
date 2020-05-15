@@ -276,6 +276,42 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public CollMaterial Material { get; set; } = CollMaterial.Basic;
 
         public float Slope { get => (Y2 - Y1) / (X2 - X1); }
+        public float SlopeDegree { get => Slope * 180 / (float)Math.PI; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GuessCollisionFlag()
+        {
+            // this is a wall
+            if (X2 == X1)
+            {
+                if (Y1 >= Y2)
+                    CollisionFlag = CollPhysics.Right;
+                else
+                    CollisionFlag = CollPhysics.Left;
+                return;
+            }
+            // this is a ceiling or floor
+            if (Y1 == Y2)
+            {
+                if (X1 >= X2)
+                    CollisionFlag = CollPhysics.Bottom;
+                else
+                    CollisionFlag = CollPhysics.Top;
+                return;
+            }
+
+            // otherwise we guess based on slope
+            if (Math.Abs(SlopeDegree) >= 0 && Math.Abs(SlopeDegree) < 90 ||
+                Math.Abs(SlopeDegree) >= 90 && Math.Abs(SlopeDegree) <= 180)
+            {
+                if (X1 >= X2)
+                    CollisionFlag = CollPhysics.Bottom;
+                else
+                    CollisionFlag = CollPhysics.Top;
+            }
+        }
 
         public override string ToString()
         {

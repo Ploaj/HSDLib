@@ -37,7 +37,7 @@ namespace HSDRawViewer.Converters.Melee
                         line.Flag |= CollProperty.LedgeGrab;
 
                     line.Material = MaterialTranslate(l.Material);
-                    //line.GuessCollisionFlag();
+                    line.GuessCollisionFlag();
                     lines.Add(line);
                 }
 

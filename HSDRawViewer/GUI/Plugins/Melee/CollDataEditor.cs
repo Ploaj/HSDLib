@@ -18,7 +18,9 @@ namespace HSDRawViewer.GUI.Plugins
     {
         public Type[] SupportedTypes => new Type[] { typeof(SBM_Coll_Data) };
 
-        public DataNode Node { get => _node;
+        public DataNode Node
+        {
+            get => _node;
             set
             {
                 _node = value;
@@ -43,7 +45,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             get
             {
-                foreach(CollLine l in listBox1.SelectedItems)
+                foreach (CollLine l in listBox1.SelectedItems)
                 {
                     yield return l;
                 }
@@ -70,7 +72,7 @@ namespace HSDRawViewer.GUI.Plugins
                 var vl = new List<CollVertex>();
                 foreach (var l in Lines)
                 {
-                    if(!vl.Contains(l.v1))
+                    if (!vl.Contains(l.v1))
                         vl.Add(l.v1);
                     if (!vl.Contains(l.v2))
                         vl.Add(l.v2);
@@ -126,7 +128,7 @@ namespace HSDRawViewer.GUI.Plugins
             listLines.DataSource = Lines;
 
             PluginManager.GetCommonViewport()?.AddRenderer(this);
-            
+
             listBox1.SelectedIndexChanged += (sender, args) =>
             {
                 ClearSelection();
@@ -175,7 +177,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             propertyGrid1.SelectedObject = null;
         }
-        
+
         #region Interaction
 
         public void ScreenClick(MouseButtons button, PickInformation ray)
@@ -190,7 +192,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             float closest = float.MaxValue;
             var pick2D = ray.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
-            
+
             List<object> selected = new List<object>();
 
             object selectedObject = null;
@@ -231,8 +233,8 @@ namespace HSDRawViewer.GUI.Plugins
                     }
                 }
             }
-            
-            if(selectedObject != null)
+
+            if (selectedObject != null)
             {
                 if (!selected.Contains(selectedObject))
                     selected.Add(selectedObject);
@@ -245,7 +247,7 @@ namespace HSDRawViewer.GUI.Plugins
                     propertyGrid1.SelectedObject = null;
             }
         }
-        
+
         public void ScreenDrag(PickInformation pick, float Xdelta, float Ydelta)
         {
             var mouseState = Mouse.GetState();
@@ -262,7 +264,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     if (v is CollVertex vert && !moved.Contains(vert.ToVector2()))
                     {
-                        if(propertyGrid1.SelectedObjects.Length == 1)
+                        if (propertyGrid1.SelectedObjects.Length == 1)
                         {
                             vert.X = pick2D.X;
                             vert.Y = pick2D.Y;
@@ -386,7 +388,7 @@ namespace HSDRawViewer.GUI.Plugins
             if (BlinkTimer > 30)
                 BlinkTimer = 0;*/
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -400,7 +402,7 @@ namespace HSDRawViewer.GUI.Plugins
             // render all group ranges with lowered opacity
             foreach (var group in LineGroups)
             {
-                if(selected == group)
+                if (selected == group)
                     continue;
                 RenderGroup(group, 0.25f);
             }
@@ -530,7 +532,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <returns></returns>
         private bool IsSelected(object o)
         {
-            foreach(var v in propertyGrid1.SelectedObjects)
+            foreach (var v in propertyGrid1.SelectedObjects)
             {
                 if (v == o)
                     return true;
@@ -570,7 +572,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonDeleteGroup_Click(object sender, EventArgs e)
         {
-            if(listBox1.SelectedItem != null)
+            if (listBox1.SelectedItem != null)
             {
                 LineGroups.Remove(listBox1.SelectedItem as CollLineGroup);
             }
@@ -592,17 +594,17 @@ namespace HSDRawViewer.GUI.Plugins
             foreach (var v in selected)
             {
                 // delete all lines containing vert
-                if(v is CollVertex vert)
+                if (v is CollVertex vert)
                 {
                     var toRem = new List<CollLine>();
-                    foreach(var l in Lines)
+                    foreach (var l in Lines)
                     {
-                        if(l.v1 == v || l.v2 == v)
+                        if (l.v1 == v || l.v2 == v)
                         {
                             toRem.Add(l);
                         }
                     }
-                    foreach(var r in toRem)
+                    foreach (var r in toRem)
                         Lines.Remove(r);
                 }
 
@@ -619,7 +621,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         #endregion
-        
+
         #region Saving Loading
 
         /// <summary>
@@ -651,8 +653,8 @@ namespace HSDRawViewer.GUI.Plugins
             var groups = CollData.LineGroups.ToList();
 
             //List<Line> Lines = new List<Line>();
-            
-            for(int lineIndex = 0; lineIndex < links.Length; lineIndex++)
+
+            for (int lineIndex = 0; lineIndex < links.Length; lineIndex++)
             {
                 var line = links[lineIndex];
                 Lines.Add(new CollLine()
@@ -686,7 +688,7 @@ namespace HSDRawViewer.GUI.Plugins
 
                 // add vertices
                 var index = 0;
-                foreach(var l in Lines)
+                foreach (var l in Lines)
                 {
                     // if the vertex belongs to this group
                     if ((vertexToIndex[l.v1] >= group.VertexStart && vertexToIndex[l.v1] < group.VertexStart + group.VertexCount) ||
@@ -719,7 +721,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             CollDataBuilder.GenerateCollData(Lines, LineGroups, CollData);
         }
-        
+
         #endregion
 
         #region Controls
@@ -740,7 +742,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             SelectedLineGroup.CalcuateRange(verts);
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -816,7 +818,7 @@ namespace HSDRawViewer.GUI.Plugins
                     foreach (var l in linesv2)
                         Lines.Remove(l);
 
-                if(linesv1.Count == 1 && linesv2.Count == 1)
+                if (linesv1.Count == 1 && linesv2.Count == 1)
                 {
                     linesv1[0].v1 = linesv2[0].v1;
                     Lines.Remove(linesv2[0]);
@@ -839,7 +841,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             var mid = new CollVertex(0, 0);
 
-            foreach(CollVertex v in propertyGrid1.SelectedObjects)
+            foreach (CollVertex v in propertyGrid1.SelectedObjects)
             {
                 mid.X += v.X;
                 mid.Y += v.Y;
@@ -847,7 +849,7 @@ namespace HSDRawViewer.GUI.Plugins
             mid.X /= propertyGrid1.SelectedObjects.Length;
             mid.Y /= propertyGrid1.SelectedObjects.Length;
 
-            foreach(var l in Lines)
+            foreach (var l in Lines)
             {
                 if (IsSelected(l.v1))
                     l.v1 = mid;
@@ -870,11 +872,11 @@ namespace HSDRawViewer.GUI.Plugins
 
             HashSet<Vector2> has = new HashSet<Vector2>();
 
-            foreach(CollVertex v in propertyGrid1.SelectedObjects)
+            foreach (CollVertex v in propertyGrid1.SelectedObjects)
             {
                 var lines = Lines.Where(l => l.v1 == v || l.v2 == v);
 
-                foreach(var l in lines)
+                foreach (var l in lines)
                 {
                     if (has.Contains(l.v1.ToVector2()))
                         l.v1 = new CollVertex(v.X, v.Y);
@@ -900,7 +902,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void addToSelectedGroupToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach(CollLine l in propertyGrid1.SelectedObjects)
+            foreach (CollLine l in propertyGrid1.SelectedObjects)
             {
                 l.Group = SelectedLineGroup;
             }
@@ -913,9 +915,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void splitLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            foreach(var p in propertyGrid1.SelectedObjects)
+            foreach (var p in propertyGrid1.SelectedObjects)
             {
-                if(p is CollLine line)
+                if (p is CollLine line)
                 {
                     var v2 = new CollVertex((line.v1.X + line.v2.X) / 2, (line.v1.Y + line.v2.Y) / 2);
 
@@ -943,9 +945,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="args"></param>
         private void createLineFromSelectedToolStripMenuItem_Click(object sender, EventArgs args)
         {
-            if(propertyGrid1.SelectedObjects.Length == 2)
+            if (propertyGrid1.SelectedObjects.Length == 2)
             {
-                if(propertyGrid1.SelectedObjects[0] is CollVertex v1 && propertyGrid1.SelectedObjects[1] is CollVertex v2)
+                if (propertyGrid1.SelectedObjects[0] is CollVertex v1 && propertyGrid1.SelectedObjects[1] is CollVertex v2)
                 {
                     // only create a new line if one does not already exist
                     var dup = Lines.Where(e => (e.v1 == v1 && e.v2 == v2) || (e.v1 == v2 && e.v2 == v1));
@@ -966,12 +968,23 @@ namespace HSDRawViewer.GUI.Plugins
         {
             var lines = SelectedGroupLines;
 
-            foreach(var l in lines)
+            foreach (var l in lines)
             {
                 var temp = l.v1;
                 l.v1 = l.v2;
                 l.v2 = temp;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void guessCollisionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var l in SelectedGroupLines)
+                l.GuessCollisionFlag();
         }
     }
 }
