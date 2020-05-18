@@ -75,6 +75,18 @@ namespace HSDRaw
             _references = str._references;
         }
 
+        public byte[] GetSubData(int offset, int length)
+        {
+            if (offset + length >= _data.Length)
+                length = _data.Length - offset;
+
+            byte[] d = new byte[length];
+            for (int i = 0; i < length; i++)
+                d[i] = _data[offset + i];
+
+            return d;
+        }
+
         public byte[] GetData()
         {
             return _data;
@@ -370,7 +382,7 @@ namespace HSDRaw
             }
             else
             {
-                var re = GetCreateReference<HSDArrayAccessor<T>>(loc);
+                var re = GetCreateReference<HSDNullPointerArrayAccessor<T>>(loc);
                 re.Array = value;
             }
         }

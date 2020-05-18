@@ -110,6 +110,9 @@
     <Compile Include="ContextMenus\JOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\JOBJDescContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\MapHeadContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>

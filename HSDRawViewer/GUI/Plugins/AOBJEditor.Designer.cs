@@ -33,11 +33,11 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonAdd = new System.Windows.Forms.ToolStripButton();
             this.buttonRemove = new System.Windows.Forms.ToolStripButton();
+            this.comboBoxAnimType = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonSave = new System.Windows.Forms.Button();
             this.cbAnimationType = new System.Windows.Forms.ComboBox();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.comboBoxAnimType = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -97,6 +97,21 @@
             this.buttonRemove.Text = "Delete Track";
             this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
             // 
+            // comboBoxAnimType
+            // 
+            this.comboBoxAnimType.Dock = System.Windows.Forms.DockStyle.Top;
+            this.comboBoxAnimType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxAnimType.FormattingEnabled = true;
+            this.comboBoxAnimType.Items.AddRange(new object[] {
+            "Joint Type",
+            "Material Type",
+            "Texture Type"});
+            this.comboBoxAnimType.Location = new System.Drawing.Point(3, 16);
+            this.comboBoxAnimType.Name = "comboBoxAnimType";
+            this.comboBoxAnimType.Size = new System.Drawing.Size(194, 21);
+            this.comboBoxAnimType.TabIndex = 2;
+            this.comboBoxAnimType.SelectedIndexChanged += new System.EventHandler(this.comboBoxAnimType_SelectedIndexChanged);
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.buttonSave);
@@ -137,21 +152,6 @@
             this.splitter1.Size = new System.Drawing.Size(3, 311);
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
-            // 
-            // comboBoxAnimType
-            // 
-            this.comboBoxAnimType.Dock = System.Windows.Forms.DockStyle.Top;
-            this.comboBoxAnimType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxAnimType.FormattingEnabled = true;
-            this.comboBoxAnimType.Items.AddRange(new object[] {
-            "Joint Type",
-            "Material Type",
-            "Texture Type"});
-            this.comboBoxAnimType.Location = new System.Drawing.Point(3, 16);
-            this.comboBoxAnimType.Name = "comboBoxAnimType";
-            this.comboBoxAnimType.Size = new System.Drawing.Size(194, 21);
-            this.comboBoxAnimType.TabIndex = 2;
-            this.comboBoxAnimType.SelectedIndexChanged += new System.EventHandler(this.comboBoxAnimType_SelectedIndexChanged);
             // 
             // AOBJEditor
             // 

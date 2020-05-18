@@ -317,28 +317,52 @@ namespace HSDRawViewer.GUI
             {
                 if(e.KeyCode == Keys.OemPeriod)
                 {
-                    var f = Tools.FileIO.OpenFile("All Files |*.*");
-
-                    if (f != null)
-                    {
-                        if (Poker.CurrentOffset >= accessor._s.Length)
-                            accessor._s.Resize((int)Poker.CurrentOffset + 4);
-
-                        if (f.ToLower().EndsWith(".dat"))
-                        {
-                            var datFile = new HSDRawFile(f);
-                            
-                            accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, datFile.Roots[0].Data._s);
-                        }
-                        else
-                        accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, new HSDStruct(System.IO.File.ReadAllBytes(f)));
-                    }
+                    SetPointer();
                 }
                 if (e.KeyCode == Keys.OemMinus)
                 {
-                    accessor._s.SetReference((int)Poker.CurrentOffset, null);
+                    RemovePointer();
                 }
             }
+        }
+
+        private void RemovePointer()
+        {
+            accessor._s.SetReference((int)Poker.CurrentOffset, null);
+
+            Node.Collapse();
+        }
+
+        private void SetPointer()
+        {
+            var f = Tools.FileIO.OpenFile("All Files |*.*");
+
+            if (f != null)
+            {
+                if (Poker.CurrentOffset >= accessor._s.Length)
+                    accessor._s.Resize((int)Poker.CurrentOffset + 4);
+
+                if (f.ToLower().EndsWith(".dat"))
+                {
+                    var datFile = new HSDRawFile(f);
+
+                    accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, datFile.Roots[0].Data._s);
+                }
+                else
+                    accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, new HSDStruct(System.IO.File.ReadAllBytes(f)));
+
+                Node.Collapse();
+            }
+        }
+
+        private void buttonSetPointer_Click(object sender, System.EventArgs e)
+        {
+            SetPointer();
+        }
+
+        private void buttonRemovePointer_Click(object sender, System.EventArgs e)
+        {
+            RemovePointer();
         }
     }
 }

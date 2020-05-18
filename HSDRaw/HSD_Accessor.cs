@@ -241,10 +241,13 @@ namespace HSDRaw
         {
             get
             {
-                T[] t = new T[Length];
+                List<T> arr = new List<T>();
+
                 for (int i = 0; i < Length; i++)
-                    t[i] = this[i];
-                return t;
+                    if (this[i] != null)
+                        arr.Add(this[i]);
+
+                return arr.ToArray();
             }
             set
             {

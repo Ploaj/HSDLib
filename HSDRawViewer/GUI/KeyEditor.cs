@@ -251,6 +251,9 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public void InsertKey()
         {
+            if (dataGridView1.SelectedRows.Count == 0)
+                return;
+
             var i = dataGridView1.SelectedRows[0].Index + 1;
             if (i != -1)
             {
@@ -455,5 +458,38 @@ namespace HSDRawViewer.GUI
         }
 
         #endregion
+
+        private void buttonInsert_Click(object sender, EventArgs e)
+        {
+            InsertKey();
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+            DeleteKeys();
+        }
+
+        public class InsertAt
+        {
+            public int FrameCount { get; set; }
+        }
+
+        private void buttonInsertAt_Click(object sender, EventArgs e)
+        {
+            var ia = new InsertAt();
+            ia.FrameCount = KeyFrames.Count;
+            using (PropertyDialog d = new PropertyDialog("Track Settings", ia))
+            {
+                if(d.ShowDialog() == DialogResult.OK)
+                {
+                    while (KeyFrames.Count <= ia.FrameCount)
+                        KeyFrames.Add(new Key());
+
+                    var toRem = KeyFrames.Count - ia.FrameCount;
+                    for(int i = 0; i < toRem; i++)
+                        KeyFrames.RemoveAt(KeyFrames.Count - 1);
+                }
+            }
+        }
     }
 }

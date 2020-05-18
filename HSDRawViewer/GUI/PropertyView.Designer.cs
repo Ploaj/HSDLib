@@ -39,6 +39,8 @@ namespace HSDRawViewer.GUI
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.offsetBox = new System.Windows.Forms.MaskedTextBox();
+            this.buttonSetPointer = new System.Windows.Forms.Button();
+            this.buttonRemovePointer = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -86,6 +88,8 @@ namespace HSDRawViewer.GUI
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.buttonRemovePointer);
+            this.groupBox1.Controls.Add(this.buttonSetPointer);
             this.groupBox1.Controls.Add(this.propertyGrid2);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
@@ -104,10 +108,10 @@ namespace HSDRawViewer.GUI
             this.propertyGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.propertyGrid2.HelpVisible = false;
-            this.propertyGrid2.Location = new System.Drawing.Point(6, 77);
+            this.propertyGrid2.Location = new System.Drawing.Point(6, 128);
             this.propertyGrid2.Name = "propertyGrid2";
             this.propertyGrid2.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid2.Size = new System.Drawing.Size(146, 240);
+            this.propertyGrid2.Size = new System.Drawing.Size(146, 189);
             this.propertyGrid2.TabIndex = 6;
             this.propertyGrid2.ToolbarVisible = false;
             this.propertyGrid2.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid2_PropertyValueChanged);
@@ -115,7 +119,7 @@ namespace HSDRawViewer.GUI
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 61);
+            this.label2.Location = new System.Drawing.Point(6, 112);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(72, 13);
             this.label2.TabIndex = 5;
@@ -136,10 +140,30 @@ namespace HSDRawViewer.GUI
             this.offsetBox.InsertKeyMode = System.Windows.Forms.InsertKeyMode.Overwrite;
             this.offsetBox.Location = new System.Drawing.Point(6, 36);
             this.offsetBox.Name = "offsetBox";
-            this.offsetBox.Size = new System.Drawing.Size(100, 22);
+            this.offsetBox.Size = new System.Drawing.Size(146, 22);
             this.offsetBox.TabIndex = 4;
             this.offsetBox.TextChanged += new System.EventHandler(this.offsetBox_TextChanged);
             this.offsetBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.offsetBox_KeyDown);
+            // 
+            // buttonSetPointer
+            // 
+            this.buttonSetPointer.Location = new System.Drawing.Point(6, 64);
+            this.buttonSetPointer.Name = "buttonSetPointer";
+            this.buttonSetPointer.Size = new System.Drawing.Size(65, 45);
+            this.buttonSetPointer.TabIndex = 7;
+            this.buttonSetPointer.Text = "Set Pointer";
+            this.buttonSetPointer.UseVisualStyleBackColor = true;
+            this.buttonSetPointer.Click += new System.EventHandler(this.buttonSetPointer_Click);
+            // 
+            // buttonRemovePointer
+            // 
+            this.buttonRemovePointer.Location = new System.Drawing.Point(77, 64);
+            this.buttonRemovePointer.Name = "buttonRemovePointer";
+            this.buttonRemovePointer.Size = new System.Drawing.Size(75, 45);
+            this.buttonRemovePointer.TabIndex = 8;
+            this.buttonRemovePointer.Text = "Remove Pointer";
+            this.buttonRemovePointer.UseVisualStyleBackColor = true;
+            this.buttonRemovePointer.Click += new System.EventHandler(this.buttonRemovePointer_Click);
             // 
             // PropertyView
             // 
@@ -164,5 +188,7 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.MaskedTextBox offsetBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PropertyGrid propertyGrid2;
+        private System.Windows.Forms.Button buttonRemovePointer;
+        private System.Windows.Forms.Button buttonSetPointer;
     }
 }
