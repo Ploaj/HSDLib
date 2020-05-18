@@ -16,6 +16,31 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="tobj"></param>
+        /// <returns></returns>
+        public static bool IsTransparent(HSD_TOBJ tobj)
+        {
+            if (tobj.ImageData.Format == GXTexFmt.RGB565)
+                return false;
+
+            if ((tobj.ImageData.Format == GXTexFmt.CI8 && tobj.TlutData.Format == GXTlutFmt.RGB565) ||
+                (tobj.ImageData.Format == GXTexFmt.CI4 && tobj.TlutData.Format == GXTlutFmt.RGB565))
+                return false;
+
+            var d = tobj.GetDecodedImageData();
+            
+            for(int i = 0; i < d.Length; i += 4)
+            {
+                if (d[i + 3] != 255)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static Bitmap LoadBitmapFromFile(string path)
