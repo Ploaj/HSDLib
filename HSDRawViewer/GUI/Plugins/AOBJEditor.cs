@@ -5,11 +5,10 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSD_AOBJ) })]
     public partial class AOBJEditor : DockContent, EditorBase
     {
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_AOBJ) };
 
         public DataNode Node { get => _node;
             set

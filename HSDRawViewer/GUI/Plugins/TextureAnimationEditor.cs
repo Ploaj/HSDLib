@@ -20,13 +20,14 @@ namespace HSDRawViewer.GUI.Plugins
     /// <summary>
     /// Tool for editing Texture Animations <see cref="HSD_TexGraphic"/> and <see cref="HSD_TexAnim"/>
     /// </summary>
+
+
+    [SupportedTypes(new Type[] { typeof(HSD_TexAnim), typeof(HSD_TexGraphic), typeof(HSD_TOBJ) })]
     public partial class TextureAnimationEditor : DockContent, EditorBase, IDrawable
     {
         public DockState DefaultDockState => DockState.Document;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_TexAnim), typeof(HSD_TexGraphic), typeof(HSD_TOBJ) };
         
         private HSD_TexAnim TexAnim;
         private HSD_TexGraphic TEXG;
@@ -36,6 +37,13 @@ namespace HSDRawViewer.GUI.Plugins
         private ImageList BitmapList = new ImageList();
 
         private ViewportControl viewport;
+
+        private int SelectedView { get; set; }
+
+        private int SelectedTexture
+        {
+            get;set;
+        }
 
         private int TextureCount
         {
@@ -309,10 +317,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             TextureManager.RenderCheckerBack(windowWidth, windowHeight);
 
-            var selectedIndex = -1;
-
-            if (textureList.SelectedItems != null && textureList.SelectedItems.Count > 0)
-                selectedIndex = textureList.SelectedItems[0].ImageIndex;
+            var selectedIndex = SelectedTexture;
 
             if (TextureCount == 1)
                 selectedIndex = 0;
@@ -320,7 +325,7 @@ namespace HSDRawViewer.GUI.Plugins
             if (selectedIndex == -1)
                 return;
 
-            switch (toolStripComboBox1.SelectedIndex)
+            switch (SelectedView)
             {
                 case 0: // fill
                     TextureManager.RenderTexture(selectedIndex, windowWidth, windowHeight, false);
@@ -793,7 +798,28 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
         }
-        
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textureList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SelectedTexture = -1;
+
+            if (textureList.SelectedIndices != null && textureList.SelectedIndices.Count > 0)
+                SelectedTexture = textureList.SelectedItems[0].ImageIndex;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SelectedView = toolStripComboBox1.SelectedIndex;
+        }
     }
 }

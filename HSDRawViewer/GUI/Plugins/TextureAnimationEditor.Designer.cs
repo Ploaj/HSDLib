@@ -31,16 +31,16 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-            this.splitter1 = new System.Windows.Forms.Splitter();
-            this.textureList = new System.Windows.Forms.ListView();
+            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.exportSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonAdd = new System.Windows.Forms.ToolStripButton();
             this.buttonRemove = new System.Windows.Forms.ToolStripButton();
             this.buttonReplace = new System.Windows.Forms.ToolStripButton();
             this.buttonLeft = new System.Windows.Forms.ToolStripButton();
             this.buttonRight = new System.Windows.Forms.ToolStripButton();
-            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.exportSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitter1 = new System.Windows.Forms.Splitter();
+            this.textureList = new System.Windows.Forms.ListView();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,6 +75,7 @@
             "50%"});
             this.toolStripComboBox1.Name = "toolStripComboBox1";
             this.toolStripComboBox1.Size = new System.Drawing.Size(121, 25);
+            this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
             // toolStripLabel1
             // 
@@ -83,26 +84,31 @@
             this.toolStripLabel1.Size = new System.Drawing.Size(35, 22);
             this.toolStripLabel1.Text = "View:";
             // 
-            // splitter1
+            // toolStripDropDownButton2
             // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(0, 135);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(463, 3);
-            this.splitter1.TabIndex = 3;
-            this.splitter1.TabStop = false;
+            this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportSelectedToolStripMenuItem,
+            this.exportAllToolStripMenuItem});
+            this.toolStripDropDownButton2.Image = global::HSDRawViewer.Properties.Resources.ico_save;
+            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            this.toolStripDropDownButton2.Size = new System.Drawing.Size(29, 22);
+            this.toolStripDropDownButton2.Text = "File";
             // 
-            // textureList
+            // exportSelectedToolStripMenuItem
             // 
-            this.textureList.Alignment = System.Windows.Forms.ListViewAlignment.Left;
-            this.textureList.Dock = System.Windows.Forms.DockStyle.Top;
-            this.textureList.HideSelection = false;
-            this.textureList.Location = new System.Drawing.Point(0, 25);
-            this.textureList.MultiSelect = false;
-            this.textureList.Name = "textureList";
-            this.textureList.Size = new System.Drawing.Size(463, 110);
-            this.textureList.TabIndex = 4;
-            this.textureList.UseCompatibleStateImageBehavior = false;
+            this.exportSelectedToolStripMenuItem.Name = "exportSelectedToolStripMenuItem";
+            this.exportSelectedToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportSelectedToolStripMenuItem.Text = "Export Selected";
+            this.exportSelectedToolStripMenuItem.Click += new System.EventHandler(this.exportSelectedToolStripMenuItem_Click);
+            // 
+            // exportAllToolStripMenuItem
+            // 
+            this.exportAllToolStripMenuItem.Name = "exportAllToolStripMenuItem";
+            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportAllToolStripMenuItem.Text = "Export All";
+            this.exportAllToolStripMenuItem.Click += new System.EventHandler(this.exportAllToolStripMenuItem_Click);
             // 
             // buttonAdd
             // 
@@ -154,31 +160,27 @@
             this.buttonRight.Text = "Move Right";
             this.buttonRight.Click += new System.EventHandler(this.buttonRight_Click);
             // 
-            // toolStripDropDownButton2
+            // splitter1
             // 
-            this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportSelectedToolStripMenuItem,
-            this.exportAllToolStripMenuItem});
-            this.toolStripDropDownButton2.Image = global::HSDRawViewer.Properties.Resources.ico_save;
-            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
-            this.toolStripDropDownButton2.Size = new System.Drawing.Size(29, 22);
-            this.toolStripDropDownButton2.Text = "File";
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.splitter1.Location = new System.Drawing.Point(0, 135);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(463, 3);
+            this.splitter1.TabIndex = 3;
+            this.splitter1.TabStop = false;
             // 
-            // exportSelectedToolStripMenuItem
+            // textureList
             // 
-            this.exportSelectedToolStripMenuItem.Name = "exportSelectedToolStripMenuItem";
-            this.exportSelectedToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this.exportSelectedToolStripMenuItem.Text = "Export Selected";
-            this.exportSelectedToolStripMenuItem.Click += new System.EventHandler(this.exportSelectedToolStripMenuItem_Click);
-            // 
-            // exportAllToolStripMenuItem
-            // 
-            this.exportAllToolStripMenuItem.Name = "exportAllToolStripMenuItem";
-            this.exportAllToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this.exportAllToolStripMenuItem.Text = "Export All";
-            this.exportAllToolStripMenuItem.Click += new System.EventHandler(this.exportAllToolStripMenuItem_Click);
+            this.textureList.Alignment = System.Windows.Forms.ListViewAlignment.Left;
+            this.textureList.Dock = System.Windows.Forms.DockStyle.Top;
+            this.textureList.HideSelection = false;
+            this.textureList.Location = new System.Drawing.Point(0, 25);
+            this.textureList.MultiSelect = false;
+            this.textureList.Name = "textureList";
+            this.textureList.Size = new System.Drawing.Size(463, 110);
+            this.textureList.TabIndex = 4;
+            this.textureList.UseCompatibleStateImageBehavior = false;
+            this.textureList.SelectedIndexChanged += new System.EventHandler(this.textureList_SelectedIndexChanged);
             // 
             // TextureAnimationEditor
             // 

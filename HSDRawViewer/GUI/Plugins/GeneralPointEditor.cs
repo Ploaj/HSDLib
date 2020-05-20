@@ -9,11 +9,11 @@ using System.ComponentModel;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using OpenTK.Input;
-using System.Collections.Generic;
 using HSDRawViewer.Converters.Melee;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSDRaw.Melee.Gr.SBM_GeneralPoints) })]
     public partial class GeneralPointEditor : DockContent, EditorBase, IDrawableInterface
     {
         public GeneralPointEditor()
@@ -62,8 +62,6 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         public DockState DefaultDockState => DockState.DockLeft;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSDRaw.Melee.Gr.SBM_GeneralPoints) };
 
         public DataNode Node
         {

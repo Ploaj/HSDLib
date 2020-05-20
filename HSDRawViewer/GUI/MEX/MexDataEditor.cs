@@ -8,6 +8,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.MEX
 {
+    [SupportedTypes(new Type[] { typeof(MEX_Data) })]
     public partial class MexDataEditor : DockContent, EditorBase
     {
         public MEXFighterControl FighterControl;
@@ -49,8 +50,6 @@ namespace HSDRawViewer.GUI.MEX
         }
 
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(MEX_Data) };
 
         public DataNode Node
         {

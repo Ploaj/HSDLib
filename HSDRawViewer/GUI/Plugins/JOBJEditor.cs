@@ -24,6 +24,7 @@ namespace HSDRawViewer.GUI.Plugins
     /// <summary>
     /// 
     /// </summary>
+    [SupportedTypes(new Type[] { typeof(HSD_JOBJ) })]
     public partial class JOBJEditor : DockContent, EditorBase, IDrawable
     {
         public DockState DefaultDockState => DockState.DockLeft;
@@ -85,13 +86,11 @@ namespace HSDRawViewer.GUI.Plugins
                         PluginManager.GetCommonViewport().AnimationTrackEnabled = false;
                         PluginManager.GetCommonViewport().RemoveRenderer(this);
                     }
-                    viewport.Dispose();
+                    //viewport.Dispose();
                     JOBJManager.CleanupRendering();
                 }
             };
         }
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_JOBJ) };
 
         public DataNode Node { get => _node;
             set

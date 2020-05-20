@@ -65,7 +65,8 @@ namespace HSDRawViewer.Rendering
         /// <returns>Index of Texture</returns>
         public int Add(byte[] rgba, int width, int height)
         {
-            OpenTKResources.MakeCurrentDummy();
+            if (!OpenTKResources.MakeDummyCurrent())
+                return -1;
 
             int texid;
             GL.GenTextures(1, out texid);

@@ -79,6 +79,8 @@ namespace HSDRawViewer.Rendering
 
         private Dictionary<HSD_JOBJ, JOBJCache> jobjToCache = new Dictionary<HSD_JOBJ, JOBJCache>();
 
+        private object renderLock = new object();
+
         /// <summary>
         /// 
         /// </summary>
@@ -234,9 +236,12 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         private void ClearRenderingCache()
         {
-            jobjToCache.Clear();
-            DOBJManager.ClearRenderingCache();
-            RefreshRendering = false;
+            lock (renderLock)
+            {
+                jobjToCache.Clear();
+                DOBJManager.ClearRenderingCache();
+                RefreshRendering = false;
+            }
         }
 
         /// <summary>
@@ -268,7 +273,18 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="camera"></param>
+        /// <param name="update"></param>
         public void Render(Camera camera, bool update = true)
+        {
+            lock (renderLock)
+                SafeRender(camera, update);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SafeRender(Camera camera, bool update = true)
         {
             if (RefreshRendering)
                 ClearRenderingCache();

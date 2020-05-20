@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Input;
 using System;
 using System.ComponentModel;
 
@@ -465,6 +466,70 @@ namespace HSDRawViewer.Rendering
         public void FrameBoundingSphere(Vector4 boundingSphere)
         {
             FrameBoundingSphere(boundingSphere.Xyz, boundingSphere.W, 0);
+        }
+
+        private Vector2 PrevCursorPos;
+        public Vector2 DeltaCursorPos { get; internal set; }
+
+        private float PrevWheel = 0;
+        private float DeltaWheel = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void UpdateCamera(bool update, bool frozen, bool lock2D)
+        {
+            var keys = Keyboard.GetState();
+            var mouse = Mouse.GetState();
+
+            var pos = new Vector2(mouse.X, mouse.Y);
+            if (PrevCursorPos == null)
+                PrevCursorPos = pos;
+            DeltaCursorPos = PrevCursorPos - pos;
+            PrevCursorPos = pos;
+
+            DeltaWheel = PrevWheel - mouse.WheelPrecise;
+            PrevWheel = mouse.WheelPrecise;
+
+            if (!update)
+                return;
+
+            var speed = 0.1f;
+            if (keys.IsKeyDown(Key.ShiftLeft) ||
+                keys.IsKeyDown(Key.ShiftRight))
+                speed *= 4;
+            if (keys.IsKeyDown(Key.W))
+                Zoom(speed, true);
+            if (keys.IsKeyDown(Key.S))
+                Zoom(-speed, true);
+            
+            var zoomMultiplier = 1;
+            try
+            {
+                var ks = Keyboard.GetState();
+
+                if (ks.IsKeyDown(Key.ShiftLeft) || ks.IsKeyDown(Key.ShiftRight))
+                    zoomMultiplier = 4;
+            }
+            catch (Exception)
+            {
+
+            }
+            Zoom(mouse.WheelPrecise / 1000f * zoomMultiplier, true);
+            
+            if (!frozen)
+            {
+                var speedpane = 0.75f;
+                if (mouse.IsButtonDown(MouseButton.Right))
+                {
+                    Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
+                }
+                if (mouse.IsButtonDown(MouseButton.Left) && !lock2D)
+                {
+                    RotationXDegrees -= DeltaCursorPos.Y * speed;
+                    RotationYDegrees -= DeltaCursorPos.X * speed;
+                }
+            }
         }
     }
 }

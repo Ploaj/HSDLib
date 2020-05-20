@@ -34,6 +34,7 @@ namespace HSDRawViewer.Rendering
 
         // Shader
         private static Shader GXShader;
+        private object shaderLock = new object();
 
         private Dictionary<HSD_DOBJ, int> DOBJtoBuffer = new Dictionary<HSD_DOBJ, int>();
         private Dictionary<HSD_DOBJ, List<CachedPOBJ>> DOBJtoPOBJCache = new Dictionary<HSD_DOBJ, List<CachedPOBJ>>();
@@ -76,12 +77,12 @@ namespace HSDRawViewer.Rendering
             imageBufferTextureIndex.Clear();
             pobjToDisplayList.Clear();
 
-            if(GXShader != null)
+            /*if (GXShader != null)
                 GXShader.Delete();
-            GXShader = null;
-
-            foreach(var v in DOBJtoBuffer)
-                    GL.DeleteBuffer(v.Value);
+            GXShader = null;*/
+            
+            foreach (var v in DOBJtoBuffer)
+                GL.DeleteBuffer(v.Value);
             DOBJtoBuffer.Clear();
 
             DOBJtoPOBJCache.Clear();

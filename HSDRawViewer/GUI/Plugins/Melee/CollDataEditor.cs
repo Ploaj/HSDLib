@@ -14,10 +14,9 @@ using HSDRawViewer.GUI.Plugins.Melee;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(SBM_Coll_Data) })]
     public partial class CollDataEditor : DockContent, EditorBase, IDrawableInterface
     {
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_Coll_Data) };
-
         public DataNode Node
         {
             get => _node;
@@ -397,7 +396,8 @@ namespace HSDRawViewer.GUI.Plugins
             var selected = SelectedLineGroup;
 
             // render selected group first
-            RenderGroup(selected, 1);
+            if(selected != null)
+                RenderGroup(selected, 1);
 
             // render all group ranges with lowered opacity
             foreach (var group in LineGroups)

@@ -16,11 +16,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// <summary>
     /// Special Plugin for Rendering Hurtboxes for fighters
     /// </summary>
+    [SupportedTypes(new Type[] { typeof(SBM_HurtboxBank<SBM_Hurtbox>) })]
     public partial class HurtBoxEditor : DockContent, EditorBase, IDrawable
     {
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_HurtboxBank<SBM_Hurtbox>) };
 
         public DataNode Node
         {

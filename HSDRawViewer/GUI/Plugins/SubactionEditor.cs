@@ -57,6 +57,7 @@ namespace HSDRawViewer.GUI
         }
 
         [Serializable]
+        [SupportedTypes(new Type[] { typeof(SBM_SubActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) })]
         public class SubActionScript
         {
             public byte[] data;
@@ -138,8 +139,6 @@ namespace HSDRawViewer.GUI
         }
 
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) };
 
         public DataNode Node
         {

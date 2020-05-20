@@ -203,6 +203,9 @@
     <Compile Include="GUI\Extra\SSMTool.Designer.cs">
       <DependentUpon>SSMTool.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\GLViewport.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="GUI\HSDTypeDialog.cs">
       <SubType>Form</SubType>
     </Compile>
