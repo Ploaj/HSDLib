@@ -27,6 +27,8 @@ namespace HSDRawViewer.GUI.Plugins
 
         private KeyEditor keyEditor;
 
+        private HSD_FOBJDesc SelectedFOBJ;
+
         public AOBJEditor()
         {
             InitializeComponent();
@@ -84,6 +86,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(e.Node?.Tag is HSD_FOBJDesc desc)
             {
+                SelectedFOBJ = desc;
                 if(desc.TrackType - 1 < cbAnimationType.Items.Count)
                     cbAnimationType.SelectedIndex = desc.TrackType - 1;
                 keyEditor.SetKeys(desc.GetDecodedKeys());
@@ -97,9 +100,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            if (treeView1.SelectedNode?.Tag is HSD_FOBJDesc desc)
+            if (SelectedFOBJ != null)
             {
-                desc.SetKeys(keyEditor.GetFOBJKeys(), (byte)(cbAnimationType.SelectedIndex + 1));
+                SelectedFOBJ.SetKeys(keyEditor.GetFOBJKeys(), (byte)(cbAnimationType.SelectedIndex + 1));
                 RefreshList();
             }
         }

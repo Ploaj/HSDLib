@@ -380,7 +380,8 @@ namespace HSDRawViewer.Rendering
                         Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
                         Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
 
-                    transform.Invert();
+                    if(tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
+                        transform.Invert();
 
                     if (animation != null)
                     {
