@@ -362,6 +362,12 @@ namespace HSDRaw.Tools
                         case GXAttribName.GX_VA_NBT: ig.Indices[i] = GetIndex(b, new float[] { v.NRM.X, v.NRM.Y, v.NRM.Z, v.BITAN.X, v.BITAN.Y, v.BITAN.Z, v.TAN.X, v.TAN.Y, v.TAN.Z }); break;
                         case GXAttribName.GX_VA_TEX0: ig.Indices[i] = GetIndex(b, new float[] { v.TEX0.X, v.TEX0.Y }); break;
                         case GXAttribName.GX_VA_TEX1: ig.Indices[i] = GetIndex(b, new float[] { v.TEX1.X, v.TEX1.Y }); break;
+                        case GXAttribName.GX_VA_TEX2: ig.Indices[i] = GetIndex(b, new float[] { v.TEX2.X, v.TEX2.Y }); break;
+                        case GXAttribName.GX_VA_TEX3: ig.Indices[i] = GetIndex(b, new float[] { v.TEX3.X, v.TEX3.Y }); break;
+                        case GXAttribName.GX_VA_TEX4: ig.Indices[i] = GetIndex(b, new float[] { v.TEX4.X, v.TEX4.Y }); break;
+                        case GXAttribName.GX_VA_TEX5: ig.Indices[i] = GetIndex(b, new float[] { v.TEX5.X, v.TEX5.Y }); break;
+                        case GXAttribName.GX_VA_TEX6: ig.Indices[i] = GetIndex(b, new float[] { v.TEX6.X, v.TEX6.Y }); break;
+                        case GXAttribName.GX_VA_TEX7: ig.Indices[i] = GetIndex(b, new float[] { v.TEX7.X, v.TEX7.Y }); break;
                         //case GXAttribName.GX_VA_CLR0: ig.Indices[i] = GetIndex(b, v.CLR0); break;
                         default:
                             throw new Exception("Error Building " + b);
