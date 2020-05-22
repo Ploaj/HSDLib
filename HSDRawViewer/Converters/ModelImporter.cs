@@ -610,6 +610,12 @@ namespace HSDRawViewer.Converters
                 if ((mesh.HasTextureCoords(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX1);
 
+                if ((mesh.HasTextureCoords(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX2);
+
+                if ((mesh.HasTextureCoords(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX3);
+
                 var vertices = new List<GX_Vertex>();
                 var jobjList = new List<HSD_JOBJ[]>(vertices.Count);
                 var wList = new List<float[]>(vertices.Count);

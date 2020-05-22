@@ -5,6 +5,8 @@ in vec3 GX_VA_POS;
 in vec3 GX_VA_NRM;
 in vec2 GX_VA_TEX0;
 in vec2 GX_VA_TEX1;
+in vec2 GX_VA_TEX2;
+in vec2 GX_VA_TEX3;
 in vec4 GX_VA_CLR0;
 
 out vec3 vertPosition;
@@ -12,6 +14,8 @@ out vec3 normal;
 out float spec;
 out vec2 texcoord0;
 out vec2 texcoord1;
+out vec2 texcoord2;
+out vec2 texcoord3;
 out vec4 vertexColor;
 out vec4 vbones;
 out vec4 vweights;
@@ -83,8 +87,9 @@ void main()
 	vertPosition = pos.xyz;
 
 	texcoord0 = GX_VA_TEX0;
-
 	texcoord1 = GX_VA_TEX1;
+	texcoord2 = GX_VA_TEX2;
+	texcoord3 = GX_VA_TEX3;
 
 	vertexColor = GX_VA_CLR0;
 	

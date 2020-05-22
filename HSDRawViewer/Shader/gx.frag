@@ -5,6 +5,8 @@ in vec3 normal;
 in float spec;
 in vec2 texcoord0;
 in vec2 texcoord1;
+in vec2 texcoord2;
+in vec2 texcoord3;
 in vec4 vertexColor;
 in vec4 vbones;
 in vec4 vweights;
@@ -58,6 +60,16 @@ uniform int hasTEX1;
 uniform int hasTEX1Tev;
 uniform TexUnit TEX1;
 uniform TevUnit TEX1Tev;
+
+uniform int hasTEX2;
+uniform int hasTEX2Tev;
+uniform TexUnit TEX2;
+uniform TevUnit TEX2Tev;
+
+uniform int hasTEX3;
+uniform int hasTEX3Tev;
+uniform TexUnit TEX3;
+uniform TevUnit TEX3Tev;
 
 // material
 uniform vec4 ambientColor;
@@ -399,6 +411,18 @@ void main()
 		if(TEX1.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 		if(TEX1.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 	}
+	if(hasTEX1 == 2)
+	{
+		if(TEX2.light_type == 0) ambientPass = ColorMap_Pass(ambientPass, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
+		if(TEX2.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
+		if(TEX2.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
+	}
+	if(hasTEX1 == 3)
+	{
+		if(TEX3.light_type == 0) ambientPass = ColorMap_Pass(ambientPass, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
+		if(TEX3.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
+		if(TEX3.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
+	}
 	
 
 	// calculate material
@@ -422,6 +446,16 @@ void main()
 	{
 		extColor = ColorMap_Pass(extColor, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 		fragColor = ColorMap_Pass(fragColor, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
+	}
+	if(hasTEX2 == 1 && TEX2.light_type == 4)
+	{
+		extColor = ColorMap_Pass(extColor, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
+		fragColor = ColorMap_Pass(fragColor, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
+	}
+	if(hasTEX3 == 1 && TEX3.light_type == 4)
+	{
+		extColor = ColorMap_Pass(extColor, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
+		fragColor = ColorMap_Pass(fragColor, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
 	}
 
 
@@ -449,13 +483,15 @@ void main()
 	case 2: fragColor = vertexColor; break;
 	case 3: fragColor = vec4(texcoord0.x, 0, texcoord0.y, 1); break;
 	case 4: fragColor = vec4(texcoord1.x, 0, texcoord1.y, 1); break;
-	case 5: fragColor = ambientPass; break;
-	case 6: fragColor = diffusePass; break;
-	case 7: fragColor = specularPass; break;
-	case 8: fragColor = extColor; break;
-	case 9: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
-	case 10: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
-	case 11: 
+	case 5: fragColor = vec4(texcoord2.x, 0, texcoord2.y, 1); break;
+	case 6: fragColor = vec4(texcoord3.x, 0, texcoord3.y, 1); break;
+	case 7: fragColor = ambientPass; break;
+	case 8: fragColor = diffusePass; break;
+	case 9: fragColor = specularPass; break;
+	case 10: fragColor = extColor; break;
+	case 11: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
+	case 12: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
+	case 13: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < 4 ; i++)
 			if(int(vbones[i]) == selectedBone)

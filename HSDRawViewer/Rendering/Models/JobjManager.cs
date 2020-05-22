@@ -15,6 +15,8 @@ namespace HSDRawViewer.Rendering
         VertexColor,
         UV0,
         UV1,
+        UV2,
+        UV3,
         AmbientColor,
         DiffuseColor,
         SpecularColor,
