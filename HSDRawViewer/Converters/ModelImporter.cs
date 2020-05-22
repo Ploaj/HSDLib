@@ -616,6 +616,18 @@ namespace HSDRawViewer.Converters
                 if ((mesh.HasTextureCoords(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX3);
 
+                if ((mesh.HasTextureCoords(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX4);
+
+                if ((mesh.HasTextureCoords(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX5);
+
+                if ((mesh.HasTextureCoords(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX6);
+
+                if ((mesh.HasTextureCoords(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)) && !hasReflection)
+                    Attributes.Add(GXAttribName.GX_VA_TEX7);
+
                 var vertices = new List<GX_Vertex>();
                 var jobjList = new List<HSD_JOBJ[]>(vertices.Count);
                 var wList = new List<float[]>(vertices.Count);
@@ -731,6 +743,36 @@ namespace HSDRawViewer.Converters
                             vertex.TEX1 = new GXVector2(
                                 mesh.TextureCoordinateChannels[1][indicie].X,
                                 mesh.TextureCoordinateChannels[1][indicie].Y);
+
+                        if (mesh.HasTextureCoords(2))
+                            vertex.TEX2 = new GXVector2(
+                                mesh.TextureCoordinateChannels[2][indicie].X,
+                                mesh.TextureCoordinateChannels[2][indicie].Y);
+
+                        if (mesh.HasTextureCoords(3))
+                            vertex.TEX3 = new GXVector2(
+                                mesh.TextureCoordinateChannels[3][indicie].X,
+                                mesh.TextureCoordinateChannels[3][indicie].Y);
+
+                        if (mesh.HasTextureCoords(4))
+                            vertex.TEX4 = new GXVector2(
+                                mesh.TextureCoordinateChannels[4][indicie].X,
+                                mesh.TextureCoordinateChannels[4][indicie].Y);
+
+                        if (mesh.HasTextureCoords(5))
+                            vertex.TEX5 = new GXVector2(
+                                mesh.TextureCoordinateChannels[5][indicie].X,
+                                mesh.TextureCoordinateChannels[5][indicie].Y);
+
+                        if (mesh.HasTextureCoords(6))
+                            vertex.TEX6 = new GXVector2(
+                                mesh.TextureCoordinateChannels[6][indicie].X,
+                                mesh.TextureCoordinateChannels[6][indicie].Y);
+
+                        if (mesh.HasTextureCoords(7))
+                            vertex.TEX7 = new GXVector2(
+                                mesh.TextureCoordinateChannels[7][indicie].X,
+                                mesh.TextureCoordinateChannels[7][indicie].Y);
 
                         if (mesh.HasVertexColors(0))
                             vertex.CLR0 = new GXColor4(
