@@ -102,7 +102,12 @@ uniform int selectedBone;
 vec2 GetSphereCoords(vec3 N)
 {
     vec3 viewNormal = mat3(sphereMatrix) * N;
-    return viewNormal.xy * 0.5 + 0.5;
+
+	vec2 cord = viewNormal.xy * 0.5 + 0.5;
+
+	cord.y = 1 - cord.y;
+
+    return cord;
 }
 
 ///
@@ -411,13 +416,13 @@ void main()
 		if(TEX1.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 		if(TEX1.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX1, hasTEX1Tev == 1, TEX1Tev, texcoord1);
 	}
-	if(hasTEX1 == 2)
+	if(hasTEX2 == 1)
 	{
 		if(TEX2.light_type == 0) ambientPass = ColorMap_Pass(ambientPass, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
 		if(TEX2.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
 		if(TEX2.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX2, hasTEX2Tev == 1, TEX2Tev, texcoord2);
 	}
-	if(hasTEX1 == 3)
+	if(hasTEX3 == 1)
 	{
 		if(TEX3.light_type == 0) ambientPass = ColorMap_Pass(ambientPass, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
 		if(TEX3.light_type == 1) diffusePass = ColorMap_Pass(diffusePass, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
@@ -485,13 +490,37 @@ void main()
 	case 4: fragColor = vec4(texcoord1.x, 0, texcoord1.y, 1); break;
 	case 5: fragColor = vec4(texcoord2.x, 0, texcoord2.y, 1); break;
 	case 6: fragColor = vec4(texcoord3.x, 0, texcoord3.y, 1); break;
-	case 7: fragColor = ambientPass; break;
-	case 8: fragColor = diffusePass; break;
-	case 9: fragColor = specularPass; break;
-	case 10: fragColor = extColor; break;
-	case 11: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
-	case 12: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
-	case 13: 
+	case 7: 
+		if(hasTEX0 == 1)
+			fragColor = texture(TEX0.tex, texcoord0); 
+		else
+			fragColor = vec4(0, 0, 0, 1);
+	break;
+	case 8: 
+		if(hasTEX1 == 1)
+			fragColor = texture(TEX1.tex, texcoord1); 
+		else
+			fragColor = vec4(0, 0, 0, 1);
+	break;
+	case 9: 
+		if(hasTEX2 == 1)
+			fragColor = texture(TEX2.tex, texcoord2); 
+		else
+			fragColor = vec4(0, 0, 0, 1);
+	break;
+	case 10: 
+		if(hasTEX3 == 1)
+			fragColor = texture(TEX3.tex, texcoord3); 
+		else
+			fragColor = vec4(0, 0, 0, 1);
+	break;
+	case 11: fragColor = ambientPass; break;
+	case 12: fragColor = diffusePass; break;
+	case 13: fragColor = specularPass; break;
+	case 14: fragColor = extColor; break;
+	case 15: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
+	case 16: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V); break;
+	case 17: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < 4 ; i++)
 			if(int(vbones[i]) == selectedBone)

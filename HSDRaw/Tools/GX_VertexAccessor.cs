@@ -123,6 +123,48 @@ namespace HSDRaw.Tools
                                 Vertex.TEX1.Y = f[1];
                             }
                             break;
+                        case GXAttribName.GX_VA_TEX2:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.TEX2.X = f[0];
+                                Vertex.TEX2.Y = f[1];
+                            }
+                            break;
+                        case GXAttribName.GX_VA_TEX3:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.TEX3.X = f[0];
+                                Vertex.TEX3.Y = f[1];
+                            }
+                            break;
+                        case GXAttribName.GX_VA_TEX4:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.TEX4.X = f[0];
+                                Vertex.TEX4.Y = f[1];
+                            }
+                            break;
+                        case GXAttribName.GX_VA_TEX5:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.TEX5.X = f[0];
+                                Vertex.TEX5.Y = f[1];
+                            }
+                            break;
+                        case GXAttribName.GX_VA_TEX6:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.TEX6.X = f[0];
+                                Vertex.TEX6.Y = f[1];
+                            }
+                            break;
+                        case GXAttribName.GX_VA_TEX7:
+                            if (attribute.AttributeType != GXAttribType.GX_DIRECT)
+                            {
+                                Vertex.TEX7.X = f[0];
+                                Vertex.TEX7.Y = f[1];
+                            }
+                            break;
                         case GXAttribName.GX_VA_CLR0:
                             if (attribute.AttributeType == GXAttribType.GX_DIRECT)
                             {

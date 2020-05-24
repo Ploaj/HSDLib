@@ -7,7 +7,6 @@ using OpenTK.Graphics.OpenGL;
 
 namespace HSDRawViewer.Rendering
 {
-    // TODO: shader cache rendering would be much faster
     /// <summary>
     /// 
     /// </summary>
@@ -76,9 +75,10 @@ namespace HSDRawViewer.Rendering
             imageBufferTextureIndex.Clear();
             pobjToDisplayList.Clear();
 
-            if(GXShader != null)
-                GXShader.Delete();
-            GXShader = null;
+            // TODO: shader is currently static
+            //if(GXShader != null)
+            //    GXShader.Delete();
+            //GXShader = null;
 
             foreach(var v in DOBJtoBuffer)
                     GL.DeleteBuffer(v.Value);
@@ -229,6 +229,8 @@ namespace HSDRawViewer.Rendering
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX2"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX3"));
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 

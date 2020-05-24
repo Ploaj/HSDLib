@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.Converters
@@ -44,9 +45,9 @@ namespace HSDRawViewer.Converters
             {
                 Material = new HSD_Material()
                 {
-                    AmbientColor = Color.Black,
+                    AmbientColor = Color.White,
                     SpecularColor = Color.Black,
-                    DiffuseColor = Color.Black,
+                    DiffuseColor = settings.Color,
                     DIF_A = 255,
                     SPC_A = 255,
                     AMB_A = 255,
@@ -64,11 +65,19 @@ namespace HSDRawViewer.Converters
 
                 GXAttribName[] attrs = new GXAttribName[]
                 {
-                        GXAttribName.GX_VA_PNMTXIDX,
                         GXAttribName.GX_VA_POS,
-                        GXAttribName.GX_VA_CLR0,
                         GXAttribName.GX_VA_NULL
                 };
+
+                if(pobj.Attributes.Select(e=>e.AttributeName).Contains(GXAttribName.GX_VA_PNMTXIDX))
+                {
+                    attrs = new GXAttribName[]
+                    {
+                        GXAttribName.GX_VA_PNMTXIDX,
+                        GXAttribName.GX_VA_POS,
+                        GXAttribName.GX_VA_NULL
+                    };
+                }
 
                 List<GX_Vertex> newVerties = new List<GX_Vertex>();
 
@@ -103,10 +112,10 @@ namespace HSDRawViewer.Converters
                     v.POS.X += v.NRM.X * settings.Size;
                     v.POS.Y += v.NRM.Y * settings.Size;
                     v.POS.Z += v.NRM.Z * settings.Size;
-                    v.CLR0.R = settings.Color.R / 255f;
-                    v.CLR0.G = settings.Color.G / 255f;
-                    v.CLR0.B = settings.Color.B / 255f;
-                    v.CLR0.A = settings.Color.A / 255f;
+                    //v.CLR0.R = settings.Color.R / 255f;
+                    //v.CLR0.G = settings.Color.G / 255f;
+                    //v.CLR0.B = settings.Color.B / 255f;
+                    //v.CLR0.A = settings.Color.A / 255f;
                     newVerties[i] = v;
                 }
 
@@ -120,7 +129,7 @@ namespace HSDRawViewer.Converters
 
                 var newpobj = pobjGen.CreatePOBJsFromTriangleList(newVerties, attrs, dl.Envelopes);
                 foreach (var p in newpobj.List)
-                    p.Flags |= POBJ_FLAG.CULLBACK | POBJ_FLAG.UNKNOWN1;
+                    p.Flags |= POBJ_FLAG.CULLFRONT | POBJ_FLAG.UNKNOWN1;
                 if (newDOBJ.Pobj == null)
                     newDOBJ.Pobj = newpobj;
                 else

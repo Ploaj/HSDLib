@@ -657,7 +657,7 @@ namespace HSDRawViewer.Converters
                                     var vertexWeight = new VertexWeight();
                                     vertexWeight.VertexID = vIndex;
                                     vertexWeight.Weight = en.Weights[w];
-                                    if(jobjToBone.ContainsKey(en.JOBJs[w]))
+                                    if(en.JOBJs[w] != null && jobjToBone.ContainsKey(en.JOBJs[w]))
                                         jobjToBone[en.JOBJs[w]].VertexWeights.Add(vertexWeight);
                                 }
 

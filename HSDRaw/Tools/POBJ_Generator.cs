@@ -242,7 +242,7 @@ namespace HSDRaw.Tools
                 var jobjweights = new List<HSD_Envelope>();
                 var pmidToNewID = new Dictionary<ushort, ushort>();
 
-                if (HasPositionNormalMatrix)
+                if (HasPositionNormalMatrix == true && weights.Count > 0)
                 {
                     foreach (var n in g._nodes)
                     {
