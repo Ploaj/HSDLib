@@ -52,8 +52,11 @@ namespace HSDRaw.Tools
                             break;
                     }
 
+                    if (j > 0x7FF)
+                        j = 0x7FF;
+
                     int flag = ((j - 1) << 4) | (int)ip;
-                    Writer.ExtendedByte(flag);
+                    Writer.WritePacked(flag);
 
                     for (int k = i; k < i + j; k++)
                     {
@@ -69,20 +72,20 @@ namespace HSDRaw.Tools
                         {
                             case GXInterpolationType.HSD_A_OP_CON:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
-                                Writer.ExtendedByte(DeltaTime);
+                                Writer.WritePacked(DeltaTime);
                                 break;
                             case GXInterpolationType.HSD_A_OP_LIN:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
-                                Writer.ExtendedByte(DeltaTime);
+                                Writer.WritePacked(DeltaTime);
                                 break;
                             case GXInterpolationType.HSD_A_OP_SPL0:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
-                                Writer.ExtendedByte(DeltaTime);
+                                Writer.WritePacked(DeltaTime);
                                 break;
                             case GXInterpolationType.HSD_A_OP_SPL:
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 tangentQ.WriteValue(Writer, Keys[k].Tan);
-                                Writer.ExtendedByte(DeltaTime);
+                                Writer.WritePacked(DeltaTime);
                                 break;
                             case GXInterpolationType.HSD_A_OP_SLP:
                                 tangentQ.WriteValue(Writer, Keys[k].Tan);

@@ -289,7 +289,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     TexAnim.TlutBuffers = null;
                     if (TexAnim?.AnimationObject?.FObjDesc?.List.Count > 1)
-                        TexAnim.AnimationObject.FObjDesc.Next = null;
+                        TexAnim.AnimationObject.FObjDesc.Next = TexAnim.AnimationObject.FObjDesc.Next.Next;
                 }
             }
 

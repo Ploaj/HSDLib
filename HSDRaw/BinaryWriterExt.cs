@@ -75,8 +75,8 @@ namespace HSDRaw
             Console.WriteLine("Stream at 0x{0}", BaseStream.Position.ToString("X"));
         }
 
-
-        public void ExtendedByte(int i)
+        
+        public void WritePacked(int i)
         {
             if (i > 0xFF || (i & 0x80) > 0)
             {
