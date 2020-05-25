@@ -118,6 +118,7 @@ namespace HSDRawViewer.GUI.Plugins
             public int DOBJIndex;
             public HSD_JOBJ ParentJOBJ;
             public HSD_DOBJ DOBJ;
+            public string Name { get => DOBJ.ClassName; set => DOBJ.ClassName = value; }
 
             public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
 
@@ -131,7 +132,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             public override string ToString()
             {
-                return $"{Index}. JOBJ {JOBJIndex} : DOBJ {DOBJIndex} : POBJs {PolygonCount} : TOBJS {TextureCount} : PP {HasPixelProcessing}";
+                return $"{Index}. JOBJ {JOBJIndex} : DOBJ {DOBJIndex} : POBJs {PolygonCount} : TOBJS {TextureCount} : PP {HasPixelProcessing} {Name}";
             }
         }
 

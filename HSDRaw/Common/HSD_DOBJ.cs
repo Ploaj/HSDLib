@@ -10,7 +10,7 @@
         public string ClassName
         {
             get => _s.GetString(0x00);
-            set => _s.SetString(0x00, value);
+            set => _s.SetString(0x00, value, true);
         }
 
         public override HSD_DOBJ Next { get => _s.GetReference<HSD_DOBJ>(0x04); set => _s.SetReference(0x04, value); }

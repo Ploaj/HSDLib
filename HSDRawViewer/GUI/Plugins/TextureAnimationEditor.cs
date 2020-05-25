@@ -278,18 +278,10 @@ namespace HSDRawViewer.GUI.Plugins
                     tb.Array = pals.ToArray();
 
                     TexAnim.TlutBuffers = tb;
-
-                    if (TexAnim?.AnimationObject?.FObjDesc?.List.Count < 2)
-                    {
-                        TexAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();
-                        TexAnim.AnimationObject.FObjDesc.Next.FromFOBJ(new HSD_FOBJ() { JointTrackType = JointTrackType.HSD_A_J_SCAX, Buffer = new byte[0] });
-                    }
                 }
                 else
                 {
                     TexAnim.TlutBuffers = null;
-                    if (TexAnim?.AnimationObject?.FObjDesc?.List.Count > 1)
-                        TexAnim.AnimationObject.FObjDesc.Next = TexAnim.AnimationObject.FObjDesc.Next.Next;
                 }
             }
 

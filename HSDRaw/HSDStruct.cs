@@ -569,9 +569,9 @@ namespace HSDRaw
         /// </summary>
         /// <param name="refloc"></param>
         /// <param name="value"></param>
-        public void SetString(int refloc, string value)
+        public void SetString(int refloc, string value, bool nullable = false)
         {
-            if (value == null)
+            if (value == null || (nullable && string.IsNullOrEmpty(value)))
                 SetReference(refloc, null);
             else
             {
