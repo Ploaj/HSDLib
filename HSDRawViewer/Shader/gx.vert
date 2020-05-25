@@ -48,7 +48,7 @@ void main()
 	vbones = vec4(0, 0, 0, 0);
 	vweights = vec4(0, 0, 0, 0);
 
-	if(enableParentTransform == 1) // todo maybe not accurate
+	if(enableParentTransform == 1 && hasEnvelopes == 0) // todo maybe not accurate
 	{
 		pos = singleBind * pos;
 		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;

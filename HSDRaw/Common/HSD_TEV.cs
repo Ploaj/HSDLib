@@ -1,8 +1,70 @@
 ﻿using HSDRaw.GX;
+using System;
 using System.Drawing;
 
 namespace HSDRaw.Common
 {
+    public enum TOBJ_TEV_CC
+    {
+        GX_CC_TEXC = 8,
+        GX_CC_TEXA = 9,
+        GX_CC_ONE = 12,
+        GX_CC_HALF = 13,
+        GX_CC_ZERO = 15,
+        KONST_RGB = (0x01 << 7 | 0),
+        KONST_RRR = (0x01 << 7 | 1),
+        KONST_GGG = (0x01 << 7 | 2),
+        KONST_BBB = (0x01 << 7 | 3),
+        KONST_AAA = (0x01 << 7 | 4),
+        TEX0_RGB = (0x01 << 7 | 5),
+        TEX0_AAA = (0x01 << 7 | 6),
+        TEX1_RGB = (0x01 << 7 | 7),
+        TEX1_AAA = (0x01 << 7 | 8)
+    }
+
+    public enum TOBJ_TEV_CA
+    {
+        GX_CC_TEXC = 8,
+        GX_CC_TEXA = 9,
+        GX_CC_ONE = 12,
+        GX_CC_HALF = 13,
+        GX_CC_ZERO = 15,
+        KONST_R = (0x01 << 6 | 0),
+        KONST_G = (0x01 << 6 | 1),
+        KONST_B = (0x01 << 6 | 2),
+        KONST_A = (0x01 << 6 | 3),
+        TEX0_A = (0x01 << 6 | 4),
+        TEX1_A = (0x01 << 6 | 5)
+    }
+
+    [Flags]
+    public enum TOBJ_TEVREG_ACTIVE
+    {
+        KONST_R = (0x01 << 0),
+        KONST_G = (0x01 << 1),
+        KONST_B = (0x01 << 2),
+        KONST_A = (0x01 << 3),
+        KONST =
+            (KONST_R | KONST_G
+                | KONST_B | KONST_A),
+        TEV0_R = (0x01 << 4),
+        TEV0_G = (0x01 << 5),
+        TEV0_B = (0x01 << 6),
+        TEV0_A = (0x01 << 7),
+        TEV0 =
+            (TEV0_R | TEV0_G
+                | TEV0_B | TEV0_A),
+        TEV1_R = (0x01 << 8),
+        TEV1_G = (0x01 << 9),
+        TEV1_B = (0x01 << 10),
+        TEV1_A = (0x01 << 11),
+        TEV1 =
+            (TEV1_R | TEV1_G
+                | TEV1_B | TEV1_A),
+        COLOR_TEV = (0x01 << 30),
+        ALPHA_TEV = (0x01 << 31)
+    }
+
     public class HSD_TOBJ_TEV : HSDAccessor
     {
         public override int TrimmedSize { get; } = 0x20;
@@ -38,24 +100,16 @@ namespace HSDRaw.Common
         private byte alpha_c { get => _s.GetByte(0x0E); set => _s.SetByte(0x0E, value); }
 
         private byte alpha_d { get => _s.GetByte(0x0F); set => _s.SetByte(0x0F, value); }
+        
+        public TOBJ_TEV_CC color_a_in { get => (TOBJ_TEV_CC)color_a; set => color_a = (byte)value; }
+        public TOBJ_TEV_CC color_b_in { get => (TOBJ_TEV_CC)color_b; set => color_b = (byte)value; }
+        public TOBJ_TEV_CC color_c_in { get => (TOBJ_TEV_CC)color_c; set => color_c = (byte)value; }
+        public TOBJ_TEV_CC color_d_in { get => (TOBJ_TEV_CC)color_d; set => color_d = (byte)value; }
 
-        public bool color_a_set { get => (color_a & 0x80) != 0; set => color_a = (byte)((color_a & 0x7F) | (value ? 0x80 : 0x00)); }
-        public bool color_b_set { get => (color_b & 0x80) != 0; set => color_b = (byte)((color_b & 0x7F) | (value ? 0x80 : 0x00)); }
-        public bool color_c_set { get => (color_c & 0x80) != 0; set => color_c = (byte)((color_c & 0x7F) | (value ? 0x80 : 0x00)); }
-        public bool color_d_set { get => (color_d & 0x80) != 0; set => color_d = (byte)((color_d & 0x7F) | (value ? 0x80 : 0x00)); }
-        public TevColorIn color_a_in { get => (TevColorIn)(color_a & 0x7F); set => color_a = (byte)((color_a & 0x80) | ((byte)value & 0x7F)); }
-        public TevColorIn color_b_in { get => (TevColorIn)(color_b & 0x7F); set => color_b = (byte)((color_b & 0x80) | ((byte)value & 0x7F)); }
-        public TevColorIn color_c_in { get => (TevColorIn)(color_c & 0x7F); set => color_c = (byte)((color_c & 0x80) | ((byte)value & 0x7F)); }
-        public TevColorIn color_d_in { get => (TevColorIn)(color_d & 0x7F); set => color_d = (byte)((color_d & 0x80) | ((byte)value & 0x7F)); }
-
-        public bool alpha_a_set { get => (alpha_a & 0x80) != 0; set => alpha_a = (byte)((alpha_a & 0x7F) | (value ? 0x80 : 0x00)); }
-        public bool alpha_b_set { get => (alpha_b & 0x80) != 0; set => alpha_b = (byte)((alpha_b & 0x7F) | (value ? 0x80 : 0x00)); }
-        public bool alpha_c_set { get => (alpha_c & 0x80) != 0; set => alpha_c = (byte)((alpha_c & 0x7F) | (value ? 0x80 : 0x00)); }
-        public bool alpha_d_set { get => (alpha_d & 0x80) != 0; set => alpha_d = (byte)((alpha_d & 0x7F) | (value ? 0x80 : 0x00)); }
-        public TevColorIn alpha_a_in { get => (TevColorIn)(alpha_a & 0x7F); set => alpha_a = (byte)((alpha_a & 0x80) | ((byte)value & 0x7F)); }
-        public TevColorIn alpha_b_in { get => (TevColorIn)(alpha_b & 0x7F); set => alpha_b = (byte)((alpha_b & 0x80) | ((byte)value & 0x7F)); }
-        public TevColorIn alpha_c_in { get => (TevColorIn)(alpha_c & 0x7F); set => alpha_c = (byte)((alpha_c & 0x80) | ((byte)value & 0x7F)); }
-        public TevColorIn alpha_d_in { get => (TevColorIn)(alpha_d & 0x7F); set => alpha_d = (byte)((alpha_d & 0x80) | ((byte)value & 0x7F)); }
+        public TOBJ_TEV_CA alpha_a_in { get => (TOBJ_TEV_CA)alpha_a; set => alpha_a = (byte)value; }
+        public TOBJ_TEV_CA alpha_b_in { get => (TOBJ_TEV_CA)alpha_b; set => alpha_b = (byte)value; }
+        public TOBJ_TEV_CA alpha_c_in { get => (TOBJ_TEV_CA)alpha_c; set => alpha_c = (byte)value; }
+        public TOBJ_TEV_CA alpha_d_in { get => (TOBJ_TEV_CA)alpha_d; set => alpha_d = (byte)value; }
 
         public byte constantAlpha { get => _s.GetByte(0x13); set => _s.SetByte(0x13, value); }
         public Color constant { get => _s.GetColorRGB(0x10); set => _s.SetColorRGB(0x10, value); }
@@ -66,6 +120,6 @@ namespace HSDRaw.Common
         public byte tev1Alpha { get => _s.GetByte(0x1B); set => _s.SetByte(0x1B, value); }
         public Color tev1 { get => _s.GetColorRGB(0x18); set => _s.SetColorRGB(0x18, value); }
         
-        public int active { get => _s.GetInt32(0x1C); set => _s.SetInt32(0x1C, value); }
+        public TOBJ_TEVREG_ACTIVE active { get => (TOBJ_TEVREG_ACTIVE)_s.GetInt32(0x1C); set => _s.SetInt32(0x1C, (int)value); }
     }
 }
