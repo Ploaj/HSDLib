@@ -30,12 +30,15 @@
         {
             this.toolStrip7 = new System.Windows.Forms.ToolStrip();
             this.saveStageButton = new System.Windows.Forms.ToolStripButton();
+            this.exportStageButton = new System.Windows.Forms.ToolStripButton();
             this.mapGOBJCopyButton = new System.Windows.Forms.ToolStripButton();
             this.stageTabControl = new System.Windows.Forms.TabControl();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.stageEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.importStageButton = new System.Windows.Forms.ToolStripButton();
+            this.stageEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.stageIDEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.removeStageButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip7.SuspendLayout();
             this.stageTabControl.SuspendLayout();
             this.tabPage5.SuspendLayout();
@@ -46,6 +49,9 @@
             // 
             this.toolStrip7.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveStageButton,
+            this.importStageButton,
+            this.exportStageButton,
+            this.removeStageButton,
             this.mapGOBJCopyButton});
             this.toolStrip7.Location = new System.Drawing.Point(0, 0);
             this.toolStrip7.Name = "toolStrip7";
@@ -61,6 +67,15 @@
             this.saveStageButton.Size = new System.Drawing.Size(132, 22);
             this.saveStageButton.Text = "Save Stage Changes";
             this.saveStageButton.Click += new System.EventHandler(this.saveStageButton_Click);
+            // 
+            // exportStageButton
+            // 
+            this.exportStageButton.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
+            this.exportStageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportStageButton.Name = "exportStageButton";
+            this.exportStageButton.Size = new System.Drawing.Size(93, 22);
+            this.exportStageButton.Text = "Export Stage";
+            this.exportStageButton.Click += new System.EventHandler(this.exportStageButton_Click);
             // 
             // mapGOBJCopyButton
             // 
@@ -94,18 +109,6 @@
             this.tabPage5.Text = "Stages";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
-            // stageEditor
-            // 
-            this.stageEditor.DisplayItemIndices = true;
-            this.stageEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.stageEditor.EnablePropertyViewDescription = true;
-            this.stageEditor.ItemIndexOffset = 0;
-            this.stageEditor.Location = new System.Drawing.Point(3, 3);
-            this.stageEditor.Name = "stageEditor";
-            this.stageEditor.Size = new System.Drawing.Size(706, 343);
-            this.stageEditor.TabIndex = 1;
-            this.stageEditor.ArrayUpdated += new System.EventHandler(this.stageEditor_ArrayUpdated);
-            // 
             // tabPage6
             // 
             this.tabPage6.Controls.Add(this.stageIDEditor);
@@ -117,6 +120,29 @@
             this.tabPage6.Text = "StageIDs";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
+            // importStageButton
+            // 
+            this.importStageButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
+            this.importStageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.importStageButton.Name = "importStageButton";
+            this.importStageButton.Size = new System.Drawing.Size(95, 22);
+            this.importStageButton.Text = "Import Stage";
+            this.importStageButton.Click += new System.EventHandler(this.importStageButton_Click);
+            // 
+            // stageEditor
+            // 
+            this.stageEditor.CanRemove = false;
+            this.stageEditor.DisplayItemIndices = true;
+            this.stageEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stageEditor.EnablePropertyViewDescription = true;
+            this.stageEditor.ItemIndexOffset = 0;
+            this.stageEditor.Location = new System.Drawing.Point(3, 3);
+            this.stageEditor.Name = "stageEditor";
+            this.stageEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            this.stageEditor.Size = new System.Drawing.Size(706, 343);
+            this.stageEditor.TabIndex = 1;
+            this.stageEditor.ArrayUpdated += new System.EventHandler(this.stageEditor_ArrayUpdated);
+            // 
             // stageIDEditor
             // 
             this.stageIDEditor.DisplayItemIndices = true;
@@ -125,8 +151,18 @@
             this.stageIDEditor.ItemIndexOffset = 0;
             this.stageIDEditor.Location = new System.Drawing.Point(3, 3);
             this.stageIDEditor.Name = "stageIDEditor";
+            this.stageIDEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.stageIDEditor.Size = new System.Drawing.Size(706, 343);
             this.stageIDEditor.TabIndex = 0;
+            // 
+            // removeStageButton
+            // 
+            this.removeStageButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
+            this.removeStageButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.removeStageButton.Name = "removeStageButton";
+            this.removeStageButton.Size = new System.Drawing.Size(102, 22);
+            this.removeStageButton.Text = "Remove Stage";
+            this.removeStageButton.Click += new System.EventHandler(this.removeStageButton_Click);
             // 
             // MEXStageControl
             // 
@@ -156,5 +192,8 @@
         private ArrayMemberEditor stageEditor;
         private System.Windows.Forms.TabPage tabPage6;
         private ArrayMemberEditor stageIDEditor;
+        private System.Windows.Forms.ToolStripButton exportStageButton;
+        private System.Windows.Forms.ToolStripButton importStageButton;
+        private System.Windows.Forms.ToolStripButton removeStageButton;
     }
 }

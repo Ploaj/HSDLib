@@ -133,10 +133,11 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("SSM"), Category("3 - Misc"), Description("Index of SSM file for this fighter"), TypeConverter(typeof(SSMIDConverter))]
         public int SSMIndex { get; set; }
 
-        [DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
+        // no need to expose these to the user
+        [Browsable(false), DisplayName("SSM Bitfield 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
         public uint SSMBitfield1 { get; set; }
 
-        [DisplayName("SSM Bitfield 2"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
+        [Browsable(false), DisplayName("SSM Bitfield 2"), Category("3 - Misc"), Description(""), TypeConverter(typeof(HexType))]
         public uint SSMBitfield2 { get; set; }
 
         [DisplayName("Narrator Sound Clip"), Category("3 - Misc"), Description("Index of narrator sound clip")]

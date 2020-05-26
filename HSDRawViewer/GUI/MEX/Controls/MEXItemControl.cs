@@ -73,11 +73,15 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 }
 
                 foreach (var stage in MexDataEditor.StageControl.StageEntries)
-                    foreach (var f in stage.Items)
+                {
+                    var items = stage.Items;
+                    foreach (var f in items)
                     {
                         if (f.Value == index) f.Value -= 1;
                         if (f.Value > index) f.Value -= 1;
                     }
+                    stage.Items = items;
+                }
             };
             
             commonItemEditor.TextOverrides.AddRange(DefaultItemNames.CommonItemNames);

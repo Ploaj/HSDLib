@@ -620,7 +620,7 @@ static struct MoveLogic move_logic[] = {
         /// </summary>
         public void SavePlCo()
         {
-            if (PlCo != null)
+            if (PlCo == null)
                 return;
             
             List<SBM_BoneLookupTable> tables = new List<SBM_BoneLookupTable>();

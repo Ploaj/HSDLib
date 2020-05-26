@@ -6,6 +6,10 @@ using System.Windows.Forms;
 using HSDRaw.MEX;
 using HSDRaw;
 using HSDRaw.MEX.Sounds;
+using HSDRawViewer.GUI.MEX.Tools;
+using HSDRawViewer.Tools;
+using System.IO;
+using HSDRaw.Common;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -21,6 +25,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 var c = Parent;
                 while (c != null && !(c is MexDataEditor)) c = c.Parent;
                 if (c is MexDataEditor e) return e._data;
+                return null;
+            }
+        }
+
+        public MexDataEditor Editor
+        {
+            get
+            {
+                var c = Parent;
+                while (c != null && !(c is MexDataEditor)) c = c.Parent;
+                if (c is MexDataEditor e) return e;
                 return null;
             }
         }
@@ -146,7 +161,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (stageEditor.SelectedObject is MEXStageEntry entry)
             {
-                var functions = entry.GOBJFunctions;
+                var functions = entry.Functions;
 
                 StringBuilder table = new StringBuilder();
                 int index = 0;
@@ -190,6 +205,93 @@ static struct map_GOBJDesc map_gobjs[] = {
         }
 
         #endregion
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportStageButton_Click(object sender, EventArgs e)
+        {
+            if (stageEditor.SelectedObject is MEXStageEntry stage)
+            {
+                var f = FileIO.SaveFile("YAML (*.yaml)|*.yaml", Path.GetFileNameWithoutExtension(stage.FileName) + ".yaml");
+                if (f != null)
+                {
+                    StagePackage package = new StagePackage();
 
+                    package.Stage = stage;
+
+                    // add stage items
+                    foreach (var itemIndex in stage.Items)
+                        package.Items.Add(Editor.ItemControl.GetItem(itemIndex.Value));
+                    
+                    package.Serialize(f);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importStageButton_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.OpenFile("YAML (*.yaml)|*.yaml");
+            if (f != null)
+            {
+                var package = StagePackage.DeserializeFile(f);
+
+                var stage = package.Stage;
+
+                // load items
+                if (package.Items != null)
+                {
+                    var newItems = new HSD_UShort[package.Items.Count];
+                    for (int i = 0; i < package.Items.Count; i++)
+                    {
+                        var item = (ushort)Editor.ItemControl.AddMEXItem(package.Items[i]);
+                        newItems[i] = new HSD_UShort() { Value = item };
+                    }
+                    stage.ItemLookup.Entries = newItems;
+                }
+
+                // insert new stage
+                stageEditor.AddItem(stage);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void removeStageButton_Click(object sender, EventArgs e)
+        {
+            if (stageEditor.SelectedIndex > -1 && MessageBox.Show("Are you sure?\nThis cannot be undone.", "Remove Stage", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                var index = stageEditor.SelectedIndex;
+                var stage = stageEditor.SelectedObject as MEXStageEntry;
+                stageEditor.RemoveAt(stageEditor.SelectedIndex);
+                
+                // remove items
+                var it = stage.Items.Select(er => er.Value).ToList();
+                it.Sort();
+                it.Reverse();
+                foreach (var i in it)
+                    Editor.ItemControl.SaveRemoveMexItem(i);
+
+                // adjust stage indices
+                foreach(var v in StageIDs)
+                {
+                    if (v.StageInternalID == index)
+                        v.StageInternalID = 0;
+
+                    if (v.StageInternalID > index)
+                        v.StageInternalID -= 1;
+                }
+            }
+        }
     }
 }

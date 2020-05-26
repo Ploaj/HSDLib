@@ -7,14 +7,11 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Music ID:"), TypeConverter(typeof(MusicIDConverter))]
         public int MusicID { get; set; }
 
-        [Browsable(false)]
-        public short PlayChanceValue { get => playChance; }
-
         [DisplayName("Play Chance")]
         public string PlayChance {
             get
             {
-                return playChance.ToString() + "%";
+                return PlayChanceValue.ToString() + "%";
             }
             set
             {
@@ -25,12 +22,12 @@ namespace HSDRawViewer.GUI.MEX
                         v = 100;
                     if (v < 0)
                         v = 0;
-                    playChance = v;
+                    PlayChanceValue = v;
                 }
             }
         }
         
-        private short playChance;
+        public short PlayChanceValue;
 
         public override string ToString()
         {

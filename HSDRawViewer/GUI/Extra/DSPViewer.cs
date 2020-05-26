@@ -12,6 +12,8 @@ namespace HSDRawViewer.GUI.Extra
 
         private DSPPlayer Player;
 
+        private string DefaultFilePath;
+
         public string SoundName
         {
             set
@@ -23,7 +25,8 @@ namespace HSDRawViewer.GUI.Extra
         /// <summary>
         /// 
         /// </summary>
-        public DSP DSP { get => _dsp; set
+        public DSP DSP { get => _dsp;
+            set
             {
                 _dsp = value;
 
@@ -84,6 +87,23 @@ namespace HSDRawViewer.GUI.Extra
             {
                 Player.Dispose();
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void LoadFromFile(string filePath)
+        {
+            var dsp = new DSP();
+
+            dsp.FromFile(filePath);
+
+            DSP = dsp;
+
+            DefaultFilePath = filePath;
+
+            SoundName = Path.GetFileName(filePath);
         }
 
         /// <summary>
@@ -152,8 +172,8 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportButton_Click(object sender, EventArgs e)
         {
-            var file = FileIO.SaveFile(DSP.SupportedExportFilter);
-
+            var file = FileIO.SaveFile(DSP.SupportedExportFilter, DefaultFilePath);
+            
             if (file != null)
             {
                 DSP.ExportFormat(file);

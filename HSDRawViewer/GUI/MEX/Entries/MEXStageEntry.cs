@@ -4,6 +4,7 @@ using HSDRaw.MEX.Sounds;
 using HSDRaw.MEX.Stages;
 using System.Linq;
 using System.ComponentModel;
+using HSDRawViewer.GUI.MEX.Tools;
 
 namespace HSDRawViewer.GUI.MEX
 {
@@ -52,7 +53,7 @@ namespace HSDRawViewer.GUI.MEX
         public MEXPlaylistEntry[] PlaylistEntries { get => Playlist; set => Playlist = value; }
 
 
-        [Category("1 - Extra"), DisplayName("MEX Items"),Description("MEX Item lookup for Stage")]
+        [Category("1 - Extra"), DisplayName("MEX Items"),Description("MEX Item lookup for Stage"), SerialIgnore()]
         public HSD_UShort[] Items { get => ItemLookup.Entries; set => ItemLookup.Entries = value; }
 
         [Category("1 - Extra"), DisplayName("MEX Effects"), Description("MEX Effect lookup for Stage")]
@@ -62,8 +63,12 @@ namespace HSDRawViewer.GUI.MEX
         [Category("1 - Extra"), DisplayName("Moving Collision Points"), Description("")]
         public MEX_MovingCollisionPoint[] MovingCollisions
         {
-            get => Stage.MovingCollisionPoint?.Array; set
+            get => Stage.MovingCollisionPoint?.Array;
+            set
             {
+                if (value == null)
+                    return;
+
                 Stage.MovingCollisionPointCount = value.Length;
                 if (value == null || value.Length == 0)
                 {
@@ -78,9 +83,10 @@ namespace HSDRawViewer.GUI.MEX
         }
 
         [Category("1 - Extra"), DisplayName("GOBJ Functions"), Description("")]
-        public MEX_MapGOBJFunctions[] GOBJFunctions
+        public MEX_MapGOBJFunctions[] Functions
         {
-            get => Stage.GOBJFunctions?.Array; set
+            get => Stage.GOBJFunctions?.Array;
+            set
             {
                 if (value == null || value.Length == 0)
                 {

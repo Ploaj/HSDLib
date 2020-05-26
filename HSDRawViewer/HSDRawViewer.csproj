@@ -264,6 +264,7 @@
       <DependentUpon>MEXStageControl.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\MEX\IMEXControl.cs" />
+    <Compile Include="GUI\MEX\Tools\StagePackage.cs" />
     <Compile Include="GUI\MEX\Tools\FighterPackage.cs" />
     <Compile Include="GUI\Plugins\AOBJEditor.cs">
       <SubType>Form</SubType>

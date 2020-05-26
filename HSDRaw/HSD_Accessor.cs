@@ -448,7 +448,9 @@ namespace HSDRaw
             {
                 if (i < 0 || i > Length)
                     throw new IndexOutOfRangeException();
-                _s.SetEmbededStruct(i * Stride, value._s);
+
+                if(value != null)
+                    _s.SetEmbededStruct(i * Stride, value._s);
             }
         }
 

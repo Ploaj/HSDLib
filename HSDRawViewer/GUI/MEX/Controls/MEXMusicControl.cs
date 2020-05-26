@@ -52,7 +52,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             InitializeComponent();
 
-            musicDSPPlayer.ReplaceButtonVisible = false;
+            //musicDSPPlayer.ReplaceButtonVisible = false;
 
             musicListEditor.EnablePropertyViewDescription = false;
         }
@@ -134,10 +134,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             musicDSPPlayer.DSP = null;
             if (File.Exists(path))
             {
-                musicDSPPlayer.SoundName = str;
-                var dsp = new Sound.DSP();
-                dsp.FromFile(path);
-                musicDSPPlayer.DSP = dsp;
+                musicDSPPlayer.LoadFromFile(path);
                 musicDSPPlayer.PlaySound();
             }
             else

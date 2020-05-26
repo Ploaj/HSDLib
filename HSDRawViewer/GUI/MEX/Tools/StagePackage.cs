@@ -1,64 +1,32 @@
-﻿using HSDRaw;
-using HSDRaw.MEX;
-using HSDRaw.MEX.Stages;
-using System;
+﻿using HSDRaw.MEX;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization.TypeInspectors;
 
 namespace HSDRawViewer.GUI.MEX.Tools
 {
-    public class SerialIgnoreAttribute : Attribute
-    {
-
-    }
-
     /// <summary>
     /// 
     /// </summary>
-    public class MEXTypeInspector : TypeInspectorSkeleton
+    public class StagePackage
     {
-        private readonly ITypeInspector _innerTypeDescriptor;
-
-        public MEXTypeInspector(ITypeInspector innerTypeDescriptor)
-        {
-            _innerTypeDescriptor = innerTypeDescriptor;
-        }
-
-        public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
-        {
-            var props = _innerTypeDescriptor.GetProperties(type, container);
-            props = props.Where(p => p.Type != typeof(HSDStruct) && p.Name != "trimmedSize" && p.Name != "costumeCount" && p.Name != "gOBJFunctions" && p.GetCustomAttribute<SerialIgnoreAttribute>() == null);
-            return props;
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class FighterPackage
-    {
-        public MEXFighterEntry Fighter;
+        public MEXStageEntry Stage;
         public List<MEX_Item> Items = new List<MEX_Item>();
-        public MEXEffectEntry Effect;
-        public MEXEffectEntry KirbyEffect;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static FighterPackage DeserializeFile(string filePath)
+        public static StagePackage DeserializeFile(string filePath)
         {
             var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
             .Build();
 
-            return deserializer.Deserialize<FighterPackage>(File.ReadAllText(filePath));
+            return deserializer.Deserialize<StagePackage>(File.ReadAllText(filePath));
         }
 
         /// <summary>
@@ -66,14 +34,14 @@ namespace HSDRawViewer.GUI.MEX.Tools
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static FighterPackage Deserialize(string data)
+        public static StagePackage Deserialize(string data)
         {
             var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
             .Build();
 
-            return deserializer.Deserialize<FighterPackage>(data);
+            return deserializer.Deserialize<StagePackage>(data);
         }
 
         /// <summary>

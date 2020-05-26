@@ -34,21 +34,21 @@
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.channelBox = new System.Windows.Forms.ListBox();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.soundTrack = new System.Windows.Forms.TrackBar();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.soundTrack = new System.Windows.Forms.TrackBar();
             this.label1 = new System.Windows.Forms.Label();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonExport = new System.Windows.Forms.ToolStripButton();
             this.buttonReplace = new System.Windows.Forms.ToolStripButton();
             this.playButton = new System.Windows.Forms.ToolStripButton();
             this.pauseButton = new System.Windows.Forms.ToolStripButton();
             this.stopButton = new System.Windows.Forms.ToolStripButton();
             this.buttonSetLoop = new System.Windows.Forms.ToolStripButton();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.soundTrack)).BeginInit();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.soundTrack)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -96,6 +96,39 @@
             this.channelBox.TabIndex = 7;
             this.channelBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.channelBox_MouseDoubleClick);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.soundTrack);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox2.Location = new System.Drawing.Point(3, 41);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(476, 83);
+            this.groupBox2.TabIndex = 11;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Playback";
+            // 
+            // soundTrack
+            // 
+            this.soundTrack.Dock = System.Windows.Forms.DockStyle.Top;
+            this.soundTrack.Location = new System.Drawing.Point(3, 29);
+            this.soundTrack.Name = "soundTrack";
+            this.soundTrack.Size = new System.Drawing.Size(470, 45);
+            this.soundTrack.TabIndex = 10;
+            this.soundTrack.ValueChanged += new System.EventHandler(this.soundTrack_ValueChanged);
+            this.soundTrack.MouseDown += new System.Windows.Forms.MouseEventHandler(this.soundTrack_MouseDown);
+            this.soundTrack.MouseUp += new System.Windows.Forms.MouseEventHandler(this.soundTrack_MouseUp);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label1.Location = new System.Drawing.Point(3, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(33, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "Time:";
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Enabled = false;
@@ -111,44 +144,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(476, 25);
             this.toolStrip1.TabIndex = 8;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // soundTrack
-            // 
-            this.soundTrack.Dock = System.Windows.Forms.DockStyle.Top;
-            this.soundTrack.Location = new System.Drawing.Point(3, 29);
-            this.soundTrack.Name = "soundTrack";
-            this.soundTrack.Size = new System.Drawing.Size(470, 45);
-            this.soundTrack.TabIndex = 10;
-            this.soundTrack.ValueChanged += new System.EventHandler(this.soundTrack_ValueChanged);
-            this.soundTrack.MouseDown += new System.Windows.Forms.MouseEventHandler(this.soundTrack_MouseDown);
-            this.soundTrack.MouseUp += new System.Windows.Forms.MouseEventHandler(this.soundTrack_MouseUp);
-            // 
-            // timer1
-            // 
-            this.timer1.Enabled = true;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.soundTrack);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox2.Location = new System.Drawing.Point(3, 41);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(476, 83);
-            this.groupBox2.TabIndex = 11;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Playback";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Location = new System.Drawing.Point(3, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(33, 13);
-            this.label1.TabIndex = 11;
-            this.label1.Text = "Time:";
             // 
             // buttonExport
             // 
@@ -208,6 +203,11 @@
             this.buttonSetLoop.Text = "Set Loop At Position";
             this.buttonSetLoop.Click += new System.EventHandler(this.buttonSetLoop_Click);
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // DSPViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -217,11 +217,11 @@
             this.Size = new System.Drawing.Size(482, 260);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.soundTrack)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.soundTrack)).EndInit();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
