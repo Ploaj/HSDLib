@@ -11,6 +11,10 @@ using HSDRaw.MEX.Characters;
 using HSDRaw;
 using System.IO;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.Tools;
+using HSDRaw.Melee;
+using System.Collections.Generic;
+using HSDRawViewer.GUI.MEX.Tools;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -26,6 +30,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 var c = Parent;
                 while (c != null && !(c is MexDataEditor)) c = c.Parent;
                 if (c is MexDataEditor e) return e._data;
+                return null;
+            }
+        }
+
+        public MexDataEditor Editor
+        {
+            get
+            {
+                var c = Parent;
+                while (c != null && !(c is MexDataEditor)) c = c.Parent;
+                if (c is MexDataEditor e) return e;
                 return null;
             }
         }
@@ -183,6 +198,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 v.SaveData(d, index, MEXIdConverter.ToExternalID(index, NumberOfEntries));
                 index++;
             }
+
+            SavePlCo();
         }
         
         /// <summary>
@@ -214,43 +231,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         }
 
         /// <summary>
-        /// Removes item index from fighters and adjust indices to accommodate 
-        /// </summary>
-        /// <param name="index"></param>
-        public void RemoveItem(int index)
-        {
-            foreach (var v in FighterEntries)
-            {
-                foreach (var s in v.MEXItems)
-                {
-                    if (s.Value ==index)
-                        s.Value = 0;
-                    if (s.Value > index)
-                        s.Value -= 1;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Removes effect index from fighters and adjust indices to accommodate
-        /// </summary>
-        /// <param name="index"></param>
-        public void RemoveEffect(int index)
-        {
-            foreach (var v in FighterEntries)
-            {
-                if (v.EffectIndex == index)
-                    v.EffectIndex = 0;
-                if (v.EffectIndex > index)
-                    v.EffectIndex--;
-                if (v.KirbyEffectID == index)
-                    v.KirbyEffectID = 0;
-                if (v.KirbyEffectID > index)
-                    v.KirbyEffectID--;
-            }
-        }
-
-        /// <summary>
         /// Checks if effect index is currently in use by fighter
         /// </summary>
         /// <param name="index"></param>
@@ -258,6 +238,16 @@ namespace HSDRawViewer.GUI.MEX.Controls
         public bool EffectInUse(int index)
         {
             return FighterEntries.Any(e => e.EffectIndex == index || e.KirbyEffectID == index);
+        }
+
+        /// <summary>
+        /// Checks if effect index is currently in use by fighter
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public bool ItemInUse(int index)
+        {
+            return FighterEntries.Any(e => e.MEXItems.Any(r=>r.Value == index));
         }
 
         /// <summary>
@@ -335,6 +325,11 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void cloneButton_Click(object sender, EventArgs e)
         {
+            if (PlCo == null)
+            {
+                MessageBox.Show("Please load PlCo.dat before cloning a fighter");
+                return;
+            }
             if (fighterList.SelectedItem is MEXFighterEntry me)
             {
                 var clone = ObjectExtensions.Copy(me);
@@ -356,12 +351,27 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void exportFighter_Click(object sender, EventArgs e)
         {
-            if (fighterList.SelectedItem is MEXFighterEntry mex)
+            if (fighterList.SelectedItem is MEXFighterEntry fighter)
             {
-                var f = Tools.FileIO.SaveFile("YAML (*.yaml)|*.yaml", mex.NameText + ".yaml");
+                var f = FileIO.SaveFile("YAML (*.yaml)|*.yaml", fighter.NameText + ".yaml");
                 if (f != null)
                 {
-                    mex.Serialize(f);
+                    FighterPackage package = new FighterPackage();
+
+                    package.Fighter = fighter;
+
+                    // add fighter items
+                    foreach(var itemIndex in fighter.MEXItems)
+                        package.Items.Add(Editor.ItemControl.GetItem(itemIndex.Value));
+
+                    // add fighter effect
+                    if(fighter.EffectIndex != -1)
+                        package.Effect = Editor.EffectControl.Effects[fighter.EffectIndex];
+                    if(fighter.KirbyEffectID != -1)
+                        package.KirbyEffect = Editor.EffectControl.Effects[fighter.KirbyEffectID];
+                    
+
+                    package.Serialize(f);
                 }
             }
         }
@@ -373,10 +383,36 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void importFighter_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("YAML (*.yaml)|*.yaml");
+            if(PlCo == null)
+            {
+                MessageBox.Show("Please load PlCo.dat before importing a fighter");
+                return;
+            }
+            var f = FileIO.OpenFile("YAML (*.yaml)|*.yaml");
             if (f != null)
             {
-                FighterEntries.Insert(FighterEntries.Count - 6, MEXFighterEntry.DeserializeFile(f));
+                var package = FighterPackage.DeserializeFile(f);
+
+                var fighter = package.Fighter;
+
+                // load items
+                if(package.Items != null)
+                {
+                    fighter.MEXItems = new HSD_UShort[package.Items.Count];
+                    for(int i = 0; i < fighter.MEXItems.Length; i++)
+                        fighter.MEXItems[i] = new HSD_UShort() { Value = (ushort)Editor.ItemControl.AddMEXItem(package.Items[i]) };
+                }
+
+                // load effects
+                if(package.Effect != null)
+                    fighter.EffectIndex = Editor.EffectControl.AddMEXEffectFile(package.Effect);
+
+                // load kirby effect
+                if (package.KirbyEffect != null)
+                    fighter.KirbyEffectID = Editor.EffectControl.AddMEXEffectFile(package.KirbyEffect);
+
+                // insert new fighter
+                FighterEntries.Insert(FighterEntries.Count - 6, fighter);
             }
         }
 
@@ -390,10 +426,43 @@ namespace HSDRawViewer.GUI.MEX.Controls
             var selected = fighterList.SelectedIndex;
             if (IsExtendedFighter(selected))
             {
-                FighterEntries.RemoveAt(selected);
+                DeleteFighter(SelectedEntry);
                 return;
             }
             MessageBox.Show("Unable to delete base game fighters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fighter"></param>
+        public void DeleteFighter(MEXFighterEntry fighter)
+        {
+            // remove fighter entry
+            FighterEntries.Remove(fighter);
+
+            // remove items
+            var it = fighter.MEXItems.Select(e => e.Value).ToList();
+            it.Sort();
+            it.Reverse();
+            foreach (var i in it)
+            {
+                Editor.ItemControl.SaveRemoveMexItem(i);
+            }
+
+            // remove effect file
+            bool removed = false;
+            if (fighter.EffectIndex >= 0)
+                removed = Editor.EffectControl.SafeRemoveEffectFile(fighter.EffectIndex);
+
+            // adjust effect index if one above it was removed above ^
+            if (fighter.KirbyEffectID >= 0)
+                if(removed && fighter.KirbyEffectID > fighter.EffectIndex)
+                    Editor.EffectControl.SafeRemoveEffectFile(fighter.KirbyEffectID - 1);
+                else
+                    Editor.EffectControl.SafeRemoveEffectFile(fighter.KirbyEffectID);
+
+            MessageBox.Show($"Removed {fighter.NameText}");
         }
 
         /// <summary>
@@ -493,9 +562,97 @@ static struct MoveLogic move_logic[] = {
         {
             fighterPropertyGrid.SelectedObject = fighterList.SelectedItem;
             functionPropertyGrid.SelectedObject = (fighterList.SelectedItem as MEXFighterEntry).Functions;
+            boneTablePropertyGrid.SelectedObject = (fighterList.SelectedItem as MEXFighterEntry).BoneTable;
         }
 
         #endregion
 
+
+        private string PlCoPath;
+        private HSDRawFile PlCo;
+        private SBM_BoneLookupTable DummyBoneTable;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void plcoButton_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "PlCo.dat");
+
+            if (f != null)
+            {
+                PlCo = new HSDRawFile(f);
+
+                if(PlCo.Roots[0].Data is ftLoadCommonData ftData)
+                {
+                    PlCoPath = f;
+                    LoadPlCO(ftData);
+                }
+                else
+                    PlCo = null;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ftData"></param>
+        private void LoadPlCO(ftLoadCommonData ftData)
+        {
+            var tables = ftData.BoneTables.Array;
+
+            if (tables.Length != FighterEntries.Count + 1)
+                MessageBox.Show($"PlCo is missing entries\nExpected {FighterEntries.Count} Found {tables.Length - 1}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            int fIndex = 0;
+            foreach(var fighter in FighterEntries)
+                fighter.BoneTable = tables[fIndex++];
+
+            DummyBoneTable = tables[tables.Length - 1];
+
+            importPlCoButton.Visible = false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SavePlCo()
+        {
+            if (PlCo != null)
+                return;
+            
+            List<SBM_BoneLookupTable> tables = new List<SBM_BoneLookupTable>();
+
+            foreach (var f in FighterEntries)
+            {
+                if (f.BoneTable != null)
+                    tables.Add(f.BoneTable);
+                else
+                    tables.Add(new SBM_BoneLookupTable());
+            }
+
+            tables.Add(DummyBoneTable);
+
+            if (PlCo.Roots[0].Data is ftLoadCommonData ftData)
+                ftData.BoneTables.Array = tables.ToArray();
+
+            PlCo.Save(PlCoPath);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ClosePlCo()
+        {
+            PlCo = null;
+            PlCoPath = "";
+            importPlCoButton.Visible = true;
+            DummyBoneTable = null;
+
+            foreach (var fighter in FighterEntries)
+                fighter.BoneTable = null;
+        }
     }
 }

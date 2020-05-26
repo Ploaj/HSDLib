@@ -48,7 +48,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
-        private ViewportControl viewport;
+        public ViewportControl viewport;
 
         private bool CSSSelected => tabControl.SelectedIndex == 0;
 

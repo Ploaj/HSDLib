@@ -139,7 +139,7 @@ namespace HSDRawViewer.GUI.MEX
             it.Reverse();
             
             foreach(var i in it)
-                editor.ItemControl.RemoveMEXItem(i);
+                editor.ItemControl.SaveRemoveMexItem(i);
         }
 
 

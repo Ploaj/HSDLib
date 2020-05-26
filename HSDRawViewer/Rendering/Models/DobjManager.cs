@@ -366,7 +366,7 @@ namespace HSDRawViewer.Rendering
             shader.SetBoolToInt("hasTEX2", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX2) || enableAll);
             shader.SetBoolToInt("hasTEX3", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX3) || enableAll);
             
-            LoadTextureConstants(shader);
+            //LoadTextureConstants(shader);
 
             // Bind Textures
             if (mobj.Textures != null)

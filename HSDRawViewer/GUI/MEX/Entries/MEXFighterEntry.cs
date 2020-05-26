@@ -1,15 +1,10 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
+using HSDRaw.Melee;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Characters;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization.TypeInspectors;
 
 namespace HSDRawViewer.GUI.MEX
 {
@@ -171,17 +166,36 @@ namespace HSDRawViewer.GUI.MEX
 
         public MEXFunctionPointers Functions = new MEXFunctionPointers();
 
+        public SBM_BoneLookupTable BoneTable;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mexData"></param>
+        /// <param name="internalID"></param>
+        /// <returns></returns>
         public bool IsSpecialCharacterInternal(MEX_Data mexData, int internalID)
         {
             return internalID >= mexData.MetaData.NumOfInternalIDs - MEXIdConverter.InternalSpecialCharCount;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mexData"></param>
+        /// <param name="externalID"></param>
+        /// <returns></returns>
         public bool IsSpecialCharacterExternal(MEX_Data mexData, int externalID)
         {
             return externalID >= mexData.MetaData.NumOfExternalIDs - MEXIdConverter.ExternalSpecialCharCount;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         private byte[] GenerateSpecialBuffer(int length, string s)
         {
             byte[] b = new byte[length];
@@ -190,6 +204,13 @@ namespace HSDRawViewer.GUI.MEX
             return b;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mexData"></param>
+        /// <param name="internalId"></param>
+        /// <param name="externalID"></param>
+        /// <returns></returns>
         public MEXFighterEntry LoadData(MEX_Data mexData, int internalId, int externalID)
         {
             Functions.LoadData(mexData, internalId, externalID);
@@ -249,6 +270,12 @@ namespace HSDRawViewer.GUI.MEX
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mexData"></param>
+        /// <param name="internalId"></param>
+        /// <param name="externalID"></param>
         public void SaveData(MEX_Data mexData, int internalId, int externalID)
         {
             Functions.SaveData(mexData, internalId, externalID);
@@ -352,59 +379,15 @@ namespace HSDRawViewer.GUI.MEX
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static MEXFighterEntry DeserializeFile(string filePath)
-        {
-            var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
-            .Build();
-
-            return deserializer.Deserialize<MEXFighterEntry>(File.ReadAllText(filePath));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static MEXFighterEntry Deserialize(string data)
-        {
-            var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .WithTypeInspector(inspector => new MEXTypeInspector(inspector))
-            .Build();
-
-            return deserializer.Deserialize<MEXFighterEntry>(data);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filepath"></param>
-        public void Serialize(string filepath)
-        {
-            var builder = new SerializerBuilder();
-            builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
-            builder.WithTypeInspector(inspector => new MEXTypeInspector(inspector));
-
-            using (StreamWriter writer = File.CreateText(filepath))
-            {
-                builder.Build().Serialize(writer, this);
-            }
-        }
-
         public override string ToString()
         {
             return NameText;
         }
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class MEXFunctionPointers
     {
         [TypeConverter(typeof(HexType)), Category("Fighter")]
@@ -642,23 +625,6 @@ namespace HSDRawViewer.GUI.MEX
             mexData.KirbyFunctions.KirbySpecialNAir.Set(internalId, new HSD_UInt() { Value = KirbySpecialNAir });
             mexData.KirbyFunctions.KirbyOnHit.Set(internalId, new HSD_UInt() { Value = KirbyOnHit });
             mexData.KirbyFunctions.KirbyOnItemInit.Set(internalId, new HSD_UInt() { Value = KirbyOnItemInit });
-        }
-    }
-    
-    public class MEXTypeInspector : TypeInspectorSkeleton
-    {
-        private readonly ITypeInspector _innerTypeDescriptor;
-
-        public MEXTypeInspector(ITypeInspector innerTypeDescriptor)
-        {
-            _innerTypeDescriptor = innerTypeDescriptor;
-        }
-
-        public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
-        {
-            var props = _innerTypeDescriptor.GetProperties(type, container);
-            props = props.Where(p => p.Type != typeof(HSDStruct) && p.Name != "trimmedSize" && p.Name != "costumeCount");
-            return props;
         }
     }
 }

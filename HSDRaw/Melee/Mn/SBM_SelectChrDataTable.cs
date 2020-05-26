@@ -10,8 +10,14 @@ namespace HSDRaw.Melee.Mn
     {
         public override int TrimmedSize => 0x100;
 
-        //TODO: 2 unknowns structs and 2 lighting stucts
+        public HSD_Camera Camera { get => _s.GetReference<HSD_Camera>(0x00); set => _s.SetReference(0x00, value); }
 
+        public HSD_LOBJ Light1 { get => _s.GetReference<HSD_LOBJ>(0x04); set => _s.SetReference(0x04, value); }
+
+        public HSD_LOBJ Light2 { get => _s.GetReference<HSD_LOBJ>(0x08); set => _s.SetReference(0x08, value); }
+
+        public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x0C); set => _s.SetReference(0x0C, value); }
+        
         public HSD_JOBJ BackgroundModel { get => _s.GetReference<HSD_JOBJ>(0x10); set => _s.SetReference(0x10, value); }
 
         public HSD_AnimJoint BackgroundAnimation { get => _s.GetReference<HSD_AnimJoint>(0x14); set => _s.SetReference(0x14, value); }

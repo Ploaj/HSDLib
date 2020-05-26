@@ -11,6 +11,7 @@ using HSDRaw.MEX.Menus;
 using System.Drawing;
 using HSDRaw.Common.Animation;
 using System.Linq;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -57,7 +58,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "MnSlChr.usd");
             if(!File.Exists(path))
-                path = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                path = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
             if (path != null)
             {
@@ -422,7 +423,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
-                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (f != null)
                 {
@@ -445,7 +446,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
-                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (f != null)
                 {
@@ -482,7 +483,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
-                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (f != null)
                 {

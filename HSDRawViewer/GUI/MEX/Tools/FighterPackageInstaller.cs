@@ -114,8 +114,8 @@ namespace HSDRawViewer.GUI.MEX
                 {
                     pack[fighterYAMLPath].Extract(zos);
                     zos.Position = 0;
-                    using (StreamReader r = new StreamReader(zos))
-                        mexEntry = MEXFighterEntry.Deserialize(r.ReadToEnd());
+                    //using (StreamReader r = new StreamReader(zos))
+                    //    mexEntry = MEXFighterEntry.Deserialize(r.ReadToEnd());
                 }
 
                 if (mexEntry == null)
@@ -210,7 +210,7 @@ namespace HSDRawViewer.GUI.MEX
                 }
 
                 // this is technically externalID, but it should be fine?
-                boneTables.Insert(internalID - 1, new SBM_BoneTables() { _s = boneTable.Roots[0].Data._s });
+                boneTables.Insert(internalID - 1, new SBM_BoneLookupTable() { _s = boneTable.Roots[0].Data._s });
 
                 commonData.BoneTables.Array = boneTables.ToArray();
             }

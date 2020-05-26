@@ -7,6 +7,7 @@ using HSDRaw.MEX;
 using HSDRaw.MEX.Sounds;
 using System.IO;
 using HSDRawViewer.Sound;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -182,7 +183,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void createHPSButton_Click(object sender, EventArgs e)
         {
-            var fs = Tools.FileIO.OpenFiles(DSP.SupportedImportFilter);
+            var fs = FileIO.OpenFiles(DSP.SupportedImportFilter);
 
             if (fs != null)
             {

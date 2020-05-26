@@ -11,6 +11,7 @@ using System.IO;
 using HSDRaw.Common;
 using System.Collections.Generic;
 using System.Linq;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -43,7 +44,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "MnSlMap.usd");
 
             if (!File.Exists(path))
-                path = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                path = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
             if (path != null)
             {
@@ -378,7 +379,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void importNewIconImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+            var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
                 using (Bitmap bmp = new Bitmap(f))
@@ -401,9 +402,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void loadGameCameraButton_Click(object sender, EventArgs e)
         {
-            //var cam = (StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable).Camera;
-
-            //viewport.LoadHSDCamera(cam);
+            var cam = (StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable).Camera;
+            var par = Parent;
+            while(par != null)
+            {
+                if (par is MEXMenuControl mn)
+                {
+                    mn.viewport.LoadHSDCamera(cam);
+                    break;
+                }
+                par = par.Parent;
+            }
         }
     }
 }

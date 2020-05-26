@@ -2,16 +2,18 @@
 
 namespace HSDRaw.Melee
 {
-    public class SBM_BoneTableBank : HSDFixedLengthPointerArrayAccessor<SBM_BoneTables>
+    public class SBM_BoneTableBank : HSDFixedLengthPointerArrayAccessor<SBM_BoneLookupTable>
     {
 
     }
 
-    public class SBM_BoneTables : HSDAccessor
+    public class SBM_BoneLookupTable : HSDAccessor
     {
         public override int TrimmedSize => 0x0C;
 
         private HSDAccessor CommonAttribute { get => _s.GetCreateReference<HSDAccessor>(0x04); set => _s.SetReference(0x04, value); }
+
+        public int BoneCount { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
         public byte Top { get => CommonAttribute._s.GetByte(0x00); set { CommonAttribute._s.SetByte(0x00, value); CreateReverseLookup(); } }
 
@@ -134,7 +136,7 @@ namespace HSDRaw.Melee
                 }
             }
 
-            _s.SetInt32(0x08, boneCount);
+            BoneCount = boneCount;
 
             var reverseTable = _s.GetCreateReference<HSDAccessor>(0x00);
             reverseTable._s.Resize(boneCount);

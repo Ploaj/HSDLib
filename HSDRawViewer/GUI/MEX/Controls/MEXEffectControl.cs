@@ -103,8 +103,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <returns>added mex file id</returns>
         public int AddMEXEffectFile(MEXEffectEntry item)
         {
-            effectEditor.AddItem(item);
-            return Effects.Length - 1;
+            return effectEditor.AddItem(item);
         }
 
 
@@ -112,10 +111,15 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// 
         /// </summary>
         /// <param name="index"></param>
-        public void SafeRemoveEffectFile(int index)
+        public bool SafeRemoveEffectFile(int index)
         {
             if (!MexDataEditor.FighterControl.EffectInUse(index))
+            {
                 effectEditor.RemoveAt(index);
+                return true;
+            }
+
+            return false;
         }
 
 
@@ -148,7 +152,22 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void effectEditor_OnItemRemove(RemovedItemEventArgs e)
         {
-            MexDataEditor.FighterControl.RemoveEffect(e.Index);
+            var index = e.Index;
+
+            foreach (var v in MexDataEditor.FighterControl.FighterEntries)
+            {
+                if (v.EffectIndex == index)
+                    v.EffectIndex = 0;
+
+                if (v.EffectIndex > index)
+                    v.EffectIndex--;
+
+                if (v.KirbyEffectID == index)
+                    v.KirbyEffectID = 0;
+
+                if (v.KirbyEffectID > index)
+                    v.KirbyEffectID--;
+            }
         }
 
         #endregion

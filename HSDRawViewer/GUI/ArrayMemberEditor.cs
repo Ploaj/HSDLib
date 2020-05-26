@@ -341,12 +341,26 @@ namespace HSDRawViewer.GUI
         /// 
         /// </summary>
         /// <param name="o"></param>
-        public void AddItem(object o)
+        public int AddItem(object o)
         {
             if (o == null)
-                return;
+                return -1;
             Items.Add(o);
             MakeChanges();
+            return Items.Count - 1 + ItemIndexOffset;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public object GetItemAt(int index)
+        {
+            if (index >= ItemIndexOffset && index < ItemIndexOffset + GetItems().Count)
+                return GetItems()[index - ItemIndexOffset];
+
+            return null;
         }
 
         /// <summary>

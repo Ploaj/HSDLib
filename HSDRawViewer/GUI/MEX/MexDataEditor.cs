@@ -1,6 +1,7 @@
 ﻿using HSDRaw.MEX;
 using HSDRawViewer.GUI.MEX.Controls;
 using HSDRawViewer.GUI.Plugins;
+using HSDRawViewer.Tools;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -110,12 +111,16 @@ namespace HSDRawViewer.GUI.MEX
         /// <param name="e"></param>
         private void installFighterButton_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
-            if(f != null)
+        }
+
+        private void OldInstall()
+        {
+            var f = FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
+            if (f != null)
             {
                 MenuControl.CloseMenuFiles();
 
-                using (ProgressBarDisplay d = new ProgressBarDisplay (new FighterPackageInstaller(f, this)))
+                using (ProgressBarDisplay d = new ProgressBarDisplay(new FighterPackageInstaller(f, this)))
                 {
                     d.DoWork();
                     d.ShowDialog();
@@ -133,7 +138,6 @@ namespace HSDRawViewer.GUI.MEX
                 MainForm.Instance.SaveDAT();
             }
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -141,7 +145,11 @@ namespace HSDRawViewer.GUI.MEX
         /// <param name="e"></param>
         private void uninstallFighterButton_Click(object sender, EventArgs e)
         {
-            if(FighterControl.IsExtendedFighter(FighterControl.SelectedIndex) && FighterControl.SelectedEntry != null)
+        }
+
+        private void OldUninstall()
+        {
+            if (FighterControl.IsExtendedFighter(FighterControl.SelectedIndex) && FighterControl.SelectedEntry != null)
             {
                 using (ProgressBarDisplay d = new ProgressBarDisplay(new FighterPackageUninstaller(FighterControl.SelectedIndex, FighterControl.SelectedEntry, this)))
                 {
