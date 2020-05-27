@@ -61,11 +61,19 @@ namespace HSDRawViewer.GUI.MEX.Controls
             bool updated = false;
 
             // legacy update
-            if(data.EffectTable._s.Length != 8)
+            if(data.EffectTable._s.Length != new MEX_EffectData().TrimmedSize)
             {
                 var strings = data.EffectTable._s;
                 data.EffectTable = new MEX_EffectData();
+                var length = strings.Length;
                 data.EffectTable.EffectFiles = new HSDArrayAccessor<MEX_EffectFiles>() { _s = strings };
+                data.EffectTable.EffectRuntime = new HSDAccessor() { _s = new HSDStruct(0x60) };
+                data.EffectTable.RuntimeArray1 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeArray2 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeArray3 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeArray4 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeArray5 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeArray6 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
                 updated = true;
             }
 
