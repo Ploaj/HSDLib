@@ -101,7 +101,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     Symbol = v.Symbol
                 });
             }
-            data.EffectTable.EffectRuntime = new HSDAccessor() { _s = new HSDStruct(0x60 + 0x18 * Effects.Length )};
+
+            data.EffectTable.EffectRuntime = new HSDAccessor() { _s = new HSDStruct( 0x60 )};
+            data.EffectTable.RuntimeArray1 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeArray2 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeArray3 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeArray4 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeArray5 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeArray6 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
         }
 
         /// <summary>
