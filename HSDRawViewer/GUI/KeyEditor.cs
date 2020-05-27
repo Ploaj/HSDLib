@@ -100,12 +100,11 @@ namespace HSDRawViewer.GUI
                 return;
 
             var fCount = keys[keys.Count - 1].Frame + 1;
-
+            
             dataGridView1.DataSource = null;
+
             for(int i = 0; i < fCount; i++)
-            {
                 KeyFrames.Add(new Key());
-            }
 
             foreach(var k in keys)
             {
@@ -113,6 +112,7 @@ namespace HSDRawViewer.GUI
                 KeyFrames[(int)k.Frame].Slope = k.Tan;
                 KeyFrames[(int)k.Frame].InterpolationType = k.InterpolationType;
             }
+
             dataGridView1.DataSource = KeyFrames;
 
             panel1.Invalidate();

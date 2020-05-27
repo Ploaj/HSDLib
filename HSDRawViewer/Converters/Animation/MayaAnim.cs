@@ -41,7 +41,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="nodes"></param>
-        public static void ExportToMayaAnim(string filePath, JointAnimManager animation)
+        public static void ExportToMayaAnim(string filePath, JointAnimManager animation, Dictionary<int, string> boneLabelMap)
         {
             using (PropertyDialog d = new PropertyDialog("Maya Settings", MayaSettings))
             {
@@ -59,7 +59,7 @@ namespace HSDRawViewer.Converters
             foreach(var n in animation.Nodes)
             {
                 MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
-                mnode.name = "JOBJ_" + nodeIndex;
+                mnode.name = boneLabelMap.ContainsKey(nodeIndex) ? boneLabelMap[nodeIndex] : "JOBJ_" + nodeIndex;
                 a.Nodes.Add(mnode);
                 
                 foreach(var t in n.Tracks)

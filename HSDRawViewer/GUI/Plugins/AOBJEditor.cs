@@ -14,6 +14,16 @@ namespace HSDRawViewer.GUI.Plugins
         public DataNode Node { get => _node;
             set
             {
+                if (value.Parent is DataNode par)
+                {
+                    if(par.Accessor is HSD_AnimJoint)
+                        comboBoxAnimType.SelectedIndex = 0;
+                    if (par.Accessor is HSD_MatAnim)
+                        comboBoxAnimType.SelectedIndex = 1;
+                    if (par.Accessor is HSD_TexAnim)
+                        comboBoxAnimType.SelectedIndex = 2;
+                }
+
                 if (value.Accessor is HSD_AOBJ aobj)
                 {
                     _node = value;
@@ -29,6 +39,9 @@ namespace HSDRawViewer.GUI.Plugins
 
         private HSD_FOBJDesc SelectedFOBJ;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public AOBJEditor()
         {
             InitializeComponent();
@@ -166,6 +179,11 @@ namespace HSDRawViewer.GUI.Plugins
             RefreshList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void comboBoxAnimType_SelectedIndexChanged(object sender, EventArgs e)
         {
             switch (comboBoxAnimType.SelectedIndex)

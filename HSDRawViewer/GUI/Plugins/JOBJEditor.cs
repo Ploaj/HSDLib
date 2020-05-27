@@ -118,6 +118,7 @@ namespace HSDRawViewer.GUI.Plugins
             public int DOBJIndex;
             public HSD_JOBJ ParentJOBJ;
             public HSD_DOBJ DOBJ;
+
             public string Name { get => DOBJ.ClassName; set => DOBJ.ClassName = value; }
 
             public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
@@ -126,6 +127,19 @@ namespace HSDRawViewer.GUI.Plugins
 
             public bool HasPixelProcessing { get => DOBJ.Mobj?.PEDesc != null; }
 
+            public bool HasTEV
+            {
+                get
+                {
+                    if(DOBJ.Mobj != null && DOBJ.Mobj.Textures != null)
+                    {
+                        if (DOBJ.Mobj.Textures.List.Any(e => e.TEV != null))
+                            return true;
+                    }
+                    return false;
+                }
+            }
+            
             public bool HasMaterialColor { get => DOBJ.Mobj?.Material != null; }
 
             public RENDER_MODE MOBJFlags { get => DOBJ.Mobj.RenderFlags; set => DOBJ.Mobj.RenderFlags = value; }
@@ -716,7 +730,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             if (f != null)
             {
-                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation);
+                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation, BoneLabelMap);
             }
         }
 

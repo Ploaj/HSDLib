@@ -164,6 +164,8 @@ namespace HSDRawViewer.Rendering
         private HSD_AnimJoint ToAnimJointRecursive(HSD_JOBJ root, AOBJ_Flags flags)
         {
             HSD_AnimJoint joint = new HSD_AnimJoint();
+            joint.Flags = 1;
+
             var n = Nodes[index++];
 
             if (n.Tracks.Count > 0)

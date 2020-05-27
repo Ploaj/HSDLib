@@ -77,8 +77,30 @@ namespace HSDRaw.Tools
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Frame"></param>
+        /// <returns></returns>
         public FOBJAnimState GetState(float Frame)
         {
+            // clamp
+            if(Keys.Count > 1 && Frame >= Keys[Keys.Count - 1].Frame)
+            {
+                var key = Keys[Keys.Count - 1];
+                return new FOBJAnimState()
+                {
+                    t0 = key.Frame,
+                    t1 = key.Frame,
+                    p0 = key.Value,
+                    p1 = key.Value,
+                    d0 = key.Tan,
+                    d1 = key.Tan,
+                    op = GXInterpolationType.HSD_A_OP_CON,
+                    op_intrp = GXInterpolationType.HSD_A_OP_CON
+                };
+            }
+
             // register
             float p0 = 0;
             float p1 = 0;

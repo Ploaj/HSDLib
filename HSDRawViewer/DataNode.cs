@@ -382,6 +382,7 @@ namespace HSDRawViewer
             {
                 Accessor._s.References.Add(v.Key, v.Value);
             }
+            NotifyChange();
         }
 
         /// <summary>
@@ -479,15 +480,19 @@ namespace HSDRawViewer
         /// </summary>
         public void NotifyChange()
         {
-            if (Parent != null && Parent is DataNode parent && IsArrayMember)
+            if(Parent != null && Parent is DataNode parent)
             {
-                var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+                if (IsArrayMember)
+                {
+                    var prop = parent.Accessor.GetType().GetProperty(ArrayName);
 
-                var arr = prop.GetValue(parent.Accessor) as object[];
+                    var arr = prop.GetValue(parent.Accessor) as object[];
 
-                arr[ArrayIndex] = Accessor;
+                    arr[ArrayIndex] = Accessor;
 
-                prop.SetValue(parent.Accessor, arr);
+                    prop.SetValue(parent.Accessor, arr);
+                }
+                parent.NotifyChange();
             }
         }
 

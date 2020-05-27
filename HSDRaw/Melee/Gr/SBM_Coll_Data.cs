@@ -40,7 +40,7 @@ namespace HSDRaw.Melee.Gr
     {
         DropThrough = 1,
         LedgeGrab   = 2,
-        Unknown     = 4
+        Unknown     = 4 // used on some dynamic collisions (PS and RC)
     }
 
     public class SBM_CollVertex : HSDAccessor
@@ -59,7 +59,7 @@ namespace HSDRaw.Melee.Gr
         public short PreviousLine { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
         public short NextLineAltGroup { get => _s.GetInt16(0x08); set => _s.SetInt16(0x08, value); } // -1
         public short PreviousLineAltGroup { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); } // -1
-        public CollPhysics CollisionFlag { get => (CollPhysics)_s.GetInt16(0x0C); set => _s.SetInt16(0x0C, (byte)value); }
+        public CollPhysics CollisionFlag { get => (CollPhysics)_s.GetInt16(0x0C); set => _s.SetInt16(0x0C, (short)value); }
         public CollProperty Flag { get => (CollProperty)_s.GetByte(0x0E); set => _s.SetByte(0x0E, (byte)value); }
         public CollMaterial Material { get => (CollMaterial)_s.GetByte(0x0F); set => _s.SetByte(0x0F, (byte)value); }
     }

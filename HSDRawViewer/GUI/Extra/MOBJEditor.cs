@@ -184,9 +184,16 @@ namespace HSDRawViewer.GUI.Extra
             if(listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
             {
                 propertyTexture.SelectedObject = con.TOBJ;
+
+                enableTEVCB.Checked = (con.TOBJ.TEV != null);
+                tevPropertyGrid.SelectedObject = con.TOBJ.TEV;
             }
             else
+            {
                 propertyTexture.SelectedObject = null;
+                enableTEVCB.Checked = false;
+                tevPropertyGrid.SelectedObject = null;
+            }
         }
 
         /// <summary>
@@ -285,7 +292,7 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void importTexture_Click(object sender, EventArgs e)
         {
             var tobj = TOBJConverter.ImportTOBJFromFile();
 
@@ -351,7 +358,6 @@ namespace HSDRawViewer.GUI.Extra
                 var tc = (listTexture.SelectedItems[0] as TextureContainer);
                 tc.Text = tc.TOBJ.Flags.ToString();
                 listTexture.Items[listTexture.SelectedIndices[0]] = listTexture.Items[listTexture.SelectedIndices[0]];
-
             }
         }
 
@@ -370,6 +376,30 @@ namespace HSDRawViewer.GUI.Extra
                     var bmp = TOBJConverter.ToBitmap(con.TOBJ);
                     bmp.Save(f);
                     bmp.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void enableTEVCB_CheckedChanged(object sender, EventArgs e)
+        {
+            if (propertyTexture.SelectedObject is HSD_TOBJ tobj)
+            {
+                if (enableTEVCB.Checked)
+                {
+                    if(tobj.TEV == null)
+                        tobj.TEV = new HSD_TOBJ_TEV();
+
+                    tevPropertyGrid.Visible = true;
+                }
+                else
+                {
+                    tobj.TEV = null;
+                    tevPropertyGrid.Visible = false;
                 }
             }
         }

@@ -37,7 +37,12 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Textures = new System.Windows.Forms.TabPage();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.propertyTexture = new System.Windows.Forms.PropertyGrid();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tevPropertyGrid = new System.Windows.Forms.PropertyGrid();
+            this.enableTEVCB = new System.Windows.Forms.CheckBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonSaveTexture = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
@@ -58,6 +63,9 @@
             this.propertyPixel = new System.Windows.Forms.PropertyGrid();
             this.tabControl1.SuspendLayout();
             this.Textures.SuspendLayout();
+            this.tabControl2.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.Colors.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -68,14 +76,14 @@
             // 
             this.listTexture.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
-            this.listTexture.Dock = System.Windows.Forms.DockStyle.Top;
+            this.listTexture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listTexture.FullRowSelect = true;
             this.listTexture.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.listTexture.HideSelection = false;
             this.listTexture.Location = new System.Drawing.Point(3, 28);
             this.listTexture.MultiSelect = false;
             this.listTexture.Name = "listTexture";
-            this.listTexture.Size = new System.Drawing.Size(458, 164);
+            this.listTexture.Size = new System.Drawing.Size(307, 370);
             this.listTexture.TabIndex = 0;
             this.listTexture.UseCompatibleStateImageBehavior = false;
             this.listTexture.View = System.Windows.Forms.View.Details;
@@ -91,7 +99,7 @@
             this.cbEnablePP.Dock = System.Windows.Forms.DockStyle.Top;
             this.cbEnablePP.Location = new System.Drawing.Point(0, 0);
             this.cbEnablePP.Name = "cbEnablePP";
-            this.cbEnablePP.Size = new System.Drawing.Size(464, 17);
+            this.cbEnablePP.Size = new System.Drawing.Size(652, 17);
             this.cbEnablePP.TabIndex = 2;
             this.cbEnablePP.Text = "Enable Pixel Processing";
             this.cbEnablePP.UseVisualStyleBackColor = true;
@@ -136,41 +144,97 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(472, 427);
+            this.tabControl1.Size = new System.Drawing.Size(660, 427);
             this.tabControl1.TabIndex = 4;
             // 
             // Textures
             // 
             this.Textures.Controls.Add(this.splitter1);
-            this.Textures.Controls.Add(this.propertyTexture);
             this.Textures.Controls.Add(this.listTexture);
+            this.Textures.Controls.Add(this.tabControl2);
             this.Textures.Controls.Add(this.toolStrip1);
             this.Textures.Location = new System.Drawing.Point(4, 22);
             this.Textures.Name = "Textures";
             this.Textures.Padding = new System.Windows.Forms.Padding(3);
-            this.Textures.Size = new System.Drawing.Size(464, 401);
+            this.Textures.Size = new System.Drawing.Size(652, 401);
             this.Textures.TabIndex = 0;
             this.Textures.Text = "Textures";
             this.Textures.UseVisualStyleBackColor = true;
             // 
             // splitter1
             // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(3, 192);
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.splitter1.Location = new System.Drawing.Point(307, 28);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(458, 3);
+            this.splitter1.Size = new System.Drawing.Size(3, 370);
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
+            // 
+            // tabControl2
+            // 
+            this.tabControl2.Controls.Add(this.tabPage1);
+            this.tabControl2.Controls.Add(this.tabPage2);
+            this.tabControl2.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabControl2.Location = new System.Drawing.Point(310, 28);
+            this.tabControl2.Name = "tabControl2";
+            this.tabControl2.SelectedIndex = 0;
+            this.tabControl2.Size = new System.Drawing.Size(339, 370);
+            this.tabControl2.TabIndex = 4;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.propertyTexture);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(331, 344);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Properties";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // propertyTexture
             // 
             this.propertyTexture.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyTexture.Location = new System.Drawing.Point(3, 192);
+            this.propertyTexture.Location = new System.Drawing.Point(3, 3);
             this.propertyTexture.Name = "propertyTexture";
             this.propertyTexture.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyTexture.Size = new System.Drawing.Size(458, 206);
+            this.propertyTexture.Size = new System.Drawing.Size(325, 338);
             this.propertyTexture.TabIndex = 1;
             this.propertyTexture.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyTexture_PropertyValueChanged);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.tevPropertyGrid);
+            this.tabPage2.Controls.Add(this.enableTEVCB);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(331, 344);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "TEV";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tevPropertyGrid
+            // 
+            this.tevPropertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tevPropertyGrid.Location = new System.Drawing.Point(3, 20);
+            this.tevPropertyGrid.Name = "tevPropertyGrid";
+            this.tevPropertyGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.tevPropertyGrid.Size = new System.Drawing.Size(325, 321);
+            this.tevPropertyGrid.TabIndex = 3;
+            this.tevPropertyGrid.Visible = false;
+            // 
+            // enableTEVCB
+            // 
+            this.enableTEVCB.AutoSize = true;
+            this.enableTEVCB.Dock = System.Windows.Forms.DockStyle.Top;
+            this.enableTEVCB.Location = new System.Drawing.Point(3, 3);
+            this.enableTEVCB.Name = "enableTEVCB";
+            this.enableTEVCB.Size = new System.Drawing.Size(325, 17);
+            this.enableTEVCB.TabIndex = 4;
+            this.enableTEVCB.Text = "Enable TEV";
+            this.enableTEVCB.UseVisualStyleBackColor = true;
+            this.enableTEVCB.CheckedChanged += new System.EventHandler(this.enableTEVCB_CheckedChanged);
             // 
             // toolStrip1
             // 
@@ -183,7 +247,7 @@
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(3, 3);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(458, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(646, 25);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -203,7 +267,7 @@
             this.toolStripButton1.Name = "toolStripButton1";
             this.toolStripButton1.Size = new System.Drawing.Size(63, 22);
             this.toolStripButton1.Text = "Import";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.toolStripButton1.Click += new System.EventHandler(this.importTexture_Click);
             // 
             // buttonReplace
             // 
@@ -249,7 +313,7 @@
             this.Colors.Location = new System.Drawing.Point(4, 22);
             this.Colors.Name = "Colors";
             this.Colors.Padding = new System.Windows.Forms.Padding(3);
-            this.Colors.Size = new System.Drawing.Size(464, 401);
+            this.Colors.Size = new System.Drawing.Size(652, 401);
             this.Colors.TabIndex = 1;
             this.Colors.Text = "Colors";
             this.Colors.UseVisualStyleBackColor = true;
@@ -356,7 +420,7 @@
             this.PixelProcessing.Controls.Add(this.cbEnablePP);
             this.PixelProcessing.Location = new System.Drawing.Point(4, 22);
             this.PixelProcessing.Name = "PixelProcessing";
-            this.PixelProcessing.Size = new System.Drawing.Size(464, 401);
+            this.PixelProcessing.Size = new System.Drawing.Size(652, 401);
             this.PixelProcessing.TabIndex = 2;
             this.PixelProcessing.Text = "PixelProcessing";
             this.PixelProcessing.UseVisualStyleBackColor = true;
@@ -367,20 +431,24 @@
             this.propertyPixel.Location = new System.Drawing.Point(0, 17);
             this.propertyPixel.Name = "propertyPixel";
             this.propertyPixel.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyPixel.Size = new System.Drawing.Size(464, 384);
+            this.propertyPixel.Size = new System.Drawing.Size(652, 384);
             this.propertyPixel.TabIndex = 3;
             // 
             // MOBJEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(472, 427);
+            this.ClientSize = new System.Drawing.Size(660, 427);
             this.Controls.Add(this.tabControl1);
             this.Name = "MOBJEditor";
             this.Text = "MOBJ Editor";
             this.tabControl1.ResumeLayout(false);
             this.Textures.ResumeLayout(false);
             this.Textures.PerformLayout();
+            this.tabControl2.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.Colors.ResumeLayout(false);
@@ -421,5 +489,10 @@
         private System.Windows.Forms.ToolStripButton buttonSaveTexture;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
+        private System.Windows.Forms.TabControl tabControl2;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.PropertyGrid tevPropertyGrid;
+        private System.Windows.Forms.CheckBox enableTEVCB;
     }
 }

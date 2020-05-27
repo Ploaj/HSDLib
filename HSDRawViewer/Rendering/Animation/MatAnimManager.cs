@@ -131,7 +131,9 @@ namespace HSDRawViewer.Rendering
             var transform = Matrix4.CreateScale(SX, SY, SZ) *
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
                 Matrix4.CreateTranslation(TX, TY, TZ);
-            transform.Invert();
+
+            if(SX != 0 && SY != 0 && SZ != 0)
+                transform.Invert();
 
             return new Tuple<HSD_TOBJ, float, Matrix4>(tex, blending, transform);
         }
