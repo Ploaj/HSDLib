@@ -12,6 +12,6 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<MEX_SSMLookup> SSM_LookupTable { get => _s.GetReference<HSDArrayAccessor<MEX_SSMLookup>>(0x08); set => _s.SetReference(0x08, value); }
 
-        // 0x0C - runtime struct
+        public HSDAccessor SSM_Runtime { get => _s.GetReference<HSDAccessor>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 }

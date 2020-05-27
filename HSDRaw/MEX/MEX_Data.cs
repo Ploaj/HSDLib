@@ -19,7 +19,7 @@ namespace HSDRaw.MEX
 
         public MEX_BGMStruct MusicTable { get => _s.GetReference<MEX_BGMStruct>(0x14); set => _s.SetReference(0x14, value); }
 
-        public HSDArrayAccessor<MEX_EffectFiles> EffectFiles { get => _s.GetReference<HSDArrayAccessor<MEX_EffectFiles>>(0x18); set => _s.SetReference(0x18, value); }
+        public MEX_EffectData EffectTable { get => _s.GetReference<MEX_EffectData>(0x18); set => _s.SetReference(0x18, value); }
         
         public MEX_ItemTables ItemTable { get => _s.GetReference<MEX_ItemTables>(0x1C); set => _s.SetReference(0x1C, value); }
         

@@ -36,15 +36,23 @@ namespace HSDRawViewer
             }
         }
 
+        private System.Drawing.Color KnownColor = System.Drawing.SystemColors.ControlText;
+        private System.Drawing.Color UnknownColor = System.Drawing.SystemColors.GrayText;
+        private System.Drawing.Color ReferenceNodeColor = System.Drawing.Color.DarkRed;
+        private System.Drawing.Color PluginEnabledColor = System.Drawing.Color.Purple; 
+
         public HSDAccessor Accessor { get => _accessor;
             set
             {
                 if (PluginManager.HasEditor(value.GetType()))
-                    ForeColor = System.Drawing.Color.DarkSlateBlue;
+                    ForeColor = PluginEnabledColor;
+
                 if(value.GetType() == typeof(HSDAccessor))
-                    ForeColor = System.Drawing.Color.Gray;
+                    ForeColor = UnknownColor;
+
                 if (ReferenceNode)
-                    ForeColor = System.Drawing.Color.DarkRed;
+                    ForeColor = ReferenceNodeColor;
+
                 _accessor = value;
 
                 if (typeToImageKey.ContainsKey(value.GetType()))
@@ -110,6 +118,7 @@ namespace HSDRawViewer
             { typeof(MEX_ItemTables), "table" },
             { typeof(MEX_MenuTable), "table" },
             { typeof(MEX_StageData), "table" },
+            { typeof(MEX_EffectData), "table" },
             { typeof(MEX_Data), "kabii" },
             { typeof(MEX_Meta), "fuma" },
         };
@@ -142,9 +151,9 @@ namespace HSDRawViewer
         /// <param name="accessor"></param>
         public DataNode(string Text, HSDAccessor accessor, bool referenceNode = false, HSDRootNode root = null)
         {
+            Accessor = accessor;
             ReferenceNode = referenceNode;
             this.Text = Text;
-            Accessor = accessor;
             Root = root;
 
             if (Accessor is HSD_JOBJ jobj && jobj.ClassName != null)
@@ -264,7 +273,7 @@ namespace HSDRawViewer
                 }
                 
                 // handle accessors
-                if (prop.PropertyType.IsSubclassOf(typeof(HSDAccessor)))
+                if (prop.PropertyType.IsSubclassOf(typeof(HSDAccessor)) || prop.PropertyType == typeof(HSDAccessor))
                 {
                     var acc = prop.GetValue(Accessor) as HSDAccessor;
                     
