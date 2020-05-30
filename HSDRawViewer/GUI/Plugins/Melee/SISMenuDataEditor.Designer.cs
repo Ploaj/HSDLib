@@ -32,13 +32,13 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.arrayMemberEditor1 = new HSDRawViewer.GUI.ArrayMemberEditor();
-            this.label1 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -57,10 +57,11 @@
             // textBox1
             // 
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.Location = new System.Drawing.Point(3, 147);
+            this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(573, 26);
+            this.textBox1.Size = new System.Drawing.Size(573, 103);
             this.textBox1.TabIndex = 3;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
@@ -89,6 +90,15 @@
             this.tabPage1.Text = "Text Strings";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // splitter1
+            // 
+            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.splitter1.Location = new System.Drawing.Point(3, 250);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(573, 3);
+            this.splitter1.TabIndex = 4;
+            this.splitter1.TabStop = false;
+            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.label1);
@@ -100,6 +110,15 @@
             this.tabPage2.Text = "Extra Characters";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(9, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(41, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "TODO:";
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -110,15 +129,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(587, 25);
             this.toolStrip1.TabIndex = 5;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // splitter1
-            // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitter1.Location = new System.Drawing.Point(3, 173);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(573, 3);
-            this.splitter1.TabIndex = 4;
-            this.splitter1.TabStop = false;
             // 
             // toolStripButton1
             // 
@@ -144,22 +154,13 @@
             this.arrayMemberEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.arrayMemberEditor1.EnablePropertyView = false;
             this.arrayMemberEditor1.EnablePropertyViewDescription = false;
-            this.arrayMemberEditor1.ItemIndexOffset = 0;
-            this.arrayMemberEditor1.Location = new System.Drawing.Point(3, 176);
+            this.arrayMemberEditor1.ItemIndexOffset = 2;
+            this.arrayMemberEditor1.Location = new System.Drawing.Point(3, 253);
             this.arrayMemberEditor1.Name = "arrayMemberEditor1";
             this.arrayMemberEditor1.SelectionMode = System.Windows.Forms.SelectionMode.One;
-            this.arrayMemberEditor1.Size = new System.Drawing.Size(573, 223);
+            this.arrayMemberEditor1.Size = new System.Drawing.Size(573, 146);
             this.arrayMemberEditor1.TabIndex = 1;
             this.arrayMemberEditor1.SelectedObjectChanged += new System.EventHandler(this.arrayMemberEditor1_SelectedObjectChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "TODO:";
             // 
             // SISMenuDataEditor
             // 
