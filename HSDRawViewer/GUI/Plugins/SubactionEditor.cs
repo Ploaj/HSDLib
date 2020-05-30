@@ -1000,7 +1000,7 @@ namespace HSDRawViewer.GUI
         /// <returns></returns>
         private Dictionary<int, Vector3> CalculatePreviousState()
         {
-            if (viewport.Frame == 0 || !displayInterpolationButton.Checked)
+            if (viewport.Frame == 0 || !interpolationToolStripMenuItem.Checked)
                 return null;
 
             Dictionary<int, Vector3> previousPosition = new Dictionary<int, Vector3>();
@@ -1044,12 +1044,14 @@ namespace HSDRawViewer.GUI
 
             JOBJManager.Frame = viewport.Frame;
 
+            JOBJManager.RenderBones = bonesToolStripMenuItem.Checked;
+                
             if (SubactionProcess.CharacterInvisibility)
                 JOBJManager.UpdateNoRender();
             else
                 JOBJManager.Render(cam);
 
-            if (hurtboxDisplayButton.Checked)
+            if (hurtboxesToolStripMenuItem.Checked)
                 HurtboxRenderer.Render(JOBJManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
             
             foreach (var hb in SubactionProcess.Hitboxes)
@@ -1069,7 +1071,7 @@ namespace HSDRawViewer.GUI
                     hbColor = GrabboxColor;
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
-                if (displayInterpolationButton.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
+                if (interpolationToolStripMenuItem.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
                 {
                     var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                     var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size);
@@ -1079,7 +1081,7 @@ namespace HSDRawViewer.GUI
                 {
                     DrawShape.DrawSphere(transform, hb.Size, 16, 16, hbColor, alpha);
                 }
-                if (hitboxDisplayButton.Checked)
+                if (hitboxInfoToolStripMenuItem.Checked)
                 {
                     if (hb.Angle != 361)
                         DrawShape.DrawAngleLine(cam, transform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
@@ -1089,7 +1091,7 @@ namespace HSDRawViewer.GUI
                 }
             }
 
-            if(displayThrowModel.Checked && !SubactionProcess.ThrownFighter && ThrowDummyManager.JointCount > 0)
+            if(throwModelToolStripMenuItem.Checked && !SubactionProcess.ThrownFighter && ThrowDummyManager.JointCount > 0)
             {
                 if(viewport.Frame < ThrowDummyManager.Animation.FrameCount)
                     ThrowDummyManager.Frame = viewport.Frame;

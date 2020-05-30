@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>dogg.ico</ApplicationIcon>
@@ -203,6 +205,12 @@
     <Compile Include="GUI\Extra\SSMTool.Designer.cs">
       <DependentUpon>SSMTool.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\HelpBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\HelpBox.Designer.cs">
+      <DependentUpon>HelpBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\HSDTypeDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -298,6 +306,12 @@
     </Compile>
     <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.Designer.cs">
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SISMenuDataEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SISMenuDataEditor.Designer.cs">
+      <DependentUpon>SISMenuDataEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
     <Compile Include="GUI\MEX\Entries\MEXCSSIconEntry.cs" />
@@ -399,12 +413,14 @@
     <Compile Include="Sound\DSPPlayer.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <Compile Include="Tools\GUITools.cs" />
+    <Compile Include="Tools\ImageTools.cs" />
     <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\melee_font.png" />
     <None Include="Melee\subactions_fighter.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -458,6 +474,9 @@
     <EmbeddedResource Include="GUI\Extra\SSMTool.resx">
       <DependentUpon>SSMTool.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\HelpBox.resx">
+      <DependentUpon>HelpBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\HSDTypeDialog.resx">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -505,6 +524,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\MexDataEditor.resx">
       <DependentUpon>MexDataEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\Melee\SISMenuDataEditor.resx">
+      <DependentUpon>SISMenuDataEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\ProgressBarDisplay.resx">
       <DependentUpon>ProgressBarDisplay.cs</DependentUpon>

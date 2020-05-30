@@ -175,6 +175,12 @@ namespace HSDRaw.Common
         /// <param name="tobjs"></param>
         public void SetFromTOBJs(HSD_TOBJ[] tobjs)
         {
+            if (tobjs.Length == 0)
+            {
+                _s.Resize(0x18);
+                return;
+            }
+
             // set texture information
             ImageCount = tobjs.Length;
             ImageFormat = tobjs[0].ImageData.Format;

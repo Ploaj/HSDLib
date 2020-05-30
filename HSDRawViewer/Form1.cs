@@ -7,10 +7,7 @@ using HSDRawViewer.GUI;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Plugins;
 using HSDRaw.Common.Animation;
-using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Extra;
-using System.Linq;
-using static System.ComponentModel.TypeConverter;
 using System.ComponentModel;
 
 namespace HSDRawViewer

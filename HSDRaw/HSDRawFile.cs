@@ -901,6 +901,12 @@ namespace HSDRaw
                 acc._s = str;
                 a = acc;
             }
+            if (rootString.StartsWith("SIS_"))
+            {
+                var acc = new SBM_SISData();
+                acc._s = str;
+                a = acc;
+            }
 
             return a;
         }

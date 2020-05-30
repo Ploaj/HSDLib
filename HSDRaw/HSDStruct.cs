@@ -617,6 +617,14 @@ namespace HSDRaw
         public void Resize(int size)
         {
             Array.Resize(ref _data, size);
+
+            List<int> remove = new List<int>();
+            foreach (var v in References)
+                if (v.Key >= size)
+                    remove.Add(v.Key);
+
+            foreach (var rem in remove)
+                References.Remove(rem);
         }
 
         private byte[] EndianFix(byte[] b)
