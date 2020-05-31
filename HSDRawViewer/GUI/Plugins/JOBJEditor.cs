@@ -857,7 +857,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if(d.ShowDialog() == DialogResult.OK)
                 {
                     // trim animation
-                    if(settings.TrimAnimation)
+                    if (settings.TrimAnimation)
                         JOBJManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
 
                     // Scale animation

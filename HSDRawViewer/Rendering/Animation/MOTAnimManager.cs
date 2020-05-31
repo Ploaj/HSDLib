@@ -12,6 +12,7 @@ namespace HSDRawViewer.Rendering
     {
         private MOT_FILE _motFile;
         private short[] _motJointTable;
+        private int _startFrame;
 
         public override Matrix4 GetAnimatedState(float frame, int boneIndex, HSD_JOBJ jobj)
         {
@@ -24,6 +25,8 @@ namespace HSDRawViewer.Rendering
             float SX = jobj.SX;
             float SY = jobj.SY;
             float SZ = jobj.SZ;
+
+            frame += _startFrame;
 
             Quaternion rotationOverride = Math3D.FromEulerAngles(RZ, RY, RX);
 
@@ -78,6 +81,17 @@ namespace HSDRawViewer.Rendering
             _motFile = file;
             _motJointTable = jointTable;
             FrameCount = (int)Math.Ceiling(_motFile.EndTime * 60);
+        }
+
+        /// <summary>
+        /// Trims frames to given region
+        /// </summary>
+        /// <param name="startFrame"></param>
+        /// <param name="endFrame"></param>
+        public override void Trim(int startFrame, int endFrame)
+        {
+            _startFrame = startFrame;
+            FrameCount = endFrame - startFrame;
         }
 
     }
