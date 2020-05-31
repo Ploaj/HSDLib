@@ -798,6 +798,22 @@ namespace HSDRawViewer.GUI.Plugins
                 }
         }
 
+        private void motToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Animation == null || !(JOBJManager.Animation is MotAnimManager))
+            {
+                MessageBox.Show("No mot animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            MotAnimManager anim = (MotAnimManager)(JOBJManager.Animation);
+
+            var f = Tools.FileIO.SaveFile("EightingMOT|*.mota;*.gnta");
+
+            MOT_FILE file = anim.GetMOT();
+            file.Save(f);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -857,7 +873,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if(d.ShowDialog() == DialogResult.OK)
                 {
                     // trim animation
-                    if(settings.TrimAnimation)
+                    if (settings.TrimAnimation)
                         JOBJManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
 
                     // Scale animation

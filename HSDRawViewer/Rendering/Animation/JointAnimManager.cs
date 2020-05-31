@@ -251,7 +251,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="startFrame"></param>
         /// <param name="endFrame"></param>
-        public void Trim(int startFrame, int endFrame)
+        public virtual void Trim(int startFrame, int endFrame)
         {
             if (startFrame == 0 && endFrame == FrameCount)
                 return;
@@ -262,9 +262,11 @@ namespace HSDRawViewer.Rendering
             {
                 foreach (var t in n.Tracks)
                 {
-                    t.Keys = t.Keys.Where(e => e.Frame >= startFrame && e.Frame <= startFrame + endFrame).ToList();
+                    t.Keys = t.Keys.Where(e => e.Frame >= startFrame && e.Frame <= endFrame).ToList();
                     foreach (var k in t.Keys)
+                    {
                         k.Frame -= startFrame;
+                    }
                 }
             }
         }

@@ -80,5 +80,30 @@ namespace HSDRawViewer.Rendering
             FrameCount = (int)Math.Ceiling(_motFile.EndTime * 60);
         }
 
+        /// <summary>
+        /// Trims frames to given region
+        /// </summary>
+        /// <param name="startFrame"></param>
+        /// <param name="endFrame"></param>
+        public override void Trim(int startFrame, int endFrame)
+        {
+            FrameCount = endFrame - startFrame;
+            foreach (var j in _motFile.Joints)
+            {
+                j.Keys = j.Keys.FindAll(k => k.Time >= startFrame / 60f && k.Time < endFrame / 60f);
+                foreach (var k in j.Keys)
+                {
+                    k.Time -= startFrame / 60f;
+                }
+                j.MaxTime = FrameCount / 60f;
+            }
+            _motFile.EndTime = FrameCount / 60f;
+        }
+
+        public MOT_FILE GetMOT()
+        {
+            return _motFile;
+        }
+
     }
 }
