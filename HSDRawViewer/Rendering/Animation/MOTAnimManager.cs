@@ -95,7 +95,14 @@ namespace HSDRawViewer.Rendering
                 {
                     k.Time -= startFrame / 60f;
                 }
+                j.MaxTime = FrameCount / 60f;
             }
+            _motFile.EndTime = FrameCount / 60f;
+        }
+
+        public MOT_FILE GetMOT()
+        {
+            return _motFile;
         }
 
     }

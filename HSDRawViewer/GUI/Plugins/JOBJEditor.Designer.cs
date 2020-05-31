@@ -69,6 +69,7 @@
             this.asMayaANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asAnimJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.asMotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
@@ -435,7 +436,8 @@
             this.exportAnimationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.asMayaANIMToolStripMenuItem,
             this.asFigatreeToolStripMenuItem,
-            this.asAnimJointToolStripMenuItem});
+            this.asAnimJointToolStripMenuItem,
+            this.asMotToolStripMenuItem});
             this.exportAnimationToolStripMenuItem.Name = "exportAnimationToolStripMenuItem";
             this.exportAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.exportAnimationToolStripMenuItem.Text = "Export Animation";
@@ -460,6 +462,13 @@
             this.asAnimJointToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.asAnimJointToolStripMenuItem.Text = "As AnimJoint";
             this.asAnimJointToolStripMenuItem.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
+            //
+            // asMotToolStripMenuItem
+            //
+            this.asMotToolStripMenuItem.Name = "asMotToolStripMenuItem";
+            this.asMotToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.asMotToolStripMenuItem.Text = "As MOT";
+            this.asMotToolStripMenuItem.Click += new System.EventHandler(this.motToolStripMenuItem_Click);
             // 
             // editAnimationToolStripMenuItem
             // 
@@ -624,6 +633,7 @@
         private System.Windows.Forms.ToolStripMenuItem asMayaANIMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem asFigatreeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem asAnimJointToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem asMotToolStripMenuItem;
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
         private System.Windows.Forms.ToolStripDropDownButton renderDropDown;
