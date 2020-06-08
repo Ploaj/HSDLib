@@ -326,7 +326,9 @@ namespace HSDRawViewer.GUI.Extra
                 if (tobj != null)
                 {
                     // replace tobj
-                    con.TOBJ._s.SetFromStruct(tobj._s);
+                    con.TOBJ.ImageData = tobj.ImageData;
+                    con.TOBJ.TlutData = tobj.TlutData;
+                    //con.TOBJ._s.SetFromStruct(tobj._s);
                     
                     // replace image in list
                     var image = TextureList.Images[con.ImageIndex];
@@ -341,6 +343,7 @@ namespace HSDRawViewer.GUI.Extra
                     
                     // refresh
                     listTexture.Items[listTexture.SelectedIndices[0]] = listTexture.Items[listTexture.SelectedIndices[0]];
+                    listTexture.Invalidate();
                 }
             }
         }

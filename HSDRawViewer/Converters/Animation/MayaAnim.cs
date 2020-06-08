@@ -174,14 +174,14 @@ namespace HSDRawViewer.Converters
             foreach(var mNode in mayaFile.Nodes)
             {
                 AnimNode node = new AnimNode();
-                Debug.WriteLine(mNode.name);
+                //Debug.WriteLine(mNode.name);
                 foreach (var mTrack in mNode.atts)
                 {
                     FOBJ_Player t = new FOBJ_Player();
                     t.Keys = new List<FOBJKey>();
                     t.JointTrackType = jointTrackToMayaTrack.FirstOrDefault(e=>e.Value == mTrack.type).Key;
 
-                    Debug.WriteLine("\t" + mTrack.type);
+                    //Debug.WriteLine("\t" + mTrack.type);
 
                     var degrees = mayaFile.header.angularUnit == "deg";
                     var trackUnit = (mTrack.IsAngular() && degrees);
@@ -251,8 +251,8 @@ namespace HSDRawViewer.Converters
                         if (mTrack.keys.Count == 1)
                             k.InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
 
-                        foreach (var key in t.Keys)
-                            Debug.WriteLine($"\t\t{key.Frame} {key.Value}");
+                        //foreach (var key in t.Keys)
+                        //    Debug.WriteLine($"\t\t{key.Frame} {key.Value}");
 
                     }
 

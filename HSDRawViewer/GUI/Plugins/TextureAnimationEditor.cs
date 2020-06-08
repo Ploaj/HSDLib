@@ -194,8 +194,13 @@ namespace HSDRawViewer.GUI.Plugins
 
             var tobjs = GetTOBJs();
 
+            if (tobjs == null)
+                return;
+
             foreach(var tobj in tobjs)
             {
+                if (tobj == null)
+                    continue;
                 LoadTexture(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
             }
         }

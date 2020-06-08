@@ -36,8 +36,12 @@ namespace HSDRawViewer.GUI
             get
             {
                 GXTexFmt fmt;
-                Enum.TryParse<GXTexFmt>(cbFormat.SelectedValue.ToString(), out fmt);
+                Enum.TryParse(cbFormat.SelectedValue.ToString(), out fmt);
                 return fmt;
+            }
+            set
+            {
+                cbFormat.SelectedItem = value.ToString();
             }
         }
         public GXTlutFmt PaletteFormat
@@ -45,8 +49,12 @@ namespace HSDRawViewer.GUI
             get
             {
                 GXTlutFmt fmt;
-                Enum.TryParse<GXTlutFmt > (sbPalFormat.SelectedValue.ToString(), out fmt);
+                Enum.TryParse(sbPalFormat.SelectedValue.ToString(), out fmt);
                 return fmt;
+            }
+            set
+            {
+                sbPalFormat.SelectedItem = value.ToString();
             }
         }
 

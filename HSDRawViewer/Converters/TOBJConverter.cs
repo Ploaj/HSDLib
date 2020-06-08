@@ -16,6 +16,57 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tobj"></param>
+        /// <returns></returns>
+        public static string FormatName(string name, HSD_TOBJ tobj)
+        {
+            if (tobj.ImageData != null)
+                name += "_" + tobj.ImageData.Format.ToString();
+
+            if (tobj.TlutData != null)
+                name += "_" + tobj.TlutData.Format.ToString();
+
+            return name;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="texFmt"></param>
+        /// <param name="palFmt"></param>
+        public static bool FormatFromString(string name, out GXTexFmt texFmt, out GXTlutFmt palFmt)
+        {
+            texFmt = GXTexFmt.RGBA8;
+            palFmt = GXTlutFmt.RGB5A3;
+
+            var parts = Path.GetFileNameWithoutExtension(name).Split('_');
+
+            bool foundFormat = false;
+
+            foreach (var p in parts)
+            {
+                // skip numeric values
+                if (int.TryParse(p, out int i))
+                    continue;
+
+                if(Enum.TryParse(p.ToUpper(), out GXTexFmt format))
+                {
+                    texFmt = format;
+                    foundFormat = true;
+                }
+
+                if (Enum.TryParse(p.ToUpper(), out GXTlutFmt palFormat ))
+                    palFmt = palFormat;
+            }
+
+            return foundFormat;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="tobj"></param>
         /// <returns></returns>
         public static bool IsTransparent(HSD_TOBJ tobj)
@@ -166,6 +217,12 @@ namespace HSDRawViewer.Converters
             {
                 using (TextureImportDialog settings = new TextureImportDialog())
                 {
+                    if (FormatFromString(f, out GXTexFmt fmt, out GXTlutFmt pal))
+                    {
+                        settings.PaletteFormat = pal;
+                        settings.TextureFormat = fmt;
+                    }
+
                     if (settings.ShowDialog() == DialogResult.OK)
                         using (Bitmap bmp = new Bitmap(f))
                         {
@@ -192,6 +249,12 @@ namespace HSDRawViewer.Converters
             {
                 using (TextureImportDialog settings = new TextureImportDialog())
                 {
+                    if (FormatFromString(filepath, out GXTexFmt fmt, out GXTlutFmt pal))
+                    {
+                        settings.PaletteFormat = pal;
+                        settings.TextureFormat = fmt;
+                    }
+
                     if (settings.ShowDialog() == DialogResult.OK)
                     {
                         settings.ApplySettings(bmp);
@@ -211,6 +274,13 @@ namespace HSDRawViewer.Converters
         /// <param name="palFormat"></param>
         public static void InjectBitmap(string filepath, HSD_TOBJ tobj,GXTexFmt imgFormat, GXTlutFmt palFormat)
         {
+            // format override
+            if (FormatFromString(filepath, out GXTexFmt fmt, out GXTlutFmt pal))
+            {
+                palFormat = pal;
+                imgFormat = fmt;
+            }
+
             using (Bitmap bmp = LoadBitmapFromFile(filepath))
             {
                 InjectBitmap(bmp, tobj, imgFormat, palFormat);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Assimp;
 using HSDRaw.Common;
 using HSDRawViewer.GUI;
@@ -472,6 +473,9 @@ namespace HSDRawViewer.Converters
                         Node dobjNode = new Node();
                         dobjNode.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}";
 
+                        bool reflective = false;
+                        var single = j != Jobjs[0];
+
                         if (!string.IsNullOrEmpty(dobj.ClassName))
                             dobjNode.Name = dobj.ClassName;
 
@@ -480,6 +484,12 @@ namespace HSDRawViewer.Converters
                             var pindex = 0;
                             foreach (var pobj in dobj.Pobj.List)
                             {
+                                if (pobj.Attributes.Any(e => e.AttributeName == GXAttribName.GX_TEX_MTX_ARRAY))
+                                    reflective = true;
+
+                                if (pobj.Attributes.Any(e=>e.AttributeName == GXAttribName.GX_POS_MTX_ARRAY))
+                                    single = false;
+
                                 dobjNode.MeshIndices.Add(Scene.Meshes.Count);
                                 var mesh = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ, dobj.Mobj);
                                 mesh.Name = dobjNode.Name + "_POBJ_" + pindex++;
@@ -526,6 +536,12 @@ namespace HSDRawViewer.Converters
                             m.TextureDiffuse = dif;
                         }
                         Scene.Materials.Add(m);
+                        
+                        if (single)
+                            dobjNode.Name = "_SINGLE";
+
+                        if (reflective)
+                            dobjNode.Name += "_REFLECTIVE";
 
                         RootNode.Children.Add(dobjNode);
                         dIndex++;
@@ -645,6 +661,7 @@ namespace HSDRawViewer.Converters
                         jobjToBone[singleBind].VertexWeights.Add(vertexWeight);
                     }
                     Matrix4 weight = Matrix4.Identity;
+                    bool hasEnvelopes = pobj.Attributes.ToList().Exists(r=>r.AttributeName == GXAttribName.GX_VA_PNMTXIDX);
                     foreach (var a in pobj.Attributes)
                     {
                         switch (a.AttributeName)
@@ -668,7 +685,7 @@ namespace HSDRawViewer.Converters
 
                                 break;
                             case GXAttribName.GX_VA_POS:
-                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN0) ? Matrix4.Identity : parentTransform);
+                                var vert = Vector3.TransformPosition(GXTranslator.toVector3(v.POS), pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN0) || hasEnvelopes ? Matrix4.Identity : parentTransform);
                                 if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                                     vert = Vector3.TransformPosition(vert, weight);
                                 vert = Vector3.TransformPosition(vert, singleBindTransform);

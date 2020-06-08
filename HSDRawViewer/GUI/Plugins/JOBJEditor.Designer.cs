@@ -30,17 +30,14 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JOBJEditor));
             this.listDOBJ = new System.Windows.Forms.CheckedListBox();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.treeJOBJ = new System.Windows.Forms.TreeView();
             this.toolStrip3 = new System.Windows.Forms.ToolStrip();
             this.jointOptionsDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importBoneINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportBoneLabelINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.meleeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reorientSkeletonForFighterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.recalculateInverseBindsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceBonesFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -56,9 +53,7 @@
             this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
             this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
             this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.previewBox = new System.Windows.Forms.GroupBox();
-            this.splitter2 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -80,15 +75,20 @@
             this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.splitter2 = new System.Windows.Forms.Splitter();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.exportBoneLabelINIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoUpdateFlagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.toolStrip2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listDOBJ
@@ -96,31 +96,20 @@
             this.listDOBJ.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listDOBJ.Location = new System.Drawing.Point(3, 28);
             this.listDOBJ.Name = "listDOBJ";
-            this.listDOBJ.Size = new System.Drawing.Size(323, 100);
+            this.listDOBJ.Size = new System.Drawing.Size(298, 232);
             this.listDOBJ.TabIndex = 0;
             this.listDOBJ.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListDOBJ_ItemCheck);
             this.listDOBJ.BindingContextChanged += new System.EventHandler(this.listDOBJ_BindingContextChanged);
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.propertyGrid1.Location = new System.Drawing.Point(11, 19);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid1.Size = new System.Drawing.Size(747, 237);
-            this.propertyGrid1.TabIndex = 1;
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.tabControl1.Location = new System.Drawing.Point(0, 25);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(3, 16);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(337, 157);
+            this.tabControl1.Size = new System.Drawing.Size(312, 289);
             this.tabControl1.TabIndex = 2;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -131,7 +120,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(329, 131);
+            this.tabPage1.Size = new System.Drawing.Size(304, 263);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Joints";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -142,7 +131,7 @@
             this.treeJOBJ.ItemHeight = 20;
             this.treeJOBJ.Location = new System.Drawing.Point(3, 28);
             this.treeJOBJ.Name = "treeJOBJ";
-            this.treeJOBJ.Size = new System.Drawing.Size(323, 100);
+            this.treeJOBJ.Size = new System.Drawing.Size(298, 232);
             this.treeJOBJ.TabIndex = 0;
             // 
             // toolStrip3
@@ -151,7 +140,7 @@
             this.jointOptionsDropDownButton1});
             this.toolStrip3.Location = new System.Drawing.Point(3, 3);
             this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(323, 25);
+            this.toolStrip3.Size = new System.Drawing.Size(298, 25);
             this.toolStrip3.TabIndex = 1;
             this.toolStrip3.Text = "toolStrip3";
             // 
@@ -162,15 +151,14 @@
             this.importBoneINIToolStripMenuItem,
             this.exportBoneLabelINIToolStripMenuItem,
             this.toolStripSeparator1,
-            this.meleeToolStripMenuItem,
-            this.toolStripSeparator3,
+            this.autoUpdateFlagsToolStripMenuItem,
             this.recalculateInverseBindsToolStripMenuItem,
             this.replaceBonesFromFileToolStripMenuItem});
             this.jointOptionsDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("jointOptionsDropDownButton1.Image")));
             this.jointOptionsDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.jointOptionsDropDownButton1.Name = "jointOptionsDropDownButton1";
-            this.jointOptionsDropDownButton1.Size = new System.Drawing.Size(62, 22);
-            this.jointOptionsDropDownButton1.Text = "Options";
+            this.jointOptionsDropDownButton1.Size = new System.Drawing.Size(90, 22);
+            this.jointOptionsDropDownButton1.Text = "Joint Options";
             // 
             // importBoneINIToolStripMenuItem
             // 
@@ -179,30 +167,17 @@
             this.importBoneINIToolStripMenuItem.Text = "Import Bone Label INI";
             this.importBoneINIToolStripMenuItem.Click += new System.EventHandler(this.importBoneLabelINIToolStripMenuItem_Click);
             // 
+            // exportBoneLabelINIToolStripMenuItem
+            // 
+            this.exportBoneLabelINIToolStripMenuItem.Name = "exportBoneLabelINIToolStripMenuItem";
+            this.exportBoneLabelINIToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.exportBoneLabelINIToolStripMenuItem.Text = "Export Bone Label INI";
+            this.exportBoneLabelINIToolStripMenuItem.Click += new System.EventHandler(this.exportBoneLabelINIToolStripMenuItem_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
-            // 
-            // meleeToolStripMenuItem
-            // 
-            this.meleeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.reorientSkeletonForFighterToolStripMenuItem});
-            this.meleeToolStripMenuItem.Name = "meleeToolStripMenuItem";
-            this.meleeToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.meleeToolStripMenuItem.Text = "Melee";
-            // 
-            // reorientSkeletonForFighterToolStripMenuItem
-            // 
-            this.reorientSkeletonForFighterToolStripMenuItem.Name = "reorientSkeletonForFighterToolStripMenuItem";
-            this.reorientSkeletonForFighterToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.reorientSkeletonForFighterToolStripMenuItem.Text = "Reorient Skeleton for Fighter";
-            this.reorientSkeletonForFighterToolStripMenuItem.Click += new System.EventHandler(this.reorientSkeletonForFighterToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(203, 6);
             // 
             // recalculateInverseBindsToolStripMenuItem
             // 
@@ -225,7 +200,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(329, 131);
+            this.tabPage2.Size = new System.Drawing.Size(304, 263);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Objects";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -240,7 +215,7 @@
             this.buttonDOBJDelete});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(323, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(298, 25);
             this.toolStrip2.TabIndex = 1;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -293,7 +268,7 @@
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
@@ -301,7 +276,7 @@
             // 
             this.importToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
             // 
@@ -309,7 +284,7 @@
             // 
             this.exportToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
@@ -343,35 +318,16 @@
             this.buttonDOBJDelete.Text = "toolStripButton3";
             this.buttonDOBJDelete.Click += new System.EventHandler(this.buttonDOBJDelete_Click);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.propertyGrid1);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.groupBox1.Location = new System.Drawing.Point(0, 185);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(767, 262);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Options";
-            // 
             // previewBox
             // 
             this.previewBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.previewBox.Location = new System.Drawing.Point(337, 25);
+            this.previewBox.Location = new System.Drawing.Point(318, 25);
             this.previewBox.Margin = new System.Windows.Forms.Padding(5);
             this.previewBox.Name = "previewBox";
-            this.previewBox.Size = new System.Drawing.Size(430, 157);
+            this.previewBox.Size = new System.Drawing.Size(503, 477);
             this.previewBox.TabIndex = 4;
             this.previewBox.TabStop = false;
             this.previewBox.Text = "Preview";
-            // 
-            // splitter2
-            // 
-            this.splitter2.Location = new System.Drawing.Point(337, 25);
-            this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(3, 157);
-            this.splitter2.TabIndex = 6;
-            this.splitter2.TabStop = false;
             // 
             // toolStrip1
             // 
@@ -384,7 +340,7 @@
             this.toolStripComboBox2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(767, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(821, 25);
             this.toolStrip1.TabIndex = 7;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -462,9 +418,9 @@
             this.asAnimJointToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.asAnimJointToolStripMenuItem.Text = "As AnimJoint";
             this.asAnimJointToolStripMenuItem.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
-            //
+            // 
             // asMotToolStripMenuItem
-            //
+            // 
             this.asMotToolStripMenuItem.Name = "asMotToolStripMenuItem";
             this.asMotToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.asMotToolStripMenuItem.Text = "As MOT";
@@ -554,33 +510,76 @@
             this.toolStripComboBox2.Size = new System.Drawing.Size(121, 25);
             this.toolStripComboBox2.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.splitter2);
+            this.groupBox2.Controls.Add(this.tabControl1);
+            this.groupBox2.Controls.Add(this.groupBox1);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox2.Location = new System.Drawing.Point(0, 25);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(318, 477);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Nodes";
+            // 
+            // splitter2
+            // 
+            this.splitter2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.splitter2.Location = new System.Drawing.Point(3, 302);
+            this.splitter2.Name = "splitter2";
+            this.splitter2.Size = new System.Drawing.Size(312, 3);
+            this.splitter2.TabIndex = 4;
+            this.splitter2.TabStop = false;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.propertyGrid1);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.groupBox1.Location = new System.Drawing.Point(3, 305);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(312, 169);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Parameters";
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.propertyGrid1.HelpVisible = false;
+            this.propertyGrid1.Location = new System.Drawing.Point(11, 19);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.propertyGrid1.Size = new System.Drawing.Size(292, 144);
+            this.propertyGrid1.TabIndex = 1;
+            this.propertyGrid1.ToolbarVisible = false;
+            // 
             // splitter1
             // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter1.Location = new System.Drawing.Point(0, 182);
+            this.splitter1.Location = new System.Drawing.Point(318, 25);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(767, 3);
+            this.splitter1.Size = new System.Drawing.Size(3, 477);
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // exportBoneLabelINIToolStripMenuItem
+            // autoUpdateFlagsToolStripMenuItem
             // 
-            this.exportBoneLabelINIToolStripMenuItem.Name = "exportBoneLabelINIToolStripMenuItem";
-            this.exportBoneLabelINIToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.exportBoneLabelINIToolStripMenuItem.Text = "Export Bone Label INI";
-            this.exportBoneLabelINIToolStripMenuItem.Click += new System.EventHandler(this.exportBoneLabelINIToolStripMenuItem_Click);
+            this.autoUpdateFlagsToolStripMenuItem.Name = "autoUpdateFlagsToolStripMenuItem";
+            this.autoUpdateFlagsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.autoUpdateFlagsToolStripMenuItem.Text = "Update Flags";
+            this.autoUpdateFlagsToolStripMenuItem.Click += new System.EventHandler(this.autoUpdateFlagsToolStripMenuItem_Click);
             // 
             // JOBJEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(767, 447);
-            this.Controls.Add(this.splitter2);
-            this.Controls.Add(this.previewBox);
-            this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.toolStrip1);
+            this.ClientSize = new System.Drawing.Size(821, 502);
             this.Controls.Add(this.splitter1);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.previewBox);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.toolStrip1);
             this.Name = "JOBJEditor";
             this.TabText = "JOBJEditor";
             this.Text = "JOBJEditor";
@@ -593,9 +592,10 @@
             this.tabPage2.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -604,20 +604,16 @@
         #endregion
 
         private System.Windows.Forms.CheckedListBox listDOBJ;
-        private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TreeView treeJOBJ;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.GroupBox previewBox;
-        private System.Windows.Forms.Splitter splitter2;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
         private System.Windows.Forms.ToolStripMenuItem importModelFromFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportModelToFileToolStripMenuItem;
-        private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton3;
         private System.Windows.Forms.ToolStripMenuItem addDummyDOBJToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonMoveUp;
@@ -652,9 +648,12 @@
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importBoneINIToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem meleeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem reorientSkeletonForFighterToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem exportBoneLabelINIToolStripMenuItem;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Splitter splitter2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.PropertyGrid propertyGrid1;
+        private System.Windows.Forms.Splitter splitter1;
+        private System.Windows.Forms.ToolStripMenuItem autoUpdateFlagsToolStripMenuItem;
     }
 }

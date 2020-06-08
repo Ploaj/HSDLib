@@ -312,7 +312,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     var tobj = new HSD_TOBJ();
                     tobj.ImageData = new HSD_Image();
                     tobj.ImageData.Width = 32;
-                    tobj.ImageData.Height = (short)(image.Length / 2 / 32);
+                    tobj.ImageData.Height = (short)(image.Length / 32);
                     tobj.ImageData.ImageData = image;
                     tobj.ImageData.Format = HSDRaw.GX.GXTexFmt.I4;
 
@@ -320,6 +320,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         FileFont.Dispose();
 
                     FileFont = TOBJConverter.ToBitmap(tobj);
+                    pictureBox1.Image = FileFont;
                     FileSpacing = sisData.CharacterSpacingParams._s.GetData();
                 }
 
@@ -396,7 +397,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         var before = 0;
                         var after = 0;
 
-                        if (kern)
+                        if (kern && o.Item2[0] * 2 + 1 < FileSpacing.Length)
                         {
                             before = Spacing[o.Item2[0] * 2];
                             after = Spacing[o.Item2[0] * 2 + 1];
@@ -416,14 +417,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     {
                         var before = 0;
                         var after = 0;
-                        if (kern)
+                        if (kern && o.Item2[0] * 2 + 1 < FileSpacing.Length)
                         {
                             before = FileSpacing[o.Item2[0] * 2];
                             after = FileSpacing[o.Item2[0] * 2 + 1];
                         }
 
                         var dest = new Rectangle(xoff, yoff, 32 - after - before, 32);
-                        var src = new Rectangle(o.Item2[0] * 32 + before, 0, 32 - after - before, 32);
+                        var src = new Rectangle(0, o.Item2[0] * 32 + before, 32, 32 - after - before);
 
                         using (var c = GetColoredCharacter(FileFont, src, colr))
                             if (c != null)

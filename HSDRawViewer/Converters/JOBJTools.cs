@@ -8,6 +8,123 @@ namespace HSDRawViewer.Converters
     public class JOBJTools
     {
         /// <summary>
+        /// Automatically updates jobj flags
+        /// </summary>
+        public static void UpdateJOBJFlags(HSD_JOBJ jobj)
+        {
+            var list = jobj.BreathFirstList;
+            list.Reverse();
+
+            foreach (var j in list)
+            {
+                if(j.Dobj != null)
+                {
+                    bool xlu = false;
+                    bool opa = false;
+
+                    foreach (var dobj in j.Dobj.List)
+                    {
+                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+                        {
+                            j.Flags |= JOBJ_FLAG.XLU;
+                            j.Flags |= JOBJ_FLAG.TEXEDGE;
+                            xlu = true;
+                        }
+                        else
+                        {
+                            j.Flags &= ~JOBJ_FLAG.XLU;
+                            j.Flags &= ~JOBJ_FLAG.TEXEDGE;
+                            opa = true;
+                        }
+
+                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE))
+                            j.Flags |= JOBJ_FLAG.LIGHTING;
+                        else
+                            j.Flags &= ~JOBJ_FLAG.LIGHTING;
+
+                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR))
+                            j.Flags |= JOBJ_FLAG.SPECULAR;
+                        else
+                            j.Flags &= ~JOBJ_FLAG.SPECULAR;
+
+                        if (dobj.Pobj != null)
+                        {
+                            j.Flags &= ~JOBJ_FLAG.ENVELOPE_MODEL;
+                            foreach (var pobj in dobj.Pobj.List)
+                            {
+                                if (pobj.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+                                    j.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
+                            }
+                        }
+                    }
+
+                    if(opa)
+                        j.Flags |= JOBJ_FLAG.OPA;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.OPA;
+
+                    if (xlu)
+                        j.Flags |= JOBJ_FLAG.XLU;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.XLU;
+                }
+
+                if (j.InverseWorldTransform != null)
+                    j.Flags |= JOBJ_FLAG.SKELETON;
+                else
+                    j.Flags &= ~JOBJ_FLAG.SKELETON;
+
+                if (ChildHasFlag(j.Child, JOBJ_FLAG.XLU))
+                    j.Flags |= JOBJ_FLAG.ROOT_XLU;
+                else
+                    j.Flags &= ~JOBJ_FLAG.ROOT_XLU;
+
+                if (ChildHasFlag(j.Child, JOBJ_FLAG.OPA))
+                    j.Flags |= JOBJ_FLAG.ROOT_OPA;
+                else
+                    j.Flags &= ~JOBJ_FLAG.ROOT_OPA;
+
+                if (ChildHasFlag(j.Child, JOBJ_FLAG.TEXEDGE))
+                    j.Flags |= JOBJ_FLAG.ROOT_TEXEDGE;
+                else
+                    j.Flags &= ~JOBJ_FLAG.ROOT_TEXEDGE;
+            }
+
+            if (ChildHasFlag(jobj.Child, JOBJ_FLAG.SKELETON))
+                jobj.Flags |= JOBJ_FLAG.SKELETON_ROOT;
+            else
+                jobj.Flags &= ~JOBJ_FLAG.SKELETON_ROOT;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <param name="flag"></param>
+        /// <returns></returns>
+        private static bool ChildHasFlag(HSD_JOBJ jobj, JOBJ_FLAG flag)
+        {
+            if (jobj == null)
+                return false;
+
+            bool hasFlag = jobj.Flags.HasFlag(flag);
+
+            foreach (var c in jobj.Children)
+            {
+                if (ChildHasFlag(c, flag))
+                    hasFlag = true;
+            }
+
+            if (jobj.Next != null)
+            {
+                if (ChildHasFlag(jobj.Next, flag))
+                    hasFlag = true;
+            }
+
+            return hasFlag;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         public static Dictionary<HSD_JOBJ, Matrix4> ApplyMeleeFighterTransforms(HSD_JOBJ root)
@@ -22,59 +139,24 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        private static Dictionary<string, Vector3> FighterDefaults = new Dictionary<string, Vector3>() { { "TopN", new Vector3(0, 0, 0) },
-{ "TransN", new Vector3(0, 0, 0) },
-{ "XRotN", new Vector3(0, 0, 0) },
-{ "YRotN", new Vector3(0, 0, 0) },
-{ "HipN", new Vector3(0, 0, 0) },
-{ "WaistN", new Vector3(0, 0, 0) },
+        private static Dictionary<string, Vector3> FighterDefaults = new Dictionary<string, Vector3>() {
+
+            // Every other bone has 0 rotation
+
 { "LLegJA", new Vector3(-1.570796f, 0, -1.570796f) },
-{ "LLegJ", new Vector3(-0.0001849213f, -0.007395464f, 0.01190592f) },
-{ "LKneeJ", new Vector3(0, 0, 0.01745588f) },
 { "LFootJA", new Vector3(0, 0, -1.570796f) },
-{ "LFootJ", new Vector3(-0.01625728f, -0.003122046f, 0.04150072f) },
 { "RLegJA", new Vector3(-1.570796f, 0, -1.570796f) },
-{ "RLegJ", new Vector3(-0.0003749531f, 0.01237885f, 0.01931265f) },
-{ "RKneeJ", new Vector3(0, 0, 0.01745588f) },
 { "RFootJA", new Vector3(0, 0, -1.570796f) },
-{ "RFootJ", new Vector3(0.04340675f, 0.006765825f, 0.03351802f) },
-{ "BustN", new Vector3(0, 0, 0) },
-{ "LShoulderN", new Vector3(0, 0, 0) },
 { "LShoulderJA", new Vector3(-1.570796f, 0, 0) },
-{ "LShoulderJ", new Vector3(-0.0008534141f, -0.0001975292f, 0.0004313609f) },
-{ "LArmJ", new Vector3(0, 0, -0.01745588f) },
-{ "LHandN", new Vector3(0, 0, -0.001827065f) },
-{ "L1stNa", new Vector3(0, -0.0299967f, 0) },
-{ "L1stNb", new Vector3(0, 0, 0) },
-{ "L2ndNa", new Vector3(0, -0.0299967f, 0) },
-{ "L2ndNb", new Vector3(0, 0, 0) },
-{ "L3rdNa", new Vector3(0, -0.0299967f, 0) },
-{ "L3rdNb", new Vector3(0, 0, 0) },
-{ "L4thNa", new Vector3(0, -0.0299967f, 0) },
-{ "L4thNb", new Vector3(0, 0, 0) },
-{ "LHaveN", new Vector3(0, 0, -0.001827065f) },
-{ "LThumbNa", new Vector3(0.02769301f, 0.03113901f, -0.3017421f) },
-{ "LThumbNb", new Vector3(0, 0, 0.159777f) },
-{ "NeckN", new Vector3(0, 0, 0) },
-{ "HeadN", new Vector3(0, 0, 0) },
-{ "RShoulderN", new Vector3(0, 0, 0) },
 { "RShoulderJA", new Vector3(-1.570796f, 0, 3.141592f) },
-{ "RShoulderJ", new Vector3(-0.0001569438f, -0.008347717f, 0.01229164f) },
-{ "RArmJ", new Vector3(0, 0, -0.0213731f) },
-{ "RHandN", new Vector3(0, 0, 0) },
-{ "R1stNa", new Vector3(0, 0, 0) },
-{ "R1stNb", new Vector3(0, 0, 0) },
-{ "R2ndNa", new Vector3(0, 0, 0) },
-{ "R2ndNb", new Vector3(0, 0, 0) },
-{ "R3rdNa", new Vector3(0, 0, 0) },
-{ "R3rdNb", new Vector3(0, 0, 0) },
-{ "R4thNa", new Vector3(0, 0, 0) },
-{ "R4thNb", new Vector3(0, 0, 0) },
-{ "RHaveN", new Vector3(0, -1.570796f, 3.127518f) },
-{ "RThumbNa", new Vector3(-0.006011998f, -0.006951f, -0.3686029f) },
-{ "RThumbNb", new Vector3(0, 0, 0.1282514f) },
-{ "ThrowN", new Vector3(0, 0, 0) },
-{ "Extra", new Vector3(0, 0, 0) }};
+
+{ "LLegC", new Vector3(-1.570796f, 0, -1.570796f) },
+{ "LFootC", new Vector3(0, 0, -1.570796f) },
+{ "RLegC", new Vector3(-1.570796f, 0, -1.570796f) },
+{ "RFootC", new Vector3(0, 0, -1.570796f) },
+{ "LShoulderC", new Vector3(-1.570796f, 0, 0) },
+{ "RShoulderC", new Vector3(-1.570796f, 0, 3.141592f) }
+        };
 
         /// <summary>
         /// 
