@@ -32,20 +32,21 @@
             this.graphBox = new System.Windows.Forms.GroupBox();
             this.keyProperty = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.splitter1 = new System.Windows.Forms.Splitter();
+            this.optionsButton = new System.Windows.Forms.ToolStripButton();
+            this.addKeyButton = new System.Windows.Forms.ToolStripButton();
             this.deleteKeyButton = new System.Windows.Forms.ToolStripButton();
+            this.importKeyButton = new System.Windows.Forms.ToolStripButton();
+            this.exportKeyButton = new System.Windows.Forms.ToolStripButton();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.addKeyButton = new System.Windows.Forms.ToolStripButton();
-            this.optionsButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.trackTree = new System.Windows.Forms.TreeView();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
             this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.importKeyButton = new System.Windows.Forms.ToolStripButton();
-            this.exportKeyButton = new System.Windows.Forms.ToolStripButton();
+            this.helpButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -81,20 +82,33 @@
             this.addKeyButton,
             this.deleteKeyButton,
             this.importKeyButton,
-            this.exportKeyButton});
+            this.exportKeyButton,
+            this.helpButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 152);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(727, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // splitter1
+            // optionsButton
             // 
-            this.splitter1.Location = new System.Drawing.Point(0, 177);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 182);
-            this.splitter1.TabIndex = 3;
-            this.splitter1.TabStop = false;
+            this.optionsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.optionsButton.Image = ((System.Drawing.Image)(resources.GetObject("optionsButton.Image")));
+            this.optionsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.optionsButton.Name = "optionsButton";
+            this.optionsButton.Size = new System.Drawing.Size(94, 22);
+            this.optionsButton.Text = "Display Options";
+            this.optionsButton.Click += new System.EventHandler(this.optionsButton_Click);
+            // 
+            // addKeyButton
+            // 
+            this.addKeyButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.addKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
+            this.addKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.addKeyButton.Name = "addKeyButton";
+            this.addKeyButton.Size = new System.Drawing.Size(23, 22);
+            this.addKeyButton.Text = "Add Key";
+            this.addKeyButton.Click += new System.EventHandler(this.addKeyButton_Click);
             // 
             // deleteKeyButton
             // 
@@ -105,6 +119,32 @@
             this.deleteKeyButton.Size = new System.Drawing.Size(23, 22);
             this.deleteKeyButton.Text = "Delete Key";
             this.deleteKeyButton.Click += new System.EventHandler(this.deleteKeyButton_Click);
+            // 
+            // importKeyButton
+            // 
+            this.importKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
+            this.importKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.importKeyButton.Name = "importKeyButton";
+            this.importKeyButton.Size = new System.Drawing.Size(90, 22);
+            this.importKeyButton.Text = "Import Keys";
+            this.importKeyButton.Click += new System.EventHandler(this.importKeyButton_Click);
+            // 
+            // exportKeyButton
+            // 
+            this.exportKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
+            this.exportKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportKeyButton.Name = "exportKeyButton";
+            this.exportKeyButton.Size = new System.Drawing.Size(88, 22);
+            this.exportKeyButton.Text = "Export Keys";
+            this.exportKeyButton.Click += new System.EventHandler(this.exportKeyButton_Click);
+            // 
+            // splitter1
+            // 
+            this.splitter1.Location = new System.Drawing.Point(0, 177);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(3, 182);
+            this.splitter1.TabIndex = 3;
+            this.splitter1.TabStop = false;
             // 
             // groupBox1
             // 
@@ -127,26 +167,6 @@
             this.splitter2.TabIndex = 4;
             this.splitter2.TabStop = false;
             // 
-            // addKeyButton
-            // 
-            this.addKeyButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.addKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
-            this.addKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.addKeyButton.Name = "addKeyButton";
-            this.addKeyButton.Size = new System.Drawing.Size(23, 22);
-            this.addKeyButton.Text = "Add Key";
-            this.addKeyButton.Click += new System.EventHandler(this.addKeyButton_Click);
-            // 
-            // optionsButton
-            // 
-            this.optionsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.optionsButton.Image = ((System.Drawing.Image)(resources.GetObject("optionsButton.Image")));
-            this.optionsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.optionsButton.Name = "optionsButton";
-            this.optionsButton.Size = new System.Drawing.Size(94, 22);
-            this.optionsButton.Text = "Display Options";
-            this.optionsButton.Click += new System.EventHandler(this.optionsButton_Click);
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.trackTree);
@@ -159,6 +179,16 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tracks";
             // 
+            // trackTree
+            // 
+            this.trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trackTree.HideSelection = false;
+            this.trackTree.Location = new System.Drawing.Point(3, 41);
+            this.trackTree.Name = "trackTree";
+            this.trackTree.Size = new System.Drawing.Size(216, 89);
+            this.trackTree.TabIndex = 8;
+            this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
+            // 
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -170,16 +200,6 @@
             this.toolStrip2.Size = new System.Drawing.Size(216, 25);
             this.toolStrip2.TabIndex = 7;
             this.toolStrip2.Text = "toolStrip2";
-            // 
-            // trackTree
-            // 
-            this.trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackTree.HideSelection = false;
-            this.trackTree.Location = new System.Drawing.Point(3, 41);
-            this.trackTree.Name = "trackTree";
-            this.trackTree.Size = new System.Drawing.Size(216, 89);
-            this.trackTree.TabIndex = 8;
-            this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
             // 
             // addTrackButton
             // 
@@ -208,23 +228,14 @@
             this.trackTypeBox.Size = new System.Drawing.Size(121, 25);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
-            // importKeyButton
+            // helpButton
             // 
-            this.importKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
-            this.importKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.importKeyButton.Name = "importKeyButton";
-            this.importKeyButton.Size = new System.Drawing.Size(90, 22);
-            this.importKeyButton.Text = "Import Keys";
-            this.importKeyButton.Click += new System.EventHandler(this.importKeyButton_Click);
-            // 
-            // exportKeyButton
-            // 
-            this.exportKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
-            this.exportKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exportKeyButton.Name = "exportKeyButton";
-            this.exportKeyButton.Size = new System.Drawing.Size(88, 22);
-            this.exportKeyButton.Text = "Export Keys";
-            this.exportKeyButton.Click += new System.EventHandler(this.exportKeyButton_Click);
+            this.helpButton.Image = global::HSDRawViewer.Properties.Resources.ico_known;
+            this.helpButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.helpButton.Name = "helpButton";
+            this.helpButton.Size = new System.Drawing.Size(52, 22);
+            this.helpButton.Text = "Help";
+            this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
             // GraphEditor
             // 
@@ -267,5 +278,6 @@
         private System.Windows.Forms.ToolStripComboBox trackTypeBox;
         private System.Windows.Forms.ToolStripButton importKeyButton;
         private System.Windows.Forms.ToolStripButton exportKeyButton;
+        private System.Windows.Forms.ToolStripButton helpButton;
     }
 }

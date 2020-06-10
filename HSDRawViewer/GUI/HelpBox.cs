@@ -8,6 +8,8 @@ namespace HSDRawViewer.GUI
         {
             InitializeComponent();
 
+            helpText = helpText.Replace("\n", System.Environment.NewLine);
+
             textBox1.Text = helpText;
 
             CenterToScreen();

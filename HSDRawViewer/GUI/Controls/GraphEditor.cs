@@ -15,6 +15,65 @@ namespace HSDRawViewer.GUI.Controls
 {
     public partial class GraphEditor : UserControl
     {
+        public class KeyProxy
+        {
+            public FOBJKey key;
+            public FOBJKey slopekey;
+
+            public float Frame
+            {
+                get => key.Frame;
+                set
+                {
+                    key.Frame = value;
+                    slopekey.Frame = value;
+                }
+            }
+
+            public float Value { get => key.Value; set => key.Value = value; }
+
+            public float InTangent { get => key.Tan; set => key.Tan = value; }
+
+            public float OutTangent
+            {
+                get
+                {
+                    if (slopekey != null)
+                        return slopekey.Tan;
+
+                    return InTangent;
+                }
+                set
+                {
+                    if (slopekey != null)
+                        slopekey.Tan = value;
+                }
+            }
+
+            public bool DifferentTangents
+            {
+                get => slopekey != null;
+                set
+                {
+                    if (value && slopekey == null)
+                    {
+                        slopekey = new FOBJKey()
+                        {
+                            Frame = key.Frame,
+                            Tan = key.Tan,
+                            InterpolationType = GXInterpolationType.HSD_A_OP_SLP
+                        };
+                    }
+                    if (!value)
+                    {
+                        slopekey = null;
+                    }
+                }
+            }
+
+            public GXInterpolationType Interpolation { get => key.InterpolationType; set => key.InterpolationType = value; }
+        }
+
         public enum AnimType
         {
             Joint,
@@ -27,11 +86,17 @@ namespace HSDRawViewer.GUI.Controls
         {
             [DisplayName("Show All Tracks")]
             public bool ShowAllTracks { get; set; } = true;
+
+            [DisplayName("Show Frame Ticks")]
+            public bool ShowFrameTicks { get; set; } = true;
+
+            [DisplayName("Show Tangents")]
+            public bool ShowTangents { get; set; } = true;
         }
 
         private List<FOBJ_Player> _players = new List<FOBJ_Player>();
 
-        private GraphDisplayOptions _options = new GraphDisplayOptions();
+        private static GraphDisplayOptions _options = new GraphDisplayOptions();
         
         private int _selectedPlayerIndex = 0;
 
@@ -87,7 +152,10 @@ namespace HSDRawViewer.GUI.Controls
 
         public static Brush BackgroundColor = new SolidBrush(Color.FromArgb(255, 40, 40, 40));
         private static Pen FrameIndicatorPen = new Pen(Color.White);
-        private static Brush SelectionColor = new SolidBrush(Color.FromArgb(180, 128, 128, 200));
+        private static Brush SelectionColor = new SolidBrush(Color.FromArgb(90, 128, 128, 200));
+
+        public static Pen TickColor = new Pen(Color.White);
+        public static Pen BackTickColor = new Pen(Color.FromArgb(255, 50, 50, 50));
 
         private static Pen LineColor = new Pen(Color.Gray);
         private static Pen SelectedLineColor = new Pen(Color.White);
@@ -133,7 +201,24 @@ namespace HSDRawViewer.GUI.Controls
 
             _graph.Paint += (sender, args) =>
             {
-                args.Graphics.FillRectangle(BackgroundColor, _graph.ClientRectangle);
+                args.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                var rect = _graph.ClientRectangle;
+
+                args.Graphics.FillRectangle(BackgroundColor, rect);
+
+                if(_options.ShowFrameTicks)
+                {
+                    args.Graphics.DrawLine(BackTickColor, 0, rect.Height / 4, rect.Width, rect.Height / 4);
+                    args.Graphics.DrawLine(BackTickColor, 0, rect.Height / 2, rect.Width, rect.Height / 2);
+                    args.Graphics.DrawLine(BackTickColor, 0, rect.Height * 3 / 4f, rect.Width, rect.Height * 3 / 4f);
+                    for (int i = 0; i < _frameCount; i++)
+                    {
+                        var x = i * (rect.Width / (float)_frameCount);
+                        args.Graphics.DrawLine(BackTickColor, x, 0, x, rect.Height);
+                        args.Graphics.DrawLine(TickColor, x, 0, x, 5);
+                    }
+                }
 
                 foreach (var p in _players)
                 {
@@ -141,6 +226,8 @@ namespace HSDRawViewer.GUI.Controls
                         continue;
 
                     var gr = new GraphRenderer();
+
+                    gr.RenderTangents = _options.ShowTangents;
 
                     if(p == _selectedPlayer)
                         gr.LineColor = SelectedLineColor;
@@ -153,23 +240,24 @@ namespace HSDRawViewer.GUI.Controls
                     gr.SetKeys(p);
 
                     if (IsControl)
-                        gr.Draw(args.Graphics, _graph.ClientRectangle, Math.Min(_frame, _startSelectionFrame), Math.Max(_frame, _startSelectionFrame) );
+                        gr.Draw(args.Graphics, rect, Math.Min(_frame, _startSelectionFrame), Math.Max(_frame, _startSelectionFrame) );
                     else
-                        gr.Draw(args.Graphics, _graph.ClientRectangle, _frame, _frame);
+                        gr.Draw(args.Graphics, rect, _frame, _frame);
                 }
 
-                var linex = (_frame / (float)_frameCount) * graphBox.Width;
-                if(!float.IsNaN(linex) && !float.IsInfinity(linex))
+                var linex = _frame * (rect.Width / (float)_frameCount);
+
+                if (!float.IsNaN(linex) && !float.IsInfinity(linex))
                 {
                     if (IsControl)
                     {
-                        var start = (_startSelectionFrame / (float)_frameCount) * graphBox.Width;
+                        var start = _startSelectionFrame * (rect.Width / (float)_frameCount);
 
                         args.Graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), _graph.Height);
 
                         args.Graphics.DrawLine(FrameIndicatorPen, start, 0, start, _graph.Height);
                     }
-
+                    
                     args.Graphics.DrawLine(FrameIndicatorPen, linex, 0, linex, _graph.Height);
                 }
 
@@ -262,10 +350,26 @@ namespace HSDRawViewer.GUI.Controls
         private void SelectFrameFromMouse(int mouseX)
         {
             _frame = (int)(mouseX / (float)_graph.Width * _frameCount);
+            SelectKeyAtFrame();
+        }
 
-            if(_selectedPlayer != null)
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SelectKeyAtFrame()
+        {
+            keyProperty.SelectedObject = null;
+
+            if (_selectedPlayer != null)
             {
-                keyProperty.SelectedObject = _selectedPlayer.Keys.Find(e => e.Frame == _frame);
+                var keyIndex = _selectedPlayer.Keys.FindIndex(e => e.Frame == _frame && e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
+                if(keyIndex != -1)
+                {
+                    var key = _selectedPlayer.Keys[keyIndex];
+                    var slope = keyIndex + 1 < Keys.Count && Keys[keyIndex + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP ? Keys[keyIndex + 1] : null;
+
+                    keyProperty.SelectedObject = new KeyProxy() { key = key, slopekey = slope };
+                }
             }
 
             _graph.Invalidate();
@@ -276,10 +380,40 @@ namespace HSDRawViewer.GUI.Controls
         /// </summary>
         private void SelectKeysInRange(int start, int end)
         {
+            keyProperty.SelectedObject = null;
+
             if (_selectedPlayer != null)
-                keyProperty.SelectedObjects = _selectedPlayer.Keys.FindAll(e => e.Frame >= Math.Min(start, end) && e.Frame <= Math.Max(start, end)).ToArray();
+            {
+                List<object> sel = new List<object>(); 
+                for(int i = Math.Min(start, end); i < Math.Max(start, end); i++)
+                {
+                    var keyIndex = _selectedPlayer.Keys.FindIndex(e => e.Frame == _frame && e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
+                    if (keyIndex != -1)
+                    {
+                        var key = _selectedPlayer.Keys[keyIndex];
+                        var slope = keyIndex + 1 < Keys.Count && Keys[keyIndex + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP ? Keys[keyIndex + 1] : null;
+                        
+                        sel.Add(new KeyProxy() { key = key, slopekey = slope });
+                    }
+                }
+                keyProperty.SelectedObjects = sel.ToArray();
+            }
 
             _graph.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private bool IsKeySelected(FOBJKey key)
+        {
+            foreach (KeyProxy v in keyProperty.SelectedObjects)
+                if (v.key == key || v.slopekey == key)
+                    return true;
+
+            return false;
         }
         
         /// <summary>
@@ -290,7 +424,7 @@ namespace HSDRawViewer.GUI.Controls
         private void deleteKeyButton_Click(object sender, EventArgs e)
         {
             if (_selectedPlayer != null)
-                _selectedPlayer.Keys.RemoveAll(k => keyProperty.SelectedObjects.Contains(k));
+                _selectedPlayer.Keys.RemoveAll(k => IsKeySelected(k));
 
             keyProperty.SelectedObject = null;
 
@@ -307,6 +441,29 @@ namespace HSDRawViewer.GUI.Controls
             // sort keys
             if (e.ChangedItem.Label.Equals("Frame") && _selectedPlayer != null)
                 _selectedPlayer.Keys = _selectedPlayer.Keys.OrderBy(k => k.Frame).ToList();
+            
+            // add/remove slope key
+            foreach(KeyProxy k in keyProperty.SelectedObjects)
+            {
+                var next = Keys.IndexOf(k.key) + 1;
+
+                if (next < Keys.Count & !k.DifferentTangents)
+                {
+                    if (Keys[next].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
+                        Keys.RemoveAt(next);
+                }
+                else
+                {
+                    if (!Keys.Contains(k.slopekey))
+                    {
+                        if(next < Keys.Count && Keys[next].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
+                        {
+                            k.slopekey.Frame = Keys[next].Frame;
+                            Keys.Insert(next, k.slopekey);
+                        }
+                    }
+                }
+            }
 
             _graph.Invalidate();
         }
@@ -331,7 +488,7 @@ namespace HSDRawViewer.GUI.Controls
                     else
                         _selectedPlayer.Keys.Insert(insertIndex, key);
 
-                    keyProperty.SelectedObject = key;
+                    SelectKeyAtFrame();
                 }
 
                 _graph.Invalidate();
@@ -453,6 +610,46 @@ namespace HSDRawViewer.GUI.Controls
                 HSDK.ExportKeys(_selectedPlayer.Keys);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void helpButton_Click(object sender, EventArgs e)
+        {
+            using (HelpBox hb = new HelpBox(HelpText))
+                hb.ShowDialog();
+        }
+
+        private static string HelpText = @"Graph Editor:
+
+Click on Graph to select keys and frames
+
+Hold Control to select multiple keys
+
+Interpolation Help:
+KEY - Key
+    Used for tracks that only have 1 key, no interpolation
+    If your track has more than one key, do not use this
+
+CON - Constant
+    Value is constant until next key
+
+LIN - Linear
+    Value is linealy interpolation (straight line) to next key
+    Used for harsh curves
+
+SPL - Spline
+    A Cubic spline with a tangent
+    Used for smooth curves
+
+SPL0 - Spline 0
+    A cubic spline with a tangent of 0
+    Results in flat tangents
+
+SLP - Slope (do not use)
+NONE - None (do not use)";
     }
 
     /// <summary>

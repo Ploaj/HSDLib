@@ -7,7 +7,29 @@ namespace HSDRawViewer.Rendering
         public static double TwoPI { get; } = 2.0 * Math.PI;
 
         public static float DegToRad { get; } = (float)(Math.PI / 180f);
-        
+        public static float RadToDeg { get; } = (float)(180f / Math.PI);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <param name="degree"></param>
+        /// <returns></returns>
+        public static float AngleToTan(float angle)
+        {
+            return (float)Math.Tan(angle * RadToDeg);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tan"></param>
+        /// <returns></returns>
+        public static float TanToAngle(float tan)
+        {
+            return (float)Math.Atan(tan) * DegToRad;
+        }
+
         /// <summary>
         /// 
         /// </summary>
