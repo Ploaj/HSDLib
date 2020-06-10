@@ -487,7 +487,7 @@ namespace HSDRawViewer.Converters
                                 if (pobj.Attributes.Any(e => e.AttributeName == GXAttribName.GX_TEX_MTX_ARRAY))
                                     reflective = true;
 
-                                if (pobj.Attributes.Any(e=>e.AttributeName == GXAttribName.GX_POS_MTX_ARRAY))
+                                if (pobj.Attributes.Any(e=>e.AttributeName == GXAttribName.GX_VA_PNMTXIDX))
                                     single = false;
 
                                 dobjNode.MeshIndices.Add(Scene.Meshes.Count);
@@ -538,7 +538,7 @@ namespace HSDRawViewer.Converters
                         Scene.Materials.Add(m);
                         
                         if (single)
-                            dobjNode.Name = "_SINGLE";
+                            dobjNode.Name += "_SINGLE";
 
                         if (reflective)
                             dobjNode.Name += "_REFLECTIVE";

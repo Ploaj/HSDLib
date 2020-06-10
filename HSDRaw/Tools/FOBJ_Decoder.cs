@@ -10,10 +10,10 @@ namespace HSDRaw.Tools
     /// </summary>
     public class FOBJKey
     {
-        public float Frame;
-        public float Value;
-        public float Tan;
-        public GXInterpolationType InterpolationType;
+        public float Frame { get; set; }
+        public float Value { get; set; }
+        public float Tan { get; set; }
+        public GXInterpolationType InterpolationType { get; set; }
     }
 
     /// <summary>

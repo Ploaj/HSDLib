@@ -32,6 +32,27 @@ namespace HSDRaw
         }
 
         /// <summary>
+        /// TODO: set struct info for known structures
+        /// </summary>
+        public virtual void SetStructFlags()
+        {
+            foreach (var v in GetType().GetProperties())
+            {
+                if (v.PropertyType.IsSubclassOf(typeof(HSDAccessor)) && v.GetIndexParameters().Length == 0 && v.GetValue(this) is HSDAccessor ac)
+                {
+                    if (ac != this)
+                        ac.SetStructFlags();
+                }
+                if (v.PropertyType.IsArray && v.GetValue(this) is HSDAccessor[] arr)
+                {
+                    foreach (var ai in arr)
+                        if (ai != null && ai != this)
+                            ai.SetStructFlags();
+                }
+            }
+        }
+
+        /// <summary>
         /// Warning: Experimental DO not use
         /// </summary>
         public virtual int Trim()

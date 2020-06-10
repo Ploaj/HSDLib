@@ -34,8 +34,8 @@ namespace HSDRawViewer.Converters
         [Category("Importing Options"), DisplayName("Flip Normals"), Description("Flips direction of normals, useful if model is all black with textures")]
         public bool InvertNormals { get; set; } = false;
 
-        //[Category("Importing Options"), DisplayName("Smooth Normals"), Description("Applies normal smoothing")]
-        //public bool SmoothNormals { get; set; } = false;
+        [Category("Importing Options"), DisplayName("Smooth Normals"), Description("Applies normal smoothing")]
+        public bool SmoothNormals { get; set; } = false;
         
 
         [Category("Importing Options"), DisplayName("Import Bone Names"), Description("Stores bone names in JOBJs")]
@@ -134,6 +134,8 @@ namespace HSDRawViewer.Converters
         // keeps matches texture path to dobj for better grouping options
         public Dictionary<string, HSD_DOBJ> TextureToDOBJ = new Dictionary<string, HSD_DOBJ>();
 
+        public Vector3 SceneScale = Vector3.One;
+
         public bool HasXLU = false;
     }
 
@@ -211,15 +213,18 @@ namespace HSDRawViewer.Converters
             if (Settings.FlipUVs)
                 processFlags |= PostProcessSteps.FlipUVs;
 
-            //if (Settings.SmoothNormals)
-            //    processFlags |= PostProcessSteps.GenerateSmoothNormals;
+            if (Settings.SmoothNormals)
+            {
+                processFlags |= PostProcessSteps.ForceGenerateNormals;
+                processFlags |= PostProcessSteps.GenerateSmoothNormals;
+            }
 
             // import model
             ProgressStatus = "Importing Model with Assimp...";
             w.ReportProgress(0);
             AssimpContext importer = new AssimpContext();
-            //if (Settings.SmoothNormals)
-            //    importer.SetConfig(new NormalSmoothingAngleConfig(80.0f));
+            if (Settings.SmoothNormals)
+                importer.SetConfig(new NormalSmoothingAngleConfig(80.0f));
             importer.SetConfig(new VertexBoneWeightLimitConfig(4));
             var importmodel = importer.ImportFile(FilePath, processFlags);
             
@@ -228,21 +233,23 @@ namespace HSDRawViewer.Converters
             ProgressStatus = "Processing Nodes...";
             w.ReportProgress(30);
             var rootNode = importmodel.RootNode;
-            var rootjobj = RecursiveProcess(cache, Settings, importmodel, importmodel.RootNode);
-            
+            var scenejobj = RecursiveProcess(cache, Settings, importmodel, importmodel.RootNode);
+
+            cache.SceneScale = new Vector3(scenejobj.SX, scenejobj.SY, scenejobj.SZ);
 
             // get root of skeleton
-            rootjobj = GetSkeleton(rootjobj);
+            var rootjobj = GetSkeleton(scenejobj);
             rootjobj.Flags = JOBJ_FLAG.SKELETON_ROOT;
             rootjobj.Next = null;
+            //RecalculateTransforms(cache, rootjobj, Matrix4.Identity);
 
 
             // Clear rotations
-            /*if (Settings.ZeroOutRotationsAndApplyFighterTransforms)
-            {
-                ProgressStatus = "Clearing Rotations...";
-                cache.jobjToNewTransform = JOBJTools.ApplyMeleeFighterTransforms(rootjobj);
-            }*/
+            //if (Settings.ZeroOutRotationsAndApplyFighterTransforms)
+            //{
+            //    ProgressStatus = "Clearing Rotations...";
+            //    cache.jobjToNewTransform = JOBJTools.ApplyMeleeFighterTransforms(rootjobj);
+            //}
 
 
             // process mesh
@@ -389,6 +396,28 @@ namespace HSDRawViewer.Converters
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <param name="settings"></param>
+        /// <param name="jobj"></param>
+        public static void RecalculateTransforms(ModelProcessCache cache, HSD_JOBJ jobj, Matrix4 parent)
+        {
+            Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
+                Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
+            
+            Transform = Transform * parent;
+
+            cache.jobjToWorldTransform[jobj] = Transform;
+
+            foreach (var child in jobj.Children)
+            {
+                RecalculateTransforms(cache, child, parent);
+            }
+        }
+
+        /// <summary>
         /// Recursivly processing nodes and convert data into JOBJ
         /// </summary>
         /// <param name="scene"></param>
@@ -456,10 +485,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private static float RoundFloat(float f)
         {
-            if (Math.Abs(f) < 0.000001)
-                return 0;
-            else
-                return f;
+            return (float)Math.Round(f, 4);
         }
 
         /// <summary>
@@ -739,7 +765,9 @@ namespace HSDRawViewer.Converters
                             vertex.POS = GXTranslator.fromVector3(tkvert);
 
                         if (mesh.HasNormals)
-                            vertex.NRM = GXTranslator.fromVector3(tknrm);
+                        {
+                            vertex.NRM = GXTranslator.fromVector3((tknrm / tknrm.Length) * cache.SceneScale);
+                        }
 
                         if (mesh.HasTangentBasis)
                         {

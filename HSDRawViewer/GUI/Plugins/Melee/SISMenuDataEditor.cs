@@ -68,7 +68,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     _data = value;
                 }
             }
-            private byte[] _data;
+            private byte[] _data = new byte[] { 0 };
 
             public List<Tuple<TEXT_OP_CODE, ushort[]>> OPCodes { get => DeserializeCodes(_data); }
 

@@ -334,6 +334,9 @@ namespace HSDRaw
         /// <returns></returns>
         public bool IsBuffer(HSDStruct a)
         {
+            if (!a.CanBeBuffer)
+                return false;
+
             return (a.References.Count == 0 && a.Length >= 0x40) || a.IsTextureBuffer;
         }
 
@@ -463,6 +466,15 @@ namespace HSDRaw
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public void SetStructFlags()
+        {
+            foreach (var r in Roots)
+                r.Data.SetStructFlags();
+        }
+
+        /// <summary>
         /// saves dat data to stream with optional alignment
         /// </summary>
         /// <param name="stream"></param>
@@ -474,6 +486,9 @@ namespace HSDRaw
 
             if (trim)
                 TrimData();
+
+            // TODO:
+            //SetStructFlags();
 
             // gather all structs--------------------------------------------------------------------------
             var allStructs = GetAllStructs();
@@ -534,7 +549,8 @@ namespace HSDRaw
                     if (IsBuffer(s) && bufferAlign) 
                         writer.Align(0x20);
                     else
-                        writer.Align(4);
+                        if(s.Align)
+                            writer.Align(4);
 
                     structToOffset.Add(s, (int)writer.BaseStream.Position - 0x20);
                     writer.Write(s.GetData());

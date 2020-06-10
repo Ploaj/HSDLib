@@ -15,6 +15,7 @@ namespace HSDRaw.Common.Animation
 
     public enum MatTrackType
     {
+        HSD_A_M_NONE = 0,
         HSD_A_M_AMBIENT_R = 1,
         HSD_A_M_AMBIENT_G,
         HSD_A_M_AMBIENT_B,
@@ -32,6 +33,7 @@ namespace HSDRaw.Common.Animation
 
     public enum TexTrackType
     {
+        HSD_A_T_NONE = 0,
         HSD_A_T_TIMG = 1,
         HSD_A_T_TRAU = 2,
         HSD_A_T_TRAV = 3,
@@ -60,6 +62,7 @@ namespace HSDRaw.Common.Animation
 
     public enum JointTrackType
     {
+        HSD_A_J_NONE = 0,
         HSD_A_J_ROTX = 1,
         HSD_A_J_ROTY,
         HSD_A_J_ROTZ,

@@ -141,6 +141,7 @@
     </Compile>
     <Compile Include="Converters\Animation\CHR0Converter.cs" />
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
+    <Compile Include="Converters\Animation\HSDK.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\DAEWriter.cs" />
     <Compile Include="Converters\JOBJTools.cs" />
@@ -166,14 +167,20 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ArrayMemberEditor.cs">
+    <Compile Include="GUI\Controls\ArrayMemberEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\ArrayMemberEditor.Designer.cs">
+    <Compile Include="GUI\Controls\ArrayMemberEditor.Designer.cs">
       <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\CustomTrackBar.cs">
+    <Compile Include="GUI\Controls\CustomTrackBar.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\GraphEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\GraphEditor.Designer.cs">
+      <DependentUpon>GraphEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Extra\AJSplitDialog.cs">
       <SubType>Form</SubType>
@@ -217,10 +224,10 @@
     <Compile Include="GUI\HSDTypeDialog.Designer.cs">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\KeyEditor.cs">
+    <Compile Include="GUI\Controls\KeyEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\KeyEditor.Designer.cs">
+    <Compile Include="GUI\Controls\KeyEditor.Designer.cs">
       <DependentUpon>KeyEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\MEX\Controls\MEXMenuCSSControl.cs">
@@ -372,10 +379,10 @@
     <Compile Include="GUI\TextureImportDialog.Designer.cs">
       <DependentUpon>TextureImportDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ViewportControl.cs">
+    <Compile Include="GUI\Controls\ViewportControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\ViewportControl.Designer.cs">
+    <Compile Include="GUI\Controls\ViewportControl.Designer.cs">
       <DependentUpon>ViewportControl.cs</DependentUpon>
     </Compile>
     <Compile Include="PluginManager.cs" />
@@ -388,6 +395,7 @@
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\Models\DobjManager.cs" />
     <Compile Include="Rendering\Animation\MatAnimManager.cs" />
+    <Compile Include="Rendering\Renderers\GraphRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
     <Compile Include="Rendering\Renderers\TextRenderer.cs" />
     <Compile Include="Rendering\Shapes\DrawShape.cs" />
@@ -459,8 +467,11 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ArrayMemberEditor.resx">
+    <EmbeddedResource Include="GUI\Controls\ArrayMemberEditor.resx">
       <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Controls\GraphEditor.resx">
+      <DependentUpon>GraphEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\AJSplitDialog.resx">
       <DependentUpon>AJSplitDialog.cs</DependentUpon>
@@ -483,7 +494,7 @@
     <EmbeddedResource Include="GUI\HSDTypeDialog.resx">
       <DependentUpon>HSDTypeDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\KeyEditor.resx">
+    <EmbeddedResource Include="GUI\Controls\KeyEditor.resx">
       <DependentUpon>KeyEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXEffectControl.resx">
@@ -552,7 +563,7 @@
     <EmbeddedResource Include="GUI\TextureImportDialog.resx">
       <DependentUpon>TextureImportDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ViewportControl.resx">
+    <EmbeddedResource Include="GUI\Controls\ViewportControl.resx">
       <DependentUpon>ViewportControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
