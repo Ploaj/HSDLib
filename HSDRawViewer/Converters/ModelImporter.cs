@@ -766,7 +766,7 @@ namespace HSDRawViewer.Converters
 
                         if (mesh.HasNormals)
                         {
-                            vertex.NRM = GXTranslator.fromVector3(((tknrm / tknrm.Length) * cache.SceneScale.Normalized()));
+                            vertex.NRM = GXTranslator.fromVector3(tknrm.Normalized());
                         }
 
                         if (mesh.HasTangentBasis)

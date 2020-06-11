@@ -14,6 +14,7 @@ using System.Linq;
 using System.Drawing;
 using HSDRaw;
 using HSDRawViewer.Tools;
+using HSDRawViewer.GUI.Controls;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -339,29 +340,19 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(toolStripComboBox2.SelectedIndex == 0)
             {
-                JOBJManager.RenderObjects = true;
+                JOBJManager.settings.RenderObjects = true;
                 JOBJManager.DOBJManager.OnlyRenderSelected = false;
             }
             if (toolStripComboBox2.SelectedIndex == 1)
             {
-                JOBJManager.RenderObjects = true;
+                JOBJManager.settings.RenderObjects = true;
                 JOBJManager.DOBJManager.OnlyRenderSelected = true;
             }
             if (toolStripComboBox2.SelectedIndex == 2)
             {
-                JOBJManager.RenderObjects = false;
+                JOBJManager.settings.RenderObjects = false;
                 JOBJManager.DOBJManager.OnlyRenderSelected = false;
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            JOBJManager.RenderBones = showBonesToolStrip.Checked;
         }
 
         /// <summary>
@@ -1116,6 +1107,42 @@ namespace HSDRawViewer.GUI.Plugins
         private void autoUpdateFlagsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             JOBJTools.UpdateJOBJFlags(root);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void viewAnimationGraphToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(JOBJManager.Animation != null)
+            {
+                var joint = treeJOBJ.SelectedNode.Tag as HSD_JOBJ;
+
+                var boneIndex = JOBJManager.IndexOf(joint);
+
+                if(boneIndex < JOBJManager.Animation.NodeCount && boneIndex >= 0)
+                {
+                    var node = JOBJManager.Animation.Nodes[boneIndex];
+
+                    using (PopoutGraphEditor editor = new PopoutGraphEditor(treeJOBJ.SelectedNode.Text, node))
+                    {
+                        editor.ShowDialog(this);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void displaySettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (PropertyDialog d = new PropertyDialog("Display Settings", JOBJManager.settings))
+                d.ShowDialog();
         }
     }
 }

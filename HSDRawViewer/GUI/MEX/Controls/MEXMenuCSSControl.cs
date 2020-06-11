@@ -41,9 +41,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             InitializeComponent();
 
-            singleMenuManager.RenderBones = false;
-            cspJOBJManager.RenderBones = false;
-            iconJOBJManager.RenderBones = false;
+            singleMenuManager.settings.RenderBones = false;
+            cspJOBJManager.settings.RenderBones = false;
+            iconJOBJManager.settings.RenderBones = false;
 
             HandleDestroyed += (sender, args) =>
             {

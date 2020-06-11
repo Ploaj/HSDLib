@@ -987,7 +987,7 @@ namespace HSDRawViewer.GUI
             JOBJManager.ModelScale = ModelScale;
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
             JOBJManager.HideDOBJs(HiddenDOBJIndices);
-            JOBJManager.RenderBones = false;
+            JOBJManager.settings.RenderBones = false;
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
 
@@ -1044,7 +1044,7 @@ namespace HSDRawViewer.GUI
 
             JOBJManager.Frame = viewport.Frame;
 
-            JOBJManager.RenderBones = bonesToolStripMenuItem.Checked;
+            JOBJManager.settings.RenderBones = bonesToolStripMenuItem.Checked;
                 
             if (SubactionProcess.CharacterInvisibility)
                 JOBJManager.UpdateNoRender();

@@ -200,6 +200,12 @@
     <Compile Include="GUI\Extra\MOBJEditor.Designer.cs">
       <DependentUpon>MOBJEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Extra\PopoutGraphEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\PopoutGraphEditor.Designer.cs">
+      <DependentUpon>PopoutGraphEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\SEMEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -481,6 +487,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\MOBJEditor.resx">
       <DependentUpon>MOBJEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\PopoutGraphEditor.resx">
+      <DependentUpon>PopoutGraphEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\SEMEditor.resx">
       <DependentUpon>SEMEditor.cs</DependentUpon>

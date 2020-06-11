@@ -12,6 +12,8 @@ namespace HSDRawViewer.Rendering
     {
         Default,
         Normals,
+        Tangents, 
+        BiNormal,
         VertexColor,
         UV0,
         UV1,
@@ -29,22 +31,29 @@ namespace HSDRawViewer.Rendering
         SpecularPass,
         BoneWeight,
     }
+
     /// <summary>
     /// 
     /// </summary>
-    public class JOBJManager
+    public class JOBJManagerSettings
     {
-        #region Settings
-
         public bool RenderBones { get; set; } = true;
 
         public bool RenderObjects { get; set; } = true;
 
         public bool RenderMaterials { get; set; } = true;
 
-        public HSD_JOBJ SelectetedJOBJ = null;
+        public bool RenderOrientation { get; set; } = false;
+    }
 
-        #endregion
+    /// <summary>
+    /// 
+    /// </summary>
+    public class JOBJManager
+    {
+        public JOBJManagerSettings settings = new JOBJManagerSettings();
+
+        public HSD_JOBJ SelectetedJOBJ = null;
 
         public float Frame { get; set; }
 
@@ -294,7 +303,7 @@ namespace HSDRawViewer.Rendering
             }
 
             // Render DOBJS
-            if (RenderObjects)
+            if (settings.RenderObjects)
             {
                 HSD_JOBJ parent = null;
                 List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>> XLU = new List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>>();
@@ -345,10 +354,15 @@ namespace HSDRawViewer.Rendering
             GL.Disable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
 
-            if (RenderBones)
+            float mag = 0;
+
+            if(settings.RenderOrientation)
+                mag = Vector3.TransformPosition(new Vector3(1, 0, 0), camera.MvpMatrix.Inverted()).Length / 30;
+
+            if (settings.RenderBones)
                 foreach (var b in jobjToCache)
                 {
-                    RenderBone(b.Value, b.Key.Equals(SelectetedJOBJ));
+                    RenderBone(mag, b.Value, b.Key.Equals(SelectetedJOBJ));
                 }
 
             GL.PopAttrib();
@@ -367,15 +381,15 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="transform"></param>
         /// <param name="parentTransform"></param>
-        private void RenderBone(JOBJCache jobj, bool selected)
+        private void RenderBone(float mag, JOBJCache jobj, bool selected)
         {
             Matrix4 transform = jobj.WorldTransform;
-            var bonePosition = Vector3.TransformPosition(Vector3.Zero, transform);
 
             if (jobj.Parent != null)
             {
                 Matrix4 parentTransform = jobj.Parent.WorldTransform;
 
+                var bonePosition = Vector3.TransformPosition(Vector3.Zero, transform);
                 var parentPosition = Vector3.TransformPosition(Vector3.Zero, parentTransform);
 
                 GL.LineWidth(1f);
@@ -397,9 +411,32 @@ namespace HSDRawViewer.Rendering
                 GL.Color3(1f, 0f, 0f);
                 GL.PointSize(5f);
             }
+
+            GL.PushMatrix();
+            GL.MultMatrix(ref transform);
+
             GL.Begin(PrimitiveType.Points);
-            GL.Vertex3(bonePosition);
+            GL.Vertex3(0, 0, 0);
             GL.End();
+
+            if (settings.RenderOrientation)
+            {
+                GL.LineWidth(2.5f);
+
+                GL.Begin(PrimitiveType.Lines);
+                GL.Color3(1f, 0f, 0f);
+                GL.Vertex3(0, 0, 0);
+                GL.Vertex3(mag, 0, 0);
+                GL.Color3(0f, 1f, 0f);
+                GL.Vertex3(0, 0, 0);
+                GL.Vertex3(0, mag, 0);
+                GL.Color3(0f, 0f, 1f);
+                GL.Vertex3(0, 0, 0);
+                GL.Vertex3(0, 0, mag);
+                GL.End();
+            }
+
+            GL.PopMatrix();
         }
 
         /// <summary>

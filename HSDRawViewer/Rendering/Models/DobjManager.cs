@@ -169,6 +169,12 @@ namespace HSDRawViewer.Rendering
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
+
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"));
+            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
+
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"), 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
 
@@ -227,6 +233,9 @@ namespace HSDRawViewer.Rendering
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"));
+            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
             GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX2"));

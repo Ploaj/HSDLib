@@ -3,6 +3,8 @@
 in float PNMTXIDX;
 in vec3 GX_VA_POS;
 in vec3 GX_VA_NRM;
+in vec3 GX_VA_TAN;
+in vec3 GX_VA_BTAN;
 in vec2 GX_VA_TEX0;
 in vec2 GX_VA_TEX1;
 in vec2 GX_VA_TEX2;
@@ -11,6 +13,8 @@ in vec4 GX_VA_CLR0;
 
 out vec3 vertPosition;
 out vec3 normal;
+out vec3 tan;
+out vec3 bitan;
 out float spec;
 out vec2 texcoord0;
 out vec2 texcoord1;
@@ -43,6 +47,8 @@ void main()
 {
 	vec4 pos = vec4(GX_VA_POS, 1);
 	
+	tan = normalize(GX_VA_TAN);
+	bitan = normalize(GX_VA_BTAN);
 	normal = GX_VA_NRM;
 
 	vbones = vec4(0, 0, 0, 0);

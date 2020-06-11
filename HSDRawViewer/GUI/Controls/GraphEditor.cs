@@ -94,6 +94,8 @@ namespace HSDRawViewer.GUI.Controls
             public bool ShowTangents { get; set; } = true;
         }
 
+        public FOBJ_Player[] TrackPlayers { get => _players.ToArray(); }
+
         private List<FOBJ_Player> _players = new List<FOBJ_Player>();
 
         private static GraphDisplayOptions _options = new GraphDisplayOptions();
@@ -121,7 +123,7 @@ namespace HSDRawViewer.GUI.Controls
         {
             get
             {
-                if (_selectedPlayerIndex < 0 || _selectedPlayerIndex > _players.Count)
+                if (_selectedPlayerIndex < 0 || _selectedPlayerIndex >= _players.Count)
                     return null;
 
                 return _players[_selectedPlayerIndex];
@@ -159,6 +161,8 @@ namespace HSDRawViewer.GUI.Controls
 
         private static Pen LineColor = new Pen(Color.Gray);
         private static Pen SelectedLineColor = new Pen(Color.White);
+
+        public event EventHandler OnTrackListUpdate;
 
         /// <summary>
         /// 
@@ -291,6 +295,37 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="aobj"></param>
         public void LoadTracks(AnimType type, HSD_AOBJ aobj)
         {
+            SetTrackType(type);
+            
+            if (aobj.FObjDesc != null)
+                foreach (var v in aobj.FObjDesc.List)
+                    AddPlayer(new FOBJ_Player(v.TrackType, v.GetDecodedKeys()));
+
+            if(trackTree.Nodes.Count > 0)
+                trackTree.SelectedNode = trackTree.Nodes[0];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="aobj"></param>
+        public void LoadTracks(AnimType type, IEnumerable<FOBJ_Player> players)
+        {
+            SetTrackType(type);
+
+            foreach (var p in players)
+                AddPlayer(p);
+
+            if (trackTree.Nodes.Count > 0)
+                trackTree.SelectedNode = trackTree.Nodes[0];
+        }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="type"></param>
+        private void SetTrackType(AnimType type)
+        {
             _animType = type;
 
             trackTypeBox.Items.Clear();
@@ -308,19 +343,9 @@ namespace HSDRawViewer.GUI.Controls
                     tt = typeof(JointTrackType);
                     break;
             }
+
             foreach (var item in Enum.GetValues(tt))
                 trackTypeBox.Items.Add(item);
-
-            List<FOBJ_Player> players = new List<FOBJ_Player>();
-            
-            if (aobj.FObjDesc != null)
-                foreach (var v in aobj.FObjDesc.List)
-                {
-                    AddPlayer(new FOBJ_Player(v.TrackType, v.GetDecodedKeys()));
-                }
-
-            if(trackTree.Nodes.Count > 0)
-                trackTree.SelectedNode = trackTree.Nodes[0];
         }
 
         /// <summary>
@@ -553,6 +578,8 @@ namespace HSDRawViewer.GUI.Controls
                 trackTree.SelectedNode = null;
 
             _graph.Invalidate();
+
+            OnTrackListUpdate.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -572,6 +599,8 @@ namespace HSDRawViewer.GUI.Controls
             trackTree.SelectedNode = trackTree.Nodes[trackTree.Nodes.Count - 1];
 
             _graph.Invalidate();
+
+            OnTrackListUpdate.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
