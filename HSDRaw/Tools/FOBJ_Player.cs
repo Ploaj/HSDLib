@@ -73,7 +73,7 @@ namespace HSDRaw.Tools
         {
             get
             {
-                if (Keys.Count == 0)
+                if (Keys == null || Keys.Count == 0)
                     return 0;
 
                 return (int)Keys.Max(e => e.Frame);

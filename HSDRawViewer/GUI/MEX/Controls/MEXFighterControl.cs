@@ -602,13 +602,19 @@ static struct MoveLogic move_logic[] = {
         private void LoadPlCO(ftLoadCommonData ftData)
         {
             var tables = ftData.BoneTables.Array;
+            var unktables = ftData.FighterTable.Array;
 
             if (tables.Length != FighterEntries.Count + 1)
                 MessageBox.Show($"PlCo is missing entries\nExpected {FighterEntries.Count} Found {tables.Length - 1}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             int fIndex = 0;
             foreach(var fighter in FighterEntries)
-                fighter.BoneTable = tables[fIndex++];
+            {
+                fighter.BoneTable = tables[fIndex];
+                if(fIndex < unktables.Length)
+                    fighter.UnkTable = unktables[fIndex];
+                fIndex++;
+            }
 
             DummyBoneTable = tables[tables.Length - 1];
 
@@ -636,7 +642,10 @@ static struct MoveLogic move_logic[] = {
             tables.Add(DummyBoneTable);
 
             if (PlCo.Roots[0].Data is ftLoadCommonData ftData)
+            {
                 ftData.BoneTables.Array = tables.ToArray();
+                ftData.FighterTable.Array = FighterEntries.Select(e => e.UnkTable).ToArray();
+            }
 
             PlCo.Save(PlCoPath);
         }

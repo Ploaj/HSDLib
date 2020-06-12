@@ -476,7 +476,10 @@ void main()
 
 	// vertex color
 	if(useVertexColor == 1)
+	{
 		fragColor.rgb *= vertexColor.rgb * vertexColor.aaa;
+		fragColor.a *= vertexColor.a;
+	}
 		
 
 	// gx overlay

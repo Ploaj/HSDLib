@@ -31,7 +31,7 @@ namespace HSDRawViewer.GUI.MEX.Tools
         public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
         {
             var props = _innerTypeDescriptor.GetProperties(type, container);
-            props = props.Where(p => p.Type != typeof(HSDStruct) && p.Name != "trimmedSize" && p.Name != "costumeCount" && p.Name != "gOBJFunctions" && p.GetCustomAttribute<SerialIgnoreAttribute>() == null);
+            props = props.Where(p => p.Type != typeof(HSDStruct) && p.Name != "trimmedSize" && p.Name != "costumeCount" && p.Name != "unkTableEntries" && p.Name != "gOBJFunctions" && p.GetCustomAttribute<SerialIgnoreAttribute>() == null);
             return props;
         }
     }

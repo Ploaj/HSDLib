@@ -812,6 +812,7 @@ namespace HSDRawViewer.GUI
                     if (scripts != null)
                     {
                         // insert scripts
+                        scripts.Reverse();
                         foreach (var v in scripts)
                             // only paste subactions the belong to this group
                             if(v.GetGroup() == SubactionGroup)

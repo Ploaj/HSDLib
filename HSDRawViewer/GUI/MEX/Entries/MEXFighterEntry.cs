@@ -152,6 +152,34 @@ namespace HSDRawViewer.GUI.MEX
         public SubCharacterBehavior SubCharacterBehavior { get; set; }
 
 
+        ///Note: if you change this name update MexTypeInspector as well
+        [DisplayName("Unk Table"), Category("3 - Misc"), Description("")]
+        public SBM_PlCoUnknownFighterTableEntry[] UnkTableEntries
+        {
+            get
+            {
+                if (UnkTable == null)
+                    return null;
+
+                return UnkTable.Entries;
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                    UnkTable = null;
+                else
+                {
+                    if (UnkTable == null)
+                        UnkTable = new SBM_PlCoUnknownFighterTable();
+
+                    UnkTable.Entries = value;
+                }
+            }
+        }
+
+        public SBM_PlCoUnknownFighterTable UnkTable;
+
+
         [DisplayName("Kirby Cap FileName"), Category("4 - Kirby"), Description("")]
         public string KirbyCapFileName { get; set; }
 

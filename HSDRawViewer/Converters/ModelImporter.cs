@@ -199,6 +199,7 @@ namespace HSDRawViewer.Converters
 
             ModelProcessCache cache = new ModelProcessCache();
             cache.POBJGen.UseTriangleStrips = Settings.UseStrips;
+            cache.POBJGen.UseVertexAlpha = Settings.ImportVertexAlpha;
             cache.FolderPath = Path.GetDirectoryName(FilePath);
 
             // assimp process flags

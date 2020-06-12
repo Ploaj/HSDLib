@@ -579,7 +579,8 @@ namespace HSDRawViewer.GUI.Controls
 
             _graph.Invalidate();
 
-            OnTrackListUpdate.Invoke(this, EventArgs.Empty);
+            if(OnTrackListUpdate != null)
+                OnTrackListUpdate.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -600,7 +601,8 @@ namespace HSDRawViewer.GUI.Controls
 
             _graph.Invalidate();
 
-            OnTrackListUpdate.Invoke(this, EventArgs.Empty);
+            if (OnTrackListUpdate != null)
+                OnTrackListUpdate.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
