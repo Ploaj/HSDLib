@@ -518,7 +518,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 int index = 341;
                 foreach (var m in moveLogic)
                 {
-                    table.AppendLine($"\t// State: {index} - " + (fighterData != null && m.AnimationID != -1 && fighterData.SubActionTable.Subactions[m.AnimationID].Name != null ? System.Text.RegularExpressions.Regex.Replace(fighterData.SubActionTable.Subactions[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
+                    table.AppendLine($"\t// State: {index} - " + (fighterData != null && m.AnimationID != -1 && fighterData.FighterCommandTable.Commands[m.AnimationID].Name != null ? System.Text.RegularExpressions.Regex.Replace(fighterData.FighterCommandTable.Commands[m.AnimationID].Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "") : "Animation: " + m.AnimationID.ToString("X")));
                     index++;
                     table.AppendLine(string.Format(
                         "\t{{" +

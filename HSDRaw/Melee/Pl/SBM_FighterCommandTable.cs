@@ -1,6 +1,6 @@
 ﻿namespace HSDRaw.Melee.Pl
 {
-    public class SBM_SubActionTable : HSDAccessor
+    public class SBM_FighterCommandTable : HSDAccessor
     {
         public int Count
         {
@@ -10,14 +10,14 @@
             }
         }
 
-        public SBM_FighterSubAction[] Subactions
+        public SBM_FighterCommand[] Commands
         {
             get
             {
-                SBM_FighterSubAction[] s = new SBM_FighterSubAction[Count];
+                SBM_FighterCommand[] s = new SBM_FighterCommand[Count];
                 for(int i = 0; i < s.Length; i++)
                 {
-                    s[i] = new SBM_FighterSubAction();
+                    s[i] = new SBM_FighterCommand();
                     s[i]._s = _s.GetEmbeddedStruct(i * 0x18, 0x18);
                 }
                 return s;

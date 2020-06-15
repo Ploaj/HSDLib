@@ -176,6 +176,9 @@
 
 - code: 20
   name: Reverse Direction
+  parameters:
+  - name: Enabled
+    bitCount: 26
 
 - code: 21
   name: Set flag 0x2210 to 10

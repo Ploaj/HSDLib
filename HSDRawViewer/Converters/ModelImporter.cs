@@ -935,7 +935,7 @@ namespace HSDRawViewer.Converters
                     if (File.Exists(texturePath + ".png"))
                         texturePath = texturePath + ".png";
 
-                    var mobjPath = Path.Combine(cache.FolderPath, Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
+                    var mobjPath = Path.Combine(Path.GetDirectoryName(texturePath), Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
                     
                     if(settings.ImportMOBJ && File.Exists(mobjPath))
                     {

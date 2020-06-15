@@ -197,8 +197,8 @@ namespace HSDRawViewer.GUI
             lbFighting.BeginUpdate();
             using (BinaryReader r = new BinaryReader(new FileStream(filePath, FileMode.Open)))
             {
-                var subs = PlayerData.SubActionTable.Subactions;
-                var winsubs = PlayerData.WinSubAction.Subactions;
+                var subs = PlayerData.FighterCommandTable.Commands;
+                var winsubs = PlayerData.WinCommandTable.Commands;
 
                 foreach (var v in subs)
                 {
@@ -237,7 +237,7 @@ namespace HSDRawViewer.GUI
             lbResult.BeginUpdate();
             using (BinaryReader r = new BinaryReader(new MemoryStream(gmDat.Roots[0].Data._s.GetData())))
             {
-                var winsubs = PlayerData.WinSubAction.Subactions;
+                var winsubs = PlayerData.WinCommandTable.Commands;
 
                 foreach (var v in winsubs)
                 {
@@ -396,7 +396,7 @@ namespace HSDRawViewer.GUI
                     if (AJPath != null)
                         using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
                         {
-                            PlayerData.SubActionTable.Subactions = CreateAnimationFile(w, PlayerData.SubActionTable.Subactions, FightingAnimations);
+                            PlayerData.FighterCommandTable.Commands = CreateAnimationFile(w, PlayerData.FighterCommandTable.Commands, FightingAnimations);
                         }
                 }
 
@@ -409,7 +409,7 @@ namespace HSDRawViewer.GUI
                         res.Roots.Add(new HSDRootNode() { Name = "ftDemoResultMotionFile" + FighterName, Data = new HSDAccessor() });
                         using (BinaryWriter w = new BinaryWriter(new MemoryStream()))
                         {
-                            PlayerData.WinSubAction.Subactions = CreateAnimationFile(w, PlayerData.WinSubAction.Subactions, ResultAnimations);
+                            PlayerData.WinCommandTable.Commands = CreateAnimationFile(w, PlayerData.WinCommandTable.Commands, ResultAnimations);
 
                             res.Roots[0].Data._s.SetData(((MemoryStream)w.BaseStream).ToArray());
                         }
@@ -441,7 +441,7 @@ namespace HSDRawViewer.GUI
         /// <param name="w"></param>
         /// <param name="subs"></param>
         /// <returns></returns>
-        private SBM_FighterSubAction[] CreateAnimationFile(BinaryWriter w, SBM_FighterSubAction[] subs, BindingList<Animation> anims)
+        private SBM_FighterCommand[] CreateAnimationFile(BinaryWriter w, SBM_FighterCommand[] subs, BindingList<Animation> anims)
         {
             Dictionary<string, Tuple<int, int>> animToOffset = new Dictionary<string, Tuple<int, int>>();
 

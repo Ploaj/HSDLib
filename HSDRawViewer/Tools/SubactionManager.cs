@@ -195,17 +195,17 @@ namespace HSDRawViewer.Tools
             string isa = "";
             string csa = "";
 
-            if (File.Exists(@"Melee\subactions_control.yaml"))
-                sa = File.ReadAllText(@"Melee\subactions_control.yaml");
+            if (File.Exists(@"Melee\command_controls.yml"))
+                sa = File.ReadAllText(@"Melee\command_controls.yml");
 
-            if (File.Exists(@"Melee\subactions_fighter.yaml"))
-                fsa = File.ReadAllText(@"Melee\subactions_fighter.yaml");
+            if (File.Exists(@"Melee\command_fighter.yml"))
+                fsa = File.ReadAllText(@"Melee\command_fighter.yml");
 
-            if (File.Exists(@"Melee\subactions_item.yaml"))
-                isa = File.ReadAllText(@"Melee\subactions_item.yaml");
+            if (File.Exists(@"Melee\command_item.yml"))
+                isa = File.ReadAllText(@"Melee\command_item.yml");
 
-            if (File.Exists(@"Melee\subactions_custom.yaml"))
-                csa = File.ReadAllText(@"Melee\subactions_custom.yaml");
+            if (File.Exists(@"Melee\command_custom.yml"))
+                csa = File.ReadAllText(@"Melee\command_custom.yml");
 
             var subs = deserializer.Deserialize<Subaction[]>(sa);
             var fsubs = deserializer.Deserialize<Subaction[]>(fsa);

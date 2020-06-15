@@ -23,20 +23,20 @@ namespace HSDRawViewer.Converters
             byte[] ajdata = File.ReadAllBytes(AJPath);
             var rstFile = new HSDRawFile(RstPath).Roots[0].Data;
 
-            var sa = fighterData.SubActionTable.Subactions;
+            var sa = fighterData.FighterCommandTable.Commands;
             foreach (var v in sa)
             {
                 v.Name = v.Name.Replace(oldName, newName);
             }
-            fighterData.SubActionTable.Subactions = sa;
+            fighterData.FighterCommandTable.Commands = sa;
 
-            var wsa = fighterData.WinSubAction.Subactions;
+            var wsa = fighterData.WinCommandTable.Commands;
             foreach (var v in wsa)
             {
                 v.Name = v.Name.Replace(oldName, newName);
 
             }
-            fighterData.WinSubAction.Subactions = wsa;
+            fighterData.WinCommandTable.Commands = wsa;
         }
 
     }

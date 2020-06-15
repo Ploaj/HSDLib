@@ -103,7 +103,7 @@ namespace HSDRawViewer
             { typeof(SBM_ArticlePointer), "group" },
             { typeof(SBM_HurtboxBank<SBM_Hurtbox>), "group" },
             { typeof(SBM_HurtboxBank<SBM_ItemHurtbox>), "group" },
-            { typeof(SBM_SubActionTable), "table" },
+            { typeof(SBM_FighterCommandTable), "table" },
             { typeof(SBM_DynamicBehaviorIDs), "table" },
             { typeof(SBM_PlayerModelLookupTables), "table" },
             { typeof(SBM_PlayerSFXTable), "table" },

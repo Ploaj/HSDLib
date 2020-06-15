@@ -139,7 +139,7 @@ namespace HSDRawViewer.GUI
 
         public DockState DefaultDockState => DockState.Document;
 
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_SubActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) };
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) };
 
         public DataNode Node
         {
@@ -150,9 +150,9 @@ namespace HSDRawViewer.GUI
                 if (value.Accessor is SBM_ItemSubactionData suidata)
                 {
                     SubactionGroup = SubactionGroup.Item;
-                    SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
+                    SBM_FighterCommand[] su = new SBM_FighterCommand[]
                     {
-                        new SBM_FighterSubAction()
+                        new SBM_FighterCommand()
                         {
                             SubAction = suidata,
                             Name = "Script"
@@ -164,9 +164,9 @@ namespace HSDRawViewer.GUI
                 }else
                 if (value.Accessor is SBM_FighterSubactionData sudata)
                 {
-                    SBM_FighterSubAction[] su = new SBM_FighterSubAction[]
+                    SBM_FighterCommand[] su = new SBM_FighterCommand[]
                     {
-                        new SBM_FighterSubAction()
+                        new SBM_FighterCommand()
                         {
                             SubAction = sudata,
                             Name = "Script"
@@ -176,9 +176,9 @@ namespace HSDRawViewer.GUI
                     LoadActions(su);
                     RefreshActionList();
                 }else
-                if(value.Accessor is SBM_SubActionTable SubactionTable)
+                if(value.Accessor is SBM_FighterCommandTable SubactionTable)
                 {
-                    LoadActions(SubactionTable.Subactions);
+                    LoadActions(SubactionTable.Commands);
                     RefreshActionList();
 
                     if (Node.Parent is DataNode parent)
@@ -228,6 +228,8 @@ namespace HSDRawViewer.GUI
 
             panel1.Visible = false;
 
+            DoubleBuffered = true;
+
             viewport = new ViewportControl();
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = true;
@@ -254,7 +256,7 @@ namespace HSDRawViewer.GUI
         /// 
         /// </summary>
         /// <param name="Subactions"></param>
-        private void LoadActions(SBM_FighterSubAction[] Subactions)
+        private void LoadActions(SBM_FighterCommand[] Subactions)
         {
             HashSet<HSDStruct> aHash = new HashSet<HSDStruct>();
             Queue<HSDStruct> extra = new Queue<HSDStruct>();

@@ -4,12 +4,35 @@ using System.Collections.Generic;
 using HSDRawViewer.Tools;
 using System.Globalization;
 using System;
+using Be.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     public partial class SubActionPanel : Form
     {
-        public byte[] Data { get; internal set; }
+        public byte[] Data
+        {
+            get => _data;
+            internal set
+            {
+                _data = value;
+
+                HexEditLock = true;
+
+                if (hexbox.ByteProvider != null)
+                {
+                    hexbox.ByteProvider.DeleteBytes(0, hexbox.ByteProvider.Length);
+                    hexbox.ByteProvider.InsertBytes(0, _data);
+                }
+
+                ReLoadData();
+
+                HexEditLock = false;
+
+                hexbox.Invalidate();
+            }
+        }
+        private byte[] _data;
 
         public HSDStruct Reference = null;
 
@@ -19,6 +42,10 @@ namespace HSDRawViewer.GUI.Plugins
 
         private SubactionGroup SubactionGroup = SubactionGroup.Fighter;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="AllActions"></param>
         public SubActionPanel(List<SubactionEditor.Action> AllActions)
         {
             this.AllActions = AllActions;
@@ -36,26 +63,66 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 Reference = (PointerBox.SelectedItem as SubactionEditor.Action)._struct;
             };
+
+            hexbox.ByteProvider = new DynamicByteProvider(new byte[0]);
+            hexbox.ByteProvider.Changed += (sender, args) =>
+            {
+                if (HexEditLock)
+                    return;
+
+                if (hexbox.ByteProvider.Length == Data.Length)
+                {
+                    var newdata = new byte[Data.Length];
+
+                    for (int i = 0; i < Data.Length; i++)
+                        newdata[i] = hexbox.ByteProvider.ReadByte(i);
+
+                    Data = newdata;
+                }
+                else
+                {
+                    HexEditLock = true;
+                    hexbox.ByteProvider.DeleteBytes(0, hexbox.ByteProvider.Length);
+                    hexbox.ByteProvider.InsertBytes(0, Data);
+                    HexEditLock = false;
+                }
+
+            };
         }
 
+        private bool HexEditLock = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="reference"></param>
+        /// <param name="group"></param>
         public void LoadData(byte[] b, HSDStruct reference, SubactionGroup group)
         {
             SubactionGroup = group;
 
             comboBox1.Items.Clear();
             foreach (var v in SubactionManager.GetGroup(SubactionGroup))
-            {
                 comboBox1.Items.Add(v.Name);
-            }
 
-            Data = b;
             Reference = reference;
-
             PointerBox.SelectedItem = AllActions.Find(e => e._struct == Reference);
-            
-            var sa = SubactionManager.GetSubaction(Data[0], SubactionGroup);
 
+            var sa = SubactionManager.GetSubaction(b[0], SubactionGroup);
             comboBox1.SelectedItem = sa.Name;
+            
+            Data = b;
+
+            CenterToScreen();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ReLoadData()
+        {
+            var sa = SubactionManager.GetSubaction(Data[0], SubactionGroup);
 
             var paramd = sa.GetParameters(Data);
 
@@ -73,15 +140,20 @@ namespace HSDRawViewer.GUI.Plugins
 
                 (panel1.Controls[sa.Parameters.Length - 1 - i].Controls[0] as SubactionValueEditor).SetValue(value);
             }
-            
-            CenterToScreen();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ReadjustHeight()
         {
-            Height = panel1.Controls.Count * 24 + 120;
+            Height = panel1.Controls.Count * 24 + 140;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="action"></param>
         private void CreateParamEditor(Subaction action)
         {
             if (action == null)
@@ -103,6 +175,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if (p.IsFloat)
                 {
                     SAFloatEditor editor = new SAFloatEditor();
+                    editor.Updated += Updated;
                     group.Controls.Add(editor);
                 }
                 else
@@ -116,6 +189,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if(p.Hex)
                 {
                     SAHexEditor editor = new SAHexEditor();
+                    editor.Updated += Updated;
                     editor.SetBitSize(p.BitCount);
                     group.Controls.Add(editor);
 
@@ -125,6 +199,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if (p.HasEnums)
                 {
                     SAEnumEditor editor = new SAEnumEditor();
+                    editor.Updated += Updated;
                     editor.SetEnums(p.Enums);
                     group.Controls.Add(editor);
                 }
@@ -133,12 +208,14 @@ namespace HSDRawViewer.GUI.Plugins
                     if(p.Signed)
                     {
                         SAIntEditor editor = new SAIntEditor();
+                        editor.Updated += Updated;
                         editor.SetBitSize(p.BitCount);
                         group.Controls.Add(editor);
                     }
                     else
                     {
                         SAUIntEditor editor = new SAUIntEditor();
+                        editor.Updated += Updated;
                         editor.SetBitSize(p.BitCount);
                         group.Controls.Add(editor);
                     }
@@ -150,9 +227,25 @@ namespace HSDRawViewer.GUI.Plugins
             }
 
             ReadjustHeight();
+
+            CompileAction();
         }
 
-        public byte[] CompileAction()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        public void Updated(object sender, EventArgs args)
+        {
+            CompileAction();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public void CompileAction()
         {
             var sa = SubactionManager.GetGroup(SubactionGroup)[comboBox1.SelectedIndex];
             
@@ -165,21 +258,31 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     continue;
                 }
+
                 values[i] = (int)(panel1.Controls[sa.Parameters.Length - 1 - i].Controls[0] as SubactionValueEditor).GetValue();
-                
             }
             
-            return sa.Compile(values);
+            Data = sa.Compile(values);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void comboBox1_SelectedIndexChanged(object sender, System.EventArgs e)
         {
             CreateParamEditor(SubactionManager.GetSubaction(comboBox1.SelectedItem as string, SubactionGroup));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonSave_Click(object sender, System.EventArgs e)
         {
-            Data = CompileAction();
+            CompileAction();
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -187,6 +290,8 @@ namespace HSDRawViewer.GUI.Plugins
 
     public interface SubactionValueEditor
     {
+        event EventHandler Updated;
+
         void SetBitSize(int bitCount);
 
         void SetValue(int value);
@@ -197,9 +302,16 @@ namespace HSDRawViewer.GUI.Plugins
     // Int Editor
     public class SAUIntEditor : NumericUpDown, SubactionValueEditor
     {
+        public event EventHandler Updated;
+
         public SAUIntEditor()
         {
             Dock = DockStyle.Fill;
+            ValueChanged += (sender, args) =>
+            {
+                if (Updated != null)
+                    Updated.Invoke(this, EventArgs.Empty);
+            };
         }
 
         public void SetBitSize(int bitCount)
@@ -226,7 +338,15 @@ namespace HSDRawViewer.GUI.Plugins
         public SAIntEditor()
         {
             Dock = DockStyle.Fill;
+
+            ValueChanged += (sender, args) =>
+            {
+                if (Updated != null)
+                    Updated.Invoke(this, EventArgs.Empty);
+            };
         }
+
+        public event EventHandler Updated;
 
         public void SetBitSize(int bitCount)
         {
@@ -251,6 +371,8 @@ namespace HSDRawViewer.GUI.Plugins
     {
         private float FloatValue = 0;
 
+        public event EventHandler Updated;
+
         public SAFloatEditor()
         {
             Dock = DockStyle.Fill;
@@ -261,6 +383,8 @@ namespace HSDRawViewer.GUI.Plugins
                 if (float.TryParse(Text, out val))
                 {
                     FloatValue = val;
+                    if (Updated != null)
+                        Updated.Invoke(this, EventArgs.Empty);
                 }
                 else
                 {
@@ -292,11 +416,19 @@ namespace HSDRawViewer.GUI.Plugins
     // Enum Editor
     public class SAEnumEditor : ComboBox, SubactionValueEditor
     {
+        public event EventHandler Updated;
+
         public SAEnumEditor()
         {
             Dock = DockStyle.Fill;
 
             DropDownStyle = ComboBoxStyle.DropDownList;
+
+            SelectedValueChanged += (sender, args) =>
+            {
+                if (Updated != null)
+                    Updated.Invoke(this, EventArgs.Empty);
+            };
         }
 
         public long GetValue()
@@ -331,6 +463,8 @@ namespace HSDRawViewer.GUI.Plugins
         private uint IntValue = 0;
         private long MaxValue = 0;
 
+        public event EventHandler Updated;
+        
         public SAHexEditor()
         {
             Dock = DockStyle.Fill;
@@ -341,6 +475,8 @@ namespace HSDRawViewer.GUI.Plugins
                 if(int.TryParse(Text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val) && val <= MaxValue)
                 {
                     IntValue = (uint)val;
+                    if (Updated != null)
+                        Updated.Invoke(this, EventArgs.Empty);
                 }
                 else
                 {

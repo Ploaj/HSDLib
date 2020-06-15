@@ -10,6 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Melee\Pl\SBM_FighterCommand.cs" />
+    <None Include="Melee\Pl\SBM_FighterCommandTable.cs" />
+    <None Include="Melee\Pl\SBM_FighterData.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1\System.dll</HintPath>
     </Reference>
