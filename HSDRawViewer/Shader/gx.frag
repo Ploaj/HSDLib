@@ -91,6 +91,18 @@ uniform int enableSpecular;
 
 // Non rendering system
 
+struct Light
+{
+	int useCamera;
+	vec3 position;
+	vec4 ambient;
+	vec4 diffuse;
+	float ambientPower;
+	float diffusePower;
+};
+
+uniform Light light;
+
 uniform vec3 cameraPos;
 uniform int colorOverride;
 uniform vec3 overlayColor;
@@ -300,7 +312,7 @@ vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 
     float lambert = clamp(dot(N, V), 0, 1);
 
-	return vec4(vec3(lambert), 1);
+	return vec4(vec3(lambert) * light.diffuse.rgb, 1);
 }
 
 ///
@@ -310,6 +322,8 @@ vec4 GetSpecularMaterial(vec3 V, vec3 N)
 {
 	if(enableSpecular == 0)
 		return vec4(0, 0, 0, 1);
+		
+    //spec = clamp(dot(normal, V), 0, 1);
 	
     float phong = pow(spec, shinniness);
 
@@ -433,10 +447,15 @@ void main()
 	
 
 	// calculate material
-	vec3 V = normalize(vertPosition - cameraPos);
+	vec3 V = vertPosition - cameraPos;
 
+	if(light.useCamera == 0)
+		V = light.position;
 
-	fragColor.rgb = diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb
+	V = normalize(V);
+
+	fragColor.rgb =  ambientPass.rgb * diffusePass.rgb * vec3(light.ambientPower)
+					+ diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb * vec3(light.diffusePower)
 					+ specularPass.rgb * GetSpecularMaterial(normalize(normal), V).rgb;
 
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));

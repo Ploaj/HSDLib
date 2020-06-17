@@ -143,6 +143,17 @@ namespace HSDRawViewer.Rendering
 
             GXShader.SetInt("selectedBone", jobjManager.IndexOf(jobjManager.SelectetedJOBJ));
 
+
+            // lighting
+            GXShader.SetBoolToInt("light.useCamera", jobjManager.settings.UseCameraLight);
+            GXShader.SetVector3("light.position", jobjManager.settings.LightX, jobjManager.settings.LightY, jobjManager.settings.LightZ);
+            GXShader.SetColor("light.ambient", jobjManager.settings.AmbientColor, 1);
+            GXShader.SetColor("light.diffuse", jobjManager.settings.DiffuseColor, 1);
+            GXShader.SetFloat("light.ambientPower", jobjManager.settings.AmbientPower);
+            GXShader.SetFloat("light.diffusePower", jobjManager.settings.DiffusePower);
+
+
+
             var tb = jobjManager.GetBindTransforms();
             if (tb.Length > 0)
                 GXShader.SetMatrix4x4("binds", tb);

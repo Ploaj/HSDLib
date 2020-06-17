@@ -27,6 +27,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         public DrawOrder DrawOrder => DrawOrder.First;
 
+        [Browsable(false)]
         private bool SelectDOBJ { get => (toolStripComboBox2.SelectedIndex == 1); }
 
         private Dictionary<int, string> BoneLabelMap = new Dictionary<int, string>();
@@ -92,7 +93,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         public Type[] SupportedTypes => new Type[] { typeof(HSD_JOBJ) };
-
+        
         public DataNode Node { get => _node;
             set
             {

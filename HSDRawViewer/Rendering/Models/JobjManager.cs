@@ -5,6 +5,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
+using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
@@ -41,9 +42,23 @@ namespace HSDRawViewer.Rendering
 
         public bool RenderObjects { get; set; } = true;
 
-        public bool RenderMaterials { get; set; } = true;
+        //public bool RenderMaterials { get; set; } = true;
 
         public bool RenderOrientation { get; set; } = false;
+
+        public float LightX { get; set; } = 0;
+
+        public float LightY { get; set; } = 10;
+
+        public float LightZ { get; set; } = 50;
+
+        public float AmbientPower { get; set; } = 0.5f;
+        public Color AmbientColor { get; set; } = Color.White;
+
+        public float DiffusePower { get; set; } = 1;
+        public Color DiffuseColor { get; set; } = Color.White;
+
+        public bool UseCameraLight { get; set; } = true;
     }
 
     /// <summary>

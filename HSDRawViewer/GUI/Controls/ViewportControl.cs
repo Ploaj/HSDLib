@@ -9,6 +9,9 @@ using System.Linq;
 using OpenTK.Input;
 using System.Timers;
 using HSDRawViewer.Rendering.Renderers;
+using System.ComponentModel;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace HSDRawViewer.GUI
 {
@@ -21,10 +24,13 @@ namespace HSDRawViewer.GUI
         public Camera Camera { get => _camera; }
         private Camera _camera;
 
+        [Browsable(false)]
         public bool ReadyToRender { get; internal set; } = false;
 
+        [Browsable(false)]
         public bool EnableHelpDisplay { get; set; } = true;
 
+        [Browsable(false)]
         public bool LoopPlayback { get => cbLoop.Checked; set => cbLoop.Checked = value; }
 
         public float Frame
@@ -41,6 +47,7 @@ namespace HSDRawViewer.GUI
         }
         private float _frame;
 
+        [Browsable(false)]
         public float MaxFrame
         {
             get
@@ -56,6 +63,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        [Browsable(false)]
         public bool AnimationTrackEnabled
         {
             set
@@ -74,6 +82,7 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public bool Lock2D { get; set; } = false;
 
+        [Browsable(false)]
         public bool IsAltAction
         {
             get
@@ -83,6 +92,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        [Browsable(false)]
         public bool Frozen
         {
             get
@@ -109,9 +119,16 @@ namespace HSDRawViewer.GUI
         public bool EnableCrossHair = false;
         private Vector3 CrossHair = new Vector3();
 
+        [Browsable(false)]
         public bool IsPlaying { get => (buttonPlay.Text == "Pause"); }
 
         public bool EnableFloor { get; set; } = false;
+
+        public bool EnableBack { get; set; } = true;
+
+        private bool TakeScreenShot = false;
+
+        private static Color ViewportBackColor = Color.FromArgb(50, 50, 50);
 
         public ViewportControl()
         {
@@ -162,6 +179,22 @@ namespace HSDRawViewer.GUI
 
             panel1.KeyDown += (sender, args) =>
             {
+                if (args.Alt && args.KeyCode == Keys.B)
+                {
+                    EnableBack = !EnableBack;
+                    if(EnableBack)
+                        GL.ClearColor(ViewportBackColor);
+                    else
+                        GL.ClearColor(0, 0, 0, 0);
+                }
+                if (args.Alt && args.KeyCode == Keys.G)
+                {
+                    EnableFloor = !EnableFloor;
+                }
+                if (args.Alt && args.KeyCode == Keys.P)
+                {
+                    TakeScreenShot = true;
+                }
                 if (args.Alt && args.KeyCode == Keys.R)
                 {
                     _camera.RestoreDefault();
@@ -421,6 +454,7 @@ namespace HSDRawViewer.GUI
             GL.PushAttrib(AttribMask.AllAttribBits);
 
             GL.MatrixMode(MatrixMode.Modelview);
+
             var v = _camera.MvpMatrix;
             GL.LoadMatrix(ref v);
 
@@ -434,9 +468,7 @@ namespace HSDRawViewer.GUI
             }
 
             if (EnableFloor)
-            {
                 DrawShape.Floor();
-            }
 
             foreach (var r in Drawables)
             {
@@ -465,12 +497,14 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
-            if(EnableHelpDisplay)
+            if(EnableHelpDisplay && !TakeScreenShot)
             {
                 if (IsAltAction)
                 {
                     GLTextRenderer.RenderText(_camera, "R - Reset Camera", 0, 0);
                     GLTextRenderer.RenderText(_camera, "C - Open Camera Settings", 0, 16);
+                    GLTextRenderer.RenderText(_camera, "G - Toggle Grid", 0, 32);
+                    GLTextRenderer.RenderText(_camera, "B - Toggle Backdrop", 0, 48);
                 }
                 else
                 {
@@ -479,6 +513,14 @@ namespace HSDRawViewer.GUI
             }
 
             panel1.SwapBuffers();
+
+            if (TakeScreenShot)
+            {
+                using (var bitmap = ReadDefaultFramebufferImagePixels(Width, Height, true))
+                    bitmap.Save("render.png");
+
+                TakeScreenShot = false;
+            }
         }
 
         /// <summary>
@@ -511,7 +553,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_Load(object sender, EventArgs e)
         {
-            GL.ClearColor(Color.FromArgb((0xFF << 24) | 0x333333));
+            GL.ClearColor(ViewportBackColor);
             _camera = new Camera();
             _camera.RenderWidth = panel1.Width;
             _camera.RenderHeight = panel1.Height;
@@ -631,6 +673,103 @@ namespace HSDRawViewer.GUI
 
             _camera.FarClipPlane = hsdCam.FarClip;
             _camera.NearClipPlane = hsdCam.NearClip;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="saveAlpha"></param>
+        /// <returns></returns>
+        public static Bitmap ReadDefaultFramebufferImagePixels(int width, int height, bool saveAlpha = false)
+        {
+            // RGBA unsigned byte
+            int pixelSizeInBytes = sizeof(byte) * 4;
+            int imageSizeInBytes = width * height * pixelSizeInBytes;
+
+            // TODO: Does the draw buffer need to be set?
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            byte[] pixels = GetBitmapPixels(width, height, pixelSizeInBytes, saveAlpha);
+
+            var bitmap = GetBitmap(width, height, pixels);
+
+            // Adjust for differences in the origin point.
+            bitmap.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
+            return bitmap;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="pixelSizeInBytes"></param>
+        /// <param name="saveAlpha"></param>
+        /// <returns></returns>
+        private static byte[] GetBitmapPixels(int width, int height, int pixelSizeInBytes, bool saveAlpha)
+        {
+            int imageSizeInBytes = width * height * pixelSizeInBytes;
+
+            // Read the pixels from whatever framebuffer is currently bound.
+            byte[] pixels = ReadPixels(width, height, imageSizeInBytes);
+
+            if (!saveAlpha)
+                SetAlphaToWhite(width, height, pixelSizeInBytes, pixels);
+            return pixels;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="imageSizeInBytes"></param>
+        /// <returns></returns>
+        private static byte[] ReadPixels(int width, int height, int imageSizeInBytes)
+        {
+            byte[] pixels = new byte[imageSizeInBytes];
+
+            // Read the pixels from the framebuffer. PNG uses the BGRA format. 
+            GL.ReadPixels(0, 0, width, height, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+            return pixels;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="pixelSizeInBytes"></param>
+        /// <param name="pixels"></param>
+        private static void SetAlphaToWhite(int width, int height, int pixelSizeInBytes, byte[] pixels)
+        {
+            for (int h = 0; h < height; h++)
+            {
+                for (int w = 0; w < width; w++)
+                {
+                    int pixelIndex = w + (h * width);
+                    pixels[pixelIndex * pixelSizeInBytes + 3] = 255;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="imageData"></param>
+        /// <returns></returns>
+        public static Bitmap GetBitmap(int width, int height, byte[] imageData)
+        {
+            Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp.PixelFormat);
+            Marshal.Copy(imageData, 0, bmpData.Scan0, imageData.Length);
+
+            bmp.UnlockBits(bmpData);
+            return bmp;
         }
     }
 }

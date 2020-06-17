@@ -30,7 +30,6 @@ uniform int isSkeleton;
 uniform int enableParentTransform;
 uniform mat4 singleBind;
 
-uniform vec3 cameraPos;
 uniform int hasEnvelopes;
 
 uniform BoneTransforms
@@ -42,6 +41,20 @@ uniform mat4 binds[200];
 
 uniform vec4 envelopeIndex[10];
 uniform vec4 weights[10];
+
+
+struct Light
+{
+	int useCamera;
+	vec3 position;
+	vec4 ambient;
+	vec4 diffuse;
+	float ambientPower;
+	float diffusePower;
+};
+
+uniform vec3 cameraPos;
+uniform Light light;
 
 void main()
 {
@@ -99,7 +112,13 @@ void main()
 
 	vertexColor = GX_VA_CLR0;
 	
-	vec3 V = normalize(vertPosition - cameraPos);
+	vec3 V = vertPosition - cameraPos;
+
+	if(light.useCamera == 0)
+		V = light.position;
+
+	V = normalize(V);
+
     spec = clamp(dot(normal, V), 0, 1);
 
 	gl_Position = mvp * vec4(pos.xyz, 1);
