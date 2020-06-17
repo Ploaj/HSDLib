@@ -16,8 +16,8 @@
         public short ViewportBottom { get => _s.GetInt16(0x0E); set => _s.SetInt16(0x0E, value); }
         public int ProjWidth { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
         public int ProjHeight { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
-        public HSD_WOBJ CamInfo1 { get => _s.GetReference<HSD_WOBJ>(0x18); set => _s.SetReference(0x18, value); }
-        public HSD_WOBJ CamInfo2 { get => _s.GetReference<HSD_WOBJ>(0x1C); set => _s.SetReference(0x1C, value); }
+        public HSD_WOBJ eye { get => _s.GetReference<HSD_WOBJ>(0x18); set => _s.SetReference(0x18, value); }
+        public HSD_WOBJ target { get => _s.GetReference<HSD_WOBJ>(0x1C); set => _s.SetReference(0x1C, value); }
         public float Roll { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
         public int Unknown3 { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
         public float NearClip { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }

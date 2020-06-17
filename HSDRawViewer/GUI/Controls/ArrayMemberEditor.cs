@@ -373,9 +373,11 @@ namespace HSDRawViewer.GUI
             if (elementList.SelectedItem == null)
                 return;
 
-            Items.Add(ObjectExtensions.Copy(elementList.SelectedItem));
+            var clone = ObjectExtensions.Copy(elementList.SelectedItem);
 
-            elementList.SelectedIndex = Items.Count - 1;
+            Items.Add(clone);
+            elementList.SelectedItems.Clear();
+            elementList.SelectedItem = clone;
 
             MakeChanges();
         }

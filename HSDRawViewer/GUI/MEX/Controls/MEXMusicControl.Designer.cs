@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.saveMusicButton = new System.Windows.Forms.ToolStripButton();
             this.createHPSButton = new System.Windows.Forms.ToolStripButton();
             this.musicDSPPlayer = new HSDRawViewer.GUI.Extra.DSPViewer();
             this.tabControl2 = new System.Windows.Forms.TabControl();
@@ -46,7 +45,6 @@
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveMusicButton,
             this.createHPSButton});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
@@ -54,22 +52,13 @@
             this.toolStrip2.TabIndex = 4;
             this.toolStrip2.Text = "toolStrip2";
             // 
-            // saveMusicButton
-            // 
-            this.saveMusicButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
-            this.saveMusicButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveMusicButton.Name = "saveMusicButton";
-            this.saveMusicButton.Size = new System.Drawing.Size(135, 22);
-            this.saveMusicButton.Text = "Save Music Changes";
-            this.saveMusicButton.Click += new System.EventHandler(this.saveMusicButton_Click);
-            // 
             // createHPSButton
             // 
             this.createHPSButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.createHPSButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.createHPSButton.Name = "createHPSButton";
-            this.createHPSButton.Size = new System.Drawing.Size(151, 22);
-            this.createHPSButton.Text = "Create HPS From File(s)";
+            this.createHPSButton.Size = new System.Drawing.Size(150, 22);
+            this.createHPSButton.Text = "Import Music From File";
             this.createHPSButton.Click += new System.EventHandler(this.createHPSButton_Click);
             // 
             // musicDSPPlayer
@@ -112,6 +101,7 @@
             this.musicListEditor.ItemIndexOffset = 0;
             this.musicListEditor.Location = new System.Drawing.Point(3, 3);
             this.musicListEditor.Name = "musicListEditor";
+            this.musicListEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.musicListEditor.Size = new System.Drawing.Size(337, 343);
             this.musicListEditor.TabIndex = 4;
             this.musicListEditor.DoubleClickedNode += new System.EventHandler(this.musicListEditor_DoubleClickedNode);
@@ -136,6 +126,7 @@
             this.menuPlaylistEditor.ItemIndexOffset = 0;
             this.menuPlaylistEditor.Location = new System.Drawing.Point(3, 3);
             this.menuPlaylistEditor.Name = "menuPlaylistEditor";
+            this.menuPlaylistEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.menuPlaylistEditor.Size = new System.Drawing.Size(337, 343);
             this.menuPlaylistEditor.TabIndex = 0;
             this.menuPlaylistEditor.DoubleClickedNode += new System.EventHandler(this.menuPlaylistEditor_DoubleClickedNode);
@@ -162,7 +153,6 @@
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip2;
-        private System.Windows.Forms.ToolStripButton saveMusicButton;
         private System.Windows.Forms.ToolStripButton createHPSButton;
         private Extra.DSPViewer musicDSPPlayer;
         private System.Windows.Forms.TabControl tabControl2;

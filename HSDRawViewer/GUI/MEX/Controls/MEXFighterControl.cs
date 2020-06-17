@@ -292,16 +292,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveFightersButton_Click(object sender, EventArgs e)
-        {
-            SaveData(MexData);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="s"></param>
         /// <param name="e"></param>
         private void propertyGrid2_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.saveFightersButton = new System.Windows.Forms.ToolStripButton();
+            this.importPlCoButton = new System.Windows.Forms.ToolStripButton();
             this.exportFighter = new System.Windows.Forms.ToolStripButton();
             this.importFighter = new System.Windows.Forms.ToolStripButton();
             this.cloneButton = new System.Windows.Forms.ToolStripButton();
@@ -44,7 +44,6 @@
             this.buttonCopyMoveLogic = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.boneTablePropertyGrid = new System.Windows.Forms.PropertyGrid();
-            this.importPlCoButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -57,7 +56,6 @@
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importPlCoButton,
-            this.saveFightersButton,
             this.exportFighter,
             this.importFighter,
             this.cloneButton,
@@ -68,14 +66,14 @@
             this.toolStrip1.TabIndex = 5;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // saveFightersButton
+            // importPlCoButton
             // 
-            this.saveFightersButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
-            this.saveFightersButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveFightersButton.Name = "saveFightersButton";
-            this.saveFightersButton.Size = new System.Drawing.Size(140, 22);
-            this.saveFightersButton.Text = "Save Fighter Changes";
-            this.saveFightersButton.Click += new System.EventHandler(this.saveFightersButton_Click);
+            this.importPlCoButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
+            this.importPlCoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.importPlCoButton.Name = "importPlCoButton";
+            this.importPlCoButton.Size = new System.Drawing.Size(111, 22);
+            this.importPlCoButton.Text = "Import PlCo.dat";
+            this.importPlCoButton.Click += new System.EventHandler(this.plcoButton_Click);
             // 
             // exportFighter
             // 
@@ -222,15 +220,6 @@
             this.boneTablePropertyGrid.Size = new System.Drawing.Size(512, 429);
             this.boneTablePropertyGrid.TabIndex = 0;
             // 
-            // importPlCoButton
-            // 
-            this.importPlCoButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
-            this.importPlCoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.importPlCoButton.Name = "importPlCoButton";
-            this.importPlCoButton.Size = new System.Drawing.Size(111, 22);
-            this.importPlCoButton.Text = "Import PlCo.dat";
-            this.importPlCoButton.Click += new System.EventHandler(this.plcoButton_Click);
-            // 
             // MEXFighterControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -254,7 +243,6 @@
 
         #endregion
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton saveFightersButton;
         private System.Windows.Forms.ToolStripButton exportFighter;
         private System.Windows.Forms.ToolStripButton importFighter;
         private System.Windows.Forms.ToolStripButton cloneButton;

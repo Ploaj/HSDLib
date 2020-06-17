@@ -170,16 +170,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveEffectButton_Click(object sender, EventArgs e)
-        {
-            SaveData(MexData);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="e"></param>
         private void effectEditor_OnItemRemove(RemovedItemEventArgs e)
         {

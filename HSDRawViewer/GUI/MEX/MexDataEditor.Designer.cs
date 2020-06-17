@@ -72,6 +72,7 @@
             // 
             this.tabPageStage.Location = new System.Drawing.Point(4, 22);
             this.tabPageStage.Name = "tabPageStage";
+            this.tabPageStage.Padding = new System.Windows.Forms.Padding(3);
             this.tabPageStage.Size = new System.Drawing.Size(791, 282);
             this.tabPageStage.TabIndex = 6;
             this.tabPageStage.Text = "Stages";

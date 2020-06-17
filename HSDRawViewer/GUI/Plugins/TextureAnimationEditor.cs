@@ -5,9 +5,7 @@ using HSDRaw.Tools;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -151,7 +149,7 @@ namespace HSDRawViewer.GUI.Plugins
             BitmapList.ColorDepth = ColorDepth.Depth32Bit;
             textureList.LargeImageList = BitmapList;
 
-            toolStripComboBox1.SelectedIndex = 4;
+            //toolStripComboBox1.SelectedIndex = 4;
             
             FormClosing += (sender, args) =>
             {

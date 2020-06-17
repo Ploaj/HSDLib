@@ -664,11 +664,10 @@ namespace HSDRawViewer.GUI
 
             _camera.RenderWidth = hsdCam.ViewportRight;
             _camera.RenderHeight = hsdCam.ViewportBottom;
-
-            _camera.RotationXRadians = 0;
-            _camera.RotationYRadians = 0;
-
-            _camera.Translation = new Vector3(-hsdCam.CamInfo1.V1, -hsdCam.CamInfo1.V2, -hsdCam.CamInfo1.V3);
+            
+            _camera.SetLookAt(new Vector3(hsdCam.eye.V1, hsdCam.eye.V2, hsdCam.eye.V3),
+                new Vector3(hsdCam.target.V1, hsdCam.target.V2, hsdCam.target.V3));
+            
             _camera.FovRadians = hsdCam.FieldOfView;
 
             _camera.FarClipPlane = hsdCam.FarClip;

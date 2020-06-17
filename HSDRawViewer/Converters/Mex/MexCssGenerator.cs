@@ -143,9 +143,12 @@ namespace HSDRawViewer.Converters
                 int cspIndex = 0;
                 while (true)
                 {
-                    var key = ico.FighterExternalID + (cspIndex * stride);
-                    if (ico.FighterExternalID > 0x13)
-                        key = ico.FighterExternalID + (cspIndex * stride) - 1;
+                    var id = ico.FighterExternalID;
+
+                    if (id > 0x13)
+                        id -= 1;
+
+                    var key = id + (cspIndex * stride);
 
                     var k = cspKeys.Find(e => e.Frame == key);
 

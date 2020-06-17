@@ -102,6 +102,9 @@ namespace HSDRawViewer.GUI.MEX
             EffectControl.SaveData(_data);
             MenuControl.SaveData(_data);
             MusicControl.SaveData(_data);
+
+            if (MessageBox.Show("Save File", "Save All Changes to Disk", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+                MainForm.Instance.SaveDAT();
         }
         
         /// <summary>

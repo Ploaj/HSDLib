@@ -229,17 +229,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         }
 
         #region Events
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveItemButton_Click(object sender, EventArgs e)
-        {
-            SaveData(MexData);
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>

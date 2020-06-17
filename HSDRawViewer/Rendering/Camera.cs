@@ -466,5 +466,21 @@ namespace HSDRawViewer.Rendering
         {
             FrameBoundingSphere(boundingSphere.Xyz, boundingSphere.W, 0);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="view"></param>
+        public void SetLookAt(Vector3 eye, Vector3 interest)
+        {
+            Translation = -eye;
+
+            Vector3 start = Vector3.UnitY;
+            Vector3 end = (interest - eye).Normalized();
+
+            rotationXRadians = (float)Math.Atan2(end.Z - start.Z, end.Y - start.Y);
+
+            RotationYRadians = (float)Math.Acos(Vector3.Dot(new Vector3(rotationXRadians, 0, 0), end));
+        }
     }
 }

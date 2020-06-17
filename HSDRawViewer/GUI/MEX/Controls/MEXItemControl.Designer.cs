@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.toolStrip5 = new System.Windows.Forms.ToolStrip();
-            this.saveItemButton = new System.Windows.Forms.ToolStripButton();
             this.mexItemCloneButton = new System.Windows.Forms.ToolStripButton();
             this.itemExportButton = new System.Windows.Forms.ToolStripButton();
             this.cpyLogicToClipButton = new System.Windows.Forms.ToolStripButton();
@@ -56,7 +55,6 @@
             // toolStrip5
             // 
             this.toolStrip5.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveItemButton,
             this.mexItemCloneButton,
             this.itemExportButton,
             this.cpyLogicToClipButton});
@@ -65,15 +63,6 @@
             this.toolStrip5.Size = new System.Drawing.Size(720, 25);
             this.toolStrip5.TabIndex = 1;
             this.toolStrip5.Text = "toolStrip5";
-            // 
-            // saveItemButton
-            // 
-            this.saveItemButton.Image = global::HSDRawViewer.Properties.Resources.ico_save;
-            this.saveItemButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.saveItemButton.Name = "saveItemButton";
-            this.saveItemButton.Size = new System.Drawing.Size(127, 22);
-            this.saveItemButton.Text = "Save Item Changes";
-            this.saveItemButton.Click += new System.EventHandler(this.saveItemButton_Click);
             // 
             // mexItemCloneButton
             // 
@@ -140,6 +129,7 @@
             this.commonItemEditor.ItemIndexOffset = 0;
             this.commonItemEditor.Location = new System.Drawing.Point(3, 3);
             this.commonItemEditor.Name = "commonItemEditor";
+            this.commonItemEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.commonItemEditor.Size = new System.Drawing.Size(706, 343);
             this.commonItemEditor.TabIndex = 1;
             // 
@@ -149,7 +139,7 @@
             this.tabPageItemFighter.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemFighter.Name = "tabPageItemFighter";
             this.tabPageItemFighter.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemFighter.Size = new System.Drawing.Size(777, 225);
+            this.tabPageItemFighter.Size = new System.Drawing.Size(712, 349);
             this.tabPageItemFighter.TabIndex = 1;
             this.tabPageItemFighter.Text = "Fighter";
             this.tabPageItemFighter.UseVisualStyleBackColor = true;
@@ -167,7 +157,8 @@
             this.fighterItemEditor.ItemIndexOffset = 0;
             this.fighterItemEditor.Location = new System.Drawing.Point(3, 3);
             this.fighterItemEditor.Name = "fighterItemEditor";
-            this.fighterItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.fighterItemEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            this.fighterItemEditor.Size = new System.Drawing.Size(706, 343);
             this.fighterItemEditor.TabIndex = 2;
             // 
             // tabPageItemPokemon
@@ -176,7 +167,7 @@
             this.tabPageItemPokemon.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemPokemon.Name = "tabPageItemPokemon";
             this.tabPageItemPokemon.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemPokemon.Size = new System.Drawing.Size(777, 225);
+            this.tabPageItemPokemon.Size = new System.Drawing.Size(712, 349);
             this.tabPageItemPokemon.TabIndex = 2;
             this.tabPageItemPokemon.Text = "Pokemon";
             this.tabPageItemPokemon.UseVisualStyleBackColor = true;
@@ -194,7 +185,8 @@
             this.pokemonItemEditor.ItemIndexOffset = 0;
             this.pokemonItemEditor.Location = new System.Drawing.Point(3, 3);
             this.pokemonItemEditor.Name = "pokemonItemEditor";
-            this.pokemonItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.pokemonItemEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            this.pokemonItemEditor.Size = new System.Drawing.Size(706, 343);
             this.pokemonItemEditor.TabIndex = 2;
             // 
             // tabPageItemStages
@@ -203,7 +195,7 @@
             this.tabPageItemStages.Location = new System.Drawing.Point(4, 22);
             this.tabPageItemStages.Name = "tabPageItemStages";
             this.tabPageItemStages.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageItemStages.Size = new System.Drawing.Size(777, 225);
+            this.tabPageItemStages.Size = new System.Drawing.Size(712, 349);
             this.tabPageItemStages.TabIndex = 3;
             this.tabPageItemStages.Text = "Stages";
             this.tabPageItemStages.UseVisualStyleBackColor = true;
@@ -221,7 +213,8 @@
             this.stageItemEditor.ItemIndexOffset = 0;
             this.stageItemEditor.Location = new System.Drawing.Point(3, 3);
             this.stageItemEditor.Name = "stageItemEditor";
-            this.stageItemEditor.Size = new System.Drawing.Size(771, 219);
+            this.stageItemEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            this.stageItemEditor.Size = new System.Drawing.Size(706, 343);
             this.stageItemEditor.TabIndex = 2;
             // 
             // tabPageMexItems
@@ -244,6 +237,7 @@
             this.mexItemEditor.ItemIndexOffset = 0;
             this.mexItemEditor.Location = new System.Drawing.Point(3, 3);
             this.mexItemEditor.Name = "mexItemEditor";
+            this.mexItemEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.mexItemEditor.Size = new System.Drawing.Size(706, 343);
             this.mexItemEditor.TabIndex = 3;
             // 
@@ -271,7 +265,6 @@
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip5;
-        private System.Windows.Forms.ToolStripButton saveItemButton;
         private System.Windows.Forms.ToolStripButton mexItemCloneButton;
         private System.Windows.Forms.ToolStripButton itemExportButton;
         private System.Windows.Forms.ToolStripButton cpyLogicToClipButton;

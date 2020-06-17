@@ -168,16 +168,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void saveMusicButton_Click(object sender, EventArgs e)
-        {
-            SaveData(MexData);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void createHPSButton_Click(object sender, EventArgs e)
         {
             var fs = FileIO.OpenFiles(DSP.SupportedImportFilter);
