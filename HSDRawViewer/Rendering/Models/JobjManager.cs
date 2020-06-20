@@ -46,6 +46,8 @@ namespace HSDRawViewer.Rendering
 
         public bool RenderOrientation { get; set; } = false;
 
+        public bool UseCameraLight { get; set; } = true;
+
         public float LightX { get; set; } = 0;
 
         public float LightY { get; set; } = 10;
@@ -57,8 +59,6 @@ namespace HSDRawViewer.Rendering
 
         public float DiffusePower { get; set; } = 1;
         public Color DiffuseColor { get; set; } = Color.White;
-
-        public bool UseCameraLight { get; set; } = true;
     }
 
     /// <summary>

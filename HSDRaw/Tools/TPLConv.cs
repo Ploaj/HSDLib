@@ -963,8 +963,7 @@ namespace HSDRaw.Tools
         public static byte[] fromCMP(byte[] tpl, int width, int height)
         {
             uint[] output = new uint[width * height];
-            ushort[] c = new ushort[4];
-            int[] pix = new int[4];
+            int[] c = new int[4];
             int inp = 0;
 
             for (int y = 0; y < height; y++)
@@ -983,17 +982,32 @@ namespace HSDRaw.Tools
 
                     int off = (8 * x1) + (16 * y1) + (32 * x2) + (4 * ww * y2);
 
-                    c[0] = Shared.Swap(BitConverter.ToUInt16(tpl, off));
-                    c[1] = Shared.Swap(BitConverter.ToUInt16(tpl, off + 2));
+                    c[0] = MakeColor565(tpl[off + 1] & 0xFF, tpl[off + 0] & 0xFF);
+                    c[1] = MakeColor565(tpl[off + 3] & 0xFF, tpl[off + 2] & 0xFF);
 
-                    if (c[0] > c[1])
+                    var mode = ((((tpl[off] & 0xFF) << 8) | (tpl[off + 1] & 0xFF)) > (((tpl[off + 2] & 0xFF) << 8) | (tpl[off + 3] & 0xFF)));
+
+                    if (mode)
                     {
-                        c[2] = (ushort)avg(2, 1, c[0], c[1]);
-                        c[3] = (ushort)avg(1, 2, c[0], c[1]);
+                        int r = (2 * GetRed(c[0]) + GetRed(c[1])) / 3;
+                        int g = (2 * GetGreen(c[0]) + GetGreen(c[1])) / 3;
+                        int b = (2 * GetBlue(c[0]) + GetBlue(c[1])) / 3;
+
+                        c[2] = (0xFF << 24) | (r << 16) | (g << 8) | (b);
+
+                        r = (2 * GetRed(c[1]) + GetRed(c[0])) / 3;
+                        g = (2 * GetGreen(c[1]) + GetGreen(c[0])) / 3;
+                        b = (2 * GetBlue(c[1]) + GetBlue(c[0])) / 3;
+
+                        c[3] = (0xFF << 24) | (r << 16) | (g << 8) | (b);
                     }
                     else
                     {
-                        c[2] = (ushort)avg(1, 1, c[0], c[1]);
+                        int r = (GetRed(c[0]) + GetRed(c[1])) / 2;
+                        int g = (GetGreen(c[0]) + GetGreen(c[1])) / 2;
+                        int b = (GetBlue(c[0]) + GetBlue(c[1])) / 2;
+
+                        c[2] = (0xFF << 24) | (r << 16) | (g << 8) | (b);
                         c[3] = 0;
                     }
 
@@ -1001,14 +1015,11 @@ namespace HSDRaw.Tools
 
                     int ix = x0 + (4 * y0);
                     int raw = c[(pixel >> (30 - (2 * ix))) & 0x03];
+                    
+                    byte alpha = 0xff;
+                    if (((pixel >> (30 - (2 * ix))) & 0x03) == 3 && !mode) alpha = 0x00;
 
-                    pix[0] = (raw >> 8) & 0xf8;
-                    pix[1] = (raw >> 3) & 0xf8;
-                    pix[2] = (raw << 3) & 0xf8;
-                    pix[3] = 0xff;
-                    if (((pixel >> (30 - (2 * ix))) & 0x03) == 3 && c[0] <= c[1]) pix[3] = 0x00;
-
-                    output[inp] = (uint)((pix[0] << 16) | (pix[1] << 8) | (pix[2] << 0) | (pix[3] << 24));
+                    output[inp] = (uint)((raw & 0x00FFFFFF) | (alpha << 24));
                     inp++;
                 }
             }
@@ -1016,13 +1027,77 @@ namespace HSDRaw.Tools
             return Shared.UIntArrayToByteArray(output);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static int GetAlpha(int c)
+        {
+            return (c >> 24) >> 0xFF;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static int GetRed(int c)
+        {
+            return (c & 0x00FF0000) >> 16;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static int GetGreen(int c)
+        {
+            return (c & 0x0000FF00) >> 8;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static int GetBlue(int c)
+        {
+            return (c & 0x000000FF);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="b1"></param>
+        /// <param name="b2"></param>
+        /// <returns></returns>
+        private static int MakeColor565(int b1, int b2)
+        {
+
+            int bt = (b2 << 8) | b1;
+
+            int a = 255;
+            int r = (bt >> 11) & 0x1F;
+            int g = (bt >> 5) & 0x3F;
+            int b = (bt) & 0x1F;
+
+            r = (r << 3) | (r >> 2);
+            g = (g << 2) | (g >> 4);
+            b = (b << 3) | (b >> 2);
+
+            return ((int)a << 24) | ((int)r << 16) | ((int)g << 8) | (int)b;
+
+        }
+
         #endregion
-        
+
         public static byte[] ToCMP(byte[] data, int width, int height)
         {
             byte[] output = new byte[width * height / 2];
 
-            int off1 = 0;
+            int off = 0;
             for (int y = 0; y < height; y += 4)
             {
                 for (int x = 0; x < width; x += 4)
@@ -1037,7 +1112,7 @@ namespace HSDRaw.Tools
                     int y1 = (y >> 2) & 0x01;
                     int y2 = y >> 3;
 
-                    int off = (8 * x1) + (16 * y1) + (32 * x2) + (4 * ww * y2);
+                    int off1 = (8 * x1) + (16 * y1) + (32 * x2) + (4 * ww * y2);
 
                     output[off + 0] = data[off1 + 1];
                     output[off + 1] = data[off1 + 0];
@@ -1048,7 +1123,7 @@ namespace HSDRaw.Tools
                     {
                         output[off + 4 + i] = SwapBits(data[off1 + 4 + i]);
                     }
-                    off1 += 8;
+                    off += 8;
                 }
             }
             return output;

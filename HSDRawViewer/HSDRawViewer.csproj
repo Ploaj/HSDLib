@@ -153,6 +153,7 @@
     <Compile Include="Converters\Mex\MexMenuAnimationGenerator.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
+    <Compile Include="Converters\SBM\CSPMaker.cs" />
     <Compile Include="Converters\SBM\ModeltoCollData.cs" />
     <Compile Include="Converters\Animation\MOTLoader.cs" />
     <Compile Include="Converters\OutlineGenerator.cs" />

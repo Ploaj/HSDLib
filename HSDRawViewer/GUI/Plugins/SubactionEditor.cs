@@ -189,6 +189,8 @@ namespace HSDRawViewer.GUI
 
                             if (plDat.Hurtboxes != null)
                                 Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
+                            
+                            ECB = plDat.EnvironmentCollision;
 
                             if (plDat.ModelLookupTables != null)
                             {
@@ -214,6 +216,8 @@ namespace HSDRawViewer.GUI
         }
 
         private DataNode _node;
+
+        private SBM_EnvironmentCollision ECB = null;
 
         private readonly List<Action> AllScripts = new List<Action>();
 
@@ -950,6 +954,8 @@ namespace HSDRawViewer.GUI
 
         private List<int> HiddenDOBJIndices = new List<int>();
 
+        private string AnimationName = "";
+
         /// <summary>
         /// 
         /// </summary>
@@ -1049,14 +1055,17 @@ namespace HSDRawViewer.GUI
 
             JOBJManager.settings.RenderBones = bonesToolStripMenuItem.Checked;
                 
-            if (SubactionProcess.CharacterInvisibility)
+            // character invisibility
+            if (SubactionProcess.CharacterInvisibility || !modelToolStripMenuItem.Checked)
                 JOBJManager.UpdateNoRender();
             else
                 JOBJManager.Render(cam);
 
+            // hurtbox collision
             if (hurtboxesToolStripMenuItem.Checked)
                 HurtboxRenderer.Render(JOBJManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
             
+            // hitbox collision
             foreach (var hb in SubactionProcess.Hitboxes)
             {
                 var boneID = hb.BoneID;
@@ -1094,6 +1103,61 @@ namespace HSDRawViewer.GUI
                 }
             }
 
+            // environment collision
+            if (ECB != null)
+            {
+                var topN = JOBJManager.GetWorldTransform(1).ExtractTranslation();
+
+                var bone1 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone1));
+                var bone2 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone2));
+                var bone3 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone3));
+                var bone4 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone4));
+                var bone5 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone5));
+                var bone6 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone6));
+
+                var minx = float.MaxValue;
+                var miny = float.MaxValue;
+                var maxx = float.MinValue;
+                var maxy = float.MinValue;
+
+                foreach (var p in new Vector3[] { bone1, bone2, bone3, bone4, bone5, bone6 })
+                {
+                    minx = Math.Min(minx, p.Z);
+                    maxx = Math.Max(maxx, p.Z);
+                    miny = Math.Min(miny, p.Y);
+                    maxy = Math.Max(maxy, p.Y);
+                }
+
+                // ecb diamond
+                if (eCBToolStripMenuItem.Checked)
+                {
+                    DrawShape.DrawECB(topN, minx, miny, maxx, maxy, groundECH.Checked);
+                }
+
+                // ledge grav
+                if (ledgeGrabBoxToolStripMenuItem.Checked)
+                {
+                    var correct = Math.Abs(minx - maxx) / 2;
+
+                    //behind
+                    DrawShape.DrawLedgeBox(
+                        topN.Z,
+                        topN.Y + ECB.VerticalOffsetFromTop - ECB.VerticalScale / 2,
+                        topN.Z - (correct + ECB.HorizontalScale),
+                        topN.Y + ECB.VerticalOffsetFromTop + ECB.VerticalScale / 2,
+                        Color.Red);
+
+                    // in front
+                    DrawShape.DrawLedgeBox(
+                        topN.Z,
+                        topN.Y + ECB.VerticalOffsetFromTop - ECB.VerticalScale / 2,
+                        topN.Z + correct + ECB.HorizontalScale,
+                        topN.Y + ECB.VerticalOffsetFromTop + ECB.VerticalScale / 2,
+                        Color.Blue);
+                }
+            }
+
+            // throw dummy
             if(throwModelToolStripMenuItem.Checked && !SubactionProcess.ThrownFighter && ThrowDummyManager.JointCount > 0)
             {
                 if(viewport.Frame < ThrowDummyManager.Animation.FrameCount)
@@ -1135,6 +1199,9 @@ namespace HSDRawViewer.GUI
 
                 ThrowDummyManager.CleanupRendering();
                 ThrowDummyManager = new JOBJManager();
+
+                AnimationName = name;
+
                 if (name.Contains("Throw") && !name.Contains("Taro"))
                 {
                     // find thrown anim

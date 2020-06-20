@@ -312,7 +312,7 @@ vec4 GetDiffuseMaterial(vec3 V, vec3 N)
 
     float lambert = clamp(dot(N, V), 0, 1);
 
-	return vec4(vec3(lambert) * light.diffuse.rgb, 1);
+	return vec4(vec3(lambert), 1);
 }
 
 ///
@@ -454,8 +454,8 @@ void main()
 
 	V = normalize(V);
 
-	fragColor.rgb =  ambientPass.rgb * diffusePass.rgb * vec3(light.ambientPower)
-					+ diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb * vec3(light.diffusePower)
+	fragColor.rgb =  ambientPass.rgb * diffusePass.rgb * light.ambient.rgb * vec3(light.ambientPower)
+					+ diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb * light.diffuse.rgb * vec3(light.diffusePower)
 					+ specularPass.rgb * GetSpecularMaterial(normalize(normal), V).rgb;
 
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));

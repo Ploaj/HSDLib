@@ -517,7 +517,10 @@ namespace HSDRawViewer.GUI
             if (TakeScreenShot)
             {
                 using (var bitmap = ReadDefaultFramebufferImagePixels(Width, Height, true))
+                {
+                    //Converters.SBM.CSPMaker.MakeCSP(bitmap);
                     bitmap.Save("render.png");
+                }
 
                 TakeScreenShot = false;
             }

@@ -43,7 +43,7 @@ namespace HSDRaw.Melee.Pl
 
         public HSDAccessor Unknown0x40 { get => _s.GetReference<HSDAccessor>(0x40); set => _s.SetReference(0x40, value); }
 
-        public SBM_LedgeGrabBox LedgeGrabBox { get => _s.GetReference<SBM_LedgeGrabBox>(0x44); set => _s.SetReference(0x44, value); }
+        public SBM_EnvironmentCollision EnvironmentCollision { get => _s.GetReference<SBM_EnvironmentCollision>(0x44); set => _s.SetReference(0x44, value); }
 
         public SBM_ArticlePointer Articles { get => _s.GetReference<SBM_ArticlePointer>(0x48); set => _s.SetReference(0x48, value); }
 

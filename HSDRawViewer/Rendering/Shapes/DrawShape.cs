@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace HSDRawViewer.Rendering
@@ -132,6 +133,108 @@ namespace HSDRawViewer.Rendering
             GL.Vertex3(x2, y2, z);
             GL.Vertex3(x2, y, z);
             GL.Vertex3(x, y, z);
+
+            GL.End();
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
+        public static void DrawLedgeBox(float x, float y, float x2, float y2, Color color)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+            GL.Disable(EnableCap.DepthTest);
+
+            GL.LineWidth(1);
+            GL.Color3(color);
+            GL.Begin(PrimitiveType.LineLoop);
+
+            GL.Vertex3(0, y2, x);
+            GL.Vertex3(0, y2, x2);
+            GL.Vertex3(0, y, x2);
+            GL.Vertex3(0, y, x);
+
+            GL.End();
+
+            GL.PopAttrib();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p3"></param>
+        /// <param name="p4"></param>
+        /// <param name="thickness"></param>
+        /// <param name="c"></param>
+        public static void DrawECB(Vector3 topN, float minx, float miny, float maxx, float maxy, bool grounded)
+        {
+            if (grounded)
+                miny = topN.Y;
+
+            var midx = Math.Abs(minx - maxx) / 2;
+            var midy = (miny + maxy) / 2;
+
+            GL.PushAttrib(AttribMask.DepthBufferBit);
+            GL.Disable(EnableCap.DepthTest);
+
+            Line(topN, topN + new Vector3(0, 2, 0), Vector4.One, 3);
+            Line(topN, topN + new Vector3(0, -2, 0), Vector4.One, 3);
+            Line(topN, topN + new Vector3(0, 0, 2), Vector4.One, 3);
+            Line(topN, topN + new Vector3(0, 0, -2), Vector4.One, 3);
+            
+            DrawDiamond(
+                new Vector3(0, midy, topN.Z - midx),
+                new Vector3(0, maxy, topN.Z), 
+                new Vector3(0, midy, topN.Z + midx),
+                new Vector3(0, miny, topN.Z),
+                1,
+                Color.Orange);
+
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="c"></param>
+        public static void DrawDiamond(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float thickness, Color c)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            GL.Color4(c);
+            GL.Begin(PrimitiveType.Quads);
+
+            GL.Vertex3(p1);
+            GL.Vertex3(p2);
+            GL.Vertex3(p3);
+            GL.Vertex3(p4);
+
+            GL.End();
+
+            GL.LineWidth(thickness);
+            GL.Color4(1f, 1f, 1f, 1f);
+            GL.Begin(PrimitiveType.LineLoop);
+
+            GL.Vertex3(p1);
+            GL.Vertex3(p2);
+            GL.Vertex3(p3);
+            GL.Vertex3(p4);
 
             GL.End();
             GL.PopAttrib();
