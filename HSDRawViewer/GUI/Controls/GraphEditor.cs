@@ -26,7 +26,8 @@ namespace HSDRawViewer.GUI.Controls
                 set
                 {
                     key.Frame = value;
-                    slopekey.Frame = value;
+                    if(slopekey != null)
+                        slopekey.Frame = value;
                 }
             }
 

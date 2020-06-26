@@ -27,7 +27,7 @@ namespace HSDRawViewer.ContextMenus
             MenuItems.Add(Export);
 
 
-            MenuItem ImportSSF = new MenuItem("Import From SSF");
+            MenuItem ImportSSF = new MenuItem("Import SSF");
             ImportSSF.Click += (sender, args) =>
             {
                 using (OpenFileDialog sd = new OpenFileDialog())
@@ -35,12 +35,17 @@ namespace HSDRawViewer.ContextMenus
                     sd.Filter = "Smash Stage File (.ssf)|*.ssf";
 
                     if (sd.ShowDialog() == DialogResult.OK)
-                    {
-                        Converters.Melee.SSFConverter.ImportCollDataFromSSF(MainForm.SelectedDataNode.Accessor as SBM_Coll_Data, SSF.Open(sd.FileName));
-                    }
+                        SSFConverter.ImportCollDataFromSSF(MainForm.SelectedDataNode.Accessor as SBM_Coll_Data, SSF.Open(sd.FileName));
                 }
             };
             MenuItems.Add(ImportSSF);
+
+            MenuItem ExportSSF = new MenuItem("Export SSF");
+            ExportSSF.Click += (sender, args) =>
+            {
+                SSFConverter.ExportCollDataToSSF(MainForm.SelectedDataNode.Accessor as SBM_Coll_Data);
+            };
+            MenuItems.Add(ExportSSF);
         }
     }
 }

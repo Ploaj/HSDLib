@@ -8,9 +8,9 @@ namespace HSDRawViewer.Converters.Melee
     [Flags]
     public enum SSFLineFlag
     {
-        RightLedge,
-        LeftLedge,
-        DropThrough
+        RightLedge = 1,
+        LeftLedge = 2,
+        DropThrough = 4
     }
 
     [Serializable]

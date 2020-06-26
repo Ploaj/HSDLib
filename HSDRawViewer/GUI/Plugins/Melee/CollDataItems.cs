@@ -6,9 +6,91 @@ using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-
     public class CollDataBuilder
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="CollData"></param>
+        /// <param name="LineGroups"></param>
+        /// <param name="Lines"></param>
+        public static void LoadCollData(SBM_Coll_Data CollData, IList<CollLineGroup> LineGroups, IList<CollLine> Lines)
+        {
+            // Load Vertices
+            Dictionary<int, CollVertex> indexToVertex = new Dictionary<int, CollVertex>();
+            Dictionary<CollVertex, int> vertexToIndex = new Dictionary<CollVertex, int>();
+            List<Vector2> v = new List<Vector2>();
+            foreach (var ve in CollData.Vertices)
+            {
+                var vert = new CollVertex(ve.X, ve.Y);
+                indexToVertex.Add(v.Count, vert);
+                vertexToIndex.Add(vert, v.Count);
+                v.Add(new Vector2(ve.X, ve.Y));
+            }
+
+            // Frame Viewport
+            //PluginManager.GetCommonViewport().FrameView(v);
+            
+            var links = CollData.Links;
+            var verts = CollData.Vertices;
+            var groups = CollData.LineGroups.ToList();
+
+            //List<Line> Lines = new List<Line>();
+
+            for (int lineIndex = 0; lineIndex < links.Length; lineIndex++)
+            {
+                var line = links[lineIndex];
+                Lines.Add(new CollLine()
+                {
+                    v1 = indexToVertex[line.VertexIndex1],
+                    v2 = indexToVertex[line.VertexIndex2],
+                    Material = line.Material,
+                    Flag = line.Flag,
+                    CollisionFlag = line.CollisionFlag,
+                    DynamicCollision = lineIndex >= CollData.DynamicLinksOffset && lineIndex < CollData.DynamicLinksOffset + CollData.DynamicLinksCount
+                });
+            }
+
+            for (int lineIndex = 0; lineIndex < links.Length; lineIndex++)
+            {
+                var line = links[lineIndex];
+                var l = Lines[lineIndex];
+
+                if (line.NextLineAltGroup != -1)
+                    l.AltNext = Lines[line.NextLineAltGroup];
+
+                if (line.PreviousLineAltGroup != -1)
+                    l.AltPrevious = Lines[line.PreviousLineAltGroup];
+            }
+
+            foreach (var group in groups)
+            {
+                // Create group and range
+                var lineGroup = new CollLineGroup();
+                lineGroup.Range = new Vector4(group.XMin, group.YMin, group.XMax, group.YMax);
+
+                // add vertices
+                var index = 0;
+                foreach (var l in Lines)
+                {
+                    // if the vertex belongs to this group
+                    if ((vertexToIndex[l.v1] >= group.VertexStart && vertexToIndex[l.v1] < group.VertexStart + group.VertexCount) ||
+                        (vertexToIndex[l.v2] >= group.VertexStart && vertexToIndex[l.v2] < group.VertexStart + group.VertexCount))
+                        l.Group = lineGroup;
+
+                    // if the line is indexed here
+                    /*if ((index >= group.TopLineIndex && index < group.TopLineIndex + group.TopLineCount) ||
+                        (index >= group.BottomLineIndex && index < group.BottomLineIndex + group.BottomLineCount) ||
+                        (index >= group.LeftLineIndex && index < group.LeftLineIndex + group.LeftLineCount) ||
+                        (index >= group.RightLineIndex && index < group.RightLineIndex + group.RightLineCount))
+                        l.Group = lineGroup;*/
+
+                    index++;
+                }
+
+                LineGroups.Add(lineGroup);
+            }
+        }
         /// <summary>
         /// Dumps all the collision information in the <see cref="SBM_Coll_Data"/> structure
         /// </summary>
