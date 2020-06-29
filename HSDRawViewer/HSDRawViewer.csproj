@@ -297,6 +297,12 @@
     <Compile Include="GUI\MEX\Controls\MEXMusicControl.Designer.cs">
       <DependentUpon>MEXMusicControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXSemControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXSemControl.Designer.cs">
+      <DependentUpon>MEXSemControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\MEX\Controls\MEXStageControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -554,6 +560,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXMusicControl.resx">
       <DependentUpon>MEXMusicControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MEX\Controls\MEXSemControl.resx">
+      <DependentUpon>MEXSemControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXStageControl.resx">
       <DependentUpon>MEXStageControl.cs</DependentUpon>

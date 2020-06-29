@@ -17,6 +17,7 @@ namespace HSDRawViewer.GUI.MEX
         public MEXEffectControl EffectControl;
         public MEXMusicControl MusicControl;
         public MEXMenuControl MenuControl;
+        public MEXSemControl SoundControl;
 
         public MexDataEditor()
         {
@@ -46,7 +47,11 @@ namespace HSDRawViewer.GUI.MEX
             MusicControl = new MEXMusicControl();
             MusicControl.Dock = DockStyle.Fill;
             mainTabControl.TabPages[5].Controls.Add(MusicControl);
-            
+
+            SoundControl = new MEXSemControl();
+            SoundControl.Dock = DockStyle.Fill;
+            mainTabControl.TabPages[6].Controls.Add(SoundControl);
+
         }
 
         public DockState DefaultDockState => DockState.Document;
@@ -87,6 +92,9 @@ namespace HSDRawViewer.GUI.MEX
 
             // Stages
             StageControl.LoadData(_data);
+
+            // Stages
+            SoundControl.LoadData(_data);
         }
         
         /// <summary>
@@ -102,6 +110,7 @@ namespace HSDRawViewer.GUI.MEX
             EffectControl.SaveData(_data);
             MenuControl.SaveData(_data);
             MusicControl.SaveData(_data);
+            SoundControl.SaveData(_data);
 
             if (MessageBox.Show("Save File", "Save All Changes to Disk", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
                 MainForm.Instance.SaveDAT();

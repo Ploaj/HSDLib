@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using System.Windows.Forms;
 using HSDRawViewer.Sound;
-using System.Collections;
 using HSDRawViewer.Tools;
 using System.Linq;
+using HSDRaw.MEX;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -15,7 +15,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <summary>
         /// 
         /// </summary>
-        private BindingList<SEMEntry> Entries = new BindingList<SEMEntry>();
+        public SEMEntry[] Entries { get; set; } = new SEMEntry[0];
 
         /// <summary>
         /// 
@@ -28,22 +28,17 @@ namespace HSDRawViewer.GUI.Extra
             _scriptEditor.Dock = DockStyle.Fill;
             Controls.Add(_scriptEditor);
             _scriptEditor.BringToFront();
-
-            entryList.DataSource = Entries;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="path"></param>
-        public void OpenSEMFile(string path)
+        public void OpenSEMFile(string path, MEX_Data mex = null)
         {
-            Entries.Clear();
-            var entries = SEM.ReadSEMFile(path);
-            foreach (var v in entries)
-            {
-                Entries.Add(v);
-            }
+            Entries = SEM.ReadSEMFile(path, true, mex).ToArray();
+
+            entryList.SetArrayFromProperty(this, "Entries");
         }
 
 
@@ -51,9 +46,9 @@ namespace HSDRawViewer.GUI.Extra
         /// 
         /// </summary>
         /// <param name="path"></param>
-        public void SaveSEMFile(string path)
+        public void SaveSEMFile(string path, MEX_Data mex = null)
         {
-            SEM.SaveSEMFile(path, Entries.ToList(), null);
+            SEM.SaveSEMFile(path, Entries.ToList(), mex);
         }
 
 
@@ -69,7 +64,7 @@ namespace HSDRawViewer.GUI.Extra
             {
                 SEMEntry entry = new SEMEntry();
                 entry.LoadFromPackage(f);
-                Entries.Add(entry);
+                entryList.AddItem(entry);
             }
         }
 
@@ -80,7 +75,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportPackage_Click(object sender, EventArgs e)
         {
-            if (entryList.SelectedItem is SEMEntry _entry)
+            if (entryList.SelectedObject is SEMEntry _entry)
             {
                 var f = FileIO.SaveFile("SEM Package (*.spk)|*.spk");
                 if (f != null)
@@ -95,7 +90,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void replacePackageButton_Click(object sender, EventArgs e)
         {
-            if (entryList.SelectedItem is SEMEntry _entry)
+            if (entryList.SelectedObject is SEMEntry _entry)
             {
                 var f = FileIO.OpenFile("SEM Package (*.spk)|*.spk");
                 if (f != null)
@@ -128,7 +123,7 @@ namespace HSDRawViewer.GUI.Extra
             {
                 if (d.ShowDialog() == DialogResult.OK)
                 {
-                    Entries.Add(new SEMEntry()
+                    entryList.AddItem(new SEMEntry()
                     {
                         SoundBank = new SSM()
                         {
@@ -147,10 +142,10 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void entryList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (entryList.SelectedItem == null)
+            if (entryList.SelectedObject == null)
                 return;
 
-            _scriptEditor.SetEntry(entryList.SelectedIndex, entryList.SelectedItem as SEMEntry);
+            _scriptEditor.SetEntry(entryList.SelectedIndex, entryList.SelectedObject as SEMEntry);
         }
 
 
@@ -178,20 +173,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            listBox_Remove(entryList);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void listBox_Remove(ListBox listBox1)
-        {
-            object data = listBox1.SelectedItem;
-            var ds = listBox1.DataSource as IList;
-            if (ds != null)
-                ds.Remove(data);
+            entryList.RemoveAt(entryList.SelectedIndex);
         }
     }
 }

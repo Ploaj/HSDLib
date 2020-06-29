@@ -90,8 +90,12 @@ namespace HSDRawViewer.GUI
         private bool _enablePropertyView = true;
 
         public bool EnablePropertyViewDescription { get => propertyGrid.HelpVisible; set => propertyGrid.HelpVisible = value; }
+        
+        public bool IsResetting { get; internal set; } = false;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public void DisableAllControls()
         {
             CanAdd = false;
@@ -99,6 +103,7 @@ namespace HSDRawViewer.GUI
             CanMove = false;
             CanClone = false;
         }
+
         /// <summary>
         /// Starting offset for item index display
         /// </summary>
@@ -179,9 +184,11 @@ namespace HSDRawViewer.GUI
         public void Reset()
         {
             elementList.BeginUpdate();
+            IsResetting = true;
             Items.Clear();
             foreach(var obj in (object[])Property.GetValue(_object))
                 Items.Add(obj);
+            IsResetting = false;
             elementList.EndUpdate();
         }
 
@@ -201,7 +208,9 @@ namespace HSDRawViewer.GUI
             }
             else
                 propertyGrid.SelectedObject = elementList.SelectedItem;
-            OnSelectedObjectChanged(EventArgs.Empty);
+
+            if(!IsResetting)
+                OnSelectedObjectChanged(EventArgs.Empty);
         }
         
         /// <summary>

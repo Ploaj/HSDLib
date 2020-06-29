@@ -30,13 +30,11 @@
         {
             this.splitter2 = new System.Windows.Forms.Splitter();
             this.entryBox = new System.Windows.Forms.GroupBox();
-            this.entryList = new System.Windows.Forms.ListBox();
+            this.entryList = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.splitter5 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.importSPKG = new System.Windows.Forms.ToolStripButton();
             this.exportPackage = new System.Windows.Forms.ToolStripButton();
-            this.buttonAddEntry = new System.Windows.Forms.ToolStripButton();
-            this.buttonDeleteEntry = new System.Windows.Forms.ToolStripButton();
             this.replacePackageButton = new System.Windows.Forms.ToolStripButton();
             this.entryBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -65,14 +63,16 @@
             // 
             // entryList
             // 
-            this.entryList.AllowDrop = true;
+            this.entryList.DisplayItemIndices = true;
             this.entryList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.entryList.FormattingEnabled = true;
+            this.entryList.EnablePropertyViewDescription = true;
+            this.entryList.ItemIndexOffset = 0;
             this.entryList.Location = new System.Drawing.Point(3, 41);
             this.entryList.Name = "entryList";
+            this.entryList.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.entryList.Size = new System.Drawing.Size(199, 441);
-            this.entryList.TabIndex = 1;
-            this.entryList.SelectedIndexChanged += new System.EventHandler(this.entryList_SelectedIndexChanged);
+            this.entryList.TabIndex = 11;
+            this.entryList.SelectedObjectChanged += new System.EventHandler(this.entryList_SelectedIndexChanged);
             this.entryList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.entryList_KeyDown);
             // 
             // splitter5
@@ -89,8 +89,6 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importSPKG,
             this.exportPackage,
-            this.buttonAddEntry,
-            this.buttonDeleteEntry,
             this.replacePackageButton});
             this.toolStrip1.Location = new System.Drawing.Point(3, 16);
             this.toolStrip1.Name = "toolStrip1";
@@ -117,26 +115,6 @@
             this.exportPackage.Size = new System.Drawing.Size(23, 22);
             this.exportPackage.Text = "Export SPKG";
             this.exportPackage.Click += new System.EventHandler(this.exportPackage_Click);
-            // 
-            // buttonAddEntry
-            // 
-            this.buttonAddEntry.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonAddEntry.Image = global::HSDRawViewer.Properties.Resources.ts_add;
-            this.buttonAddEntry.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonAddEntry.Name = "buttonAddEntry";
-            this.buttonAddEntry.Size = new System.Drawing.Size(23, 22);
-            this.buttonAddEntry.Text = "Add Entry";
-            this.buttonAddEntry.Click += new System.EventHandler(this.buttonAddEntry_Click);
-            // 
-            // buttonDeleteEntry
-            // 
-            this.buttonDeleteEntry.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.buttonDeleteEntry.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
-            this.buttonDeleteEntry.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonDeleteEntry.Name = "buttonDeleteEntry";
-            this.buttonDeleteEntry.Size = new System.Drawing.Size(23, 22);
-            this.buttonDeleteEntry.Text = "Delete Entry";
-            this.buttonDeleteEntry.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
             // replacePackageButton
             // 
@@ -168,13 +146,11 @@
 
         private System.Windows.Forms.Splitter splitter2;
         private System.Windows.Forms.GroupBox entryBox;
-        private System.Windows.Forms.ListBox entryList;
         private System.Windows.Forms.Splitter splitter5;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton importSPKG;
         private System.Windows.Forms.ToolStripButton exportPackage;
-        private System.Windows.Forms.ToolStripButton buttonAddEntry;
-        private System.Windows.Forms.ToolStripButton buttonDeleteEntry;
         private System.Windows.Forms.ToolStripButton replacePackageButton;
+        private ArrayMemberEditor entryList;
     }
 }

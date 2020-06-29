@@ -16,6 +16,9 @@ namespace HSDRawViewer.Sound
     [Serializable]
     public class SEMEntry
     {
+        [YamlIgnore, Description("Bank Name")]
+        public string Name { get => SoundBank == null ? "" : SoundBank.Name; set { if (SoundBank != null) SoundBank.Name = value; } }
+        
         [YamlIgnore, Description("Unknown Flag"), TypeConverter(typeof(HexType))]
         public uint Flags { get => SoundBank == null ? 0 : (uint)SoundBank.Flag; set { if (SoundBank != null) SoundBank.Flag = (int)value; } }
 
@@ -32,7 +35,7 @@ namespace HSDRawViewer.Sound
 
         public override string ToString()
         {
-            return SoundBank != null ? SoundBank.Name : $" Count {Scripts.Length}";
+            return SoundBank != null ? Name : $" Count {Scripts.Length}";
         }
 
         /// <summary>

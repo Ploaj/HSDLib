@@ -38,6 +38,7 @@
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip6 = new System.Windows.Forms.ToolStrip();
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.mainTabControl.SuspendLayout();
             this.tabPageMusic.SuspendLayout();
             this.toolStrip6.SuspendLayout();
@@ -51,6 +52,7 @@
             this.mainTabControl.Controls.Add(this.tabPageEffects);
             this.mainTabControl.Controls.Add(this.tabPageCSS);
             this.mainTabControl.Controls.Add(this.tabPageMusic);
+            this.mainTabControl.Controls.Add(this.tabPage1);
             this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainTabControl.Location = new System.Drawing.Point(0, 25);
             this.mainTabControl.Name = "mainTabControl";
@@ -147,6 +149,15 @@
             this.saveAllChangesButton.Text = "Save All Changes";
             this.saveAllChangesButton.Click += new System.EventHandler(this.saveAllChangesButton_Click);
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(791, 282);
+            this.tabPage1.TabIndex = 7;
+            this.tabPage1.Text = "Sound";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
             // MexDataEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -178,5 +189,6 @@
         private System.Windows.Forms.ToolStrip toolStrip6;
         private System.Windows.Forms.ToolStripButton saveAllChangesButton;
         private System.Windows.Forms.TabPage tabPageStage;
+        private System.Windows.Forms.TabPage tabPage1;
     }
 }
