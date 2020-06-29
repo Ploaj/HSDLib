@@ -72,9 +72,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="data"></param>
         public void LoadData(MEX_Data data)
         {
-            MEXConverter.ssmValues.Clear();
-            MEXConverter.ssmValues.AddRange(data.SSMTable.SSM_SSMFiles.Array.Select(e => e.Value));
-
             Music = data.MusicTable.BackgroundMusicStrings.Array;
             musicListEditor.SetArrayFromProperty(this, "Music");
 

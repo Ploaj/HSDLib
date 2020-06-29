@@ -4,6 +4,7 @@ using HSDRaw.MEX;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Tools;
 using System.IO;
+using System.Linq;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
@@ -44,6 +45,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
         public void LoadData(MEX_Data data)
         {
             _data = data;
+
+            MEXConverter.ssmValues.Clear();
+            MEXConverter.ssmValues.AddRange(data.SSMTable.SSM_SSMFiles.Array.Select(e => e.Value));
         }
 
         /// <summary>
@@ -61,7 +65,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
         public void SaveData(MEX_Data data)
         {
             if(!string.IsNullOrEmpty(SemPath) && MessageBox.Show("Save SEM", "Save SEM and SSM files?", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+            {
                 _editor.SaveSEMFile(SemPath, data);
+
+                MEXConverter.ssmValues.Clear();
+                MEXConverter.ssmValues.AddRange(data.SSMTable.SSM_SSMFiles.Array.Select(e => e.Value));
+            }
         }
 
         /// <summary>
