@@ -177,7 +177,8 @@ namespace HSDRawViewer.GUI.MEX
             if (!inUse)
             {
                 var nameBank = SemEntries.Find(e => e.SoundBank?.Name == "nr_name.ssm");
-                nameBank.RemoveSoundAt(fighter.AnnouncerCall % 10000);
+                //nameBank.RemoveSoundAt(fighter.AnnouncerCall % 10000);
+                // TODO: remove narrator name call
 
                 foreach(var v in editor.FighterControl.FighterEntries)
                 {

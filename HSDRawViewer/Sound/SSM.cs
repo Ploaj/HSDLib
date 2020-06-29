@@ -1,7 +1,5 @@
 ﻿using HSDRaw;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace HSDRawViewer.Sound
@@ -10,17 +8,31 @@ namespace HSDRawViewer.Sound
     {
         public string Name;
 
-        public int StartIndex;
+        public int StartIndex { get; set; } = 0;
 
-        public int Flag = 0;
+        public int Flag { get; set; } = 0;
 
-        public int GroupFlags = 0;
+        public int GroupFlags { get; set; } = 0;
 
-        public BindingList<DSP> Sounds = new BindingList<DSP>();
+        public DSP[] Sounds { get; set; } = new DSP[0];
 
+        /// <summary>
+        /// 
+        /// </summary>
         public SSM()
         {
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void AddSound(DSP value)
+        {
+            var ar = Sounds;
+            Array.Resize(ref ar, ar.Length + 1);
+            ar[ar.Length - 1] = value;
+            Sounds = ar;
         }
 
         /// <summary>
@@ -49,10 +61,11 @@ namespace HSDRawViewer.Sound
                 var soundCount = r.ReadInt32();
                 StartIndex = r.ReadInt32();
 
+                Sounds = new DSP[soundCount];
+
                 for (int i = 0; i < soundCount; i++)
                 {
                     var sound = new DSP();
-                    sound.Index = i;
                     var ChannelCount = r.ReadInt32();
                     sound.Frequency = r.ReadInt32();
 
@@ -88,7 +101,7 @@ namespace HSDRawViewer.Sound
                         
                     }
 
-                    Sounds.Add(sound);
+                    Sounds[i] = sound;
                 }
             }
         }
@@ -109,13 +122,24 @@ namespace HSDRawViewer.Sound
         /// <param name="filePath"></param>
         public void Save(string filePath, out int bufferSize)
         {
-            using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(filePath, FileMode.Create)))
+            using (var stream = new FileStream(filePath, FileMode.Create))
+                WriteToStream(stream, out bufferSize);
+        }
+
+        /// <summary>
+        /// Writes SSM file to stream
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="bufferSize">Size of the buffer</param>
+        public void WriteToStream(Stream stream, out int bufferSize)
+        {
+            using (BinaryWriterExt w = new BinaryWriterExt(stream))
             {
                 w.BigEndian = true;
 
                 w.Write(0);
                 w.Write(0);
-                w.Write(Sounds.Count);
+                w.Write(Sounds.Length);
                 w.Write(StartIndex);
 
                 int headerSize = 0;
@@ -192,6 +216,5 @@ namespace HSDRawViewer.Sound
                 bufferSize = (int)DataSize;
             }
         }
-
     }
 }

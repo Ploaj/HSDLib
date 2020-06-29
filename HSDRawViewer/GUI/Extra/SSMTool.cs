@@ -5,6 +5,7 @@ using System.IO;
 using HSDRaw;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Sound;
+using System.Linq;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -265,7 +266,7 @@ namespace HSDRawViewer.GUI.Extra
 
             var ssm = new SSM();
             ssm.StartIndex = StartIndex;
-            ssm.Sounds = (Sounds);
+            ssm.Sounds = Sounds.ToArray();
             ssm.Save(filePath);
         }
 

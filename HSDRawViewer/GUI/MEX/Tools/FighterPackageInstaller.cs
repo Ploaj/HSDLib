@@ -351,13 +351,13 @@ namespace HSDRawViewer.GUI.MEX
             {
                 var narsound = new DSP();
                 narsound.FromFormat(GetBytes(narr), "dsp");
-                var index = nameBank.SoundBank.Sounds.Count;
-                nameBank.SoundBank.Sounds.Add(narsound);
+                var index = nameBank.SoundBank.Sounds.Length;
+                nameBank.SoundBank.AddSound(narsound);
 
-                var script = new SEMSound();
+                var script = new SEMScript();
                 SEM.CompileSEMScript(narratorScript.Replace("(id)", index.ToString()), out script.CommandData);
-                var scriptIndex = nameBank.Sounds.Count;
-                nameBank.Sounds.Add(script);
+                var scriptIndex = nameBank.Scripts.Length;
+                nameBank.AddScript(script);
 
                 fighter.AnnouncerCall = scriptIndex + SemEntries.IndexOf(nameBank) * 10000;
 

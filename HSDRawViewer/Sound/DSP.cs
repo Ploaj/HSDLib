@@ -472,12 +472,12 @@ namespace HSDRawViewer.Sound
 
         #endregion
 
-        [Browsable(false)]
-        public int Index { get; set; }
+        //[Browsable(false)]
+       // public int Index { get; set; }
 
         public override string ToString()
         {
-            return $"SFXID: {Index} : Channels {Channels.Count} : Frequency {Frequency}Hz";
+            return $"Channels {Channels.Count} : Frequency {Frequency}Hz";
         }
     }
 }

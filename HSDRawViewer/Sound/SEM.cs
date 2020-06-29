@@ -3,14 +3,11 @@ using HSDRaw.Common;
 using HSDRaw.MEX;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace HSDRawViewer.Sound
 {
@@ -40,12 +37,16 @@ namespace HSDRawViewer.Sound
         UNKNOWN15, // Unused
         NULL = 0xFD
     }
+
     /// <summary>
-    /// 
+    /// Class for help with reading and writing sem files
     /// </summary>
     public class SEM
     {
-        private static int NullEntryID = 55;
+        /// <summary>
+        /// 
+        /// </summary>
+        private static readonly int NullEntryID = 55;
 
         /// <summary>
         /// 
@@ -142,7 +143,6 @@ namespace HSDRawViewer.Sound
                 for (uint i = 0; i < entryCount; i++)
                 {
                     SEMEntry e = new SEMEntry();
-                    e.Index = (int)i;
                     Entries.Add(e);
 
                     r.Seek(0x0C + i * 4);
@@ -152,8 +152,7 @@ namespace HSDRawViewer.Sound
                     var ssmStartIndex = int.MaxValue;
                     for (uint j = 0; j < endIndex - startIndex; j++)
                     {
-                        SEMSound s = new SEMSound();
-                        s.Index = (int)j;
+                        SEMScript s = new SEMScript();
                         r.Seek((uint)(offsetTableStart + startIndex * 4 + j * 4));
                         var dataOffsetStart = r.ReadUInt32();
                         var dataOffsetEnd = r.ReadUInt32();
@@ -163,7 +162,7 @@ namespace HSDRawViewer.Sound
 
                         r.Seek(dataOffsetStart);
                         s.CommandData = r.ReadBytes((int)(dataOffsetEnd - dataOffsetStart));
-                        e.Sounds.Add(s);
+                        e.AddScript(s);
 
                         ssmStartIndex = Math.Min(ssmStartIndex, s.SoundCommandIndex);
                     }
@@ -182,7 +181,7 @@ namespace HSDRawViewer.Sound
                             }
                         }
 
-                        foreach (var v in e.Sounds)
+                        foreach (var v in e.Scripts)
                             v.SoundCommandIndex -= ssmStartIndex;
                     }
                 }
@@ -190,6 +189,12 @@ namespace HSDRawViewer.Sound
             return Entries;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static byte[] GeneratePaddedBuffer(int size, byte value)
         {
             byte[] b = new byte[size];
@@ -199,7 +204,7 @@ namespace HSDRawViewer.Sound
         }
 
         /// <summary>
-        /// 
+        /// Generates and saves a SEM file
         /// </summary>
         public static void SaveSEMFile(string path, List<SEMEntry> Entries, MEX_Data mexData)
         {
@@ -239,7 +244,7 @@ namespace HSDRawViewer.Sound
                 foreach (var e in Entries)
                 {
                     w.Write(index);
-                    index += e.Sounds.Count;
+                    index += e.Scripts.Length;
                 }
                 w.Write(index);
 
@@ -248,7 +253,7 @@ namespace HSDRawViewer.Sound
 
                 foreach (var e in Entries)
                 {
-                    foreach (var v in e.Sounds)
+                    foreach (var v in e.Scripts)
                     {
                         w.Write((int)(offset + dataindex));
                         dataindex += v.CommandData.Length;
@@ -279,21 +284,21 @@ namespace HSDRawViewer.Sound
                         }
 
                         // add sound offset
-                        foreach (var v in e.Sounds)
+                        foreach (var v in e.Scripts)
                             v.SoundCommandIndex += soundOffset;
 
-                        foreach (var v in e.Sounds)
+                        foreach (var v in e.Scripts)
                             w.Write(v.CommandData);
 
                         //return to normal
-                        foreach (var v in e.Sounds)
+                        foreach (var v in e.Scripts)
                             v.SoundCommandIndex -= soundOffset;
 
-                        soundOffset += e.SoundBank.Sounds.Count;
+                        soundOffset += e.SoundBank.Sounds.Length;
                     }
                     else
                     {
-                        foreach (var v in e.Sounds)
+                        foreach (var v in e.Scripts)
                         {
                             w.Write(v.CommandData);
                         }
@@ -311,7 +316,7 @@ namespace HSDRawViewer.Sound
 
             foreach (var e in entries)
             {
-                foreach (var s in e.Sounds)
+                foreach (var s in e.Scripts)
                 {
                     int p = 0;
                     while (p < s.CommandData.Length)
@@ -344,153 +349,4 @@ namespace HSDRawViewer.Sound
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    [Serializable]
-    public class SEMEntry
-    {
-        [Description("Unknown Flag"), TypeConverter(typeof(HexType))]
-        public uint Flags { get => SoundBank == null ? 0 : (uint)SoundBank.Flag; set { if (SoundBank != null) SoundBank.Flag = (int)value; } }
-
-        [DisplayName("Group Flags"), Description("Grouping Lookup information"), TypeConverter(typeof(HexType))]
-        public uint GroupFlags { get => SoundBank == null ? 0 : (uint)SoundBank.GroupFlags; set { if (SoundBank != null) SoundBank.GroupFlags = (int)value; } }
-        
-        public BindingList<SEMSound> Sounds = new BindingList<SEMSound>();
-
-        [YamlIgnore]
-        public int Index;
-
-        [YamlIgnore]
-        public SSM SoundBank;
-
-        public override string ToString()
-        {
-            return SoundBank != null ? SoundBank.Name : $"Entry_{Index} : Count {Sounds.Count}";
-        }
-
-        /// <summary>
-        /// Removes sound with given ID from sound bank
-        /// </summary>
-        /// <param name="index"></param>
-        public void RemoveSoundAt(int index)
-        {
-            //foreach(var r in Sounds.Where(e=>e.SoundCommandIndex == index))
-            //    Sounds.Remove(r);
-
-            Sounds.RemoveAt(index);
-
-            RemoveUnusedSounds();
-        }
-
-        /// <summary>
-        /// Removes unused sounds from sound bank
-        /// </summary>
-        public void RemoveUnusedSounds()
-        {
-            if (SoundBank == null)
-                return;
-
-            var usedSounds = Sounds.Select(e=>e.SoundCommandIndex);
-
-            List<DSP> toRem = new List<DSP>();
-
-            for(int i = 0; i < SoundBank.Sounds.Count; i++)
-            {
-                if (!usedSounds.Contains(i))
-                    toRem.Add(SoundBank.Sounds[i]);
-            }
-            foreach (var v in toRem)
-                SoundBank.Sounds.Remove(v);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public static SEMEntry Deserialize(string data)
-        {
-            var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
-
-            return deserializer.Deserialize<SEMEntry>(data);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filepath"></param>
-        public void Serialize(string filepath)
-        {
-            var builder = new SerializerBuilder();
-            builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
-
-            using (StreamWriter writer = File.CreateText(filepath))
-            {
-                builder.Build().Serialize(writer, this);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class SEMSound
-    {
-        public byte[] CommandData = new byte[0];
-
-        [YamlIgnore]
-        public string Name { get; set; } = "SFX_";
-
-        public int Index { get; set; }
-
-        [YamlIgnore]
-        public int SoundCommandIndex
-        {
-            get => GetOPCodeValue(0x01);
-            set => SetOpCodeValue(0x01, value);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="opCode"></param>
-        /// <returns></returns>
-        public int GetOPCodeValue(byte opCode)
-        {
-            for (int i = 0; i < CommandData.Length; i += 4)
-            {
-                if (CommandData[i] == opCode)
-                {
-                    return (short)(((CommandData[i + 2] & 0xFF) << 8) | (CommandData[i + 3] & 0xFF));
-                }
-            }
-            return -1;
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="opCode"></param>
-        /// <param name="value"></param>
-        public void SetOpCodeValue(byte opCode, int value)
-        {
-            for (int i = 0; i < CommandData.Length; i += 4)
-            {
-                if (CommandData[i] == 0x01)
-                {
-                    CommandData[i + 1] = (byte)((value >> 16) & 0xFF);
-                    CommandData[i + 2] = (byte)((value >> 8) & 0xFF);
-                    CommandData[i + 3] = (byte)(value & 0xFF);
-                }
-            }
-        }
-        
-        public override string ToString()
-        {
-            return $"{Index.ToString("D6")} - {Name} - ID: {SoundCommandIndex}";
-        }
-    }
 }

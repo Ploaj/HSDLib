@@ -225,6 +225,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonRemove_Click(object sender, EventArgs e)
         {
+            if (Property == null)
+                return;
+
             RemoveAt(elementList.SelectedIndex);
         }
 
@@ -235,6 +238,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
+            if (Property == null)
+                return;
+
             var ob = Activator.CreateInstance(Property.PropertyType.GetElementType());
             if(ob != null)
             {
@@ -250,7 +256,10 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonUp_Click(object sender, EventArgs e)
         {
-            if(elementList.SelectedIndex != -1)
+            if (Property == null)
+                return;
+
+            if (elementList.SelectedIndex != -1)
             {
                 elementList.BeginUpdate();
 
@@ -272,6 +281,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void buttonDown_Click(object sender, EventArgs e)
         {
+            if (Property == null)
+                return;
+
             if (elementList.SelectedIndex != -1)
             {
                 elementList.BeginUpdate();

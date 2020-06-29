@@ -208,10 +208,28 @@
       <DependentUpon>PopoutGraphEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Extra\SEMEditor.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GUI\Extra\SEMEditor.Designer.cs">
       <DependentUpon>SEMEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Extra\SEMEditorTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\SEMEditorTool.Designer.cs">
+      <DependentUpon>SEMEditorTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Extra\SoundBankEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\SoundBankEditor.Designer.cs">
+      <DependentUpon>SoundBankEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Extra\SoundScriptEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\SoundScriptEditor.Designer.cs">
+      <DependentUpon>SoundScriptEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Extra\SSMTool.cs">
       <SubType>Form</SubType>
@@ -422,6 +440,7 @@
     </Compile>
     <Compile Include="Sound\HPS.cs" />
     <Compile Include="Sound\SEM.cs" />
+    <Compile Include="Sound\SEMEntry.cs" />
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
@@ -493,6 +512,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\SEMEditor.resx">
       <DependentUpon>SEMEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\SEMEditorTool.resx">
+      <DependentUpon>SEMEditorTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\SoundBankEditor.resx">
+      <DependentUpon>SoundBankEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\SoundScriptEditor.resx">
+      <DependentUpon>SoundScriptEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\SSMTool.resx">
       <DependentUpon>SSMTool.cs</DependentUpon>

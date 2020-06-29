@@ -251,7 +251,7 @@ namespace HSDRawViewer
             {
                 if (f.ToLower().EndsWith(".sem"))
                 {
-                    SEMEditor d = new SEMEditor();
+                    SEMEditorTool d = new SEMEditorTool();
                     {
                         d.Show();
                     }
@@ -651,7 +651,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void sEMEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SEMEditor d = new SEMEditor();
+            SEMEditorTool d = new SEMEditorTool();
             {
                 d.Show();
             }
