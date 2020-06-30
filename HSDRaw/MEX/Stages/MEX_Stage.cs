@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using HSDRaw.Common;
+using System.ComponentModel;
 
 namespace HSDRaw.MEX.Stages
 {
@@ -8,8 +9,32 @@ namespace HSDRaw.MEX.Stages
 
         public int StageInternalID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
         
-        public HSDArrayAccessor<MEX_MapGOBJFunctions> GOBJFunctions { get => _s.GetReference<HSDArrayAccessor<MEX_MapGOBJFunctions>>(0x04); set => _s.SetReference(0x04, value); }
-        
+        // can have references or pointers for gobjs
+        public HSDArrayAccessor<MEX_MapGOBJFunctions> GOBJFunctions
+        {
+            get
+            {
+                return _s.GetReference<HSDArrayAccessor<MEX_MapGOBJFunctions>>(0x04);
+            }
+            set => _s.SetReference(0x04, value);
+        }
+
+        public int GOBJFunctionsPointer
+        {
+            get
+            {
+                if (_s.GetReference<HSDAccessor>(0x04) == null)
+                    return _s.GetInt32(0x04);
+
+                return -1;
+            }
+            set
+            {
+                if (_s.GetReference<HSDAccessor>(0x04) == null)
+                    _s.SetInt32(0x04, value);
+            }
+        }
+
         public string StageFileName { get => _s.GetString(0x08); set => _s.SetString(0x08, value); }
 
         [TypeConverter(typeof(HexType))]

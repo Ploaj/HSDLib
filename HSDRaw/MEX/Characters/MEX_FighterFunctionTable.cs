@@ -12,7 +12,29 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<HSD_UInt> OnUnknown { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>> MoveLogic { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>>(0x0C); set => _s.SetReference(0x0C, value); }
+
+        // can have references or pointers for move logic
+        public HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>> MoveLogic
+        {
+            get
+            {
+                if (_s.GetReference<HSDAccessor>(0x0C)._s.References.Count > 0)
+                    return _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>>(0x0C);
+
+                return null;
+            }
+            set => _s.SetReference(0x0C, value);
+        }
+
+        public HSDArrayAccessor<HSD_UInt> MoveLogicPointers {
+            get
+            {
+                if(_s.GetReference<HSDAccessor>(0x0C)._s.References.Count == 0)
+                    return _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x0C);
+
+                return null;
+            } set => _s.SetReference(0x0C, value); }
+
 
         public HSDArrayAccessor<HSD_UInt> SpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x10); set => _s.SetReference(0x10, value); }
 

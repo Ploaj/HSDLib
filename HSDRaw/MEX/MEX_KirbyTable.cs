@@ -14,7 +14,7 @@ namespace HSDRaw.MEX
 
         public HSDAccessor CostumeRuntime { get => _s.GetReference<HSDAccessor>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public HSDArrayAccessor<HSD_Byte> EffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x10); set => _s.SetReference(0x10, value); }
+        public HSDArrayAccessor<HSD_Byte> KirbyEffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x10); set => _s.SetReference(0x10, value); }
 
     }
 

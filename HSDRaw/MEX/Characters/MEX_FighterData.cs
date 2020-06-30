@@ -7,7 +7,7 @@ namespace HSDRaw.MEX
     {
         public override int TrimmedSize => 0x58;
 
-        public HSDNullPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
 
         public HSDArrayAccessor<MEX_CharFileStrings> CharFiles { get => _s.GetReference<HSDArrayAccessor<MEX_CharFileStrings>>(0x04); set => _s.SetReference(0x04, value); }
 
@@ -19,15 +19,15 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<MEX_CostumeFileSymbolTable> CostumeFileSymbols { get => _s.GetReference<HSDArrayAccessor<MEX_CostumeFileSymbolTable>>(0x14); set => _s.SetReference(0x14, value); }
 
-        public HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames> FtDemo_SymbolNames { get => _s.GetReference<HSDNullPointerArrayAccessor<MEX_FtDemoSymbolNames>>(0x18); set => _s.SetReference(0x18, value); }
+        public HSDFixedLengthPointerArrayAccessor<MEX_FtDemoSymbolNames> FtDemo_SymbolNames { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<MEX_FtDemoSymbolNames>>(0x18); set => _s.SetReference(0x18, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_String> AnimFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x1C); set => _s.SetReference(0x1C, value); }
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> AnimFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x1C); set => _s.SetReference(0x1C, value); }
 
         public HSDArrayAccessor<MEX_AnimCount> AnimCount { get => _s.GetReference<HSDArrayAccessor<MEX_AnimCount>>(0x20); set => _s.SetReference(0x20, value); }
 
         public HSDArrayAccessor<HSD_Byte> EffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x24); set => _s.SetReference(0x24, value); }
 
-        public HSDNullPointerArrayAccessor<HSD_String> ResultAnimFiles { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_String>>(0x28); set => _s.SetReference(0x28, value); }
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> ResultAnimFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x28); set => _s.SetReference(0x28, value); }
 
         public HSDArrayAccessor<HSD_Float> ResultScale { get => _s.GetReference<HSDArrayAccessor<HSD_Float>>(0x2C); set => _s.SetReference(0x2C, value); }
 

@@ -100,6 +100,19 @@ namespace HSDRawViewer.GUI.MEX
             }
         }
 
+        [Category("1 - Extra"), DisplayName("GOBJ Functions Pointer"), Description(""), TypeConverter(typeof(HexType))]
+        public int FunctionsPointer
+        {
+            get
+            {
+                return Stage.GOBJFunctionsPointer;
+            }
+            set
+            {
+                Stage.GOBJFunctionsPointer = value;
+            }
+        }
+
         /*[Category("1 - Extra"), DisplayName("Collisions"), Description("")]
         public MEX_StageCollisionData[] CollisionData
         {

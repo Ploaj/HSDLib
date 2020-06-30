@@ -161,6 +161,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
             {
                 var functions = entry.Functions;
 
+                if (functions == null)
+                {
+                    MessageBox.Show("This MxDt file does not contains map gobj functions", "Nothing to copy", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return;
+                }
+
                 StringBuilder table = new StringBuilder();
                 int index = 0;
                 foreach (var m in functions)

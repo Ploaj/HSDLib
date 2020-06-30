@@ -13,7 +13,7 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<MEX_Item> Pokemon { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSDArrayAccessor<MEX_Item> Stages { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSDArrayAccessor<MEX_Item> StageItems { get => _s.GetReference<HSDArrayAccessor<MEX_Item>>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public HSDArrayAccessor<MEX_Item> MEXItems { get => _s.GetCreateReference<HSDArrayAccessor<MEX_Item>>(0x10); set => _s.SetReference(0x10, value); }
 
@@ -24,8 +24,43 @@ namespace HSDRaw.MEX
     public class MEX_Item : HSDAccessor
     {
         public override int TrimmedSize => 0x3C;
+        
+        // can have references or pointers for item states
+        public MEX_ItemStateInfo[] ItemStates
+        {
+            get
+            {
+                if (_s.GetReference<HSDAccessor>(0x00) != null)
+                    return _s.GetCreateReference<HSDArrayAccessor<MEX_ItemStateInfo>>(0x00).Array;
 
-        public MEX_ItemStateInfo[] ItemStates { get => _s.GetCreateReference<HSDArrayAccessor<MEX_ItemStateInfo>>(0x00).Array; set => _s.GetCreateReference<HSDArrayAccessor<MEX_ItemStateInfo>>(0x00).Array = value; }
+                return null;
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                    _s.References.Remove(0x00);
+                else
+                    _s.GetCreateReference<HSDArrayAccessor<MEX_ItemStateInfo>>(0x00).Array = value;
+            }
+        }
+
+        [TypeConverter(typeof(HexType))]
+        public int ItemStatePointer
+        {
+            get
+            {
+                if (ItemStates == null)
+                    return _s.GetInt32(0x00);
+                else
+                    return -1;
+            }
+            set
+            {
+                if(ItemStates == null)
+                    _s.SetInt32(0x00, value);
+            }
+        }
+        
 
         [TypeConverter(typeof(HexType))]
         public int OnSpawn { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
@@ -71,7 +106,7 @@ namespace HSDRaw.MEX
 
         public override string ToString()
         {
-            return $"Item - States: {ItemStates.Length}";
+            return $"Item - States: {(ItemStates == null ? "0x" + ItemStatePointer.ToString("X8") : ItemStates.Length.ToString())}";
         }
     }
 

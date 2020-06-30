@@ -1,16 +1,25 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace HSDRaw.MEX
 {
+    [Flags]
+    public enum MexFlags
+    {
+        ContainMoveLogic = 1,
+        ContainItemState = 2,
+        ContainMapGOBJs = 4,
+    }
+
     public class MEX_Meta : HSDAccessor
     {
         public override int TrimmedSize => 0x20;
 
         [DisplayName("Version Major")]
-        public int VersionMajor { get => _s.GetInt16(0x00); }
+        public short VersionMajor { get => _s.GetInt16(0x00); internal set => _s.SetInt16(0x00, value); }
 
-        [DisplayName("Version Minor")]
-        public int VersionMinor { get => _s.GetInt16(0x02); }
+        [DisplayName("Mex Flags")]
+        public MexFlags Flags { get => (MexFlags)_s.GetInt16(0x02); set => _s.SetInt16(0x02, (short)value); }
 
         [DisplayName("Internal ID Count")]
         public int NumOfInternalIDs { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }

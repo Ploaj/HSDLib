@@ -121,7 +121,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             pokemonItemEditor.ItemIndexOffset = MEXItemOffset;
             MEXItemOffset += ItemPokemon.Length;
 
-            ItemStage = data.ItemTable.Stages.Array;
+            ItemStage = data.ItemTable.StageItems.Array;
             stageItemEditor.SetArrayFromProperty(this, "ItemStage");
             stageItemEditor.ItemIndexOffset = MEXItemOffset;
             MEXItemOffset += ItemStage.Length;
@@ -140,9 +140,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
             data.ItemTable.CommonItems.Array = ItemCommon;
             data.ItemTable.FighterItems.Array = ItemFighter;
             data.ItemTable.Pokemon.Array = ItemPokemon;
-            data.ItemTable.Stages.Array = ItemStage;
+            data.ItemTable.StageItems.Array = ItemStage;
             data.ItemTable.MEXItems.Array = ItemMEX;
-            data.ItemTable._s.GetCreateReference<HSDAccessor>(0x18)._s.Resize(Math.Max(4, ItemMEX.Length * 4));
+            data.ItemTable._s.GetCreateReference<HSDAccessor>(0x14)._s.Resize(Math.Max(4, ItemMEX.Length * 4));
         }
 
 
@@ -318,6 +318,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
             if (item == null)
                 return;
+
+            if (item.ItemStates == null)
+            {
+                MessageBox.Show("This MxDt file does not contains item states", "Nothing to copy", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
 
             StringBuilder table = new StringBuilder();
             int index = 0;

@@ -136,7 +136,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
             d.FighterFunctions.OnUnknown.Array = new HSD_UInt[0];
-            d.FighterFunctions.MoveLogic.Array = new HSDArrayAccessor<MEX_MoveLogic>[0];
+
+            if (d.MetaData.Flags.HasFlag(MexFlags.ContainMoveLogic))
+                d.FighterFunctions.MoveLogic.Array = new HSDArrayAccessor<MEX_MoveLogic>[0];
+            else
+                d.FighterFunctions.MoveLogicPointers = new HSDArrayAccessor<HSD_UInt>();
+
             d.FighterFunctions.SpecialN.Array = new HSD_UInt[0];
             d.FighterFunctions.SpecialNAir.Array = new HSD_UInt[0];
             d.FighterFunctions.SpecialHi.Array = new HSD_UInt[0];
@@ -176,7 +181,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
             d.KirbyData.CapFiles.Array = new MEX_KirbyCapFiles[0];
             d.KirbyData.KirbyCostumes.Array = new MEX_KirbyCostume[0];
-            d.KirbyData.EffectIDs.Array = new HSD_Byte[0];
+            d.KirbyData.KirbyEffectIDs.Array = new HSD_Byte[0];
             d.KirbyFunctions.OnAbilityGain.Array = new HSD_UInt[0];
             d.KirbyFunctions.OnAbilityLose.Array = new HSD_UInt[0];
             d.KirbyFunctions.KirbySpecialN.Array = new HSD_UInt[0];
@@ -495,6 +500,12 @@ namespace HSDRawViewer.GUI.MEX.Controls
             if (fighterList.SelectedItem is MEXFighterEntry fighter)
             {
                 var moveLogic = fighter.Functions.MoveLogic;
+
+                if (moveLogic == null)
+                {
+                    MessageBox.Show("This MxDt file does not contains move logic", "Nothing to copy", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return;
+                }
 
                 var ftDataFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), fighter.FighterDataPath);
 
