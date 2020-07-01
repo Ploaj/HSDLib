@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SEMEditor));
             this.splitter2 = new System.Windows.Forms.Splitter();
             this.entryBox = new System.Windows.Forms.GroupBox();
             this.entryList = new HSDRawViewer.GUI.ArrayMemberEditor();
@@ -36,6 +37,7 @@
             this.importSPKG = new System.Windows.Forms.ToolStripButton();
             this.exportPackage = new System.Windows.Forms.ToolStripButton();
             this.replacePackageButton = new System.Windows.Forms.ToolStripButton();
+            this.renameButton = new System.Windows.Forms.ToolStripButton();
             this.entryBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -73,6 +75,7 @@
             this.entryList.Size = new System.Drawing.Size(199, 441);
             this.entryList.TabIndex = 11;
             this.entryList.SelectedObjectChanged += new System.EventHandler(this.entryList_SelectedIndexChanged);
+            this.entryList.ArrayUpdated += new System.EventHandler(this.entryList_ArrayUpdated);
             this.entryList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.entryList_KeyDown);
             // 
             // splitter5
@@ -89,7 +92,8 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importSPKG,
             this.exportPackage,
-            this.replacePackageButton});
+            this.replacePackageButton,
+            this.renameButton});
             this.toolStrip1.Location = new System.Drawing.Point(3, 16);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(199, 25);
@@ -126,6 +130,16 @@
             this.replacePackageButton.Text = "Replace Package";
             this.replacePackageButton.Click += new System.EventHandler(this.replacePackageButton_Click);
             // 
+            // renameButton
+            // 
+            this.renameButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.renameButton.Image = ((System.Drawing.Image)(resources.GetObject("renameButton.Image")));
+            this.renameButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.renameButton.Name = "renameButton";
+            this.renameButton.Size = new System.Drawing.Size(54, 22);
+            this.renameButton.Text = "Rename";
+            this.renameButton.Click += new System.EventHandler(this.renameButton_Click);
+            // 
             // SEMEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -152,5 +166,6 @@
         private System.Windows.Forms.ToolStripButton exportPackage;
         private System.Windows.Forms.ToolStripButton replacePackageButton;
         private ArrayMemberEditor entryList;
+        private System.Windows.Forms.ToolStripButton renameButton;
     }
 }

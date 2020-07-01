@@ -21,6 +21,8 @@ namespace HSDRawViewer.Tools
         public bool IncludeItemStates { get; set; } = false;
 
         public bool IncludeMapGOBJs { get; set; } = false;
+
+        public bool IncludeBGMNames { get; set; } = false;
     }
 
     /// <summary>
@@ -327,9 +329,14 @@ namespace HSDRawViewer.Tools
 
             // generate music table
             data.MusicTable = new MEX_BGMStruct();
-            data.MusicTable.BackgroundMusicStrings = new HSDFixedLengthPointerArrayAccessor<HSD_String>() { Array = dol.ReadStringTable(MusicStringOffset, data.MetaData.NumOfMusic) };
+            data.MusicTable.BGMFileNames = new HSDFixedLengthPointerArrayAccessor<HSD_String>() { Array = dol.ReadStringTable(MusicStringOffset, data.MetaData.NumOfMusic) };
             data.MusicTable.MenuPlaylist = new HSDArrayAccessor<MEX_PlaylistItem>() { Array = new MEX_PlaylistItem[] { new MEX_PlaylistItem() { ChanceToPlay = 100, HPSID = 52 } } };
             data.MusicTable.MenuPlayListCount = 1;
+
+            if (settings.IncludeBGMNames)
+            {
+                data.MusicTable.BGMLabels = new HSDFixedLengthPointerArrayAccessor<HSD_String>() { Array = MusicNames.Select(e=>new HSD_String() { Value = e} ).ToArray() };
+            }
 
 
             // generate effect table
@@ -585,6 +592,108 @@ namespace HSDRawViewer.Tools
         public static readonly byte[] FighterItemStates = new byte[] { 12, 18, 10, 12, 2, 1, 8, 1, 1, 1, 3, 2, 2, 3, 3, 8, 8, 4, 4, 10, 10, 6, 6, 1, 1, 3, 1, 3, 3, 3, 3, 12, 12, 10, 10, 1, 6, 1, 3, 3, 2, 2, 1, 3, 3, 1, 2, 1, 2, 1, 4, 10, 4, 10, 6, 2, 6, 1, 2, 4, 3, 2, 1, 4, 1, 2, 1, 1, 1, 18, 4, 4, 1, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 8, 1, 4, 2, 1, 2, 2, 12, 12, 6, 6, 10, 10, 18, 3, 1, 2, 1, 2, 1, 10, 6, 1, 1, 2, 1, 3, 3, 6, 20 };
         public static readonly byte[] PokemonItemStates = new byte[] { 6, 3, 3, 4, 3, 4, 3, 3, 3, 3, 4, 3, 2, 2, 2, 6, 8, 6, 6, 3, 6, 8, 3, 3, 3, 8, 2, 3, 4, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 0 };
         public static readonly byte[] StageItemStates = new byte[] { 12, 1, 6, 12, 8, 22, 0, 0, 12, 12, 6, 12, 14, 14, 0, 0, 0, 8, 8, 0, 0, 0, 10, 0, 0, 12, 8, 2, 6 };
+
+        public static string[] MusicNames = new string[]
+        {
+            "All-Star Rest Area",
+"Fire Emblem (Meeting Theme)",
+"Balloon Fight",
+"Big Blue",
+"Princess Peach's Castle",
+"Continue Screen",
+"Corneria",
+"Doctor Mario (Fever)",
+"1-Player Mode Ending",
+"FamiDemo",
+"1-Player Stage Clear Fanfare 1",
+"1-Player Stage Clear Fanfare 2",
+"Bad Fanfare",
+"Donkey Kong Fanfare",
+"Fire Emblem Fanfare",
+"Game & Watch Fanfare",
+"Star Fox Fanfare",
+"F-Zero Fanfare",
+"Good Fanfare",
+"Ice Climbers Fanfare",
+"Kirby Fanfare",
+"Legend of Zelda Fanfare",
+"Super Mario Fanfare",
+"Earthbound Fanfare",
+"Pokémon Fanfare",
+"Metroid Fanfare",
+"Step Fanfare 1",
+"Step Fanfare 2",
+"Step Fanfare 3",
+"Yoshi Fanfare",
+"Flat Zone",
+"Fourside",
+"Game Over jingle",
+"Kongo Jungle",
+"Great Bay",
+"Green Greens",
+"How to Play",
+"How to Play",
+"Multi-Man Melee",
+"Multi-Man Melee (Alt)",
+"Icicle Mountain",
+"Mushroom Kingdom",
+"Mushroom Kingdom 20 seconds",
+"Mushroom Kingdom (Alt)",
+"Mushroom Kingdom (Alt) 20 seconds",
+"Classic Mode Intro",
+"Adventure Mode Intro",
+"Hammer",
+"Super Star",
+"Fountain of Dreams",
+"Jungle Japes",
+"Brinstar Depths",
+"Menu",
+"Trophy Tussle",
+"Menu Alternate",
+"Mach Rider",
+"Mute City",
+"N64 Congo Jungle",
+"N64 Dream Land",
+"N64 Yoshi's Island",
+"Onett",
+"Pollyanna",
+"Opening",
+"Battle Theme",
+"Pokémon Stadium",
+"Poké Floats",
+"Rainbow Cruise",
+"Notices 1",
+"Notices 2",
+"Notices 3",
+"New Trophy",
+"Rare New Trophy",
+"Challenger Approaching",
+"Unused",
+"Saria's Song",
+"Temple",
+"Brinstar Escape Shaft",
+"Super Mario Bros. 3",
+"Final Destination",
+"Giga Bowser",
+"Metal Battle",
+"Race to the Finish",
+"Special Movie",
+"Home-Run Contest",
+"Venom",
+"Giant Bowser Defeat",
+"Enter Luigi",
+"Arwings Assist",
+"Brinstar Explodes",
+"Giant Bowser's Defeat (Alternative)",
+"Giga Bowser's Defeat",
+"Intro to Grand Prix stage",
+"Enter Giga Bowser",
+"Tournament Mode",
+"Tournament Mode Alt",
+"Yoshi's Island",
+"Yoshi's Story",
+"Brinstar"
+        };
     }
 
     /// <summary>

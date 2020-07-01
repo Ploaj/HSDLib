@@ -93,7 +93,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 { TEXT_OP_CODE.RESET_TEXTBOX, new Tuple<string, string>("/TEXTBOX", "") },
                 { TEXT_OP_CODE.RIGHT_ALIGNED, new Tuple<string, string>("/RIGHT", "") },
                 { TEXT_OP_CODE.SCALING, new Tuple<string, string>("SCALE", "bbbb") },
-                { TEXT_OP_CODE.SET_TEXTBOX, new Tuple<string, string>("TEXTBOX", "bbbb") },
+                { TEXT_OP_CODE.SET_TEXTBOX, new Tuple<string, string>("TEXTBOX", "ss") },
                 { TEXT_OP_CODE.UNKNOWN_02, new Tuple<string, string>("UNK02", "") },
                 { TEXT_OP_CODE.UNKNOWN_04, new Tuple<string, string>("UNK04", "") },
                 { TEXT_OP_CODE.UNKNOWN_05, new Tuple<string, string>("UNK05", "s") },

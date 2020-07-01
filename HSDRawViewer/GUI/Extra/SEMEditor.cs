@@ -29,6 +29,15 @@ namespace HSDRawViewer.GUI.Extra
             Controls.Add(_scriptEditor);
             _scriptEditor.BringToFront();
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetEntryNames()
+        {
+            return Entries.Select(e => e.Name).ToArray();
+        }
 
         /// <summary>
         /// 
@@ -174,6 +183,60 @@ namespace HSDRawViewer.GUI.Extra
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             entryList.RemoveAt(entryList.SelectedIndex);
+        }
+
+        public event EventHandler ArrayUpdated;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnArrayUpdated(EventArgs e)
+        {
+            EventHandler handler = ArrayUpdated;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void entryList_ArrayUpdated(object sender, EventArgs e)
+        {
+            OnArrayUpdated(EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class RenameBox
+        {
+            public string NewName { get; set; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void renameButton_Click(object sender, EventArgs e)
+        {
+            if(entryList.SelectedObject is SEMEntry entry)
+            {
+                var renameBox = new RenameBox();
+
+                renameBox.NewName = entry.Name;
+
+                using (PropertyDialog d = new PropertyDialog("Rename", renameBox))
+                {
+                    if (d.ShowDialog() == DialogResult.OK)
+                        entry.Name = renameBox.NewName;
+                }
+            }
         }
     }
 }

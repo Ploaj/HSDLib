@@ -8,11 +8,44 @@ using HSDRaw.MEX.Sounds;
 using System.IO;
 using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
+using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
     public partial class MEXMusicControl : UserControl, IMEXControl
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public class MusicEntry
+        {
+            [DisplayName("File Name")]
+            public string FileName { get => _fileName.Value; set => _fileName.Value = value; }
+
+            public HSD_String _fileName = new HSD_String() { Value = "" };
+
+            public override string ToString()
+            {
+                return FileName;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class MusicEntryLabel : MusicEntry
+        {
+            [DisplayName("Label")]
+            public string Label { get => _label.Value; set => _label.Value = value; }
+
+            public HSD_String _label = new HSD_String() { Value = "" };
+
+            public override string ToString()
+            {
+                return Label;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -41,13 +74,21 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
-        public HSD_String[] Music { get; set; }
+        public MusicEntry[] Music { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MusicEntryLabel[] LabeledMusic { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         public MEXPlaylistEntry[] MenuPlaylist { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MEXMusicControl()
         {
             InitializeComponent();
@@ -72,9 +113,29 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="data"></param>
         public void LoadData(MEX_Data data)
         {
-            Music = data.MusicTable.BackgroundMusicStrings.Array;
-            musicListEditor.SetArrayFromProperty(this, "Music");
+            var filenames = data.MusicTable.BGMFileNames.Array;
+            var labels = data.MusicTable.BGMLabels?.Array;
 
+            if (labels != null)
+            {
+                LabeledMusic = new MusicEntryLabel[filenames.Length];
+                for (int i = 0; i < filenames.Length; i++)
+                {
+                    LabeledMusic[i] = new MusicEntryLabel()
+                    {
+                        _fileName = filenames[i],
+                        _label = labels[i]
+                    };
+                }
+                musicListEditor.SetArrayFromProperty(this, "LabeledMusic");
+            }
+            else
+            {
+                Music = filenames.Select(e => new MusicEntry() { _fileName = e }).ToArray();
+                musicListEditor.SetArrayFromProperty(this, "Music");
+            }
+
+            // menu playlist
             MenuPlaylist = new MEXPlaylistEntry[data.MusicTable.MenuPlayListCount];
             for (int i = 0; i < MenuPlaylist.Length; i++)
             {
@@ -94,11 +155,19 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="data"></param>
         public void SaveData(MEX_Data data)
         {
-            data.MetaData.NumOfMusic = Music.Length;
-            data.MusicTable.BackgroundMusicStrings.Array = new HSD_String[0];
-            foreach (var v in Music)
-                data.MusicTable.BackgroundMusicStrings.Add(v);
+            if (Music != null)
+            {
+                data.MetaData.NumOfMusic = Music.Length;
+                data.MusicTable.BGMFileNames.Array = Music.Select(e => e._fileName).ToArray();
+            }
+            else
+            {
+                data.MetaData.NumOfMusic = LabeledMusic.Length;
+                data.MusicTable.BGMFileNames.Array = LabeledMusic.Select(e => e._fileName).ToArray();
+                data.MusicTable.BGMLabels.Array = LabeledMusic.Select(e => e._label).ToArray();
+            }
 
+            // playlist
             data.MusicTable.MenuPlaylist.Array = new MEX_PlaylistItem[0];
             data.MusicTable.MenuPlayListCount = MenuPlaylist.Length;
             for (int i = 0; i < MenuPlaylist.Length; i++)
@@ -145,7 +214,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         public int AddMusic(HSD_String musicName)
         {
-            musicListEditor.AddItem(musicName);
+            if(Music != null)
+            {
+                musicListEditor.AddItem(new MusicEntry() { _fileName = musicName });
+            }
+            else
+            {
+                musicListEditor.AddItem(new MusicEntryLabel() { _fileName = musicName, _label = new HSD_String() { Value = ""} });
+            }
             return Music.Length - 1;
         }
 
@@ -182,11 +258,33 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     dsp.FromFile(f);
                     HPS.SaveDSPAsHPS(dsp, Path.Combine(audioPath, Path.GetFileNameWithoutExtension(f) + ".hps"));
                     var newHPSName = Path.GetFileNameWithoutExtension(f) + ".hps";
+
                     foreach (var v in Music)
-                        if (v.Value.Equals(newHPSName))
+                        if (v.FileName.Equals(newHPSName))
                             return;
-                    musicListEditor.AddItem(new HSD_String() { Value = newHPSName });
+
+                    foreach (var v in LabeledMusic)
+                        if (v.FileName.Equals(newHPSName))
+                            return;
+
+                    AddMusic(new HSD_String() { Value = newHPSName });
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private string[] GetFileNameStrings()
+        {
+            if(Music != null)
+            {
+                return Music.Select(e => e.FileName).ToArray();
+            }
+            else
+            {
+                return LabeledMusic.Select(e => e.FileName).ToArray();
             }
         }
 
@@ -198,21 +296,24 @@ namespace HSDRawViewer.GUI.MEX.Controls
         private void musicListEditor_ArrayUpdated(object sender, EventArgs e)
         {
             var oldValues = MEXConverter.musicIDValues.ToArray();
-            MEXConverter.musicIDValues.Clear();
-            MEXConverter.musicIDValues.AddRange(Music.Select(r => r.Value));
 
-            if (oldValues != null && oldValues.Length == Music.Length)
+            var music = GetFileNameStrings();
+
+            MEXConverter.musicIDValues.Clear();
+            MEXConverter.musicIDValues.AddRange(music);
+
+            if (oldValues != null && oldValues.Length == music.Length)
             {
                 for (int i = 0; i < oldValues.Length; i++)
                 {
-                    if (oldValues[i] != Music[i].Value)
+                    if (oldValues[i] != music[i])
                     {
                         var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{oldValues[i]}");
-                        var newpath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{Music[i].Value}");
+                        var newpath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), $"audio\\{music[i]}");
 
                         if (File.Exists(path) && !File.Exists(newpath))
                         {
-                            if (MessageBox.Show($"Rename {oldValues[i]} to {Music[i].Value}?", "Rename File", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+                            if (MessageBox.Show($"Rename {oldValues[i]} to {music[i]}?", "Rename File", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
                             {
                                 File.Move(path, newpath);
                             }
@@ -229,9 +330,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void musicListEditor_DoubleClickedNode(object sender, EventArgs e)
         {
-            if (musicListEditor.SelectedObject is HSD_String str)
+            if (musicListEditor.SelectedObject is MusicEntry str)
             {
-                PlayMusicFromName(str.Value);
+                PlayMusicFromName(str.FileName);
             }
         }
 
@@ -244,7 +345,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             if (menuPlaylistEditor.SelectedObject is MEXPlaylistEntry str)
             {
-                PlayMusicFromName(Music[str.MusicID].Value);
+                PlayMusicFromName(Music[str.MusicID].FileName);
             }
         }
 

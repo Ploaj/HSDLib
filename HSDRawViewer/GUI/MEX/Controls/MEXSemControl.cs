@@ -25,8 +25,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
             _editor = new SEMEditor();
             _editor.Dock = DockStyle.Fill;
+            _editor.Enabled = false;
             Controls.Add(_editor);
             _editor.BringToFront();
+            _editor.ArrayUpdated += (sender, args) =>
+            {
+                MEXConverter.ssmValues.Clear();
+                MEXConverter.ssmValues.AddRange(_editor.GetEntryNames());
+            };
         }
 
         /// <summary>
@@ -90,7 +96,10 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 SemPath = FileIO.OpenFile("SEM (*.sem)|*.sem", "smash2.sem");
 
             if (SemPath != null && File.Exists(SemPath))
+            {
                 _editor.OpenSEMFile(SemPath, _data);
+                _editor.Enabled = true;
+            }
         }
     }
 }
