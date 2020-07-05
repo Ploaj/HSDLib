@@ -16,13 +16,13 @@ namespace HSDRawViewer.Tools
     /// </summary>
     public class MxDtSettings
     {
-        public bool IncludeMoveLogic { get; set; } = false;
+        public bool IncludeMoveLogic { get; set; } = true;
 
-        public bool IncludeItemStates { get; set; } = false;
+        public bool IncludeItemStates { get; set; } = true;
 
-        public bool IncludeMapGOBJs { get; set; } = false;
+        public bool IncludeMapGOBJs { get; set; } = true;
 
-        public bool IncludeBGMNames { get; set; } = false;
+        public bool IncludeBGMNames { get; set; } = true;
     }
 
     /// <summary>
@@ -200,6 +200,21 @@ namespace HSDRawViewer.Tools
                 CSSHandScale = 1
             };
             ExtractData(dol, data.MenuTable);
+
+
+            // expand stage select node
+            var sss = data.MenuTable.SSSIconData._s;
+            var stageIcons = new MEX_StageIconData[sss.Length / 0x1C];
+            for(int i = 0; i <  stageIcons.Length; i++)
+            {
+                stageIcons[i] = new MEX_StageIconData()
+                {
+                    _s = new HSDStruct(sss.GetSubData(i * 0x1C, 0x1C))
+                };
+                stageIcons[i]._s.Resize(0x20);
+                stageIcons[i].ExternalID = sss.GetByte(i * 0x1C + 0x0B);
+            }
+            data.MenuTable.SSSIconData.Array = stageIcons;
 
 
             // generate fighter table

@@ -624,8 +624,8 @@ namespace HSDRawViewer.GUI.MEX
             mexData.FighterFunctions.OnDeath.Set(internalId, new HSD_UInt() { Value = OnDeath });
             mexData.FighterFunctions.OnUnknown.Set(internalId, new HSD_UInt() { Value = OnUnk });
 
-            if (mexData.MetaData.Flags.HasFlag(MexFlags.ContainMoveLogic))
-                mexData.FighterFunctions.MoveLogic.Set(internalId, new HSDRaw.HSDArrayAccessor<MEX_MoveLogic>() { Array = MoveLogic });
+            if (mexData.MetaData.Flags.HasFlag(MexFlags.ContainMoveLogic) && MoveLogic != null)
+                mexData.FighterFunctions.MoveLogic.Set(internalId, new HSDArrayAccessor<MEX_MoveLogic>() { Array = MoveLogic });
 
             if (!mexData.MetaData.Flags.HasFlag(MexFlags.ContainMoveLogic))
                 mexData.FighterFunctions.MoveLogicPointers.Set(internalId, new HSD_UInt() { Value = MoveLogicPointer });

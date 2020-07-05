@@ -18,10 +18,7 @@ namespace HSDRaw.MEX
         {
             get
             {
-                if (_s.GetReference<HSDAccessor>(0x0C)._s.References.Count > 0)
-                    return _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>>(0x0C);
-
-                return null;
+                return _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSDArrayAccessor<MEX_MoveLogic>>>(0x0C);
             }
             set => _s.SetReference(0x0C, value);
         }
@@ -29,10 +26,7 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<HSD_UInt> MoveLogicPointers {
             get
             {
-                if(_s.GetReference<HSDAccessor>(0x0C)._s.References.Count == 0)
-                    return _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x0C);
-
-                return null;
+                return _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x0C);
             } set => _s.SetReference(0x0C, value); }
 
 

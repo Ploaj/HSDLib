@@ -481,6 +481,9 @@ namespace HSDRawViewer.GUI.Plugins
         {
             [DisplayName("Number to Generate"), Description("")]
             public int NumberToGenerate { get; set; } = 1;
+
+            [DisplayName("Add Dummy Texture"), Description("")]
+            public bool AddDummyTexture { get; set; } = false;
         }
 
         /// <summary>
@@ -491,12 +494,19 @@ namespace HSDRawViewer.GUI.Plugins
         private void addDummyDOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var setting = new DummyDOBJSetting();
+
             using (PropertyDialog d = new PropertyDialog("Add Dummy DOBJs", setting))
             {
                 if (d.ShowDialog() == DialogResult.OK)
                 {
+                    Bitmap dummy = null;
+
+                    if (setting.AddDummyTexture)
+                        dummy = new Bitmap(8, 8);
+
                     for (int i = 0; i < setting.NumberToGenerate; i++)
-                        root.Dobj.Add(new HSD_DOBJ()
+                    {
+                        var dobj = new HSD_DOBJ()
                         {
                             Mobj = new HSD_MOBJ()
                             {
@@ -509,7 +519,20 @@ namespace HSDRawViewer.GUI.Plugins
                                     Shininess = 50
                                 }
                             }
-                        });
+                        };
+
+                        if (setting.AddDummyTexture)
+                        {
+                            dobj.Mobj.RenderFlags |= RENDER_MODE.TEX0;
+                            dobj.Mobj.Textures = TOBJConverter.BitmapToTOBJ(dummy, HSDRaw.GX.GXTexFmt.I4, HSDRaw.GX.GXTlutFmt.IA8);
+                            dobj.Mobj.Textures.Trim();
+                        }
+
+                        root.Dobj.Add(dobj);
+                    }
+
+                    if (dummy != null)
+                        dummy.Dispose();
                 }
             }
 
@@ -1144,6 +1167,24 @@ namespace HSDRawViewer.GUI.Plugins
         {
             using (PropertyDialog d = new PropertyDialog("Display Settings", JOBJManager.settings))
                 d.ShowDialog();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void clearSelectedPOBJsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure?\nThis will clear all polygons in the selected DOBJ\n and cannot be undone", "Clear POBJs", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                if (propertyGrid1.SelectedObject is DOBJContainer con)
+                    con.DOBJ.Pobj = null;
+
+                JOBJManager.RefreshRendering = true;
+
+                RefreshGUI();
+            }
         }
     }
 }
