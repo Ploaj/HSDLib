@@ -223,5 +223,27 @@ namespace HSDRawViewer.Converters
             foreach (var c in root.Children)
                 ZeroOutRotations(newTransforms, c, oldTransform, newTransform);
         }
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rootjobj"></param>
+        private static void ApplyNarutoMaterials(HSD_JOBJ rootjobj)
+        {
+            foreach (var j in rootjobj.BreathFirstList)
+            {
+                if (j.Dobj != null)
+                    foreach (var d in j.Dobj.List)
+                    {
+                        d.Mobj.Material.SPC_A = 255;
+                        d.Mobj.Material.SPC_B = 0;
+                        d.Mobj.Material.SPC_G = 0;
+                        d.Mobj.Material.SPC_R = 0;
+                        d.Mobj.Material.Shininess = 50;
+                    }
+            }
+        }
     }
 }

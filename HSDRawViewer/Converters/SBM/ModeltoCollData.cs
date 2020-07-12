@@ -1,10 +1,8 @@
-﻿using Assimp;
-using HSDRaw.Common;
+﻿using HSDRaw.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
 using System.IO;
 using System.Xml;
@@ -61,9 +59,10 @@ namespace HSDRawViewer.Converters
 
         public static SBM_Coll_Data JOBJtoCollData(HSD_JOBJ root)
         {
-            var scene = ModelExporter.JOBJtoScene(root);
-
             List<Line> Lines = new List<Line>();
+
+            // TODO;
+            /*var scene = ModelExporter.JOBJtoScene(root);
 
             // go through each triangle and check collision with plane
             // if it collides, get the intersection points as a line
@@ -91,9 +90,9 @@ namespace HSDRawViewer.Converters
                                     Lines.Add(line);
                             }
                         }
-                }
+                }*/
 
-            
+
             CollLineGroup lineGroup = new CollLineGroup();
 
             // gather unique vertices
@@ -187,11 +186,6 @@ namespace HSDRawViewer.Converters
                 XmlSerializer serializer = new XmlSerializer(typeof(svg));
                 serializer.Serialize(settings, svg);
             }
-        }
-
-        private static Vector3 AssimpToTK(Vector3D v)
-        {
-            return new Vector3(v.X, v.Y, v.Z);
         }
 
         private static bool TriangleIntersectsPlane(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 planePosition, Vector3 planeNormal, out Vector3 i0, out Vector3 i1)

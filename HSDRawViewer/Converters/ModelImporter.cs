@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assimp;
-using Assimp.Configs;
 using HSDRaw.Common;
 using OpenTK;
 using HSDRawViewer.Rendering;
@@ -10,16 +8,14 @@ using HSDRaw.Tools;
 using HSDRaw.GX;
 using System.ComponentModel;
 using HSDRawViewer.GUI;
+using IONET;
+using IONET.Core.Skeleton;
+using IONET.Core;
+using IONET.Core.Model;
+using System.Linq;
 
 namespace HSDRawViewer.Converters
 {
-    public enum ForceGroupModes
-    {
-        None,
-        Texture,
-        MeshGroup
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -47,26 +43,17 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options"), DisplayName("Use Triangle Strips"), Description("Slower to import, but better optimized for game")]
         public bool UseStrips { get; set; } = true;
-
-        [Category("Importing Options"), DisplayName("Force Merge Objects"), Description("Reduces number of DOBJs by forcing mesh groups to be grouped by material")]
-        public ForceGroupModes ForceMergeObjects { get; set; } = ForceGroupModes.None;
-
-        //[Category("Importing Options"), DisplayName("Scale"), Description("Amount to scale model by when importing")]
-        //public float Scale { get; set; } = 1;
-
-        //[Category("Importing Options"), DisplayName("Set Joint Scale to 1"), Description("Sets all joint scaling to 1, 1, 1")]
-        //public bool SetScaleToOne { get; set; } = false;
-
+        
         [Category("Importing Options"), DisplayName("Import Rigging"), Description("Import rigging from model file")]
         public bool ImportRigging { get; set; } = true;
 
         
         
-        [Category("Material Options"), DisplayName("Import MOBJs"), Description("Imports .mobj files from file")]
+        [Category("Material Options"), DisplayName("Import MOBJs"), Description("Imports .mobj files from file if found")]
         public bool ImportMOBJ { get; set; } = false;
 
-        //[Category("Material Options"), DisplayName("Import Material Info"), Description("Imports the material info from model file. NOT recommended")]
-        //public bool ImportMaterialInfo { get; set; } = false;
+        [Category("Material Options"), DisplayName("Import Material Info"), Description("Imports the material info from model file. NOT recommended")]
+        public bool ImportMaterialInfo { get; set; } = false;
 
         [Category("Material Options"), DisplayName("Import Normals"), Description("")]
         public bool ImportNormals { get; set; } = true;
@@ -95,13 +82,6 @@ namespace HSDRawViewer.Converters
 
         [Category("Texture Options"), DisplayName("Palette Format"), Description("Palette format used with CI8 and CI4.")]
         public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB565;
-
-
-        //[Category("Misc"), DisplayName("Apply Fighter Transform (Melee Fighter Only)"), Description("Applies fighter transforms for use with Super Smash Bros. Melee")]
-        //public bool ZeroOutRotationsAndApplyFighterTransforms { get; set; } = false;
-        
-        //[Category("Misc"), DisplayName("Apply Naruto GNT Materials"), Description("Applys Material Style used in Naruto Clash of Ninja games")]
-        //public bool ApplyNarutoMaterials { get; set; } = false;
     }
 
 
@@ -118,23 +98,15 @@ namespace HSDRawViewer.Converters
 
         // cache the jobj names to their respective jobj
         public Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
-
-        // SingleBoundJOBJ bound vertices need to be inverted by their parent bone
-        public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
-
-        //
-        public Dictionary<HSD_JOBJ, Matrix4> jobjToNewTransform = new Dictionary<HSD_JOBJ, Matrix4>();
-
-        // mesh nodes need to be processed after the jobjs
-        public List<Node> MeshNodes = new List<Node>();
-
+        
         // Indicates jobjs that need the SKELETON flag set along with inverted transform
         public List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
+        
+        // 
+        public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
 
         // keeps matches texture path to dobj for better grouping options
         public Dictionary<string, HSD_DOBJ> TextureToDOBJ = new Dictionary<string, HSD_DOBJ>();
-
-        public Vector3 SceneScale = Vector3.One;
 
         public bool HasXLU = false;
     }
@@ -148,7 +120,9 @@ namespace HSDRawViewer.Converters
     {
         private string FilePath;
         private ModelImportSettings Settings;
+        private ImportSettings IOSettings;
         public HSD_JOBJ NewModel;
+        ModelProcessCache _cache = new ModelProcessCache();
 
         /// <summary>
         /// 
@@ -156,16 +130,25 @@ namespace HSDRawViewer.Converters
         /// <param name="toReplace"></param>
         public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
         {
-            var f = Tools.FileIO.OpenFile("Supported Formats (*.dae, *.obj)|*.dae;*.obj;*.fbx;*.smd");
+            var f = Tools.FileIO.OpenFile(IOManager.GetModelImportFileFilter());
 
             if (f != null)
             {
                 var settings = new ModelImportSettings();
                 using (PropertyDialog d = new PropertyDialog("Model Import Options", settings))
                 {
+                    ImportSettings ioSettings = new ImportSettings()
+                    {
+                        FlipUVs = settings.FlipUVs,
+                        FlipWindingOrder = settings.FlipFaces,
+                        Triangulate = true,
+                        SmoothNormals = settings.SmoothNormals,
+                        //WeightLimit = true,
+                    };
+
                     if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        ModelImporter imp = new ModelImporter(f, settings);
+                        ModelImporter imp = new ModelImporter(f, settings, ioSettings);
 
                         using (ProgressBarDisplay pb = new ProgressBarDisplay(imp))
                         {
@@ -181,10 +164,17 @@ namespace HSDRawViewer.Converters
             }
         }
 
-        public ModelImporter(string filePath, ModelImportSettings settings)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="settings"></param>
+        /// <param name="iosettings"></param>
+        public ModelImporter(string filePath, ModelImportSettings settings, ImportSettings iosettings)
         {
             FilePath = filePath;
             Settings = settings;
+            IOSettings = iosettings;
         }
 
         /// <summary>
@@ -197,106 +187,82 @@ namespace HSDRawViewer.Converters
             if (Settings == null)
                 Settings = new ModelImportSettings();
 
-            ModelProcessCache cache = new ModelProcessCache();
-            cache.POBJGen.UseTriangleStrips = Settings.UseStrips;
-            cache.POBJGen.UseVertexAlpha = Settings.ImportVertexAlpha;
-            cache.FolderPath = Path.GetDirectoryName(FilePath);
+            if (IOSettings == null)
+                IOSettings = new ImportSettings();
 
-            // assimp process flags
-            var processFlags = PostProcessPreset.TargetRealTimeMaximumQuality
-                | PostProcessSteps.Triangulate
-                | PostProcessSteps.LimitBoneWeights
-                | PostProcessSteps.CalculateTangentSpace;
-
-            if (!Settings.FlipFaces)
-                processFlags |= PostProcessSteps.FlipWindingOrder;
-
-            if (Settings.FlipUVs)
-                processFlags |= PostProcessSteps.FlipUVs;
-
-            if (Settings.SmoothNormals)
-            {
-                processFlags |= PostProcessSteps.ForceGenerateNormals;
-                processFlags |= PostProcessSteps.GenerateSmoothNormals;
-            }
-
-            // import model
-            ProgressStatus = "Importing Model with Assimp...";
-            w.ReportProgress(0);
-            AssimpContext importer = new AssimpContext();
-            if (Settings.SmoothNormals)
-                importer.SetConfig(new NormalSmoothingAngleConfig(80.0f));
-            importer.SetConfig(new VertexBoneWeightLimitConfig(4));
-            var importmodel = importer.ImportFile(FilePath, processFlags);
+            _cache.POBJGen.UseTriangleStrips = Settings.UseStrips;
+            _cache.POBJGen.UseVertexAlpha = Settings.ImportVertexAlpha;
+            _cache.FolderPath = Path.GetDirectoryName(FilePath);
             
 
-            // process nodes
-            ProgressStatus = "Processing Nodes...";
-            w.ReportProgress(30);
-            var rootNode = importmodel.RootNode;
-            var scenejobj = RecursiveProcess(cache, Settings, importmodel, importmodel.RootNode);
+            // import model
+            ProgressStatus = "Importing Model Data...";
+            w.ReportProgress(0);
+            var scene = IOManager.LoadScene(FilePath, IOSettings);
 
-            cache.SceneScale = new Vector3(scenejobj.SX, scenejobj.SY, scenejobj.SZ);
+            var model = scene.Models[0];
+
+            // process nodes
+            ProgressStatus = "Processing Joints...";
+            w.ReportProgress(30);
+            HSD_JOBJ root = null;
+            foreach(var r in model.Skeleton.RootBones)
+            {
+                if (root == null)
+                    root = IOBoneToJOBJ(r);
+                else
+                    root.Add(IOBoneToJOBJ(r));
+            }
+            if(root == null)
+            {
+                root = IOBoneToJOBJ(
+                    new IOBone() {
+                    Name = "Root"
+                });
+            }
+
 
             // get root of skeleton
-            var rootjobj = GetSkeleton(scenejobj);
-            rootjobj.Flags = JOBJ_FLAG.SKELETON_ROOT;
-            rootjobj.Next = null;
-            //RecalculateTransforms(cache, rootjobj, Matrix4.Identity);
-
-
-            // Clear rotations
-            //if (Settings.ZeroOutRotationsAndApplyFighterTransforms)
-            //{
-            //    ProgressStatus = "Clearing Rotations...";
-            //    cache.jobjToNewTransform = JOBJTools.ApplyMeleeFighterTransforms(rootjobj);
-            //}
-
+            root.Flags = JOBJ_FLAG.SKELETON_ROOT;
+            
 
             // process mesh
             ProgressStatus = "Processing Mesh...";
-            foreach (var mesh in cache.MeshNodes)
+            foreach (var mesh in model.Meshes)
             {
-                ProcessMesh(cache, Settings, importmodel, mesh, rootjobj);
+                ProcessMesh(scene, mesh, root);
 
-                ProgressStatus = $"Processing Mesh {rootjobj.Dobj.List.Count} {cache.MeshNodes.Count + 1}...";
-                w.ReportProgress((int)(30 + 60 * (rootjobj.Dobj.List.Count / (float)cache.MeshNodes.Count)));
+                ProgressStatus = $"Processing Mesh {root.Dobj.List.Count} {model.Meshes.Count + 1}...";
+                w.ReportProgress((int)(30 + 60 * (root.Dobj.List.Count / (float)model.Meshes.Count)));
             }
 
 
             // set flags
-            if (cache.EnvelopedJOBJs.Count > 0)
-                rootjobj.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
+            if (_cache.EnvelopedJOBJs.Count > 0)
+                root.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
             
-            if (cache.HasXLU)
-                rootjobj.Flags |= JOBJ_FLAG.XLU;
-            
-            rootjobj.Flags |= JOBJ_FLAG.OPA;
+            if (_cache.HasXLU)
+                root.Flags |= JOBJ_FLAG.XLU;
+
+            root.Flags |= JOBJ_FLAG.OPA;
 
 
             // calculate inverse binds
-            foreach (var jobj in cache.EnvelopedJOBJs)
+            foreach (var jobj in _cache.EnvelopedJOBJs)
             {
                 ProgressStatus = "Generating Inverse Transforms...";
-                if (cache.jobjToNewTransform.ContainsKey(jobj))
-                    jobj.InverseWorldTransform = Matrix4ToHSDMatrix(cache.jobjToNewTransform[jobj].Inverted());
-                else
-                    jobj.InverseWorldTransform = Matrix4ToHSDMatrix(cache.jobjToWorldTransform[jobj].Inverted());
+                if (_cache.jobjToWorldTransform.ContainsKey(jobj))
+                    jobj.InverseWorldTransform = Matrix4ToHSDMatrix(_cache.jobjToWorldTransform[jobj].Inverted());
             }
-
-            /*if (Settings.ApplyNarutoMaterials)
-            {
-                ProgressStatus = "Applying Naruto Materials...";
-                ApplyNarutoMaterials(rootjobj);
-            }*/
+            
 
             // SAVE POBJ buffers
             ProgressStatus = "Generating and compressing vertex buffers...";
             w.ReportProgress(90);
-            cache.POBJGen.SaveChanges();
+            _cache.POBJGen.SaveChanges();
 
             // done
-            NewModel = rootjobj;
+            NewModel = root;
 
             // update flags
             JOBJTools.UpdateJOBJFlags(NewModel);
@@ -308,25 +274,35 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sceneRoot"></param>
+        /// <param name="bone"></param>
         /// <returns></returns>
-        private static HSD_JOBJ GetSkeleton(HSD_JOBJ sceneRoot)
+        private HSD_JOBJ IOBoneToJOBJ(IOBone bone)
         {
-            if (sceneRoot.Child == null)
-                return sceneRoot;
-
-            HSD_JOBJ skel = sceneRoot.Child;
-            var maxDepth = 0;
-            foreach(var v in sceneRoot.Children)
+            HSD_JOBJ jobj = new HSD_JOBJ()
             {
-                if(v.BreathFirstList.Count > maxDepth)
-                {
-                    maxDepth = v.BreathFirstList.Count;
-                    skel = v;
-                }
+                TX = bone.TranslationX,
+                TY = bone.TranslationY,
+                TZ = bone.TranslationZ,
+                RX = bone.RotationEuler.X,
+                RY = bone.RotationEuler.Y,
+                RZ = bone.RotationEuler.Z,
+                SX = bone.ScaleX,
+                SY = bone.ScaleY,
+                SZ = bone.ScaleZ,
+            };
+
+            if (Settings.ImportBoneNames)
+                jobj.ClassName = bone.Name;
+
+            _cache.NameToJOBJ.Add(bone.Name, jobj);
+            _cache.jobjToWorldTransform.Add(jobj, MatrixNumericsToTKMatrix(bone.WorldTransform));
+
+            foreach(var child in bone.Children)
+            {
+                jobj.AddChild(IOBoneToJOBJ(child));
             }
 
-            return skel;
+            return jobj;
         }
         
         /// <summary>
@@ -356,21 +332,15 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="rootjobj"></param>
-        private static void ApplyNarutoMaterials(HSD_JOBJ rootjobj)
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private static Matrix4 MatrixNumericsToTKMatrix(System.Numerics.Matrix4x4 t)
         {
-            foreach (var j in rootjobj.BreathFirstList)
-            {
-                if (j.Dobj != null)
-                    foreach (var d in j.Dobj.List)
-                    {
-                        d.Mobj.Material.SPC_A = 255;
-                        d.Mobj.Material.SPC_B = 0;
-                        d.Mobj.Material.SPC_G = 0;
-                        d.Mobj.Material.SPC_R = 0;
-                        d.Mobj.Material.Shininess = 50;
-                    }
-            }
+            return new Matrix4(
+                t.M11, t.M12, t.M13, t.M14,
+                t.M21, t.M22, t.M23, t.M24,
+                t.M31, t.M32, t.M33, t.M34,
+                t.M41, t.M42, t.M43, t.M44);
         }
 
         /// <summary>
@@ -399,89 +369,6 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="cache"></param>
-        /// <param name="settings"></param>
-        /// <param name="jobj"></param>
-        public static void RecalculateTransforms(ModelProcessCache cache, HSD_JOBJ jobj, Matrix4 parent)
-        {
-            Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
-                Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
-            
-            Transform = Transform * parent;
-
-            cache.jobjToWorldTransform[jobj] = Transform;
-
-            foreach (var child in jobj.Children)
-            {
-                RecalculateTransforms(cache, child, parent);
-            }
-        }
-
-        /// <summary>
-        /// Recursivly processing nodes and convert data into JOBJ
-        /// </summary>
-        /// <param name="scene"></param>
-        /// <param name="node"></param>
-        /// <returns></returns>
-        private static HSD_JOBJ RecursiveProcess(ModelProcessCache cache, ModelImportSettings settings, Scene scene, Node node)
-        {
-            if (node.Name.EndsWith("_end"))
-                return null;
-            
-            var t = node.Transform;
-            var transform = new OpenTK.Matrix4(
-                                        t.A1, t.B1, t.C1, t.D1,
-                                        t.A2, t.B2, t.C2, t.D2,
-                                        t.A3, t.B3, t.C3, t.D3,
-                                        t.A4, t.B4, t.C4, t.D4);
-            
-            var translation = transform.ExtractTranslation();
-            var scale = transform.ExtractScale();
-            var rotation = Math3D.ToEulerAngles(transform.ExtractRotation().Inverted());
-
-            //if (settings.SetScaleToOne)
-            //    scale = Vector3.One;
-
-            //translation *= settings.Scale;
-            
-            HSD_JOBJ jobj = new HSD_JOBJ();
-
-            if (node.Parent != null)
-            {
-                transform = transform * cache.jobjToWorldTransform[cache.NameToJOBJ[node.Parent.Name]];
-            }
-            cache.NameToJOBJ.Add(node.Name, jobj);
-            cache.jobjToWorldTransform.Add(jobj, transform);
-
-            if(settings.ImportBoneNames)
-                jobj.ClassName = node.Name;
-            jobj.Flags = JOBJ_FLAG.CLASSICAL_SCALING;
-            jobj.TX = RoundFloat(translation.X);
-            jobj.TY = RoundFloat(translation.Y);
-            jobj.TZ = RoundFloat(translation.Z);
-            jobj.RX = RoundFloat(rotation.X);
-            jobj.RY = RoundFloat(rotation.Y);
-            jobj.RZ = RoundFloat(rotation.Z);
-            jobj.SX = RoundFloat(scale.X);
-            jobj.SY = RoundFloat(scale.Y);
-            jobj.SZ = RoundFloat(scale.Z);
-
-            if (node.HasMeshes)
-                cache.MeshNodes.Add(node);
-
-            foreach (var child in node.Children)
-            {
-                Console.WriteLine(child.Name);
-                jobj.AddChild(RecursiveProcess(cache, settings, scene, child));
-            }
-
-            return jobj;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="f"></param>
         /// <returns></returns>
         private static float RoundFloat(float f)
@@ -493,7 +380,7 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <returns></returns>
-        private static void ProcessMesh(ModelProcessCache cache, ModelImportSettings settings, Scene scene, Node node, HSD_JOBJ rootnode)
+        private void ProcessMesh(IOScene scene, IOMesh mesh, HSD_JOBJ rootnode)
         {
             HSD_JOBJ parent = rootnode;
 
@@ -501,65 +388,57 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ prev = null;
 
             var skeleton = rootnode.BreathFirstList;
-            Console.WriteLine("Processing " + node.Name);
+            Console.WriteLine("Processing " + mesh.Name);
 
-            bool singleBinded = node.Name.Contains("SINGLE");
+            bool singleBinded = mesh.Name.Contains("SINGLE");
 
-            foreach (int index in node.MeshIndices)
+            foreach (var poly in mesh.Polygons)
             {
-                Mesh mesh = scene.Meshes[index];
-                var material = scene.Materials[mesh.MaterialIndex];
+                // Skip Empty Polygon
+                if (poly.Indicies.Count == 0)
+                    continue;
 
-                Console.WriteLine(mesh.Name + " " + material.Name);
-                //Console.WriteLine(cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]].ToString());
+
+                // convert to triangles
+                poly.ToTriangles(mesh);
+
+                if (poly.PrimitiveType != IOPrimitive.TRIANGLE)
+                    continue;
+
 
                 // Generate DOBJ
                 HSD_DOBJ dobj = new HSD_DOBJ();
 
-                if(settings.ImportMeshNames)
+                if(Settings.ImportMeshNames)
                     dobj.ClassName = mesh.Name;
 
-                // hack to make dobjs merged by texture
-                if (settings.ImportTexture && 
-                    settings.ForceMergeObjects == ForceGroupModes.Texture &&
-                    material.HasTextureDiffuse &&
-                    cache.TextureToDOBJ.ContainsKey(material.TextureDiffuse.FilePath))
-                {
-                    dobj = cache.TextureToDOBJ[material.TextureDiffuse.FilePath];
-                }
+                if (root == null)
+                    root = dobj;
                 else
-                {
-                    if (root == null)
-                        root = dobj;
-                    else
-                        prev.Next = dobj;
-                    prev = dobj;
-                    
-                    dobj.Mobj = GenerateMaterial(cache, settings, material);
-                    if(settings.ForceMergeObjects == ForceGroupModes.Texture &&
-                        material.HasTextureDiffuse && 
-                        settings.ImportTexture)
-                        cache.TextureToDOBJ.Add(material.TextureDiffuse.FilePath, dobj);
-                }
-                
-                if (root != null && settings.ForceMergeObjects == ForceGroupModes.MeshGroup)
-                    dobj = root;
+                    prev.Next = dobj;
+                prev = dobj;
 
-                // Assessment
-                if (!mesh.HasFaces)
-                    continue;
-                
-                // Assess needed attributes based on the material MOBJ
 
+                // generate material
+                var material = scene.Materials.Find(e => e.Name == poly.MaterialName);
+
+                dobj.Mobj = GenerateMaterial(material);
+                
+
+                Console.WriteLine(mesh.Name + " " + material.Name);
+
+                
                 // reflective mobjs do not use uvs
                 var hasReflection = false;
+
                 // bump maps need tangents and bitangents
                 var hasBump = false;
 
-                if (node.Name.Contains("REFLECTIVE"))
+                // Assess needed attributes based on the material MOBJ
+                if (mesh.Name.Contains("REFLECTIVE"))
                     hasReflection = true;
 
-                if (node.Name.Contains("BUMP"))
+                if (mesh.Name.Contains("BUMP"))
                     hasBump = true;
 
                 if (dobj.Mobj.Textures != null)
@@ -573,281 +452,167 @@ namespace HSDRawViewer.Converters
                     }
                 }
 
+                // assess attributes
                 List<GXAttribName> Attributes = new List<GXAttribName>();
 
-                // todo: rigging
-                List<HSD_JOBJ>[] jobjs = new List<HSD_JOBJ>[mesh.Vertices.Count];
-                List<float>[] weights = new List<float>[mesh.Vertices.Count];
-                List<Matrix4>[] binds = new List<Matrix4>[mesh.Vertices.Count];
-                List<Matrix4>[] worlds = new List<Matrix4>[mesh.Vertices.Count];
-                if (mesh.HasBones && settings.ImportRigging)
-                {
-                    if(!singleBinded)
-                        Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
-
-                    foreach (var v in mesh.Bones)
-                    {
-                        var jobj = cache.NameToJOBJ[v.Name];
-
-                        if (!skeleton.Contains(jobj))
-                            jobj = skeleton[0];
-
-                        if (!cache.EnvelopedJOBJs.Contains(jobj))
-                            cache.EnvelopedJOBJs.Add(jobj);
-
-                        var t = v.OffsetMatrix;
-                        var invmat = new Matrix4(
-                            t.A1, t.B1, t.C1, t.D1,
-                            t.A2, t.B2, t.C2, t.D2,
-                            t.A3, t.B3, t.C3, t.D3,
-                            t.A4, t.B4, t.C4, t.D4);
-
-                        var envjobj = cache.NameToJOBJ[v.Name];
-
-                        if (v.HasVertexWeights)
-                            foreach (var vw in v.VertexWeights)
-                            {
-                                if (jobjs[vw.VertexID] == null)
-                                    jobjs[vw.VertexID] = new List<HSD_JOBJ>();
-                                if (weights[vw.VertexID] == null)
-                                    weights[vw.VertexID] = new List<float>();
-                                if (binds[vw.VertexID] == null)
-                                    binds[vw.VertexID] = new List<Matrix4>();
-                                if (worlds[vw.VertexID] == null)
-                                    worlds[vw.VertexID] = new List<Matrix4>();
-
-                                if (vw.Weight > 0)
-                                {
-                                    jobjs[vw.VertexID].Add(envjobj);
-                                    weights[vw.VertexID].Add(vw.Weight);
-
-                                    if (cache.jobjToNewTransform.ContainsKey(envjobj))
-                                        binds[vw.VertexID].Add(cache.jobjToNewTransform[envjobj].Inverted());
-                                    else
-                                        binds[vw.VertexID].Add(invmat);
-
-                                    worlds[vw.VertexID].Add(invmat * cache.jobjToWorldTransform[envjobj]);
-                                }
-                            }
-                    }
-                }
+                if (mesh.HasEnvelopes() && Settings.ImportRigging && !singleBinded)
+                    Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
 
                 if (hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
-
-                if (mesh.HasVertices)
-                    Attributes.Add(GXAttribName.GX_VA_POS);
+                
+                Attributes.Add(GXAttribName.GX_VA_POS);
 
 
                 if (hasBump)
                     Attributes.Add(GXAttribName.GX_VA_NBT);
                 else
-                if (mesh.HasNormals && settings.ImportNormals)
+                if (mesh.HasNormals && Settings.ImportNormals)
                     Attributes.Add(GXAttribName.GX_VA_NRM);
 
 
-                if (mesh.HasVertexColors(0) && settings.ImportVertexColor)
+                if (mesh.HasColorSet(0) && Settings.ImportVertexColor)
                     Attributes.Add(GXAttribName.GX_VA_CLR0);
 
+                if (mesh.HasColorSet(1) && Settings.ImportVertexColor)
+                    Attributes.Add(GXAttribName.GX_VA_CLR1);
 
-                if (mesh.HasTextureCoords(0) && !hasReflection)
+
+                if (mesh.HasUVSet(0) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
-                if ((mesh.HasTextureCoords(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)) && !hasReflection)
+                if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX1);
 
-                if ((mesh.HasTextureCoords(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)) && !hasReflection)
+                if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX2);
 
-                if ((mesh.HasTextureCoords(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)) && !hasReflection)
+                if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX3);
 
-                if ((mesh.HasTextureCoords(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)) && !hasReflection)
+                if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX4);
 
-                if ((mesh.HasTextureCoords(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)) && !hasReflection)
+                if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX5);
 
-                if ((mesh.HasTextureCoords(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)) && !hasReflection)
+                if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX6);
 
-                if ((mesh.HasTextureCoords(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)) && !hasReflection)
+                if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)) && !hasReflection)
                     Attributes.Add(GXAttribName.GX_VA_TEX7);
 
+
                 var vertices = new List<GX_Vertex>();
-                var jobjList = new List<HSD_JOBJ[]>(vertices.Count);
-                var wList = new List<float[]>(vertices.Count);
+                var jobjList = new List<HSD_JOBJ[]>();
+                var weightList = new List<float[]>();
 
-                foreach (var face in mesh.Faces)
+                foreach (var face in poly.Indicies)
                 {
-                    PrimitiveType faceMode;
-                    switch (face.IndexCount)
+                    var v = mesh.Vertices[face];
+
+                    GX_Vertex vertex = new GX_Vertex();
+
+                    var tkvert = new Vector3(v.Position.X, v.Position.Y, v.Position.Z);
+                    var tknrm = new Vector3(v.Normal.X, v.Normal.Y, v.Normal.Z);
+                    var tktan = new Vector3(v.Tangent.X, v.Tangent.Y, v.Tangent.Z);
+                    var tkbitan = new Vector3(v.Binormal.X, v.Binormal.Y, v.Binormal.Z);
+
+                    tkvert = Vector3.TransformPosition(tkvert, _cache.jobjToWorldTransform[rootnode].Inverted());
+                    tknrm = Vector3.TransformNormal(tknrm, _cache.jobjToWorldTransform[rootnode].Inverted()).Normalized();
+                    tktan = Vector3.TransformNormal(tktan, _cache.jobjToWorldTransform[rootnode].Inverted()).Normalized();
+                    tkbitan = Vector3.TransformNormal(tkbitan, _cache.jobjToWorldTransform[rootnode].Inverted()).Normalized();
+
+                    if (mesh.HasEnvelopes() && Settings.ImportRigging)
                     {
-                        case 1:
-                            faceMode = PrimitiveType.Point;
-                            break;
-                        case 2:
-                            faceMode = PrimitiveType.Line;
-                            break;
-                        case 3:
-                            faceMode = PrimitiveType.Triangle;
-                            break;
-                        default:
-                            faceMode = PrimitiveType.Polygon;
-                            break;
-                    }
-
-                    if (faceMode != PrimitiveType.Triangle)
-                    {
-                        continue;
-                    }
-
-                    for (int i = 0; i < face.IndexCount; i++)
-                    {
-                        int indicie = face.Indices[i];
-
-                        GX_Vertex vertex = new GX_Vertex();
-
-                        var tkvert = new Vector3(mesh.Vertices[indicie].X, mesh.Vertices[indicie].Y, mesh.Vertices[indicie].Z);//* settings.Scale;
-                        var tknrm = new Vector3(mesh.Normals[indicie].X, mesh.Normals[indicie].Y, mesh.Normals[indicie].Z);
-                        var tktan = Vector3.Zero;
-                        var tkbitan = Vector3.Zero;
-
-                        tkvert = Vector3.TransformPosition(tkvert, cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]]);
-                        tknrm = Vector3.TransformNormal(tknrm, cache.jobjToWorldTransform[cache.NameToJOBJ[node.Name]]);
-
-                        tkvert = Vector3.TransformPosition(tkvert, cache.jobjToWorldTransform[rootnode].Inverted());
-                        tknrm = Vector3.TransformNormal(tknrm, cache.jobjToWorldTransform[rootnode].Inverted());
-
-                        if (mesh.HasBones && settings.ImportRigging)
-                        {
-                            //  unbound verts
-                            if (jobjs[indicie] == null) 
-                            {
-                                jobjs[indicie] = new List<HSD_JOBJ>();
-                                weights[indicie] = new List<float>();
-                                binds[indicie] = new List<Matrix4>();
-                                worlds[indicie] = new List<Matrix4>();
-                            }
-
-                            jobjList.Add(jobjs[indicie].ToArray());
-                            wList.Add(weights[indicie].ToArray());
-
-                            // tan and bitan
-                            // TODO; tan is weird
-                            if (mesh.HasTangentBasis)
-                            {
-                                tktan = new Vector3(mesh.Tangents[indicie].X, mesh.Tangents[indicie].Y, mesh.Tangents[indicie].Z);
-                                tkbitan = new Vector3(mesh.BiTangents[indicie].X, mesh.BiTangents[indicie].Y, mesh.BiTangents[indicie].Z);
-                            }
-
-                            if (weights[indicie].Count > 1)
-                            {
-                                var bindv = Vector3.Zero;
-                                var bindvn = Vector3.Zero;
-                                for (int k = 0; k < weights[indicie].Count; k++)
-                                {
-                                    bindv += Vector3.TransformPosition(tkvert, worlds[indicie][k]) * weights[indicie][k];
-                                    bindvn += Vector3.TransformNormal(tknrm, worlds[indicie][k]) * weights[indicie][k];
-                                }
-                                tkvert = bindv;
-                                tknrm = bindvn;
-                            }
-
-                            if (weights[indicie].Count == 1)
-                            {
-                                tkvert = Vector3.TransformPosition(tkvert, binds[indicie][0]);
-                                tknrm = Vector3.TransformNormal(tknrm, binds[indicie][0]);
-                            }
-                        }
-
-                        if (mesh.HasVertices)
-                            vertex.POS = GXTranslator.fromVector3(tkvert);
-
-                        if (mesh.HasNormals)
-                        {
-                            vertex.NRM = GXTranslator.fromVector3(tknrm.Normalized());
-                        }
-
-                        if (mesh.HasTangentBasis)
-                        {
-                            vertex.TAN = GXTranslator.fromVector3(tktan);
-                            vertex.BITAN = GXTranslator.fromVector3(tkbitan);
-                        }
-
-                        if (settings.InvertNormals)
-                        {
-                            vertex.NRM.X *= -1;
-                            vertex.NRM.Y *= -1;
-                            vertex.NRM.Z *= -1;
-                        }
+                        // create weighting lists
+                        jobjList.Add(v.Envelope.Weights.Select(e => _cache.NameToJOBJ[e.BoneName]).ToArray());
+                        weightList.Add(v.Envelope.Weights.Select(e => e.Weight).ToArray());
                         
-                        if (mesh.HasTextureCoords(0))
-                            vertex.TEX0 = new GXVector2(
-                                mesh.TextureCoordinateChannels[0][indicie].X,
-                                mesh.TextureCoordinateChannels[0][indicie].Y);
+                        // indicate enveloped jobjs
+                        foreach (var bw in v.Envelope.Weights)
+                            if (!_cache.EnvelopedJOBJs.Contains(_cache.NameToJOBJ[bw.BoneName]))
+                                _cache.EnvelopedJOBJs.Add(_cache.NameToJOBJ[bw.BoneName]);
 
-                        if (mesh.HasTextureCoords(1))
-                            vertex.TEX1 = new GXVector2(
-                                mesh.TextureCoordinateChannels[1][indicie].X,
-                                mesh.TextureCoordinateChannels[1][indicie].Y);
+                        // invert single binds
+                        if (v.Envelope.Weights.Count == 1)
+                        {
+                            var inv = _cache.jobjToWorldTransform[_cache.NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
+                            tkvert = Vector3.TransformPosition(tkvert, inv);
+                            tknrm = Vector3.TransformNormal(tknrm, inv).Normalized();
+                            tktan = Vector3.TransformNormal(tknrm, inv).Normalized();
+                            tkbitan = Vector3.TransformNormal(tknrm, inv).Normalized();
+                        }
+                    }
+                    
+                    vertex.POS = GXTranslator.fromVector3(tkvert);
+                    vertex.NRM = GXTranslator.fromVector3(tknrm.Normalized());
+                    vertex.TAN = GXTranslator.fromVector3(tktan);
+                    vertex.BITAN = GXTranslator.fromVector3(tkbitan);
 
-                        if (mesh.HasTextureCoords(2))
-                            vertex.TEX2 = new GXVector2(
-                                mesh.TextureCoordinateChannels[2][indicie].X,
-                                mesh.TextureCoordinateChannels[2][indicie].Y);
-
-                        if (mesh.HasTextureCoords(3))
-                            vertex.TEX3 = new GXVector2(
-                                mesh.TextureCoordinateChannels[3][indicie].X,
-                                mesh.TextureCoordinateChannels[3][indicie].Y);
-
-                        if (mesh.HasTextureCoords(4))
-                            vertex.TEX4 = new GXVector2(
-                                mesh.TextureCoordinateChannels[4][indicie].X,
-                                mesh.TextureCoordinateChannels[4][indicie].Y);
-
-                        if (mesh.HasTextureCoords(5))
-                            vertex.TEX5 = new GXVector2(
-                                mesh.TextureCoordinateChannels[5][indicie].X,
-                                mesh.TextureCoordinateChannels[5][indicie].Y);
-
-                        if (mesh.HasTextureCoords(6))
-                            vertex.TEX6 = new GXVector2(
-                                mesh.TextureCoordinateChannels[6][indicie].X,
-                                mesh.TextureCoordinateChannels[6][indicie].Y);
-
-                        if (mesh.HasTextureCoords(7))
-                            vertex.TEX7 = new GXVector2(
-                                mesh.TextureCoordinateChannels[7][indicie].X,
-                                mesh.TextureCoordinateChannels[7][indicie].Y);
-
-                        if (mesh.HasVertexColors(0))
-                            vertex.CLR0 = new GXColor4(
-                                mesh.VertexColorChannels[0][indicie].R * (settings.MultiplyVertexColorBy2 ? 2 : 1),
-                                mesh.VertexColorChannels[0][indicie].G * (settings.MultiplyVertexColorBy2 ? 2 : 1),
-                                mesh.VertexColorChannels[0][indicie].B * (settings.MultiplyVertexColorBy2 ? 2 : 1),
-                                settings.ImportVertexAlpha ? mesh.VertexColorChannels[0][indicie].A : 1);
-
-                        if (mesh.HasVertexColors(1))
-                            vertex.CLR0 = new GXColor4(
-                                mesh.VertexColorChannels[1][indicie].R * (settings.MultiplyVertexColorBy2 ? 2 : 1),
-                                mesh.VertexColorChannels[1][indicie].G * (settings.MultiplyVertexColorBy2 ? 2 : 1),
-                                mesh.VertexColorChannels[1][indicie].B * (settings.MultiplyVertexColorBy2 ? 2 : 1),
-                                settings.ImportVertexAlpha ? mesh.VertexColorChannels[1][indicie].A : 1);
-
-                        vertices.Add(vertex);
+                    if (Settings.InvertNormals)
+                    {
+                        vertex.NRM.X *= -1;
+                        vertex.NRM.Y *= -1;
+                        vertex.NRM.Z *= -1;
+                        vertex.TAN.X *= -1;
+                        vertex.TAN.Y *= -1;
+                        vertex.TAN.Z *= -1;
+                        vertex.BITAN.X *= -1;
+                        vertex.BITAN.Y *= -1;
+                        vertex.BITAN.Z *= -1;
                     }
 
+                    if (mesh.HasUVSet(0))
+                        vertex.TEX0 = new GXVector2(v.UVs[0].X, v.UVs[0].Y);
+
+                    if (mesh.HasUVSet(1))
+                        vertex.TEX1 = new GXVector2(v.UVs[1].X, v.UVs[1].Y);
+
+                    if (mesh.HasUVSet(2))
+                        vertex.TEX2 = new GXVector2(v.UVs[2].X, v.UVs[2].Y);
+
+                    if (mesh.HasUVSet(3))
+                        vertex.TEX3 = new GXVector2(v.UVs[3].X, v.UVs[3].Y);
+
+                    if (mesh.HasUVSet(4))
+                        vertex.TEX4 = new GXVector2(v.UVs[4].X, v.UVs[4].Y);
+
+                    if (mesh.HasUVSet(5))
+                        vertex.TEX5 = new GXVector2(v.UVs[5].X, v.UVs[5].Y);
+
+                    if (mesh.HasUVSet(6))
+                        vertex.TEX6 = new GXVector2(v.UVs[6].X, v.UVs[6].Y);
+
+                    if (mesh.HasUVSet(7))
+                        vertex.TEX7 = new GXVector2(v.UVs[7].X, v.UVs[7].Y);
+
+                    if (mesh.HasColorSet(0))
+                        vertex.CLR0 = new GXColor4(
+                            v.Colors[0].X * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
+                            v.Colors[0].Y * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
+                            v.Colors[0].Z * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
+                            Settings.ImportVertexAlpha ? v.Colors[0].W : 1);
+
+                    if (mesh.HasColorSet(1))
+                        vertex.CLR1 = new GXColor4(
+                            v.Colors[1].X * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
+                            v.Colors[1].Y * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
+                            v.Colors[1].Z * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
+                            Settings.ImportVertexAlpha ? v.Colors[1].W : 1);
+
+                    vertices.Add(vertex);
                 }
 
+                
+                // generate pobjs
                 HSD_POBJ pobj = null;
 
-                if (mesh.HasBones && settings.ImportRigging && !singleBinded)
-                    pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, wList);
+                if (mesh.HasEnvelopes() && Settings.ImportRigging && !singleBinded)
+                    pobj = _cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, weightList);
                 else
-                    pobj = cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
+                    pobj = _cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
 
                 if (singleBinded && jobjList.Count > 0 && jobjList[0].Length > 0)
                     parent = jobjList[0][0];
@@ -874,70 +639,67 @@ namespace HSDRawViewer.Converters
         /// <param name="settings"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        private static HSD_MOBJ GenerateMaterial(ModelProcessCache cache, ModelImportSettings settings, Material material)
+        private HSD_MOBJ GenerateMaterial(IOMaterial material)
         {
+            // create blank mobj
             var Mobj = new HSD_MOBJ();
-            Mobj.Material = new HSD_Material();
-            Mobj.Material.AMB_A = 0xFF;
-            Mobj.Material.AMB_R = 0x7F;
-            Mobj.Material.AMB_G = 0x7F;
-            Mobj.Material.AMB_B = 0x7F;
-            Mobj.Material.DiffuseColor = System.Drawing.Color.White;
-            Mobj.Material.SpecularColor = System.Drawing.Color.White;
-            Mobj.Material.Shininess = 50;
-            Mobj.Material.Alpha = 1;
+            Mobj.Material = new HSD_Material()
+            {
+                AMB_A = 0xFF,
+                AMB_R = 0x7F,
+                AMB_G = 0x7F,
+                AMB_B = 0x7F,
+                DiffuseColor = System.Drawing.Color.White,
+                SpecularColor = System.Drawing.Color.White,
+                Shininess = 50,
+                Alpha = 1
+            };
 
-            if (settings.ImportVertexColor)
+            // detect and set flags
+            if (Settings.ImportVertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
 
-            if (settings.EnableDiffuse)
+            if (Settings.EnableDiffuse)
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
 
             // Properties
-            /*if (settings.ImportMaterialInfo)
+            if (Settings.ImportMaterialInfo)
             {
-                if (material.HasShininess)
-                    Mobj.Material.Shininess = material.Shininess;
+                Mobj.Material.Shininess = material.Shininess;
+                Mobj.Material.Alpha = material.Alpha;
 
-                if (material.HasColorAmbient)
-                {
-                    Mobj.Material.AMB_A = ColorFloatToByte(material.ColorAmbient.A);
-                    Mobj.Material.AMB_R = ColorFloatToByte(material.ColorAmbient.R);
-                    Mobj.Material.AMB_G = ColorFloatToByte(material.ColorAmbient.G);
-                    Mobj.Material.AMB_B = ColorFloatToByte(material.ColorAmbient.B);
-                }
-                if (material.HasColorDiffuse)
-                {
-                    Mobj.Material.DIF_A = ColorFloatToByte(material.ColorDiffuse.A);
-                    Mobj.Material.DIF_R = ColorFloatToByte(material.ColorDiffuse.R);
-                    Mobj.Material.DIF_G = ColorFloatToByte(material.ColorDiffuse.G);
-                    Mobj.Material.DIF_B = ColorFloatToByte(material.ColorDiffuse.B);
-                }
-                if (material.HasColorSpecular)
-                {
-                    Mobj.Material.SPC_A = ColorFloatToByte(material.ColorSpecular.A);
-                    Mobj.Material.SPC_R = ColorFloatToByte(material.ColorSpecular.R);
-                    Mobj.Material.SPC_G = ColorFloatToByte(material.ColorSpecular.G);
-                    Mobj.Material.SPC_B = ColorFloatToByte(material.ColorSpecular.B);
-                }
-            }*/
+                Mobj.Material.AMB_R = (byte)(material.AmbientColor.X * 255);
+                Mobj.Material.AMB_G = (byte)(material.AmbientColor.Y * 255);
+                Mobj.Material.AMB_B = (byte)(material.AmbientColor.Z * 255);
+                Mobj.Material.AMB_A = (byte)(material.AmbientColor.W * 255);
+
+                Mobj.Material.DIF_R = (byte)(material.DiffuseColor.X * 255);
+                Mobj.Material.DIF_G = (byte)(material.DiffuseColor.Y * 255);
+                Mobj.Material.DIF_B = (byte)(material.DiffuseColor.Z * 255);
+                Mobj.Material.DIF_A = (byte)(material.DiffuseColor.W * 255);
+
+                Mobj.Material.SPC_R = (byte)(material.SpecularColor.X * 255);
+                Mobj.Material.SPC_G = (byte)(material.SpecularColor.Y * 255);
+                Mobj.Material.SPC_B = (byte)(material.SpecularColor.Z * 255);
+                Mobj.Material.SPC_A = (byte)(material.SpecularColor.W * 255);
+            }
 
             // Textures
-            if(settings.ImportTexture)
+            if(Settings.ImportTexture)
             {
-                if (material.HasTextureDiffuse)
+                if (material.DiffuseMap != null)
                 {
-                    var texturePath = Path.Combine(cache.FolderPath, material.TextureDiffuse.FilePath);
+                    var texturePath = Path.Combine(_cache.FolderPath, material.DiffuseMap.FilePath);
 
-                    if (File.Exists(material.TextureDiffuse.FilePath))
-                        texturePath = material.TextureDiffuse.FilePath;
+                    if (File.Exists(material.DiffuseMap.FilePath))
+                        texturePath = material.DiffuseMap.FilePath;
 
                     if (File.Exists(texturePath + ".png"))
                         texturePath = texturePath + ".png";
 
                     var mobjPath = Path.Combine(Path.GetDirectoryName(texturePath), Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
                     
-                    if(settings.ImportMOBJ && File.Exists(mobjPath))
+                    if(Settings.ImportMOBJ && File.Exists(mobjPath))
                     {
                         var dat = new HSDRaw.HSDRawFile(mobjPath);
                         Mobj._s = dat.Roots[0].Data._s;
@@ -956,18 +718,18 @@ namespace HSDRawViewer.Converters
                     {
                         Mobj.RenderFlags |= RENDER_MODE.TEX0;
 
-                        var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, settings.TextureFormat, settings.PaletteFormat);
+                        var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, Settings.TextureFormat, Settings.PaletteFormat);
                         tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
                         
                         tobj.GXTexGenSrc = 4;
                         tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
 
-                        tobj.WrapS = ToGXWrapMode(material.TextureDiffuse.WrapModeU);
-                        tobj.WrapT = ToGXWrapMode(material.TextureDiffuse.WrapModeV);
+                        tobj.WrapS = ToGXWrapMode(material.DiffuseMap.WrapS);
+                        tobj.WrapT = ToGXWrapMode(material.DiffuseMap.WrapT);
 
                         if (TOBJConverter.IsTransparent(tobj))
                         {
-                            cache.HasXLU = true;
+                            _cache.HasXLU = true;
                             Mobj.RenderFlags |= RENDER_MODE.XLU | RENDER_MODE.NO_ZUPDATE;
                             tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;
                         }
@@ -985,13 +747,13 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        private static GXWrapMode ToGXWrapMode(TextureWrapMode mode)
+        private static GXWrapMode ToGXWrapMode(WrapMode mode)
         {
             switch (mode)
             {
-                case TextureWrapMode.Clamp:
+                case WrapMode.CLAMP:
                     return GXWrapMode.CLAMP;
-                case TextureWrapMode.Mirror:
+                case WrapMode.MIRROR:
                     return GXWrapMode.MIRROR;
                 default:
                     return GXWrapMode.REPEAT;
@@ -1006,33 +768,6 @@ namespace HSDRawViewer.Converters
         private static byte ColorFloatToByte(float val)
         {
             return (byte)(val > 1.0f ? 255 : val * 256);
-        }
-
-        /// <summary>
-        /// Converts from Assimps <see cref="Matrix4x4"/> to OpenTK's <see cref="Matrix4"/>
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <returns></returns>
-        public static Matrix4 FromMatrix(Matrix4x4 mat)
-        {
-            Matrix4 m = new Matrix4();
-            m.M11 = mat.A1;
-            m.M12 = mat.A2;
-            m.M13 = mat.A3;
-            m.M14 = mat.A4;
-            m.M21 = mat.B1;
-            m.M22 = mat.B2;
-            m.M23 = mat.B3;
-            m.M24 = mat.B4;
-            m.M31 = mat.C1;
-            m.M32 = mat.C2;
-            m.M33 = mat.C3;
-            m.M34 = mat.C4;
-            m.M41 = mat.D1;
-            m.M42 = mat.D2;
-            m.M43 = mat.D3;
-            m.M44 = mat.D4;
-            return m;
         }
 
     }
