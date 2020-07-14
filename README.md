@@ -13,11 +13,6 @@ This program is still a work-in-progress so expect bugs and incomplete features.
 
 ## LIB Credits:
 
-* AssimpNet
-* Copyright (c) 2018 Nicholas Woodfield
-* MIT License: https://opensource.org/licenses/mit-license.php
-
-
 * CSCore
 * Copyright (c) 2017 Florian R.
 * MIT License: https://github.com/filoe/cscore/blob/master/license.md
@@ -36,6 +31,11 @@ This program is still a work-in-progress so expect bugs and incomplete features.
 * Hexbox
 * Copyright (c) 2011-2014 Bernhard Elbl
 * MIT License: https://raw.githubusercontent.com/Pkcs11Admin/Be.HexEditor/master/LICENSE.txt
+
+
+* IONET
+* Copyright (c) 2020 Ploaj
+* GPL Liscense: https://github.com/Ploaj/IONET/blob/master/LICENSE
 
 
 * OpenTK

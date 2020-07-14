@@ -137,17 +137,17 @@ namespace HSDRawViewer.Converters
                 var settings = new ModelImportSettings();
                 using (PropertyDialog d = new PropertyDialog("Model Import Options", settings))
                 {
-                    ImportSettings ioSettings = new ImportSettings()
-                    {
-                        FlipUVs = settings.FlipUVs,
-                        FlipWindingOrder = settings.FlipFaces,
-                        Triangulate = true,
-                        SmoothNormals = settings.SmoothNormals,
-                        //WeightLimit = true,
-                    };
-
                     if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
+                        ImportSettings ioSettings = new ImportSettings()
+                        {
+                            FlipUVs = settings.FlipUVs,
+                            FlipWindingOrder = settings.FlipFaces,
+                            SmoothNormals = settings.SmoothNormals,
+                            Triangulate = true,
+                            //WeightLimit = true,
+                        };
+
                         ModelImporter imp = new ModelImporter(f, settings, ioSettings);
 
                         using (ProgressBarDisplay pb = new ProgressBarDisplay(imp))
@@ -425,7 +425,7 @@ namespace HSDRawViewer.Converters
                 dobj.Mobj = GenerateMaterial(material);
                 
 
-                Console.WriteLine(mesh.Name + " " + material.Name);
+                Console.WriteLine(mesh.Name + " " + material?.Name);
 
                 
                 // reflective mobjs do not use uvs
@@ -663,7 +663,7 @@ namespace HSDRawViewer.Converters
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
 
             // Properties
-            if (Settings.ImportMaterialInfo)
+            if (material != null && Settings.ImportMaterialInfo)
             {
                 Mobj.Material.Shininess = material.Shininess;
                 Mobj.Material.Alpha = material.Alpha;
@@ -685,9 +685,9 @@ namespace HSDRawViewer.Converters
             }
 
             // Textures
-            if(Settings.ImportTexture)
+            if(material != null && Settings.ImportTexture)
             {
-                if (material.DiffuseMap != null)
+                if (material.DiffuseMap != null && !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
                 {
                     var texturePath = Path.Combine(_cache.FolderPath, material.DiffuseMap.FilePath);
 
