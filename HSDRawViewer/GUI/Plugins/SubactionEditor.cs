@@ -1070,7 +1070,10 @@ namespace HSDRawViewer.GUI
             {
                 var boneID = hb.BoneID;
                 if (boneID == 0)
-                    boneID = 1;
+                    if (JOBJManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
+                        boneID = 2;
+                    else
+                        boneID = 1;
 
                 var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
 
