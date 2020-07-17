@@ -126,6 +126,9 @@
     <Compile Include="ContextMenus\MatAnimContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\JointAnimContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\MatAnimJointContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>

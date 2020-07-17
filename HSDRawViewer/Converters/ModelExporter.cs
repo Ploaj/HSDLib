@@ -22,24 +22,20 @@ namespace HSDRawViewer.Converters
     public class ModelExportSettings
     {
         public string Directory;
-
-        // TODO:
+        
         public bool Optimize { get; set; } = true;
-
-        // TODO:
+        
         public bool FlipUVs { get; set; } = false;
-
-        // TODO:
+        
         public bool ExportBindPose { get; set; } = true;
-
-        // TODO:
+        
         public bool ExportMOBJs { get; set; } = false;
-
-        // TODO:
+        
         public bool ExportTransformedUVs { get => ModelExporter.TransformUVS; set => ModelExporter.TransformUVS = value; }
-
-        // TODO:
+        
         public bool ExportScaledUVs { get => ModelExporter.ScaleUVs; set => ModelExporter.ScaleUVs = value; }
+
+        public bool ExportTextureInfo { get; set; } = true;
     }
 
     /// <summary>
@@ -91,7 +87,8 @@ namespace HSDRawViewer.Converters
             {
                 FlipUVs = settings.FlipUVs,
                 Optimize = settings.Optimize,
-                FlipWindingOrder = true
+                FlipWindingOrder = true,
+                ExportTextureInfo = settings.ExportTextureInfo
             };
 
             IOManager.ExportScene(exp.Scene, filePath, exportsettings);
