@@ -110,6 +110,9 @@ namespace HSDRaw.Common.Animation
                 tobj[i] = new HSD_TOBJ()
                 {
                     ImageData = ImageBuffers[i].Data,
+                    SX = 1,
+                    SY = 1,
+                    SZ = 1,
                 };
                 if (i < TlutCount)
                     tobj[i].TlutData = TlutBuffers[i].Data;

@@ -105,7 +105,7 @@ namespace HSDRawViewer.GUI.Controls
 
         private int _startSelectionFrame = 0;
 
-        private int _frame { get; set; } = 0;
+        private int _frame { get => (int)nudFrame.Value; set => nudFrame.Value = value; }
 
         private AnimType _animType = AnimType.Joint;
 
@@ -376,7 +376,6 @@ namespace HSDRawViewer.GUI.Controls
         private void SelectFrameFromMouse(int mouseX)
         {
             _frame = (int)(mouseX / (float)_graph.Width * _frameCount);
-            SelectKeyAtFrame();
         }
 
         /// <summary>
@@ -682,6 +681,16 @@ SPL0 - Spline 0
 
 SLP - Slope (do not use)
 NONE - None (do not use)";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudFrame_ValueChanged(object sender, EventArgs e)
+        {
+            SelectKeyAtFrame();
+        }
     }
 
     /// <summary>

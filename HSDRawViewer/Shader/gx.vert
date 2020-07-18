@@ -104,6 +104,7 @@ void main()
 	}
 	
 	vertPosition = pos.xyz;
+	normal = normalize(normal);
 
 	texcoord0 = GX_VA_TEX0;
 	texcoord1 = GX_VA_TEX1;

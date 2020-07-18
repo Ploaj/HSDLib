@@ -48,7 +48,10 @@
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.createOutlineMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearSelectedPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.materialDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,9 +87,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.clearSelectedPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.createAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -277,12 +278,29 @@
             this.addDummyDOBJToolStripMenuItem.Text = "Add Dummy DOBJ";
             this.addDummyDOBJToolStripMenuItem.Click += new System.EventHandler(this.addDummyDOBJToolStripMenuItem_Click);
             // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(180, 6);
+            // 
+            // clearSelectedPOBJsToolStripMenuItem
+            // 
+            this.clearSelectedPOBJsToolStripMenuItem.Name = "clearSelectedPOBJsToolStripMenuItem";
+            this.clearSelectedPOBJsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.clearSelectedPOBJsToolStripMenuItem.Text = "Clear Selected POBJs";
+            this.clearSelectedPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearSelectedPOBJsToolStripMenuItem_Click);
+            // 
             // clearAllPOBJsToolStripMenuItem
             // 
             this.clearAllPOBJsToolStripMenuItem.Name = "clearAllPOBJsToolStripMenuItem";
             this.clearAllPOBJsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.clearAllPOBJsToolStripMenuItem.Text = "Clear All POBJs";
             this.clearAllPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearAllPOBJsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(180, 6);
             // 
             // materialDropDownButton1
             // 
@@ -384,6 +402,7 @@
             this.toolStripSeparator2,
             this.importAnimationToolStripMenuItem,
             this.exportAnimationToolStripMenuItem,
+            this.createAnimationToolStripMenuItem,
             this.editAnimationToolStripMenuItem,
             this.clearAnimationToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
@@ -598,22 +617,12 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // clearSelectedPOBJsToolStripMenuItem
+            // createAnimationToolStripMenuItem
             // 
-            this.clearSelectedPOBJsToolStripMenuItem.Name = "clearSelectedPOBJsToolStripMenuItem";
-            this.clearSelectedPOBJsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.clearSelectedPOBJsToolStripMenuItem.Text = "Clear Selected POBJs";
-            this.clearSelectedPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearSelectedPOBJsToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(180, 6);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(180, 6);
+            this.createAnimationToolStripMenuItem.Name = "createAnimationToolStripMenuItem";
+            this.createAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.createAnimationToolStripMenuItem.Text = "Create Animation";
+            this.createAnimationToolStripMenuItem.Click += new System.EventHandler(this.createAnimationToolStripMenuItem_Click);
             // 
             // JOBJEditor
             // 
@@ -705,5 +714,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem clearSelectedPOBJsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem createAnimationToolStripMenuItem;
     }
 }

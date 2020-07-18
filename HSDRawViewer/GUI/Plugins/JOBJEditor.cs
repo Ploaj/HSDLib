@@ -1186,5 +1186,46 @@ namespace HSDRawViewer.GUI.Plugins
                 RefreshGUI();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class AnimationCreationSettings
+        {
+            public int FrameCount { get; set; } = 60;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createAnimationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var settings = new AnimationCreationSettings();
+            using (PropertyDialog d = new PropertyDialog("Create Animation", settings))
+            {
+                if (d.ShowDialog() == DialogResult.OK && settings.FrameCount > 0)
+                {
+                    JOBJManager.Animation = new JointAnimManager()
+                    {
+                        FrameCount = settings.FrameCount
+                    };
+
+                    for (int i = 0; i < JOBJManager.JointCount; i++)
+                        JOBJManager.Animation.Nodes.Add(
+                            new AnimNode()
+                        {
+                            Tracks = new List<HSDRaw.Tools.FOBJ_Player>()
+                        }
+                        );
+
+                    var vp = viewport;
+                    vp.AnimationTrackEnabled = true;
+                    vp.Frame = 0;
+                    vp.MaxFrame = settings.FrameCount;
+                }
+            }
+        }
     }
 }

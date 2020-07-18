@@ -37,6 +37,7 @@
             this.deleteKeyButton = new System.Windows.Forms.ToolStripButton();
             this.importKeyButton = new System.Windows.Forms.ToolStripButton();
             this.exportKeyButton = new System.Windows.Forms.ToolStripButton();
+            this.helpButton = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitter2 = new System.Windows.Forms.Splitter();
@@ -46,11 +47,13 @@
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
             this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.helpButton = new System.Windows.Forms.ToolStripButton();
+            this.nudFrame = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
             this.SuspendLayout();
             // 
             // graphBox
@@ -137,6 +140,15 @@
             this.exportKeyButton.Size = new System.Drawing.Size(88, 22);
             this.exportKeyButton.Text = "Export Keys";
             this.exportKeyButton.Click += new System.EventHandler(this.exportKeyButton_Click);
+            // 
+            // helpButton
+            // 
+            this.helpButton.Image = global::HSDRawViewer.Properties.Resources.ico_known;
+            this.helpButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.helpButton.Name = "helpButton";
+            this.helpButton.Size = new System.Drawing.Size(52, 22);
+            this.helpButton.Text = "Help";
+            this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
             // 
             // splitter1
             // 
@@ -228,19 +240,36 @@
             this.trackTypeBox.Size = new System.Drawing.Size(121, 25);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
-            // helpButton
+            // nudFrame
             // 
-            this.helpButton.Image = global::HSDRawViewer.Properties.Resources.ico_known;
-            this.helpButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.helpButton.Name = "helpButton";
-            this.helpButton.Size = new System.Drawing.Size(52, 22);
-            this.helpButton.Text = "Help";
-            this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
+            this.nudFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.nudFrame.Location = new System.Drawing.Point(582, 155);
+            this.nudFrame.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.nudFrame.Name = "nudFrame";
+            this.nudFrame.Size = new System.Drawing.Size(142, 20);
+            this.nudFrame.TabIndex = 0;
+            this.nudFrame.ValueChanged += new System.EventHandler(this.nudFrame_ValueChanged);
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(540, 157);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(36, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Frame";
             // 
             // GraphEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.nudFrame);
             this.Controls.Add(this.graphBox);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.toolStrip1);
@@ -254,6 +283,7 @@
             this.groupBox2.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -279,5 +309,7 @@
         private System.Windows.Forms.ToolStripButton importKeyButton;
         private System.Windows.Forms.ToolStripButton exportKeyButton;
         private System.Windows.Forms.ToolStripButton helpButton;
+        private System.Windows.Forms.NumericUpDown nudFrame;
+        private System.Windows.Forms.Label label1;
     }
 }

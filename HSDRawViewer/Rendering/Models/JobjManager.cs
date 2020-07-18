@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace HSDRawViewer.Rendering
 {
@@ -38,26 +39,46 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public class JOBJManagerSettings
     {
+        [Category("1. Display"), DisplayName("Show Bones"), Description("")]
         public bool RenderBones { get; set; } = true;
 
+        [Category("1. Display"), DisplayName("Show Objects"), Description("")]
         public bool RenderObjects { get; set; } = true;
+
+        [Category("1. Display"), DisplayName("Show Bone Orientation"), Description("")]
+        public bool RenderOrientation { get; set; } = false;
+
 
         //public bool RenderMaterials { get; set; } = true;
 
-        public bool RenderOrientation { get; set; } = false;
 
+        [Category("4. Enhancements"), DisplayName("Use Per Pixel Lighting"), Description("Calculates lighting per pixel for a smoother look. Set to false for gamecube style.")]
+        public bool UsePerPixelLighting { get; set; } = true;
+
+
+        [Category("2. Lighting Settings"), DisplayName("Use Camera Light"), Description("When true makes the light source emit from the camera's location")]
         public bool UseCameraLight { get; set; } = true;
 
+        [Category("2. Lighting Settings"), DisplayName("Light X"), Description("X position of light in world when camera light is disabled")]
         public float LightX { get; set; } = 0;
 
+        [Category("2. Lighting Settings"), DisplayName("Light Y"), Description("Y position of light in world when camera light is disabled")]
         public float LightY { get; set; } = 10;
 
+        [Category("2. Lighting Settings"), DisplayName("Light Z"), Description("Z position of light in world when camera light is disabled")]
         public float LightZ { get; set; } = 50;
 
+
+        [Category("3. Lighting Color"), DisplayName("Ambient Intensity"), Description("The intensity of the ambient lighting")]
         public float AmbientPower { get; set; } = 0.5f;
+
+        [Category("3. Lighting Color"), DisplayName("Ambient Color"), Description("The color of the ambient light")]
         public Color AmbientColor { get; set; } = Color.White;
 
+        [Category("3. Lighting Color"), DisplayName("Diffuse Intensity"), Description("The intensity of the diffuse lighting")]
         public float DiffusePower { get; set; } = 1;
+
+        [Category("3. Lighting Color"), DisplayName("Diffuse Color"), Description("The color of the diffuse light")]
         public Color DiffuseColor { get; set; } = Color.White;
     }
 

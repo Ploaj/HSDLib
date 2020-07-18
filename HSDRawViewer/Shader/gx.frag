@@ -109,6 +109,7 @@ uniform vec3 overlayColor;
 uniform mat4 sphereMatrix;
 uniform int renderOverride;
 uniform int selectedBone;
+uniform int perPixelLighting;
 
 ///
 /// Gets spherical UV coords, this is used for reflection effects
@@ -322,10 +323,13 @@ vec4 GetSpecularMaterial(vec3 V, vec3 N)
 {
 	if(enableSpecular == 0)
 		return vec4(0, 0, 0, 1);
-		
-    //spec = clamp(dot(normal, V), 0, 1);
+
+	float spc = spec;
 	
-    float phong = pow(spec, shinniness);
+	if(perPixelLighting == 1)
+		spc = clamp(dot(N, V), 0, 1);
+	
+    float phong = pow(spc, shinniness);
 
 	return vec4(vec3(phong), 1);
 }
