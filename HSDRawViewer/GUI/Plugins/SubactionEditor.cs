@@ -365,18 +365,24 @@ namespace HSDRawViewer.GUI
         /// <param name="script"></param>
         private void RefreshSubactionList(Action script)
         {
+            // get subaction data
             var data = script._struct.GetData();
 
+            // set the script for the subaction processer for rendering
             SubactionProcess.SetStruct(script._struct, SubactionGroup);
 
+            // begin filling the subaction list
             subActionList.BeginUpdate();
             subActionList.Items.Clear();
             for (int i = 0; i < data.Length;)
             {
+                // get subaction
                 var sa = SubactionManager.GetSubaction((byte)(data[i]), SubactionGroup);
 
+                // create new script node
                 var sas = new SubActionScript(SubactionGroup);
-
+                
+                // store any pointers within this subaction
                 foreach (var r in script._struct.References)
                 {
                     if (r.Key >= i && r.Key < i + sa.ByteSize)
@@ -386,21 +392,25 @@ namespace HSDRawViewer.GUI
                             sas.Reference = r.Value;
                 }
 
+                // copy subaction data to script node
                 var sub = new byte[sa.ByteSize];
 
                 if (i + sub.Length > data.Length)
-                {
                     break;
-                }
 
                 for (int j = 0; j < sub.Length; j++)
                     sub[j] = data[i + j];
+                
+                i += sa.ByteSize;
 
                 sas.data = sub;
 
+                // add new script node
                 subActionList.Items.Add(sas);
 
-                i += sa.ByteSize;
+                // if end of script then stop reading
+                if (sa.Code == 0)
+                    break;
             }
             subActionList.EndUpdate();
         }

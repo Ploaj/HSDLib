@@ -241,9 +241,11 @@ namespace HSDRawViewer.Converters
             if (_cache.EnvelopedJOBJs.Count > 0)
                 root.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
             
+            // enable xlu if anything needs it
             if (_cache.HasXLU)
-                root.Flags |= JOBJ_FLAG.XLU;
+                root.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
 
+            // just always enable opaque
             root.Flags |= JOBJ_FLAG.OPA;
 
 
@@ -730,7 +732,7 @@ namespace HSDRawViewer.Converters
                         if (TOBJConverter.IsTransparent(tobj))
                         {
                             _cache.HasXLU = true;
-                            Mobj.RenderFlags |= RENDER_MODE.XLU | RENDER_MODE.NO_ZUPDATE;
+                            Mobj.RenderFlags |= RENDER_MODE.XLU;
                             tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;
                         }
 
