@@ -129,9 +129,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterData.RstRuntime.Array = new MEX_RstRuntime[0];
             d.FighterData.FighterItemLookup.Array = new MEX_ItemLookup[0];
             d.FighterData.FighterEffectLookup.Array = new MEX_EffectTypeLookup[0];
-
-            d.FighterData.TargetTestStageLookups = new HSDArrayAccessor<HSD_UShort>();
             d.FighterData.TargetTestStageLookups.Array = new HSD_UShort[0];
+            d.FighterData.FighterSongIDs.Array = new MEX_FighterSongID[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];

@@ -78,6 +78,13 @@ namespace HSDRaw.Common
         public HSD_Matrix4x3 InverseWorldTransform { get => _s.GetReference<HSD_Matrix4x3>(0x38); set => _s.SetReference(0x38, value); }
 
         // robj
-        
+
+        public override int Trim()
+        {
+            // quit optimizing these away
+            _s.CanBeBuffer = false;
+
+            return base.Trim();
+        }
     }
 }

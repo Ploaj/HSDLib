@@ -337,7 +337,7 @@ namespace HSDRaw
             if (!a.CanBeBuffer)
                 return false;
 
-            return (a.References.Count == 0 && a.Length >= 0x40) || a.IsTextureBuffer;
+            return (a.References.Count == 0 && a.Length > 0x40) || a.IsTextureBuffer;
         }
 
         //https://stackoverflow.com/questions/16340/how-do-i-generate-a-hashcode-from-a-byte-array-in-c/16381

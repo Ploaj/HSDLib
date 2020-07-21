@@ -16,9 +16,12 @@ namespace HSDRaw.MEX
         public override int TrimmedSize => 0x20;
 
         [DisplayName("Version Major")]
-        public short VersionMajor { get => _s.GetInt16(0x00); internal set => _s.SetInt16(0x00, value); }
+        public byte VersionMajor { get => _s.GetByte(0x00); internal set => _s.SetByte(0x00, value); }
 
-        [DisplayName("Mex Flags")]
+        [DisplayName("Version Minor")]
+        public byte VersionMinor { get => _s.GetByte(0x00); internal set => _s.SetByte(0x01, value); }
+
+        [DisplayName("m-ex Flags")]
         public MexFlags Flags { get => (MexFlags)_s.GetInt16(0x02); set => _s.SetInt16(0x02, (short)value); }
 
         [DisplayName("Internal ID Count")]

@@ -1,6 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.MEX;
+using HSDRaw.MEX.Characters;
 using HSDRaw.MEX.Menus;
 using HSDRaw.MEX.Sounds;
 using HSDRaw.MEX.Stages;
@@ -50,6 +51,7 @@ namespace HSDRawViewer.Tools
             { "ResultScale", new Tuple<int, int>(0x3D4058, 0x68) },
             { "SSMFileIDs", new Tuple<int, int>(0x3B83C0, 0x210) },
             { "RstRuntime", new Tuple<int, int>(0x3BF5FC, 0x100) },
+            { "FighterSongIDs", new Tuple<int, int>(0x3B94A0, 0x40) },
 
 	    // Fighter Functions
 
@@ -183,8 +185,10 @@ namespace HSDRawViewer.Tools
                 NumOfEffects = 51,
             };
 
-            data.MetaData._s.SetInt16(0x00, 1); // Major
+            // Version
+            data.MetaData._s.SetInt16(0x00, 0x0100); 
 
+            // flags
             if (settings.IncludeMoveLogic)
                 data.MetaData.Flags |= MexFlags.ContainMoveLogic;
             if (settings.IncludeItemStates)
@@ -220,6 +224,18 @@ namespace HSDRawViewer.Tools
             // generate fighter table
             data.FighterData = new MEX_FighterData();
             ExtractData(dol, data.FighterData);
+
+
+            // convert fighter songs from bytes to shorts
+            {
+                var d = dol.GetSection((uint)dolOffset["FighterSongIDs"].Item1, dolOffset["FighterSongIDs"].Item2);
+                data.FighterData.FighterSongIDs.Array = Enumerable.Range(0, d.Length / 2).Select(i => new MEX_FighterSongID()
+                {
+                    SongID = d[i * 2],
+                    Unknown = d[i * 2 + 1]
+                }).ToArray();
+            }
+
 
             // costume strings and runtime setup
             data.FighterData.CostumePointers = new HSDArrayAccessor<MEX_CostumeRuntimePointers>() { _s = dol.GetStruct(new Tuple<int, int>((int)CostumePointerOffset, 0x108))};
@@ -538,7 +554,7 @@ namespace HSDRawViewer.Tools
 
         // Hardcoded tables
 
-        public static readonly string[] CharText =
+        private static readonly string[] CharText =
       {
             "C. Falcon",
             "DK",
@@ -575,25 +591,25 @@ namespace HSDRawViewer.Tools
             "Popo",
         };
 
-        public static readonly string[] RestAnimFiles = new string[] { "GmRstMCa.dat", "GmRstMDk.dat", "GmRstMFx.dat", "GmRstMGw.dat", "GmRstMKb.dat", "GmRstMKp.dat", "GmRstMLk.dat", "GmRstMLg.dat", "GmRstMMr.dat", "GmRstMMs.dat", "GmRstMMt.dat", "GmRstMNs.dat", "GmRstMPe.dat", "GmRstMPk.dat", "GmRstMPn.dat", "GmRstMPr.dat", "GmRstMSs.dat", "GmRstMYs.dat", "GmRstMZd.dat", "GmRstMSk.dat", "GmRstMFc.dat", "GmRstMCl.dat", "GmRstMDr.dat", "GmRstMFe.dat", "GmRstMPc.dat", "GmRstMGn.dat", "GmRstMMr.dat", "GmRstMMh.dat", "GmRstMBo.dat", "GmRstMGl.dat", "GmRstMGk.dat", "GmRstMCh.dat", "GmRstMSb.dat", };
+        private static readonly string[] RestAnimFiles = new string[] { "GmRstMCa.dat", "GmRstMDk.dat", "GmRstMFx.dat", "GmRstMGw.dat", "GmRstMKb.dat", "GmRstMKp.dat", "GmRstMLk.dat", "GmRstMLg.dat", "GmRstMMr.dat", "GmRstMMs.dat", "GmRstMMt.dat", "GmRstMNs.dat", "GmRstMPe.dat", "GmRstMPk.dat", "GmRstMPn.dat", "GmRstMPr.dat", "GmRstMSs.dat", "GmRstMYs.dat", "GmRstMZd.dat", "GmRstMSk.dat", "GmRstMFc.dat", "GmRstMCl.dat", "GmRstMDr.dat", "GmRstMFe.dat", "GmRstMPc.dat", "GmRstMGn.dat", "GmRstMMr.dat", "GmRstMMh.dat", "GmRstMBo.dat", "GmRstMGl.dat", "GmRstMGk.dat", "GmRstMCh.dat", "GmRstMSb.dat", };
 
-        public static readonly ushort[] TargetTestIDs = new ushort[] { 0x22, 0x24, 0x27, 0x38, 0x29, 0x2A, 0x2B, 0x2C, 0x21, 0x2D, 0x2E, 0x2F, 0x30, 0x32, 0x28, 0x33, 0x34, 0x36, 0x37, 0x35, 0x36, 0x23, 0x25, 0x39, 0x31, 0x3A };
+        private static readonly ushort[] TargetTestIDs = new ushort[] { 0x22, 0x24, 0x27, 0x38, 0x29, 0x2A, 0x2B, 0x2C, 0x21, 0x2D, 0x2E, 0x2F, 0x30, 0x32, 0x28, 0x33, 0x34, 0x36, 0x37, 0x35, 0x36, 0x23, 0x25, 0x39, 0x31, 0x3A };
 
-        public static readonly byte[] InsigniaIDs = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x05, 0x06, 0x0D, 0x06, 0x06, 0x07, 0x09, 0x08, 0x06, 0x09, 0x04, 0x09, 0x0A, 0x0C, 0x0D, 0x0D, 0x02, 0x0D, 0x06, 0x07, 0x09, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
-        
-        public static readonly uint[] VictoryThemeIDs = new uint[] { 0x11, 0x0D, 0x10, 0x0F, 0x14, 0x16, 0x15, 0x16, 0x16, 0x0E, 0x18, 0x17, 0x16, 0x18, 0x13, 0x18, 0x19, 0x1D, 0x15, 0x15, 0x10, 0x15, 0x16, 0x0E, 0x18, 0x15, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00 };
+        private static readonly byte[] InsigniaIDs = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x05, 0x06, 0x0D, 0x06, 0x06, 0x07, 0x09, 0x08, 0x06, 0x09, 0x04, 0x09, 0x0A, 0x0C, 0x0D, 0x0D, 0x02, 0x0D, 0x06, 0x07, 0x09, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 };
 
-        public static readonly byte[] WallJump = new byte[] { 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        private static readonly uint[] VictoryThemeIDs = new uint[] { 0x11, 0x0D, 0x10, 0x0F, 0x14, 0x16, 0x15, 0x16, 0x16, 0x0E, 0x18, 0x17, 0x16, 0x18, 0x13, 0x18, 0x19, 0x1D, 0x15, 0x15, 0x10, 0x15, 0x16, 0x0E, 0x18, 0x15, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00 };
 
-        public static readonly uint[] AnnouncerCalls = new uint[] { 0x07C830, 0x07C831, 0x07C835, 0x07C83A, 0x07C83F, 0x07C840, 0x07C842, 0x07C844, 0x07C845, 0x07C846, 0x07C848, 0x07C84A, 0x07C84B, 0x07C84D, 0x07C83B, 0x07C83D, 0x07C84E, 0x07C84F, 0x07C851, 0x07C850, 0x07C834, 0x07C843, 0x07C832, 0x07C83C, 0x07C84C, 0x07C836, 0x07C849, 0x07C833, 0x07C833, 0x07C838, 0x07C849, 0x07C848, 0x07C83B };
+        private static readonly byte[] WallJump = new byte[] { 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-        public static readonly byte[] MoveLogicEntries = new byte[] {
+        private static readonly uint[] AnnouncerCalls = new uint[] { 0x07C830, 0x07C831, 0x07C835, 0x07C83A, 0x07C83F, 0x07C840, 0x07C842, 0x07C844, 0x07C845, 0x07C846, 0x07C848, 0x07C84A, 0x07C84B, 0x07C84D, 0x07C83B, 0x07C83D, 0x07C84E, 0x07C84F, 0x07C851, 0x07C850, 0x07C834, 0x07C843, 0x07C832, 0x07C83C, 0x07C84C, 0x07C836, 0x07C849, 0x07C833, 0x07C833, 0x07C838, 0x07C849, 0x07C848, 0x07C83B };
+
+        private static readonly byte[] MoveLogicEntries = new byte[] {
                               12,35,23,46,203,23,21,24,36,26,
                               16,26,26,18,28,32,20,20,32,18,
                               22,10,35,26,40,23,32,50,49,0,
                               0,24,1};
 
-        public static readonly byte[] MapGOBJEntries = new byte[] {
+        private static readonly byte[] MapGOBJEntries = new byte[] {
             0, 4, 21, 8, 12, 8, 11, 3, 12, 6,
             4, 2, 11, 8, 22, 19, 12, 28, 40, 41,
             8, 8, 11, 0, 4, 16, 0, 9, 6, 6,
@@ -603,12 +619,12 @@ namespace HSDRawViewer.Tools
             4, 4, 4, 4, 4, 4, 6, 14, 3, 3,
             3 };
 
-        public static readonly byte[] CommonItemStates = new byte[] { 7, 10, 8, 8, 10, 10, 14, 12, 6, 6, 1, 6, 6, 14, 10, 8, 6, 6, 4, 8, 8, 6, 6, 6, 10, 8, 2, 2, 6, 6, 6, 6, 6, 6, 8, 1, 1, 2, 10, 1, 4, 6, 6 };
-        public static readonly byte[] FighterItemStates = new byte[] { 12, 18, 10, 12, 2, 1, 8, 1, 1, 1, 3, 2, 2, 3, 3, 8, 8, 4, 4, 10, 10, 6, 6, 1, 1, 3, 1, 3, 3, 3, 3, 12, 12, 10, 10, 1, 6, 1, 3, 3, 2, 2, 1, 3, 3, 1, 2, 1, 2, 1, 4, 10, 4, 10, 6, 2, 6, 1, 2, 4, 3, 2, 1, 4, 1, 2, 1, 1, 1, 18, 4, 4, 1, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 8, 1, 4, 2, 1, 2, 2, 12, 12, 6, 6, 10, 10, 18, 3, 1, 2, 1, 2, 1, 10, 6, 1, 1, 2, 1, 3, 3, 6, 20 };
-        public static readonly byte[] PokemonItemStates = new byte[] { 6, 3, 3, 4, 3, 4, 3, 3, 3, 3, 4, 3, 2, 2, 2, 6, 8, 6, 6, 3, 6, 8, 3, 3, 3, 8, 2, 3, 4, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 0 };
-        public static readonly byte[] StageItemStates = new byte[] { 12, 1, 6, 12, 8, 22, 0, 0, 12, 12, 6, 12, 14, 14, 0, 0, 0, 8, 8, 0, 0, 0, 10, 0, 0, 12, 8, 2, 6 };
+        private static readonly byte[] CommonItemStates = new byte[] { 7, 10, 8, 8, 10, 10, 14, 12, 6, 6, 1, 6, 6, 14, 10, 8, 6, 6, 4, 8, 8, 6, 6, 6, 10, 8, 2, 2, 6, 6, 6, 6, 6, 6, 8, 1, 1, 2, 10, 1, 4, 6, 6 };
+        private static readonly byte[] FighterItemStates = new byte[] { 12, 18, 10, 12, 2, 1, 8, 1, 1, 1, 3, 2, 2, 3, 3, 8, 8, 4, 4, 10, 10, 6, 6, 1, 1, 3, 1, 3, 3, 3, 3, 12, 12, 10, 10, 1, 6, 1, 3, 3, 2, 2, 1, 3, 3, 1, 2, 1, 2, 1, 4, 10, 4, 10, 6, 2, 6, 1, 2, 4, 3, 2, 1, 4, 1, 2, 1, 1, 1, 18, 4, 4, 1, 1, 2, 2, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 8, 1, 4, 2, 1, 2, 2, 12, 12, 6, 6, 10, 10, 18, 3, 1, 2, 1, 2, 1, 10, 6, 1, 1, 2, 1, 3, 3, 6, 20 };
+        private static readonly byte[] PokemonItemStates = new byte[] { 6, 3, 3, 4, 3, 4, 3, 3, 3, 3, 4, 3, 2, 2, 2, 6, 8, 6, 6, 3, 6, 8, 3, 3, 3, 8, 2, 3, 4, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 0 };
+        private static readonly byte[] StageItemStates = new byte[] { 12, 1, 6, 12, 8, 22, 0, 0, 12, 12, 6, 12, 14, 14, 0, 0, 0, 8, 8, 0, 0, 0, 10, 0, 0, 12, 8, 2, 6 };
 
-        public static string[] MusicNames = new string[]
+        private static string[] MusicNames = new string[]
         {
             "All-Star Rest Area",
 "Fire Emblem (Meeting Theme)",

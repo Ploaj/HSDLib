@@ -127,6 +127,12 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Victory Theme"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
         public int VictoryThemeID { get; set; }
 
+        [DisplayName("Fighter Song"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
+        public int FighterSongID { get; set; }
+
+        [DisplayName("Fighter Song Unknown Value"), Category("3 - Misc"), Description("")]
+        public byte UnknownFighterSongValue { get; set; }
+
         [DisplayName("Effect File"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int EffectIndex { get; set; }
 
@@ -286,6 +292,9 @@ namespace HSDRawViewer.GUI.MEX
             }
             
             VictoryThemeID = mexData.FighterData.VictoryThemeIDs[externalID].Value;
+            FighterSongID = mexData.FighterData.FighterSongIDs[externalID].SongID;
+            UnknownFighterSongValue = mexData.FighterData.FighterSongIDs[externalID].Unknown;
+
             if (!IsSpecialCharacterExternal(mexData, externalID))
             {
                 RedCostumeID = mexData.FighterData.CostumeIDs[externalID].RedCostumeIndex;
@@ -392,6 +401,11 @@ namespace HSDRawViewer.GUI.MEX
             mexData.FighterData.ResultAnimFiles.Set(externalID, new HSD_String() { Value = RstAnimFile });
 
             mexData.FighterData.VictoryThemeIDs.Set(externalID, new HSD_Int() { Value = VictoryThemeID });
+            mexData.FighterData.FighterSongIDs.Set(externalID, new MEX_FighterSongID() {
+                SongID = (short)FighterSongID,
+                Unknown = UnknownFighterSongValue}
+            );
+
             if (!IsSpecialCharacterExternal(mexData, externalID))
             {
                 mexData.FighterData.CostumeIDs.Set(externalID, new MEX_CostumeIDs()
