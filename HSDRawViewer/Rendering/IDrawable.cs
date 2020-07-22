@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System;
 using System.Windows.Forms;
+using OpenTK.Input;
 
 namespace HSDRawViewer.Rendering
 {
@@ -18,6 +19,8 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public interface IDrawableInterface : IDrawable
     {
+        void ViewportKeyPress(KeyboardState kbState);
+
         void ScreenClick(MouseButtons button, PickInformation pick);
 
         void ScreenDoubleClick(PickInformation pick);

@@ -406,12 +406,53 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public float X { get; set; }
         public float Y { get; set; }
 
+        private Stack<Tuple<float, float>> previous = new Stack<Tuple<float, float>>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Push()
+        {
+            previous.Push(new Tuple<float, float>(X, Y));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Pop()
+        {
+            if (previous.Count == 0)
+                return;
+
+            var prev = previous.Pop();
+
+            X = prev.Item1;
+            Y = prev.Item2;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearStack()
+        {
+            previous.Clear();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public CollVertex(float x, float y)
         {
             X = x;
             Y = y;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public Vector2 ToVector2()
         {
             return new Vector2(X, Y);

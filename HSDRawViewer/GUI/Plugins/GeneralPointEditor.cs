@@ -531,5 +531,13 @@ namespace HSDRawViewer.GUI.Plugins
                 PointList.Invalidate();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kbState"></param>
+        public void ViewportKeyPress(KeyboardState kbState)
+        {
+        }
     }
 }

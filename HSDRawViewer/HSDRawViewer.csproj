@@ -320,6 +320,13 @@
     <Compile Include="GUI\MEX\IMEXControl.cs" />
     <Compile Include="GUI\MEX\Tools\StagePackage.cs" />
     <Compile Include="GUI\MEX\Tools\FighterPackage.cs" />
+    <Compile Include="GUI\Plugins\AirRide\AirRideGrCollisionManager.cs" />
+    <Compile Include="GUI\Plugins\AirRide\AirRideGrDataEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\AirRide\AirRideGrDataEditor.Designer.cs">
+      <DependentUpon>AirRideGrDataEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\AirRide\AriRideGrModelEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -590,6 +597,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXStageControl.resx">
       <DependentUpon>MEXStageControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\AirRide\AirRideGrDataEditor.resx">
+      <DependentUpon>AirRideGrDataEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\AirRide\AriRideGrModelEditor.resx">
       <DependentUpon>AriRideGrModelEditor.cs</DependentUpon>

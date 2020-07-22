@@ -204,6 +204,11 @@ namespace HSDRawViewer.GUI
                     using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
                         d.ShowDialog();
                 }
+
+                var keyState = OpenTK.Input.Keyboard.GetState();
+                foreach (var v in Drawables)
+                    if (v is IDrawableInterface inter)
+                        inter.ViewportKeyPress(keyState);
             };
 
             panel1.MouseClick += (sender, args) =>
