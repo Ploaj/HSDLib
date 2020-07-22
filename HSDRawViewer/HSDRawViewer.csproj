@@ -320,11 +320,23 @@
     <Compile Include="GUI\MEX\IMEXControl.cs" />
     <Compile Include="GUI\MEX\Tools\StagePackage.cs" />
     <Compile Include="GUI\MEX\Tools\FighterPackage.cs" />
+    <Compile Include="GUI\Plugins\AirRide\AriRideGrModelEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\AirRide\AriRideGrModelEditor.Designer.cs">
+      <DependentUpon>AriRideGrModelEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\AOBJEditor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\Plugins\AOBJEditor.Designer.cs">
       <DependentUpon>AOBJEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\JobjEditorDock.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\JobjEditorDock.Designer.cs">
+      <DependentUpon>JobjEditorDock.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\CollDataEditor.cs">
       <SubType>Form</SubType>
@@ -339,11 +351,11 @@
     <Compile Include="GUI\Plugins\GeneralPointEditor.Designer.cs">
       <DependentUpon>GeneralPointEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\JOBJEditor.cs">
-      <SubType>Form</SubType>
+    <Compile Include="GUI\Controls\JobjEditor.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Plugins\JOBJEditor.Designer.cs">
-      <DependentUpon>JOBJEditor.cs</DependentUpon>
+    <Compile Include="GUI\Controls\JobjEditor.Designer.cs">
+      <DependentUpon>JobjEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\CollDataItems.cs" />
     <Compile Include="GUI\Plugins\Melee\DummyThrowModel.cs" />
@@ -579,8 +591,14 @@
     <EmbeddedResource Include="GUI\MEX\Controls\MEXStageControl.resx">
       <DependentUpon>MEXStageControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\AirRide\AriRideGrModelEditor.resx">
+      <DependentUpon>AriRideGrModelEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\AOBJEditor.resx">
       <DependentUpon>AOBJEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\JobjEditorDock.resx">
+      <DependentUpon>JobjEditorDock.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\Melee\CollDataEditor.resx">
       <DependentUpon>CollDataEditor.cs</DependentUpon>
@@ -588,8 +606,8 @@
     <EmbeddedResource Include="GUI\Plugins\GeneralPointEditor.resx">
       <DependentUpon>GeneralPointEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\JOBJEditor.resx">
-      <DependentUpon>JOBJEditor.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\Controls\JobjEditor.resx">
+      <DependentUpon>JobjEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\Melee\HurtBoxEditor.resx">
       <DependentUpon>HurtBoxEditor.cs</DependentUpon>

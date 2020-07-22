@@ -18,7 +18,40 @@ namespace HSDRawViewer.Rendering
         public List<AnimNode> Nodes { get; internal set; } = new List<AnimNode>();
 
         private int index = 0;
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public JointAnimManager()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public JointAnimManager(int jointCount)
+        {
+            for (int i = 0; i < jointCount; i++)
+                Nodes.Add(new AnimNode() { Tracks = new List<FOBJ_Player>() });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public JointAnimManager(HSD_FigaTree tree)
+        {
+            FromFigaTree(tree);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public JointAnimManager(HSD_AnimJoint joint)
+        {
+            FromAnimJoint(joint);
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -2,7 +2,6 @@
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
 using System;
-using WeifenLuo.WinFormsUI.Docking;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -14,17 +13,14 @@ using System.Linq;
 using System.Drawing;
 using HSDRaw;
 using HSDRawViewer.Tools;
-using HSDRawViewer.GUI.Controls;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     /// <summary>
     /// 
     /// </summary>
-    public partial class JOBJEditor : DockContent, EditorBase, IDrawable
+    public partial class JobjEditor : UserControl, IDrawable
     {
-        public DockState DefaultDockState => DockState.DockLeft;
-
         public DrawOrder DrawOrder => DrawOrder.First;
 
         [Browsable(false)]
@@ -37,7 +33,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
-        public JOBJEditor()
+        public JobjEditor()
         {
             InitializeComponent();
 
@@ -77,7 +73,7 @@ namespace HSDRawViewer.GUI.Plugins
             viewport.RefreshSize();
             viewport.BringToFront();
 
-            FormClosing += (sender, args) =>
+            Disposed += (sender, args) =>
             {
                 if (PluginManager.GetCommonViewport() != null)
                 {
@@ -92,26 +88,26 @@ namespace HSDRawViewer.GUI.Plugins
             };
         }
 
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_JOBJ) };
-        
-        public DataNode Node { get => _node;
-            set
-            {
-                _node = value;
-
-                if (_node.Accessor is HSD_JOBJ jobj)
-                {
-                    root = jobj;
-                    JOBJManager.SetJOBJ(root);
-                    RefreshGUI();
-                }
-            }
+        private List<IDrawable> _drawables = new List<IDrawable>();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="draw"></param>
+        public void AddDrawable(IDrawable draw)
+        {
+            _drawables.Add(draw);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="draw"></param>
+        public void RemoveDrawable(IDrawable draw)
+        {
+            _drawables.Remove(draw);
         }
 
-        private DataNode _node;
-        private HSD_JOBJ root;
         private Dictionary<HSD_JOBJ, int> jobjToIndex = new Dictionary<HSD_JOBJ, int>();
-        
+
         private class DOBJContainer
         {
             public int Index;
@@ -170,6 +166,15 @@ namespace HSDRawViewer.GUI.Plugins
         private BindingList<DOBJContainer> dobjList = new BindingList<DOBJContainer>();
 
         private JOBJManager JOBJManager;
+
+        private HSD_JOBJ root;
+
+        public void SetJOBJ(HSD_JOBJ jobj)
+        {
+            root = jobj;
+            JOBJManager.SetJOBJ(root);
+            RefreshGUI();
+        }
 
         /// <summary>
         /// Refreshes and reloads the jobj data
@@ -266,32 +271,6 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tree"></param>
-        public void LoadAnimation(HSD_FigaTree tree)
-        {
-            var vp = viewport; 
-            vp.AnimationTrackEnabled = true;
-            vp.Frame = 0;
-            vp.MaxFrame = tree.FrameCount;
-            JOBJManager.SetFigaTree(tree);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="joint"></param>
-        public void LoadAnimation(HSD_AnimJoint joint)
-        {
-            JOBJManager.SetAnimJoint(joint);
-            var vp = viewport; 
-            vp.AnimationTrackEnabled = true;
-            vp.Frame = 0;
-            vp.MaxFrame = JOBJManager.Animation.FrameCount;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="joint"></param>
         public void LoadAnimation(HSD_MatAnimJoint joint)
         {
@@ -326,8 +305,16 @@ namespace HSDRawViewer.GUI.Plugins
             JOBJManager.Frame = viewport.Frame;
             JOBJManager.DOBJManager.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
             JOBJManager.Render(cam);
+
+            foreach (var d in _drawables)
+                d.Draw(cam, windowWidth, windowHeight);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
         }
@@ -764,10 +751,10 @@ namespace HSDRawViewer.GUI.Plugins
                     var dat = new HSDRaw.HSDRawFile(f);
 
                     if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
-                        LoadAnimation(tree);
+                        LoadAnimation(new JointAnimManager(tree));
 
                     if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
-                        LoadAnimation(joint);
+                        LoadAnimation(new JointAnimManager(joint));
                 }
             }
         }

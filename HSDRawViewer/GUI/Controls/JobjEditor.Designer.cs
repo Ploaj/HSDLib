@@ -1,6 +1,6 @@
 ﻿namespace HSDRawViewer.GUI.Plugins
 {
-    partial class JOBJEditor
+    partial class JobjEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JOBJEditor));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JobjEditor));
             this.listDOBJ = new System.Windows.Forms.CheckedListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -634,7 +634,6 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.toolStrip1);
             this.Name = "JOBJEditor";
-            this.TabText = "JOBJEditor";
             this.Text = "JOBJEditor";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

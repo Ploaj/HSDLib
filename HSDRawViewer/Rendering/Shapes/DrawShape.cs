@@ -384,5 +384,71 @@ namespace HSDRawViewer.Rendering
             GL.End();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="z1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="z2"></param>
+        public static void DrawBox(Color color, float x1, float y1, float z1, float x2, float y2, float z2)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+            
+            GL.LineWidth(2f);
+            GL.Color3(color);
+
+            GL.Begin(PrimitiveType.Lines);
+
+
+            GL.Vertex3(x1, y1, z1);
+            GL.Vertex3(x2, y1, z1);
+
+            GL.Vertex3(x1, y1, z1);
+            GL.Vertex3(x1, y2, z1);
+
+            GL.Vertex3(x1, y1, z1);
+            GL.Vertex3(x1, y1, z2);
+            
+
+            GL.Vertex3(x2, y2, z2);
+            GL.Vertex3(x1, y2, z2);
+
+            GL.Vertex3(x2, y2, z2);
+            GL.Vertex3(x2, y1, z2);
+
+            GL.Vertex3(x2, y2, z2);
+            GL.Vertex3(x2, y2, z1);
+
+
+            GL.Vertex3(x2, y1, z1);
+            GL.Vertex3(x2, y2, z1);
+
+            GL.Vertex3(x2, y1, z1);
+            GL.Vertex3(x2, y1, z2);
+
+            GL.Vertex3(x2, y2, z1);
+            GL.Vertex3(x1, y2, z1);
+
+
+            GL.Vertex3(x1, y2, z2);
+            GL.Vertex3(x1, y1, z2);
+
+            GL.Vertex3(x1, y2, z2);
+            GL.Vertex3(x1, y2, z1);
+
+            GL.Vertex3(x1, y1, z2);
+            GL.Vertex3(x2, y1, z2);
+
+
+
+            GL.End();
+
+            GL.PopAttrib();
+        }
+
     }
 }
