@@ -5,21 +5,27 @@
     bitCount: 8
   - name: Destroy on State Change
     bitCount: 1
+    enums:
+   - false
+   - true
   - name: Use Common Bone IDs
     bitCount: 1
+    enums:
+   - false
+   - true
   - name: Unk1
     bitCount: 16
   - name: GFX ID
     bitCount: 16
   - name: Unk2
     bitCount: 16
-  - name: Z
+  - name: X Offset
     bitCount: 16
     signed: true
-  - name: Y
+  - name: Y Offset
     bitCount: 16
     signed: true
-  - name: X
+  - name: Z Offset
     bitCount: 16
     signed: true
   - name: Range Z
@@ -38,39 +44,30 @@
   - name: ID
     bitCount: 3
   - name: Unk1
-    bitCount: 5
+    bitCount: 3    
   - name: Bone
-    bitCount: 7
-  - name: Unk2
-    bitCount: 2
+    bitCount: 7 
   - name: Damage
-    bitCount: 9
+    bitCount: 13 
   - name: Size
-    bitCount: 16
-  - name: X-Offset
-    bitCount: 16
+    bitCount: 16 
+  - name: X Offset
+    bitCount: 16 
     signed: true
-  - name: Y-Offset
-    bitCount: 16
+  - name: Y Offset
+    bitCount: 16  
     signed: true
-  - name: Z-Offset
-    bitCount: 16
+  - name: Z Offset
+    bitCount: 16  
     signed: true
-  - name: Angle
-    bitCount: 9
+  - name: Knockback Angle
+    bitCount: 9 
   - name: Knockback Growth
     bitCount: 9
   - name: Weight Set Knockback
     bitCount: 9
-  - name: Unk3
-    bitCount: 3
   - name: Hitbox Interaction
-    bitCount: 2
-    enums:
-    - Unknown
-    - Normal Does not Clank
-    - Can Clank
-    - Normal Can Clank
+    bitCount: 5
   - name: Base Knockback
     bitCount: 9
   - name: Element
@@ -82,37 +79,144 @@
     - Slash
     - Coin
     - Ice
-    - Sleep (103 Frames)
-    - Sleep (412 Frames)
+    - Sleep - Short
+    - Sleep - Long
     - Grab
-    - Grounded (97 Frames)
+    - Grounded
     - Cape
     - Empty
     - Disable
     - Darkness
     - Screw Attack
     - Poison Flower
-    - Nothing (No Graphic)
-  - name: Hitbox Interaction 2
+    - Nothing
+  - name: Flag1
     bitCount: 1
     enums:
     - false
     - true
   - name: Shield Damage
-    bitCount: 7
-  - name: Hit Sound Effect
-    bitCount: 8
-  - name: Hurtbox Interaction
+    bitCount: 9
+  - name: SFX Severity
     bitCount: 2
     enums:
-    - Nothing
-    - Aerial Only
-    - Grounded Only
-    - Both
-  - name: Unk5
-    bitCount: 32
-    hex: true
-
+    - Weak
+    - Moderate
+    - Strong
+  - name: SFX Group
+    bitCount: 4
+    enums:
+    - None
+    - NHit (Punch)
+    - MHit (Kick)
+    - SwdHit (Sword)
+    - SJP_Hit (Super Jump/Coin)
+    - MHit+Bat
+    - Harisen (Fan)
+    - EleHit (Electric)
+    - FireHit (Fire)
+    - Nage_Kamu (Yoshi Chew)
+    - KameKr_Hit (Shell Hit)
+    - GHit (Energy)
+    - Peach_Item (Pan, Club, Racket)
+    - IceHit (Bat)
+    - Empty
+    - Empty
+  - name: Flag2
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag3
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Unk4
+    bitCount: 8
+  - name: Flag4
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag5
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag6
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag7
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag8
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag9
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag10
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag11
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag12
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag13
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag14
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag15
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag16
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag17
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag18
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Flag19
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: padding
+    bitCount: 8 
+ 
 - code: 12
   name: Adjust Hitbox Damage
   parameters:
