@@ -47,13 +47,13 @@
     bitCount: 9
   - name: Size
     bitCount: 16
-  - name: Z-Offset
+  - name: X-Offset
     bitCount: 16
     signed: true
   - name: Y-Offset
     bitCount: 16
     signed: true
-  - name: X-Offset
+  - name: Z-Offset
     bitCount: 16
     signed: true
   - name: Angle
