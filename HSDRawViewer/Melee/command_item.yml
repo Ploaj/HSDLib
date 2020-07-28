@@ -2,22 +2,12 @@
   name: Graphic Effect
   parameters:
   - name: Bone ID
-    bitCount: 8
-  - name: Destroy on State Change
-    bitCount: 1
-    enums:
-   - false
-   - true
-  - name: Use Common Bone IDs
-    bitCount: 1
-    enums:
-   - false
-   - true
+    bitCount: 10
   - name: Unk1
     bitCount: 16
   - name: GFX ID
     bitCount: 16
-  - name: Unk2
+  - name: Unused
     bitCount: 16
   - name: X Offset
     bitCount: 16
@@ -127,7 +117,7 @@
     enums:
     - false
     - true
-  - name: Flag3
+  - name: Reflectable
     bitCount: 1
     enums:
     - false
