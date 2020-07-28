@@ -112,12 +112,12 @@
     - IceHit (Bat)
     - Empty
     - Empty
-  - name: Flag2
+  - name: Hit Grounded Fighters
     bitCount: 1
     enums:
     - false
     - true
-  - name: Reflectable
+  - name: Hit Aerial Fighters
     bitCount: 1
     enums:
     - false
