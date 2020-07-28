@@ -149,7 +149,7 @@
     enums:
     - false
     - true
-  - name: Flag9
+  - name: Can Shield
     bitCount: 1
     enums:
     - false
@@ -164,7 +164,7 @@
     enums:
     - false
     - true
-  - name: Flag12
+  - name: Can Reflect
     bitCount: 1
     enums:
     - false
