@@ -1066,5 +1066,18 @@ namespace HSDRawViewer.GUI.Plugins
             foreach (var l in SelectedGroupLines)
                 l.GuessCollisionFlag();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            /*if(propertyGrid1.SelectedObjects.Length > 0 && !(propertyGrid1.SelectedObjects[0] is CollLineGroup))
+            {
+                PushState();
+            }*/
+        }
     }
 }

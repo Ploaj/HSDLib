@@ -691,13 +691,20 @@ namespace HSDRawViewer.Converters
             {
                 if (material.DiffuseMap != null && !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
                 {
-                    var texturePath = Path.Combine(_cache.FolderPath, material.DiffuseMap.FilePath);
+                    var texturePath = material.DiffuseMap.FilePath;
 
+                    if (texturePath.Contains("file://"))
+                        texturePath = texturePath.Replace("file://", "");
+                    
+                    if (File.Exists(Path.Combine(_cache.FolderPath, texturePath)))
+                        texturePath = Path.Combine(_cache.FolderPath, texturePath);
+                    
                     if (File.Exists(material.DiffuseMap.FilePath))
                         texturePath = material.DiffuseMap.FilePath;
 
                     if (File.Exists(texturePath + ".png"))
                         texturePath = texturePath + ".png";
+
 
                     var mobjPath = Path.Combine(Path.GetDirectoryName(texturePath), Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
                     

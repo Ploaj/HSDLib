@@ -228,6 +228,7 @@
             this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.propertyGrid1.Size = new System.Drawing.Size(264, 243);
             this.propertyGrid1.TabIndex = 4;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
             // listBox1
             // 
