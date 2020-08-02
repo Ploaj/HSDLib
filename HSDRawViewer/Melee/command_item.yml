@@ -124,27 +124,27 @@
     - true
   - name: Unk4
     bitCount: 8
-  - name: Flag4
+  - name: Flag4 (0x08 @ 0x41)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag5
+  - name: Flag5 (0x04 @ 0x41)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag6
+  - name: Flag6 (0x02 @ 0x41)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag7
+  - name: Flag7 (0x01 @ 0x41)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag8
+  - name: Flag8 (0x80 @ 0x42)
     bitCount: 1
     enums:
     - false
@@ -154,12 +154,12 @@
     enums:
     - false
     - true
-  - name: Flag10
+  - name: Only Hit Facing (0x20 @ 0x42)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag11
+  - name: Flag11 (0x10 @ 0x42)
     bitCount: 1
     enums:
     - false
@@ -169,27 +169,27 @@
     enums:
     - false
     - true
-  - name: Flag13
+  - name: Hit Fighters (0x04 @ 0x42)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag14
+  - name: Flag14 (0x02 @ 0x42)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag15
+  - name: Flag15 (0x01 @ 0x42)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag16
+  - name: Flag16 (0x80 @ 0x43)
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag17
+  - name: Flag17 
     bitCount: 1
     enums:
     - false
