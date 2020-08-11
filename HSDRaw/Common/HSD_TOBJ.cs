@@ -189,7 +189,7 @@ namespace HSDRaw.Common
         public override int Trim()
         {
             if (_s.References.ContainsKey(0x00))
-                _s.References[0x00].IsTextureBuffer = true;
+                _s.References[0x00].IsBufferAligned = true;
 
             //Console.WriteLine("Trimmed Image " + Width + " " + Height);
 
@@ -212,7 +212,7 @@ namespace HSDRaw.Common
         public override int Trim()
         {
             if (_s.References.ContainsKey(0x00))
-                _s.References[0x00].IsTextureBuffer = true;
+                _s.References[0x00].IsBufferAligned = true;
 
             return base.Trim();
         }

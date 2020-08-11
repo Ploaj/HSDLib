@@ -14,10 +14,16 @@ namespace HSDRaw
     {
         private byte[] _data = new byte[0];
 
-        public bool IsTextureBuffer = false;
+        // Indicates it should be algined 0x20
+        public bool IsBufferAligned = false;
 
+        // Indicates it can be repointed to (RemoveDuplicateBuffers)
+        public bool CanBeDuplicate = true;
+
+        // We don't know whether or not it should be buffer aligned
         public bool CanBeBuffer = true;
 
+        // Indicates it should be algined 0x04
         public bool Align = true;
 
         public Dictionary<int, HSDStruct> References { get => _references; }
@@ -135,12 +141,12 @@ namespace HSDRaw
             if (_references.ContainsKey(loc))
             {
                 var reference = _references[loc];
-                reference.IsTextureBuffer = true;
+                reference.IsBufferAligned = true;
                 reference.SetData(data);
             }
             else
             {
-                _references.Add(loc, new HSDStruct(data) { IsTextureBuffer = true });
+                _references.Add(loc, new HSDStruct(data) { IsBufferAligned = true });
             }
         }
 

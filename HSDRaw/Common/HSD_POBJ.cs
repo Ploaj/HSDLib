@@ -205,5 +205,38 @@ namespace HSDRaw.Common
             DisplayList = dl;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override int Trim()
+        {
+
+            var attr = _s.GetReference<HSDAccessor>(0x08);
+            // align attribute buffers
+            if (attr != null)
+                foreach (var att in attr._s.References)
+                    att.Value.IsBufferAligned = true;
+
+            // align display buffer
+            if (_s.GetReference<HSDAccessor>(0x10) != null)
+                _s.GetReference<HSDAccessor>(0x10)._s.IsBufferAligned = true;
+
+            // align envelope buffer
+            if (Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+            {
+                var evn = _s.GetReference<HSDAccessor>(0x14);
+                if(evn != null)
+                {
+                    evn._s.IsBufferAligned = true;
+                    evn._s.CanBeDuplicate = false;
+                }
+
+            }
+
+
+            return base.Trim();
+        }
+
     }
 }
