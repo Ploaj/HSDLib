@@ -232,8 +232,11 @@ namespace HSDRawViewer.Converters
             {
                 ProcessMesh(scene, mesh, root);
 
-                ProgressStatus = $"Processing Mesh {root.Dobj.List.Count} {model.Meshes.Count + 1}...";
-                w.ReportProgress((int)(30 + 60 * (root.Dobj.List.Count / (float)model.Meshes.Count)));
+                if(root.Dobj != null)
+                {
+                    ProgressStatus = $"Processing Mesh {root.Dobj.List.Count} {model.Meshes.Count + 1}...";
+                    w.ReportProgress((int)(30 + 60 * (root.Dobj.List.Count / (float)model.Meshes.Count)));
+                }
             }
 
 
