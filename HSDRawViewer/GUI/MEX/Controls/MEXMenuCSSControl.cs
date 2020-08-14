@@ -79,6 +79,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 MexCssGenerator.HookMexNode((SBM_SelectChrDataTable)MenuFile["MnSelectChrDataTable"].Data, (MEX_mexSelectChr)MenuFile["mexSelectChr"].Data);
 
                 // save file
+                MenuFile.TrimData();
                 MenuFile.Save(MenuFilePath);
             }
         }

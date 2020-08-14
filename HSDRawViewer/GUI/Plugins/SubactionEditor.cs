@@ -36,7 +36,7 @@ namespace HSDRawViewer.GUI
             public int Index;
 
             [Category("Display Flags"), DisplayName("Flags")]
-            public string BitFlags { get => Flags.ToString("X"); set { uint v = Flags; uint.TryParse(value, out v); Flags = v; } }
+            public string BitFlags { get => Flags.ToString("X"); set { uint v = Flags; uint.TryParse(value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.CurrentCulture, out v); Flags = v; } }
 
             [Category("Flags"), DisplayName("Character ID")]
             public uint CharIDCheck { get => Flags & 0x3FF; set => Flags = (Flags & 0xFFFFFC00) | (value & 0x3FF); }

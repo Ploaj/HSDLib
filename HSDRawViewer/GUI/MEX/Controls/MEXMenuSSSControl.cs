@@ -69,6 +69,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     StageMenuFile.Roots.Add(new HSDRootNode() { Name = "mexMapData", Data = node });
 
                 // save file
+                StageMenuFile.TrimData();
                 StageMenuFile.Save(StageMenuFilePath);
             }
         }
