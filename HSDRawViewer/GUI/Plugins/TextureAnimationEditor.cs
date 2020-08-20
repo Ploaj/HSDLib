@@ -197,8 +197,9 @@ namespace HSDRawViewer.GUI.Plugins
 
             foreach(var tobj in tobjs)
             {
-                if (tobj == null)
+                if (tobj == null || tobj.ImageData == null)
                     continue;
+                
                 LoadTexture(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
             }
         }
@@ -222,9 +223,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSD_TlutBuffer pal = null;
 
                     if (TexAnim.TlutBuffers != null)
-                    {
                         pal = TexAnim.TlutBuffers.Array[i];
-                    }
 
                     HSD_TOBJ tobj = new HSD_TOBJ();
                     tobj.ImageData = v.Data;
@@ -248,7 +247,12 @@ namespace HSDRawViewer.GUI.Plugins
         private void SetTOBJs(HSD_TOBJ[] tobjs)
         {
             if (TOBJ != null)
-                TOBJ = tobjs[0];
+            {
+                TOBJ._s.References.Clear();
+                foreach(var r in tobjs[0]._s.References)
+                    TOBJ._s.References.Add(r.Key, r.Value);
+                TOBJ._s.SetData(tobjs[0]._s.GetData());
+            }
 
             if (TexAnim != null)
             {
@@ -313,6 +317,9 @@ namespace HSDRawViewer.GUI.Plugins
                 selectedIndex = 0;
 
             if (selectedIndex == -1)
+                return;
+
+            if (TextureManager.TextureCount == 0)
                 return;
 
             switch (toolStripComboBox1.SelectedIndex)
@@ -422,7 +429,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 GXTexFmt texFormat = GXTexFmt.CMP;
                 GXTlutFmt palFormat = GXTlutFmt.IA8;
-                if(tobjs.Length == 0)
+                if(tobjs.Length == 0 || tobjs[0].ImageData == null)
                 {
                     using (TextureImportDialog settings = new TextureImportDialog())
                     {
