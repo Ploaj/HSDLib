@@ -113,7 +113,7 @@ namespace HSDRawViewer.Rendering.Renderers
             }
 
             // draw points
-            if(RenderPoints && _player.Keys != null)
+            if(RenderPoints && _player.Keys != null && _player.Keys.Count > 1)
             {
                 for (int i = 0; i < _player.Keys.Count; i++)
                 {

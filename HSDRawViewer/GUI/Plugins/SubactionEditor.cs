@@ -27,10 +27,14 @@ namespace HSDRawViewer.GUI
         {
             public HSDStruct _struct;
 
-            public string Text;
+            [Category("Animation"), DisplayName("Figatree Symbol")]
+            public string Text { get; set; }
 
-            public int AnimOffset;
-            public int AnimSize;
+            [Category("Animation"), DisplayName("Figatree Offset")]
+            public int AnimOffset { get; set; }
+
+            [Category("Animation"), DisplayName("Figatree FileSize")]
+            public int AnimSize { get; set; }
 
             public uint Flags;
             public int Index;

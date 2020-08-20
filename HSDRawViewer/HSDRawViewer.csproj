@@ -108,7 +108,7 @@
     <Compile Include="ContextMenus\FigatreeContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\FighterArticleContextMenu.cs">
+    <Compile Include="ContextMenus\Melee\FighterArticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\FOBJContextMenu.cs">
@@ -132,13 +132,16 @@
     <Compile Include="ContextMenus\MatAnimJointContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\MeleeEffectTable.cs">
+    <Compile Include="ContextMenus\Melee\MeleeEffectTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ContextMenus\Melee\MapGOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\ParticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\SelectCharContextMenu.cs">
+    <Compile Include="ContextMenus\Melee\SelectCharContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\SubactionTableContextMenu.cs">
@@ -170,11 +173,11 @@
     <Compile Include="Converters\SBM\SSFConverter.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Controls\ArrayMemberEditor.cs">
       <SubType>UserControl</SubType>
@@ -526,8 +529,8 @@
     </None>
     <None Include="Resources\ts_stop.png" />
     <None Include="Resources\ts_play.png" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Controls\ArrayMemberEditor.resx">
       <DependentUpon>ArrayMemberEditor.cs</DependentUpon>

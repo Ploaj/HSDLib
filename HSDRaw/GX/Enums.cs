@@ -57,11 +57,14 @@
     {
         PosXY = 0,
         PosXYZ = 1,
+
         NrmXYZ = 0,
         NrmNBT = 1, // one index per NBT
         NrmNBT3 = 2, // one index per each of N/B/T
+
         ClrRGB = 0,
         ClrRGBA = 1,
+
         TexS = 0,
         TexST = 1
     }
