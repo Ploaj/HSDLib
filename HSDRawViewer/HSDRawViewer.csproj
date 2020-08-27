@@ -486,7 +486,6 @@
     </Compile>
     <Compile Include="Tools\GUITools.cs" />
     <Compile Include="Tools\ImageTools.cs" />
-    <Compile Include="Tools\MxDtGenerator.cs" />
     <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>

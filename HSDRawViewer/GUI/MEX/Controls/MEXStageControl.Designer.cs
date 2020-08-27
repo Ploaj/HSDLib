@@ -152,6 +152,7 @@
             this.stageIDEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.stageIDEditor.Size = new System.Drawing.Size(706, 343);
             this.stageIDEditor.TabIndex = 0;
+            this.stageIDEditor.ArrayUpdated += new System.EventHandler(this.stageIDEditor_ArrayUpdated);
             // 
             // MEXStageControl
             // 

@@ -17,7 +17,6 @@ namespace HSDRawViewer.GUI.MEX
 
         public static List<string> internalIDValues { get; } = new List<string>();
 
-        public static List<string> stageIDValues { get; } = new List<string>();
 
         public static List<string> externalIDValues
         {
@@ -34,6 +33,10 @@ namespace HSDRawViewer.GUI.MEX
                 return external;
             }
         }
+
+        public static List<string> stageIDValues { get; } = new List<string>();
+
+        public static List<int> stageExternalIDValues { get; } = new List<int>();
     }
 
     public class FighterIDConverter : TypeConverter

@@ -82,8 +82,8 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("MEX Items"), Category("0 - General"), Description("MEX Item lookup for Fighter")]
         public HSD_UShort[] MEXItems { get; set; }
 
-        [DisplayName("MEX Effects"), Category("0 - General"), Description("MEX Effect lookup for Fighter")]
-        public MEXEffectType[] MEXEffects { get; set; }
+        //[DisplayName("MEX Effects"), Category("0 - General"), Description("MEX Effect lookup for Fighter")]
+        //public MEXEffectType[] MEXEffects { get; set; }
 
         [Browsable(false)]
         public byte CostumeCount { get => (byte)Costumes.Length; }
@@ -258,7 +258,7 @@ namespace HSDRawViewer.GUI.MEX
             RstAnimCount = mexData.FighterData.RstRuntime[internalId].AnimMax;
 
             MEXItems = mexData.FighterData.FighterItemLookup[internalId].Entries;
-            MEXEffects = mexData.FighterData.FighterEffectLookup[internalId].Entries;
+            //MEXEffects = mexData.FighterData.FighterEffectLookup[internalId].Entries;
 
             InsigniaID = mexData.FighterData.InsigniaIDs[externalID].Value;
 
@@ -325,7 +325,7 @@ namespace HSDRawViewer.GUI.MEX
             mexData.FighterData.RstRuntime.Set(internalId, new MEX_RstRuntime() { AnimMax = RstAnimCount });
 
             mexData.FighterData.FighterItemLookup.Set(internalId, new MEX_ItemLookup() { Entries = MEXItems });
-            mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_EffectTypeLookup() { Entries = MEXEffects });
+            //mexData.FighterData.FighterEffectLookup.Set(internalId, new MEX_EffectTypeLookup() { Entries = MEXEffects });
 
             mexData.FighterData.InsigniaIDs.Set(externalID, new HSD_Byte() { Value = InsigniaID });
 

@@ -169,7 +169,7 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="access"></param>
         /// <param name="index"></param>
-        private void AddNext(HSDAccessor access, int index, List<DataNode> nodes)
+        private void AddNext(string name, HSDAccessor access, int index, List<DataNode> nodes)
         {
             foreach (var prop in access.GetType().GetProperties())
             {
@@ -178,9 +178,9 @@ namespace HSDRawViewer
                     var acc = (HSDAccessor)prop.GetValue(access);
                     if (acc != null)
                     {
-                        var node = new DataNode(prop.PropertyType.Name + "_" + index, acc);
+                        var node = new DataNode(name + "_" + index, acc);
                         nodes.Add(node);
-                        AddNext(acc, index + 1, nodes);
+                        AddNext(name, acc, index + 1, nodes);
                     }
                 }
             }
@@ -238,7 +238,7 @@ namespace HSDRawViewer
                             labeledNodes.Add(a._s, null);
 
                             var node = new DataNode
-                                (prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}:\t" + prop.PropertyType.Name), a)
+                                (prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}_({prop.PropertyType.Name})"), a)
                                 {
                                     IsArrayMember = true,
                                     ArrayName = prop.Name,
@@ -259,7 +259,7 @@ namespace HSDRawViewer
 
                             List<DataNode> nodes = new List<DataNode>();
                             nodes.Add(node);
-                            AddNext(a, 1, nodes);
+                            AddNext(prop.Name, a, 1, nodes);
                             index++;
 
                             foreach (var n in nodes)
@@ -281,11 +281,11 @@ namespace HSDRawViewer
                     {
                         if (prop.Name != "Next")
                         {
-                            var node = new DataNode(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : ":\t" + prop.PropertyType.Name), acc);
+                            var node = new DataNode(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_({prop.PropertyType.Name})"), acc);
                             
                             List<DataNode> nodes = new List<DataNode>();
                             nodes.Add(node);
-                            AddNext(acc, 1, nodes);
+                            AddNext(prop.Name, acc, 1, nodes);
                             if (!labeledNodes.ContainsKey(acc._s))
                                 labeledNodes.Add(acc._s, nodes);
                         }

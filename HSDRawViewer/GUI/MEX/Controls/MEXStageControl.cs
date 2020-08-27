@@ -297,5 +297,11 @@ static struct map_GOBJDesc map_gobjs[] = {
                 }
             }
         }
+
+        private void stageIDEditor_ArrayUpdated(object sender, EventArgs e)
+        {
+            MEXConverter.stageExternalIDValues.Clear();
+            MEXConverter.stageExternalIDValues.AddRange(StageIDs.Select(i=>i.StageInternalID));
+        }
     }
 }

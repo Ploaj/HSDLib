@@ -56,8 +56,8 @@ namespace HSDRawViewer.GUI.MEX
         [Category("1 - Extra"), DisplayName("MEX Items"),Description("MEX Item lookup for Stage"), SerialIgnore()]
         public HSD_UShort[] Items { get => ItemLookup.Entries; set => ItemLookup.Entries = value; }
 
-        [Category("1 - Extra"), DisplayName("MEX Effects"), Description("MEX Effect lookup for Stage")]
-        public MEXEffectType[] Effects { get => EffectLookup.Entries; set => EffectLookup.Entries = value; }
+        //[Category("1 - Extra"), DisplayName("MEX Effects"), Description("MEX Effect lookup for Stage")]
+        //public MEXEffectType[] Effects { get => EffectLookup.Entries; set => EffectLookup.Entries = value; }
 
 
         [Category("1 - Extra"), DisplayName("Moving Collision Points"), Description("")]

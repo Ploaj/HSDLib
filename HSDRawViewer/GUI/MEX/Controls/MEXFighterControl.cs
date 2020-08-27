@@ -579,7 +579,10 @@ static struct MoveLogic move_logic[] = {
         /// <param name="e"></param>
         private void plcoButton_Click(object sender, EventArgs e)
         {
-            var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "PlCo.dat");
+            var f = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "PlCo.dat");
+
+            if(!File.Exists(f))
+                f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "PlCo.dat");
 
             if (f != null)
             {
@@ -610,9 +613,16 @@ static struct MoveLogic move_logic[] = {
             int fIndex = 0;
             foreach(var fighter in FighterEntries)
             {
-                fighter.BoneTable = tables[fIndex];
-                if(fIndex < unktables.Length)
+                if (fIndex < tables.Length)
+                    fighter.BoneTable = tables[fIndex];
+                else
+                    fighter.BoneTable = new SBM_BoneLookupTable();
+
+                if (fIndex < unktables.Length)
                     fighter.UnkTable = unktables[fIndex];
+                else
+                    fighter.UnkTable = new SBM_PlCoUnknownFighterTable();
+
                 fIndex++;
             }
 
@@ -644,7 +654,9 @@ static struct MoveLogic move_logic[] = {
             if (PlCo.Roots[0].Data is ftLoadCommonData ftData)
             {
                 ftData.BoneTables.Array = tables.ToArray();
-                ftData.FighterTable.Array = FighterEntries.Select(e => e.UnkTable).ToArray();
+                var ft = FighterEntries.Select(e => e.UnkTable).ToList();
+                ft.Add(null);
+                ftData.FighterTable.Array = ft.ToArray();
             }
 
             PlCo.Save(PlCoPath);

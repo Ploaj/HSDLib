@@ -91,7 +91,14 @@ namespace HSDRawViewer.GUI.MEX
 
         public override string ToString()
         {
-            return "Stage ID: " + ExternalID;
+            var stageID = ExternalID.ToString();
+
+            if (ExternalID < MEXConverter.stageExternalIDValues.Count && ExternalID >= 0
+                && MEXConverter.stageExternalIDValues[ExternalID] < MEXConverter.stageIDValues.Count &&
+                MEXConverter.stageExternalIDValues[ExternalID] >= 0)
+                stageID = MEXConverter.stageIDValues[MEXConverter.stageExternalIDValues[ExternalID]];
+
+            return "Stage ID: " + stageID;
         }
     }
 }
