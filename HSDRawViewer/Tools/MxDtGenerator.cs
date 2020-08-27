@@ -97,7 +97,7 @@ namespace HSDRawViewer.Tools
             { "CommonItems", new Tuple<int, int>(0x3EE4C4, 0xA14) },
             { "FighterItems", new Tuple<int, int>(0x3F0100, 0x1BA8) },
             { "Pokemon", new Tuple<int, int>(0x3EF3CC, 0xB04) },
-            { "StageItems", new Tuple<int, int>(0x3F0100, 0x6CC) },
+            { "StageItems", new Tuple<int, int>(0x3F1D20, 0x6CC) },
 
             // kirby 
 
@@ -403,12 +403,12 @@ namespace HSDRawViewer.Tools
                     Array = dol.ReadStringTable(EffectStringOffset, data.MetaData.NumOfEffects * 3)
                 }._s
             };
-            data.EffectTable.EffectRuntime = new HSDAccessor() { _s = new HSDStruct(0x60) };
-            data.EffectTable.RuntimeArray1 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
-            data.EffectTable.RuntimeArray2 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
-            data.EffectTable.RuntimeArray3 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
-            data.EffectTable.RuntimeArray4 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
-            data.EffectTable.RuntimeArray5 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
+            data.EffectTable.RuntimeUnk1 = new HSDAccessor() { _s = new HSDStruct(0x60) };
+            data.EffectTable.RuntimeUnk3 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
+            data.EffectTable.RuntimeTexGrNum = new HSDAccessor() { _s = new HSDStruct(0xCC) };
+            data.EffectTable.RuntimeTexGrData = new HSDAccessor() { _s = new HSDStruct(0xCC) };
+            data.EffectTable.RuntimeUnk4 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
+            data.EffectTable.RuntimePtclLast = new HSDAccessor() { _s = new HSDStruct(0xCC) };
             data.EffectTable.RuntimeArray6 = new HSDAccessor() { _s = new HSDStruct(0xCC) };
 
 

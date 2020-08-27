@@ -10,6 +10,18 @@ namespace HSDRawViewer.ContextMenus
 
         public AnimJointContextMenu() : base()
         {
+            MenuItem OpenAsAJ = new MenuItem("Add AOBJ");
+            OpenAsAJ.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
+                {
+                    anim.AOBJ = new HSD_AOBJ();
+                    MainForm.SelectedDataNode.Refresh();
+                }
+            };
+            MenuItems.Add(OpenAsAJ);
+
+
             MenuItem addChild = new MenuItem("Add Child");
             MenuItems.Add(addChild);
 

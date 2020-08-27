@@ -194,7 +194,7 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
-        private float nearClipPlane = 1;
+        private float nearClipPlane = 10;
 
         /// <summary>
         /// The width of the viewport or rendered region in pixels.

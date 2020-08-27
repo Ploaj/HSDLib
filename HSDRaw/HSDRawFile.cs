@@ -849,6 +849,13 @@ namespace HSDRaw
                 a = acc;
             }
             else
+            if (rootString.StartsWith("effBehaviorTable"))
+            {
+                var acc = new MEX_EffectTypeLookup();
+                acc._s = str;
+                a = acc;
+            }
+            else
             if (rootString.StartsWith("eff"))
             {
                 var acc = new SBM_EffectTable();

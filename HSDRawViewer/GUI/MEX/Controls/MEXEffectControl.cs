@@ -67,13 +67,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 data.EffectTable = new MEX_EffectData();
                 var length = strings.Length;
                 data.EffectTable.EffectFiles = new HSDArrayAccessor<MEX_EffectFiles>() { _s = strings };
-                data.EffectTable.EffectRuntime = new HSDAccessor() { _s = new HSDStruct(0x60) };
-                data.EffectTable.RuntimeArray1 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
-                data.EffectTable.RuntimeArray2 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
-                data.EffectTable.RuntimeArray3 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
-                data.EffectTable.RuntimeArray4 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
-                data.EffectTable.RuntimeArray5 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
-                data.EffectTable.RuntimeArray6 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeUnk1 = new HSDAccessor() { _s = new HSDStruct(0x60) };
+                data.EffectTable.RuntimeUnk3 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeTexGrNum = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeTexGrData = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeUnk4 = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimePtclLast = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimePtclData = new HSDAccessor() { _s = new HSDStruct(4 * length) };
+                data.EffectTable.RuntimeLookup = new HSDAccessor() { _s = new HSDStruct(4 * length) };
                 updated = true;
             }
 
@@ -110,13 +111,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 });
             }
 
-            data.EffectTable.EffectRuntime = new HSDAccessor() { _s = new HSDStruct( 0x60 )};
-            data.EffectTable.RuntimeArray1 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
-            data.EffectTable.RuntimeArray2 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
-            data.EffectTable.RuntimeArray3 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
-            data.EffectTable.RuntimeArray4 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
-            data.EffectTable.RuntimeArray5 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
-            data.EffectTable.RuntimeArray6 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeUnk1 = new HSDAccessor() { _s = new HSDStruct( 0x60 )};
+            data.EffectTable.RuntimeUnk3 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeTexGrNum = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeTexGrData = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeUnk4 = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimePtclLast = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimePtclData = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
+            data.EffectTable.RuntimeLookup = new HSDAccessor() { _s = new HSDStruct(4 * Effects.Length) };
         }
 
         /// <summary>
