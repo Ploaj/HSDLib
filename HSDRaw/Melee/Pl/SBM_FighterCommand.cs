@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using HSDRaw.Melee.Cmd;
 
 namespace HSDRaw.Melee.Pl
 {
@@ -50,20 +51,5 @@ namespace HSDRaw.Melee.Pl
 
         public uint Flags { get => (uint)_s.GetInt32(0x10); set => _s.SetInt32(0x10, (int)value); }
         
-    }
-
-    public class SBM_FighterSubactionData : HSDAccessor
-    {
-        public override int Trim()
-        {
-            _s.CanBeBuffer = false;
-            _s.Align = false;
-            return base.Trim();
-        }
-    }
-
-    public class SBM_ItemSubactionData : SBM_FighterSubactionData
-    {
-
     }
 }

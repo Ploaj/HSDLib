@@ -18,6 +18,7 @@ using HSDRawViewer.Rendering.Shapes;
 using OpenTK;
 using HSDRawViewer.Rendering.Renderers;
 using System.ComponentModel;
+using HSDRaw.Melee.Cmd;
 
 namespace HSDRawViewer.GUI
 {
@@ -143,7 +144,7 @@ namespace HSDRawViewer.GUI
 
         public DockState DefaultDockState => DockState.Document;
 
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData) };
+        public Type[] SupportedTypes => new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) };
 
         public DataNode Node
         {
@@ -151,23 +152,14 @@ namespace HSDRawViewer.GUI
             set
             {
                 _node = value;
-                if (value.Accessor is SBM_ItemSubactionData suidata)
-                {
-                    SubactionGroup = SubactionGroup.Item;
-                    SBM_FighterCommand[] su = new SBM_FighterCommand[]
-                    {
-                        new SBM_FighterCommand()
-                        {
-                            SubAction = suidata,
-                            Name = "Script"
-                        }
-                    };
-
-                    LoadActions(su);
-                    RefreshActionList();
-                }else
                 if (value.Accessor is SBM_FighterSubactionData sudata)
                 {
+                    if (value.Accessor is SBM_ItemSubactionData)
+                        SubactionGroup = SubactionGroup.Item;
+
+                    if (value.Accessor is SBM_ColorSubactionData)
+                        SubactionGroup = SubactionGroup.Color;
+
                     SBM_FighterCommand[] su = new SBM_FighterCommand[]
                     {
                         new SBM_FighterCommand()
@@ -179,7 +171,9 @@ namespace HSDRawViewer.GUI
 
                     LoadActions(su);
                     RefreshActionList();
-                }else
+                    propertyGrid1.Visible = false;
+                }
+                else
                 if(value.Accessor is SBM_FighterCommandTable SubactionTable)
                 {
                     LoadActions(SubactionTable.Commands);

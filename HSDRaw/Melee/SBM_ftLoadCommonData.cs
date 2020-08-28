@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using System.Drawing;
+using HSDRaw.Melee.Cmd;
 
 namespace HSDRaw.Melee
 {
@@ -12,6 +13,8 @@ namespace HSDRaw.Melee
         public HSDFixedLengthPointerArrayAccessor<SBM_BoneLookupTable> BoneTables { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_BoneLookupTable>>(0x10); set => _s.SetReference(0x10, value); }
 
         public HSDFixedLengthPointerArrayAccessor<SBM_PlCoUnknownFighterTable> FighterTable { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_PlCoUnknownFighterTable>>(0x14); set => _s.SetReference(0x14, value); }
+
+        public HSDFixedLengthPointerArrayAccessor<SBM_ColorSubactionData> ColorSATable { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_ColorSubactionData>>(0x18); set => _s.SetReference(0x18, value); }
 
 
         public SBM_RespawnPlatform RespawnPlatform { get => _s.GetReference<SBM_RespawnPlatform>(0x20); set => _s.SetReference(0x20, value); }

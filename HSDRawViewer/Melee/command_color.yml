@@ -1,0 +1,109 @@
+﻿- code: 10
+  name: Terminate Color Update
+  parameters:
+    - name: None
+      bitCount: 26
+- code: 11
+  name: Sync Timer
+  parameters:
+    - name: Value
+      bitCount: 26
+- code: 12
+  name: Disable Light and Overlay
+  parameters:
+    - name: None
+      bitCount: 26
+- code: 13
+  name: Set New Light
+  parameters:
+    - name: Unk
+      bitCount: 26
+    - name: R
+      bitCount: 8
+    - name: G
+      bitCount: 8
+    - name: B
+      bitCount: 8
+    - name: A
+      bitCount: 8
+- code: 14
+  name: Set Light Color
+  parameters:
+    - name: Unknown
+      bitCount: 26
+    - name: R
+      bitCount: 8
+    - name: G
+      bitCount: 8
+    - name: B
+      bitCount: 8
+    - name: A
+      bitCount: 8
+- code: 15
+  name: Set Light Blend Rate
+  parameters:
+    - name: None
+      bitCount: 26
+    - name: R
+      bitCount: 8
+    - name: G
+      bitCount: 8
+    - name: B
+      bitCount: 8
+    - name: A
+      bitCount: 8
+- code: 16
+  name: Set Light Position
+  parameters:
+    - name: Unknown
+      bitCount: 26
+- code: 17
+  name: Disable Light
+  parameters:
+    - name: Unknown
+      bitCount: 26
+- code: 18
+  name: Set New Overlay
+  parameters:
+    - name: Unknown
+      bitCount: 26
+    - name: R
+      bitCount: 8
+    - name: G
+      bitCount: 8
+    - name: B
+      bitCount: 8
+    - name: A
+      bitCount: 8
+- code: 19
+  name: Set Overlay Blink Rate
+  parameters:
+    - name: Rate
+      bitCount: 26
+      hex: true
+    - name: R
+      bitCount: 8
+    - name: G
+      bitCount: 8
+    - name: B
+      bitCount: 8
+    - name: A
+      bitCount: 8
+- code: 20
+  name: Disable Overlay
+  parameters:
+    - name: Unk1
+      bitCount: 26
+      hex: true
+    - name: Unk2
+      bitCount: 32
+      hex: true
+    - name: Unk3
+      bitCount: 32
+      hex: true
+    - name: Unk4
+      bitCount: 32
+      hex: true
+    - name: Unk5
+      bitCount: 32
+      hex: true

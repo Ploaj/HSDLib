@@ -143,7 +143,8 @@ namespace HSDRawViewer.Tools
     public enum SubactionGroup
     {
         Fighter, 
-        Item
+        Item,
+        Color
     }
 
     public class SubactionManager
@@ -159,6 +160,7 @@ namespace HSDRawViewer.Tools
         }
         private static List<Subaction> _fighterSubactions;
 
+
         public static List<Subaction> ItemSubactions
         {
             get
@@ -169,6 +171,19 @@ namespace HSDRawViewer.Tools
             }
         }
         private static List<Subaction> _itemSubactions;
+
+        
+        public static List<Subaction> ColorSubactions
+        {
+            get
+            {
+                if (_colorSubactions == null)
+                    LoadFromFile();
+                return _colorSubactions;
+            }
+        }
+        private static List<Subaction> _colorSubactions;
+
 
         public static List<Subaction> CustomSubactions
         {
@@ -193,6 +208,7 @@ namespace HSDRawViewer.Tools
             string sa = "";
             string fsa = "";
             string isa = "";
+            string clrsa = "";
             string csa = "";
 
             if (File.Exists(@"Melee\command_controls.yml"))
@@ -204,12 +220,16 @@ namespace HSDRawViewer.Tools
             if (File.Exists(@"Melee\command_item.yml"))
                 isa = File.ReadAllText(@"Melee\command_item.yml");
 
+            if (File.Exists(@"Melee\command_color.yml"))
+                clrsa = File.ReadAllText(@"Melee\command_color.yml");
+
             if (File.Exists(@"Melee\command_custom.yml"))
                 csa = File.ReadAllText(@"Melee\command_custom.yml");
 
             var subs = deserializer.Deserialize<Subaction[]>(sa);
             var fsubs = deserializer.Deserialize<Subaction[]>(fsa);
             var isubs = deserializer.Deserialize<Subaction[]>(isa);
+            var csubs = deserializer.Deserialize<Subaction[]>(clrsa);
             var customsubs = deserializer.Deserialize<Subaction[]>(csa);
 
             if (subs != null && subs.Length != 0)
@@ -233,6 +253,15 @@ namespace HSDRawViewer.Tools
                         s.Code <<= 2;
                     _itemSubactions.AddRange(subs);
                     _itemSubactions.AddRange(isubs);
+                }
+
+                _colorSubactions = new List<Subaction>();
+                if (csubs != null && csubs.Length != 0)
+                {
+                    foreach (var s in csubs)
+                        s.Code <<= 2;
+                    _colorSubactions.AddRange(subs);
+                    _colorSubactions.AddRange(csubs);
                 }
             }
 
@@ -282,6 +311,8 @@ namespace HSDRawViewer.Tools
             {
                 case SubactionGroup.Item:
                     return ItemSubactions;
+                case SubactionGroup.Color:
+                    return ColorSubactions;
                 default:
                     return FighterSubactions;
             }

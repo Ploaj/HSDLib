@@ -492,6 +492,9 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Melee\command_color.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\melee_font.png" />
     <None Include="Melee\command_fighter.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

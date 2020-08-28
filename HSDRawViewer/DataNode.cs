@@ -235,7 +235,8 @@ namespace HSDRawViewer
                             if (a == null) continue;
 
                             // add to labeled nodes so we don't get this node labeled as unknown
-                            labeledNodes.Add(a._s, null);
+                            if(!labeledNodes.ContainsKey(a._s))
+                                labeledNodes.Add(a._s, null);
 
                             var node = new DataNode
                                 (prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}_({prop.PropertyType.Name})"), a)
