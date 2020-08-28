@@ -6,7 +6,7 @@
 - code: 11
   name: Sync Timer
   parameters:
-    - name: Value
+    - name: Timer
       bitCount: 26
 - code: 12
   name: Disable Light and Overlay
@@ -16,8 +16,14 @@
 - code: 13
   name: Set New Light
   parameters:
-    - name: Unk
-      bitCount: 26
+    - name: Light Enable
+      bitCount: 1
+    - name: Unused
+      bitCount: 1
+    - name: X
+      bitCount: 9
+    - name: Y
+      bitCount: 9
     - name: R
       bitCount: 8
     - name: G
@@ -40,9 +46,9 @@
     - name: A
       bitCount: 8
 - code: 15
-  name: Set Light Blend Rate
+  name: Set Light Blend
   parameters:
-    - name: None
+    - name: Blend Frames
       bitCount: 26
     - name: R
       bitCount: 8
@@ -55,17 +61,19 @@
 - code: 16
   name: Set Light Position
   parameters:
-    - name: Unknown
-      bitCount: 26
+    - name: X
+      bitCount: 13
+    - name: Y
+      bitCount: 13
 - code: 17
   name: Disable Light
   parameters:
-    - name: Unknown
+    - name: None
       bitCount: 26
 - code: 18
-  name: Set New Overlay
+  name: Enable Color
   parameters:
-    - name: Unknown
+    - name: Padding
       bitCount: 26
     - name: R
       bitCount: 8
@@ -76,9 +84,9 @@
     - name: A
       bitCount: 8
 - code: 19
-  name: Set Overlay Blink Rate
+  name: Set Color Blend
   parameters:
-    - name: Rate
+    - name: Blend Frames
       bitCount: 26
       hex: true
     - name: R
@@ -90,20 +98,61 @@
     - name: A
       bitCount: 8
 - code: 20
-  name: Disable Overlay
+  name: Disable Color Blend
   parameters:
-    - name: Unk1
+    - name: None
       bitCount: 26
-      hex: true
-    - name: Unk2
-      bitCount: 32
-      hex: true
-    - name: Unk3
-      bitCount: 32
-      hex: true
-    - name: Unk4
-      bitCount: 32
-      hex: true
-    - name: Unk5
-      bitCount: 32
-      hex: true
+- code: 21
+  name: Graphic Effect
+  parameters:
+  - name: Bone ID
+    bitCount: 8
+  - name: Destroy on State Change
+    bitCount: 1
+  - name: Use Common Bone IDs
+    bitCount: 1
+  - name: Unk1
+    bitCount: 16
+  - name: GFX ID
+    bitCount: 16
+  - name: Unk2
+    bitCount: 16
+  - name: Z
+    bitCount: 16
+    signed: true
+  - name: Y
+    bitCount: 16
+    signed: true
+  - name: X
+    bitCount: 16
+    signed: true
+  - name: Range Z
+    bitCount: 16
+    signed: true
+  - name: Range Y
+    bitCount: 16
+    signed: true
+  - name: Range X
+    bitCount: 16
+    signed: true
+- code: 22
+  name: Sound Effect
+  parameters:
+  - name: Behavior
+    bitCount: 8
+  - name: Unknown
+    bitCount: 18
+  - name: SFX ID
+    bitCount: 32
+  - name: Padding
+    bitCount: 16
+  - name: Volume
+    bitCount: 8
+  - name: Unknown
+    bitCount: 8
+    hex: true
+- code: 23
+  name: Flags
+  parameters:
+    - name: None
+      bitCount: 26

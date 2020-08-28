@@ -14,7 +14,7 @@ namespace HSDRaw.Melee
 
         public HSDFixedLengthPointerArrayAccessor<SBM_PlCoUnknownFighterTable> FighterTable { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_PlCoUnknownFighterTable>>(0x14); set => _s.SetReference(0x14, value); }
 
-        public HSDFixedLengthPointerArrayAccessor<SBM_ColorSubactionData> ColorSATable { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_ColorSubactionData>>(0x18); set => _s.SetReference(0x18, value); }
+        public HSDArrayAccessor<ftCommonColorEffect> ColorSATable { get => _s.GetReference<HSDArrayAccessor<ftCommonColorEffect>>(0x18); set => _s.SetReference(0x18, value); }
 
 
         public SBM_RespawnPlatform RespawnPlatform { get => _s.GetReference<SBM_RespawnPlatform>(0x20); set => _s.SetReference(0x20, value); }
@@ -59,5 +59,17 @@ namespace HSDRaw.Melee
     public class ftLoadCommandDataCommonAttributes : HSDAccessor
     {
 
+    }
+
+    public class ftCommonColorEffect : HSDAccessor
+    {
+        public override int TrimmedSize => 0x08;
+
+        public SBM_ColorSubactionData SubactionData { get => _s.GetReference<SBM_ColorSubactionData>(0x00); set => _s.SetReference(0x00, value); }
+
+        public byte Flag1 { get => _s.GetByte(0x04); set => _s.SetByte(0x04, value); }
+        public byte Flag2 { get => _s.GetByte(0x05); set => _s.SetByte(0x05, value); }
+        public byte Flag3 { get => _s.GetByte(0x06); set => _s.SetByte(0x06, value); }
+        public byte Flag4 { get => _s.GetByte(0x07); set => _s.SetByte(0x07, value); }
     }
 }
