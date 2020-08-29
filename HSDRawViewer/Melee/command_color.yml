@@ -154,5 +154,6 @@
 - code: 23
   name: Flags
   parameters:
-    - name: None
-      bitCount: 26
+  - name: Value
+    bitCount: 26
+    hex: true

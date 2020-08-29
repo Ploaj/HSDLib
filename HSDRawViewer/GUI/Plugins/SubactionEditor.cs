@@ -190,26 +190,23 @@ namespace HSDRawViewer.GUI
                             
                             ECB = plDat.EnvironmentCollision;
 
-                            if (plDat.ModelLookupTables != null)
-                            {
-                                var lowpolyStruct = plDat.ModelLookupTables
-                                    ?._s.GetReference<HSDAccessor>(0x04)
-                                    ?._s.GetReference<HSDAccessor>(0x04)
-                                    ?._s.GetReference<HSDAccessor>(0x04)?._s;
-
-                                var tab = lowpolyStruct?.GetReference<HSDAccessor>(0x04)?._s;
-
-                                if (lowpolyStruct != null && tab != null)
-                                {
-                                    for (int i = 0; i < lowpolyStruct.GetInt32(0); i++)
-                                    {
-                                        HiddenDOBJIndices.Add(tab.GetByte(i));
-                                    }
-                                }
-                            }
+                            SetModelVis(0, 0);
                         }
                     }
                 }
+            }
+        }
+
+        public SBM_FighterData FighterData
+        {
+            get
+            {
+                if (_node.Accessor is SBM_FighterCommandTable SubactionTable)
+                    if (Node.Parent is DataNode parent)
+                        if (parent.Accessor is SBM_FighterData plDat)
+                            return plDat;
+
+                return null;
             }
         }
 
@@ -960,8 +957,6 @@ namespace HSDRawViewer.GUI
 
         private HurtboxRenderer HurtboxRenderer = new HurtboxRenderer();
 
-        private List<int> HiddenDOBJIndices = new List<int>();
-
         private string AnimationName = "";
 
         /// <summary>
@@ -1003,12 +998,46 @@ namespace HSDRawViewer.GUI
 
             JOBJManager.ModelScale = ModelScale;
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
-            JOBJManager.HideDOBJs(HiddenDOBJIndices);
             JOBJManager.settings.RenderBones = false;
+
+            SetModelVis(0, 0);
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
 
             previewBox.Visible = true;
+        }
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="structid"></param>
+        /// <param name="objectid"></param>
+        private void SetModelVis(int structid, int objectid)
+        {
+            var plDat = FighterData;
+
+            if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
+            {
+                var table = plDat.ModelLookupTables.LookupTables[structid];
+
+                var hidden = new List<int>();
+                for (int i = 0; i < JOBJManager.JointCount; i++)
+                    hidden.Add(i);
+
+                foreach (var t in table.Array)
+                {
+                    if (objectid > t.Count || t.LookupEntries == null)
+                        continue;
+
+                    var id = t.LookupEntries[objectid];
+                    foreach (var i in id.Entries)
+                        hidden.Remove(i);
+                }
+
+                JOBJManager.HideDOBJs(hidden);
+            }
         }
 
         /// <summary>

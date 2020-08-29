@@ -662,7 +662,8 @@ namespace HSDRawViewer.Rendering
         public void HideDOBJs(List<int> DOBJIndices)
         {
             var i = 0;
-            foreach(var j in RootJOBJ.BreathFirstList)
+            DOBJManager.HiddenDOBJs.Clear();
+            foreach (var j in RootJOBJ.BreathFirstList)
             {
                 if(j.Dobj != null)
                 {

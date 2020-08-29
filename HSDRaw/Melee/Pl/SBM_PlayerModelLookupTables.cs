@@ -6,8 +6,8 @@
         
         public int TableCounts { get => _s.GetInt32(0x00); internal set => _s.SetInt32(0x00, value); }
 
-        /*public HSDNullPointerArrayAccessor<SBM_LookupTable> LookupTables {
-            get => _s.GetReference<HSDNullPointerArrayAccessor<SBM_LookupTable>>(0x04);
+        public HSDNullPointerArrayAccessor<HSDArrayAccessor<SBM_LookupTable>> LookupTables {
+            get => _s.GetReference<HSDNullPointerArrayAccessor<HSDArrayAccessor<SBM_LookupTable>>>(0x04);
             set
             {
                 if (value == null || value.Length == 0)
@@ -20,7 +20,7 @@
                     TableCounts = value.Length;
                 }
             }
-        }*/
+        }
     
         public int MaterialIndexCount { get => _s.GetInt32(0x08); internal set => _s.SetInt32(0x08, value); }
         
@@ -37,9 +37,9 @@
 
         public int Count { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
-        /*public SBM_LookupEntry[] LookupEntries
+        public HSDArrayAccessor<SBM_LookupEntry> LookupEntries
         {
-            get => _s.GetNullPointerArray<SBM_LookupEntry>(0x04);
+            get => _s.GetReference<HSDArrayAccessor<SBM_LookupEntry>>(0x04);
             set
             {
                 if (value == null || value.Length == 0)
@@ -49,11 +49,11 @@
                 }
                 else
                 {
-                    _s.SetNullPointerArray(0x04, value);
+                    _s.SetReference(0x04, value);
                     Count = value.Length;
                 }
             }
-        }*/
+        }
     }
 
     public class SBM_LookupEntry : HSDAccessor

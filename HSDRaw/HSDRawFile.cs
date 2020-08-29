@@ -938,7 +938,14 @@ namespace HSDRaw
                 acc._s = str;
                 a = acc;
             }
-
+            else
+            if (rootString.Equals("lbBgFlashColAnimData"))
+            {
+                var acc = new HSDArrayAccessor<ftCommonColorEffect>();
+                acc._s = str;
+                a = acc;
+            }
+            
             return a;
         }
     }
