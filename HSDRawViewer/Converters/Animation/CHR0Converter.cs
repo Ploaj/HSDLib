@@ -4,6 +4,7 @@ using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using OpenTK;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,9 +17,17 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static JointAnimManager LoadCHR0(string filePath)
+        public static JointAnimManager LoadCHR0(string filePath, Dictionary<int, string> BoneLabelMap)
         {
             JointAnimManager anim = new JointAnimManager();
+
+            Dictionary<string, int> nameToIndex = new Dictionary<string, int>();
+            
+            foreach(var v in BoneLabelMap)
+            {
+                nameToIndex.Add(v.Value, v.Key);
+                anim.Nodes.Add(new AnimNode());
+            }
 
             using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
             {
@@ -63,6 +72,9 @@ namespace HSDRawViewer.Converters
                         continue;
                     }
 
+                    if (!nameToIndex.ContainsKey(boneName))
+                        continue;
+
                     r.Seek(dataOffset);
 
                     var nameOff = r.Position + r.ReadUInt32();
@@ -93,44 +105,56 @@ namespace HSDRawViewer.Converters
                     int Siso = (flags >> 0x4) & 0x1;
                     
                     AnimNode node = new AnimNode();
-                    FOBJ_Player trackX = new FOBJ_Player();
-                    FOBJ_Player trackY = new FOBJ_Player();
-                    FOBJ_Player trackZ = new FOBJ_Player();
-                    FOBJ_Player trackRX = new FOBJ_Player();
-                    FOBJ_Player trackRY = new FOBJ_Player();
-                    FOBJ_Player trackRZ = new FOBJ_Player();
-                    FOBJ_Player trackSX = new FOBJ_Player();
-                    FOBJ_Player trackSY = new FOBJ_Player();
-                    FOBJ_Player trackSZ = new FOBJ_Player();
+                    FOBJ_Player trackX = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAX };
+                    FOBJ_Player trackY = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAY };
+                    FOBJ_Player trackZ = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAZ };
+                    FOBJ_Player trackRX = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTX };
+                    FOBJ_Player trackRY = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTY };
+                    FOBJ_Player trackRZ = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTZ };
+                    FOBJ_Player trackSX = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAX };
+                    FOBJ_Player trackSY = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAY };
+                    FOBJ_Player trackSZ = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAZ };
 
                     if (hasS == 1)
-                        ReadKeys(r, node, (int)anim.FrameCount, trackX, trackY, trackZ, Siso == 1, SXfixed == 1, SYfixed == 1, SZfixed == 1, s_type, dataOffset);
+                        ReadKeys(r, node, (int)anim.FrameCount, trackSX, trackSY, trackSZ, Siso == 1, SXfixed == 1, SYfixed == 1, SZfixed == 1, s_type, dataOffset);
 
                     if (hasR == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackRX, trackRY, trackRZ, Riso == 1, RXfixed == 1, RYfixed == 1, RZfixed == 1, r_type, dataOffset);
 
                     if (hasT == 1)
-                        ReadKeys(r, node, (int)anim.FrameCount, trackSX, trackSY, trackSZ, Tiso == 1, Xfixed == 1, Yfixed == 1, Zfixed == 1, t_type, dataOffset);
+                        ReadKeys(r, node, (int)anim.FrameCount, trackX, trackY, trackZ, Tiso == 1, Xfixed == 1, Yfixed == 1, Zfixed == 1, t_type, dataOffset);
 
-                    if (trackX.Keys.Count > 0) node.Tracks.Add(trackX);
-                    if (trackY.Keys.Count > 0) node.Tracks.Add(trackY);
-                    if (trackZ.Keys.Count > 0) node.Tracks.Add(trackZ);
-                    if (trackRX.Keys.Count > 0) node.Tracks.Add(trackRX);
-                    if (trackRY.Keys.Count > 0) node.Tracks.Add(trackRY);
-                    if (trackRZ.Keys.Count > 0) node.Tracks.Add(trackRZ);
-                    if (trackSX.Keys.Count > 0) node.Tracks.Add(trackSX);
-                    if (trackSY.Keys.Count > 0) node.Tracks.Add(trackSY);
-                    if (trackSZ.Keys.Count > 0) node.Tracks.Add(trackSZ);
+                    if (trackX.Keys.Count > 1) node.Tracks.Add(trackX);
+                    if (trackY.Keys.Count > 1) node.Tracks.Add(trackY);
+                    if (trackZ.Keys.Count > 1) node.Tracks.Add(trackZ);
+                    if (trackRX.Keys.Count > 1) node.Tracks.Add(trackRX);
+                    if (trackRY.Keys.Count > 1) node.Tracks.Add(trackRY);
+                    if (trackRZ.Keys.Count > 1) node.Tracks.Add(trackRZ);
+                    if (trackSX.Keys.Count > 1) node.Tracks.Add(trackSX);
+                    if (trackSY.Keys.Count > 1) node.Tracks.Add(trackSY);
+                    if (trackSZ.Keys.Count > 1) node.Tracks.Add(trackSZ);
 
                     foreach (var k in trackRX.Keys)
+                    {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
+                        k.Tan = MathHelper.DegreesToRadians(k.Value);
+                    }
                     foreach (var k in trackRY.Keys)
+                    {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
+                        k.Tan = MathHelper.DegreesToRadians(k.Value);
+                    }
                     foreach (var k in trackRZ.Keys)
+                    {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
+                        k.Tan = MathHelper.DegreesToRadians(k.Value);
+                    }
 
                     Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count);
-                    anim.Nodes.Add(node);
+                    Console.WriteLine($"{trackX.Keys.Count} {trackY.Keys.Count} {trackZ.Keys.Count}");
+                    Console.WriteLine($"{trackRX.Keys.Count} {trackRY.Keys.Count} {trackRZ.Keys.Count}");
+                    Console.WriteLine($"{trackSX.Keys.Count} {trackSY.Keys.Count} {trackSZ.Keys.Count}");
+                    anim.Nodes[nameToIndex[boneName]] = node;
                 }
             }
 

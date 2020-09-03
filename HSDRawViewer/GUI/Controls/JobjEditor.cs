@@ -729,10 +729,15 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta)|*.dat;*.anim;*.mota;*.gnta");
+            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta)|*.dat;*.anim;*.mota;*.gnta;*.chr0");
 
             if (f != null)
             {
+                if (Path.GetExtension(f).ToLower().Equals(".chr0"))
+                {
+                    LoadAnimation(CHR0Converter.LoadCHR0(f, BoneLabelMap));
+                }
+                else
                 if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta"))
                 {
                     var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");

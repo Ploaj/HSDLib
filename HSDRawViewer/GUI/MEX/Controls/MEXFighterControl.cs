@@ -194,6 +194,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
             // kirby runtimes
             d.KirbyData.CapFileRuntime._s = new HSDStruct(4 * NumberOfEntries);
             d.KirbyData.CostumeRuntime._s = new HSDStruct(4);
+            //d.KirbyData.KirbyNState = new HSDArrayAccessor<HSD_UShort>();
+            //d.KirbyData.KirbyNStateAir = new HSDArrayAccessor<HSD_UShort>();
 
             // dump data
             int index = 0;

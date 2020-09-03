@@ -388,6 +388,11 @@ namespace HSDRawViewer.Converters
         private void ProcessMesh(IOScene scene, IOMesh mesh, HSD_JOBJ rootnode)
         {
             HSD_JOBJ parent = rootnode;
+            
+
+            if (mesh.ParentBone != null && _cache.NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
+                parent = _cache.NameToJOBJ[mesh.ParentBone.Name];
+
 
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
@@ -523,11 +528,14 @@ namespace HSDRawViewer.Converters
                     var tknrm = new Vector3(v.Normal.X, v.Normal.Y, v.Normal.Z);
                     var tktan = new Vector3(v.Tangent.X, v.Tangent.Y, v.Tangent.Z);
                     var tkbitan = new Vector3(v.Binormal.X, v.Binormal.Y, v.Binormal.Z);
+                    
+                    var parentTransform = _cache.jobjToWorldTransform[parent].Inverted();
+                    
+                    tkvert = Vector3.TransformPosition(tkvert, parentTransform);
+                    tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
+                    tktan = Vector3.TransformNormal(tktan, parentTransform).Normalized();
+                    tkbitan = Vector3.TransformNormal(tkbitan, parentTransform).Normalized();
 
-                    tkvert = Vector3.TransformPosition(tkvert, _cache.jobjToWorldTransform[rootnode].Inverted());
-                    tknrm = Vector3.TransformNormal(tknrm, _cache.jobjToWorldTransform[rootnode].Inverted()).Normalized();
-                    tktan = Vector3.TransformNormal(tktan, _cache.jobjToWorldTransform[rootnode].Inverted()).Normalized();
-                    tkbitan = Vector3.TransformNormal(tkbitan, _cache.jobjToWorldTransform[rootnode].Inverted()).Normalized();
 
                     if (mesh.HasEnvelopes() && Settings.ImportRigging)
                     {

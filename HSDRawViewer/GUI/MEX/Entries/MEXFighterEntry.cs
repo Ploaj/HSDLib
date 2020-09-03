@@ -198,6 +198,12 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Kirby Effect ID"), Category("4 - Kirby"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int KirbyEffectID { get; set; }
 
+        //[DisplayName("Kirby Special State Index"), Category("4 - Kirby"), Description("")]
+        //public ushort KirbyNSpecialStateIndex { get; set; }
+
+        //[DisplayName("Kirby Special (Air) State Index"), Category("4 - Kirby"), Description("")]
+        //public ushort KirbyNSpecialAirStateIndex { get; set; }
+
 
         public MEXFunctionPointers Functions = new MEXFunctionPointers();
 
@@ -282,6 +288,8 @@ namespace HSDRawViewer.GUI.MEX
             KirbyCapSymbol = mexData.KirbyData.CapFiles[internalId].Symbol;
             KirbySpecialCostumes = mexData.KirbyData.KirbyCostumes[internalId]?.Array;
             KirbyEffectID = mexData.KirbyData.KirbyEffectIDs[internalId].Value;
+            //KirbyNSpecialStateIndex = mexData.KirbyData.KirbyNState[internalId].Value;
+            //KirbyNSpecialAirStateIndex = mexData.KirbyData.KirbyNStateAir[internalId].Value;
 
             if (!IsSpecialCharacterInternal(mexData, internalId))
             {
@@ -355,6 +363,8 @@ namespace HSDRawViewer.GUI.MEX
                 mexData.KirbyData.KirbyCostumes.Set(internalId, null);
             
             mexData.KirbyData.KirbyEffectIDs.Set(internalId, new HSD_Byte() { Value = (byte)KirbyEffectID });
+            //mexData.KirbyData.KirbyNState.Set(internalId, new HSD_UShort() { Value = KirbyNSpecialStateIndex });
+            //mexData.KirbyData.KirbyNStateAir.Set(internalId, new HSD_UShort() { Value = KirbyNSpecialAirStateIndex });
 
             mexData.FighterData.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
