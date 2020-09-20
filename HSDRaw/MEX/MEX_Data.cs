@@ -1,11 +1,12 @@
 ﻿using HSDRaw.MEX.Menus;
+using HSDRaw.MEX.Scenes;
 using HSDRaw.MEX.Stages;
 
 namespace HSDRaw.MEX
 {
     public class MEX_Data : HSDAccessor
     {
-        public override int TrimmedSize => 0x30;
+        public override int TrimmedSize => 0x34;
 
         public MEX_Meta MetaData { get => _s.GetReference<MEX_Meta>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -30,6 +31,8 @@ namespace HSDRaw.MEX
         public MEX_StageData StageData { get => _s.GetReference<MEX_StageData>(0x28); set => _s.SetReference(0x28, value); }
 
         public HSDFixedLengthPointerArrayAccessor<MEX_Stage> StageFunctions { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<MEX_Stage>>(0x2C); set => _s.SetReference(0x2C, value); }
+
+        public MEX_SceneData SceneData { get => _s.GetReference<MEX_SceneData>(0x30); set => _s.SetReference(0x30, value); }
 
     }
 }

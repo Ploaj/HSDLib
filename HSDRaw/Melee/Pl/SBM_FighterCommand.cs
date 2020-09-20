@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using HSDRaw.Melee.Cmd;
+using HSDRaw.Common.Animation;
 
 namespace HSDRaw.Melee.Pl
 {
@@ -44,6 +45,8 @@ namespace HSDRaw.Melee.Pl
         }
 
         public int AnimationOffset { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+
+        public HSD_FigaTree Animation { get => _s.GetReference<HSD_FigaTree>(0x04); set { _s.SetReference(0x04, value);  AnimationSize = value._s.Length; } }
 
         public int AnimationSize { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 

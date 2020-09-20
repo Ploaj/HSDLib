@@ -16,6 +16,8 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<HSD_Byte> KirbyEffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x10); set => _s.SetReference(0x10, value); }
 
+        public HSDAccessor CapFtCmdRuntime { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
+
         //public HSDArrayAccessor<HSD_UShort> KirbyNState { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x14); set => _s.SetReference(0x14, value); }
 
         //public HSDArrayAccessor<HSD_UShort> KirbyNStateAir { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x18); set => _s.SetReference(0x18, value); }

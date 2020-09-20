@@ -945,7 +945,14 @@ namespace HSDRaw
                 acc._s = str;
                 a = acc;
             }
-            
+            else
+            if (rootString.Equals("ftcmd"))
+            {
+                var acc = new SBM_FighterCommandTable();
+                acc._s = str;
+                a = acc;
+            }
+
             return a;
         }
     }
