@@ -128,7 +128,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterData.WallJump.Array = new HSD_Byte[0];
             d.FighterData.RstRuntime.Array = new MEX_RstRuntime[0];
             d.FighterData.FighterItemLookup.Array = new MEX_ItemLookup[0];
-            d.FighterData.FighterEffectLookup.Array = new MEX_EffectTypeLookup[0];
+            //d.FighterData.FighterEffectLookup.Array = new MEX_EffectTypeLookup[0];
             d.FighterData.TargetTestStageLookups.Array = new HSD_UShort[0];
             d.FighterData.FighterSongIDs.Array = new MEX_FighterSongID[0];
 
@@ -195,6 +195,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.KirbyData.CapFileRuntime._s = new HSDStruct(4 * NumberOfEntries);
             d.KirbyData.CostumeRuntime._s = new HSDStruct(4);
             d.KirbyData.CapFtCmdRuntime._s = new HSDStruct(4 * NumberOfEntries);
+            d.KirbyData.MoveLogicRuntime._s = new HSDStruct(4 * NumberOfEntries);
             //d.KirbyData.KirbyNState = new HSDArrayAccessor<HSD_UShort>();
             //d.KirbyData.KirbyNStateAir = new HSDArrayAccessor<HSD_UShort>();
 

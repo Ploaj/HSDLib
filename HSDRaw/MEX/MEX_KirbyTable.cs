@@ -18,6 +18,8 @@ namespace HSDRaw.MEX
 
         public HSDAccessor CapFtCmdRuntime { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
 
+        public HSDAccessor MoveLogicRuntime { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
+
         //public HSDArrayAccessor<HSD_UShort> KirbyNState { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x14); set => _s.SetReference(0x14, value); }
 
         //public HSDArrayAccessor<HSD_UShort> KirbyNStateAir { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x18); set => _s.SetReference(0x18, value); }
