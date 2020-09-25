@@ -100,6 +100,12 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Green Costume Index"), Category("1 - CSS"), Description("Index of GREEN costume")]
         public byte GreenCostumeID { get; set; }
 
+        [DisplayName("VI Wait File"), Category("2 - Demo"), Description("")]
+        public string DemoFile { get; set; }
+
+        [DisplayName("Vi Wait"), Category("2 - Demo"), Description("")]
+        public string DemoWait { get; set; }
+
         [DisplayName("Result"), Category("2 - Demo"), Description("")]
         public string DemoResult { get; set; }
 
@@ -108,9 +114,6 @@ namespace HSDRawViewer.GUI.MEX
 
         [DisplayName("Ending"), Category("2 - Demo"), Description("")]
         public string DemoEnding { get; set; }
-
-        [DisplayName("Vi Wait"), Category("2 - Demo"), Description("")]
-        public string DemoWait { get; set; }
 
         [DisplayName("Target Test Stage"), Category("3 - Misc"), Description("")]
         public int TargetTestStage { get; set; }
@@ -311,6 +314,7 @@ namespace HSDRawViewer.GUI.MEX
 
                 ResultScreenScale = mexData.FighterData.ResultScale[externalID].Value;
                 TargetTestStage = mexData.FighterData.TargetTestStageLookups[externalID].Value;
+                DemoFile = mexData.FighterData.VIFiles[externalID].Value;
             }
 
             return this;
@@ -428,6 +432,7 @@ namespace HSDRawViewer.GUI.MEX
 
                 mexData.FighterData.ResultScale.Set(externalID, new HSD_Float() { Value = ResultScreenScale });
                 mexData.FighterData.TargetTestStageLookups.Set(externalID, new HSD_UShort() { Value = (ushort)TargetTestStage });
+                mexData.FighterData.VIFiles.Set(externalID, new HSD_String() { Value = DemoFile });
             }
 
         }
