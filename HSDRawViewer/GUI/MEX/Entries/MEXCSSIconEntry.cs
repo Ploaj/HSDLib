@@ -19,7 +19,8 @@ namespace HSDRawViewer.GUI.MEX
         public MEX_CSSIcon icon;
 
         public List<HSD_TOBJ> CSPs = new List<HSD_TOBJ>();
-
+        public List<HSD_TOBJ> StockIcons = new List<HSD_TOBJ>();
+        
         public HSD_JOBJ Joint;
         public HSD_MatAnimJoint MatAnimJoint;
         

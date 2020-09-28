@@ -952,6 +952,13 @@ namespace HSDRaw
                 acc._s = str;
                 a = acc;
             }
+            else
+            if (rootString.Equals("Stc_icns"))
+            {
+                var acc = new MEX_Stock();
+                acc._s = str;
+                a = acc;
+            }
 
             return a;
         }

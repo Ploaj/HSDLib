@@ -71,6 +71,7 @@
             this.asFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asAnimJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asMotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
@@ -87,7 +88,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.createAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsExportTextures = new System.Windows.Forms.ToolStripMenuItem();
+            this.importTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -404,7 +407,10 @@
             this.exportAnimationToolStripMenuItem,
             this.createAnimationToolStripMenuItem,
             this.editAnimationToolStripMenuItem,
-            this.clearAnimationToolStripMenuItem});
+            this.clearAnimationToolStripMenuItem,
+            this.toolStripSeparator7,
+            this.tsExportTextures,
+            this.importTexturesToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
@@ -475,6 +481,13 @@
             this.asMotToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.asMotToolStripMenuItem.Text = "As MOT";
             this.asMotToolStripMenuItem.Click += new System.EventHandler(this.motToolStripMenuItem_Click);
+            // 
+            // createAnimationToolStripMenuItem
+            // 
+            this.createAnimationToolStripMenuItem.Name = "createAnimationToolStripMenuItem";
+            this.createAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.createAnimationToolStripMenuItem.Text = "Create Animation";
+            this.createAnimationToolStripMenuItem.Click += new System.EventHandler(this.createAnimationToolStripMenuItem_Click);
             // 
             // editAnimationToolStripMenuItem
             // 
@@ -617,24 +630,35 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // createAnimationToolStripMenuItem
+            // toolStripSeparator7
             // 
-            this.createAnimationToolStripMenuItem.Name = "createAnimationToolStripMenuItem";
-            this.createAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.createAnimationToolStripMenuItem.Text = "Create Animation";
-            this.createAnimationToolStripMenuItem.Click += new System.EventHandler(this.createAnimationToolStripMenuItem_Click);
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(196, 6);
             // 
-            // JOBJEditor
+            // tsExportTextures
+            // 
+            this.tsExportTextures.Name = "tsExportTextures";
+            this.tsExportTextures.Size = new System.Drawing.Size(199, 22);
+            this.tsExportTextures.Text = "Export Textures";
+            this.tsExportTextures.Click += new System.EventHandler(this.tsExportTextures_Click);
+            // 
+            // importTexturesToolStripMenuItem
+            // 
+            this.importTexturesToolStripMenuItem.Name = "importTexturesToolStripMenuItem";
+            this.importTexturesToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.importTexturesToolStripMenuItem.Text = "Import Textures";
+            this.importTexturesToolStripMenuItem.Click += new System.EventHandler(this.importTexturesToolStripMenuItem_Click);
+            // 
+            // JobjEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(821, 502);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.previewBox);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.toolStrip1);
-            this.Name = "JOBJEditor";
-            this.Text = "JOBJEditor";
+            this.Name = "JobjEditor";
+            this.Size = new System.Drawing.Size(821, 502);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
@@ -714,5 +738,8 @@
         private System.Windows.Forms.ToolStripMenuItem clearSelectedPOBJsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem createAnimationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem tsExportTextures;
+        private System.Windows.Forms.ToolStripMenuItem importTexturesToolStripMenuItem;
     }
 }

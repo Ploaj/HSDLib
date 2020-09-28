@@ -32,11 +32,11 @@
             this.buttonSaveCSS = new System.Windows.Forms.ToolStripButton();
             this.buttonImportMnSlcChr = new System.Windows.Forms.ToolStripButton();
             this.buttonImportMnSlMap = new System.Windows.Forms.ToolStripButton();
+            this.playButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.playButton = new System.Windows.Forms.ToolStripButton();
             this.toolStrip4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabControl.SuspendLayout();
@@ -69,8 +69,8 @@
             this.buttonImportMnSlcChr.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.buttonImportMnSlcChr.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonImportMnSlcChr.Name = "buttonImportMnSlcChr";
-            this.buttonImportMnSlcChr.Size = new System.Drawing.Size(112, 22);
-            this.buttonImportMnSlcChr.Text = "Import MnSlChr";
+            this.buttonImportMnSlcChr.Size = new System.Drawing.Size(141, 22);
+            this.buttonImportMnSlcChr.Text = "Import MnSlChr+IfAll";
             this.buttonImportMnSlcChr.Click += new System.EventHandler(this.buttonImportMnSlcChr_Click);
             // 
             // buttonImportMnSlMap
@@ -81,6 +81,16 @@
             this.buttonImportMnSlMap.Size = new System.Drawing.Size(117, 22);
             this.buttonImportMnSlMap.Text = "Import MnSlMap";
             this.buttonImportMnSlMap.Click += new System.EventHandler(this.buttonImportMnSlMap_Click);
+            // 
+            // playButton
+            // 
+            this.playButton.Image = global::HSDRawViewer.Properties.Resources.ts_play;
+            this.playButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.playButton.Name = "playButton";
+            this.playButton.Size = new System.Drawing.Size(49, 22);
+            this.playButton.Text = "Play";
+            this.playButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.playButton.Click += new System.EventHandler(this.playButton_Click);
             // 
             // groupBox2
             // 
@@ -123,16 +133,6 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "SSS";
             this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // playButton
-            // 
-            this.playButton.Image = global::HSDRawViewer.Properties.Resources.ts_play;
-            this.playButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.playButton.Name = "playButton";
-            this.playButton.Size = new System.Drawing.Size(49, 22);
-            this.playButton.Text = "Play";
-            this.playButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.playButton.Click += new System.EventHandler(this.playButton_Click);
             // 
             // MEXMenuControl
             // 

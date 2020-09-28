@@ -83,10 +83,36 @@ namespace HSDRawViewer.GUI
             set => elementList.SelectionMode = value;
         }
 
+        public int ItemHeight { get => elementList.ItemHeight; set => elementList.ItemHeight = value; }
+
+        public ushort ImageWidth { get; set; } = 24;
+
+        public ushort ImageHeight { get; set; } = 24;
+
+        public bool DisplayItemImages { get; set; } = false;
+
         public bool DisplayItemIndices { get; set; } = false;
 
         [DefaultValue(true)]
-        public bool EnablePropertyView { get => _enablePropertyView; set { propertyGrid.Visible = value; _enablePropertyView = value; } }
+        public bool EnablePropertyView
+        {
+            get => _enablePropertyView;
+            set
+            {
+                propertyGrid.Visible = value;
+                _enablePropertyView = value;
+                if (value)
+                {
+                    elementList.Dock = DockStyle.Top;
+                    splitter1.Visible = true;
+                }
+                else
+                {
+                    elementList.Dock = DockStyle.Fill;
+                    splitter1.Visible = false;
+                }
+            }
+        }
         private bool _enablePropertyView = true;
 
         public bool EnablePropertyViewDescription { get => propertyGrid.HelpVisible; set => propertyGrid.HelpVisible = value; }
@@ -424,19 +450,33 @@ namespace HSDRawViewer.GUI
                 if (string.IsNullOrEmpty(itemText))
                     itemText = "-";
 
+                int offset = 0;
+                
                 if (DisplayItemIndices)
                 {
                     var indText = (e.Index + ItemIndexOffset).ToString() + ".";
+                    var indSize = TextRenderer.MeasureText(indText, e.Font);
 
-                    var indSize =  TextRenderer.MeasureText(indText, e.Font);
-                    var indexBound = new Rectangle(e.Bounds.X, e.Bounds.Y, indSize.Width, indSize.Height);
-                    var textBound = new Rectangle(e.Bounds.X + indSize.Width, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
-
+                    var indexBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, indSize.Width, indSize.Height);
                     e.Graphics.DrawString(indText, e.Font, ApplicationSettings.SystemGrayTextColorBrush, indexBound, StringFormat.GenericDefault);
-                    e.Graphics.DrawString(itemText, e.Font, brush, textBound, StringFormat.GenericDefault);
+
+                    offset += indSize.Width;
                 }
-                else
-                    e.Graphics.DrawString(itemText, e.Font, brush, e.Bounds, StringFormat.GenericDefault);
+
+                if (DisplayItemImages && ((ListBox)sender).Items[e.Index] is ImageArrayItem imageitem)
+                {
+                    using (var img = imageitem.ToImage())
+                        if (img != null)
+                        {
+                            var indexBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, ImageWidth, ImageHeight);
+                            e.Graphics.DrawImage(img, indexBound);
+
+                            offset += ImageWidth;
+                        }
+                }
+                
+                var textBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
+                e.Graphics.DrawString(itemText, e.Font, brush, textBound, StringFormat.GenericDefault);
 
                 e.DrawFocusRectangle();
             }
@@ -500,6 +540,11 @@ namespace HSDRawViewer.GUI
     public class RemovedItemEventArgs : EventArgs
     {
         public int Index { get; set; }
+    }
+
+    public interface ImageArrayItem : IDisposable
+    {
+        Image ToImage();
     }
 
 }

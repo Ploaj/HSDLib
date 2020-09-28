@@ -1,7 +1,10 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRawViewer.Rendering;
 using OpenTK;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 
 namespace HSDRawViewer.Converters
 {
@@ -243,6 +246,119 @@ namespace HSDRawViewer.Converters
                         d.Mobj.Material.SPC_R = 0;
                         d.Mobj.Material.Shininess = 50;
                     }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void ExportTextures(HSD_JOBJ jobj)
+        {
+            var folder = Tools.FileIO.OpenFolder();
+
+            if(!string.IsNullOrEmpty(folder))
+            {
+                HashSet<int> textures = new HashSet<int>();
+
+                // get all tobjs
+                foreach(var j in jobj.BreathFirstList)
+                {
+                    if (j.Dobj != null)
+                        foreach (var dobj in j.Dobj.List)
+                        {
+                            if(dobj.Mobj != null && dobj.Mobj.Textures != null)
+                            {
+                                foreach(var tobj in dobj.Mobj.Textures.List)
+                                {
+                                    // generate hashes and export textures and formatting
+
+                                    var hash = ComputeHash(tobj.GetDecodedImageData());
+
+                                    if(!textures.Contains(hash))
+                                    {
+                                        using (var bmp = TOBJConverter.ToBitmap(tobj))
+                                            bmp.Save(System.IO.Path.Combine(folder, TOBJConverter.FormatName(hash.ToString("X8"), tobj) + ".png"));
+
+                                        textures.Add(hash);
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
+        }
+
+        //https://stackoverflow.com/questions/16340/how-do-i-generate-a-hashcode-from-a-byte-array-in-c/16381
+        private static int ComputeHash(params byte[] data)
+        {
+            unchecked
+            {
+                const int p = 16777619;
+                int hash = (int)2166136261;
+
+                for (int i = 0; i < data.Length; i++)
+                    hash = (hash ^ data[i]) * p;
+
+                hash += hash << 13;
+                hash ^= hash >> 7;
+                hash += hash << 3;
+                hash ^= hash >> 17;
+                hash += hash << 5;
+                return hash;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void ImportTextures(HSD_JOBJ jobj)
+        {
+            var folder = Tools.FileIO.OpenFolder();
+
+            if (!string.IsNullOrEmpty(folder))
+            {
+                // get all tobjs
+                Dictionary<int, HSD_TOBJ> hashToImage = new Dictionary<int, HSD_TOBJ>();
+
+                // load all textures from file
+                foreach(var tf in System.IO.Directory.GetFiles(folder))
+                {
+                    if (tf.ToLower().EndsWith(".png"))
+                    {
+                        var fn = System.IO.Path.GetFileNameWithoutExtension(tf);
+                        if(fn.Length >= 8 && 
+                            int.TryParse(fn.Substring(0, 8), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hash) && 
+                            TOBJConverter.FormatFromString(fn, out HSDRaw.GX.GXTexFmt texFmt, out HSDRaw.GX.GXTlutFmt tlutFmt))
+                        {
+                            hashToImage.Add(hash, TOBJConverter.ImportTOBJFromFile(tf, texFmt, tlutFmt));
+                        }
+                    }
+                }
+
+                // get all tobjs
+                foreach (var j in jobj.BreathFirstList)
+                {
+                    if (j.Dobj != null)
+                        foreach (var dobj in j.Dobj.List)
+                        {
+                            if (dobj.Mobj != null && dobj.Mobj.Textures != null)
+                            {
+                                foreach (var tobj in dobj.Mobj.Textures.List)
+                                {
+                                    // generate hashes and export textures and formatting
+
+                                    var hash = ComputeHash(tobj.GetDecodedImageData());
+
+                                    if (hashToImage.ContainsKey(hash))
+                                    {
+                                        var imgClone = HSDAccessor.DeepClone<HSD_TOBJ>(hashToImage[hash]);
+                                        tobj.ImageData = imgClone.ImageData;
+                                        tobj.TlutData = imgClone.TlutData;
+                                    }
+                                }
+                            }
+                        }
+                }
             }
         }
     }

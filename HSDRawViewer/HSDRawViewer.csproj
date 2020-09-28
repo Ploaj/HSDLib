@@ -153,6 +153,7 @@
     <Compile Include="Converters\Animation\CHR0Converter.cs" />
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />
+    <Compile Include="Converters\Mex\MexStockIconTool.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\DAEWriter.cs" />
     <Compile Include="Converters\JOBJTools.cs" />
@@ -173,6 +174,18 @@
     <Compile Include="Converters\SBM\SSFConverter.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
+    <Compile Include="GUI\MEX\Controls\MEXStockIconControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXStockIconControl.Designer.cs">
+      <DependentUpon>MEXStockIconControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\MEXStockIconEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\MEXStockIconEditor.Designer.cs">
+      <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -531,6 +544,12 @@
     </None>
     <None Include="Resources\ts_stop.png" />
     <None Include="Resources\ts_play.png" />
+    <EmbeddedResource Include="GUI\MEX\Controls\MEXStockIconControl.resx">
+      <DependentUpon>MEXStockIconControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\MEXStockIconEditor.resx">
+      <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

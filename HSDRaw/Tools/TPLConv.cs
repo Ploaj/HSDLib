@@ -1097,7 +1097,7 @@ namespace HSDRaw.Tools
         {
             byte[] output = new byte[width * height / 2];
 
-            int off = 0;
+            int off1 = 0;
             for (int y = 0; y < height; y += 4)
             {
                 for (int x = 0; x < width; x += 4)
@@ -1112,7 +1112,7 @@ namespace HSDRaw.Tools
                     int y1 = (y >> 2) & 0x01;
                     int y2 = y >> 3;
 
-                    int off1 = (8 * x1) + (16 * y1) + (32 * x2) + (4 * ww * y2);
+                    int off = (8 * x1) + (16 * y1) + (32 * x2) + (4 * ww * y2);
 
                     output[off + 0] = data[off1 + 1];
                     output[off + 1] = data[off1 + 0];
@@ -1123,7 +1123,7 @@ namespace HSDRaw.Tools
                     {
                         output[off + 4 + i] = SwapBits(data[off1 + 4 + i]);
                     }
-                    off += 8;
+                    off1 += 8;
                 }
             }
             return output;

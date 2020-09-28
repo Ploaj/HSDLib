@@ -1219,5 +1219,25 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importTexturesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            JOBJTools.ImportTextures(root);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tsExportTextures_Click(object sender, EventArgs e)
+        {
+            JOBJTools.ExportTextures(root);
+        }
     }
 }
