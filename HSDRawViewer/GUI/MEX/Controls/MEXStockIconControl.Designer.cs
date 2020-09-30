@@ -69,6 +69,7 @@
             // 
             // arrayMemberEditor1
             // 
+            this.arrayMemberEditor1.CanClone = false;
             this.arrayMemberEditor1.DisplayItemImages = true;
             this.arrayMemberEditor1.DisplayItemIndices = true;
             this.arrayMemberEditor1.Dock = System.Windows.Forms.DockStyle.Left;
@@ -158,6 +159,7 @@
             // 
             // arrayMemberEditor2
             // 
+            this.arrayMemberEditor2.CanClone = false;
             this.arrayMemberEditor2.DisplayItemImages = true;
             this.arrayMemberEditor2.DisplayItemIndices = true;
             this.arrayMemberEditor2.Dock = System.Windows.Forms.DockStyle.Fill;

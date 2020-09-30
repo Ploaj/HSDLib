@@ -106,7 +106,13 @@ namespace HSDRawViewer.Rendering.Renderers
                     prevY = y;
                 }
 
-                g.DrawLine(LineColor, new PointF(x, y), new PointF(prevX, prevY));
+                if (_player.GetState(i).op_intrp == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_CON)
+                {
+                    g.DrawLine(LineColor, new PointF(x, prevY), new PointF(prevX, prevY));
+                    g.DrawLine(LineColor, new PointF(x, y), new PointF(x, prevY));
+                }
+                else
+                    g.DrawLine(LineColor, new PointF(x, y), new PointF(prevX, prevY));
 
                 prevX = x;
                 prevY = y;

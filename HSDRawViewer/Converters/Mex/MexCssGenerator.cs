@@ -60,19 +60,19 @@ namespace HSDRawViewer.Converters
             table.PortraitMaterialAnimation.Children[2].Children[0].MaterialAnimation = mex.CSPMatAnim;
 
             // hook stock icons
-            table.SingleMenuMaterialAnimation.Children[9].Children[0].MaterialAnimation = mex.StockMatAnim;
+            /*table.SingleMenuMaterialAnimation.Children[9].Children[0].MaterialAnimation = mex.StockMatAnim;
             table.SingleMenuMaterialAnimation.Children[9].Children[1].MaterialAnimation = mex.StockMatAnim;
             table.SingleMenuMaterialAnimation.Children[9].Children[2].MaterialAnimation = mex.StockMatAnim;
             table.SingleMenuMaterialAnimation.Children[9].Children[3].MaterialAnimation = mex.StockMatAnim;
-            table.SingleMenuMaterialAnimation.Children[9].Children[4].MaterialAnimation = mex.StockMatAnim;
+            table.SingleMenuMaterialAnimation.Children[9].Children[4].MaterialAnimation = mex.StockMatAnim;*/
 
             // hook emblems
-            table.MenuMaterialAnimation.Children[5].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;
+            /*table.MenuMaterialAnimation.Children[5].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;
             table.MenuMaterialAnimation.Children[5].Children[1].MaterialAnimation.Next = mex.EmblemMatAnim;
             table.MenuMaterialAnimation.Children[5].Children[2].MaterialAnimation.Next = mex.EmblemMatAnim;
             table.MenuMaterialAnimation.Children[5].Children[3].MaterialAnimation.Next = mex.EmblemMatAnim;
             table.SingleMenuMaterialAnimation.Children[5].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;
-            table.PortraitMaterialAnimation.Children[1].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;
+            table.PortraitMaterialAnimation.Children[1].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;*/
         }
 
         /// <summary>
@@ -245,8 +245,8 @@ namespace HSDRawViewer.Converters
 
             SetMexNode(mex, icons);
             
-            mex.StockMatAnim = HSDAccessor.DeepClone<HSD_MatAnim>(table.SingleMenuMaterialAnimation.Children[9].Child.MaterialAnimation);
-            mex.EmblemMatAnim = HSDAccessor.DeepClone<HSD_MatAnim>(table.MenuMaterialAnimation.Children[5].Child.MaterialAnimation.Next);
+            //mex.StockMatAnim = HSDAccessor.DeepClone<HSD_MatAnim>(table.SingleMenuMaterialAnimation.Children[9].Child.MaterialAnimation);
+            //mex.EmblemMatAnim = HSDAccessor.DeepClone<HSD_MatAnim>(table.MenuMaterialAnimation.Children[5].Child.MaterialAnimation.Next);
             
             return mex;
         }

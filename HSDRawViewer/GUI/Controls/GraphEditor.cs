@@ -105,7 +105,7 @@ namespace HSDRawViewer.GUI.Controls
 
         private int _startSelectionFrame = 0;
 
-        private int _frame { get => (int)nudFrame.Value; set => nudFrame.Value = value; }
+        private int _frame { get => (int)nudFrame.Value; set => nudFrame.Value = Math.Max(Math.Min(value, nudFrame.Maximum), 0); }
 
         private AnimType _animType = AnimType.Joint;
 

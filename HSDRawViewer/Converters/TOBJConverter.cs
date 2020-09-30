@@ -326,8 +326,8 @@ namespace HSDRawViewer.Converters
             {
                // if (imgFormat == GXTexFmt.CI8) // doesn't work well with alpha
                //     bmp = ReduceColors(bmp, 256);
-                if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
-                    bmp = BitmapTools.ReduceColors(bmp, 16);
+                //if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
+                //    bmp = BitmapTools.ReduceColors(bmp, 16);
 
                 var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 var length = bitmapData.Stride * bitmapData.Height;
