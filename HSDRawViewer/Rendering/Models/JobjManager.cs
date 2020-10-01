@@ -7,6 +7,7 @@ using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
 using System.Drawing;
 using System.ComponentModel;
+using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Rendering
 {
@@ -73,13 +74,29 @@ namespace HSDRawViewer.Rendering
         public float AmbientPower { get; set; } = 0.5f;
 
         [Category("3. Lighting Color"), DisplayName("Ambient Color"), Description("The color of the ambient light")]
+        [YamlIgnore]
         public Color AmbientColor { get; set; } = Color.White;
+
+        [Browsable(false)]
+        public byte AmbientR { get => AmbientColor.R; set => AmbientColor = Color.FromArgb(AmbientColor.A, value, AmbientColor.G, AmbientColor.B); }
+        [Browsable(false)]
+        public byte AmbientG { get => AmbientColor.G; set => AmbientColor = Color.FromArgb(AmbientColor.A, AmbientColor.R, value, AmbientColor.B); }
+        [Browsable(false)]
+        public byte AmbientB { get => AmbientColor.B; set => AmbientColor = Color.FromArgb(AmbientColor.A, AmbientColor.R, AmbientColor.G, value); }
 
         [Category("3. Lighting Color"), DisplayName("Diffuse Intensity"), Description("The intensity of the diffuse lighting")]
         public float DiffusePower { get; set; } = 1;
 
         [Category("3. Lighting Color"), DisplayName("Diffuse Color"), Description("The color of the diffuse light")]
+        [YamlIgnore]
         public Color DiffuseColor { get; set; } = Color.White;
+        
+        [Browsable(false)]
+        public byte DiffuseR { get => DiffuseColor.R; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, value, DiffuseColor.G, DiffuseColor.B); }
+        [Browsable(false)]
+        public byte DiffuseG { get => DiffuseColor.G; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, DiffuseColor.R, value, DiffuseColor.B); }
+        [Browsable(false)]
+        public byte DiffuseB { get => DiffuseColor.B; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, DiffuseColor.R, DiffuseColor.G, value); }
     }
 
     /// <summary>

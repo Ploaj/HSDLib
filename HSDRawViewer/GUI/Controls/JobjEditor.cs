@@ -13,6 +13,8 @@ using System.Linq;
 using System.Drawing;
 using HSDRaw;
 using HSDRawViewer.Tools;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -1238,6 +1240,72 @@ namespace HSDRawViewer.GUI.Plugins
         private void tsExportTextures_Click(object sender, EventArgs e)
         {
             JOBJTools.ExportTextures(root);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class SceneSettings
+        {
+            public Camera Camera { get; set; }
+
+            public JOBJManagerSettings Settings { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <returns></returns>
+            public static SceneSettings Deserialize(string filePath)
+            {
+                var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+
+                return deserializer.Deserialize<SceneSettings>(File.ReadAllText(filePath));
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="filepath"></param>
+            public void Serialize(string filepath)
+            {
+                var builder = new SerializerBuilder();
+                builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
+
+                using (StreamWriter writer = File.CreateText(filepath))
+                {
+                    builder.Build().Serialize(writer, this);
+                }
+            }
+        }
+
+        private void exportSceneSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.SaveFile("Scene (*.yaml)|*.yml");
+
+            if(f != null)
+            {
+                SceneSettings settings = new SceneSettings()
+                {
+                    Camera = viewport.Camera,
+                    Settings = JOBJManager.settings
+                };
+                settings.Serialize(f);
+            }
+        }
+
+        private void importSceneSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.OpenFile("Scene (*.yaml)|*.yml");
+
+            if (f != null)
+            {
+                var settings = SceneSettings.Deserialize(f);
+                viewport.Camera = settings.Camera;
+                JOBJManager.settings = settings.Settings;
+            }
         }
     }
 }

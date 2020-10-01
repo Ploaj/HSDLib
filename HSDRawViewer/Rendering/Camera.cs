@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using System;
 using System.ComponentModel;
+using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Rendering
 {
@@ -13,17 +14,20 @@ namespace HSDRawViewer.Rendering
         /// The position of the camera in scene units, taking into account translation and rotation.
         /// </summary>
         [Browsable(false)]
+        [YamlIgnore]
         public Vector3 TransformedPosition { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
+        [YamlIgnore]
         public Vector3 DefaultTranslation = new Vector3(0, 10, -80);
 
         /// <summary>
         /// The translation component of the camera's transforms in scene units.
         /// </summary>
         [Browsable(false)]
+        [YamlIgnore]
         public Vector3 Translation
         {
             get => translation;
@@ -33,6 +37,7 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
+        [YamlIgnore]
         private Vector3 translation = new Vector3(0, 10, -80);
 
         public float X { get => translation.X; set => Translation = new Vector3(value, translation.Y, translation.Z); }
@@ -52,6 +57,7 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
+        [YamlIgnore]
         private float scale = 1;
 
         /// <summary>
@@ -71,6 +77,7 @@ namespace HSDRawViewer.Rendering
                 }
             }
         }
+        [YamlIgnore]
         private float fovRadians = (float)Math.PI / 6.0f; // 30 degrees
 
         /// <summary>
@@ -78,6 +85,7 @@ namespace HSDRawViewer.Rendering
         /// Updates <see cref="FovRadians"/> and all matrices when set.
         /// <para>Values less than or equal to 0 or greater than or equal to 180 are ignored.</para>
         /// </summary>
+        [YamlIgnore]
         public float FovDegrees
         {
             get => (float)GetDegrees(fovRadians);
@@ -106,11 +114,13 @@ namespace HSDRawViewer.Rendering
                 UpdateMvpMatrix();
             }
         }
+        [YamlIgnore]
         private float rotationXRadians;
 
         /// <summary>
         /// The rotation around the x-axis in degrees.
         /// </summary>
+        [YamlIgnore]
         public float RotationXDegrees
         {
             get => (float)GetDegrees(rotationXRadians);
@@ -140,11 +150,13 @@ namespace HSDRawViewer.Rendering
                 UpdateMvpMatrix();
             }
         }
+        [YamlIgnore]
         private float rotationYRadians;
 
         /// <summary>
         /// The rotation around the y-axis in degrees.
         /// </summary>
+        [YamlIgnore]
         public float RotationYDegrees
         {
             get => (float)GetDegrees(rotationYRadians);
@@ -180,6 +192,7 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
+        [YamlIgnore]
         private float farClipPlane = 100000;
 
         /// <summary>
@@ -194,13 +207,14 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
+        [YamlIgnore]
         private float nearClipPlane = 10;
 
         /// <summary>
         /// The width of the viewport or rendered region in pixels.
         /// Values less than 1 are set to 1.
         /// </summary>
-        [Browsable(false)]
+        //[Browsable(false)]
         public int RenderWidth
         {
             get => renderWidth;
@@ -210,6 +224,7 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
+        [YamlIgnore]
         private int renderWidth = 1;
 
         /// <summary>
@@ -217,7 +232,7 @@ namespace HSDRawViewer.Rendering
         /// Values less than 1 are set to 1.
         /// </summary>
         /// 
-        [Browsable(false)]
+        //[Browsable(false)]
         public int RenderHeight
         {
             get => renderHeight;
@@ -227,56 +242,67 @@ namespace HSDRawViewer.Rendering
                 UpdateTransformationMatrices();
             }
         }
+        [YamlIgnore]
         private int renderHeight = 1;
 
         /// <summary>
         /// The ratio for <see cref="RenderWidth"/> / <see cref="RenderHeight"/>.
         /// </summary>
+        [YamlIgnore]
         public float AspectRatio => (float)RenderWidth / RenderHeight;
 
         /// <summary>
         /// See <see cref="ModelViewMatrix"/>
         /// </summary>
+        [YamlIgnore]
         protected Matrix4 modelViewMatrix = Matrix4.Identity;
 
         /// <summary>
         /// The result of <see cref="RotationMatrix"/> * <see cref="TranslationMatrix"/>
         /// </summary>
+        [YamlIgnore]
         public Matrix4 ModelViewMatrix => modelViewMatrix;
 
         /// <summary>
         /// See <see cref="MvpMatrix"/>
         /// </summary>
+        [YamlIgnore]
         protected Matrix4 mvpMatrix = Matrix4.Identity;
 
         /// <summary>
         /// The result of <see cref="ModelViewMatrix"/> * <see cref="PerspectiveMatrix"/>
         /// </summary>
+        [YamlIgnore]
         public Matrix4 MvpMatrix => mvpMatrix;
 
         /// <summary>
         /// See <see cref="RotationMatrix"/>
         /// </summary>
+        [YamlIgnore]
         protected Matrix4 rotationMatrix = Matrix4.Identity;
 
         /// <summary>
         /// The result of <see cref="Matrix4.CreateRotationY(float)"/> * <see cref="Matrix4.CreateRotationX(float)"/>
         /// </summary>
+        [YamlIgnore]
         public Matrix4 RotationMatrix => rotationMatrix;
 
         /// <summary>
         /// See <see cref="TranslationMatrix"/>
         /// </summary>
+        [YamlIgnore]
         protected Matrix4 translationMatrix = Matrix4.Identity;
 
         /// <summary>
         /// The result of <see cref="Matrix4.CreateTranslation(float, float, float)"/> for X, -Y, Z of <see cref="TransformedPosition"/>
         /// </summary>
+        [YamlIgnore]
         public Matrix4 TranslationMatrix => translationMatrix;
 
         /// <summary>
         /// See <see cref="PerspectiveMatrix"/>
         /// </summary>
+        [YamlIgnore]
         protected Matrix4 perspectiveMatrix = Matrix4.Identity;
 
         /// <summary>
@@ -284,6 +310,7 @@ namespace HSDRawViewer.Rendering
         /// <see cref="FovRadians"/>, <see cref="RenderWidth"/> / <see cref="RenderHeight"/>, <see cref="NearClipPlane"/>,
         /// <see cref="FarClipPlane"/>
         /// </summary>
+        [YamlIgnore]
         public Matrix4 PerspectiveMatrix => perspectiveMatrix;
 
         /// <summary>

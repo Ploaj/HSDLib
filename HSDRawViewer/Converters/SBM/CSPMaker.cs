@@ -58,8 +58,8 @@ namespace HSDRawViewer.Converters.SBM
         {
             byte[] shadow = new byte[image.Length];
 
-            var sx = 22;
-            var sy = 22;
+            var sx = 10;
+            var sy = 10;
             
             // Apply Outline
             for(int w = 0; w < width; w++)

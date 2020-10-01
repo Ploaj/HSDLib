@@ -12,6 +12,7 @@ using HSDRawViewer.Rendering.Renderers;
 using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Drawing.Drawing2D;
 
 namespace HSDRawViewer.GUI
 {
@@ -21,7 +22,7 @@ namespace HSDRawViewer.GUI
     /// </summary>
     public partial class ViewportControl : UserControl
     {
-        public Camera Camera { get => _camera; }
+        public Camera Camera { get => _camera; set => _camera = value; }
         private Camera _camera;
 
         [Browsable(false)]
@@ -128,6 +129,8 @@ namespace HSDRawViewer.GUI
 
         private bool TakeScreenShot = false;
 
+        private bool TakeCSP = false;
+
         private static Color ViewportBackColor = Color.FromArgb(50, 50, 50);
 
         public ViewportControl()
@@ -179,30 +182,32 @@ namespace HSDRawViewer.GUI
 
             panel1.KeyDown += (sender, args) =>
             {
-                if (args.Alt && args.KeyCode == Keys.B)
+                if (args.Alt)
                 {
-                    EnableBack = !EnableBack;
-                    if(EnableBack)
-                        GL.ClearColor(ViewportBackColor);
-                    else
-                        GL.ClearColor(0, 0, 0, 0);
-                }
-                if (args.Alt && args.KeyCode == Keys.G)
-                {
-                    EnableFloor = !EnableFloor;
-                }
-                if (args.Alt && args.KeyCode == Keys.P)
-                {
-                    TakeScreenShot = true;
-                }
-                if (args.Alt && args.KeyCode == Keys.R)
-                {
-                    _camera.RestoreDefault();
-                }
-                if (args.Alt && args.KeyCode == Keys.C)
-                {
-                    using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
-                        d.ShowDialog();
+                    if (args.KeyCode == Keys.B)
+                    {
+                        EnableBack = !EnableBack;
+                        if (EnableBack)
+                            GL.ClearColor(ViewportBackColor);
+                        else
+                            GL.ClearColor(0, 0, 0, 0);
+                    }
+
+                    if (args.KeyCode == Keys.G)
+                        EnableFloor = !EnableFloor;
+
+                    if (args.KeyCode == Keys.P)
+                        TakeScreenShot = true;
+
+                    if (args.KeyCode == Keys.O)
+                        TakeCSP = true;
+
+                    if (args.KeyCode == Keys.R)
+                        _camera.RestoreDefault();
+
+                    if (args.KeyCode == Keys.C)
+                        using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
+                            d.ShowDialog();
                 }
 
                 var keyState = OpenTK.Input.Keyboard.GetState();
@@ -454,6 +459,9 @@ namespace HSDRawViewer.GUI
             panel1.MakeCurrent();
             GL.Viewport(0, 0, panel1.Width, panel1.Height);
 
+            if (TakeScreenShot || TakeCSP)
+                GL.Viewport(0, 0, Camera.RenderWidth * 2, Camera.RenderHeight * 2);
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.PushAttrib(AttribMask.AllAttribBits);
@@ -502,7 +510,7 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
-            if(EnableHelpDisplay && !TakeScreenShot)
+            if(EnableHelpDisplay && !TakeScreenShot && !TakeCSP)
             {
                 if (IsAltAction)
                 {
@@ -519,16 +527,54 @@ namespace HSDRawViewer.GUI
 
             panel1.SwapBuffers();
 
-            if (TakeScreenShot)
+            if (TakeScreenShot || TakeCSP)
             {
-                using (var bitmap = ReadDefaultFramebufferImagePixels(Width, Height, true))
+                using (var bitmap = ReadDefaultFramebufferImagePixels(Camera.RenderWidth * 2, Camera.RenderHeight * 2, true))
                 {
-                    //Converters.SBM.CSPMaker.MakeCSP(bitmap);
-                    bitmap.Save("render.png");
+                    using (var resize = ResizeImage(bitmap, bitmap.Width / 2, bitmap.Height / 2))
+                    {
+                        if (TakeCSP)
+                            Converters.SBM.CSPMaker.MakeCSP(resize);
+
+                        resize.Save("render.png");
+                    }
                 }
 
                 TakeScreenShot = false;
+                TakeCSP = false;
             }
+        }
+
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
         }
 
         /// <summary>
