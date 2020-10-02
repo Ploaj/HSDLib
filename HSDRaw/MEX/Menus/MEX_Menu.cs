@@ -1,12 +1,11 @@
-﻿using HSDRaw.Common;
-using HSDRaw.Common.Animation;
-using HSDRaw.Tools.Melee;
+﻿using HSDRaw.Common.Animation;
+using HSDRaw.Melee;
 
 namespace HSDRaw.MEX.Menus
 {
     public class MEX_Menu : HSDAccessor
     {
-        public override int TrimmedSize => 0x10;
+        public override int TrimmedSize => 0x14;
 
         public HSDArrayAccessor<MEX_Menu_NameFrames> AnimationValues { get => _s.GetReference<HSDArrayAccessor<MEX_Menu_NameFrames>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -15,6 +14,8 @@ namespace HSDRaw.MEX.Menus
         public HSD_MatAnimJoint OptionTextures { get => _s.GetReference<HSD_MatAnimJoint>(0x08); set => _s.SetReference(0x08, value); }
 
         public HSD_MatAnimJoint MenuTextures { get => _s.GetReference<HSD_MatAnimJoint>(0x0C); set => _s.SetReference(0x0C, value); }
+
+        public SBM_SISData Descriptions { get => _s.GetReference<SBM_SISData>(0x10); set => _s.SetReference(0x10, value); }
     }
 
     public class MEX_Menu_NameFrames : HSDAccessor
@@ -47,36 +48,14 @@ namespace HSDRaw.MEX.Menus
 
     public class MEX_Menu_OptionDef : HSDAccessor
     {
-        public override int TrimmedSize => 0x08;
+        public override int TrimmedSize => 0x04;
 
         public byte Kind { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
         public byte ID { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
-        public short Frame { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
+        public byte Frame { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
 
-        public HSDAccessor DescText { get => _s.GetReference<HSDAccessor>(0x04); set => _s.SetReference(0x04, value); }
-
-        public string TextCode
-        {
-            get
-            {
-                if(DescText == null)
-                    return null;
-                return MeleeMenuText.DeserializeString(DescText._s.GetData());
-            }
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                    DescText = null;
-                else
-                {
-                    MeleeMenuText txt = new MeleeMenuText();
-
-                    if (txt.FromString(value))
-                        _s.GetCreateReference<HSDAccessor>(0x04)._s.SetData(txt.Data);
-                }
-            }
-        }
+        public byte DescID { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
     }
 }

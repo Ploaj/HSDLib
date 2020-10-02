@@ -134,6 +134,9 @@ namespace HSDRaw.Tools.Melee
 
                 Tuple<TEXT_OP_CODE, ushort[]> c = new Tuple<TEXT_OP_CODE, ushort[]>(opcode, param);
                 d.Add(c);
+
+                if (opcode == TEXT_OP_CODE.END)
+                    break;
             }
 
             return d;

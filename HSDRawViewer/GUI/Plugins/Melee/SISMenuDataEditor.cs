@@ -42,21 +42,28 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         MenuTexts[i].Data = sisData._s.GetReference<HSDAccessor>(i * 4 + 8)._s.GetData();
                     }
 
-                    var image = sisData.ImageData._s.GetData();
+                    if(sisData.ImageData != null)
+                    {
+                        var image = sisData.ImageData._s.GetData();
 
-                    var tobj = new HSD_TOBJ();
-                    tobj.ImageData = new HSD_Image();
-                    tobj.ImageData.Width = 32;
-                    tobj.ImageData.Height = (short)(image.Length / 32);
-                    tobj.ImageData.ImageData = image;
-                    tobj.ImageData.Format = HSDRaw.GX.GXTexFmt.I4;
+                        var tobj = new HSD_TOBJ();
+                        tobj.ImageData = new HSD_Image();
+                        tobj.ImageData.Width = 32;
+                        tobj.ImageData.Height = (short)(image.Length / 32);
+                        tobj.ImageData.ImageData = image;
+                        tobj.ImageData.Format = HSDRaw.GX.GXTexFmt.I4;
 
-                    if (FileFont != null)
-                        FileFont.Dispose();
+                        if (FileFont != null)
+                            FileFont.Dispose();
 
-                    FileFont = TOBJConverter.ToBitmap(tobj);
-                    pictureBox1.Image = FileFont;
-                    FileSpacing = sisData.CharacterSpacingParams._s.GetData();
+                        FileFont = TOBJConverter.ToBitmap(tobj);
+                        pictureBox1.Image = FileFont;
+                        FileSpacing = sisData.CharacterSpacingParams._s.GetData();
+                    }
+                    else
+                    {
+                        FileSpacing = new byte[0];
+                    }
                 }
 
                 arrayMemberEditor1.SetArrayFromProperty(this, "MenuTexts");
@@ -132,7 +139,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         var before = 0;
                         var after = 0;
 
-                        if (kern && o.Item2[0] * 2 + 1 < FileSpacing.Length)
+                        if (kern && o.Item2[0] * 2 + 1 < Spacing.Length)
                         {
                             before = Spacing[o.Item2[0] * 2];
                             after = Spacing[o.Item2[0] * 2 + 1];
