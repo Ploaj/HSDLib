@@ -13,6 +13,23 @@ namespace HSDRaw.Melee
 
         // everything else is op codes for drawing
 
+        public SIS_Data[] SISData
+        {
+            get
+            {
+                SIS_Data[] data = new SIS_Data[Length - 2];
+                for(int i = 2; i < Length; i++)
+                    data[i - 2] = GetTextData(i);
+                return data;
+            }
+            set
+            {
+                _s.Resize(8);
+                for(int i = 0; i < value.Length; i++)
+                    SetTextData(i + 2, value[i]);
+            }
+        }
+
         public int Length { get => _s.Length / 4; }
 
         /// <summary>
@@ -38,7 +55,7 @@ namespace HSDRaw.Melee
             if (index == 0 || index == 1)
                 return;
 
-            if (index > Length)
+            if (index >= Length)
                 _s.Resize((index + 1) * 4);
 
             _s.SetReference(index * 4, data);

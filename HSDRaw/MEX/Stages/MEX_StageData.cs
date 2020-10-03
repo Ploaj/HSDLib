@@ -1,10 +1,11 @@
-﻿using HSDRaw.MEX.Sounds;
+﻿using HSDRaw.Melee;
+using HSDRaw.MEX.Sounds;
 
 namespace HSDRaw.MEX.Stages
 {
     public class MEX_StageData : HSDAccessor
     {
-        public override int TrimmedSize => 0x18;
+        public override int TrimmedSize => 0x1C;
 
         public HSDArrayAccessor<MEX_StageIDTable> StageIDTable { get => _s.GetReference<HSDArrayAccessor<MEX_StageIDTable>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -17,6 +18,8 @@ namespace HSDRaw.MEX.Stages
         public HSDArrayAccessor<MEX_EffectTypeLookup> StageEffectLookup { get => _s.GetReference<HSDArrayAccessor<MEX_EffectTypeLookup>>(0x10); set => _s.SetReference(0x10, value); }
 
         public HSDArrayAccessor<MEX_Playlist> StagePlaylists { get => _s.GetReference<HSDArrayAccessor<MEX_Playlist>>(0x14); set => _s.SetReference(0x14, value); }
+
+        public SBM_SISData StageName { get => _s.GetReference<SBM_SISData>(0x18); set => _s.SetReference(0x18, value); }
 
     }
 

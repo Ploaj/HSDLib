@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Melee;
+using System.ComponentModel;
 
 namespace HSDRaw.MEX.Menus
 {
@@ -50,7 +51,7 @@ namespace HSDRaw.MEX.Menus
 
     public class MEX_Menu_OptionDef : HSDAccessor
     {
-        public override int TrimmedSize => 0x04;
+        public override int TrimmedSize => 0x08;
 
         public byte Kind { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
@@ -59,5 +60,8 @@ namespace HSDRaw.MEX.Menus
         public byte Frame { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
 
         public byte DescID { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
+        
+        [TypeConverter(typeof(HexType))]
+        public uint Init { get => (uint)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
     }
 }
