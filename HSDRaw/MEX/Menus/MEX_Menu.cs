@@ -41,6 +41,8 @@ namespace HSDRaw.MEX.Menus
 
         public byte NumberOfOptions { get => _s.GetByte(0x0C); set => _s.SetByte(0x0C, value); }
 
+        public byte ReturnMenu { get => _s.GetByte(0x0D); set => _s.SetByte(0x0D, value); }
+
         public short Frame { get => _s.GetInt16(0x0E); set => _s.SetInt16(0x0E, value); }
 
         public int MenuThink { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }

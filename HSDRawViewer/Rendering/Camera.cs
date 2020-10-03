@@ -214,7 +214,8 @@ namespace HSDRawViewer.Rendering
         /// The width of the viewport or rendered region in pixels.
         /// Values less than 1 are set to 1.
         /// </summary>
-        //[Browsable(false)]
+        [Browsable(false)]
+        [YamlIgnore]
         public int RenderWidth
         {
             get => renderWidth;
@@ -232,7 +233,8 @@ namespace HSDRawViewer.Rendering
         /// Values less than 1 are set to 1.
         /// </summary>
         /// 
-        //[Browsable(false)]
+        [Browsable(false)]
+        [YamlIgnore]
         public int RenderHeight
         {
             get => renderHeight;

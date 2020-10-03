@@ -22,7 +22,7 @@ namespace HSDRawViewer.GUI
     /// </summary>
     public partial class ViewportControl : UserControl
     {
-        public Camera Camera { get => _camera; set => _camera = value; }
+        public Camera Camera { get => _camera; set { _camera = value; RefreshSize(); } }
         private Camera _camera;
 
         [Browsable(false)]
@@ -104,6 +104,9 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        public int CSPWidth = 136 * 2;
+        public int CSPHeight = 188 * 2;
+
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
         private EventHandler RenderLoop;
@@ -129,7 +132,7 @@ namespace HSDRawViewer.GUI
 
         private bool TakeScreenShot = false;
 
-        private bool TakeCSP = false;
+        private bool CSPMode = false;
 
         private static Color ViewportBackColor = Color.FromArgb(50, 50, 50);
 
@@ -200,7 +203,19 @@ namespace HSDRawViewer.GUI
                         TakeScreenShot = true;
 
                     if (args.KeyCode == Keys.O)
-                        TakeCSP = true;
+                    {
+
+                        CSPMode = !CSPMode;
+                        if(CSPMode)
+                        {
+                            panel1.Dock = DockStyle.Top;
+                            panel1.Height = CSPHeight * 2;
+                        }
+                        else
+                        {
+                            panel1.Dock = DockStyle.Fill;
+                        }
+                    }
 
                     if (args.KeyCode == Keys.R)
                         _camera.RestoreDefault();
@@ -457,11 +472,9 @@ namespace HSDRawViewer.GUI
                 return;
             
             panel1.MakeCurrent();
+
             GL.Viewport(0, 0, panel1.Width, panel1.Height);
-
-            if (TakeScreenShot || TakeCSP)
-                GL.Viewport(0, 0, Camera.RenderWidth * 2, Camera.RenderHeight * 2);
-
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.PushAttrib(AttribMask.AllAttribBits);
@@ -484,9 +497,7 @@ namespace HSDRawViewer.GUI
                 DrawShape.Floor();
 
             foreach (var r in Drawables)
-            {
                 r.Draw(_camera, panel1.Width, panel1.Height);
-            }
             
             GL.PopAttrib();
             
@@ -510,7 +521,49 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
-            if(EnableHelpDisplay && !TakeScreenShot && !TakeCSP)
+            if (CSPMode && !TakeScreenShot)
+            {
+                GL.MatrixMode(MatrixMode.Modelview);
+                GL.LoadIdentity();
+
+                GL.Disable(EnableCap.DepthTest);
+
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+                // 136 x 188
+                
+                float width = CSPWidth / (float)panel1.Width;
+                float height = CSPHeight / (float)panel1.Height;
+                
+                GL.Color4(0.5f, 0.5f, 0.5f, 0.5f);
+
+                GL.Begin(PrimitiveType.Quads);
+
+                GL.Vertex2(-1, -height);
+                GL.Vertex2(1, -height);
+                GL.Vertex2(1, -1);
+                GL.Vertex2(-1, -1);
+
+                GL.Vertex2(-1, 1);
+                GL.Vertex2(1, 1);
+                GL.Vertex2(1, height);
+                GL.Vertex2(-1, height);
+
+                GL.Vertex2(1, -height);
+                GL.Vertex2(width, -height);
+                GL.Vertex2(width, height);
+                GL.Vertex2(1, height);
+
+                GL.Vertex2(-width, -height);
+                GL.Vertex2(-1, -height);
+                GL.Vertex2(-1, height);
+                GL.Vertex2(-width, height);
+
+                GL.End();
+            }
+
+            if (EnableHelpDisplay && !TakeScreenShot)
             {
                 if (IsAltAction)
                 {
@@ -527,23 +580,28 @@ namespace HSDRawViewer.GUI
 
             panel1.SwapBuffers();
 
-            if (TakeScreenShot || TakeCSP)
+            if (TakeScreenShot)
             {
-                using (var bitmap = ReadDefaultFramebufferImagePixels(Camera.RenderWidth * 2, Camera.RenderHeight * 2, true))
+                using (var bitmap = ReadDefaultFramebufferImagePixels(Camera.RenderWidth, Camera.RenderHeight, true))
                 {
-                    using (var resize = ResizeImage(bitmap, bitmap.Width / 2, bitmap.Height / 2))
+                    if (CSPMode)
                     {
-                        if (TakeCSP)
+                        using (var resize = ResizeImage(bitmap, Camera.RenderWidth / 2, Camera.RenderHeight / 2))
+                        {
                             Converters.SBM.CSPMaker.MakeCSP(resize);
 
-                        resize.Save("render.png");
+                            using (var csp = resize.Clone(new Rectangle((panel1.Width - CSPWidth) / 4, (panel1.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2), bitmap.PixelFormat))
+                                csp.Save("render.png");
+                        }
                     }
+                    else
+                        bitmap.Save("render.png");
                 }
 
                 TakeScreenShot = false;
-                TakeCSP = false;
             }
         }
+
 
         /// <summary>
         /// Resize the image to the specified width and height.
