@@ -5,8 +5,10 @@ using HSDRaw.Melee.Mn;
 using HSDRaw.MEX.Stages;
 using HSDRaw.Tools;
 using HSDRawViewer.GUI.MEX;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Windows.Forms;
@@ -282,24 +284,30 @@ namespace HSDRawViewer.Converters
                     g.FillRectangle(new SolidBrush(Color.Black), new RectangleF(0, 0, bmp.Width, bmp.Height));
                 }
                 {
-                    SizeF stringSize = g.MeasureString(location, font2, new SizeF(13, 15f), StringFormat.GenericTypographic);
+                    SizeF stringSize = TextRenderer.MeasureText(location, font2);
+
                     var stringWidth = stringSize.Width;
                     var scale = 0.95f;
                     var newwidth = stringWidth * scale;
+
                     g.ResetTransform();
                     g.ScaleTransform(scale, 1);
                     g.DrawString(location, font2, new SolidBrush(Color.White), (224 / 2) / scale, -4, stringFormat);
                 }
                 {
-                    SizeF stringSize = g.MeasureString(name, font, new SizeF(30, 15f), StringFormat.GenericTypographic);
+                    SizeF stringSize = TextRenderer.MeasureText(name, font);
+
                     var stringWidth = stringSize.Width;
                     var scale = 0.75f;
                     var newwidth = stringWidth * scale;
                     if (newwidth > bmp.Width)
                     {
-                        scale = (bmp.Width * 0.9f) / stringWidth;
+                        scale = (bmp.Width * 0.95f) / stringWidth;
                         newwidth = stringWidth * scale;
                     }
+
+                    //System.Console.WriteLine(name + " " + stringWidth + " " + scale + " " + stringSize.ToString());
+
                     g.ResetTransform();
                     g.ScaleTransform(scale, 1);
                     g.DrawString(name, font, new SolidBrush(Color.White), (224 / 2) / scale, 3, stringFormat);
@@ -308,6 +316,129 @@ namespace HSDRawViewer.Converters
 
             font.Dispose();
             font2.Dispose();
+            stringFormat.Dispose();
+
+            return bmp;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public static Bitmap GenerateMenuOptionImage(string name)
+        {
+            float fontSize = 19f;
+
+            Font font = null;
+            using (InstalledFontCollection installedFontCollection = new InstalledFontCollection())
+                font = new Font(installedFontCollection.Families.FirstOrDefault(e => e.Name.Equals("A-OTF Folk Pro H")), fontSize, FontStyle.Regular);
+
+            if (font == null)
+                return null;
+
+            Bitmap bmp = new Bitmap(176, 30);
+
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.InterpolationMode = InterpolationMode.Bilinear;
+
+                {
+                    g.FillRectangle(new SolidBrush(Color.Transparent), new RectangleF(0, 0, bmp.Width, bmp.Height));
+                }
+                {
+                    var scale = 1.025f;
+                    SizeF stringSize = TextRenderer.MeasureText(name, font);
+
+                    var stringWidth = stringSize.Width;
+                    var newwidth = stringWidth * scale;
+                    if (newwidth > bmp.Width )
+                    {
+                        scale = bmp.Width  / stringWidth;
+                    }
+
+                    //System.Console.WriteLine(name + " " + stringWidth + " " + scale + " " + stringSize.ToString() + " " + font.FontFamily.GetEmHeight(font.Style));
+
+
+                    g.ResetTransform();
+                    g.ScaleTransform(scale, 1);
+
+                    GraphicsPath p = new GraphicsPath();
+                    var em = g.DpiY * font.SizeInPoints / 72f;
+                    p.AddString(name, font.FontFamily, (int)font.Style, em, new PointF((176 / 2) / scale, -8), stringFormat);
+                    g.DrawPath(new Pen(Color.Black, 4), p);
+                    g.FillPath(new SolidBrush(Color.White), p);
+                }
+            }
+
+            font.Dispose();
+            stringFormat.Dispose();
+
+            return bmp;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public static Bitmap GenerateMenuHeaderImage(string name)
+        {
+            float fontSize = 19f;
+
+            Font font = null;
+            using (InstalledFontCollection installedFontCollection = new InstalledFontCollection())
+                font = new Font(installedFontCollection.Families.FirstOrDefault(e => e.Name.Equals("A-OTF Folk Pro H")), fontSize, FontStyle.Italic);
+
+            if (font == null)
+                return null;
+
+            Bitmap bmp = new Bitmap(168, 28);
+
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.InterpolationMode = InterpolationMode.Bilinear;
+
+                {
+                    g.FillRectangle(new SolidBrush(Color.Transparent), new RectangleF(0, 0, bmp.Width, bmp.Height));
+                }
+                {
+                    var scale = 1f;
+                    SizeF stringSize = TextRenderer.MeasureText(name, font);
+
+                    var stringWidth = stringSize.Width;
+                    var newwidth = stringWidth * scale;
+                    if (newwidth > bmp.Width)
+                    {
+                        scale = bmp.Width / stringWidth;
+                    }
+
+                    //System.Console.WriteLine(name + " " + stringWidth + " " + scale + " " + stringSize.ToString() + " " + font.FontFamily.GetEmHeight(font.Style));
+
+
+                    g.ResetTransform();
+                    g.ScaleTransform(scale, 1);
+
+                    GraphicsPath p = new GraphicsPath();
+                    var em = g.DpiY * font.SizeInPoints / 72f;
+                    p.AddString(name, font.FontFamily, (int)font.Style, em, new PointF((168 / 2) / scale, -8), stringFormat);
+                    g.FillPath(new SolidBrush(Color.White), p);
+                }
+            }
+
+            font.Dispose();
             stringFormat.Dispose();
 
             return bmp;

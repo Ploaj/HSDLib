@@ -134,6 +134,8 @@ namespace HSDRawViewer.GUI
 
         private bool CSPMode = false;
 
+        public bool EnableCSPMode { get; set; } = false;
+
         private static Color ViewportBackColor = Color.FromArgb(50, 50, 50);
 
         public ViewportControl()
@@ -202,7 +204,7 @@ namespace HSDRawViewer.GUI
                     if (args.KeyCode == Keys.P)
                         TakeScreenShot = true;
 
-                    if (args.KeyCode == Keys.O)
+                    if (args.KeyCode == Keys.O && EnableCSPMode)
                     {
 
                         CSPMode = !CSPMode;
@@ -571,6 +573,7 @@ namespace HSDRawViewer.GUI
                     GLTextRenderer.RenderText(_camera, "C - Open Camera Settings", 0, 16);
                     GLTextRenderer.RenderText(_camera, "G - Toggle Grid", 0, 32);
                     GLTextRenderer.RenderText(_camera, "B - Toggle Backdrop", 0, 48);
+                    GLTextRenderer.RenderText(_camera, "P - Save Screenshot to File", 0, 64);
                 }
                 else
                 {
@@ -582,6 +585,7 @@ namespace HSDRawViewer.GUI
 
             if (TakeScreenShot)
             {
+                var fileName = "render_" + System.DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss") + ".png";
                 using (var bitmap = ReadDefaultFramebufferImagePixels(Camera.RenderWidth, Camera.RenderHeight, true))
                 {
                     if (CSPMode)
@@ -591,11 +595,13 @@ namespace HSDRawViewer.GUI
                             Converters.SBM.CSPMaker.MakeCSP(resize);
 
                             using (var csp = resize.Clone(new Rectangle((panel1.Width - CSPWidth) / 4, (panel1.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2), bitmap.PixelFormat))
-                                csp.Save("render.png");
+                                csp.Save(fileName);
                         }
                     }
                     else
-                        bitmap.Save("render.png");
+                        bitmap.Save(fileName);
+
+                    MessageBox.Show("Screenshot saved as " + fileName);
                 }
 
                 TakeScreenShot = false;

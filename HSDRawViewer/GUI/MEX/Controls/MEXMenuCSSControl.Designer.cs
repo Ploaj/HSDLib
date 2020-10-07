@@ -33,13 +33,13 @@
             this.editMenu = new System.Windows.Forms.ToolStripDropDownButton();
             this.enableSnapAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceIconToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cspDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cspSelectBox = new System.Windows.Forms.ToolStripComboBox();
             this.cssIconEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
-            this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -84,6 +84,13 @@
             this.replaceIconToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
             this.replaceIconToolStripMenuItem.Text = "Import Icon";
             this.replaceIconToolStripMenuItem.Click += new System.EventHandler(this.replaceIconToolStripMenuItem_Click);
+            // 
+            // editAnimationToolStripMenuItem
+            // 
+            this.editAnimationToolStripMenuItem.Name = "editAnimationToolStripMenuItem";
+            this.editAnimationToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.editAnimationToolStripMenuItem.Text = "Edit Animation";
+            this.editAnimationToolStripMenuItem.Click += new System.EventHandler(this.editAnimationToolStripMenuItem_Click);
             // 
             // cspDropDown
             // 
@@ -140,9 +147,13 @@
             // 
             this.cssIconEditor.CanAdd = false;
             this.cssIconEditor.CanMove = false;
+            this.cssIconEditor.DisplayItemImages = false;
             this.cssIconEditor.DisplayItemIndices = false;
             this.cssIconEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cssIconEditor.EnablePropertyViewDescription = true;
+            this.cssIconEditor.ImageHeight = ((ushort)(24));
+            this.cssIconEditor.ImageWidth = ((ushort)(24));
+            this.cssIconEditor.ItemHeight = 13;
             this.cssIconEditor.ItemIndexOffset = 0;
             this.cssIconEditor.Location = new System.Drawing.Point(0, 25);
             this.cssIconEditor.Name = "cssIconEditor";
@@ -151,13 +162,6 @@
             this.cssIconEditor.TabIndex = 1;
             this.cssIconEditor.SelectedObjectChanged += new System.EventHandler(this.cssIconEditor_SelectedObjectChanged);
             this.cssIconEditor.ArrayUpdated += new System.EventHandler(this.cssIconEditor_ArrayUpdated);
-            // 
-            // editAnimationToolStripMenuItem
-            // 
-            this.editAnimationToolStripMenuItem.Name = "editAnimationToolStripMenuItem";
-            this.editAnimationToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.editAnimationToolStripMenuItem.Text = "Edit Animation";
-            this.editAnimationToolStripMenuItem.Click += new System.EventHandler(this.editAnimationToolStripMenuItem_Click);
             // 
             // MEXMenuCSSControl
             // 

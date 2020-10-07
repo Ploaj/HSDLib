@@ -71,6 +71,7 @@ namespace HSDRawViewer.GUI.Plugins
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
             viewport.EnableFloor = true;
+            viewport.EnableCSPMode = true;
             previewBox.Controls.Add(viewport);
             viewport.RefreshSize();
             viewport.BringToFront();

@@ -259,6 +259,9 @@ namespace HSDRawViewer.GUI
 
                     accessor._s.Resize((int)hexbox.ByteProvider.Length);
                 }
+
+                Node?.NotifyChange();
+                UpdateValues();
             };
             UpdateValues();
         }

@@ -12,6 +12,7 @@ using System.Drawing;
 using HSDRaw.Common.Animation;
 using System.Linq;
 using HSDRawViewer.Tools;
+using HSDRawViewer.GUI.Extra;
 
 namespace HSDRawViewer.GUI.MEX.Controls
 {
