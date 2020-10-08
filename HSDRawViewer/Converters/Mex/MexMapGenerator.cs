@@ -364,14 +364,16 @@ namespace HSDRawViewer.Converters
                     }
 
                     //System.Console.WriteLine(name + " " + stringWidth + " " + scale + " " + stringSize.ToString() + " " + font.FontFamily.GetEmHeight(font.Style));
-
-
-                    g.ResetTransform();
-                    g.ScaleTransform(scale, 1);
-
+                    
                     GraphicsPath p = new GraphicsPath();
+
                     var em = g.DpiY * font.SizeInPoints / 72f;
                     p.AddString(name, font.FontFamily, (int)font.Style, em, new PointF((176 / 2) / scale, -8), stringFormat);
+
+                    Matrix mat = new Matrix();
+                    mat.Scale(scale, 1);
+                    p.Transform(mat);
+
                     g.DrawPath(new Pen(Color.Black, 4), p);
                     g.FillPath(new SolidBrush(Color.White), p);
                 }
@@ -392,11 +394,11 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static Bitmap GenerateMenuHeaderImage(string name)
         {
-            float fontSize = 19f;
+            float fontSize = 20f;
 
             Font font = null;
             using (InstalledFontCollection installedFontCollection = new InstalledFontCollection())
-                font = new Font(installedFontCollection.Families.FirstOrDefault(e => e.Name.Equals("A-OTF Folk Pro H")), fontSize, FontStyle.Italic);
+                font = new Font(installedFontCollection.Families.FirstOrDefault(e => e.Name.Equals("A-OTF Folk Pro H")), fontSize, FontStyle.Bold);
 
             if (font == null)
                 return null;
@@ -412,7 +414,7 @@ namespace HSDRawViewer.Converters
                 g.InterpolationMode = InterpolationMode.Bilinear;
 
                 {
-                    g.FillRectangle(new SolidBrush(Color.Transparent), new RectangleF(0, 0, bmp.Width, bmp.Height));
+                    g.FillRectangle(new SolidBrush(Color.Black), new RectangleF(0, 0, bmp.Width, bmp.Height));
                 }
                 {
                     var scale = 1f;
@@ -426,14 +428,17 @@ namespace HSDRawViewer.Converters
                     }
 
                     //System.Console.WriteLine(name + " " + stringWidth + " " + scale + " " + stringSize.ToString() + " " + font.FontFamily.GetEmHeight(font.Style));
-
-
-                    g.ResetTransform();
-                    g.ScaleTransform(scale, 1);
-
+                    
                     GraphicsPath p = new GraphicsPath();
                     var em = g.DpiY * font.SizeInPoints / 72f;
-                    p.AddString(name, font.FontFamily, (int)font.Style, em, new PointF((168 / 2) / scale, -8), stringFormat);
+
+                    p.AddString(name, font.FontFamily, (int)font.Style, em, new PointF((168 / 2) / scale + 0.5f, -8), stringFormat);
+
+                    Matrix mat = new Matrix();
+                    mat.Scale(scale, 1);
+                    mat.Shear(-0.5f, 0);
+                    p.Transform(mat);
+
                     g.FillPath(new SolidBrush(Color.White), p);
                 }
             }

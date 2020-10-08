@@ -117,6 +117,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
             data.StageData.StagePlaylists.Array = StageEntries.Select(e => e.GetPlaylist()).ToArray();
 
             data.StageData.StageIDTable.Array = StageIDs.Select(e => e.IDTable).ToArray();
+
+            data.MetaData.NumOfExternalStage = StageEntries.Length;
+            data.MetaData.NumOfInternalStage = StageIDs.Length;
         }
 
         /// <summary>

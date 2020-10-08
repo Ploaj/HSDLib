@@ -13,7 +13,7 @@ namespace HSDRaw.MEX
 
     public class MEX_Meta : HSDAccessor
     {
-        public override int TrimmedSize => 0x24;
+        public override int TrimmedSize => 0x30;
 
         [DisplayName("Version Major")]
         public byte VersionMajor { get => _s.GetByte(0x00); internal set => _s.SetByte(0x00, value); }
@@ -32,21 +32,30 @@ namespace HSDRaw.MEX
 
         [DisplayName("CSS Icon Count")]
         public int NumOfCSSIcons { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+
+        [DisplayName("Internal Stage Count")]
+        public int NumOfInternalStage { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+
+        [DisplayName("External Stage Count")]
+        public int NumOfExternalStage { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
         
         [DisplayName("SSS Icon Count")]
-        public int NumOfSSSIcons { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int NumOfSSSIcons { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
 
         [DisplayName("SSM Count")]
-        public int NumOfSSMs { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int NumOfSSMs { get => _s.GetInt32(0x1C); set => _s.SetInt32(0x1C, value); }
 
         [DisplayName("BGM Count")]
-        public int NumOfMusic { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        public int NumOfMusic { get => _s.GetInt32(0x20); set => _s.SetInt32(0x20, value); }
         
         [DisplayName("Effect Count")]
-        public int NumOfEffects { get => _s.GetInt32(0x1C); set => _s.SetInt32(0x1C, value); }
+        public int NumOfEffects { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
+
+        [DisplayName("Starting Scene")]
+        public int EnterScene { get => _s.GetInt32(0x28); set => _s.SetInt32(0x28, value); }
 
         [DisplayName("Last Major Scene ID")]
-        public int LastMajor { get => _s.GetInt32(0x20); set => _s.SetInt32(0x20, value); }
+        public int LastMajor { get => _s.GetInt32(0x2C); set => _s.SetInt32(0x2C, value); }
     }
 
 }
