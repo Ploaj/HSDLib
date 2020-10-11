@@ -13,7 +13,7 @@ namespace HSDRaw.MEX
 
     public class MEX_Meta : HSDAccessor
     {
-        public override int TrimmedSize => 0x30;
+        public override int TrimmedSize => 0x34;
 
         [DisplayName("Version Major")]
         public byte VersionMajor { get => _s.GetByte(0x00); internal set => _s.SetByte(0x00, value); }
@@ -51,11 +51,14 @@ namespace HSDRaw.MEX
         [DisplayName("Effect Count")]
         public int NumOfEffects { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
 
-        [DisplayName("Starting Scene")]
+        [DisplayName("Boot Up Scene")]
         public int EnterScene { get => _s.GetInt32(0x28); set => _s.SetInt32(0x28, value); }
 
         [DisplayName("Last Major Scene ID")]
         public int LastMajor { get => _s.GetInt32(0x2C); set => _s.SetInt32(0x2C, value); }
+
+        [DisplayName("Last Minor Scene ID")]
+        public int LastMinor { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }
     }
 
 }
