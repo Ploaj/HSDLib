@@ -22,6 +22,8 @@ namespace HSDRawViewer.Rendering
 
         public HSD_DOBJ SelectedDOBJ;
 
+        public int DOBJCount { get => DOBJtoBuffer.Count; }
+
         public List<HSD_DOBJ> HiddenDOBJs { get; internal set; } = new List<HSD_DOBJ>();
         
         private Dictionary<HSD_POBJ, GX_DisplayList> pobjToDisplayList = new Dictionary<HSD_POBJ, GX_DisplayList>();
@@ -29,7 +31,6 @@ namespace HSDRawViewer.Rendering
         private Dictionary<byte[], int> imageBufferTextureIndex = new Dictionary<byte[], int>();
 
         private TextureManager TextureManager = new TextureManager();
-
 
         // Shader
         private static Shader GXShader;

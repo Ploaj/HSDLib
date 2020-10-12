@@ -36,6 +36,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public Dictionary<int, int> BoneCollisionStates = new Dictionary<int, int>();
 
+
+        public delegate void UpdateVIS(int structId, int objectId);
+
+        public UpdateVIS UpdateVISMethod;
+
+
         private HSDStruct Struct;
 
         /// <summary>
@@ -238,6 +244,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             else
                                 BoneCollisionStates.Add(cmd.Parameters[0], cmd.Parameters[1]);
                         }
+                        break;
+                    case 31 << 2: // struct vis change
+                        UpdateVISMethod(cmd.Parameters[0], cmd.Parameters[2]);
                         break;
                     case 37 << 2:
                         CharacterInvisibility = cmd.Parameters[1] == 1;

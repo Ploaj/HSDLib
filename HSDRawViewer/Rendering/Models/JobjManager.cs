@@ -670,7 +670,51 @@ namespace HSDRawViewer.Rendering
             Animation = new MotAnimManager();
             ((MotAnimManager)Animation).SetMOT(jointTable, file);
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public HSD_DOBJ GetDOBJAtIndex(int index)
+        {
+            var i = 0;
+            foreach (var j in RootJOBJ.BreathFirstList)
+            {
+                if (j.Dobj != null)
+                {
+                    foreach (var dobj in j.Dobj.List)
+                    {
+                        if (i == index)
+                            return dobj;
+                        i++;
+                    }
+                }
+            }
+            return null;
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        public void HideDOBJ(int index)
+        {
+            var dobj = GetDOBJAtIndex(index);
+            if(dobj != null && ! DOBJManager.HiddenDOBJs.Contains(dobj))
+                DOBJManager.HiddenDOBJs.Add(dobj);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        public void ShowDOBJ(int index)
+        {
+            var dobj = GetDOBJAtIndex(index);
+            if (dobj != null)
+                DOBJManager.HiddenDOBJs.Remove(dobj);
+        }
 
         /// <summary>
         /// Hides DOBJs with given indices

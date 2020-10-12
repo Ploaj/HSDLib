@@ -190,7 +190,7 @@ namespace HSDRawViewer.GUI
                             
                             ECB = plDat.EnvironmentCollision;
 
-                            SetModelVis(0, 0);
+                            ResetModelVis();
                         }
                     }
                 }
@@ -249,6 +249,8 @@ namespace HSDRawViewer.GUI
                 JOBJManager.CleanupRendering();
                 viewport.Dispose();
             };
+            
+            SubactionProcess.UpdateVISMethod = SetModelVis;
         }
 
         /// <summary>
@@ -352,6 +354,8 @@ namespace HSDRawViewer.GUI
             RefreshSubactionList(script);
 
             LoadAnimation(script.AnimOffset, script.AnimSize);
+
+            ResetModelVis();
         }
 
         /// <summary>
@@ -1000,14 +1004,33 @@ namespace HSDRawViewer.GUI
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
             JOBJManager.settings.RenderBones = false;
 
-            SetModelVis(0, 0);
+            ResetModelVis();
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
 
             previewBox.Visible = true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ResetModelVis()
+        {
+            var plDat = FighterData;
 
+            if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
+            {
+                JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+
+                // only show struct 0 vis
+                for (int i = 0; i < plDat.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly.Length; i++)
+                    SetModelVis(i, 0);
+
+                // hide low poly
+                foreach (var lut in plDat.ModelLookupTables.CostumeVisibilityLookups[0].LowPoly.Array)
+                    SetModelVis(lut, -1);
+            }
+        }
 
         /// <summary>
         /// 
@@ -1019,24 +1042,30 @@ namespace HSDRawViewer.GUI
             var plDat = FighterData;
 
             if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
+                SetModelVis(plDat.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly[structid], objectid);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="structid"></param>
+        /// <param name="objectid"></param>
+        private void SetModelVis(SBM_LookupTable lookuptable, int objectid)
+        {
+            var plDat = FighterData;
+
+            if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0 && lookuptable.LookupEntries != null)
             {
-                var table = plDat.ModelLookupTables.LookupTables[structid];
+                var structs = lookuptable.LookupEntries.Array;
 
-                var hidden = new List<int>();
-                for (int i = 0; i < JOBJManager.JointCount; i++)
-                    hidden.Add(i);
-
-                foreach (var t in table.Array)
+                for (int i = 0; i < structs.Length; i++)
                 {
-                    if (objectid > t.Count || t.LookupEntries == null)
-                        continue;
-
-                    var id = t.LookupEntries[objectid];
-                    foreach (var i in id.Entries)
-                        hidden.Remove(i);
+                    foreach (var v in structs[i].Entries)
+                        if (i == objectid)
+                            JOBJManager.ShowDOBJ(v);
+                        else
+                            JOBJManager.HideDOBJ(v);
                 }
-
-                JOBJManager.HideDOBJs(hidden);
             }
         }
 
@@ -1091,7 +1120,7 @@ namespace HSDRawViewer.GUI
             JOBJManager.Frame = viewport.Frame;
 
             JOBJManager.settings.RenderBones = bonesToolStripMenuItem.Checked;
-                
+
             // character invisibility
             if (SubactionProcess.CharacterInvisibility || !modelToolStripMenuItem.Checked)
                 JOBJManager.UpdateNoRender();
