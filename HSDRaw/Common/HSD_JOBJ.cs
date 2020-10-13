@@ -77,7 +77,7 @@ namespace HSDRaw.Common
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_Matrix4x3 InverseWorldTransform { get => _s.GetReference<HSD_Matrix4x3>(0x38); set => _s.SetReference(0x38, value); }
 
-        // robj
+        public HSD_ROBJ ROBJ { get => _s.GetReference<HSD_ROBJ>(0x3C); set => _s.SetReference(0x3C, value); }
 
         public override int Trim()
         {

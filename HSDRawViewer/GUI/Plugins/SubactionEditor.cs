@@ -1018,7 +1018,7 @@ namespace HSDRawViewer.GUI
         {
             var plDat = FighterData;
 
-            if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
+            if (plDat != null && plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
             {
                 JOBJManager.DOBJManager.HiddenDOBJs.Clear();
 
