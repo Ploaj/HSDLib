@@ -5,7 +5,7 @@ namespace HSDRaw.MEX.Menus
 {
     public class MEX_mexSelectChr : HSDAccessor
     {
-        public override int TrimmedSize => 0x10;
+        public override int TrimmedSize => 0x14;
         
         public HSD_JOBJ IconModel { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -15,8 +15,6 @@ namespace HSDRaw.MEX.Menus
         
         public HSD_MatAnim CSPMatAnim { get => _s.GetReference<HSD_MatAnim>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        //public HSD_MatAnim StockMatAnim { get => _s.GetReference<HSD_MatAnim>(0x10); set => _s.SetReference(0x10, value); }
-
-        //public HSD_MatAnim EmblemMatAnim { get => _s.GetReference<HSD_MatAnim>(0x14); set => _s.SetReference(0x14, value); }
+        public int CSPStride { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
     }
 }

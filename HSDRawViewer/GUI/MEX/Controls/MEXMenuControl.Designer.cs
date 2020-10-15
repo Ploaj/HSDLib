@@ -69,8 +69,8 @@
             this.buttonImportMnSlcChr.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.buttonImportMnSlcChr.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonImportMnSlcChr.Name = "buttonImportMnSlcChr";
-            this.buttonImportMnSlcChr.Size = new System.Drawing.Size(141, 22);
-            this.buttonImportMnSlcChr.Text = "Import MnSlChr+IfAll";
+            this.buttonImportMnSlcChr.Size = new System.Drawing.Size(112, 22);
+            this.buttonImportMnSlcChr.Text = "Import MnSlChr";
             this.buttonImportMnSlcChr.Click += new System.EventHandler(this.buttonImportMnSlcChr_Click);
             // 
             // buttonImportMnSlMap

@@ -67,7 +67,7 @@ namespace HSDRawViewer.Converters
                         j.Flags &= ~JOBJ_FLAG.OPA;
 
                     if (xlu)
-                        j.Flags |= JOBJ_FLAG.XLU;
+                        j.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
                     else
                         j.Flags &= ~JOBJ_FLAG.XLU;
                 }
@@ -247,6 +247,48 @@ namespace HSDRawViewer.Converters
                         d.Mobj.Material.Shininess = 50;
                     }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void MergeIntoOneObject(HSD_JOBJ jobj)
+        {
+            // gather all pobjs
+
+            HSD_DOBJ result = null;
+
+            List<HSD_POBJ> pobj = new List<HSD_POBJ>();
+            foreach(var j in jobj.BreathFirstList)
+            {
+                if (j.Dobj != null)
+                {
+                    foreach (var d in j.Dobj.List)
+                        if (d.Pobj != null)
+                            foreach (var p in d.Pobj.List)
+                                pobj.Add(p);
+
+                    if (result == null)
+                    {
+                        result = j.Dobj;
+                        result.Next = null;
+                    }
+                }
+                j.Dobj = null;
+            }
+            
+            // link pobjs
+            for(int i = 0; i < pobj.Count; i++)
+            {
+                if (i == pobj.Count - 1)
+                    pobj[i].Next = null;
+                else
+                    pobj[i].Next = pobj[i + 1];
+            }
+
+            // put them all in the first dobj
+            result.Pobj = pobj[0];
+            jobj.Dobj = result;
         }
 
         /// <summary>

@@ -47,37 +47,6 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="mex"></param>
-        public static void HookMexNode(SBM_SelectChrDataTable table, MEX_mexSelectChr mex)
-        { 
-            // hook csps
-            table.MenuMaterialAnimation.Children[6].Children[0].MaterialAnimation = mex.CSPMatAnim;
-            table.MenuMaterialAnimation.Children[6].Children[1].MaterialAnimation = mex.CSPMatAnim;
-            table.MenuMaterialAnimation.Children[6].Children[2].MaterialAnimation = mex.CSPMatAnim;
-            table.MenuMaterialAnimation.Children[6].Children[3].MaterialAnimation = mex.CSPMatAnim;
-            table.SingleMenuMaterialAnimation.Children[6].Children[0].MaterialAnimation = mex.CSPMatAnim;
-            table.PortraitMaterialAnimation.Children[2].Children[0].MaterialAnimation = mex.CSPMatAnim;
-
-            // hook stock icons
-            /*table.SingleMenuMaterialAnimation.Children[9].Children[0].MaterialAnimation = mex.StockMatAnim;
-            table.SingleMenuMaterialAnimation.Children[9].Children[1].MaterialAnimation = mex.StockMatAnim;
-            table.SingleMenuMaterialAnimation.Children[9].Children[2].MaterialAnimation = mex.StockMatAnim;
-            table.SingleMenuMaterialAnimation.Children[9].Children[3].MaterialAnimation = mex.StockMatAnim;
-            table.SingleMenuMaterialAnimation.Children[9].Children[4].MaterialAnimation = mex.StockMatAnim;*/
-
-            // hook emblems
-            /*table.MenuMaterialAnimation.Children[5].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;
-            table.MenuMaterialAnimation.Children[5].Children[1].MaterialAnimation.Next = mex.EmblemMatAnim;
-            table.MenuMaterialAnimation.Children[5].Children[2].MaterialAnimation.Next = mex.EmblemMatAnim;
-            table.MenuMaterialAnimation.Children[5].Children[3].MaterialAnimation.Next = mex.EmblemMatAnim;
-            table.SingleMenuMaterialAnimation.Children[5].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;
-            table.PortraitMaterialAnimation.Children[1].Children[0].MaterialAnimation.Next = mex.EmblemMatAnim;*/
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public static void SetMexNode(MEX_mexSelectChr mex, MEX_CSSIconEntry[] icons)
         {
             var posModel = GenerateIconModel(icons);
@@ -86,7 +55,7 @@ namespace HSDRawViewer.Converters
             mex.IconMatAnimJoint = posModel.Item3;
 
             // generate csp node
-            var stride = MEXConverter.FighterIDCount - 3;
+            var stride = MEXConverter.FighterIDCount;
             List<FOBJKey> keys = new List<FOBJKey>();
             List<HSD_TOBJ> tobjs = new List<HSD_TOBJ>();
             foreach(var v in icons)
@@ -94,10 +63,6 @@ namespace HSDRawViewer.Converters
                 for(int i = 0; i < v.CSPs.Count; i++)
                 {
                     var id = v.FighterExternalID;
-
-                    if (id > 0x13)
-                        id -= 1;
-
                     keys.Add(new FOBJKey() { Frame = stride * i + id, Value = tobjs.Count, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
                     tobjs.Add(v.CSPs[i]);
                 }
@@ -115,6 +80,7 @@ namespace HSDRawViewer.Converters
             anim.TextureAnimation.AnimationObject.FObjDesc.Next.SetKeys(keys, (byte)TexTrackType.HSD_A_T_TCLT);
 
             mex.CSPMatAnim = anim;
+            mex.CSPStride = stride;
         }
 
         /// <summary>
@@ -125,7 +91,7 @@ namespace HSDRawViewer.Converters
             var csps = mex.CSPMatAnim.TextureAnimation.ToTOBJs();
             var cspKeys = mex.CSPMatAnim.TextureAnimation.AnimationObject.FObjDesc.GetDecodedKeys();
 
-            var stride = MEXConverter.FighterIDCount - 3;
+            var stride = mex.CSPStride;
 
             var index = 0;
             foreach(var ico in icons)
@@ -143,12 +109,7 @@ namespace HSDRawViewer.Converters
                 int cspIndex = 0;
                 while (true)
                 {
-                    var id = ico.FighterExternalID;
-
-                    if (id > 0x13)
-                        id -= 1;
-
-                    var key = id + (cspIndex * stride);
+                    var key = ico.FighterExternalID + (cspIndex * stride);
 
                     var k = cspKeys.Find(e => e.Frame == key);
 
@@ -244,9 +205,6 @@ namespace HSDRawViewer.Converters
             MEX_mexSelectChr mex = new MEX_mexSelectChr();
 
             SetMexNode(mex, icons);
-            
-            //mex.StockMatAnim = HSDAccessor.DeepClone<HSD_MatAnim>(table.SingleMenuMaterialAnimation.Children[9].Child.MaterialAnimation);
-            //mex.EmblemMatAnim = HSDAccessor.DeepClone<HSD_MatAnim>(table.MenuMaterialAnimation.Children[5].Child.MaterialAnimation.Next);
             
             return mex;
         }

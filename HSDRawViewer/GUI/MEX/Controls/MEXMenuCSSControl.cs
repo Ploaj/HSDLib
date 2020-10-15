@@ -77,7 +77,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
             {
                 // regenerate and hook node
                 MexCssGenerator.SetMexNode((MEX_mexSelectChr)MenuFile["mexSelectChr"].Data, Icons);
-                MexCssGenerator.HookMexNode((SBM_SelectChrDataTable)MenuFile["MnSelectChrDataTable"].Data, (MEX_mexSelectChr)MenuFile["mexSelectChr"].Data);
 
                 // save file
                 MenuFile.TrimData();

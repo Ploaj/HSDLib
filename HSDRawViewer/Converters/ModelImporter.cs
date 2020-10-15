@@ -47,8 +47,12 @@ namespace HSDRawViewer.Converters
         [Category("Importing Options"), DisplayName("Import Rigging"), Description("Import rigging from model file")]
         public bool ImportRigging { get; set; } = true;
 
-        
-        
+#if DEBUG
+        [Category("Debug Options"), DisplayName("Merge"), Description("")]
+        public bool Merge { get; set; } = false;
+#endif
+
+
         [Category("Material Options"), DisplayName("Import MOBJs"), Description("Imports .mobj files from file if found")]
         public bool ImportMOBJ { get; set; } = false;
 
@@ -271,6 +275,11 @@ namespace HSDRawViewer.Converters
 
             // update flags
             JOBJTools.UpdateJOBJFlags(NewModel);
+
+#if DEBUG
+            if (Settings.Merge)
+                JOBJTools.MergeIntoOneObject(NewModel);
+#endif
 
             ProgressStatus = "Done!";
             w.ReportProgress(100);
