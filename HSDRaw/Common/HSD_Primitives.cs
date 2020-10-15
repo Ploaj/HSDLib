@@ -1,7 +1,95 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace HSDRaw.Common
 {
+    public class HSD_ShiftJIS_String : HSDAccessor
+    {
+        private static readonly Encoding SHIFT_JIS = Encoding.GetEncoding("Shift_JIS");
+
+        private static readonly Dictionary<char, char> CharToShiftChar = new Dictionary<char, char>()
+            {
+                { '+' ,'＋' },
+                { '-' ,'－' },
+                { '=' ,'＝' },
+                { '?' ,'？' },
+                { '!' ,'！' },
+                { '@' ,'＠' },
+                { '%' ,'％' },
+                { '&' ,'＆' },
+                { '$' ,'＄' },
+                { ',' ,'，' },
+                { '•' ,'・' },
+                { ';' ,'；' },
+                { ':' ,'：' },
+                { '^' ,'＾' },
+                { '_' ,'＿' },
+                { '—' ,'ー' },
+                { '~' ,'～' },
+                { '/' ,'／' },
+                { '|' ,'｜' },
+                { '\\' ,'＼' },
+                { '"' ,'“' },
+                { '(' ,'（' },
+                { ')' ,'）' },
+                { '[' ,'［' },
+                { ']' ,'］' },
+                { '{' ,'｛' },
+                { '}' ,'｝' },
+                { '<' ,'〈' },
+                { '>' ,'〉' },
+                { '¥' ,'￥' },
+                { '#' ,'＃' },
+                { '*' ,'＊' },
+                { '\'', '’'}
+            };
+
+        public string Value
+        {
+            get
+            {
+                var nullpoint = 0;
+                foreach (var d in _s.GetData())
+                    if (d == 0)
+                        break;
+                    else
+                        nullpoint++;
+                return SHIFT_JIS.GetString(_s.GetData(), 0, nullpoint);
+            }
+            set
+            {
+                // shift-jis stylize string and validate
+                var chars = value.ToCharArray();
+                for (int i = 0; i < chars.Length; i++)
+                {
+                    // convert to shift jis
+                    if (CharToShiftChar.ContainsKey(chars[i]))
+                        chars[i] = CharToShiftChar[chars[i]];
+                }
+
+                // set data
+                _s.SetData(SHIFT_JIS.GetBytes(new string(chars)));
+
+                // null terminated
+                _s.Resize(_s.Length + 1);
+                
+                if (_s.Length % 4 != 0)
+                    _s.Resize(_s.Length + (4 - (_s.Length % 4)));
+            }
+        }
+
+        public override void New()
+        {
+            base.New();
+            _s.Resize(0x04);
+        }
+
+        public override string ToString()
+        {
+            return Value;
+        }
+    }
+
     public class HSD_String : HSDAccessor
     {
         public string Value

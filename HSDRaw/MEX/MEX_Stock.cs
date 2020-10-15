@@ -1,4 +1,5 @@
-﻿using HSDRaw.Common.Animation;
+﻿using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,6 +25,15 @@ namespace HSDRaw.MEX
         BUTTON_DOWN = 0x20000,
         BUTTON_LEFT = 0x40000,
         BUTTON_RIGHT = 0x80000,
+    }
+
+    public class MEX_BGMModel : HSDAccessor
+    {
+        public override int TrimmedSize => 0x8;
+
+        public HSD_JOBJ Model { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
+
+        public HSD_AnimJoint Animation { get => _s.GetReference<HSD_AnimJoint>(0x04); set => _s.SetReference(0x04, value); }
     }
 
     public class MEX_Stock : HSDAccessor

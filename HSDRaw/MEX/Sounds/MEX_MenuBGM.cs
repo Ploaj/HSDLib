@@ -13,7 +13,7 @@ namespace HSDRaw.MEX
 
         public int MenuPlayListCount { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
-        public HSDFixedLengthPointerArrayAccessor<HSD_String> BGMLabels { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSDFixedLengthPointerArrayAccessor<HSD_ShiftJIS_String> BGMLabels { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_ShiftJIS_String>>(0x0C); set => _s.SetReference(0x0C, value); }
 
     }
 }

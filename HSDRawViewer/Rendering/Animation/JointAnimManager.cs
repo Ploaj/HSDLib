@@ -199,7 +199,12 @@ namespace HSDRawViewer.Rendering
             HSD_AnimJoint joint = new HSD_AnimJoint();
             joint.Flags = 1;
 
-            var n = Nodes[index++];
+            AnimNode n = null;
+
+            if (index >= Nodes.Count)
+                n = new AnimNode();
+            else
+                n = Nodes[index++];
 
             if (n.Tracks.Count > 0)
             {

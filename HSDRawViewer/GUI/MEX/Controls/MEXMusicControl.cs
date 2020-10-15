@@ -38,7 +38,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             [DisplayName("Label")]
             public string Label { get => _label.Value; set => _label.Value = value; }
 
-            public HSD_String _label = new HSD_String() { Value = "" };
+            public HSD_ShiftJIS_String _label = new HSD_ShiftJIS_String() { Value = "" };
 
             public override string ToString()
             {
@@ -220,7 +220,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             }
             else
             {
-                musicListEditor.AddItem(new MusicEntryLabel() { _fileName = musicName, _label = new HSD_String() { Value = ""} });
+                musicListEditor.AddItem(new MusicEntryLabel() { _fileName = musicName, _label = new HSD_ShiftJIS_String() { Value = ""} });
             }
             return Music.Length - 1;
         }
