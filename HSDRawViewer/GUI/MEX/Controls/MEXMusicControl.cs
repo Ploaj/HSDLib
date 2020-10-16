@@ -79,11 +79,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
-        public MusicEntryLabel[] LabeledMusic { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public MEXPlaylistEntry[] MenuPlaylist { get; set; }
 
         /// <summary>
@@ -115,25 +110,25 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             var filenames = data.MusicTable.BGMFileNames.Array;
             var labels = data.MusicTable.BGMLabels?.Array;
-
+            
+            // load labels if they exist
             if (labels != null)
             {
-                LabeledMusic = new MusicEntryLabel[filenames.Length];
+                Music = new MusicEntryLabel[filenames.Length];
                 for (int i = 0; i < filenames.Length; i++)
                 {
-                    LabeledMusic[i] = new MusicEntryLabel()
+                    Music[i] = new MusicEntryLabel()
                     {
                         _fileName = filenames[i],
                         _label = labels[i]
                     };
                 }
-                musicListEditor.SetArrayFromProperty(this, "LabeledMusic");
             }
             else
-            {
                 Music = filenames.Select(e => new MusicEntry() { _fileName = e }).ToArray();
-                musicListEditor.SetArrayFromProperty(this, "Music");
-            }
+
+            // bind array
+            musicListEditor.SetArrayFromProperty(this, "Music");
 
             // menu playlist
             MenuPlaylist = new MEXPlaylistEntry[data.MusicTable.MenuPlayListCount];
@@ -146,6 +141,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     PlayChance = e.ChanceToPlay.ToString() + "%"
                 };
             }
+
+            // bind playlist
             menuPlaylistEditor.SetArrayFromProperty(this, "MenuPlaylist");
         }
 
@@ -155,16 +152,15 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="data"></param>
         public void SaveData(MEX_Data data)
         {
-            if (Music != null)
+            data.MetaData.NumOfMusic = Music.Length;
+            data.MusicTable.BGMFileNames.Array = Music.Select(e => e._fileName).ToArray();
+            data.MusicTable.BGMLabels.Array = new HSD_ShiftJIS_String[Music.Length];
+            for(int i = 0; i < Music.Length; i++)
             {
-                data.MetaData.NumOfMusic = Music.Length;
-                data.MusicTable.BGMFileNames.Array = Music.Select(e => e._fileName).ToArray();
-            }
-            else
-            {
-                data.MetaData.NumOfMusic = LabeledMusic.Length;
-                data.MusicTable.BGMFileNames.Array = LabeledMusic.Select(e => e._fileName).ToArray();
-                data.MusicTable.BGMLabels.Array = LabeledMusic.Select(e => e._label).ToArray();
+                if (Music[i] is MusicEntryLabel l)
+                    data.MusicTable.BGMLabels.Set(i, new HSD_ShiftJIS_String() { Value = l.Label});
+                else
+                    data.MusicTable.BGMLabels.Set(i, new HSD_ShiftJIS_String() { Value = "" });
             }
 
             // playlist
@@ -212,16 +208,13 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
-        public int AddMusic(HSD_String musicName)
+        public int AddMusic(HSD_String musicName, string label = null)
         {
-            if(Music != null)
-            {
+            if(string.IsNullOrEmpty(label))
                 musicListEditor.AddItem(new MusicEntry() { _fileName = musicName });
-            }
             else
-            {
-                musicListEditor.AddItem(new MusicEntryLabel() { _fileName = musicName, _label = new HSD_ShiftJIS_String() { Value = ""} });
-            }
+                musicListEditor.AddItem(new MusicEntryLabel() { _fileName = musicName, _label = new HSD_ShiftJIS_String() { Value = label} });
+
             return Music.Length - 1;
         }
 
@@ -235,6 +228,23 @@ namespace HSDRawViewer.GUI.MEX.Controls
         }
 
         #region Events
+
+        public class HPSImportOptions
+        {
+            [DisplayName("File Name"), Description("File name to use in file system")]
+            public string FileName { get; set; }
+
+            [DisplayName("Music Name"), Description("Name shown in game")]
+            public string MusicName { get; set; }
+
+            [DisplayName("Loop Point"), Description("Time stamp to loop to when music ends")]
+            public string LoopPoint
+            {
+                get => _loopPoint.ToString();
+                set => TimeSpan.TryParse(value, out _loopPoint);
+            }
+            public TimeSpan _loopPoint = TimeSpan.Zero;
+        }
 
         /// <summary>
         /// 
@@ -254,20 +264,26 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
                 foreach (var f in fs)
                 {
-                    var dsp = new DSP();
-                    dsp.FromFile(f);
-                    HPS.SaveDSPAsHPS(dsp, Path.Combine(audioPath, Path.GetFileNameWithoutExtension(f) + ".hps"));
-                    var newHPSName = Path.GetFileNameWithoutExtension(f) + ".hps";
+                    var options = new HPSImportOptions();
+                    options.FileName = Path.GetFileNameWithoutExtension(f) + ".hps";
+                    options.MusicName = Path.GetFileNameWithoutExtension(f);
 
-                    foreach (var v in Music)
-                        if (v.FileName.Equals(newHPSName))
-                            return;
+                    using (PropertyDialog d = new PropertyDialog("HPS Creation Options", options))
+                    {
+                        if (d.ShowDialog() == DialogResult.OK)
+                        {
+                            var dsp = new DSP();
+                            dsp.FromFile(f);
+                            dsp.SetLoopFromTimeSpan(options._loopPoint);
+                            HPS.SaveDSPAsHPS(dsp, Path.Combine(audioPath, options.FileName));
 
-                    foreach (var v in LabeledMusic)
-                        if (v.FileName.Equals(newHPSName))
-                            return;
+                            foreach (var v in Music)
+                                if (v.FileName.Equals(options.FileName))
+                                    continue;
 
-                    AddMusic(new HSD_String() { Value = newHPSName });
+                            AddMusic(new HSD_String() { Value = options.FileName }, options.MusicName);
+                        }
+                    }
                 }
             }
         }
@@ -278,14 +294,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <returns></returns>
         private string[] GetFileNameStrings()
         {
-            if(Music != null)
-            {
-                return Music.Select(e => e.FileName).ToArray();
-            }
-            else
-            {
-                return LabeledMusic.Select(e => e.FileName).ToArray();
-            }
+            return Music.Select(e => e.FileName).ToArray();
         }
 
         /// <summary>
