@@ -110,6 +110,10 @@ namespace HSDRawViewer.Rendering
 
         public float Frame { get; set; }
 
+        public bool EnableMaterialFrame { get; set; } = false;
+
+        public float MaterialFrame { get; set; }
+
         private HSD_JOBJ RootJOBJ { get; set; }
 
         public DOBJManager DOBJManager = new DOBJManager();
@@ -360,8 +364,11 @@ namespace HSDRawViewer.Rendering
             {
                 HSD_JOBJ parent = null;
                 List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>> XLU = new List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>>();
-                MatAnimation.Frame = Frame;
+
+                if (!EnableMaterialFrame)
+                    MatAnimation.SetAllFrames(Frame);
                 MatAnimation.JOBJIndex = 0;
+
                 foreach (var b in jobjToCache)
                 {
                     MatAnimation.DOBJIndex = 0;
@@ -589,7 +596,7 @@ namespace HSDRawViewer.Rendering
 
             if (animatedBoneIndex != -1 && Animation != null)
             {
-                Transform = Animation.GetAnimatedState(Frame, animatedBoneIndex, jobj);
+                Transform = Animation.GetAnimatedMatrix(Frame, animatedBoneIndex, jobj);
                 animatedBoneIndex++;
             }
             

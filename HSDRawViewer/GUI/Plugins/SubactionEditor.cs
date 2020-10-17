@@ -251,6 +251,8 @@ namespace HSDRawViewer.GUI
             };
             
             SubactionProcess.UpdateVISMethod = SetModelVis;
+            SubactionProcess.AnimateMaterialMethod = AnimateMaterial;
+            SubactionProcess.AnimateModelMethod = AnimateModel;
         }
 
         /// <summary>
@@ -946,6 +948,46 @@ namespace HSDRawViewer.GUI
         
         #region Rendering
         
+        public class ModelPartAnimations : IJointFrameModifier
+        {
+            private byte[] Entries;
+
+            private JointAnimManager[] Anims;
+
+            private int StartBone;
+
+            public int AnimIndex = -1;
+
+            public ModelPartAnimations(SBM_ModelPart part)
+            {
+                StartBone = part.StartingBone;
+
+                Entries = new byte[part.Count];
+                for(int i = 0; i < part.Count; i++)
+                    Entries[i] = part.Entries[i];
+
+                Anims = part.Anims.Array.Select(e => new JointAnimManager(e)).ToArray();
+            }
+
+            public bool OverrideAnim(float frame, int boneIndex, HSD_JOBJ jobj, ref float TX, ref float TY, ref float TZ, ref float RX, ref float RY, ref float RZ, ref float SX, ref float SY, ref float SZ)
+            {
+                // check if bone index is in entries
+                if (AnimIndex == -1 || boneIndex < StartBone || boneIndex >= StartBone + Anims[0].NodeCount)
+                    return false;
+
+                // get anim for entry
+                foreach(var e in Entries)
+                    if(e == boneIndex)
+                    {
+                        var anim = Anims[AnimIndex];
+                        anim.GetAnimatedState(0, boneIndex - StartBone, jobj, out TX, out TY, out TZ, out RX, out RY, out RZ, out SX, out SY, out SZ);
+                        return true;
+                    }
+
+                return false;
+            }
+        }
+
         private ViewportControl viewport;
 
         private JOBJManager JOBJManager = new JOBJManager();
@@ -954,6 +996,8 @@ namespace HSDRawViewer.GUI
         public DrawOrder DrawOrder => DrawOrder.Last;
 
         private byte[] AJBuffer;
+        
+        private ModelPartAnimations[] ModelPartsIndices;
 
         private SubactionProcessor SubactionProcess = new SubactionProcessor();
 
@@ -1000,11 +1044,18 @@ namespace HSDRawViewer.GUI
             else
                 return;
 
+            if (modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
+            {
+                JOBJManager.SetMatAnimJoint(matanim);
+                JOBJManager.EnableMaterialFrame = true;
+            }
+
             JOBJManager.ModelScale = ModelScale;
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
             JOBJManager.settings.RenderBones = false;
 
             ResetModelVis();
+            LoadModelParts();
 
             AJBuffer = System.IO.File.ReadAllBytes(aFile);
 
@@ -1014,9 +1065,26 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
+        private void LoadModelParts()
+        {
+            var plDat = FighterData;
+
+            if (plDat != null && plDat.ModelPartAnimations != null && JOBJManager.JointCount != 0)
+            {
+                ModelPartsIndices = plDat.ModelPartAnimations.Array.Select(
+                    e => new ModelPartAnimations(e)
+                ).ToArray() ;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void ResetModelVis()
         {
             var plDat = FighterData;
+
+            JOBJManager.MatAnimation.SetAllFrames(0);
 
             if (plDat != null && plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
             {
@@ -1029,6 +1097,16 @@ namespace HSDRawViewer.GUI
                 // hide low poly
                 foreach (var lut in plDat.ModelLookupTables.CostumeVisibilityLookups[0].LowPoly.Array)
                     SetModelVis(lut, -1);
+            }
+
+            // reset model parts
+            if(ModelPartsIndices != null)
+            {
+                for (int i = 0; i < ModelPartsIndices.Length; i++)
+                    ModelPartsIndices[i].AnimIndex = -1;
+
+                JOBJManager.Animation.FrameModifier.Clear();
+                JOBJManager.Animation.FrameModifier.AddRange(ModelPartsIndices);
             }
         }
 
@@ -1067,6 +1145,42 @@ namespace HSDRawViewer.GUI
                             JOBJManager.HideDOBJ(v);
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="frame"></param>
+        private void AnimateMaterial(int index, int frame, int matflag, int frameflag)
+        {
+            var plDat = FighterData;
+
+            if (plDat.ModelLookupTables != null && index < plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Length)
+            {
+                if(matflag == 1)
+                {
+                    foreach(var v in plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Array)
+                        JOBJManager.MatAnimation.SetFrame(v.Value, frame);
+
+                }
+                else
+                {
+                    var idx = plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries[index];
+                    JOBJManager.MatAnimation.SetFrame(idx.Value, frame);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="frame"></param>
+        private void AnimateModel(int part_index, int anim_index)
+        {
+            if(ModelPartsIndices != null && part_index < ModelPartsIndices.Length && part_index >= 0)
+                ModelPartsIndices[part_index].AnimIndex = anim_index;
         }
 
         /// <summary>
@@ -1111,21 +1225,28 @@ namespace HSDRawViewer.GUI
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
+            // store previous hitbox state info
             Dictionary<int, Vector3> previousPosition = CalculatePreviousState();
 
+            // reset model parts
+            if (ModelPartsIndices != null)
+                for (int i = 0; i < ModelPartsIndices.Length; i++)
+                    ModelPartsIndices[i].AnimIndex = -1;
+
+            // process ftcmd
             SubactionProcess.SetFrame(viewport.Frame);
 
+            // update display info
             JOBJManager.DOBJManager.OverlayColor = SubactionProcess.OverlayColor;
-
-            JOBJManager.Frame = viewport.Frame;
-
             JOBJManager.settings.RenderBones = bonesToolStripMenuItem.Checked;
 
+            // apply model animations
+            JOBJManager.Frame = viewport.Frame;
+            JOBJManager.UpdateNoRender();
+
             // character invisibility
-            if (SubactionProcess.CharacterInvisibility || !modelToolStripMenuItem.Checked)
-                JOBJManager.UpdateNoRender();
-            else
-                JOBJManager.Render(cam);
+            if (!SubactionProcess.CharacterInvisibility && modelToolStripMenuItem.Checked)
+                JOBJManager.Render(cam, false);
 
             // hurtbox collision
             if (hurtboxesToolStripMenuItem.Checked)
@@ -1162,6 +1283,8 @@ namespace HSDRawViewer.GUI
                 {
                     DrawShape.DrawSphere(transform, hb.Size, 16, 16, hbColor, alpha);
                 }
+
+                // draw hitbox angle
                 if (hitboxInfoToolStripMenuItem.Checked)
                 {
                     if (hb.Angle != 361)

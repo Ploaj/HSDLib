@@ -182,7 +182,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 var transform = Matrix4.Identity;
 
                 if (entryAnimation.ContainsKey(ico))
-                    transform = entryAnimation[ico].GetAnimatedState(frame, 0, ico.Joint);
+                    transform = entryAnimation[ico].GetAnimatedMatrix(frame, 0, ico.Joint);
                 else
                     transform = Matrix4.CreateScale(ico.Joint.SX, ico.Joint.SY, ico.Joint.SZ) *
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(ico.Joint.RZ, ico.Joint.RY, ico.Joint.RX)) *

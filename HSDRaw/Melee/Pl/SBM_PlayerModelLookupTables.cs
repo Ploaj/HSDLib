@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.Melee.Pl
+﻿using HSDRaw.Common;
+
+namespace HSDRaw.Melee.Pl
 {
     public class SBM_PlayerModelLookupTables : HSDAccessor
     {
@@ -89,17 +91,7 @@
     public class SBM_CostumeMaterialLookup : HSDAccessor
     {
         public override int TrimmedSize => 0x4;
-        
-        public byte[] Entries
-        {
-            get => _s.GetCreateReference<HSDAccessor>(0x00)._s.GetData();
-            set
-            {
-                if (value == null || value.Length == 0)
-                    _s.SetReference(0x00, null);
-                else
-                    _s.GetCreateReference<HSDAccessor>(0x00)._s.SetData(value);
-            }
-        }
+
+        public HSDArrayAccessor<HSD_UShort> Entries { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x00); set => _s.SetReference(0x00, value); }
     }
 }

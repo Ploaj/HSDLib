@@ -401,9 +401,9 @@
   name: Animate Model
   parameters:
   - name: Body Part
-    bitCount: 10
+    bitCount: 7
   - name: State
-    bitCount: 4
+    bitCount: 7
   - name: Unk
     bitCount: 12
 

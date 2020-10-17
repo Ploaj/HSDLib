@@ -6,9 +6,6 @@ using HSDRaw.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Rendering
 {
@@ -22,6 +19,15 @@ namespace HSDRawViewer.Rendering
         public List<MatAnimTexture> TextureAnims = new List<MatAnimTexture>();
 
         public List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
+
+        public float Frame = 0;
+
+        public void SetFrame(float frame)
+        {
+            Frame = frame;
+            foreach (var v in TextureAnims)
+                v.SetFrame(frame);
+        }
     }
 
     public class MatAnimTexture
@@ -31,6 +37,13 @@ namespace HSDRawViewer.Rendering
         public List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
 
         public List<HSD_TOBJ> Textures = new List<HSD_TOBJ>();
+
+        public float Frame = 0;
+
+        public void SetFrame(float frame)
+        {
+            Frame = frame;
+        }
     }
 
     public class MatAnimManager : AnimManager
@@ -42,8 +55,6 @@ namespace HSDRawViewer.Rendering
         public int JOBJIndex = 0;
 
         public int DOBJIndex = 0;
-
-        public float Frame = 0;
 
         public Tuple<HSD_Material> GetMaterialState(HSD_MOBJ mobj)
         {
@@ -57,16 +68,16 @@ namespace HSDRawViewer.Rendering
                 {
                     switch ((MatTrackType)t.TrackType)
                     {
-                        case MatTrackType.HSD_A_M_ALPHA: mat.Alpha = t.GetValue(Frame); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_R: mat.AMB_R = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_G: mat.AMB_G = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_B: mat.AMB_B = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_R: mat.DIF_R = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_G: mat.DIF_G = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_B: mat.DIF_B = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_R: mat.SPC_R = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_G: mat.SPC_G = (byte)(t.GetValue(Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_B: mat.SPC_B = (byte)(t.GetValue(Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_ALPHA: mat.Alpha = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_AMBIENT_R: mat.AMB_R = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_AMBIENT_G: mat.AMB_G = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_AMBIENT_B: mat.AMB_B = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_DIFFUSE_R: mat.DIF_R = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_DIFFUSE_G: mat.DIF_G = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_DIFFUSE_B: mat.DIF_B = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_SPECULAR_R: mat.SPC_R = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_SPECULAR_G: mat.SPC_G = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_SPECULAR_B: mat.SPC_B = (byte)(t.GetValue(node.Frame) * 0xFF); break;
                     }
                 }
             }
@@ -110,19 +121,19 @@ namespace HSDRawViewer.Rendering
                         switch ((TexTrackType)t.TrackType)
                         {
                             case TexTrackType.HSD_A_T_TIMG:
-                                tex = texAnim.Textures[(int)t.GetValue(Frame)];
+                                tex = texAnim.Textures[(int)t.GetValue(texAnim.Frame)];
                                 break;
                             case TexTrackType.HSD_A_T_BLEND:
                             case TexTrackType.HSD_A_T_TS_BLEND:
-                                blending = t.GetValue(Frame);
+                                blending = t.GetValue(texAnim.Frame);
                                 break;
-                            case TexTrackType.HSD_A_T_TRAU: TX = t.GetValue(Frame); break;
-                            case TexTrackType.HSD_A_T_TRAV: TY = t.GetValue(Frame); break;
-                            case TexTrackType.HSD_A_T_SCAU: SX = t.GetValue(Frame); break;
-                            case TexTrackType.HSD_A_T_SCAV: SY = t.GetValue(Frame); break;
-                            case TexTrackType.HSD_A_T_ROTX: RX = t.GetValue(Frame); break;
-                            case TexTrackType.HSD_A_T_ROTY: RY = t.GetValue(Frame); break;
-                            case TexTrackType.HSD_A_T_ROTZ: RZ = t.GetValue(Frame); break;
+                            case TexTrackType.HSD_A_T_TRAU: TX = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_TRAV: TY = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_SCAU: SX = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_SCAV: SY = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_ROTX: RX = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_ROTY: RY = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_ROTZ: RZ = t.GetValue(texAnim.Frame); break;
                         }
                     }
                 }
@@ -192,6 +203,49 @@ namespace HSDRawViewer.Rendering
                     }
                 Nodes.Add(matjoint);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        public void SetAllFrames(float frame)
+        {
+            foreach (var v in Nodes)
+                foreach (var n in v.Nodes)
+                    n.SetFrame(frame);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public MatAnim GetMatAnimAtIndex(int index)
+        {
+            int i = 0;
+            foreach(var v in Nodes)
+            {
+                foreach(var n in v.Nodes)
+                {
+                    if (index == i)
+                        return n;
+                    i++;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="frame"></param>
+        public void SetFrame(int mat_index, float frame)
+        {
+            var node = GetMatAnimAtIndex(mat_index);
+            if (node != null)
+                node.SetFrame(frame);
         }
     }
 }

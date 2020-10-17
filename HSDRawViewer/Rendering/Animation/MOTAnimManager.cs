@@ -13,7 +13,7 @@ namespace HSDRawViewer.Rendering
         private MOT_FILE _motFile;
         private short[] _motJointTable;
 
-        public override Matrix4 GetAnimatedState(float frame, int boneIndex, HSD_JOBJ jobj)
+        public override Matrix4 GetAnimatedMatrix(float frame, int boneIndex, HSD_JOBJ jobj)
         {
             float TX = jobj.TX;
             float TY = jobj.TY;

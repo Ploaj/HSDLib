@@ -38,8 +38,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
 
         public delegate void UpdateVIS(int structId, int objectId);
-
         public UpdateVIS UpdateVISMethod;
+
+
+        public delegate void AnimateMaterial(int matindex, int frame, int matflag, int frameflag);
+        public AnimateMaterial AnimateMaterialMethod;
+
+
+        public delegate void AnimateModel(int part_index, int anim_index);
+        public AnimateModel AnimateModelMethod;
 
 
         private HSDStruct Struct;
@@ -250,6 +257,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 37 << 2:
                         CharacterInvisibility = cmd.Parameters[1] == 1;
+                        break;
+                    case 40 << 2:
+                        AnimateMaterialMethod(cmd.Parameters[1], cmd.Parameters[3], cmd.Parameters[0], cmd.Parameters[2]);
+                        break;
+                    case 41 << 2:
+                        AnimateModelMethod(cmd.Parameters[0], cmd.Parameters[1]);
                         break;
                     case 46 << 2: //overlay color
                         if(cmd.Parameters[0] == 1)

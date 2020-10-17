@@ -2,17 +2,6 @@
 
 namespace HSDRaw.Melee.Pl
 {
-    public class SBM_ModelPartTable : HSDAccessor
-    {
-        public override int TrimmedSize => 0x0C;
-
-        public SBM_ModelPart LHand { get => _s.GetReference<SBM_ModelPart>(0x00); set => _s.SetReference(0x00, value); }
-
-        public SBM_ModelPart RHand { get => _s.GetReference<SBM_ModelPart>(0x04); set => _s.SetReference(0x04, value); }
-
-        public SBM_ModelPart Head { get => _s.GetReference<SBM_ModelPart>(0x08); set => _s.SetReference(0x08, value); }
-    }
-
     public class SBM_ModelPart : HSDAccessor
     {
         public override int TrimmedSize => 0x0C;

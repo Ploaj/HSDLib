@@ -10,7 +10,7 @@ namespace HSDRawViewer.ContextMenus
 
         public MatAnimContextMenu() : base()
         {
-            MenuItem AddMatAnim = new MenuItem("Add Material Anim");
+            MenuItem AddMatAnim = new MenuItem("Add Material Animation");
             AddMatAnim.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_MatAnim matanim)
@@ -22,7 +22,7 @@ namespace HSDRawViewer.ContextMenus
             };
             MenuItems.Add(AddMatAnim);
 
-            MenuItem OpenAsAJ = new MenuItem("Add Texture Anim");
+            MenuItem OpenAsAJ = new MenuItem("Add Texture Animation");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_MatAnim matanim)

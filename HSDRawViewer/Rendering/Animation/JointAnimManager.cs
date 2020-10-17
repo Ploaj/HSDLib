@@ -11,6 +11,14 @@ namespace HSDRawViewer.Rendering
     /// <summary>
     /// 
     /// </summary>
+    public interface IJointFrameModifier
+    {
+        bool OverrideAnim(float frame, int boneIndex, HSD_JOBJ jobj, ref float TX, ref float TY, ref float TZ, ref float RX, ref float RY, ref float RZ, ref float SX, ref float SY, ref float SZ);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class JointAnimManager : AnimManager
     {
         public override int NodeCount => Nodes.Count;
@@ -18,6 +26,8 @@ namespace HSDRawViewer.Rendering
         public List<AnimNode> Nodes { get; internal set; } = new List<AnimNode>();
 
         private int index = 0;
+
+        public List<IJointFrameModifier> FrameModifier = new List<IJointFrameModifier>();
 
         /// <summary>
         /// 
@@ -59,17 +69,33 @@ namespace HSDRawViewer.Rendering
         /// <param name="boneIndex"></param>
         /// <param name="jobj"></param>
         /// <returns></returns>
-        public virtual Matrix4 GetAnimatedState(float frame, int boneIndex, HSD_JOBJ jobj)
+        public virtual Matrix4 GetAnimatedMatrix(float frame, int boneIndex, HSD_JOBJ jobj)
         {
-            float TX = jobj.TX;
-            float TY = jobj.TY;
-            float TZ = jobj.TZ;
-            float RX = jobj.RX;
-            float RY = jobj.RY;
-            float RZ = jobj.RZ;
-            float SX = jobj.SX;
-            float SY = jobj.SY;
-            float SZ = jobj.SZ;
+            GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
+
+            return Matrix4.CreateScale(SX, SY, SZ) *
+                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
+                Matrix4.CreateTranslation(TX, TY, TZ);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="boneIndex"></param>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public virtual void GetAnimatedState(float frame, int boneIndex, HSD_JOBJ jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ)
+        {
+            TX = jobj.TX;
+            TY = jobj.TY;
+            TZ = jobj.TZ;
+            RX = jobj.RX;
+            RY = jobj.RY;
+            RZ = jobj.RZ;
+            SX = jobj.SX;
+            SY = jobj.SY;
+            SZ = jobj.SZ;
 
             if (boneIndex < Nodes.Count)
             {
@@ -91,13 +117,12 @@ namespace HSDRawViewer.Rendering
                 }
             }
 
-            return Matrix4.CreateScale(SX, SY, SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
-                Matrix4.CreateTranslation(TX, TY, TZ);
+            foreach (var fm in FrameModifier)
+                fm.OverrideAnim(frame, boneIndex, jobj, ref TX, ref TY, ref TZ, ref RX, ref RY, ref RZ, ref SX, ref SY, ref SZ);
         }
 
         #region AnimationTypeLoading
-        
+
         /// <summary>
         /// 
         /// </summary>
