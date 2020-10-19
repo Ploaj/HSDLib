@@ -257,20 +257,41 @@ namespace HSDRaw
                 Debug.WriteLine("Find All Parsed: " + sw.ElapsedMilliseconds);
                 sw.Restart();
 
+                HashSet<HSDStruct> orphans = new HashSet<HSDStruct>();
+
+                foreach (var str in offsetToStruct)
+                    orphans.Add(str.Value);
+
                 // set references-------------------------
                 foreach (var str in offsetToStruct)
                 {
-                    var offsets = offsetToOffsets[str.Key];
-                    var innerOffsets = offsetToInnerOffsets[str.Key];
-                    for(int i = 0; i < offsets.Count; i++)
+                    var _o = str.Key;
+                    var _s = str.Value;
+
+                    var offsets = offsetToOffsets[_o];
+                    var innerOffsets = offsetToInnerOffsets[_o];
+
+                    // set references in struct
+                    for (int i = 0; i < offsets.Count; i++)
                     {
-                        if(offsetToStruct.ContainsKey(offsets[i]) && str.Value.Length >= innerOffsets[i] - str.Key + 4)
-                            str.Value.SetReferenceStruct(innerOffsets[i] - str.Key, offsetToStruct[offsets[i]]);
+                        if (offsetToStruct.ContainsKey(offsets[i]) && _s.Length >= innerOffsets[i] - _o + 4)
+                        {
+                            var refstruct = offsetToStruct[offsets[i]];
+
+                            _s.SetReferenceStruct(innerOffsets[i] - _o, refstruct);
+
+                            // this not is not an orphan
+                            if (refstruct != _s && orphans.Contains(refstruct))
+                                orphans.Remove(refstruct);
+                        }
                     }
 
                     _structCache.Add(str.Value);
                     _structCacheToOffset.Add(str.Value, str.Key);
                 }
+
+                Debug.WriteLine("Set References: " + sw.ElapsedMilliseconds);
+                sw.Restart();
 
                 // set roots
                 for (int i = 0; i < rootOffsets.Count; i++)
@@ -279,6 +300,9 @@ namespace HSDRaw
                     HSDAccessor a = GuessAccessor(rootStrings[i], str);
 
                     Roots.Add(new HSDRootNode() { Name = rootStrings[i], Data = a });
+
+                    if (orphans.Contains(str))
+                        orphans.Remove(str);
                 }
 
 
@@ -289,14 +313,72 @@ namespace HSDRaw
                     HSDAccessor a = new HSDAccessor();
                     a._s = str;
                     References.Add(new HSDRootNode() { Name = refStrings[i], Data = a });
+
+                    if (orphans.Contains(str))
+                        orphans.Remove(str);
                 }
 
+                // process special orphans
+                foreach (var orphan in orphans)
+                {
+                    HSDStruct str = orphan;
+                    HSDAccessor a = new HSDAccessor() { _s = str };
+
+                    // hack: if this is a subaction append it to previous struct
+                    if(str.References.Count > 0)
+                    {
+                        var maxkey = str.References.Keys.Max();
+                        if (str.References[maxkey] == str && maxkey >= 8 && str.GetInt32(maxkey - 4) == 0x1C000000)
+                        {
+                            // get previous struct
+                            var prev = GetPreviousStruct(str);
+
+                            // add goto pointer to subaction
+                            if (prev != null)
+                            {
+                                var len = prev.Length;
+                                prev.Resize(prev.Length + 8);
+                                prev.SetInt32(len, 0x1C000000);
+                                prev.SetReferenceStruct(len + 4, str);
+                                continue;
+                            }
+                        }
+                    }
+
+#if DEBUG
+                    // add orphans for debugging
+                    Roots.Add(new HSDRootNode() { Name = "Orphan0x" + _structCacheToOffset[orphan].ToString("X"), Data = a });
+#endif
+
+                }
 
                 Debug.WriteLine("Finish: " + sw.ElapsedMilliseconds);
                 sw.Restart();
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private HSDStruct GetPreviousStruct(HSDStruct str)
+        {
+            for(int i = 0; i < _structCache.Count - 1; i++)
+            {
+                if (_structCache[i + 1] == str)
+                    return _structCache[i];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public static int BinarySearch(List<int> a, int item)
         {
             if (a.Count == 0)

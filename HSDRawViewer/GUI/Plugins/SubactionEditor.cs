@@ -19,6 +19,7 @@ using OpenTK;
 using HSDRawViewer.Rendering.Renderers;
 using System.ComponentModel;
 using HSDRaw.Melee.Cmd;
+using System.IO;
 
 namespace HSDRawViewer.GUI
 {
@@ -139,6 +140,12 @@ namespace HSDRawViewer.GUI
                     data = (byte[])data.Clone(),
                     Reference = Reference
                 };
+            }
+
+            public override string ToString()
+            {
+                var sa = SubactionManager.GetSubaction(data[0], SubactionGroup);
+                return Name +  "(" + string.Join(", ", Parameters) + ")";
             }
         }
 
@@ -366,15 +373,30 @@ namespace HSDRawViewer.GUI
         /// <param name="script"></param>
         private void RefreshSubactionList(Action script)
         {
-            // get subaction data
-            var data = script._struct.GetData();
-
             // set the script for the subaction processer for rendering
             SubactionProcess.SetStruct(script._struct, SubactionGroup);
 
             // begin filling the subaction list
             subActionList.BeginUpdate();
             subActionList.Items.Clear();
+            var scripts = GetScripts(script);
+            foreach (var s in scripts)
+                subActionList.Items.Add(s);
+            subActionList.EndUpdate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="script"></param>
+        /// <returns></returns>
+        public List<SubActionScript> GetScripts(Action script)
+        {
+            // get subaction data
+            var data = script._struct.GetData();
+            List<SubActionScript> scripts = new List<SubActionScript>();
+
+            // process data
             for (int i = 0; i < data.Length;)
             {
                 // get subaction
@@ -382,7 +404,7 @@ namespace HSDRawViewer.GUI
 
                 // create new script node
                 var sas = new SubActionScript(SubactionGroup);
-                
+
                 // store any pointers within this subaction
                 foreach (var r in script._struct.References)
                 {
@@ -401,19 +423,20 @@ namespace HSDRawViewer.GUI
 
                 for (int j = 0; j < sub.Length; j++)
                     sub[j] = data[i + j];
-                
+
                 i += sa.ByteSize;
 
                 sas.data = sub;
 
                 // add new script node
-                subActionList.Items.Add(sas);
+                scripts.Add(sas);
 
                 // if end of script then stop reading
                 if (sa.Code == 0)
                     break;
             }
-            subActionList.EndUpdate();
+
+            return scripts;
         }
 
 
@@ -977,7 +1000,7 @@ namespace HSDRawViewer.GUI
 
                 // get anim for entry
                 foreach(var e in Entries)
-                    if(e == boneIndex)
+                    if(e == boneIndex && AnimIndex < Anims.Length)
                     {
                         var anim = Anims[AnimIndex];
                         anim.GetAnimatedState(0, boneIndex - StartBone, jobj, out TX, out TY, out TZ, out RX, out RY, out RZ, out SX, out SY, out SZ);
@@ -1520,6 +1543,34 @@ namespace HSDRawViewer.GUI
             catch
             {
 
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.SaveFile("Text File (*.txt)|*.txt", "cmd_script.txt");
+
+            if(f != null)
+            {
+                using (FileStream stream = new FileStream(f, FileMode.Create))
+                using (StreamWriter w = new StreamWriter(stream))
+                    foreach (var v in AllScripts)
+                    {
+                        w.WriteLine("Symbol = " + v.Text);
+                        w.WriteLine("Flags = " + v.Flags.ToString("X"));
+
+                        var scripts = GetScripts(v);
+                        w.WriteLine("{");
+                        foreach (var s in scripts)
+                            w.WriteLine("\t" + s.ToString());
+                        w.WriteLine("}");
+                    }
             }
         }
     }
