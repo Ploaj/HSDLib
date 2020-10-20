@@ -5,7 +5,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_FighterData : HSDAccessor
     {
-        public override int TrimmedSize => 0x60;
+        public override int TrimmedSize => 0x70;
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -54,7 +54,16 @@ namespace HSDRaw.MEX
         public HSDArrayAccessor<MEX_FighterSongID> FighterSongIDs { get => _s.GetReference<HSDArrayAccessor<MEX_FighterSongID>>(0x54); set => _s.SetReference(0x54, value); }
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> VIFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x58); set => _s.SetReference(0x58, value); }
+        
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> EndClassicFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x5C); set => _s.SetReference(0x5C, value); }
 
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> EndAdventureFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x60); set => _s.SetReference(0x60, value); }
+
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> EndAllStarFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x64); set => _s.SetReference(0x64, value); }
+
+        public HSDFixedLengthPointerArrayAccessor<HSD_String> EndMovieFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x68); set => _s.SetReference(0x68, value); }
+
+        //public HSDArrayAccessor<HSD_UShort> AdventureTrophyLookup { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x5C); set => _s.SetReference(0x5C, value); }
 
     }
 }

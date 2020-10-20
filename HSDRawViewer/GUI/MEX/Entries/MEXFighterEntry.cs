@@ -115,8 +115,23 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Ending"), Category("2 - Demo"), Description("")]
         public string DemoEnding { get; set; }
 
+        [DisplayName("Classic Ending Image File"), Category("2 - Demo"), Description("")]
+        public string EndClassicFile { get; set; }
+
+        [DisplayName("Adventure Ending Image File"), Category("2 - Demo"), Description("")]
+        public string EndAdventureFile { get; set; }
+
+        [DisplayName("All Star Ending Image File"), Category("2 - Demo"), Description("")]
+        public string EndAllStarFile { get; set; }
+
+        [DisplayName("Ending Movie File"), Category("2 - Demo"), Description("")]
+        public string EndMovieFile { get; set; }
+
         [DisplayName("Target Test Stage"), Category("3 - Misc"), Description("")]
         public int TargetTestStage { get; set; }
+
+        [DisplayName("Adventure Trophy Index"), Category("3 - Misc"), Description("")]
+        public short AdventureTrophyLookup { get; set; }
 
         [DisplayName("Result Screen Scale"), Category("3 - Misc"), Description("")]
         public float ResultScreenScale { get; set; }
@@ -315,6 +330,11 @@ namespace HSDRawViewer.GUI.MEX
                 ResultScreenScale = mexData.FighterData.ResultScale[externalID].Value;
                 TargetTestStage = mexData.FighterData.TargetTestStageLookups[externalID].Value;
                 DemoFile = mexData.FighterData.VIFiles[externalID].Value;
+
+                EndClassicFile = mexData.FighterData.EndClassicFiles[externalID].Value;
+                EndAdventureFile = mexData.FighterData.EndAdventureFiles[externalID].Value;
+                EndAllStarFile = mexData.FighterData.EndAllStarFiles[externalID].Value;
+                EndMovieFile = mexData.FighterData.EndMovieFiles[externalID].Value;
             }
 
             return this;
@@ -433,6 +453,11 @@ namespace HSDRawViewer.GUI.MEX
                 mexData.FighterData.ResultScale.Set(externalID, new HSD_Float() { Value = ResultScreenScale });
                 mexData.FighterData.TargetTestStageLookups.Set(externalID, new HSD_UShort() { Value = (ushort)TargetTestStage });
                 mexData.FighterData.VIFiles.Set(externalID, new HSD_String() { Value = DemoFile });
+
+                mexData.FighterData.EndClassicFiles.Set(externalID, new HSD_String() { Value = EndClassicFile });
+                mexData.FighterData.EndAllStarFiles.Set(externalID, new HSD_String() { Value = EndAllStarFile });
+                mexData.FighterData.EndAdventureFiles.Set(externalID, new HSD_String() { Value = EndAdventureFile });
+                mexData.FighterData.EndMovieFiles.Set(externalID, new HSD_String() { Value = EndMovieFile });
             }
 
         }

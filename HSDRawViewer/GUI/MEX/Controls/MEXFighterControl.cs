@@ -132,6 +132,10 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterData.TargetTestStageLookups.Array = new HSD_UShort[0];
             d.FighterData.FighterSongIDs.Array = new MEX_FighterSongID[0];
             d.FighterData.VIFiles.Array = new HSD_String[0];
+            d.FighterData.EndAdventureFiles.Array = new HSD_String[0];
+            d.FighterData.EndAllStarFiles.Array = new HSD_String[0];
+            d.FighterData.EndClassicFiles.Array = new HSD_String[0];
+            d.FighterData.EndMovieFiles.Array = new HSD_String[0];
 
             d.FighterFunctions.OnLoad.Array = new HSD_UInt[0];
             d.FighterFunctions.OnDeath.Array = new HSD_UInt[0];
