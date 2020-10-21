@@ -317,6 +317,8 @@ namespace HSDRawViewer.Sound
                 if (bpp != 16)
                     throw new NotSupportedException("Only 16 bit WAVE formats accepted");
 
+                while (r.ReadByte() == 0);
+                r.BaseStream.Seek(-1, SeekOrigin.Current);
                 
                 while (new string(r.ReadChars(4)) != "data")
                 {
