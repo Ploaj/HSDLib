@@ -176,6 +176,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterFunctions.onLand.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onExtRstAnim.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onIndexExtResultAnim.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.DemoMoveLogic.Array = new HSD_UInt[NumberOfEntries];
 
             d.FighterFunctions.onSmashDown.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onSmashUp.Array = new HSD_UInt[NumberOfEntries];

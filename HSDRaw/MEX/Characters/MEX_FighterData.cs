@@ -47,8 +47,6 @@ namespace HSDRaw.MEX
         
         public HSDArrayAccessor<MEX_ItemLookup> FighterItemLookup { get => _s.GetReference<HSDArrayAccessor<MEX_ItemLookup>>(0x4C); set => _s.SetReference(0x4C, value); }
 
-        //public HSDArrayAccessor<MEX_EffectTypeLookup> FighterEffectLookup { get => _s.GetReference<HSDArrayAccessor<MEX_EffectTypeLookup>>(0x50); set => _s.SetReference(0x50, value); }
-
         public HSDArrayAccessor<HSD_UShort> TargetTestStageLookups { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x50); set => _s.SetReference(0x50, value); }
 
         public HSDArrayAccessor<MEX_FighterSongID> FighterSongIDs { get => _s.GetReference<HSDArrayAccessor<MEX_FighterSongID>>(0x54); set => _s.SetReference(0x54, value); }

@@ -18,9 +18,9 @@ namespace HSDRaw.Melee.Gr
 
         public int TiltScale { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
-        public float HorizontalRotation { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        public float VerticalRotation { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
 
-        public float VerticalRotation { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
+        public float HorizontalRotation { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
 
         public float Fixedness { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
 

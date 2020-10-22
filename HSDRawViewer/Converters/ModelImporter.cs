@@ -475,13 +475,15 @@ namespace HSDRawViewer.Converters
                 List<GXAttribName> Attributes = new List<GXAttribName>();
 
                 if (mesh.HasEnvelopes() && Settings.ImportRigging && !singleBinded)
+                {
                     Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
 
-                if (hasReflection)
-                    Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
+                    if (hasReflection)
+                        Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
-                if(hasReflection && dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)
-                    Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+                    if (hasReflection && dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)
+                        Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+                }
 
                 
                 Attributes.Add(GXAttribName.GX_VA_POS);

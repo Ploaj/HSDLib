@@ -397,7 +397,7 @@ namespace HSDRawViewer.GUI.MEX
             fd.CostumePointers.Set(internalId, new MEX_CostumeRuntimePointers()
             {
                 CostumeCount = CostumeCount,
-                Pointer = new HSDRaw.HSDAccessor() { _s = new HSDRaw.HSDStruct(4 * 6) }
+                Pointer = new HSDRaw.HSDAccessor() { _s = new HSDRaw.HSDStruct(0x18 * CostumeCount) }
             });
 
             fd.SSMFileIDs.Set(externalID, new MEX_CharSSMFileID()
@@ -493,6 +493,9 @@ namespace HSDRawViewer.GUI.MEX
 
         [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint MoveLogicPointer { get; set; }
+
+        [TypeConverter(typeof(HexType)), Category("Fighter")]
+        public uint DemoMoveLogicPointer { get; set; }
 
         [TypeConverter(typeof(HexType)), Category("Fighter")]
         public uint SpecialN { get; set; }
@@ -638,6 +641,8 @@ namespace HSDRawViewer.GUI.MEX
             if (!mexData.MetaData.Flags.HasFlag(MexFlags.ContainMoveLogic))
                 MoveLogicPointer = ff.MoveLogicPointers[internalId].Value;
 
+            DemoMoveLogicPointer = ff.DemoMoveLogic[internalId].Value;
+
             SpecialN = ff.SpecialN[internalId].Value;
             SpecialNAir = ff.SpecialNAir[internalId].Value;
             SpecialHi = ff.SpecialHi[internalId].Value;
@@ -703,6 +708,8 @@ namespace HSDRawViewer.GUI.MEX
 
             if (!mexData.MetaData.Flags.HasFlag(MexFlags.ContainMoveLogic))
                 ff.MoveLogicPointers.Set(internalId, new HSD_UInt() { Value = MoveLogicPointer });
+
+            ff.DemoMoveLogic.Set(internalId, new HSD_UInt() { Value = DemoMoveLogicPointer });
 
             ff.SpecialN.Set(internalId, new HSD_UInt() { Value = SpecialN });
             ff.SpecialNAir.Set(internalId, new HSD_UInt() { Value = SpecialNAir });
