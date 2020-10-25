@@ -266,7 +266,7 @@ namespace HSDRawViewer.Converters
 
         public List<MOT_KEY> Keys = new List<MOT_KEY>();
 
-        public MOT_KEY GetKey(float frame)
+        public MOT_KEY GetKey(float time)
         {
             if (Keys.Count == 0)
                 return null;
@@ -274,20 +274,20 @@ namespace HSDRawViewer.Converters
             if (Keys.Count == 1)
                 return Keys[0];
 
-            if (frame < Keys[0].Time)
+            if (Keys[0].Time > time)
                 return Keys[0];
 
-            var index = Keys.FindIndex(e => frame < e.Time) - 1;
+            // Keys.FindIndex should not return 0 here due to above check
+            var index = Keys.FindIndex(e => e.Time > time) - 1;
             
+            // If index is negative all keys come before the provided time, pick the last one
             if (index < 0)
-                return Keys[0];
-
-            if (index + 1 >= Keys.Count - 1)
                 return Keys[Keys.Count - 1];
 
-            var weight = (frame - Keys[index].Time) / (Keys[index + 1].Time - Keys[index].Time);
+            var weight = (time - Keys[index].Time) / (Keys[index + 1].Time - Keys[index].Time);
             return new MOT_KEY()
             {
+                Time = time,
                 X = AnimationInterpolationHelper.Lerp(Keys[index].X, Keys[index + 1].X, weight),
                 Y = AnimationInterpolationHelper.Lerp(Keys[index].Y, Keys[index + 1].Y, weight),
                 Z = AnimationInterpolationHelper.Lerp(Keys[index].Z, Keys[index + 1].Z, weight),
