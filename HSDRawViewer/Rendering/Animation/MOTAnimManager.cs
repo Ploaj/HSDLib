@@ -32,6 +32,10 @@ namespace HSDRawViewer.Rendering
             foreach (var j in joints)
             {
                 var key = j.GetKey(frame / 60f);
+                if (key == null)
+                {
+                    continue;
+                }
 
                 if (j.TrackFlag.HasFlag(MOT_FLAGS.TRANSLATE))
                 {
