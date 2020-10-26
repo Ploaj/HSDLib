@@ -97,15 +97,41 @@
     bitCount: 1
   - name: Shield Damage
     bitCount: 7
-  - name: Hit Sound Effect
-    bitCount: 8
-  - name: Hurtbox Interaction
-    bitCount: 2
+  - name: Hit SFX Severity
+    bitCount: 3
     enums:
-    - Nothing
-    - Aerial Only
-    - Grounded Only
-    - Both
+    - Weak
+    - Moderate
+    - Strong
+  - name: Hit SFX Kind
+    bitCount: 5
+    enums:
+    - None
+    - NHit (Punch)
+    - MHit (Kick)
+    - SwdHit (Sword)
+    - SJP_Hit (Super Jump/Coin)
+    - MHit+Bat
+    - Harisen (Fan)
+    - EleHit (Electric)
+    - FireHit (Fire)
+    - Nage_Kamu (Yoshi Chew)
+    - KameKr_Hit (Shell Hit)
+    - GHit (Energy)
+    - Peach_Item (Pan, Club, Racket)
+    - IceHit (Bat)
+    - Empty
+    - Empty
+  - name: Hit Grounded Fighters
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Hit Aerial Fighters
+    bitCount: 1
+    enums:
+    - false
+    - true
 
 - code: 12
   name: Adjust Hitbox Damage
