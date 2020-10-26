@@ -2,6 +2,8 @@
 using System;
 using HSDRaw.Common;
 using OpenTK;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace HSDRawViewer.Rendering
 {
@@ -32,6 +34,10 @@ namespace HSDRawViewer.Rendering
             foreach (var j in joints)
             {
                 var key = j.GetKey(frame / 60f);
+                if (key == null)
+                {
+                    continue;
+                }
 
                 if (j.TrackFlag.HasFlag(MOT_FLAGS.TRANSLATE))
                 {
@@ -88,16 +94,41 @@ namespace HSDRawViewer.Rendering
         public override void Trim(int startFrame, int endFrame)
         {
             FrameCount = endFrame - startFrame;
+            _motFile.EndTime = 0f;
             foreach (var j in _motFile.Joints)
             {
-                j.Keys = j.Keys.FindAll(k => k.Time >= startFrame / 60f && k.Time < endFrame / 60f);
+                var startKey = j.GetKey(startFrame / 60f);
+                var endKey = j.GetKey(endFrame / 60f);
+                var middleKeys = j.Keys.FindAll(k => k.Time >= startFrame / 60f && k.Time <= endFrame / 60f);
+
+                j.Keys = new List<MOT_KEY>();
+                if (middleKeys.Count == 0)
+                {
+                    j.Keys.Add(startKey);
+                    j.Keys.Add(endKey);
+                } else
+                {
+                    if (middleKeys[0].Time - startKey.Time > 0.001)
+                    {
+                        j.Keys.Add(startKey);
+                    }
+
+                    j.Keys.AddRange(middleKeys);
+
+                    if (endKey.Time - middleKeys[middleKeys.Count - 1].Time > 0.001)
+                    {
+                        j.Keys.Add(endKey);
+                    }
+                }
+
+                Debug.Assert(j.Keys.Count > 0);
                 foreach (var k in j.Keys)
                 {
                     k.Time -= startFrame / 60f;
                 }
-                j.MaxTime = FrameCount / 60f;
+                j.MaxTime = j.Keys[j.Keys.Count - 1].Time;
+                _motFile.EndTime = Math.Max(_motFile.EndTime, j.MaxTime);
             }
-            _motFile.EndTime = FrameCount / 60f;
         }
 
         public MOT_FILE GetMOT()
