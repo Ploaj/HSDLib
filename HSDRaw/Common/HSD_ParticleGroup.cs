@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.Common
+﻿using System;
+
+namespace HSDRaw.Common
 {
     public class HSD_ParticleGroup : HSDAccessor
     {
@@ -84,6 +86,40 @@
         Sphere
     }
 
+    [Flags]
+    public enum ParticleKind : uint
+    {
+        None        = 0x00000000,
+        Gravity     = 0x00000001,
+        Friction    = 0x00000002,
+        Tornado     = 0x00000004,
+        Bit4        = 0x00000008,
+        ComTLUT     = 0x00000010,
+        MirrorS     = 0x00000020,
+        MirrorT     = 0x00000040,
+        PrimEnv     = 0x00000080,
+        IMMRND      = 0x00000100,
+        // interpolation type
+        ExecPause   = 0x00000800,
+        //
+        PNTJOBJ     = 0x00008000,
+        BillboardG  = 0x00010000,
+        BillboardA  = 0x00020000,
+        FlipS       = 0x00040000,
+        FlipT       = 0x00080000,
+        Trail       = 0x00100000,
+        DirVec      = 0x00200000,
+        // blend
+        Fog         = 0x01000000,
+        Bit26       = 0x02000000,
+        Bit27       = 0x04000000,
+        Bit28       = 0x08000000,
+        Bit29       = 0x10000000,
+        Bit30       = 0x20000000,
+        Point       = 0x40000000,
+        Lighting    = 0x80000000
+    }
+
     public class HSD_Particle : HSDAccessor
     {
         public ParticleType Type { get => (ParticleType)_s.GetInt16(0x00); set => _s.SetInt16(0x00, (short)value); }
@@ -94,7 +130,14 @@
 
         public short Life { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
 
-        public int Kind { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+        private int _kind { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+
+        public ParticleKind Kind { get => (ParticleKind)_kind; set => _kind = (int)value; }
+
+        public int JobjNumber
+        {
+            get => (_kind >> 13) & 0x7;
+        }
 
         public float Gravity { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
 

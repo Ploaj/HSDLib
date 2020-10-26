@@ -61,6 +61,8 @@ namespace HSDRaw.MEX
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> EndMovieFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x68); set => _s.SetReference(0x68, value); }
 
+        public HSDArrayAccessor<HSD_Int> RaceToFinishTimeLimits { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x6C); set => _s.SetReference(0x6C, value); }
+
         //public HSDArrayAccessor<HSD_UShort> AdventureTrophyLookup { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x5C); set => _s.SetReference(0x5C, value); }
 
     }

@@ -130,8 +130,11 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Target Test Stage"), Category("3 - Misc"), Description("")]
         public int TargetTestStage { get; set; }
 
-        [DisplayName("Adventure Trophy Index"), Category("3 - Misc"), Description("")]
-        public short AdventureTrophyLookup { get; set; }
+        [DisplayName("Race to the Finish Time"), Category("3 - Misc"), Description("")]
+        public int RacetoTheFinishTime { get; set; }
+
+        //[DisplayName("Adventure Trophy Index"), Category("3 - Misc"), Description("")]
+        //public short AdventureTrophyLookup { get; set; }
 
         [DisplayName("Result Screen Scale"), Category("3 - Misc"), Description("")]
         public float ResultScreenScale { get; set; }
@@ -145,11 +148,11 @@ namespace HSDRawViewer.GUI.MEX
         [DisplayName("Victory Theme"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
         public int VictoryThemeID { get; set; }
 
-        [DisplayName("Fighter Song"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
-        public int FighterSongID { get; set; }
+        [DisplayName("Fighter Song 1"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
+        public int FighterSongID1 { get; set; }
 
-        [DisplayName("Fighter Song Unknown Value"), Category("3 - Misc"), Description("")]
-        public byte UnknownFighterSongValue { get; set; }
+        [DisplayName("Fighter Song 2"), Category("3 - Misc"), Description(""), TypeConverter(typeof(MusicIDConverter))]
+        public int FighterSongID2 { get; set; }
 
         [DisplayName("Effect File"), Category("3 - Misc"), Description(""), TypeConverter(typeof(EffectIDConverter))]
         public int EffectIndex { get; set; }
@@ -320,8 +323,8 @@ namespace HSDRawViewer.GUI.MEX
             }
 
             VictoryThemeID = fd.VictoryThemeIDs[externalID].Value;
-            FighterSongID = fd.FighterSongIDs[externalID].SongID;
-            UnknownFighterSongValue = fd.FighterSongIDs[externalID].Unknown;
+            FighterSongID1 = fd.FighterSongIDs[externalID].SongID1;
+            FighterSongID2 = fd.FighterSongIDs[externalID].SongID2;
 
             if (!IsSpecialCharacterExternal(mexData, externalID))
             {
@@ -331,6 +334,7 @@ namespace HSDRawViewer.GUI.MEX
 
                 ResultScreenScale = fd.ResultScale[externalID].Value;
                 TargetTestStage = fd.TargetTestStageLookups[externalID].Value;
+                RacetoTheFinishTime = fd.RaceToFinishTimeLimits[externalID].Value;
                 DemoFile = fd.VIFiles[externalID].Value;
 
                 EndClassicFile = fd.EndClassicFiles[externalID].Value;
@@ -441,8 +445,8 @@ namespace HSDRawViewer.GUI.MEX
             fd.VictoryThemeIDs.Set(externalID, new HSD_Int() { Value = VictoryThemeID });
             fd.FighterSongIDs.Set(externalID, new MEX_FighterSongID()
             {
-                SongID = (short)FighterSongID,
-                Unknown = UnknownFighterSongValue
+                SongID1 = (short)FighterSongID1,
+                SongID2 = (short)FighterSongID2
             }
             );
 
@@ -458,6 +462,7 @@ namespace HSDRawViewer.GUI.MEX
 
                 fd.ResultScale.Set(externalID, new HSD_Float() { Value = ResultScreenScale });
                 fd.TargetTestStageLookups.Set(externalID, new HSD_UShort() { Value = (ushort)TargetTestStage });
+                fd.RaceToFinishTimeLimits.Set(externalID, new HSD_Int() { Value = RacetoTheFinishTime });
                 fd.VIFiles.Set(externalID, new HSD_String() { Value = DemoFile });
 
                 fd.EndClassicFiles.Set(externalID, new HSD_String() { Value = EndClassicFile });
