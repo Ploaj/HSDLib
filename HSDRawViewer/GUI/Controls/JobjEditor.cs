@@ -742,7 +742,7 @@ namespace HSDRawViewer.GUI.Plugins
                 }
                 else
                 if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta") ||
-                    Path.GetExtension(f).ToLower().Equals(".xml"))
+                    (Path.GetExtension(f).ToLower().Equals(".xml") && MOT_FILE.IsMotXML(f)))
                 {
                     var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");
 

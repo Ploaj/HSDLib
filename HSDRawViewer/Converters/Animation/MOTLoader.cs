@@ -93,6 +93,28 @@ namespace HSDRawViewer.Converters
 
         public List<MOT_JOINT> Joints = new List<MOT_JOINT>();
 
+        public static bool IsMotXML(string filePath)
+        {
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.IgnoreWhitespace = true;
+            using (XmlReader r = XmlReader.Create(filePath, settings))
+                while (r.Read())
+                {
+                    switch (r.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                        {
+                            if (r.Name == "MOT")
+                            {
+                                return true;
+                            }
+                        } break;
+                    }
+                }
+
+            return false;
+        }
+
         public MOT_FILE()
         {
 
