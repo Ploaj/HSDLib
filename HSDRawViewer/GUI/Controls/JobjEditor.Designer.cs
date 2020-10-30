@@ -71,6 +71,7 @@
             this.asFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asAnimJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asMotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.asXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -448,14 +449,14 @@
             this.importAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.importAnimationToolStripMenuItem.Text = "Import Animation";
             this.importAnimationToolStripMenuItem.Click += new System.EventHandler(this.importFromFileToolStripMenuItem_Click);
-            // 
             // exportAnimationToolStripMenuItem
             // 
             this.exportAnimationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.asMayaANIMToolStripMenuItem,
             this.asFigatreeToolStripMenuItem,
             this.asAnimJointToolStripMenuItem,
-            this.asMotToolStripMenuItem});
+            this.asMotToolStripMenuItem,
+            this.asXMLToolStripMenuItem});
             this.exportAnimationToolStripMenuItem.Name = "exportAnimationToolStripMenuItem";
             this.exportAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.exportAnimationToolStripMenuItem.Text = "Export Animation";
@@ -487,6 +488,13 @@
             this.asMotToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.asMotToolStripMenuItem.Text = "As MOT";
             this.asMotToolStripMenuItem.Click += new System.EventHandler(this.motToolStripMenuItem_Click);
+            //
+            // asXMLToolStripMenuItem
+            //
+            this.asXMLToolStripMenuItem.Name = "asXMLToolStripMenuItem";
+            this.asXMLToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.asXMLToolStripMenuItem.Text = "As XML";
+            this.asXMLToolStripMenuItem.Click += new System.EventHandler(this.xmlToolStripMenuItem_Click);
             // 
             // createAnimationToolStripMenuItem
             // 
@@ -731,6 +739,7 @@
         private System.Windows.Forms.ToolStripMenuItem asFigatreeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem asAnimJointToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem asMotToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem asXMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
         private System.Windows.Forms.ToolStripDropDownButton renderDropDown;
