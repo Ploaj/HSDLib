@@ -26,8 +26,7 @@ namespace HSDRawViewer.GUI.MEX
         public MEX_Stage Stage = new MEX_Stage();
         public MEX_StageReverb Reverb = new MEX_StageReverb();
         public MEX_StageCollision Collision = new MEX_StageCollision();
-
-        public MEX_EffectTypeLookup EffectLookup = new MEX_EffectTypeLookup();
+        
         public MEX_ItemLookup ItemLookup = new MEX_ItemLookup();
         public MEXPlaylistEntry[] Playlist = new MEXPlaylistEntry[0];
 

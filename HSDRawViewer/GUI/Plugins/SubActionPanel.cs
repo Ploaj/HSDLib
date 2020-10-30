@@ -406,6 +406,16 @@ namespace HSDRawViewer.GUI.Plugins
             Text = BitConverter.ToSingle(BitConverter.GetBytes(value), 0).ToString();
         }
 
+        public void SetFloatValue(float value)
+        {
+            FloatValue = value;
+        }
+
+        public float GetFloatValue()
+        {
+            return FloatValue;
+        }
+
         public long GetValue()
         {
             return BitConverter.ToInt32(BitConverter.GetBytes(FloatValue), 0);

@@ -21,7 +21,7 @@ namespace HSDRawViewer.ContextMenus
                         var file = new HSDRaw.HSDRawFile(f);
                         var mod = root.Particles;
                         Array.Resize(ref mod, mod.Length + 1);
-                        mod[mod.Length - 1] = new HSD_Particle()
+                        mod[mod.Length - 1] = new HSD_ParticleGenerator()
                         {
                             _s = file.Roots[0].Data._s
                         };

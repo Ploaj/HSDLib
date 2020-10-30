@@ -1,0 +1,545 @@
+﻿- code: 0x00
+  range: 1
+  name: Wait
+  description: 
+  paramDesc: s
+  params:
+  - Frames
+
+- code: 0x40
+  range: 1
+  name: Unknown0x40
+  description: 
+  paramDesc: b
+  params:
+  - Unknown
+
+- code: 0x80
+  range: 8
+  name: Set Position
+  description: 
+  paramDesc: fff
+  params:
+  - X
+  - Y
+  - Z
+
+- code: 0x88
+  range: 8
+  name: Add Position
+  description: 
+  paramDesc: fff
+  params:
+  - X
+  - Y
+  - Z
+  
+- code: 0x90
+  range: 8
+  name: Set Velocity
+  description: 
+  paramDesc: fff
+  params:
+  - X
+  - Y
+  - Z
+
+- code: 0x98
+  range: 8
+  name: Add Velocity
+  description: 
+  paramDesc: fff
+  params:
+  - X
+  - Y
+  - Z
+  
+- code: 0xA0
+  range: 1
+  name: Set Size Count and Target
+  description: 
+  paramDesc: sf
+  params:
+  - Size Count
+  - Size Target
+  
+- code: 0xA1
+  range: 1
+  name: Disable Display Textures
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xA2
+  range: 1
+  name: Set Gravity
+  description: 
+  paramDesc: f
+  params:
+  - Value
+  
+- code: 0xA3
+  range: 1
+  name: Set Friction
+  description: 
+  paramDesc: f
+  params:
+  - Value
+  
+- code: 0xA4
+  range: 1
+  name: Create new particle
+  description: 
+  paramDesc: bb
+  params:
+  - bank id
+  - particle id
+  
+- code: 0xA5
+  range: 1
+  name: Create new generator
+  description: 
+  paramDesc: bb
+  params:
+  - bank id
+  - particle id
+  
+- code: 0xA6
+  range: 1
+  name: Set Life
+  description: 
+  paramDesc: ss
+  params:
+  - Value
+  - Random Range
+  
+- code: 0xA7
+  range: 1
+  name: Chance to destroy out of 100
+  description: 
+  paramDesc: b
+  params:
+  - Chance
+  
+- code: 0xA8
+  range: 1
+  name: Randomize Position
+  description: 
+  paramDesc: fff
+  params:
+  - X
+  - Y
+  - Z
+  
+- code: 0xA9
+  range: 1
+  name: Randomize Velocity
+  description: 
+  paramDesc: f
+  params:
+  - Value
+  
+- code: 0xAA
+  range: 1
+  name: Clone Particle
+  description: 
+  paramDesc: ss
+  params:
+  - unknown 1
+  - unknown 2
+  
+- code: 0xAB
+  range: 1
+  name: Multiply Velocity
+  description: 
+  paramDesc: f
+  params:
+  - Value
+  
+- code: 0xAC
+  range: 1
+  name: Size Count and Target Range
+  description: 
+  paramDesc: sff
+  params:
+  - Size Count
+  - Target Value
+  - Target Range
+  
+- code: 0xAD
+  range: 1
+  name: Enable PrimEnv
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xAE
+  range: 1
+  name: Disable PrimEnv
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xAF
+  range: 1
+  name: Set MirrorS
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xB0
+  range: 1
+  name: Set MirrorT
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xB1
+  range: 1
+  name: Set MirrorS and MirrorT
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xB2
+  range: 1
+  name: Remove Particle if gen is present
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xB3
+  range: 1
+  name: Ambient Color Remain?
+  description: 
+  paramDesc: sbs
+  params:
+  - unknown 1
+  - unknown 2
+  - unknown 3
+  
+- code: 0xB4
+  range: 1
+  name: Use Linear Interpolation
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xB5
+  range: 1
+  name: Use Near Interpolation
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xB6
+  range: 1
+  name: Set Rotate Count and Target
+  description: 
+  paramDesc: sf
+  params:
+  - Count Value
+  - Target Value
+  
+- code: 0xB7
+  range: 1
+  name: Jobj Scale and Particle Velocity?
+  description: 
+  paramDesc: b
+  params:
+  - Jobj Index
+  
+- code: 0xB8
+  range: 1
+  name: Edits Jobj Scale?
+  description: 
+  paramDesc: bff
+  params:
+  - Jobj Index
+  - unknown 2
+  - unknown 3
+  
+- code: 0xB9
+  range: 1
+  name: Creates Particle?
+  description: 
+  paramDesc: bb
+  params:
+  - Particle Index
+  - Particle ID
+  
+- code: 0xBA
+  range: 1
+  name: Randomize Prim Col Remain?
+  description: 
+  paramDesc: bbbb
+  params:
+  - unknown 1
+  - unknown 2
+  - unknown 3
+  - unknown 3
+  
+- code: 0xBB
+  range: 1
+  name: Randomize Prim Col Target?
+  description: 
+  paramDesc: bbbb
+  params:
+  - unknown 1
+  - unknown 2
+  - unknown 3
+  - unknown 3
+  
+- code: 0xBC
+  range: 1
+  name: Random PoseNum
+  description: 
+  paramDesc: bb
+  params:
+  - Base Value
+  - Random Range
+  
+- code: 0xBD
+  range: 1
+  name: Randomize Velocity?
+  description: 
+  paramDesc: ff
+  params:
+  - unknown 1
+  - unknown 2
+  
+- code: 0xBE
+  range: 1
+  name: Randomize Gravity
+  description: 
+  paramDesc: fff
+  params:
+  - X
+  - Y
+  - Z
+  
+- code: 0xBF
+  range: 1
+  name: Set PNTJOBJ
+  description: 
+  paramDesc: b
+  params:
+  - PNTJOBJ value
+  
+- code: 0xC0
+  range: 16
+  name: Set Prim Color
+  description: 
+  paramDesc: sbbbb
+  params:
+  - unknown 1
+  - R
+  - G
+  - B
+  - A
+  
+- code: 0xD0
+  range: 16
+  name: Set Env Color
+  description: 
+  paramDesc: sbbbb
+  params:
+  - unknown 1
+  - R
+  - G
+  - B
+  - A
+  
+- code: 0xE0
+  range: 1
+  name: Random Remain
+  description: 
+  paramDesc: bbbb
+  params:
+  - PrimColrRemain 1
+  - PrimColrRemain 2
+  - EnvColrRemain 1
+  - EnvColrRemain 2
+  
+- code: 0xE1
+  range: 1
+  name: Set User Data
+  description: 
+  paramDesc: b
+  params:
+  - unknown
+  
+- code: 0xE2
+  range: 1
+  name: Set Bit 4 in Kind
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xE3
+  range: 1
+  name: Set PalNum
+  description: 
+  paramDesc: b
+  params:
+  - Value
+  
+- code: 0xE4
+  range: 1
+  name: FlipS
+  description: 
+  paramDesc: b
+  params:
+  - Style (0 = none 1 = FlipS 2 = Toggle 3 = Randomize)
+  
+- code: 0xE5
+  range: 1
+  name: FlipT
+  description: 
+  paramDesc: b
+  params:
+  - Style (0 = none 1 = FlipS 2 = Toggle 3 = Randomize)
+  
+- code: 0xE6
+  range: 1
+  name: Enable DirVec
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xE7
+  range: 1
+  name: Disable DirVec
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xE8
+  range: 1
+  name: Particle Trail Toggle?
+  description: 
+  paramDesc: f
+  params:
+  - unknown
+  
+- code: 0xE9
+  range: 1
+  name: Unknown 0xE9
+  description: 
+  paramDesc: bb
+  params:
+  - unknown
+  - unknown
+  
+- code: 0xEA
+  range: 1
+  name: Unknown 0xEA
+  description: 
+  paramDesc: sbb
+  params:
+  - MatColCount Value
+  - unknown
+  - unknown
+  
+- code: 0xEB
+  range: 1
+  name: Unknown 0xEB
+  description: 
+  paramDesc: sbb
+  params:
+  - AmbColCount Value
+  - unknown
+  - unknown
+  
+- code: 0xEC
+  range: 1
+  name: Set AppSRT Value
+  description: 
+  paramDesc: bf
+  params:
+  - SRT Index
+  - Value
+  
+- code: 0xED
+  range: 2
+  name: Set Rotate and Rotate Target
+  description: 
+  paramDesc: ffb
+  params:
+  - unknown
+  - unknown
+  - unknown
+  
+- code: 0xEF
+  range: 1
+  name: Unknown 0xEF
+  description: 
+  paramDesc: sb
+  params:
+  - unknown
+  - unknown
+  
+- code: 0xF0
+  range: 1
+  name: Unknown 0xf0
+  description: 
+  paramDesc: sb
+  params:
+  - unknown
+  - unknown
+  
+- code: 0xF1
+  range: 1
+  name: Unknown 0xF1
+  description: 
+  paramDesc: sbb
+  params:
+  - unknown
+  - unknown
+  - unknown
+  
+- code: 0xF2
+  range: 8
+  name: Unknown 0xF2
+  description: 
+  paramDesc: sbb
+  params:
+  - unknown
+  - unknown
+  - unknown
+  
+- code: 0xFA
+  range: 1
+  name: Set Loop
+  description: 
+  paramDesc: b
+  params:
+  - Loop Amt
+  
+- code: 0xFB
+  range: 1
+  name: Execute Loop
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xFC
+  range: 1
+  name: Set Mark Pointer
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xFD
+  range: 1
+  name: Goto Mark Pointer
+  description: 
+  paramDesc: 
+  params:
+  
+- code: 0xFE
+  range: 2
+  name: Exit
+  description: 
+  paramDesc: 
+  params:

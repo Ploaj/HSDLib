@@ -180,11 +180,23 @@
     <Compile Include="GUI\MEX\Controls\MEXStockIconControl.Designer.cs">
       <DependentUpon>MEXStockIconControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Plugins\ParticleGenEditorPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\ParticleGenEditorPanel.Designer.cs">
+      <DependentUpon>ParticleGenEditorPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\MEXStockIconEditor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\Plugins\MEXStockIconEditor.Designer.cs">
       <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\ParticleGenEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\ParticleGenEditor.Designer.cs">
+      <DependentUpon>ParticleGenEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -504,8 +516,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Sound\SSM.cs" />
+    <Compile Include="Tools\ParticleManager.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
     <None Include="Melee\command_color.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Melee\ptcl.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\melee_font.png" />
@@ -549,6 +565,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\MEXStockIconEditor.resx">
       <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\ParticleGenEditor.resx">
+      <DependentUpon>ParticleGenEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\ParticleGenEditorPanel.resx">
+      <DependentUpon>ParticleGenEditorPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

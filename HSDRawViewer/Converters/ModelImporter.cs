@@ -67,13 +67,13 @@ namespace HSDRawViewer.Converters
 
 
 
-        [Category("Material Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("")]
+        [Category("Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("")]
         public bool ImportVertexColor { get; set; } = false;
 
-        [Category("Material Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha color from vertex colors")]
+        [Category("Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha color from vertex colors")]
         public bool ImportVertexAlpha { get; set; } = false;
 
-        [Category("Material Vertex Color Options"), DisplayName("Multiply by 2"), Description("Multiplies vertex colors by 2")]
+        [Category("Vertex Color Options"), DisplayName("Multiply by 2"), Description("Multiplies vertex colors by 2")]
         public bool MultiplyVertexColorBy2 { get; set; } = false;
 
 

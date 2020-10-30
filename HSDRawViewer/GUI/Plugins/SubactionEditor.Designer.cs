@@ -74,9 +74,9 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
@@ -538,16 +538,6 @@
             this.clearAllActionsToolStripMenuItem.Text = "Clear All Action\'s Scripts";
             this.clearAllActionsToolStripMenuItem.Click += new System.EventHandler(this.clearAllActionsToolStripMenuItem_Click);
             // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.propertyGrid1.HelpVisible = false;
-            this.propertyGrid1.Location = new System.Drawing.Point(3, 262);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(191, 174);
-            this.propertyGrid1.TabIndex = 10;
-            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
-            // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
@@ -559,6 +549,16 @@
             this.toolStripMenuItem1.Size = new System.Drawing.Size(218, 22);
             this.toolStripMenuItem1.Text = "Export to Text";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.propertyGrid1.HelpVisible = false;
+            this.propertyGrid1.Location = new System.Drawing.Point(3, 262);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(191, 174);
+            this.propertyGrid1.TabIndex = 10;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
             // SubactionEditor
             // 

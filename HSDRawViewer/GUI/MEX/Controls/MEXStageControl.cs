@@ -89,7 +89,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     Reverb = data.StageData.ReverbTable[i],
                     Collision = data.StageData.CollisionTable[i],
                     ItemLookup = data.StageData.StageItemLookup[i],
-                    EffectLookup = data.StageData.StageEffectLookup[i],
                 };
                 if (data.StageData.StagePlaylists[i] != null && data.StageData.StagePlaylists[i].MenuPlayListCount > 0)
                 {
@@ -113,7 +112,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             data.StageData.ReverbTable.Array = StageEntries.Select(e => e.Reverb).ToArray();
             data.StageData.CollisionTable.Array = StageEntries.Select(e => e.Collision).ToArray();
             data.StageData.StageItemLookup.Array = StageEntries.Select(e => e.ItemLookup).ToArray();
-            data.StageData.StageEffectLookup.Array = StageEntries.Select(e => e.EffectLookup).ToArray();
+            //data.StageData.StageEffectLookup.Array = StageEntries.Select(e => e.EffectLookup).ToArray();
             data.StageData.StagePlaylists.Array = StageEntries.Select(e => e.GetPlaylist()).ToArray();
 
             data.StageData.StageIDTable.Array = StageIDs.Select(e => e.IDTable).ToArray();

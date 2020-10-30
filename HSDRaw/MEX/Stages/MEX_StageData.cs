@@ -15,7 +15,7 @@ namespace HSDRaw.MEX.Stages
 
         public HSDArrayAccessor<MEX_ItemLookup> StageItemLookup { get => _s.GetReference<HSDArrayAccessor<MEX_ItemLookup>>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public HSDArrayAccessor<MEX_EffectTypeLookup> StageEffectLookup { get => _s.GetReference<HSDArrayAccessor<MEX_EffectTypeLookup>>(0x10); set => _s.SetReference(0x10, value); }
+        //public HSDArrayAccessor<MEX_EffectTypeLookup> StageEffectLookup { get => _s.GetReference<HSDArrayAccessor<MEX_EffectTypeLookup>>(0x10); set => _s.SetReference(0x10, value); }
 
         public HSDArrayAccessor<MEX_Playlist> StagePlaylists { get => _s.GetReference<HSDArrayAccessor<MEX_Playlist>>(0x14); set => _s.SetReference(0x14, value); }
 

@@ -33,7 +33,120 @@ namespace HSDRaw.Tools
                 CodeRange = coderange;
                 Parameters = parameters.ToCharArray();
             }
-            
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="code"></param>
+            /// <param name="r"></param>
+            /// <returns></returns>
+            public void Encode(byte code, object[] p, BinaryWriterExt w)
+            {
+                if(Parameters.Length != p.Length 
+                    && (code & 0xF0) != 0xC0 
+                    && (code & 0xF0) != 0xD0
+                    && (code & 0xF8) != 0x80
+                    && (code & 0xF8) != 0x88
+                    && (code & 0xF8) != 0x90
+                    && (code & 0xF8) != 0x98)
+                    throw new ArgumentOutOfRangeException($"Op Code 0x{code.ToString("X")} expected {Parameters.Length} argument(s) and recieved {p.Length}");
+
+                var codepos = w.BaseStream.Position;
+                w.Write((byte)0);
+
+                for (int i = 0; i < Parameters.Length; i++)
+                {
+                    var k = Parameters[i];
+
+                    switch (k)
+                    {
+                        case 'e':
+                            {
+                                var param = (short)p[i];
+
+                                if(param >= 0x80)
+                                {
+                                    w.Write((byte)(((param >> 8) & 0x7F) | 0x80));
+                                    w.Write((byte)(param & 0xFF));
+                                }
+                                else
+                                {
+                                    w.Write((byte)param);
+                                }
+                            }
+                            break;
+                        case 'b':
+                            w.Write((byte)p[i]);
+                            break;
+                        case 'f':
+                            w.Write((float)p[i]);
+                            break;
+                        case 's':
+                            w.Write((short)p[i]);
+                            break;
+                        case 'c':
+                            {
+                                byte param_count = 0;
+
+                                for (int j = 0; j < p.Length; j++)
+                                    param_count |= (byte)(1 << j);
+
+                                code = ((byte)((code & 0xF0) | param_count));
+                                for (int j = 1; j < p.Length; j++)
+                                    w.Write((byte)p[j]);
+                            }
+                            break;
+                        case 'p':
+                        case 'v':
+                            {
+                                byte param_count = 0;
+
+                                for (int j = 0; j < p.Length; j++)
+                                    param_count |= (byte)(1 << j);
+
+                                code = ((byte)((code & 0xF8) | param_count));
+                                for (int j = 0; j < p.Length; j++)
+                                    w.Write((float)p[j]);
+                            }
+                            break;
+                        case 'r':
+                            {
+                                var beh = 0;
+
+                                if ((bool)p[0])
+                                    beh |= 0x10;
+
+                                if ((bool)p[1])
+                                    beh |= 0x20;
+
+                                byte param_count = 0;
+
+                                for (int j = 0; j < p.Length - 3; j++)
+                                    param_count |= (byte)(1 << j);
+
+                                w.Write((byte)(beh | param_count));
+                                w.Write((byte)p[2]);
+
+                                for (int j = 3; j < p.Length; j++)
+                                    w.Write((byte)p[j]);
+                            }
+                            break;
+                        case 'm':
+                            {
+                                w.Write((byte)0x09);
+                                w.Write((byte)p[0]);
+                                w.Write((byte)p[0]);
+                            }
+                            break;
+                    }
+                }
+                
+                var temp = w.BaseStream.Position;
+                w.Seek((uint)codepos);
+                w.Write(code);
+                w.Seek((uint)temp);
+            }
+
             /// <summary>
             /// 
             /// </summary>
@@ -55,7 +168,7 @@ namespace HSDRaw.Tools
                             if((e & 0x80) > 0)
                                 e = ((e & 0x7F) << 8 | r.ReadByte());
 
-                            output.Add(e);
+                            output.Add((short)e);
                             break;
                         case 'b':
                             output.Add(r.ReadByte());
@@ -77,6 +190,70 @@ namespace HSDRaw.Tools
                                         output.Add(r.ReadByte());
                             }
                             break;
+                        case 'p':
+                        case 'v':
+                            {
+                                if ((code & 0x01) != 0)
+                                    output.Add(r.ReadSingle());
+                                else
+                                    output.Add(0);
+
+                                if ((code & 0x02) != 0)
+                                    output.Add(r.ReadSingle());
+                                else
+                                    output.Add(0);
+
+                                if ((code & 0x04) != 0)
+                                    output.Add(r.ReadSingle());
+                                else
+                                    output.Add(0);
+                            }
+                            break;
+                        case 'r':
+                            {
+                                var behavior = r.ReadByte();
+
+                                output.Add((behavior & 0x10) != 0);
+                                output.Add((behavior & 0x20) != 0);
+
+                                output.Add(r.ReadByte());
+
+                                if ((behavior & 0x01) != 0)
+                                    output.Add(r.ReadByte());
+                                else
+                                    output.Add(0);
+
+                                if ((behavior & 0x02) != 0)
+                                    output.Add(r.ReadByte());
+                                else
+                                    output.Add(0);
+
+                                if ((behavior & 0x04) != 0)
+                                    output.Add(r.ReadByte());
+                                else
+                                    output.Add(0);
+
+                                if ((behavior & 0x08) != 0)
+                                    output.Add(r.ReadByte());
+                                else
+                                    output.Add(0);
+                            }
+                            break;
+                        case 'm':
+                            {
+                                var behavior = r.ReadByte();
+
+                                if ((behavior & 0x01) != 0)
+                                    output.Add(r.ReadByte());
+                                else
+                                    output.Add(0);
+
+                                if ((behavior & 0x08) != 0)
+                                    output.Add(r.ReadByte());
+                                else
+                                    output.Add(0);
+                            }
+                            break;
                     }
                 }
 
@@ -89,11 +266,10 @@ namespace HSDRaw.Tools
         /// </summary>
         private static readonly ParticleOpCode[] OpCodes = new ParticleOpCode[]
         {
-            new ParticleOpCode(0x00, 32, "w"),
-            new ParticleOpCode(0x80, 7, "p"),
-            new ParticleOpCode(0x88, 7, "p"),
-            new ParticleOpCode(0x90, 7, "v"),
-            new ParticleOpCode(0x98, 7, "v"),
+            new ParticleOpCode(0x80, 8, "p"),
+            new ParticleOpCode(0x88, 8, "p"),
+            new ParticleOpCode(0x90, 8, "v"),
+            new ParticleOpCode(0x98, 8, "v"),
             new ParticleOpCode(0xA0, 1, "ef"),
             new ParticleOpCode(0xA1, 1, ""),
             new ParticleOpCode(0xA2, 1, "f"),
@@ -144,8 +320,8 @@ namespace HSDRaw.Tools
             new ParticleOpCode(0xED, 2, "ffb"),
             new ParticleOpCode(0xEF, 1, "sb"),
             new ParticleOpCode(0xF0, 1, "sb"),
-            new ParticleOpCode(0xF1, 1, "s"),
-            new ParticleOpCode(0xF2, 8, "?"),
+            new ParticleOpCode(0xF1, 1, "sm"),
+            new ParticleOpCode(0xF2, 8, "sm"),
             new ParticleOpCode(0xFA, 1, "b"),
             new ParticleOpCode(0xFB, 1, ""),
             new ParticleOpCode(0xFC, 1, ""),
@@ -168,6 +344,79 @@ namespace HSDRaw.Tools
             return null;
         }
 
+        /*
+         * 
+            new ParticleOpCode(0x00, 31, "w"),
+            new ParticleOpCode(0x20, 1, "s"), // idk
+            new ParticleOpCode(0x40, 1, "b"), // interpolation type
+         */
+         
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <returns></returns>
+        public static byte[] EncodeParticleCodes(IEnumerable<Tuple<byte, object[]>> codes)
+        {
+            // process data
+            using (MemoryStream stream = new MemoryStream())
+            using (BinaryWriterExt w = new BinaryWriterExt(stream))
+            {
+                w.BigEndian = true;
+                
+                foreach(var c in codes)
+                {
+                    var code = c.Item1;
+                    var p = c.Item2;
+
+                    if(code == 0x00)
+                    {
+                        if (p.Length != 1)
+                            throw new ArgumentOutOfRangeException($"Op Code 0x{code.ToString("X")} expected 1 argument(s) and recieved {p.Length}");
+
+                        var wait = (short)p[0];
+
+                        if (wait >= 0x2000)
+                        {
+                            throw new IndexOutOfRangeException("Particle can only wait 8192 frames");
+                        }
+                        if (wait > 31)
+                        {
+                            w.Write((byte)((wait >> 8) | 0x20));
+                            w.Write((byte)wait);
+                        }
+                        else
+                            w.Write((byte)wait);
+                    }
+                    else
+                    if(code == 0x40)
+                    {
+                        w.Write(0x40);
+                        w.Write((byte)p[0]);
+                    }
+                    else
+                    {
+                        // get descriptor
+                        var opcode = GetOpCode(code);
+
+                        // op code not found
+                        if (opcode == null)
+                            throw new NotSupportedException("Unknown op code 0x" + code.ToString("X"));
+
+                        // process code
+                        opcode.Encode(code, p, w);
+
+                        // terminate script
+                        if (code == 0xFF || code == 0xFE || code == 0xFD)
+                            break;
+                    }
+                }
+
+                return stream.ToArray();
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -187,18 +436,31 @@ namespace HSDRaw.Tools
                     // read code
                     var code = r.ReadByte();
 
+                    if(code < 128)
+                    {
+                        var wait = code & 0x1F;
+                        if ((code & 0x20) != 0)
+                            wait = (wait << 8) | r.ReadByte();
+                        output.Add(new Tuple<byte, object[]>(0x00, new object[] { (short)wait }));
+
+                        if ((code & 0xC0) == 0x40)
+                            output.Add(new Tuple<byte, object[]>(0x40, new object[] { r.ReadByte()}));
+
+                        continue;
+                    }
+
                     // get descriptor
                     var opcode = GetOpCode(code);
 
                     // op code not found
                     if (opcode == null)
                         throw new NotSupportedException("Unknown op code 0x" + code.ToString("X"));
-
+                    
                     // process code
                     output.Add(new Tuple<byte, object[]>(code, opcode.Decode(code, r)));
 
                     // terminate script
-                    if (code == 0xFF || code == 0xFE)
+                    if (code == 0xFF || code == 0xFE || code == 0xFD)
                         break;
                 }
             }

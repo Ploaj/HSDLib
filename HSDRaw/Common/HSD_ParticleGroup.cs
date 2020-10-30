@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace HSDRaw.Common
 {
@@ -12,24 +13,33 @@ namespace HSDRaw.Common
 
         public int ParticleCount { get => _s.GetInt32(0x08); internal set => _s.SetInt32(0x08, value); }
 
-        public HSD_Particle[] Particles
+        public HSD_ParticleGenerator[] Particles
         {
             get
             {
-                HSD_Particle[] p = new HSD_Particle[ParticleCount];
+                HSD_ParticleGenerator[] p = new HSD_ParticleGenerator[ParticleCount];
 
                 int prevSize = 0;
                 for(int i = 0; i < p.Length; i++)
                 {
                     var size = _s.GetInt32(0x0C + i * 4);
-                    if (i > 0)
+
+                    if(size == 0)
                     {
-                        p[i - 1] = new HSD_Particle();
-                        p[i - 1]._s = _s.GetEmbeddedStruct(prevSize, size - prevSize);
+                        p[i - 1] = null;
                     }
-                    prevSize = size;
+                    else
+                    {
+                        if (i > 0)
+                        {
+                            p[i - 1] = new HSD_ParticleGenerator();
+                            p[i - 1]._s = _s.GetEmbeddedStruct(prevSize, size - prevSize);
+                        }
+
+                        prevSize = size;
+                    }
                 }
-                p[p.Length - 1] = new HSD_Particle();
+                p[p.Length - 1] = new HSD_ParticleGenerator();
                 p[p.Length - 1]._s = _s.GetEmbeddedStruct(prevSize, _s.Length - prevSize);
 
                 return p;
@@ -44,12 +54,17 @@ namespace HSDRaw.Common
                 int i = 0;
                 foreach (var v in value)
                 {
-                    if (size % 0x8 != 0)
-                        size += 0x8 - (size % 0x8);
+                    if(v == null)
+                        _s.SetInt32(0x0C + 4 * i++, 0);
+                    else
+                    {
+                        if (size % 0x8 != 0)
+                            size += 0x8 - (size % 0x8);
 
-                    _s.SetInt32(0x0C + 4 * i++, size);
+                        _s.SetInt32(0x0C + 4 * i++, size);
 
-                    size += v._s.Length;
+                        size += v._s.Length;
+                    }
                 }
 
                 if (size % 0x8 != 0)
@@ -60,12 +75,15 @@ namespace HSDRaw.Common
                 size = 0x0C + 4 * value.Length;
                 foreach (var v in value)
                 {
-                    if (size % 0x8 != 0)
-                        size += 0x8 - (size % 0x8);
+                    if (v != null)
+                    {
+                        if (size % 0x8 != 0)
+                            size += 0x8 - (size % 0x8);
 
-                    _s.SetBytes(size, v._s.GetData());
+                        _s.SetBytes(size, v._s.GetData());
 
-                    size += v._s.Length;
+                        size += v._s.Length;
+                    }
                 }
 
                 ParticleCount = value.Length;
@@ -120,7 +138,7 @@ namespace HSDRaw.Common
         Lighting    = 0x80000000
     }
 
-    public class HSD_Particle : HSDAccessor
+    public class HSD_ParticleGenerator : HSDAccessor
     {
         public ParticleType Type { get => (ParticleType)_s.GetInt16(0x00); set => _s.SetInt16(0x00, (short)value); }
 
@@ -163,6 +181,7 @@ namespace HSDRaw.Common
 
         public float Param3 { get => _s.GetFloat(0x38); set => _s.SetFloat(0x38, value); }
 
+        [Browsable(false)]
         public byte[] TrackData
         {
             get
@@ -174,6 +193,17 @@ namespace HSDRaw.Common
                 _s.Resize(0x3C + value.Length);
                 _s.SetBytes(0x3C, value);
             }
+        }
+
+        public override void New()
+        {
+            _s = new HSDStruct(0x40);
+            TrackData = new byte[] { 0xFF };
+        }
+
+        public override string ToString()
+        {
+            return $"Particle {Type}";
         }
     }
 }
