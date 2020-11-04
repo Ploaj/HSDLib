@@ -456,8 +456,9 @@ namespace HSDRawViewer.Rendering
                     int coordType = (int)flags & 0xF;
                     int colorOP = ((int)flags >> 16) & 0xF;
                     int alphaOP = ((int)flags >> 20) & 0xF;
-                    
-                    shader.SetInt($"TEX{i}.tex", i);
+
+                    shader.SetInt($"textures[{i}]", i);
+                    shader.SetInt($"TEX{i}.texIndex", i);
                     shader.SetInt($"TEX{i}.light_type", lightType);
                     shader.SetInt($"TEX{i}.color_operation", colorOP);
                     shader.SetInt($"TEX{i}.alpha_operation", alphaOP);
@@ -502,7 +503,7 @@ namespace HSDRawViewer.Rendering
             var transform = Matrix4.Identity;
             for (int i = 0; i < 4; i++)
             {
-                shader.SetInt($"TEX{i}.tex", 0);
+                shader.SetInt($"TEX{i}.texIndex", 0);
                 shader.SetInt($"TEX{i}.light_type", 0);
                 shader.SetInt($"TEX{i}.color_operation", 0);
                 shader.SetInt($"TEX{i}.alpha_operation", 0);

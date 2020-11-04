@@ -77,6 +77,7 @@
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.importFromTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
@@ -505,7 +506,8 @@
             this.createNewSubroutineToolStripMenuItem,
             this.clearAllActionsToolStripMenuItem,
             this.toolStripSeparator5,
-            this.toolStripMenuItem1});
+            this.toolStripMenuItem1,
+            this.importFromTextToolStripMenuItem});
             this.editDropDown.Image = ((System.Drawing.Image)(resources.GetObject("editDropDown.Image")));
             this.editDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.editDropDown.Name = "editDropDown";
@@ -559,6 +561,14 @@
             this.propertyGrid1.Size = new System.Drawing.Size(191, 174);
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            // 
+            // importFromTextToolStripMenuItem
+            // 
+            this.importFromTextToolStripMenuItem.Enabled = false;
+            this.importFromTextToolStripMenuItem.Name = "importFromTextToolStripMenuItem";
+            this.importFromTextToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.importFromTextToolStripMenuItem.Text = "Import From Text";
+            this.importFromTextToolStripMenuItem.Click += new System.EventHandler(this.importFromTextToolStripMenuItem_Click);
             // 
             // SubactionEditor
             // 
@@ -636,5 +646,6 @@
         private System.Windows.Forms.ToolStripMenuItem groundECH;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem importFromTextToolStripMenuItem;
     }
 }

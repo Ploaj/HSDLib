@@ -18,7 +18,7 @@ out vec4 fragColor;
 // textures
 struct TexUnit
 {
-	sampler2D tex;
+	int texIndex;
 	int light_type;
 	int color_operation;
 	int alpha_operation;
@@ -53,6 +53,8 @@ struct TevUnit
 };
 
 // textures
+uniform sampler2D textures[4];
+
 uniform int hasTEX0;
 uniform int hasTEX0Tev;
 uniform TexUnit TEX0;
@@ -300,7 +302,7 @@ vec4 MixTextureColor(TexUnit tex, vec2 texCoord)
 	if(tex.mirror_fix == 1) // GX OPENGL difference
 		coords.y += 1;
 
-    return texture(tex.tex, coords);
+    return texture(textures[tex.texIndex], coords);
 }
 
 ///
@@ -522,25 +524,25 @@ void main()
 	case 8: fragColor = vec4(texcoord3.x, 0, texcoord3.y, 1); break;
 	case 9: 
 		if(hasTEX0 == 1)
-			fragColor = texture(TEX0.tex, texcoord0); 
+			fragColor = MixTextureColor(TEX0, texcoord0);
 		else
 			fragColor = vec4(0, 0, 0, 1);
 	break;
 	case 10: 
 		if(hasTEX1 == 1)
-			fragColor = texture(TEX1.tex, texcoord1); 
+			fragColor = MixTextureColor(TEX1, texcoord1); 
 		else
 			fragColor = vec4(0, 0, 0, 1);
 	break;
 	case 11: 
 		if(hasTEX2 == 1)
-			fragColor = texture(TEX2.tex, texcoord2); 
+			fragColor = MixTextureColor(TEX2, texcoord2); 
 		else
 			fragColor = vec4(0, 0, 0, 1);
 	break;
 	case 12: 
 		if(hasTEX3 == 1)
-			fragColor = texture(TEX3.tex, texcoord3); 
+			fragColor = MixTextureColor(TEX3, texcoord3);
 		else
 			fragColor = vec4(0, 0, 0, 1);
 	break;
