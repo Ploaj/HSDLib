@@ -648,6 +648,7 @@ namespace HSDRawViewer.Rendering
             RefreshRendering = true;
             MatAnimation = new MatAnimManager();
             MatAnimation.FromMatAnim(joint);
+            DOBJManager.PreLoadMatAnim(MatAnimation);
         }
 
         /// <summary>

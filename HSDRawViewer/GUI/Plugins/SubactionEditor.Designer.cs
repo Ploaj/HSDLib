@@ -76,8 +76,10 @@
             this.clearAllActionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.importFromTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            this.deleteSelectedActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
@@ -504,6 +506,8 @@
             this.loadPlayerFilesToolStripMenuItem,
             this.toolStripSeparator2,
             this.createNewSubroutineToolStripMenuItem,
+            this.deleteSelectedActionToolStripMenuItem,
+            this.toolStripSeparator6,
             this.clearAllActionsToolStripMenuItem,
             this.toolStripSeparator5,
             this.toolStripMenuItem1,
@@ -530,7 +534,7 @@
             // 
             this.createNewSubroutineToolStripMenuItem.Name = "createNewSubroutineToolStripMenuItem";
             this.createNewSubroutineToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.createNewSubroutineToolStripMenuItem.Text = "Create New Subroutine";
+            this.createNewSubroutineToolStripMenuItem.Text = "Create New Action";
             this.createNewSubroutineToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // clearAllActionsToolStripMenuItem
@@ -552,6 +556,14 @@
             this.toolStripMenuItem1.Text = "Export to Text";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
+            // importFromTextToolStripMenuItem
+            // 
+            this.importFromTextToolStripMenuItem.Enabled = false;
+            this.importFromTextToolStripMenuItem.Name = "importFromTextToolStripMenuItem";
+            this.importFromTextToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.importFromTextToolStripMenuItem.Text = "Import From Text";
+            this.importFromTextToolStripMenuItem.Click += new System.EventHandler(this.importFromTextToolStripMenuItem_Click);
+            // 
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -562,13 +574,17 @@
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
-            // importFromTextToolStripMenuItem
+            // deleteSelectedActionToolStripMenuItem
             // 
-            this.importFromTextToolStripMenuItem.Enabled = false;
-            this.importFromTextToolStripMenuItem.Name = "importFromTextToolStripMenuItem";
-            this.importFromTextToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.importFromTextToolStripMenuItem.Text = "Import From Text";
-            this.importFromTextToolStripMenuItem.Click += new System.EventHandler(this.importFromTextToolStripMenuItem_Click);
+            this.deleteSelectedActionToolStripMenuItem.Name = "deleteSelectedActionToolStripMenuItem";
+            this.deleteSelectedActionToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.deleteSelectedActionToolStripMenuItem.Text = "Delete Selected Action";
+            this.deleteSelectedActionToolStripMenuItem.Click += new System.EventHandler(this.deleteSelectedActionToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(215, 6);
             // 
             // SubactionEditor
             // 
@@ -647,5 +663,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem importFromTextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteSelectedActionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
     }
 }

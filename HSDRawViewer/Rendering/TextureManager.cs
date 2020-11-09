@@ -8,10 +8,88 @@ namespace HSDRawViewer.Rendering
 {
     public class TextureManager
     {
-        public int TextureCount => Textures.Count;
+        /// <summary>
+        /// 
+        /// </summary>
+        private class GLTexture
+        {
+            private bool Loaded = false;
 
-        private List<int> Textures = new List<int>();
-        private List<Vector2> TextureSizes = new List<Vector2>();
+            public int GLID
+            {
+                get
+                {
+                    if (!Loaded)
+                        Load();
+
+                    return _glid;
+                }
+            }
+            private int _glid;
+
+            public int Width { get; internal set; }
+
+            public int Height { get; internal set; }
+
+            private byte[] RGBAData;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="rgba"></param>
+            /// <param name="width"></param>
+            /// <param name="height"></param>
+            public GLTexture(byte[] rgba, int width, int height)
+            {
+                RGBAData = rgba;
+                Width = width;
+                Height = height;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            private void Load()
+            {
+                if (Loaded)
+                    return;
+                
+                GL.GenTextures(1, out _glid);
+
+                GL.BindTexture(TextureTarget.Texture2D, _glid);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, RGBAData);
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 1);
+
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+
+#if DEBUG
+                Console.WriteLine($"Loaded Texture {Width}x{Height} {_glid}");
+#endif
+
+                RGBAData = null;
+                Loaded = true;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public void Delete()
+            {
+                if(Loaded)
+                {
+                    GL.DeleteTexture(_glid);
+                    Loaded = false;
+                }
+            }
+        }
+
+        public int TextureCount => Textures.Count;
+        
+        private List<GLTexture> Textures = new List<GLTexture>();
 
         /// <summary>
         /// 
@@ -20,7 +98,7 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public int Get(int index)
         {
-            return Textures[index];
+            return Textures[index].GLID;
         }
 
         /// <summary>
@@ -65,25 +143,7 @@ namespace HSDRawViewer.Rendering
         /// <returns>Index of Texture</returns>
         public int Add(byte[] rgba, int width, int height)
         {
-            OpenTKResources.MakeCurrentDummy();
-
-            int texid;
-            GL.GenTextures(1, out texid);
-
-            GL.BindTexture(TextureTarget.Texture2D, texid);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, rgba);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 1);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-            
-            GL.BindTexture(TextureTarget.Texture2D, 0);
-            
-            Textures.Add(texid);
-            TextureSizes.Add(new Vector2(width, height));
-
+            Textures.Add(new TextureManager.GLTexture(rgba, width, height));
             return Textures.Count - 1;
         }
 
@@ -93,10 +153,13 @@ namespace HSDRawViewer.Rendering
         public void ClearTextures()
         {
             foreach(var tex in Textures)
-            {
-                GL.DeleteTexture(tex);
-            }
+                tex.Delete();
+
             Textures.Clear();
+
+#if DEBUG
+            Console.WriteLine($"Textures Deleted");
+#endif
         }
 
         /// <summary>
@@ -106,8 +169,8 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public Vector2 GetTextureSize(int index)
         {
-            if (index < TextureSizes.Count)
-                return TextureSizes[index];
+            if (index < Textures.Count)
+                return new Vector2(Textures[index].Width, Textures[index].Height);
 
             return Vector2.Zero;
         }
@@ -149,7 +212,9 @@ namespace HSDRawViewer.Rendering
         /// <param name="actualSize"></param>
         public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize)
         {
-            RenderTexture(index, windowWidth, windowHeight, actualSize, (int)TextureSizes[index].X, (int)TextureSizes[index].Y);
+            var texture = Textures[index];
+
+            RenderTexture(index, windowWidth, windowHeight, actualSize, texture.Width, texture.Height);
         }
 
         /// <summary>

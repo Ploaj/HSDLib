@@ -45,7 +45,12 @@ namespace HSDRawViewer.Rendering
 
         public class CachedPOBJ
         {
-            public POBJ_FLAG Flag;
+            public POBJ_FLAG Flag
+            {
+                get => POBJ == null ? 0 : POBJ.Flags;
+            }
+
+            public HSD_POBJ POBJ;
 
             public int EnvelopeCount = 0;
             public Vector4[] Envelopes = new Vector4[10];
@@ -280,7 +285,7 @@ namespace HSDRawViewer.Rendering
 
                 var pobjCache = new CachedPOBJ();
 
-                pobjCache.Flag = pobj.Flags;
+                pobjCache.POBJ = pobj;
 
                 // build envelopes
                 int eni = 0;
@@ -332,6 +337,38 @@ namespace HSDRawViewer.Rendering
             DOBJtoPOBJCache.Add(dobj, pobjs);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="matAnim"></param>
+        public void PreLoadMatAnim(MatAnimManager matAnim)
+        {
+            foreach (var n in matAnim.Nodes)
+                foreach (var no in n.Nodes)
+                    foreach (var t in no.TextureAnims)
+                        foreach (var texture in t.Textures)
+                            PreLoadTexture(texture);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void PreLoadTexture(HSD_TOBJ tobj)
+        {
+            if (!imageBufferTextureIndex.ContainsKey(tobj.ImageData.ImageData))
+            {
+                var rawImageData = tobj.ImageData.ImageData;
+                var width = tobj.ImageData.Width;
+                var height = tobj.ImageData.Height;
+
+                var rgbaData = tobj.GetDecodedImageData();
+
+                var index = TextureManager.Add(rgbaData, width, height);
+
+                imageBufferTextureIndex.Add(rawImageData, index);
+            }
+        }
+
         #region MOBJ
         /// <summary>
         /// 
@@ -364,9 +401,8 @@ namespace HSDRawViewer.Rendering
             if (color != null)
             {
                 if (animation != null)
-                {
-                    color = animation.GetMaterialState(mobj).Item1;
-                }
+                    color = animation.GetMaterialState(mobj);
+
                 shader.SetVector4("ambientColor", color.AMB_R / 255f, color.AMB_G / 255f, color.AMB_B / 255f, color.AMB_A / 255f);
                 shader.SetVector4("diffuseColor", color.DIF_R / 255f, color.DIF_G / 255f, color.DIF_B / 255f, color.DIF_A / 255f);
                 shader.SetVector4("specularColor", color.SPC_R / 255f, color.SPC_G / 255f, color.SPC_B / 255f, color.SPC_A / 255f);
@@ -416,20 +452,21 @@ namespace HSDRawViewer.Rendering
                     if (animation != null)
                     {
                         var state = animation.GetTextureAnimState(tex);
-                        displayTex = state.Item1;
-                        blending = state.Item2;
-                        transform = state.Item3;
+                        if(state != null)
+                        {
+                            displayTex = state.TOBJ;
+                            blending = state.Blending;
+                            transform = state.Transform;
+                        }
                     }
 
-                    if (!imageBufferTextureIndex.ContainsKey(displayTex.ImageData.ImageData))
-                    {
-                        imageBufferTextureIndex.Add(displayTex.ImageData.ImageData, TextureManager.TextureCount);
-                        TextureManager.Add(displayTex.GetDecodedImageData(), displayTex.ImageData.Width, displayTex.ImageData.Height);
-                        continue;
-                    }
+                    // make sure texture is loaded
+                    PreLoadTexture(displayTex);
 
+                    // grab texture id
                     var texid = TextureManager.Get(imageBufferTextureIndex[displayTex.ImageData.ImageData]);
 
+                    // set texture
                     GL.ActiveTexture(TextureUnit.Texture0 + i);
                     GL.BindTexture(TextureTarget.Texture2D, texid);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GXTranslator.toWrapMode(tex.WrapS));

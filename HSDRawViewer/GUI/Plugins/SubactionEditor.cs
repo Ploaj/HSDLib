@@ -61,7 +61,7 @@ namespace HSDRawViewer.GUI
 
             public override string ToString()
             {
-                return DisplayText;
+                return DisplayText == null ? "NULL" : DisplayText;
             }
         }
 
@@ -291,19 +291,18 @@ namespace HSDRawViewer.GUI
                     continue;
 
                 if (!aHash.Contains(v.SubAction._s))
-                {
                     aHash.Add(v.SubAction._s);
-                    AllScripts.Add(new Action()
-                    {
-                        _struct = v.SubAction._s,
-                        AnimOffset = v.AnimationOffset,
-                        AnimSize = v.AnimationSize,
-                        Flags = v.Flags,
-                        Index = Index,
-                        Symbol = v.Name,
-                        DisplayText = v.Name == null ? "Func_" + Index.ToString("X") : Regex.Replace(v.Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "")
-                    });
-                }
+
+                AllScripts.Add(new Action()
+                {
+                    _struct = v.SubAction._s,
+                    AnimOffset = v.AnimationOffset,
+                    AnimSize = v.AnimationSize,
+                    Flags = v.Flags,
+                    Index = Index,
+                    Symbol = v.Name,
+                    DisplayText = v.Name == null ? "Func_" + Index.ToString("X") : Regex.Replace(v.Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "")
+                });
 
                 foreach (var c in v.SubAction._s.References)
                 {
@@ -560,6 +559,7 @@ namespace HSDRawViewer.GUI
             var action = new Action()
             {
                 Symbol = "Custom_" + AllScripts.Count,
+                DisplayText = "Custom_" + AllScripts.Count,
                 _struct = new HSDStruct(data)
             };
             AllScripts.Insert(actionList.SelectedIndex, action);
@@ -567,6 +567,19 @@ namespace HSDRawViewer.GUI
             actionList.SelectedItem = action;
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void deleteSelectedActionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(actionList.SelectedIndex != -1)
+            {
+                AllScripts.RemoveAt(actionList.SelectedIndex);
+                RefreshActionList();
+            }
+        }
         
         /// <summary>
         /// 
@@ -1076,12 +1089,12 @@ namespace HSDRawViewer.GUI
             }
 
             var modelFile = new HSDRawFile(cFile);
-            if (modelFile.Roots[0].Data is HSD_JOBJ jobj)
+            if (modelFile.Roots.Count > 0 && modelFile.Roots[0].Data is HSD_JOBJ jobj)
                 JOBJManager.SetJOBJ(jobj);
             else
                 return;
 
-            if (modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
+            if (modelFile.Roots.Count > 1 && modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
             {
                 JOBJManager.SetMatAnimJoint(matanim);
                 JOBJManager.EnableMaterialFrame = true;
@@ -1538,7 +1551,7 @@ namespace HSDRawViewer.GUI
 
                 var itemText = ((ListBox)sender).Items[e.Index].ToString();
 
-                if (!itemText.StartsWith("Subroutine"))
+                if (!itemText.StartsWith("Subroutine") && !itemText.StartsWith("Custom"))
                 {
                     var indText = e.Index.ToString() + ".";
 

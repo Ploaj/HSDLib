@@ -46,6 +46,28 @@ namespace HSDRawViewer.Rendering
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class MatAnimTextureState
+    {
+        public HSD_TOBJ TOBJ { get; }
+
+        public float Blending { get; }
+
+        public Matrix4 Transform { get; }
+
+        public MatAnimTextureState(HSD_TOBJ tOBJ, float blending, Matrix4 transform)
+        {
+            TOBJ = tOBJ;
+            Blending = blending;
+            Transform = transform;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class MatAnimManager : AnimManager
     {
         public override int NodeCount => Nodes.Count;
@@ -56,7 +78,12 @@ namespace HSDRawViewer.Rendering
 
         public int DOBJIndex = 0;
 
-        public Tuple<HSD_Material> GetMaterialState(HSD_MOBJ mobj)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mobj"></param>
+        /// <returns></returns>
+        public HSD_Material GetMaterialState(HSD_MOBJ mobj)
         {
             HSD_Material mat = HSDAccessor.DeepClone<HSD_Material>(mobj.Material);
 
@@ -82,7 +109,7 @@ namespace HSDRawViewer.Rendering
                 }
             }
 
-            return new Tuple<HSD_Material>(mat);
+            return mat;
         }
 
         /// <summary>
@@ -91,10 +118,10 @@ namespace HSDRawViewer.Rendering
         /// <param name="frame"></param>
         /// <param name="boneIndex"></param>
         /// <param name="tobj"></param>
-        public Tuple<HSD_TOBJ, float, Matrix4> GetTextureAnimState(HSD_TOBJ tobj)
+        public MatAnimTextureState GetTextureAnimState(HSD_TOBJ tobj)
         {
             if (tobj == null)
-                return new Tuple<HSD_TOBJ, float, Matrix4>(tobj, 1, Matrix4.Identity);
+                return null;
 
             var tex = tobj;
             var blending = tobj.Blending;
@@ -146,7 +173,7 @@ namespace HSDRawViewer.Rendering
             if(SX != 0 && SY != 0 && SZ != 0)
                 transform.Invert();
 
-            return new Tuple<HSD_TOBJ, float, Matrix4>(tex, blending, transform);
+            return new MatAnimTextureState(tex, blending, transform);
         }
 
         /// <summary>

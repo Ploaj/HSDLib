@@ -113,6 +113,14 @@ namespace HSDRawViewer.GUI.Plugins
 
         private class DOBJContainer
         {
+            public enum CullMode
+            {
+                None,
+                Front,
+                Back,
+                FrontAndBack
+            }
+
             public int Index;
             public int JOBJIndex;
             public int DOBJIndex;
@@ -133,6 +141,48 @@ namespace HSDRawViewer.GUI.Plugins
             public float Shinniness { get => DOBJ.Mobj.Material.Shininess; set => DOBJ.Mobj.Material.Shininess = value; }
 
             public float Alpha { get => DOBJ.Mobj.Material.Alpha; set => DOBJ.Mobj.Material.Alpha = value; }
+            
+            public CullMode Culling
+            {
+                get
+                {
+                    if (DOBJ.Pobj == null)
+                        return CullMode.None;
+                    else
+                    {
+                        if (DOBJ.Pobj.Flags.HasFlag(POBJ_FLAG.CULLBACK) && DOBJ.Pobj.Flags.HasFlag(POBJ_FLAG.CULLFRONT))
+                            return CullMode.FrontAndBack;
+
+                        if (DOBJ.Pobj.Flags.HasFlag(POBJ_FLAG.CULLBACK))
+                            return CullMode.Back;
+
+                        if (DOBJ.Pobj.Flags.HasFlag(POBJ_FLAG.CULLFRONT))
+                            return CullMode.Front;
+
+                        return CullMode.None;
+                    }
+                }
+                set
+                {
+                    if(DOBJ.Pobj != null)
+                        foreach (var p in DOBJ.Pobj.List)
+                        {
+                            p.Flags &= ~(POBJ_FLAG.CULLBACK | POBJ_FLAG.CULLFRONT);
+                            switch (value)
+                            {
+                                case CullMode.FrontAndBack:
+                                    p.Flags |= POBJ_FLAG.CULLBACK | POBJ_FLAG.CULLFRONT;
+                                    break;
+                                case CullMode.Front:
+                                    p.Flags |= POBJ_FLAG.CULLFRONT;
+                                    break;
+                                case CullMode.Back:
+                                    p.Flags |= POBJ_FLAG.CULLBACK;
+                                    break;
+                            }
+                        }
+                }
+            }
 
             [Browsable(false)]
             public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
