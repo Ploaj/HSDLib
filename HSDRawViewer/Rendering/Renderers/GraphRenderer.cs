@@ -12,6 +12,9 @@ namespace HSDRawViewer.Rendering.Renderers
     {
         private FOBJ_Player _player = new FOBJ_Player();
 
+        public float MaxValue { get => _maxValue; }
+        public float MinValue { get => _minValue; }
+
         private float _minValue;
         private float _maxValue;
 
@@ -121,6 +124,8 @@ namespace HSDRawViewer.Rendering.Renderers
             // draw points
             if(RenderPoints && _player.Keys != null && _player.Keys.Count > 1)
             {
+                var tra = g.Transform;
+
                 for (int i = 0; i < _player.Keys.Count; i++)
                 {
                     var key = _player.Keys[i];
@@ -170,7 +175,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             g.RotateTransform(45);
                             g.FillRectangle(clr, -_xScale / 2, -_xScale / 2, _xScale, _xScale);
                             g.DrawRectangle(PointOutline, -_xScale / 2, -_xScale / 2, _xScale, _xScale);
-                            g.ResetTransform();
+                            g.Transform = tra;
                             break;
                         case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL:
                         case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL0:
@@ -224,17 +229,21 @@ namespace HSDRawViewer.Rendering.Renderers
             g.DrawLine(clr, one_x, one_y, two_x, two_y);
             g.DrawLine(clr, one_x_o, one_y_o, two_x_o, two_y_o);
 
+            var tra = g.Transform;
+
             g.TranslateTransform(one_x, one_y);
             g.RotateTransform(angle1 - 180);
             g.DrawLine(clr, -7f, 3.5f, 0, 0);
             g.DrawLine(clr, 0, 0, -7f, -3.5f);
-            g.ResetTransform();
+
+            g.Transform = tra;
 
             g.TranslateTransform(two_x_o, two_y_o);
             g.RotateTransform(angle2);
             g.DrawLine(clr, -7f, 3.5f, 0, 0);
             g.DrawLine(clr, 0, 0, -7f, -3.5f);
-            g.ResetTransform();
+
+            g.Transform = tra;
         }
         
     }

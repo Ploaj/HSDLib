@@ -30,9 +30,17 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GraphEditor));
             this.graphBox = new System.Windows.Forms.GroupBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.nudFrame = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.keyProperty = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.optionsButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.showAllTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showFrameTicksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showTangentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addKeyButton = new System.Windows.Forms.ToolStripButton();
             this.deleteKeyButton = new System.Windows.Forms.ToolStripButton();
             this.importKeyButton = new System.Windows.Forms.ToolStripButton();
@@ -47,17 +55,19 @@
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
             this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.nudFrame = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
+            this.graphBox.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
             this.SuspendLayout();
             // 
             // graphBox
             // 
+            this.graphBox.Controls.Add(this.panel1);
             this.graphBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.graphBox.Location = new System.Drawing.Point(3, 177);
             this.graphBox.Name = "graphBox";
@@ -65,6 +75,67 @@
             this.graphBox.TabIndex = 0;
             this.graphBox.TabStop = false;
             this.graphBox.Text = "Graph";
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.nudFrame);
+            this.panel1.Controls.Add(this.numericUpDown1);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(3, 16);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(718, 31);
+            this.panel1.TabIndex = 0;
+            // 
+            // nudFrame
+            // 
+            this.nudFrame.Location = new System.Drawing.Point(48, 9);
+            this.nudFrame.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.nudFrame.Name = "nudFrame";
+            this.nudFrame.Size = new System.Drawing.Size(142, 20);
+            this.nudFrame.TabIndex = 0;
+            this.nudFrame.ValueChanged += new System.EventHandler(this.nudFrame_ValueChanged);
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(239, 9);
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(66, 20);
+            this.numericUpDown1.TabIndex = 6;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(196, 11);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(37, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Zoom:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 11);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(39, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Frame:";
             // 
             // keyProperty
             // 
@@ -81,7 +152,7 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.optionsButton,
+            this.toolStripDropDownButton1,
             this.addKeyButton,
             this.deleteKeyButton,
             this.importKeyButton,
@@ -93,33 +164,62 @@
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // optionsButton
+            // toolStripDropDownButton1
             // 
-            this.optionsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.optionsButton.Image = ((System.Drawing.Image)(resources.GetObject("optionsButton.Image")));
-            this.optionsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.optionsButton.Name = "optionsButton";
-            this.optionsButton.Size = new System.Drawing.Size(94, 22);
-            this.optionsButton.Text = "Display Options";
-            this.optionsButton.Click += new System.EventHandler(this.optionsButton_Click);
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showAllTracksToolStripMenuItem,
+            this.showFrameTicksToolStripMenuItem,
+            this.showTangentsToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(103, 22);
+            this.toolStripDropDownButton1.Text = "Display Options";
+            // 
+            // showAllTracksToolStripMenuItem
+            // 
+            this.showAllTracksToolStripMenuItem.CheckOnClick = true;
+            this.showAllTracksToolStripMenuItem.Name = "showAllTracksToolStripMenuItem";
+            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showAllTracksToolStripMenuItem.Text = "Show All Tracks";
+            this.showAllTracksToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OptionCheckChanged);
+            // 
+            // showFrameTicksToolStripMenuItem
+            // 
+            this.showFrameTicksToolStripMenuItem.Checked = true;
+            this.showFrameTicksToolStripMenuItem.CheckOnClick = true;
+            this.showFrameTicksToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showFrameTicksToolStripMenuItem.Name = "showFrameTicksToolStripMenuItem";
+            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showFrameTicksToolStripMenuItem.Text = "Show Frame Ticks";
+            this.showFrameTicksToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OptionCheckChanged);
+            // 
+            // showTangentsToolStripMenuItem
+            // 
+            this.showTangentsToolStripMenuItem.Checked = true;
+            this.showTangentsToolStripMenuItem.CheckOnClick = true;
+            this.showTangentsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showTangentsToolStripMenuItem.Name = "showTangentsToolStripMenuItem";
+            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showTangentsToolStripMenuItem.Text = "Show Tangents";
+            this.showTangentsToolStripMenuItem.CheckedChanged += new System.EventHandler(this.OptionCheckChanged);
             // 
             // addKeyButton
             // 
-            this.addKeyButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.addKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
             this.addKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.addKeyButton.Name = "addKeyButton";
-            this.addKeyButton.Size = new System.Drawing.Size(23, 22);
-            this.addKeyButton.Text = "Add Key";
+            this.addKeyButton.Size = new System.Drawing.Size(78, 22);
+            this.addKeyButton.Text = "Insert Key";
             this.addKeyButton.Click += new System.EventHandler(this.addKeyButton_Click);
             // 
             // deleteKeyButton
             // 
-            this.deleteKeyButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.deleteKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
             this.deleteKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.deleteKeyButton.Name = "deleteKeyButton";
-            this.deleteKeyButton.Size = new System.Drawing.Size(23, 22);
+            this.deleteKeyButton.Size = new System.Drawing.Size(82, 22);
             this.deleteKeyButton.Text = "Delete Key";
             this.deleteKeyButton.Click += new System.EventHandler(this.deleteKeyButton_Click);
             // 
@@ -240,42 +340,21 @@
             this.trackTypeBox.Size = new System.Drawing.Size(121, 25);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
-            // nudFrame
-            // 
-            this.nudFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.nudFrame.Location = new System.Drawing.Point(582, 155);
-            this.nudFrame.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.nudFrame.Name = "nudFrame";
-            this.nudFrame.Size = new System.Drawing.Size(142, 20);
-            this.nudFrame.TabIndex = 0;
-            this.nudFrame.ValueChanged += new System.EventHandler(this.nudFrame_ValueChanged);
-            // 
-            // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(540, 157);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(36, 13);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Frame";
-            // 
             // GraphEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.nudFrame);
             this.Controls.Add(this.graphBox);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.groupBox1);
             this.Name = "GraphEditor";
             this.Size = new System.Drawing.Size(727, 359);
+            this.graphBox.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -283,7 +362,6 @@
             this.groupBox2.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,7 +377,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Splitter splitter2;
         private System.Windows.Forms.ToolStripButton addKeyButton;
-        private System.Windows.Forms.ToolStripButton optionsButton;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TreeView trackTree;
         private System.Windows.Forms.ToolStrip toolStrip2;
@@ -311,5 +388,12 @@
         private System.Windows.Forms.ToolStripButton helpButton;
         private System.Windows.Forms.NumericUpDown nudFrame;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem showAllTracksToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showFrameTicksToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showTangentsToolStripMenuItem;
     }
 }

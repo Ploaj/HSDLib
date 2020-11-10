@@ -37,6 +37,7 @@
             // 
             this.jointTree.Dock = System.Windows.Forms.DockStyle.Left;
             this.jointTree.HideSelection = false;
+            this.jointTree.Indent = 12;
             this.jointTree.ItemHeight = 24;
             this.jointTree.Location = new System.Drawing.Point(0, 0);
             this.jointTree.Name = "jointTree";
