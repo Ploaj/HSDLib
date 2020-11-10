@@ -483,7 +483,7 @@ namespace HSDRawViewer.Converters
                             currentData = new MayaTrack();
                             if (args.Length == 7)
                             {
-                                currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
+                                //currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
                                 currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
                                 currentNode.atts.Add(currentData);
                             }

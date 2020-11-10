@@ -33,9 +33,9 @@ namespace HSDRaw.Melee.Pl
 
         public HSDArrayAccessor<SBM_LookupTable> LowPoly { get => _s.GetReference<HSDArrayAccessor<SBM_LookupTable>>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDArrayAccessor<SBM_LookupTable> Metal { get => _s.GetReference<HSDArrayAccessor<SBM_LookupTable>>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDArrayAccessor<SBM_LookupTable> MetalPoly { get => _s.GetReference<HSDArrayAccessor<SBM_LookupTable>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSDArrayAccessor<SBM_LookupTable> UnknownTable { get => _s.GetReference<HSDArrayAccessor<SBM_LookupTable>>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSDArrayAccessor<SBM_LookupTable> MetalMainModel { get => _s.GetReference<HSDArrayAccessor<SBM_LookupTable>>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 
     public class SBM_LookupTable : HSDAccessor

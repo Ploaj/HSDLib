@@ -105,5 +105,7 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<HSD_UInt> DemoMoveLogic { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0xA0); set => _s.SetReference(0xA0, value); }
 
+        public HSDArrayAccessor<HSD_UInt> getTrailData { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0xA4); set => _s.SetReference(0xA4, value); }
+
     }
 }

@@ -82,6 +82,11 @@ namespace HSDRawViewer.Rendering
                 if(Loaded)
                 {
                     GL.DeleteTexture(_glid);
+
+#if DEBUG
+                    Console.WriteLine($"Deleted Texture {_glid}");
+#endif
+
                     Loaded = false;
                 }
             }
@@ -152,14 +157,12 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void ClearTextures()
         {
+            OpenTKResources.MakeCurrentDummy();
+
             foreach(var tex in Textures)
                 tex.Delete();
 
             Textures.Clear();
-
-#if DEBUG
-            Console.WriteLine($"Textures Deleted");
-#endif
         }
 
         /// <summary>

@@ -42,7 +42,7 @@ namespace HSDRawViewer.GUI
             public int AnimSize { get; set; }
 
             public uint Flags;
-            public int Index;
+            //public int Index;
 
             [Category("Display Flags"), DisplayName("Flags")]
             public string BitFlags { get => Flags.ToString("X"); set { uint v = Flags; uint.TryParse(value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.CurrentCulture, out v); Flags = v; } }
@@ -51,13 +51,13 @@ namespace HSDRawViewer.GUI
             public uint CharIDCheck { get => Flags & 0x3FF; set => Flags = (Flags & 0xFFFFFC00) | (value & 0x3FF); }
 
             [Category("Flags"), DisplayName("Utilize animation-induced physics")]
-            public bool AnimInducedPhysics { get => (Flags & 0x08000000) != 0; set => Flags = ((Flags & 0x08000000) | (uint)((value ? 1 : 0) << 27)); }
+            public bool AnimInducedPhysics { get => (Flags & 0x08000000) != 0; set => Flags = (uint)((Flags & ~0x08000000) | (uint)((value ? 1 : 0) << 27)); }
 
             [Category("Flags"), DisplayName("Loop Animation")]
-            public bool LoopAnimation { get => (Flags & 0x04000000) != 0; set => Flags = ((Flags & 0x04000000) | (uint)((value ? 1 : 0) << 26)); }
+            public bool LoopAnimation { get => (Flags & 0x04000000) != 0; set => Flags = (uint)((Flags & ~0x04000000) | (uint)((value ? 1 : 0) << 26)); }
 
             [Category("Flags"), DisplayName("Unknown")]
-            public bool Unknown { get => (Flags & 0x02000000) != 0; set => Flags = ((Flags & 0x02000000) | (uint)((value ? 1 : 0) << 25)); }
+            public bool Unknown { get => (Flags & 0x02000000) != 0; set => Flags = (uint)((Flags & ~0x02000000) | (uint)((value ? 1 : 0) << 25)); }
 
             public override string ToString()
             {
@@ -299,7 +299,6 @@ namespace HSDRawViewer.GUI
                     AnimOffset = v.AnimationOffset,
                     AnimSize = v.AnimationSize,
                     Flags = v.Flags,
-                    Index = Index,
                     Symbol = v.Name,
                     DisplayText = v.Name == null ? "Func_" + Index.ToString("X") : Regex.Replace(v.Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "")
                 });
@@ -495,14 +494,19 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void SaveSubactionChanges()
         {
+            int index = 0;
             if (actionList.SelectedItem is Action a)
             {
                 AddActionToUndo();
 
                 a._struct.References.Clear();
-                _node.Accessor._s.SetInt32(0x18 * a.Index + 0x04, (int)a.AnimOffset);
-                _node.Accessor._s.SetInt32(0x18 * a.Index + 0x08, (int)a.AnimSize);
-                _node.Accessor._s.SetInt32(0x18 * a.Index + 0x10, (int)a.Flags);
+                var ftcmd = new SBM_FighterCommand();
+                ftcmd._s = _node.Accessor._s.GetEmbeddedStruct(0x18 * index, ftcmd.TrimmedSize);
+                ftcmd.Name = a.Symbol;
+                ftcmd.AnimationOffset = a.AnimOffset;
+                ftcmd.AnimationSize = a.AnimSize;
+                ftcmd.Flags = a.Flags;
+                _node.Accessor._s.SetEmbededStruct(0x18 * index, ftcmd._s);
 
                 List<byte> scriptData = new List<byte>();
                 foreach (SubActionScript scr in subActionList.Items)
@@ -517,6 +521,7 @@ namespace HSDRawViewer.GUI
                 
                 a._struct.SetData(scriptData.ToArray());
                 SubactionProcess.SetStruct(a._struct, SubactionGroup);
+                index++;
             }
         }
 
