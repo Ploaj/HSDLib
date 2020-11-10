@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml;
+using System.Diagnostics;
 
 namespace HSDRawViewer.Converters
 {
@@ -91,6 +93,28 @@ namespace HSDRawViewer.Converters
 
         public List<MOT_JOINT> Joints = new List<MOT_JOINT>();
 
+        public static bool IsMotXML(string filePath)
+        {
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.IgnoreWhitespace = true;
+            using (XmlReader r = XmlReader.Create(filePath, settings))
+                while (r.Read())
+                {
+                    switch (r.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                        {
+                            if (r.Name == "MOT")
+                            {
+                                return true;
+                            }
+                        } break;
+                    }
+                }
+
+            return false;
+        }
+
         public MOT_FILE()
         {
 
@@ -98,8 +122,17 @@ namespace HSDRawViewer.Converters
 
         public MOT_FILE(string filePath)
         {
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
-                Parse(r);
+            if (Path.GetExtension(filePath).ToLower().Equals(".xml"))
+            {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.IgnoreWhitespace = true;
+                using (XmlReader r = XmlReader.Create(filePath, settings))
+                    ParseXML(r);
+            } else
+            {
+                using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
+                    Parse(r);
+            }
         }
 
         /// <summary>
@@ -163,6 +196,252 @@ namespace HSDRawViewer.Converters
                 }
             }
 
+        }
+
+        private void WriteXML(XmlWriter file)
+        {
+            float prevTime = Single.NegativeInfinity;
+
+            file.WriteStartElement("MOT");
+            file.WriteAttributeString("PlaySpeed", "" + PlaySpeed);
+            file.WriteAttributeString("EndTime", "" + EndTime);
+ 
+            foreach (var j in Joints)
+            {
+                file.WriteStartElement("Joint");
+                file.WriteAttributeString("Flag1", "" + j.Flag1);
+                file.WriteAttributeString("Flag2", "" + j.Flag2);
+                file.WriteAttributeString("TrackFlag", "" + j.TrackFlag);
+                file.WriteAttributeString("BoneID", "" + j.BoneID);
+                file.WriteAttributeString("MaxTime", "" + j.MaxTime);
+                file.WriteAttributeString("Unknown", "" + j.Unknown);
+                file.WriteEndElement();
+            }
+
+            do
+            {
+                float currTime = Single.PositiveInfinity;
+
+                // Find the next keyframe
+                foreach (var j in Joints)
+                {
+                    foreach (var k in j.Keys)
+                    {
+                        if (k.Time > prevTime)
+                        {
+                            currTime = Math.Min(currTime, k.Time);
+                            break;
+                        }
+                    }
+                }
+
+                var keys = new List<MOT_KEY>();
+                var joints = new List<int>();
+
+                int jointIdx = 0;
+                // Find all joints that have this keyframe
+                foreach (var j in Joints)
+                {
+                    foreach (var k in j.Keys)
+                    {
+                        if (k.Time == currTime)
+                        {
+                            keys.Add(k);
+                            joints.Add(jointIdx);
+                            break;
+                        }
+                    }
+
+                    jointIdx++;
+                }
+
+                Debug.Assert(keys.Count == joints.Count);
+                if (keys.Count == 0)
+                {
+                    break;
+                }
+
+                file.WriteStartElement("Key");
+                file.WriteAttributeString("Time", "" + currTime);
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    var k = keys[i];
+                    int j = joints[i];
+
+                    file.WriteStartElement("Joint");
+                    file.WriteAttributeString("Index", "" + j);
+                    file.WriteAttributeString("X", "" + k.X);
+                    file.WriteAttributeString("Y", "" + k.Y);
+                    file.WriteAttributeString("Z", "" + k.Z);
+                    file.WriteAttributeString("W", "" + k.W);
+                    file.WriteEndElement();
+                }
+                file.WriteEndElement();
+
+                prevTime = currTime;
+            } while (true);
+            file.WriteEndElement();
+        }
+
+        public void ExportXML(string filename)
+        {
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.IndentChars = "\t";
+            using (XmlWriter file = XmlWriter.Create(filename, settings))
+                WriteXML(file);
+        }
+
+        private void ParseXML(XmlReader r)
+        {
+            const int STATE_ENTER = 0;
+            const int STATE_JOINTS = 1;
+            const int STATE_KEYS = 2;
+            int state = STATE_ENTER;
+            float time = Single.NegativeInfinity;
+            while (r.Read())
+            {
+                switch (r.NodeType)
+                {
+                case XmlNodeType.Element:
+                    {
+                        if (state == STATE_ENTER)
+                        {
+                            if (r.Name != "MOT")
+                            {
+                                throw new NotSupportedException("Expected Element \"MOT\"");
+                            }
+
+                            string strPlaySpeed = r.GetAttribute("PlaySpeed");
+                            string strEndTime = r.GetAttribute("EndTime");
+
+                            if (!float.TryParse(strPlaySpeed, out PlaySpeed))
+                            {
+                                throw new NotSupportedException("Could not parse attribute \"PlaySpeed\"");
+                            }
+
+                            if (!float.TryParse(strEndTime, out EndTime))
+                            {
+                                throw new NotSupportedException("Could not parse attribute \"EndTime\"");
+                            }
+
+                            state = STATE_JOINTS;
+                        } else if (state == STATE_JOINTS)
+                        {
+                            if (r.Name == "Joint")
+                            {
+                                var j = new MOT_JOINT();
+
+                                string strFlag1 = r.GetAttribute("Flag1");
+                                string strFlag2 = r.GetAttribute("Flag2");
+                                string strTrackFlag = r.GetAttribute("TrackFlag");
+                                string strBoneID = r.GetAttribute("BoneID");
+                                string strMaxTime = r.GetAttribute("MaxTime");
+                                string strUnknown = r.GetAttribute("Unknown");
+
+                                if (!byte.TryParse(strFlag1, out j.Flag1))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"Flag1\"");
+                                }
+
+                                if (!byte.TryParse(strFlag2, out j.Flag2))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"Flag2\"");
+                                }
+
+                                if (!Enum.TryParse<MOT_FLAGS>(strTrackFlag, out j.TrackFlag))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"Flag2\"");
+                                }
+
+                                if (!short.TryParse(strBoneID, out j.BoneID))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"BoneID\"");
+                                }
+
+                                if (!float.TryParse(strMaxTime, out j.MaxTime))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"MaxTime\"");
+                                }
+
+                                if (!int.TryParse(strUnknown, out j.Unknown))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"Unknown\"");
+                                }
+
+                                Joints.Add(j);
+                            } else if (r.Name == "Key")
+                            {
+                                state = STATE_KEYS;
+                            }
+                        }
+
+                        if (state == STATE_KEYS)
+                        {
+                            if (r.Name == "Key")
+                            {
+                                string strTime = r.GetAttribute("Time");
+
+                                if (!float.TryParse(strTime, out time))
+                                {
+                                    throw new NotSupportedException("Could not parse attribute \"Time\"");
+                                }
+                            } else if (r.Name == "Joint")
+                            {
+                                if (Single.IsNegativeInfinity(time))
+                                {
+                                    throw new NotSupportedException("No Key element defined");
+                                }
+
+                                int index;
+                                string indexStr;
+                                float X, Y, Z, W;
+                                string xStr, yStr, zStr, wStr;
+
+                                indexStr = r.GetAttribute("Index");
+                                if (!int.TryParse(indexStr, out index))
+                                {
+                                    throw new NotSupportedException("Unable to parse Index attribute");
+                                }
+
+                                xStr = r.GetAttribute("X");
+                                if (!float.TryParse(xStr, out X))
+                                {
+                                    throw new NotSupportedException("Unable to parse X attribute");
+                                }
+
+                                yStr = r.GetAttribute("Y");
+                                if (!float.TryParse(yStr, out Y))
+                                {
+                                    throw new NotSupportedException("Unable to parse Y attribute");
+                                }
+
+                                zStr = r.GetAttribute("Z");
+                                if (!float.TryParse(zStr, out Z))
+                                {
+                                    throw new NotSupportedException("Unable to parse Z attribute");
+                                }
+
+                                wStr = r.GetAttribute("W");
+                                if (!float.TryParse(wStr, out W))
+                                {
+                                    throw new NotSupportedException("Unable to parse W attribute");
+                                }
+
+                                var key = new MOT_KEY();
+                                key.Time = time;
+                                key.X = X;
+                                key.Y = Y;
+                                key.Z = Z;
+                                key.W = W;
+
+                                Joints[index].Keys.Add(key);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
         }
 
         private void WriteAt(BinaryWriterExt ext, int pos, int value)

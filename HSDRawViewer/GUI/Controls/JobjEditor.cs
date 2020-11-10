@@ -782,7 +782,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta)|*.dat;*.anim;*.mota;*.gnta;*.chr0");
+            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta*.xml)|*.dat;*.anim;*.mota;*.gnta;*.chr0;*.xml");
 
             if (f != null)
             {
@@ -791,7 +791,8 @@ namespace HSDRawViewer.GUI.Plugins
                     LoadAnimation(CHR0Converter.LoadCHR0(f, BoneLabelMap));
                 }
                 else
-                if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta"))
+                if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta") ||
+                    (Path.GetExtension(f).ToLower().Equals(".xml") && MOT_FILE.IsMotXML(f)))
                 {
                     var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");
 
@@ -946,6 +947,21 @@ namespace HSDRawViewer.GUI.Plugins
 
             MOT_FILE file = anim.GetMOT();
             file.Save(f);
+        }
+
+        private void xmlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JOBJManager.Animation == null || !(JOBJManager.Animation is MotAnimManager))
+            {
+                MessageBox.Show("No mot animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            MotAnimManager anim = (MotAnimManager)(JOBJManager.Animation);
+            var f = Tools.FileIO.SaveFile("XML|*.xml;");
+
+            MOT_FILE file = anim.GetMOT();
+            file.ExportXML(f);
         }
 
         /// <summary>
