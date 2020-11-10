@@ -3,9 +3,9 @@
   parameters:
   - name: Bone ID
     bitCount: 8
-  - name: Destroy on State Change
-    bitCount: 1
   - name: Use Common Bone IDs
+    bitCount: 1
+  - name: Destroy on State Change
     bitCount: 1
   - name: Unk1
     bitCount: 16
