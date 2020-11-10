@@ -15,11 +15,19 @@ namespace HSDRaw
         {
         }
 
-        public void Align(int alignment)
+        public void Align(int alignment, byte fill = 0)
         {
             if(BaseStream.Position % alignment > 0)
             {
-                Write(new byte[alignment - (BaseStream.Position % alignment)]);
+                if(fill != 0)
+                {
+                    var data = new byte[alignment - (BaseStream.Position % alignment)];
+                    for (int i = 0; i < data.Length; i++)
+                        data[i] = fill;
+                    Write(data);
+                }
+                else
+                    Write(new byte[alignment - (BaseStream.Position % alignment)]);
             }
         }
 

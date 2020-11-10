@@ -21,6 +21,7 @@ using System.ComponentModel;
 using HSDRaw.Melee.Cmd;
 using System.IO;
 using System.Text.RegularExpressions;
+using HSDRawViewer.GUI.Extra;
 
 namespace HSDRawViewer.GUI
 {
@@ -30,38 +31,69 @@ namespace HSDRawViewer.GUI
         {
             public HSDStruct _struct;
 
-            public string DisplayText;
+            private string DisplayText;
 
             [Category("Animation"), DisplayName("Figatree Symbol")]
-            public string Symbol { get; set; }
+            public string Symbol
+            {
+                get => _symbol;
+                set
+                {
+                    _symbol = value;
 
-            [Category("Animation"), DisplayName("Figatree Offset")]
-            public int AnimOffset { get; set; }
+                    if(!string.IsNullOrEmpty(_symbol))
+                        DisplayText = Regex.Replace(_symbol.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "");
+                }
+            }
 
-            [Category("Animation"), DisplayName("Figatree FileSize")]
-            public int AnimSize { get; set; }
+            private string _symbol;
+
+            public bool Subroutine = false;
+
+            public int Index;
+            
+            public int AnimOffset;
+            
+            public int AnimSize;
 
             public uint Flags;
-            //public int Index;
 
             [Category("Display Flags"), DisplayName("Flags")]
             public string BitFlags { get => Flags.ToString("X"); set { uint v = Flags; uint.TryParse(value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.CurrentCulture, out v); Flags = v; } }
-
-            [Category("Flags"), DisplayName("Character ID")]
-            public uint CharIDCheck { get => Flags & 0x3FF; set => Flags = (Flags & 0xFFFFFC00) | (value & 0x3FF); }
-
+            
             [Category("Flags"), DisplayName("Utilize animation-induced physics")]
-            public bool AnimInducedPhysics { get => (Flags & 0x08000000) != 0; set => Flags = (uint)((Flags & ~0x08000000) | (uint)((value ? 1 : 0) << 27)); }
+            public bool AnimInducedPhysics { get => (Flags & 0x80000000) != 0; set => Flags = (uint)((Flags & ~0x80000000) | 0x80000000); }
 
             [Category("Flags"), DisplayName("Loop Animation")]
-            public bool LoopAnimation { get => (Flags & 0x04000000) != 0; set => Flags = (uint)((Flags & ~0x04000000) | (uint)((value ? 1 : 0) << 26)); }
+            public bool LoopAnimation { get => (Flags & 0x40000000) != 0; set => Flags = (uint)((Flags & ~0x40000000) | 0x40000000); }
 
             [Category("Flags"), DisplayName("Unknown")]
-            public bool Unknown { get => (Flags & 0x02000000) != 0; set => Flags = (uint)((Flags & ~0x02000000) | (uint)((value ? 1 : 0) << 25)); }
+            public bool Unknown { get => (Flags & 0x20000000) != 0; set => Flags = (uint)((Flags & ~0x20000000) | 0x20000000); }
+
+            [Category("Flags"), DisplayName("Unknown Flag")]
+            public bool UnknownFlag { get => (Flags & 0x10000000) != 0; set => Flags = (uint)((Flags & ~0x10000000) | 0x10000000); }
+
+            [Category("Flags"), DisplayName("Disable Dynamics")]
+            public bool DisableDynamics { get => (Flags & 0x08000000) != 0; set => Flags = (uint)((Flags & ~0x08000000) | 0x08000000); }
+
+            [Category("Flags"), DisplayName("Unknown TransN Update")]
+            public bool TransNUpdate { get => (Flags & 0x04000000) != 0; set => Flags = (uint)((Flags & ~0x04000000) | 0x04000000); }
+
+            [Category("Flags"), DisplayName("TransN Affected by Model Scale")]
+            public bool AffectModelScale { get => (Flags & 0x02000000) != 0; set => Flags = (uint)((Flags & ~0x02000000) | 0x02000000); }
+
+            [Category("Flags"), DisplayName("Additional Bone Value")]
+            public uint AdditionalBone { get => (Flags & 0x003FFE00) >> 9; set => Flags = (uint)((Flags & ~0x003FFE00) | ((value << 9) & 0x003FFE00)); }
+            
+            [Category("Flags"), DisplayName("Disable Blend on Bone Index")]
+            public uint BoneIndex { get => (Flags & 0x1C0) >> 7; set => Flags = (uint)(Flags & ~0x1C0) | ((value << 7) & 0x1C0); }
+
+            [Category("Flags"), DisplayName("Character ID")]
+            public uint CharIDCheck { get => Flags & 0x3F; set => Flags = (Flags & 0xFFFFFFC0) | (value & 0x3F); }
 
             public override string ToString()
             {
-                return DisplayText == null ? "NULL" : DisplayText;
+                return DisplayText == null ? (Subroutine ? "Subroutine_" : "Function_") + Index : DisplayText;
             }
         }
 
@@ -119,8 +151,8 @@ namespace HSDRawViewer.GUI
                             param.Enums[value]);
                     else
                     if (param.IsPointer)
-                        if (editor != null && editor.AllScripts.Find(e => e._struct == Reference) != null)
-                            yield return ("&" + editor.AllScripts.Find(e => e._struct == Reference).DisplayText);
+                        if (editor != null && editor.AllActions.Find(e => e._struct == Reference) != null)
+                            yield return ("&" + editor.AllActions.Find(e => e._struct == Reference).ToString());
                         else
                             yield return ("POINTER->(Edit To View)");
                     else
@@ -189,6 +221,9 @@ namespace HSDRawViewer.GUI
 
                     LoadActions(su);
                     RefreshActionList();
+
+                    // disable fighter only stuff
+                    loadPlayerFilesToolStripMenuItem.Enabled = false;
                     propertyGrid1.Visible = false;
                 }
                 else
@@ -232,7 +267,7 @@ namespace HSDRawViewer.GUI
 
         private SBM_EnvironmentCollision ECB = null;
 
-        private readonly List<Action> AllScripts = new List<Action>();
+        private readonly List<Action> AllActions = new List<Action>();
 
         public SubactionGroup SubactionGroup = SubactionGroup.Fighter;
 
@@ -264,8 +299,16 @@ namespace HSDRawViewer.GUI
 
             FormClosing += (sender, args) =>
             {
+                SaveFile();
                 JOBJManager.CleanupRendering();
                 viewport.Dispose();
+                _animEditor.Dispose();
+            };
+
+            _animEditor.FormClosing += (sender, args) =>
+            {
+                if(MessageBox.Show("Save Changes Made to Animation?", "Save Animation?", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+                    SaveAnimation();
             };
             
             SubactionProcess.UpdateVISMethod = SetModelVis;
@@ -293,14 +336,13 @@ namespace HSDRawViewer.GUI
                 if (!aHash.Contains(v.SubAction._s))
                     aHash.Add(v.SubAction._s);
 
-                AllScripts.Add(new Action()
+                AllActions.Add(new Action()
                 {
                     _struct = v.SubAction._s,
                     AnimOffset = v.AnimationOffset,
                     AnimSize = v.AnimationSize,
                     Flags = v.Flags,
                     Symbol = v.Name,
-                    DisplayText = v.Name == null ? "Func_" + Index.ToString("X") : Regex.Replace(v.Name.Replace("_figatree", ""), @"Ply.*_Share_ACTION_", "")
                 });
 
                 foreach (var c in v.SubAction._s.References)
@@ -320,10 +362,10 @@ namespace HSDRawViewer.GUI
                 if (!aHash.Contains(v))
                 {
                     aHash.Add(v);
-                    AllScripts.Add(new Action()
+                    AllActions.Add(new Action()
                     {
                         _struct = v,
-                        DisplayText = "Subroutine_" + Index.ToString("X")
+                        Subroutine = true
                     });
                 }
                 foreach (var r in v.References)
@@ -340,8 +382,14 @@ namespace HSDRawViewer.GUI
         {
             actionList.Items.Clear();
             subActionList.Items.Clear();
-            foreach (var sa in AllScripts)
+            var actionIndex = 0;
+            var routineIndex = 0;
+            foreach (var sa in AllActions)
             {
+                if(sa.Subroutine)
+                    sa.Index = routineIndex++;
+                else
+                    sa.Index = actionIndex++;
                 actionList.Items.Add(sa);
             }
         }
@@ -357,7 +405,7 @@ namespace HSDRawViewer.GUI
             ClearUndoStack();
 
             // gather all references to this script
-            var references = AllScripts.FindAll(e=>e._struct.References.ContainsValue(script._struct));
+            var references = AllActions.FindAll(e=>e._struct.References.ContainsValue(script._struct));
 
             cbReference.Items.Clear();
             foreach(var r in references)
@@ -372,7 +420,7 @@ namespace HSDRawViewer.GUI
             
             RefreshSubactionList(script);
 
-            LoadAnimation(script.AnimOffset, script.AnimSize);
+            LoadAnimation(script.Symbol);
 
             ResetModelVis();
         }
@@ -492,37 +540,157 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
-        private void SaveSubactionChanges()
+        private void SaveAllActionChanges()
         {
-            int index = 0;
-            if (actionList.SelectedItem is Action a)
-            {
-                AddActionToUndo();
+            for (int i = 0; i < AllActions.Count; i++)
+                SaveActionChanges(i);
+        }
 
-                a._struct.References.Clear();
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SaveSelectedActionChanges()
+        {
+            int index = actionList.SelectedIndex;
+            if (index != -1)
+                SaveActionChanges(index);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SaveActionChanges(int index)
+        {
+            var a = AllActions[index];
+            AddActionToUndo();
+
+            if (!a.Subroutine)
+            {
                 var ftcmd = new SBM_FighterCommand();
                 ftcmd._s = _node.Accessor._s.GetEmbeddedStruct(0x18 * index, ftcmd.TrimmedSize);
                 ftcmd.Name = a.Symbol;
                 ftcmd.AnimationOffset = a.AnimOffset;
                 ftcmd.AnimationSize = a.AnimSize;
                 ftcmd.Flags = a.Flags;
-                _node.Accessor._s.SetEmbededStruct(0x18 * index, ftcmd._s);
 
-                List<byte> scriptData = new List<byte>();
-                foreach (SubActionScript scr in subActionList.Items)
-                { 
-                    // TODO: are all references in this position?
-                    if(scr.Reference != null)
-                    {
-                        a._struct.References.Add(scriptData.Count + 4, scr.Reference);
-                    }
-                    scriptData.AddRange(scr.data);
+                if (_node.Accessor._s.Length <= 0x18 * index + 0x18)
+                    _node.Accessor._s.Resize(0x18 * index + 0x18);
+
+                _node.Accessor._s.SetEmbededStruct(0x18 * index, ftcmd._s);
+            }
+
+            // compile subaction
+            a._struct.References.Clear();
+            List<byte> scriptData = new List<byte>();
+            foreach (SubActionScript scr in subActionList.Items)
+            {
+                // TODO: are all references in this position?
+                if (scr.Reference != null)
+                {
+                    a._struct.References.Add(scriptData.Count + 4, scr.Reference);
                 }
+                scriptData.AddRange(scr.data);
+            }
+
+            // update struct
+            a._struct.SetData(scriptData.ToArray());
+            SubactionProcess.SetStruct(a._struct, SubactionGroup);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SaveFile()
+        {
+            GenerateAndSaveNewAJFile();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void GenerateAndSaveNewAJFile()
+        {
+            // rendering files not loaded
+            if (string.IsNullOrEmpty(AJFilePath))
+                return;
+
+            // make sure okay to overwrite
+            if (MessageBox.Show($"Is it okay to overwrite {AJFilePath}?", "Save Animation File Changes?", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                return;
+
+            // collect used symbols from all actions
+            var usedSymbols = AllActions.Select(e => e.Symbol);
+
+            // generate new aj file
+            Dictionary<string, Tuple<int, int>> animOffsets = new Dictionary<string, Tuple<int, int>>();
+
+            using (MemoryStream ajBuffer = new MemoryStream())
+            using (BinaryWriterExt w = new BinaryWriterExt(ajBuffer))
+            {
+                // collect used symbols
+                foreach (var sym in usedSymbols)
+                {
+                    if(sym != null)
+                    {
+                        if (SymbolToAnimation.ContainsKey(sym) && !animOffsets.ContainsKey(sym))
+                        {
+                            // write animation
+                            var anim = SymbolToAnimation[sym];
+                            animOffsets.Add(sym, new Tuple<int, int>((int)ajBuffer.Position, anim.Length));
+                            w.Write(anim);
+                            w.Align(0x20, 0xFF);
+                        }
+                        else
+                        if (!animOffsets.ContainsKey(sym))
+                        {
+                            // animation not found
+                            MessageBox.Show($"\"{sym}\" animation not found", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            animOffsets.Add(sym, new Tuple<int, int>(0, 0));
+                        }
+                    }
+                }
+
+                // dump to file
+                File.WriteAllBytes(AJFilePath, ajBuffer.ToArray());
+            }
+
+
+            int index = 0;
+            foreach(var a in AllActions)
+            {
+                // don't write subroutines
+                if (a.Subroutine)
+                    continue;
+
+                // get embedded script
+                var ftcmd = new SBM_FighterCommand();
+                ftcmd._s = _node.Accessor._s.GetEmbeddedStruct(0x18 * index, ftcmd.TrimmedSize);
                 
-                a._struct.SetData(scriptData.ToArray());
-                SubactionProcess.SetStruct(a._struct, SubactionGroup);
+                // update symbol name
+                ftcmd.Name = a.Symbol;
+
+                // offset
+                var ofst = animOffsets[a.Symbol];
+
+                // update action offset and size
+                a.AnimOffset = ofst.Item1;
+                a.AnimSize = ofst.Item2;
+
+                // update file offset and size
+                ftcmd.AnimationOffset = a.AnimOffset;
+                ftcmd.AnimationSize = a.AnimSize;
+
+                // resize if needed
+                if (_node.Accessor._s.Length <= 0x18 * index + 0x18)
+                    _node.Accessor._s.Resize(0x18 * index + 0x18);
+
+                // update script
+                _node.Accessor._s.SetEmbededStruct(0x18 * index, ftcmd._s);
                 index++;
             }
+
+            MainForm.Instance.SaveDAT();
         }
 
         /// <summary>
@@ -556,22 +724,66 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
+        public int ActionCount
+        {
+            get
+            {
+                int index = 0;
+                foreach (var v in AllActions)
+                {
+                    if (v.Subroutine)
+                        break;
+                    index++;
+                }
+                return index;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
+            var data = new byte[] { 0, 0, 0, 0 };
+            var action = new Action()
+            {
+                _struct = new HSDStruct(data)
+            };
+
+            var index = actionList.SelectedIndex;
+
+            if (index == -1 || index > ActionCount)
+                index = ActionCount;
+
+            AllActions.Insert(index, action);
+            RefreshActionList();
+            actionList.SelectedItem = action;
+
+            SaveAllActionChanges();
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createNewSubroutineToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
             var data = new byte[] { 0x18, 0, 0, 0 };
             var action = new Action()
             {
-                Symbol = "Custom_" + AllScripts.Count,
-                DisplayText = "Custom_" + AllScripts.Count,
-                _struct = new HSDStruct(data)
+                _struct = new HSDStruct(data),
+                Subroutine = true
             };
-            AllScripts.Insert(actionList.SelectedIndex, action);
+            AllActions.Insert(actionList.Items.Count, action);
             RefreshActionList();
             actionList.SelectedItem = action;
+
+            SaveAllActionChanges();
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -581,8 +793,10 @@ namespace HSDRawViewer.GUI
         {
             if(actionList.SelectedIndex != -1)
             {
-                AllScripts.RemoveAt(actionList.SelectedIndex);
+                AllActions.RemoveAt(actionList.SelectedIndex);
                 RefreshActionList();
+
+                SaveAllActionChanges();
             }
         }
         
@@ -613,7 +827,7 @@ namespace HSDRawViewer.GUI
             subActionList.SelectedItem = null;
             subActionList.SelectedItem = ac;
 
-            SaveSubactionChanges();
+            SaveSelectedActionChanges();
         }
 
         /// <summary>
@@ -639,7 +853,7 @@ namespace HSDRawViewer.GUI
             }
             subActionList.EndUpdate();
 
-            SaveSubactionChanges();
+            SaveSelectedActionChanges();
         }
 
         /// <summary>
@@ -661,7 +875,7 @@ namespace HSDRawViewer.GUI
 
             if (subActionList.SelectedItem is SubActionScript sa)
             {
-                using (SubActionPanel p = new SubActionPanel(AllScripts))
+                using (SubActionPanel p = new SubActionPanel(AllActions))
                 {
                     p.LoadData(sa.data, sa.Reference, SubactionGroup);
                     if (p.ShowDialog() == DialogResult.OK)
@@ -675,7 +889,7 @@ namespace HSDRawViewer.GUI
 
                         subActionList.Items[selectedIndex] = subActionList.SelectedItem;
 
-                        SaveSubactionChanges();
+                        SaveSelectedActionChanges();
 
                         subActionList.Invalidate();
                     }
@@ -785,7 +999,7 @@ namespace HSDRawViewer.GUI
                 }
             }
             subActionList.EndUpdate();
-            SaveSubactionChanges();
+            SaveSelectedActionChanges();
         }
 
         private void buttonDown_Click(object sender, EventArgs e)
@@ -806,7 +1020,7 @@ namespace HSDRawViewer.GUI
                 }
             }
             subActionList.EndUpdate();
-            SaveSubactionChanges();
+            SaveSelectedActionChanges();
         }
 
         /// <summary>
@@ -890,7 +1104,7 @@ namespace HSDRawViewer.GUI
                             if(v.GetGroup() == SubactionGroup)
                                 subActionList.Items.Insert(index, v.Clone());
 
-                        SaveSubactionChanges();
+                        SaveSelectedActionChanges();
                     }
                 }
             }
@@ -989,7 +1203,7 @@ namespace HSDRawViewer.GUI
             DialogResult dialogResult = MessageBox.Show("Are you sure?\nThis operation cannot be undone", "Clear All Scripts", MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
-                foreach(var script in AllScripts)
+                foreach(var script in AllActions)
                 {
                     script._struct.References.Clear();
                     script._struct.SetData(new byte[4]);
@@ -1050,7 +1264,8 @@ namespace HSDRawViewer.GUI
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private byte[] AJBuffer;
+        private string AJFilePath;
+        private Dictionary<string, byte[]> SymbolToAnimation = new Dictionary<string, byte[]>();
         
         private ModelPartAnimations[] ModelPartsIndices;
 
@@ -1072,8 +1287,9 @@ namespace HSDRawViewer.GUI
             var aFile = MainForm.Instance.FilePath.Replace(".dat", "AJ.dat");
             var cFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
 
+            // try to automatically locate files
             bool openFiles = true;
-            if(System.IO.File.Exists(aFile) && System.IO.File.Exists(cFile))
+            if (File.Exists(aFile) && File.Exists(cFile))
             {
                 var r = MessageBox.Show($"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", "Open Files", MessageBoxButtons.YesNoCancel);
 
@@ -1083,6 +1299,8 @@ namespace HSDRawViewer.GUI
                 if (r == DialogResult.Yes)
                     openFiles = false;
             }
+
+            // find files to open
             if (openFiles)
             {
                 cFile = FileIO.OpenFile("Fighter Costume (Pl**Nr.dat)|*.dat");
@@ -1093,28 +1311,52 @@ namespace HSDRawViewer.GUI
                     return;
             }
 
+            // load model
             var modelFile = new HSDRawFile(cFile);
             if (modelFile.Roots.Count > 0 && modelFile.Roots[0].Data is HSD_JOBJ jobj)
+            {
                 JOBJManager.SetJOBJ(jobj);
+
+                // load material animation if it exists
+                if (modelFile.Roots.Count > 1 && modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
+                {
+                    JOBJManager.SetMatAnimJoint(matanim);
+                    JOBJManager.EnableMaterialFrame = true;
+                }
+            }
             else
                 return;
-
-            if (modelFile.Roots.Count > 1 && modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
-            {
-                JOBJManager.SetMatAnimJoint(matanim);
-                JOBJManager.EnableMaterialFrame = true;
-            }
-
+            
+            // set model scale
             JOBJManager.ModelScale = ModelScale;
+
+            // clear hidden dobjs
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+
+            // don't render bones by default
             JOBJManager.settings.RenderBones = false;
 
+            // reset model visibility
             ResetModelVis();
+
+            // load the model parts
             LoadModelParts();
 
-            AJBuffer = System.IO.File.ReadAllBytes(aFile);
-
+            // populate animation dictionary
+            AJFilePath = aFile;
+            SymbolToAnimation.Clear();
+            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(aFile, FileMode.Open)))
+                foreach (var a in AllActions)
+                    if (a.Symbol != null && !SymbolToAnimation.ContainsKey(a.Symbol))
+                        SymbolToAnimation.Add(a.Symbol, r.GetSection((uint)a.AnimOffset, a.AnimSize));
+            
+            // enable preview box
             previewBox.Visible = true;
+            savePlayerRenderingFilesToolStripMenuItem.Enabled = true;
+
+            // reselect action
+            if(actionList.SelectedItem is Action action)
+                SelectAction(action);
         }
 
         /// <summary>
@@ -1217,7 +1459,6 @@ namespace HSDRawViewer.GUI
                 {
                     foreach(var v in plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Array)
                         JOBJManager.MatAnimation.SetFrame(v.Value, frame);
-
                 }
                 else
                 {
@@ -1427,21 +1668,25 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="offset"></param>
         /// <param name="size"></param>
-        private void LoadAnimation(int offset, int size)
+        private void LoadAnimation(string symbol)
         {
+            // clear animation
             JOBJManager.SetFigaTree(null);
 
-            if (size == 0 || AJBuffer == null || offset + size > AJBuffer.Length)
+            // check if animation exists
+            if (symbol == null || !SymbolToAnimation.ContainsKey(symbol))
                 return;
 
-            var f = new byte[size];
-            Array.Copy(AJBuffer, offset, f, 0, size);
-            var anim = new HSDRawFile(f);
+            // load animation
+            var anim = new HSDRawFile(SymbolToAnimation[symbol]);
             if(anim.Roots[0].Data is HSD_FigaTree tree)
             {
                 var name = new Action() { Symbol = anim.Roots[0].Name }.ToString();
 
                 JOBJManager.SetFigaTree(tree);
+                
+                _animEditor.SetJoint(JOBJManager.GetJOBJ(0), JOBJManager.Animation);
+
                 viewport.MaxFrame = tree.FrameCount;
 
                 ThrowDummyManager.CleanupRendering();
@@ -1449,6 +1694,7 @@ namespace HSDRawViewer.GUI
 
                 AnimationName = name;
 
+                // load throw dummy for thrown animations
                 if (name.Contains("Throw") && !name.Contains("Taro"))
                 {
                     // find thrown anim
@@ -1462,15 +1708,13 @@ namespace HSDRawViewer.GUI
                         }
                     } 
 
-                    if (throwAction != null)
+                    if (throwAction != null && throwAction.Symbol != null && SymbolToAnimation.ContainsKey(throwAction.Symbol))
                     {
                         // load throw dummy
                         ThrowDummyManager.SetJOBJ(DummyThrowModel.GenerateThrowDummy());
 
                         // load throw animation
-                        var tf = new byte[throwAction.AnimSize];
-                        Array.Copy(AJBuffer, throwAction.AnimOffset, tf, 0, tf.Length);
-                        var tanim = new HSDRawFile(tf);
+                        var tanim = new HSDRawFile(SymbolToAnimation[throwAction.Symbol]);
                         if (tanim.Roots[0].Data is HSD_FigaTree tree2)
                             ThrowDummyManager.SetFigaTree(tree2);
                     }
@@ -1521,7 +1765,7 @@ namespace HSDRawViewer.GUI
                 subActionList.Items.Insert(index, i);
             }
 
-            SaveSubactionChanges();
+            SaveSelectedActionChanges();
 
             subActionList.SelectedIndex = index;
         }
@@ -1538,7 +1782,7 @@ namespace HSDRawViewer.GUI
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            SaveSubactionChanges();
+            SaveSelectedActionChanges();
         }
 
         /// <summary>
@@ -1592,7 +1836,7 @@ namespace HSDRawViewer.GUI
             {
                 using (FileStream stream = new FileStream(f, FileMode.Create))
                 using (StreamWriter w = new StreamWriter(stream))
-                    foreach (var v in AllScripts)
+                    foreach (var v in AllActions)
                     {
                         w.WriteLine($"[Symbol = \"{v.Symbol}\"]");
                         w.WriteLine($"[AnimOffset = 0x{v.AnimOffset}]");
@@ -1600,7 +1844,7 @@ namespace HSDRawViewer.GUI
                         w.WriteLine($"[Flags = 0x{v.Flags.ToString("X")}]");
 
                         var scripts = GetScripts(v);
-                        w.WriteLine(v.DisplayText + "()");
+                        w.WriteLine(v.ToString() + "()");
                         w.WriteLine("{");
                         foreach (var s in scripts)
                             w.WriteLine($"\t{s.Serialize(this)};");
@@ -1637,6 +1881,117 @@ namespace HSDRawViewer.GUI
 
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void savePlayerRenderingFilesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFile();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importFigatreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (actionList.SelectedItem is Action a)
+            {
+                var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+
+                if (f != null)
+                {
+                    // check valid dat file
+                    var file = new HSDRawFile(f);
+
+                    // grab symbol
+                    var symbol = file.Roots[0].Name;
+
+                    // check if symbol exists and ok to overwrite
+                    if(SymbolToAnimation.ContainsKey(symbol))
+                    {
+                        if(MessageBox.Show($"Symbol \"{symbol}\" already exists.\nIs it okay to overwrite?", "Overwrite Symbol", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                            return;
+
+                        SymbolToAnimation[symbol] = File.ReadAllBytes(f);
+                    }
+                    else
+                        SymbolToAnimation.Add(symbol, File.ReadAllBytes(f));
+                        
+                    // set action symbol
+                    a.Symbol = symbol;
+
+                    // reselect action
+                    LoadAnimation(symbol);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportFigatreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(actionList.SelectedItem is Action a)
+            {
+                if(a.Symbol != null && SymbolToAnimation.ContainsKey(a.Symbol))
+                {
+                    var f = FileIO.SaveFile(ApplicationSettings.HSDFileFilter, a.Symbol + ".dat");
+
+                    if (f != null)
+                        File.WriteAllBytes(f, SymbolToAnimation[a.Symbol]);
+                }
+            }
+        }
+
+        private PopoutJointAnimationEditor _animEditor = new PopoutJointAnimationEditor();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void popoutEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _animEditor.Show();
+            _animEditor.Visible = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveAnimationChangesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveAnimation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SaveAnimation()
+        {
+            if(actionList.SelectedItem is Action action)
+            {
+                HSDRawFile f = new HSDRawFile();
+                f.Roots.Add(new HSDRootNode()
+                {
+                    Name = action.Symbol,
+                    Data = JOBJManager.Animation.ToFigaTree()
+                });
+                var tempFileName = Path.GetTempFileName();
+                f.Save(tempFileName);
+                SymbolToAnimation[action.Symbol] = File.ReadAllBytes(tempFileName);
+                File.Delete(tempFileName);
             }
         }
     }

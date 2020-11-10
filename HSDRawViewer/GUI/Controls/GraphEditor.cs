@@ -293,6 +293,16 @@ namespace HSDRawViewer.GUI.Controls
         /// <summary>
         /// 
         /// </summary>
+        public void ClearTracks()
+        {
+            _players.Clear();
+            trackTree.Nodes.Clear();
+            Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="aobj"></param>
         public void LoadTracks(AnimType type, HSD_AOBJ aobj)
         {

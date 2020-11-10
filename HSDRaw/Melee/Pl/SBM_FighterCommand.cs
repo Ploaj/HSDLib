@@ -35,12 +35,15 @@ namespace HSDRaw.Melee.Pl
                 {
                     _s.SetReference(0x00, null);
                 }
-                var re = _s.GetCreateReference<HSDAccessor>(0x00);
-                byte[] data = new byte[value.Length+1];
-                var bytes = UTF8Encoding.UTF8.GetBytes(value);
-                for (int i = 0; i < value.Length; i++)
-                    data[i] = bytes[i];
-                re._s.SetData(data);
+                else
+                {
+                    var re = _s.GetCreateReference<HSDAccessor>(0x00);
+                    byte[] data = new byte[value.Length + 1];
+                    var bytes = UTF8Encoding.UTF8.GetBytes(value);
+                    for (int i = 0; i < value.Length; i++)
+                        data[i] = bytes[i];
+                    re._s.SetData(data);
+                }
             }
         }
 
