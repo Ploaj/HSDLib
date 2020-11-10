@@ -245,22 +245,26 @@ namespace HSDRawViewer.GUI.Controls
                         gr.SetKeys(_selectedPlayer);
 
                         // horizontal lines
-                        DrawLine(graphics, BackTickColor, -x1, 0, x1 * 2 + rect.Width, 0);
+                        graphics.DrawLine(BackTickColor, -x1, 0, x1 * 2 + rect.Width, 0);
                         graphics.DrawString(gr.MinValue.ToString("n2"), _markerFont, FontColor, -20, 0, _markerFormat);
 
-                        DrawLine(graphics, BackTickColor, -x1, rect.Height / 4f, x1 * 2 + rect.Width, rect.Height / 4f);
+                        graphics.DrawLine(BackTickColor, -x1, rect.Height / 4f, x1 * 2 + rect.Width, rect.Height / 4f);
 
-                        DrawLine(graphics, BackTickColor, -x1, rect.Height / 2f, x1 * 2 + rect.Width, rect.Height / 2f);
+                        graphics.DrawLine(BackTickColor, -x1, rect.Height / 2f, x1 * 2 + rect.Width, rect.Height / 2f);
                         graphics.DrawString(((gr.MinValue + gr.MaxValue) / 2).ToString("n2"), _markerFont, FontColor, -20, rect.Height / 2f, _markerFormat);
 
-                        DrawLine(graphics, BackTickColor, -x1, rect.Height * 3f / 4f, x1 * 2 + rect.Width, rect.Height * 3f / 4f);
+                        graphics.DrawLine(BackTickColor, -x1, rect.Height * 3f / 4f, x1 * 2 + rect.Width, rect.Height * 3f / 4f);
 
-                        DrawLine(graphics, BackTickColor, -x1, rect.Height, x1 * 2 + rect.Width, rect.Height);
+                        graphics.DrawLine(BackTickColor, -x1, rect.Height, x1 * 2 + rect.Width, rect.Height);
                         graphics.DrawString(gr.MaxValue.ToString("n2"), _markerFont, FontColor, -20, rect.Height, _markerFormat);
                     }
 
                     var tickWidth = (rect.Width / (float)_frameCount);
                     var increment = 1;
+
+                    // fix infinity
+                    if (_frameCount == 0)
+                        tickWidth = 1;
 
                     // don't crunch numbers too far together
                     if (tickWidth * Zoom < 20)
@@ -278,13 +282,13 @@ namespace HSDRawViewer.GUI.Controls
                             var x = i * tickWidth;
 
                             // frame line
-                            DrawLine(graphics, BackTickColor, x, 0, x, rect.Height);
+                            graphics.DrawLine(BackTickColor, x, 0, x, rect.Height);
 
                             // tick number
                             graphics.DrawString(i.ToString(), _markerFont, FontColor, x, -12, _markerFormat);
 
                             // tick line
-                            DrawLine(graphics, TickColor, x, 0, x, 5f);
+                            graphics.DrawLine(TickColor, x, 0, x, 5f);
                         }
                     }
                 }
@@ -327,28 +331,14 @@ namespace HSDRawViewer.GUI.Controls
 
                         graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), _graph.Height);
 
-                        DrawLine(graphics, FrameIndicatorPen, start, 0, start, _graph.Height);
+                        graphics.DrawLine(FrameIndicatorPen, start, 0, start, _graph.Height);
                     }
 
-                    DrawLine(graphics, FrameIndicatorPen, linex, 0, linex, _graph.Height);
+                    graphics.DrawLine(FrameIndicatorPen, linex, 0, linex, _graph.Height);
                 }
 
             };
 
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="g"></param>
-        /// <param name="color"></param>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        private void DrawLine(Graphics g, Pen color, float x1, float y1, float x2, float y2)
-        {
-            g.DrawLine(color, x1, y1, x2, y2);
         }
 
         /// <summary>

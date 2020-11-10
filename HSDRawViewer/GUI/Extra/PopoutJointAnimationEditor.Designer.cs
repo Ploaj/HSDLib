@@ -41,7 +41,7 @@
             this.jointTree.ItemHeight = 24;
             this.jointTree.Location = new System.Drawing.Point(0, 0);
             this.jointTree.Name = "jointTree";
-            this.jointTree.Size = new System.Drawing.Size(246, 486);
+            this.jointTree.Size = new System.Drawing.Size(246, 564);
             this.jointTree.TabIndex = 1;
             this.jointTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.jointTree_AfterSelect);
             // 
@@ -49,7 +49,7 @@
             // 
             this.splitter1.Location = new System.Drawing.Point(246, 0);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 486);
+            this.splitter1.Size = new System.Drawing.Size(3, 564);
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
             // 
@@ -58,14 +58,14 @@
             this.graphEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.graphEditor1.Location = new System.Drawing.Point(249, 0);
             this.graphEditor1.Name = "graphEditor1";
-            this.graphEditor1.Size = new System.Drawing.Size(833, 486);
+            this.graphEditor1.Size = new System.Drawing.Size(833, 564);
             this.graphEditor1.TabIndex = 0;
             // 
             // PopoutJointAnimationEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1082, 486);
+            this.ClientSize = new System.Drawing.Size(1082, 564);
             this.Controls.Add(this.graphEditor1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.jointTree);
