@@ -483,6 +483,8 @@ namespace HSDRawViewer.GUI.Controls
 
                     keyProperty.SelectedObject = new KeyProxy() { key = key, slopekey = slope };
                 }
+                
+                label4.Text = _selectedPlayer.GetValue(_frame).ToString();
             }
 
             _graph.Invalidate();

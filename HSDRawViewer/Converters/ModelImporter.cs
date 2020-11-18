@@ -65,6 +65,9 @@ namespace HSDRawViewer.Converters
         [Category("Material Options"), DisplayName("Enable Diffuse"), Description("Enables DIFFUSE flag on materials")]
         public bool EnableDiffuse { get; set; } = true;
 
+        [Category("Material Options"), DisplayName("Enable Constant"), Description("Enables CONSTANT flag on materials. Material will have constant color.")]
+        public bool EnableConstant { get; set; } = false;
+
 
 
         [Category("Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("")]
@@ -688,6 +691,9 @@ namespace HSDRawViewer.Converters
 
             if (Settings.EnableDiffuse)
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
+
+            if (Settings.EnableConstant)
+                Mobj.RenderFlags |= RENDER_MODE.CONSTANT;
 
             // Properties
             if (material != null && Settings.ImportMaterialInfo)

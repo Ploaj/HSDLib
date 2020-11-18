@@ -99,8 +99,8 @@ namespace HSDRaw.Tools
                     p1 = key.Value,
                     d0 = key.Tan,
                     d1 = key.Tan,
-                    op = GXInterpolationType.HSD_A_OP_CON,
-                    op_intrp = GXInterpolationType.HSD_A_OP_CON
+                    op = key.InterpolationType,
+                    op_intrp = key.InterpolationType
                 };
             }
 

@@ -55,6 +55,8 @@
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
             this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.graphBox.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
@@ -80,6 +82,8 @@
             // 
             this.panel1.Controls.Add(this.nudFrame);
             this.panel1.Controls.Add(this.numericUpDown1);
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -340,6 +344,24 @@
             this.trackTypeBox.Size = new System.Drawing.Size(121, 25);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(311, 11);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(82, 13);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Value At Frame:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(390, 11);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(13, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "0";
+            // 
             // GraphEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,5 +417,7 @@
         private System.Windows.Forms.ToolStripMenuItem showAllTracksToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showFrameTicksToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showTangentsToolStripMenuItem;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
     }
 }

@@ -178,6 +178,10 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterFunctions.onIndexExtResultAnim.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.DemoMoveLogic.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.getTrailData.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.onThrowFw.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.onThrowBk.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.onThrowHi.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.onThrowLw.Array = new HSD_UInt[NumberOfEntries];
 
             d.FighterFunctions.onSmashDown.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onSmashUp.Array = new HSD_UInt[NumberOfEntries];
