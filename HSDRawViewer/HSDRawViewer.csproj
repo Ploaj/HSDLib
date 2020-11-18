@@ -150,7 +150,6 @@
     <Compile Include="ContextMenus\UnidentifiedContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Converters\Animation\BlendKeys.cs" />
     <Compile Include="Converters\Animation\CHR0Converter.cs" />
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />

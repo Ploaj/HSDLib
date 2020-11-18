@@ -260,7 +260,7 @@ namespace HSDRawViewer.Rendering
             GL.Color4(color.X, color.Y, color.Z, alpha);
 
             int i, j;
-            for (i = 0; i <= lats; i++)
+            for (i = 1; i <= lats; i++)
             {
                 double lat0 = Math.PI * (-0.5 + (double)(i - 1) / lats);
                 double z0 = Math.Sin(lat0);
