@@ -39,7 +39,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             get
             {
                 var c = Parent;
-                while (c != null && !(c is MexDataEditor)) c = c.Parent;
+                while (c != null && !(c is MexDataEditor)) { c = c.Parent; Console.WriteLine(c.GetType()); }
                 if (c is MexDataEditor e) return e;
                 return null;
             }
@@ -86,6 +86,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 MEXConverter.internalIDValues.Add("None");
                 MEXConverter.internalIDValues.AddRange(FighterEntries.Select(e => e.NameText));
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void CheckEnable(MexDataEditor editor)
+        {
+            var sym = editor.GetSymbol("ftLoadCommonData");
+
+            if (DummyBoneTable == null && sym != null && sym is ftLoadCommonData plco)
+                LoadPlCO(plco);
         }
 
         /// <summary>
@@ -169,19 +180,19 @@ namespace HSDRawViewer.GUI.MEX.Controls
             d.FighterFunctions.onActionStateChange.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onRespawn.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onModelRender.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onShadowRender.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onUnknownMultijump.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.onShadowRender = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onUnknownMultijump = new HSDArrayAccessor<HSD_UInt>();
             d.FighterFunctions.onActionStateChangeWhileEyeTextureIsChanged.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onTwoEntryTable.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onLand.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onExtRstAnim.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onIndexExtResultAnim.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.DemoMoveLogic.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.getTrailData.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onThrowFw.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onThrowBk.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onThrowHi.Array = new HSD_UInt[NumberOfEntries];
-            d.FighterFunctions.onThrowLw.Array = new HSD_UInt[NumberOfEntries];
+            d.FighterFunctions.onTwoEntryTable = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onLand = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onExtRstAnim = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onIndexExtResultAnim = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.DemoMoveLogic = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.getTrailData = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onThrowFw = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onThrowBk = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onThrowHi = new HSDArrayAccessor<HSD_UInt>();
+            d.FighterFunctions.onThrowLw = new HSDArrayAccessor<HSD_UInt>();
 
             d.FighterFunctions.onSmashDown.Array = new HSD_UInt[NumberOfEntries];
             d.FighterFunctions.onSmashUp.Array = new HSD_UInt[NumberOfEntries];
@@ -336,7 +347,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void cloneButton_Click(object sender, EventArgs e)
         {
-            if (PlCo == null)
+            if (Editor.GetFile("PlCo.dat") == null)
             {
                 MessageBox.Show("Please load PlCo.dat before cloning a fighter");
                 return;
@@ -394,7 +405,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void importFighter_Click(object sender, EventArgs e)
         {
-            if(PlCo == null)
+            if(Editor.GetFile("PlCo.dat") == null)
             {
                 MessageBox.Show("Please load PlCo.dat before importing a fighter");
                 return;
@@ -435,12 +446,13 @@ namespace HSDRawViewer.GUI.MEX.Controls
         private void deleteFighter_Click(object sender, EventArgs e)
         {
             var selected = fighterList.SelectedIndex;
-            if (IsExtendedFighter(selected))
-            {
+
+            if (!IsExtendedFighter(selected))
+                MessageBox.Show("Unable to delete base game fighters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            else 
+            if(MessageBox.Show("Permanently delete this Fighter?", "Delete Fighter", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
                 DeleteFighter(SelectedEntry);
-                return;
-            }
-            MessageBox.Show("Unable to delete base game fighters", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
         }
 
         /// <summary>
@@ -584,36 +596,9 @@ static struct MoveLogic move_logic[] = {
 
         #endregion
 
-
-        private string PlCoPath;
-        private HSDRawFile PlCo;
+        
         private SBM_BoneLookupTable DummyBoneTable;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void plcoButton_Click(object sender, EventArgs e)
-        {
-            var f = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "PlCo.dat");
-
-            if(!File.Exists(f))
-                f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "PlCo.dat");
-
-            if (f != null)
-            {
-                PlCo = new HSDRawFile(f);
-
-                if(PlCo.Roots[0].Data is ftLoadCommonData ftData)
-                {
-                    PlCoPath = f;
-                    LoadPlCO(ftData);
-                }
-                else
-                    PlCo = null;
-            }
-        }
+        
 
         /// <summary>
         /// 
@@ -644,8 +629,6 @@ static struct MoveLogic move_logic[] = {
             }
 
             DummyBoneTable = tables[tables.Length - 1];
-
-            importPlCoButton.Visible = false;
         }
 
         /// <summary>
@@ -653,6 +636,8 @@ static struct MoveLogic move_logic[] = {
         /// </summary>
         public void SavePlCo()
         {
+            var PlCo = Editor.GetFile("PlCo.dat");
+
             if (PlCo == null)
                 return;
             
@@ -675,22 +660,6 @@ static struct MoveLogic move_logic[] = {
                 ft.Add(null);
                 ftData.FighterTable.Array = ft.ToArray();
             }
-
-            PlCo.Save(PlCoPath);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void ClosePlCo()
-        {
-            PlCo = null;
-            PlCoPath = "";
-            importPlCoButton.Visible = true;
-            DummyBoneTable = null;
-
-            foreach (var fighter in FighterEntries)
-                fighter.BoneTable = null;
         }
     }
 }

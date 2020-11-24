@@ -29,7 +29,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         private HSD_JOBJ CSPRender;
 
         public HSDRawFile MenuFile;
-        private string MenuFilePath;
 
         private SBM_SelectChrDataTable SelectTable { get => (SBM_SelectChrDataTable)MenuFile?["MnSelectChrDataTable"].Data; }
 
@@ -49,23 +48,21 @@ namespace HSDRawViewer.GUI.MEX.Controls
             HandleDestroyed += (sender, args) =>
             {
                 CloseFile();
+
+                Image oldImage = iconPreviewBox.Image;
+                iconPreviewBox.Image = null;
+                if (oldImage != null)
+                    oldImage.Dispose();
             };
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void LoadFile()
+        public void LoadFile(HSDRawFile file)
         {
-            var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "MnSlChr.usd");
-            if(!File.Exists(path))
-                path = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
-
-            if (path != null)
-            {
-                LoadMnSlChr(path);
-                Enabled = true;
-            }
+            if (MenuFile == null && file != null)
+                LoadMnSlChr(file);
         }
 
         /// <summary>
@@ -73,14 +70,14 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         public void SaveFile()
         {
-            if (MenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(MenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MenuFile != null)// && MessageBox.Show("Save Change to " + Path.GetFileName(MenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 // regenerate and hook node
                 MexCssGenerator.SetMexNode((MEX_mexSelectChr)MenuFile["mexSelectChr"].Data, Icons);
 
                 // save file
-                MenuFile.TrimData();
-                MenuFile.Save(MenuFilePath);
+                //MenuFile.TrimData();
+                //MenuFile.Save(MenuFilePath);
             }
         }
 
@@ -96,7 +93,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
             CSPRender = null;
 
             MenuFile = null;
-            MenuFilePath = "";
 
             Enabled = false;
         }
@@ -105,27 +101,30 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        private void LoadMnSlChr(string filePath)
+        private void LoadMnSlChr(HSDRawFile datFile)
         {
-            HSDRawFile hsd = new HSDRawFile(filePath);
+            // don't load if file is already loaded
+            if (MenuFile != null)
+                return;
 
-            var node = hsd["mexSelectChr"];
+            // find/create mexSelectChr node
+            var node = datFile["mexSelectChr"];
 
-            if (node == null && hsd.Roots[0].Data is SBM_SelectChrDataTable menu)
+            if (node == null && datFile.Roots[0].Data is SBM_SelectChrDataTable menu)
             {
                 MessageBox.Show("mexSelectChr symbol not found. One will now be generated", "Symbol Not Found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                hsd.Roots.Add(new HSDRootNode()
+                datFile.Roots.Add(new HSDRootNode()
                 {
                     Name = "mexSelectChr",
                     Data = MexCssGenerator.GenerateMEXMapFromVanilla(menu, Icons)
                 });
-                node = hsd["mexSelectChr"];
+                node = datFile["mexSelectChr"];
             }
-
-            if (node != null && hsd.Roots[0].Data is SBM_SelectChrDataTable tab)
+            
+            // load data for rendering
+            if (node != null && datFile["MnSelectChrDataTable"] != null)
             {
-                MenuFilePath = filePath;
-                MenuFile = hsd;
+                MenuFile = datFile;
 
                 // mex data node
                 var mex = node.Data as MEX_mexSelectChr;
@@ -164,6 +163,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 RefreshMenuRender();
                 
                 LoadPreviewModel();
+
+                Enabled = true;
             }
         }
 
@@ -174,9 +175,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             CSPRender.Child.Dobj.Mobj.Textures = null;
 
-            if (SelectedIcon != null && cspSelectBox.SelectedIndex >= 0 && cspSelectBox.SelectedIndex < SelectedIcon.CSPs.Count)
+            if (SelectedIcon != null && cspArrayEditor.SelectedIndex >= 0 && cspArrayEditor.SelectedIndex < SelectedIcon.CSPs.Length)
             {
-                CSPRender.Child.Dobj.Mobj.Textures = SelectedIcon.CSPs[cspSelectBox.SelectedIndex];
+                CSPRender.Child.Dobj.Mobj.Textures = SelectedIcon.CSPs[cspArrayEditor.SelectedIndex].TOBJ;
                 CSPRender.Child.Dobj.Mobj.Textures.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE;
             }
 
@@ -361,17 +362,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 if (Math.Abs((rect.Y - rect.Height) - coll.Y) < SnapDelta) icon.PositionY = coll.Y + rect.Height - icon.OffsetY + icon.Height;
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cspSelectBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            RefreshMenuRender();
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -387,29 +378,26 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         public void RefreshCSPRender()
         {
-            cspSelectBox.Items.Clear();
-
-            if (SelectedIcon == null || SelectedIcon.CSPs.Count == 0)
+            if (SelectedIcon == null || SelectedIcon.CSPs.Length == 0)
                 return;
 
-            for (int i = 0; i < SelectedIcon.CSPs.Count; i++)
-                cspSelectBox.Items.Add("CSP " + i.ToString());
+            Image oldImage = iconPreviewBox.Image;
+            iconPreviewBox.Image = null;
+            if (oldImage != null)
+                oldImage.Dispose();
 
-            cspSelectBox.SelectedIndex = 0;
+            iconPreviewBox.Image = TOBJConverter.ToBitmap(SelectedIcon.IconTexture);
+
+            cspArrayEditor.SetArrayFromProperty(SelectedIcon, "CSPs");
+
             RefreshMenuRender();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void CalculateEvenSpacing()
-        {
-            foreach(var ico in Icons)
-            {
-
-            }
-        }
-
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cssIconEditor_ArrayUpdated(object sender, EventArgs e)
         {
             LoadPreviewModel();
@@ -422,7 +410,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <param name="e"></param>
         private void replaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            if (cspArrayEditor.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
             {
                 var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
@@ -431,47 +419,33 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     HSD_TOBJ tobj = null;
                     using (Bitmap bmp = new Bitmap(f))
                         tobj = Converters.TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
-
-                    icon.CSPs[cspSelectBox.SelectedIndex] = tobj;
+                    
+                    if(cspArrayEditor.SelectedObject is TOBJProxy proxy)
+                    {
+                        proxy.TOBJ = tobj;
+                        cspArrayEditor.Invalidate();
+                    }
                 }
                 RefreshCSPRender();
             }
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addToolStripMenuItem_Click(object sender, EventArgs e)
+        private void buttonExportCSP_Click(object sender, EventArgs e)
         {
-            if (cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
+            if (cspArrayEditor.SelectedObject is TOBJProxy proxy)
             {
-                var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                var f = FileIO.SaveFile(ApplicationSettings.ImageFileFilter, "CSP.png");
 
-                if (f != null)
+                if(f != null)
                 {
-                    HSD_TOBJ tobj = null;
-                    using (Bitmap bmp = new Bitmap(f))
-                        tobj = Converters.TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
-
-                    icon.CSPs.Add(tobj);
+                    using (var bmp = TOBJConverter.ToBitmap(proxy.TOBJ))
+                        bmp.Save(f);
                 }
-                RefreshCSPRender();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if(cspSelectBox.SelectedIndex != -1 && cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon)
-            {
-                icon.CSPs.RemoveAt(cspSelectBox.SelectedIndex);
-                RefreshCSPRender();
             }
         }
 
@@ -490,11 +464,35 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 {
                     HSD_TOBJ tobj = null;
                     using (Bitmap bmp = new Bitmap(f))
-                        tobj = Converters.TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
-
-                    icon.Joint.Dobj.Next.Mobj.Textures = tobj;
+                        tobj = TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
                     tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_BLEND | TOBJ_FLAGS.ALPHAMAP_BLEND;
+
+                    icon.IconTexture = tobj;
+
+                    Image oldImage = iconPreviewBox.Image;
+                    iconPreviewBox.Image = null;
+                    if (oldImage != null)
+                        oldImage.Dispose();
+
+                    iconPreviewBox.Image = TOBJConverter.ToBitmap(icon.IconTexture);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonExportIcon_Click(object sender, EventArgs e)
+        {
+            if (cssIconEditor.SelectedObjects.Length == 1 && cssIconEditor.SelectedObject is MEX_CSSIconEntry icon && icon.IconTexture != null)
+            {
+                var f = FileIO.SaveFile(ApplicationSettings.ImageFileFilter, "Icon.png");
+
+                if (f != null)
+                    using (var bmp = TOBJConverter.ToBitmap(icon.IconTexture))
+                        bmp.Save(f);
             }
         }
 
@@ -514,27 +512,24 @@ namespace HSDRawViewer.GUI.MEX.Controls
             }
         }
 
-        /*
-         *
-        private void importIconButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonEditUI_CheckedChanged(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("PNG (*.png)|*.png");
-
-            if (f != null)
-            {
-                HSD_TOBJ tobj = null;
-                using (Bitmap bmp = new Bitmap(f))
-                    tobj = Converters.TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
-
-                var chrsel = MenuFile.Roots[0].Data as SBM_SelectChrDataTable;
-
-                InjectCSSIconTexture(chrsel.MenuModel, chrsel.MenuAnimation, chrsel.MenuMaterialAnimation, tobj, 17, false);
-                InjectCSSIconTexture(chrsel.SingleMenuModel, chrsel.SingleMenuAnimation, chrsel.SingleMenuMaterialAnimation, tobj, 13, true);
-            }
+            groupBox1.Visible = buttonEditUI.Checked;
         }
-        
-         * 
-         */
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cspArrayEditor_SelectedObjectChanged(object sender, EventArgs e)
+        {
+            RefreshMenuRender();
+        }
     }
 }

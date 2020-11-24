@@ -180,6 +180,18 @@
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.Designer.cs">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXCostumeManagerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXCostumeManagerControl.Designer.cs">
+      <DependentUpon>MEXCostumeManagerControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXExternalFileControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\MEX\Controls\MEXExternalFileControl.Designer.cs">
+      <DependentUpon>MEXExternalFileControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\MEX\Controls\MEXStockIconControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -524,6 +536,8 @@
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\ParticleManager.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\ts_x.png" />
+    <None Include="Resources\ts_check.png" />
     <None Include="Melee\command_color.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -568,6 +582,12 @@
     <None Include="Resources\ts_play.png" />
     <EmbeddedResource Include="GUI\Extra\PopoutJointAnimationEditor.resx">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MEX\Controls\MEXCostumeManagerControl.resx">
+      <DependentUpon>MEXCostumeManagerControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MEX\Controls\MEXExternalFileControl.resx">
+      <DependentUpon>MEXExternalFileControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MEX\Controls\MEXStockIconControl.resx">
       <DependentUpon>MEXStockIconControl.cs</DependentUpon>

@@ -67,6 +67,13 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
+        public void CheckEnable(MexDataEditor editor)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="data"></param>
         public void LoadData(MEX_Data data)
         {
@@ -89,6 +96,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     Reverb = data.StageData.ReverbTable[i],
                     Collision = data.StageData.CollisionTable[i],
                     ItemLookup = data.StageData.StageItemLookup[i],
+                    StageName = data.StageData.StageNames[i].Value
                 };
                 if (data.StageData.StagePlaylists[i] != null && data.StageData.StagePlaylists[i].MenuPlayListCount > 0)
                 {
@@ -114,6 +122,10 @@ namespace HSDRawViewer.GUI.MEX.Controls
             data.StageData.StageItemLookup.Array = StageEntries.Select(e => e.ItemLookup).ToArray();
             //data.StageData.StageEffectLookup.Array = StageEntries.Select(e => e.EffectLookup).ToArray();
             data.StageData.StagePlaylists.Array = StageEntries.Select(e => e.GetPlaylist()).ToArray();
+            data.StageData.StageNames = new HSDFixedLengthPointerArrayAccessor<HSD_String>()
+            {
+                Array = StageEntries.Select(e => new HSD_String() { Value = e.StageName }).ToArray()
+            };
 
             data.StageData.StageIDTable.Array = StageIDs.Select(e => e.IDTable).ToArray();
 
@@ -149,7 +161,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         {
             UpdateInternalIDs();
             MEXConverter.stageIDValues.Clear();
-            MEXConverter.stageIDValues.AddRange(StageEntries.Select((s, i) => i + " - " + s.FileName));
+            MEXConverter.stageIDValues.AddRange(StageEntries.Select((s, i) => i + " - " + s.StageName + " - " + s.FileName));
         }
 
         /// <summary>

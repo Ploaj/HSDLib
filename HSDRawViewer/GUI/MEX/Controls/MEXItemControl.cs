@@ -102,6 +102,13 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
+        public void CheckEnable(MexDataEditor editor)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="data"></param>
         public void LoadData(MEX_Data data)
         {

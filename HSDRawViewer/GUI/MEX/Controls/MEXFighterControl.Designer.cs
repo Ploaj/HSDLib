@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.importPlCoButton = new System.Windows.Forms.ToolStripButton();
             this.exportFighter = new System.Windows.Forms.ToolStripButton();
             this.importFighter = new System.Windows.Forms.ToolStripButton();
             this.cloneButton = new System.Windows.Forms.ToolStripButton();
@@ -55,7 +54,6 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importPlCoButton,
             this.exportFighter,
             this.importFighter,
             this.cloneButton,
@@ -65,15 +63,6 @@
             this.toolStrip1.Size = new System.Drawing.Size(720, 25);
             this.toolStrip1.TabIndex = 5;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // importPlCoButton
-            // 
-            this.importPlCoButton.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
-            this.importPlCoButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.importPlCoButton.Name = "importPlCoButton";
-            this.importPlCoButton.Size = new System.Drawing.Size(111, 22);
-            this.importPlCoButton.Text = "Import PlCo.dat";
-            this.importPlCoButton.Click += new System.EventHandler(this.plcoButton_Click);
             // 
             // exportFighter
             // 
@@ -257,6 +246,5 @@
         private System.Windows.Forms.Button buttonCopyMoveLogic;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.PropertyGrid boneTablePropertyGrid;
-        private System.Windows.Forms.ToolStripButton importPlCoButton;
     }
 }

@@ -8,5 +8,6 @@ namespace HSDRawViewer.GUI.MEX
         void LoadData(MEX_Data data);
         void SaveData(MEX_Data data);
         void ResetDataBindings();
+        void CheckEnable(MexDataEditor editor);
     }
 }

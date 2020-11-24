@@ -102,6 +102,15 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// <summary>
         /// 
         /// </summary>
+        public void CheckEnable(MexDataEditor editor)
+        {
+            CSS.LoadFile(editor.GetFile("MnSlChr.usd"));
+            SSS.LoadFile(editor.GetFile("MnSlMap.usd"));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="data"></param>
         public void LoadData(MEX_Data data)
         {
@@ -275,46 +284,25 @@ namespace HSDRawViewer.GUI.MEX.Controls
             CSS.CloseFile();
             SSS.CloseFile();
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void buttonImportMnSlMap_Click(object sender, EventArgs e)
-        {
-            SSS.LoadFile();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void buttonImportMnSlcChr_Click(object sender, EventArgs e)
-        {
-            CSS.LoadFile();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void playButton_Click(object sender, EventArgs e)
-        {
-            if (Frame == -1)
-                Frame = 0;
-            else
-                Frame = -1;
-        }
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="kbState"></param>
         public void ViewportKeyPress(KeyboardState kbState)
         {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void playButton_Click_1(object sender, EventArgs e)
+        {
+            if (Frame == -1)
+                Frame = 0;
+            else
+                Frame = -1;
         }
     }
 }

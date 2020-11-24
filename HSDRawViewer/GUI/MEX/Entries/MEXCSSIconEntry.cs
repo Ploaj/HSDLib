@@ -17,9 +17,9 @@ namespace HSDRawViewer.GUI.MEX
     public class MEX_CSSIconEntry
     {
         public MEX_CSSIcon icon;
-
-        public List<HSD_TOBJ> CSPs = new List<HSD_TOBJ>();
-        public List<HSD_TOBJ> StockIcons = new List<HSD_TOBJ>();
+        
+        [Browsable(false)]
+        public TOBJProxy[] CSPs { get; set; } = new TOBJProxy[0];
         
         public HSD_JOBJ Joint;
         public HSD_MatAnimJoint MatAnimJoint;
@@ -62,6 +62,25 @@ namespace HSDRawViewer.GUI.MEX
         public float Height { get => icon.Y2 - icon.Y1; set => icon.Y2 = icon.Y1 + Math.Abs(value); }
         
         private Stack<Vector3> PositionStack = new Stack<Vector3>();
+
+        [Browsable(false)]
+        public HSD_TOBJ IconTexture
+        {
+            get
+            {
+                if (Joint == null || Joint.Dobj == null || Joint.Dobj.Next == null || Joint.Dobj.Next.Mobj.Textures == null)
+                    return null;
+
+                return Joint.Dobj.Next.Mobj.Textures;
+            }
+            set
+            {
+                if (Joint == null || Joint.Dobj == null || Joint.Dobj.Next == null || Joint.Dobj.Next.Mobj.Textures == null)
+                    return;
+
+                Joint.Dobj.Next.Mobj.Textures = value;
+            }
+        }
 
         public void PushPosition()
         {

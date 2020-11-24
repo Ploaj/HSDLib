@@ -5,6 +5,7 @@ using System.Drawing;
 using System.ComponentModel;
 using System.Collections.Generic;
 using static System.Windows.Forms.ListBox;
+using HSDRaw.Common;
 
 namespace HSDRawViewer.GUI
 {
@@ -294,7 +295,7 @@ namespace HSDRawViewer.GUI
             if (Property == null)
                 return;
 
-            if (elementList.SelectedIndex != -1)
+            if (elementList.SelectedIndex > 0)
             {
                 elementList.BeginUpdate();
 
@@ -319,7 +320,7 @@ namespace HSDRawViewer.GUI
             if (Property == null)
                 return;
 
-            if (elementList.SelectedIndex != -1)
+            if (elementList.SelectedIndex != -1 && elementList.SelectedIndex + 1 < elementList.Items.Count)
             {
                 elementList.BeginUpdate();
 
@@ -469,6 +470,7 @@ namespace HSDRawViewer.GUI
                         if (img != null)
                         {
                             var indexBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, ImageWidth, ImageHeight);
+
                             e.Graphics.DrawImage(img, indexBound);
 
                             offset += ImageWidth;
@@ -545,6 +547,56 @@ namespace HSDRawViewer.GUI
     public interface ImageArrayItem : IDisposable
     {
         Image ToImage();
+    }
+    
+    public class TOBJProxy : ImageArrayItem
+    {
+        public HSD_TOBJ TOBJ = new HSD_TOBJ() { SX = 1, SY = 1, SZ = 1 };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public TOBJProxy()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobj"></param>
+        public TOBJProxy(HSD_TOBJ tobj)
+        {
+            TOBJ = tobj;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Image ToImage()
+        {
+            if (TOBJ != null)
+                return Converters.TOBJConverter.ToBitmap(TOBJ);
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "";
+        }
     }
 
 }

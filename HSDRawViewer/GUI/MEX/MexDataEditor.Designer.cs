@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.mainTabControl = new System.Windows.Forms.TabControl();
+            this.tabPageExternal = new System.Windows.Forms.TabPage();
             this.tabPageFighter = new System.Windows.Forms.TabPage();
             this.tabPageStage = new System.Windows.Forms.TabPage();
             this.tabPageItem = new System.Windows.Forms.TabPage();
@@ -36,9 +37,9 @@
             this.tabPageCSS = new System.Windows.Forms.TabPage();
             this.tabPageMusic = new System.Windows.Forms.TabPage();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.tabPageSound = new System.Windows.Forms.TabPage();
             this.toolStrip6 = new System.Windows.Forms.ToolStrip();
             this.saveAllChangesButton = new System.Windows.Forms.ToolStripButton();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.mainTabControl.SuspendLayout();
             this.tabPageMusic.SuspendLayout();
             this.toolStrip6.SuspendLayout();
@@ -46,19 +47,29 @@
             // 
             // mainTabControl
             // 
+            this.mainTabControl.Controls.Add(this.tabPageExternal);
             this.mainTabControl.Controls.Add(this.tabPageFighter);
             this.mainTabControl.Controls.Add(this.tabPageStage);
             this.mainTabControl.Controls.Add(this.tabPageItem);
             this.mainTabControl.Controls.Add(this.tabPageEffects);
             this.mainTabControl.Controls.Add(this.tabPageCSS);
             this.mainTabControl.Controls.Add(this.tabPageMusic);
-            this.mainTabControl.Controls.Add(this.tabPage1);
+            this.mainTabControl.Controls.Add(this.tabPageSound);
             this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainTabControl.Location = new System.Drawing.Point(0, 25);
             this.mainTabControl.Name = "mainTabControl";
             this.mainTabControl.SelectedIndex = 0;
             this.mainTabControl.Size = new System.Drawing.Size(799, 308);
             this.mainTabControl.TabIndex = 0;
+            // 
+            // tabPageExternal
+            // 
+            this.tabPageExternal.Location = new System.Drawing.Point(4, 22);
+            this.tabPageExternal.Name = "tabPageExternal";
+            this.tabPageExternal.Size = new System.Drawing.Size(791, 282);
+            this.tabPageExternal.TabIndex = 9;
+            this.tabPageExternal.Text = "External Files";
+            this.tabPageExternal.UseVisualStyleBackColor = true;
             // 
             // tabPageFighter
             // 
@@ -130,6 +141,15 @@
             this.splitter1.TabIndex = 6;
             this.splitter1.TabStop = false;
             // 
+            // tabPageSound
+            // 
+            this.tabPageSound.Location = new System.Drawing.Point(4, 22);
+            this.tabPageSound.Name = "tabPageSound";
+            this.tabPageSound.Size = new System.Drawing.Size(791, 282);
+            this.tabPageSound.TabIndex = 7;
+            this.tabPageSound.Text = "Sound";
+            this.tabPageSound.UseVisualStyleBackColor = true;
+            // 
             // toolStrip6
             // 
             this.toolStrip6.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -148,15 +168,6 @@
             this.saveAllChangesButton.Size = new System.Drawing.Size(117, 22);
             this.saveAllChangesButton.Text = "Save All Changes";
             this.saveAllChangesButton.Click += new System.EventHandler(this.saveAllChangesButton_Click);
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(791, 282);
-            this.tabPage1.TabIndex = 7;
-            this.tabPage1.Text = "Sound";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // MexDataEditor
             // 
@@ -189,6 +200,7 @@
         private System.Windows.Forms.ToolStrip toolStrip6;
         private System.Windows.Forms.ToolStripButton saveAllChangesButton;
         private System.Windows.Forms.TabPage tabPageStage;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPageSound;
+        private System.Windows.Forms.TabPage tabPageExternal;
     }
 }

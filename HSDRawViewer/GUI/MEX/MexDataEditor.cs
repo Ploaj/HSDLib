@@ -1,9 +1,8 @@
-﻿using HSDRaw.MEX;
+﻿using HSDRaw;
+using HSDRaw.MEX;
 using HSDRawViewer.GUI.MEX.Controls;
 using HSDRawViewer.GUI.Plugins;
-using HSDRawViewer.Tools;
 using System;
-using System.Linq;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -11,6 +10,7 @@ namespace HSDRawViewer.GUI.MEX
 {
     public partial class MexDataEditor : DockContent, EditorBase
     {
+        public MEXExternalFileControl FileControl;
         public MEXFighterControl FighterControl;
         public MEXStageControl StageControl;
         public MEXItemControl ItemControl;
@@ -18,40 +18,60 @@ namespace HSDRawViewer.GUI.MEX
         public MEXMusicControl MusicControl;
         public MEXMenuControl MenuControl;
         public MEXSemControl SoundControl;
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public MexDataEditor()
         {
             InitializeComponent();
 
             //GUITools.SetIconFromBitmap(this, Properties.Resources.doc_kabii);
+
+            var page = 0;
+
+            FileControl = new MEXExternalFileControl();
+            FileControl.Dock = DockStyle.Fill;
+            mainTabControl.TabPages[page++].Controls.Add(FileControl);
+
             FighterControl = new MEXFighterControl();
             FighterControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[0].Controls.Add(FighterControl);
+            mainTabControl.TabPages[page++].Controls.Add(FighterControl);
 
             StageControl = new MEXStageControl();
             StageControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[1].Controls.Add(StageControl);
+            mainTabControl.TabPages[page++].Controls.Add(StageControl);
 
             ItemControl = new MEXItemControl();
             ItemControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[2].Controls.Add(ItemControl);
+            mainTabControl.TabPages[page++].Controls.Add(ItemControl);
 
             EffectControl = new MEXEffectControl();
             EffectControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[3].Controls.Add(EffectControl);
+            mainTabControl.TabPages[page++].Controls.Add(EffectControl);
 
             MenuControl = new MEXMenuControl();
             MenuControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[4].Controls.Add(MenuControl);
+            mainTabControl.TabPages[page++].Controls.Add(MenuControl);
 
             MusicControl = new MEXMusicControl();
             MusicControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[5].Controls.Add(MusicControl);
+            mainTabControl.TabPages[page++].Controls.Add(MusicControl);
 
             SoundControl = new MEXSemControl();
             SoundControl.Dock = DockStyle.Fill;
-            mainTabControl.TabPages[6].Controls.Add(SoundControl);
+            mainTabControl.TabPages[page++].Controls.Add(SoundControl);
 
+            FileControl.AddExternal("MnSlMap.usd", new string[] { "MnSelectStageDataTable", "mexMapData" }, "Stage Select Screen Data (US)");
+            FileControl.AddExternal("MnSlChr.usd", new string[] { "MnSelectChrDataTable", "mexSelectChr" }, "Character Select Screen Data (US)");
+            FileControl.AddExternal("PlCo.dat", new string[] { "ftLoadCommonData" }, "Contains Fighter Bone Tables");
+            FileControl.AddExternal("IfAll.usd", new string[] { "Stc_icns" }, "Contains stock icons");
+
+            MEXExternalFileControl.OnFileLoaded += (sender, args) =>
+            {
+                FighterControl.CheckEnable(this);
+                MenuControl.CheckEnable(this);
+            };
         }
 
         public DockState DefaultDockState => DockState.Document;
@@ -68,7 +88,27 @@ namespace HSDRawViewer.GUI.MEX
         }
         private DataNode _node;
         public MEX_Data _data { get { if (_node.Accessor is MEX_Data data) return data; else return null; } }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public HSDRawFile GetFile(string file)
+        {
+            return FileControl.GetFile(file);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public HSDAccessor GetSymbol(string symbol)
+        {
+            return FileControl.GetSymbol(symbol);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -90,10 +130,10 @@ namespace HSDRawViewer.GUI.MEX
             // Items------------------------------------
             ItemControl.LoadData(_data);
 
-            // Stages
+            // Stages------------------------------------
             StageControl.LoadData(_data);
 
-            // Stages
+            // Sound------------------------------------
             SoundControl.LoadData(_data);
         }
         
@@ -112,76 +152,11 @@ namespace HSDRawViewer.GUI.MEX
             MusicControl.SaveData(_data);
             SoundControl.SaveData(_data);
 
+            FileControl.SaveFiles();
+
             if (MessageBox.Show("Save File", "Save All Changes to Disk", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
                 MainForm.Instance.SaveDAT();
         }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void installFighterButton_Click(object sender, EventArgs e)
-        {
-        }
 
-        private void OldInstall()
-        {
-            var f = FileIO.OpenFile("Fighter Package (*.zip)|*.zip");
-            if (f != null)
-            {
-                MenuControl.CloseMenuFiles();
-
-                using (ProgressBarDisplay d = new ProgressBarDisplay(new FighterPackageInstaller(f, this)))
-                {
-                    d.DoWork();
-                    d.ShowDialog();
-                }
-
-                FighterControl.ResetDataBindings();
-                ItemControl.ResetDataBindings();
-                EffectControl.ResetDataBindings();
-                MusicControl.ResetDataBindings();
-
-                MEXConverter.ssmValues.Clear();
-                MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
-                MessageBox.Show("Fighter installed");
-                saveAllChangesButton_Click(null, null);
-                MainForm.Instance.SaveDAT();
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void uninstallFighterButton_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void OldUninstall()
-        {
-            if (FighterControl.IsExtendedFighter(FighterControl.SelectedIndex) && FighterControl.SelectedEntry != null)
-            {
-                using (ProgressBarDisplay d = new ProgressBarDisplay(new FighterPackageUninstaller(FighterControl.SelectedIndex, FighterControl.SelectedEntry, this)))
-                {
-                    d.DoWork();
-                    d.ShowDialog();
-                }
-
-                FighterControl.ResetDataBindings();
-                ItemControl.ResetDataBindings();
-                EffectControl.ResetDataBindings();
-                MusicControl.ResetDataBindings();
-
-                MEXConverter.ssmValues.Clear();
-                MEXConverter.ssmValues.AddRange(_data.SSMTable.SSM_SSMFiles.Array.Select(s => s.Value));
-                MessageBox.Show("Fighter uninstalled");
-                saveAllChangesButton_Click(null, null);
-                MainForm.Instance.SaveDAT();
-            }
-        }
-        
-        
     }
 }

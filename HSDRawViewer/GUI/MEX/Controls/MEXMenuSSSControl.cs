@@ -23,7 +23,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
         private JOBJManager StageNameJOBJManager = new JOBJManager();
 
         public HSDRawFile StageMenuFile;
-        private string StageMenuFilePath;
 
         /// <summary>
         /// 
@@ -34,23 +33,43 @@ namespace HSDRawViewer.GUI.MEX.Controls
 
             IconJOBJManager.RefreshRendering = true;
             StageNameJOBJManager.RefreshRendering = true;
+
+            Disposed += (sender, args) =>
+            {
+                ResourceCleanup();
+            };
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void LoadFile()
+        private void ResourceCleanup()
         {
-            var path = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "MnSlMap.usd");
-
-            if (!File.Exists(path))
-                path = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
-
-            if (path != null)
             {
-                LoadMnSlMap(path);
-                Enabled = true;
+                var img = iconPreviewBox.Image;
+                if (img != null)
+                {
+                    iconPreviewBox.Image = null;
+                    img.Dispose();
+                }
             }
+            {
+                var img = namePreviewBox.Image;
+                if (img != null)
+                {
+                    namePreviewBox.Image = null;
+                    img.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadFile(HSDRawFile file)
+        {
+            if (file != null)
+                LoadMnSlMap(file);
         }
 
         /// <summary>
@@ -58,7 +77,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         public void SaveFile()
         {
-            if (StageMenuFile != null && MessageBox.Show("Save Change to " + Path.GetFileName(StageMenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (StageMenuFile != null)//&& MessageBox.Show("Save Change to " + Path.GetFileName(StageMenuFilePath), "Save Changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 // regenerate and dump node
                 var node = MexMapGenerator.GenerateMexMap(StageMenuFile["MnSelectStageDataTable"].Data as SBM_MnSelectStageDataTable, Icons);
@@ -69,8 +88,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                     StageMenuFile.Roots.Add(new HSDRootNode() { Name = "mexMapData", Data = node });
 
                 // save file
-                StageMenuFile.TrimData();
-                StageMenuFile.Save(StageMenuFilePath);
+                //StageMenuFile.TrimData();
+                //StageMenuFile.Save(StageMenuFilePath);
             }
         }
 
@@ -83,15 +102,15 @@ namespace HSDRawViewer.GUI.MEX.Controls
             StageNameJOBJManager.CleanupRendering();
             
             StageMenuFile = null;
-            StageMenuFilePath = "";
 
-            foreach (var v in Icons)
-            {
-                v.Joint = null;
-                v.Animation = null;
-                v.NameTOBJ = null;
-                v.IconTOBJ = null;
-            }
+            /*if (Icons != null)
+                foreach (var v in Icons)
+                {
+                    v.Joint = null;
+                    v.Animation = null;
+                    v.NameTOBJ = null;
+                    v.IconTOBJ = null;
+                }*/
 
             Enabled = false;
         }
@@ -101,9 +120,10 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        private void LoadMnSlMap(string filePath)
+        private void LoadMnSlMap(HSDRawFile hsd)
         {
-            HSDRawFile hsd = new HSDRawFile(filePath);
+            if (StageMenuFile != null)
+                return;
 
             var org = hsd["MnSelectStageDataTable"];
             var mex = hsd["mexMapData"];
@@ -130,7 +150,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 var stage = org.Data as SBM_MnSelectStageDataTable;
                 var mexMap = mex.Data as MEX_mexMapData;
 
-                StageMenuFilePath = filePath;
+                //StageMenuFilePath = filePath;
                 StageMenuFile = hsd;
                 
                 // Load Data from Mex Symbol
@@ -147,6 +167,8 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 StageNameJOBJManager.SetJOBJ(name);
                 StageNameJOBJManager.SetAnimJoint(stage.StageNameAnimJoint);
                 StageNameJOBJManager.Frame = 10;
+
+                Enabled = true;
             }
         }
 
@@ -169,6 +191,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 // Load Animation
                 foreach (var i in Icons)
                 {
+                    if (i.AnimJoint == null)
+                        continue;
+
                     var a = new JointAnimManager();
                     a.FromAnimJoint(i.AnimJoint);
                     entryAnimation.Add(i, a);
@@ -178,6 +203,9 @@ namespace HSDRawViewer.GUI.MEX.Controls
             for(int i = 0; i < Icons.Length; i++)
             {
                 var ico = Icons[i];
+
+                if (ico.Joint == null)
+                    continue;
 
                 var transform = Matrix4.Identity;
 
@@ -316,7 +344,17 @@ namespace HSDRawViewer.GUI.MEX.Controls
         private void sssEditor_SelectedObjectChanged(object sender, EventArgs e)
         {
             if (StageMenuFile != null && sssEditor.SelectedObject is MEXStageIconEntry ico)
+            {
                 IconJOBJManager.SelectetedJOBJ = ico.Joint;
+
+                ResourceCleanup();
+
+                if(ico.IconTOBJ != null)
+                    iconPreviewBox.Image = TOBJConverter.ToBitmap(ico.IconTOBJ);
+
+                if (ico.NameTOBJ != null)
+                    namePreviewBox.Image = TOBJConverter.ToBitmap(ico.NameTOBJ);
+            }
         }
         
         /// <summary>
@@ -332,6 +370,36 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 {
                     d.ShowDialog();
                 }
+                /*using (PopoutJointAnimationEditor popout = new PopoutJointAnimationEditor())
+                {
+                    // create a proxy structure/animation?
+                    HSD_JOBJ root = null;
+                    JointAnimManager manager = new JointAnimManager();
+                    
+                    foreach(MEXStageIconEntry sel in sssEditor.SelectedObjects)
+                    {
+                        if(sel.Joint != null && sel.AnimJoint != null)
+                        {
+                            if (root == null)
+                                root = sel.Joint;
+                            else
+                                root.Add(sel.Joint);
+                            var man = new JointAnimManager();
+                            man.FromAnimJoint(sel.AnimJoint);
+                            manager.Nodes.AddRange(man.Nodes);
+                        }
+                    }
+
+                    // use 
+                    popout.SetJoint(root, manager);
+                    popout.ShowDialog();
+
+                    var list = root.BreathFirstList;
+                    foreach (var j in list)
+                        j.Next = null;
+
+                    // TODO: save anim changes
+                }*/
             }
         }
 
@@ -378,6 +446,29 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void buttonImportName_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+            if (f != null)
+            {
+                using (Bitmap bmp = new Bitmap(f))
+                {
+                    var tobj = TOBJConverter.BitmapToTOBJ(bmp, HSDRaw.GX.GXTexFmt.IA4, HSDRaw.GX.GXTlutFmt.IA8);
+
+                    if (sssEditor.SelectedObject is MEXStageIconEntry ico)
+                    {
+                        ico.NameTOBJ = tobj;
+                        StageNameJOBJManager.RefreshRendering = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importNewIconImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
@@ -401,11 +492,34 @@ namespace HSDRawViewer.GUI.MEX.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void buttonExportIcon_Click(object sender, EventArgs e)
+        {
+            var f = FileIO.SaveFile(ApplicationSettings.ImageFileFilter, "Icon.png");
+            if (f != null && sssEditor.SelectedObject is MEXStageIconEntry ico && ico.IconTOBJ != null)
+            {
+                using (var bmp = TOBJConverter.ToBitmap(ico.IconTOBJ))
+                    bmp.Save(f);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void loadGameCameraButton_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadGameCamera()
         {
             var cam = (StageMenuFile.Roots[0].Data as SBM_MnSelectStageDataTable).Camera;
             var par = Parent;
-            while(par != null)
+            while (par != null)
             {
                 if (par is MEXMenuControl mn)
                 {
@@ -414,6 +528,19 @@ namespace HSDRawViewer.GUI.MEX.Controls
                 }
                 par = par.Parent;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonEditUI_CheckedChanged(object sender, EventArgs e)
+        {
+            if(buttonEditUI.Checked)
+                groupBox1.Show();
+            else
+                groupBox1.Hide();
         }
     }
 }

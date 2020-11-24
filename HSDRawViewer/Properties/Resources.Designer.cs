@@ -353,6 +353,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ts_check {
+            get {
+                object obj = ResourceManager.GetObject("ts_check", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ts_clone {
             get {
                 object obj = ResourceManager.GetObject("ts_clone", resourceCulture);
@@ -436,6 +446,16 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ts_up {
             get {
                 object obj = ResourceManager.GetObject("ts_up", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_x {
+            get {
+                object obj = ResourceManager.GetObject("ts_x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

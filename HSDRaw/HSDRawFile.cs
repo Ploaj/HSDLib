@@ -800,6 +800,7 @@ namespace HSDRaw
                 x => x.Equals("Stc_icns") ?  new MEX_Stock() : null,
                 x => x.Equals("mexMenu") ?  new MEX_Menu() : null,
                 x => x.Equals("bgm") ?  new MEX_BGMModel() : null,
+                x => x.StartsWith("mnName") ?  new HSDFixedLengthPointerArrayAccessor<HSD_ShiftJIS_String>() : null,
                 x => new HSDAccessor(),
         };
 

@@ -33,6 +33,9 @@ namespace HSDRawViewer.GUI.MEX
         [Browsable(false), Category("0 - General"), DisplayName("Internal ID"), Description("")]
         public int InternalID { get => Stage.StageInternalID; set { Stage.StageInternalID = value; Collision.InternalID = value; } }
 
+        [Category("0 - General"), DisplayName("Stage Name"), Description("")]
+        public string StageName { get; set; } = "";
+
         [Category("0 - General"), DisplayName("File Path"), Description("")]
         public string FileName { get => Stage.StageFileName; set => Stage.StageFileName = value; }
 
@@ -153,7 +156,7 @@ namespace HSDRawViewer.GUI.MEX
 
         public override string ToString()
         {
-            return FileName == null ? "" : FileName;
+            return (StageName == null ? "" : StageName) + " - " + (FileName == null ? "" : FileName);
         }
 
         public MEX_Playlist GetPlaylist()

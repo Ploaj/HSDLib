@@ -13,56 +13,6 @@ namespace HSDRawViewer.GUI.MEX.Controls
 {
     public partial class MEXStockIconControl : UserControl
     {
-        public class TOBJProxy : ImageArrayItem
-        {
-            public HSD_TOBJ TOBJ;
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public TOBJProxy()
-            {
-
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="tobj"></param>
-            public TOBJProxy(HSD_TOBJ tobj)
-            {
-                TOBJ = tobj;
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
-            public Image ToImage()
-            {
-                if (TOBJ != null)
-                    return Converters.TOBJConverter.ToBitmap(TOBJ);
-                return null;
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public void Dispose()
-            {
-
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
-            public override string ToString()
-            {
-                return "";
-            }
-        }
-
         public class StockIconNode : ImageArrayItem
         {
             public TOBJProxy[] TOBJS { get; set; } = new TOBJProxy[0];

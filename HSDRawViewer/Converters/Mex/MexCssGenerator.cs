@@ -5,6 +5,7 @@ using HSDRaw.GX;
 using HSDRaw.Melee.Mn;
 using HSDRaw.MEX.Menus;
 using HSDRaw.Tools;
+using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.MEX;
 using HSDRawViewer.Rendering;
 using OpenTK;
@@ -60,11 +61,11 @@ namespace HSDRawViewer.Converters
             List<HSD_TOBJ> tobjs = new List<HSD_TOBJ>();
             foreach(var v in icons)
             {
-                for(int i = 0; i < v.CSPs.Count; i++)
+                for(int i = 0; i < v.CSPs.Length; i++)
                 {
                     var id = v.FighterExternalID;
                     keys.Add(new FOBJKey() { Frame = stride * i + id, Value = tobjs.Count, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
-                    tobjs.Add(v.CSPs[i]);
+                    tobjs.Add(v.CSPs[i].TOBJ);
                 }
             }
             keys = keys.OrderBy(e => e.Frame).ToList();
@@ -105,7 +106,7 @@ namespace HSDRawViewer.Converters
                 }
 
                 // load csps
-                ico.CSPs.Clear();
+                var icocsps = new List<HSD_TOBJ>();
                 int cspIndex = 0;
                 while (true)
                 {
@@ -116,10 +117,11 @@ namespace HSDRawViewer.Converters
                     if (k == null)
                         break;
 
-                    ico.CSPs.Add(csps[(int)k.Value]);
+                    icocsps.Add(csps[(int)k.Value]);
 
                     cspIndex++;
                 }
+                ico.CSPs = icocsps.Select(e => new TOBJProxy(e)).ToArray();
 
                 index++;
             }
@@ -181,7 +183,7 @@ namespace HSDRawViewer.Converters
 
                 // load csps
                 // find key at stride
-                ico.CSPs.Clear();
+                var icocsps = new List<HSD_TOBJ>();
                 int cspIndex = 0;
                 while (true)
                 {
@@ -194,10 +196,11 @@ namespace HSDRawViewer.Converters
                     if (k == null)
                         break;
                     
-                    ico.CSPs.Add(csps[(int)k.Value]);
+                    icocsps.Add(csps[(int)k.Value]);
 
                     cspIndex++;
                 }
+                ico.CSPs = icocsps.Select(e => new TOBJProxy() { TOBJ = e }).ToArray();
             }
 
             m.RefreshRendering = true;
