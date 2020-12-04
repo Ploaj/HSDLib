@@ -46,19 +46,12 @@
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
       <HintPath>..\packages\CSCore.1.2.1.2\lib\net35-client\CSCore.dll</HintPath>
     </Reference>
-    <Reference Include="DirectXTexNet, Version=1.0.0.4, Culture=neutral, PublicKeyToken=67e4f5ed452a4f5d, processorArchitecture=MSIL">
-      <HintPath>..\packages\DirectXTexNet.1.0.0-rc4\lib\netstandard2.0\DirectXTexNet.dll</HintPath>
-    </Reference>
     <Reference Include="IONET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\IONET.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
-    </Reference>
-    <Reference Include="nQuant.Core, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\nQuant.Core.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
@@ -90,8 +83,8 @@
     <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.1.6643.41644, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WeifenLuo.WinFormsUI.Docking.2.1.0\lib\net20\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
-    <Reference Include="YamlDotNet, Version=8.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.8.1.2\lib\net45\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=9.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.9.1.0\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +167,9 @@
     <Compile Include="Converters\SBM\SSFConverter.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
+    <Compile Include="GUI\Controls\DoubleBufferedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -204,10 +200,10 @@
     <Compile Include="GUI\Plugins\ParticleGenEditorPanel.Designer.cs">
       <DependentUpon>ParticleGenEditorPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\MEXStockIconEditor.cs">
+    <Compile Include="GUI\Plugins\Melee\MEXStockIconEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Plugins\MEXStockIconEditor.Designer.cs">
+    <Compile Include="GUI\Plugins\Melee\MEXStockIconEditor.Designer.cs">
       <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\ParticleGenEditor.cs">
@@ -447,10 +443,10 @@
     <Compile Include="GUI\ProgressBarDisplay.Designer.cs">
       <DependentUpon>ProgressBarDisplay.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\SubActionPanel.cs">
+    <Compile Include="GUI\Plugins\Melee\SubActionPanel.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Plugins\SubActionPanel.Designer.cs">
+    <Compile Include="GUI\Plugins\Melee\SubActionPanel.Designer.cs">
       <DependentUpon>SubActionPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\TextureAnimationEditor.cs">
@@ -471,10 +467,10 @@
     <Compile Include="GUI\PropertyView.Designer.cs">
       <DependentUpon>PropertyView.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\SubactionEditor.cs">
+    <Compile Include="GUI\Plugins\Melee\SubactionEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Plugins\SubactionEditor.Designer.cs">
+    <Compile Include="GUI\Plugins\Melee\SubactionEditor.Designer.cs">
       <DependentUpon>SubactionEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\TextureImportDialog.cs">
@@ -564,9 +560,6 @@
     <Content Include="lib\IONET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lib\nQuant.Core.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />
@@ -592,7 +585,7 @@
     <EmbeddedResource Include="GUI\MEX\Controls\MEXStockIconControl.resx">
       <DependentUpon>MEXStockIconControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\MEXStockIconEditor.resx">
+    <EmbeddedResource Include="GUI\Plugins\Melee\MEXStockIconEditor.resx">
       <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\ParticleGenEditor.resx">
@@ -706,7 +699,7 @@
     <EmbeddedResource Include="GUI\ProgressBarDisplay.resx">
       <DependentUpon>ProgressBarDisplay.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\SubActionPanel.resx">
+    <EmbeddedResource Include="GUI\Plugins\Melee\SubActionPanel.resx">
       <DependentUpon>SubActionPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\TextureAnimationEditor.resx">
@@ -718,7 +711,7 @@
     <EmbeddedResource Include="GUI\PropertyView.resx">
       <DependentUpon>PropertyView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\SubactionEditor.resx">
+    <EmbeddedResource Include="GUI\Plugins\Melee\SubactionEditor.resx">
       <DependentUpon>SubactionEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\TextureImportDialog.resx">
@@ -814,11 +807,4 @@
     </ReferenceCopyLocalPaths>
   </ItemDefinitionGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\DirectXTexNet.1.0.0-rc4\build\DirectXTexNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DirectXTexNet.1.0.0-rc4\build\DirectXTexNet.targets'))" />
-  </Target>
-  <Import Project="..\packages\DirectXTexNet.1.0.0-rc4\build\DirectXTexNet.targets" Condition="Exists('..\packages\DirectXTexNet.1.0.0-rc4\build\DirectXTexNet.targets')" />
 </Project>

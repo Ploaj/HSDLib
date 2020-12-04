@@ -1,4 +1,5 @@
-﻿using HSDRaw.GX;
+﻿using Chadsoft.CTools.Image;
+using HSDRaw.GX;
 using HSDRaw.Tools;
 using System;
 using System.Drawing;
@@ -111,7 +112,7 @@ namespace HSDRawViewer.GUI
 
         private void cbFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
-            sbPalFormat.Enabled = TPLConv.IsPalettedFormat(TextureFormat);
+            sbPalFormat.Enabled = ImageDataFormat.IsPalettedFormat(TextureFormat);
 
             propertyGrid1.SelectedObject = null;
 

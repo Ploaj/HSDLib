@@ -15,6 +15,7 @@ using HSDRaw;
 using HSDRawViewer.Tools;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using HSDRaw.GX;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -212,7 +213,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             public override string ToString()
             {
-                return $"{Index}. JOBJ {JOBJIndex} : DOBJ {DOBJIndex} : POBJs {PolygonCount} : TOBJS {TextureCount} : PP {HasPixelProcessing} {Name}";
+                return $"{Index}. Joint {JOBJIndex} : Object {DOBJIndex} : Polygons {PolygonCount} : Textures {TextureCount} {Name}";
             }
         }
 
@@ -267,9 +268,9 @@ namespace HSDRawViewer.GUI.Plugins
                 tree.Text = BoneLabelMap[index];
             else
             if (!string.IsNullOrEmpty(jobj.ClassName))
-                tree.Text = $"(JOBJ_{index})" + jobj.ClassName;
+                tree.Text = $"(Joint_{index})" + jobj.ClassName;
             else
-                tree.Text = "JOBJ_" + index;
+                tree.Text = "Joint_" + index;
             index++;
             tree.Tag = jobj;
 
@@ -370,6 +371,175 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            propertyGrid1.SelectedObject = null;
+
+            if(tabControl1.SelectedIndex == 2)
+                LoadTextureList();
+            else
+                UnloadTextureList();
+        }
+
+        public class TextureListProxy : ImageArrayItem
+        {
+            private List<HSD_TOBJ> tobjs = new List<HSD_TOBJ>();
+
+            //private Bitmap PreviewImage;
+
+            public int _hash;
+
+            public string Hash { get => _hash.ToString("X"); }
+
+            public GXTexFmt ImageFormat { get => tobjs[0].ImageData.Format; }
+
+            public GXTlutFmt PaletteFormat
+            {
+                get
+                {
+                    if (tobjs[0].TlutData == null)
+                        return GXTlutFmt.IA8;
+
+                    return tobjs[0].TlutData.Format;
+                }
+            }
+
+            public int Width
+            {
+                get
+                {
+                    if (tobjs[0].ImageData == null)
+                        return 0;
+
+                    return tobjs[0].ImageData.Width;
+                }
+            }
+
+            public int Height
+            {
+                get
+                {
+                    if (tobjs[0].ImageData == null)
+                        return 0;
+
+                    return tobjs[0].ImageData.Height;
+                }
+            }
+
+            public TextureListProxy(int hash)
+            {
+                _hash = hash;
+            }
+
+            public void Dispose()
+            {
+                //PreviewImage.Dispose();
+            }
+
+            public override string ToString()
+            {
+                return $"References: {tobjs.Count}";
+            }
+
+            public void AddTOBJ(HSD_TOBJ tobj)
+            {
+                //if (PreviewImage == null)
+                //    PreviewImage = TOBJConverter.ToBitmap(tobj);
+                tobjs.Add(tobj);
+            }
+
+            public void Replace(HSD_TOBJ newTOBJ)
+            {
+                foreach (var t in tobjs)
+                {
+                    if (newTOBJ.ImageData != null)
+                    {
+                        if (t.ImageData == null)
+                            t.ImageData = new HSD_Image();
+                        t.ImageData.ImageData = newTOBJ.ImageData.ImageData;
+                        t.ImageData.Format = newTOBJ.ImageData.Format;
+                        t.ImageData.Width = newTOBJ.ImageData.Width;
+                        t.ImageData.Height = newTOBJ.ImageData.Height;
+                    }
+                    else
+                        t.ImageData = null;
+
+                    if (newTOBJ.TlutData != null)
+                    {
+                        if (t.TlutData == null)
+                            t.TlutData = new HSD_Tlut();
+                        newTOBJ.TlutData.TlutData = newTOBJ.TlutData.TlutData;
+                        newTOBJ.TlutData.Format = newTOBJ.TlutData.Format;
+                    }
+                    else
+                        t.TlutData = null;
+
+                    //if(PreviewImage != null)
+                    //    PreviewImage.Dispose();
+                    //PreviewImage = TOBJConverter.ToBitmap(newTOBJ);
+                }
+            }
+
+            public Image ToImage()
+            {
+                if (tobjs.Count > 0)
+                    return TOBJConverter.ToBitmap(tobjs[0]);
+                return null;
+            }
+        }
+
+        public TextureListProxy[] TextureLists { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadTextureList()
+        {
+            UnloadTextureList();
+
+            var tex = new List<TextureListProxy>();
+            
+            foreach(var jobj in root.BreathFirstList)
+            {
+                if (jobj.Dobj == null)
+                    continue;
+
+                foreach(var dobj in jobj.Dobj.List)
+                {
+                    if (dobj.Mobj == null || dobj.Mobj.Textures == null)
+                        continue;
+
+                    foreach(var tobj in dobj.Mobj.Textures.List)
+                    {
+                        var hash = HSDRawFile.ComputeHash(tobj.GetDecodedImageData());
+
+                        var proxy = tex.Find(e => e._hash == hash);
+
+                        if(proxy == null)
+                        {
+                            proxy = new TextureListProxy(hash);
+                            tex.Add(proxy);
+                        }
+
+                        proxy.AddTOBJ(tobj);
+                    }
+                }
+            }
+
+            TextureLists = tex.ToArray();
+            textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UnloadTextureList()
+        {
+            if(TextureLists != null)
+            {
+                foreach (var t in TextureLists)
+                    t.Dispose();
+                TextureLists = new TextureListProxy[0];
+                textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
+            }
         }
 
         /// <summary>
@@ -737,7 +907,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonDOBJDelete_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete DOBJ", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            if (MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete Object?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 var dobj = listDOBJ.SelectedItem as DOBJContainer;
                 if(dobj != null)
@@ -1097,7 +1267,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (propertyGrid1.SelectedObject is DOBJContainer con)
             {
-                var f = Tools.FileIO.SaveFile("MOBJ (*.mobj)|*.mobj");
+                var f = Tools.FileIO.SaveFile("Material (*.mobj)|*.mobj");
 
                 if (f != null)
                 {
@@ -1117,7 +1287,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (propertyGrid1.SelectedObject is DOBJContainer con)
             {
-                var f = Tools.FileIO.OpenFile("MOBJ (*.mobj)|*.mobj");
+                var f = Tools.FileIO.OpenFile("Material (*.mobj)|*.mobj");
 
                 if (f != null)
                 {
@@ -1237,7 +1407,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void clearSelectedPOBJsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Are you sure?\nThis will clear all polygons in the selected DOBJ\n and cannot be undone", "Clear POBJs", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            if (MessageBox.Show("Are you sure?\nThis will clear all polygons in the selected object\n and cannot be undone", "Clear Polygons", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 if (propertyGrid1.SelectedObject is DOBJContainer con)
                     con.DOBJ.Pobj = null;
@@ -1372,6 +1542,32 @@ namespace HSDRawViewer.GUI.Plugins
                 var settings = SceneSettings.Deserialize(f);
                 viewport.Camera = settings.Camera;
                 JOBJManager.settings = settings.Settings;
+            }
+        }
+
+        private void textureArrayEditor_SelectedObjectChanged(object sender, EventArgs e)
+        {
+            propertyGrid1.SelectedObject = textureArrayEditor.SelectedObject;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void replaceTextureButton_Click(object sender, EventArgs e)
+        {
+            if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
+            {
+                var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                if (f != null)
+                    using (var teximport = new TextureImportDialog())
+                        if (teximport.ShowDialog() == DialogResult.OK)
+                        {
+                            proxy.Replace(TOBJConverter.ImportTOBJFromFile(f, teximport.TextureFormat, teximport.PaletteFormat));
+                            textureArrayEditor.Invalidate();
+                            JOBJManager.RefreshRendering = true;
+                        }
             }
         }
     }

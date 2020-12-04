@@ -187,7 +187,7 @@ namespace HSDRawViewer.Converters
                     {
                         // create mesh
                         IOMesh mesh = new IOMesh();
-                        mesh.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}";
+                        mesh.Name = $"Joint_{jIndex}_Object_{dIndex}";
 
                         bool reflective = false;
                         var single = j != _root;
@@ -197,7 +197,7 @@ namespace HSDRawViewer.Converters
 
                         // process and export material
                         IOMaterial m = new IOMaterial();
-                        m.Name = $"JOBJ_{jIndex}_DOBJ_{dIndex}_MOBJ_{dIndex}";
+                        m.Name = $"Joint_{jIndex}_Object_{dIndex}_Material_{dIndex}";
                         m.Shininess = dobj.Mobj.Material.Shininess;
                         m.Alpha = dobj.Mobj.Material.Alpha;
 
@@ -208,7 +208,7 @@ namespace HSDRawViewer.Converters
                             {
                                 if (t.ImageData != null && t.ImageData.ImageData != null && !imageToName.ContainsKey(t.ImageData.ImageData))
                                 {
-                                    var name = $"TOBJ_{imageToName.Count}";
+                                    var name = $"Texture_{imageToName.Count}";
                                     using (Bitmap img = TOBJConverter.ToBitmap(t))
                                         img.Save(_settings.Directory + name + ".png");
                                     imageToName.Add(t.ImageData.ImageData, name);

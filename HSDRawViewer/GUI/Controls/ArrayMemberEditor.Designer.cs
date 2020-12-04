@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
-            this.elementList = new System.Windows.Forms.ListBox();
+            this.elementList = new System.Windows.Forms.DoubleBufferedListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonAdd = new System.Windows.Forms.ToolStripButton();
             this.buttonRemove = new System.Windows.Forms.ToolStripButton();
@@ -156,7 +156,7 @@
         #endregion
 
         private System.Windows.Forms.PropertyGrid propertyGrid;
-        private System.Windows.Forms.ListBox elementList;
+        private System.Windows.Forms.DoubleBufferedListBox elementList;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton buttonAdd;
         private System.Windows.Forms.ToolStripButton buttonRemove;

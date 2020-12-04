@@ -23,11 +23,6 @@ This program is still a work-in-progress so expect bugs and incomplete features.
 * MIT License: https://github.com/dockpanelsuite/dockpanelsuite/blob/master/license.txt
 
 
-* DirectXTexNet
-* Copyright (c) 2019 Dennis Gocke
-* MIT License: https://opensource.org/licenses/mit-license.php
-
-
 * Hexbox
 * Copyright (c) 2011-2014 Bernhard Elbl
 * MIT License: https://raw.githubusercontent.com/Pkcs11Admin/Be.HexEditor/master/LICENSE.txt

@@ -83,7 +83,7 @@
             this.listTexture.Location = new System.Drawing.Point(3, 28);
             this.listTexture.MultiSelect = false;
             this.listTexture.Name = "listTexture";
-            this.listTexture.Size = new System.Drawing.Size(307, 370);
+            this.listTexture.Size = new System.Drawing.Size(583, 485);
             this.listTexture.TabIndex = 0;
             this.listTexture.UseCompatibleStateImageBehavior = false;
             this.listTexture.View = System.Windows.Forms.View.Details;
@@ -144,7 +144,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(660, 427);
+            this.tabControl1.Size = new System.Drawing.Size(936, 542);
             this.tabControl1.TabIndex = 4;
             // 
             // Textures
@@ -156,7 +156,7 @@
             this.Textures.Location = new System.Drawing.Point(4, 22);
             this.Textures.Name = "Textures";
             this.Textures.Padding = new System.Windows.Forms.Padding(3);
-            this.Textures.Size = new System.Drawing.Size(652, 401);
+            this.Textures.Size = new System.Drawing.Size(928, 516);
             this.Textures.TabIndex = 0;
             this.Textures.Text = "Textures";
             this.Textures.UseVisualStyleBackColor = true;
@@ -164,9 +164,9 @@
             // splitter1
             // 
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.splitter1.Location = new System.Drawing.Point(307, 28);
+            this.splitter1.Location = new System.Drawing.Point(583, 28);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 370);
+            this.splitter1.Size = new System.Drawing.Size(3, 485);
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
             // 
@@ -175,10 +175,10 @@
             this.tabControl2.Controls.Add(this.tabPage1);
             this.tabControl2.Controls.Add(this.tabPage2);
             this.tabControl2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tabControl2.Location = new System.Drawing.Point(310, 28);
+            this.tabControl2.Location = new System.Drawing.Point(586, 28);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(339, 370);
+            this.tabControl2.Size = new System.Drawing.Size(339, 485);
             this.tabControl2.TabIndex = 4;
             // 
             // tabPage1
@@ -187,7 +187,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(331, 344);
+            this.tabPage1.Size = new System.Drawing.Size(331, 459);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Properties";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -198,7 +198,7 @@
             this.propertyTexture.Location = new System.Drawing.Point(3, 3);
             this.propertyTexture.Name = "propertyTexture";
             this.propertyTexture.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyTexture.Size = new System.Drawing.Size(325, 338);
+            this.propertyTexture.Size = new System.Drawing.Size(325, 453);
             this.propertyTexture.TabIndex = 1;
             this.propertyTexture.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyTexture_PropertyValueChanged);
             // 
@@ -247,7 +247,7 @@
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(3, 3);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(646, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(922, 25);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -438,7 +438,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(660, 427);
+            this.ClientSize = new System.Drawing.Size(936, 542);
             this.Controls.Add(this.tabControl1);
             this.Name = "MOBJEditor";
             this.Text = "MOBJ Editor";

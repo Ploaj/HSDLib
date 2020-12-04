@@ -21,6 +21,7 @@
 
 // Adapted and simplified for use with HSDLib
 
+using Chadsoft.CTools.Image;
 using HSDRaw.GX;
 using System;
 using System.Collections.Generic;
@@ -1095,7 +1096,8 @@ namespace HSDRaw.Tools
 
         public static byte[] ToCMP(byte[] data, int width, int height)
         {
-            byte[] output = new byte[width * height / 2];
+            return ImageDataFormat.Cmpr.ConvertTo(data, width, height, null);
+            /*byte[] output = new byte[width * height / 2];
 
             int off1 = 0;
             for (int y = 0; y < height; y += 4)
@@ -1126,7 +1128,7 @@ namespace HSDRaw.Tools
                     off1 += 8;
                 }
             }
-            return output;
+            return output;*/
         }
 
         private static byte SwapBits(byte b)

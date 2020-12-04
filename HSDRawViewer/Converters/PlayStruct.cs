@@ -189,7 +189,7 @@ namespace HSDRawViewer.Converters
                             }
                         }
                     }
-                    ftData.Attributes = attr;
+                    ftData.ParametersCommon = attr;
                 }
                 else if (f.EndsWith(".txt"))
                 {

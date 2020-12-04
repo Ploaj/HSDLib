@@ -423,7 +423,7 @@ namespace HSDRaw
         }
 
         //https://stackoverflow.com/questions/16340/how-do-i-generate-a-hashcode-from-a-byte-array-in-c/16381
-        private static int ComputeHash(params byte[] data)
+        public static int ComputeHash(params byte[] data)
         {
             unchecked
             {

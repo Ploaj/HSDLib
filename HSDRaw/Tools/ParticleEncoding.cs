@@ -438,13 +438,16 @@ namespace HSDRaw.Tools
 
                     if(code < 128)
                     {
-                        var wait = code & 0x1F;
-                        if ((code & 0x20) != 0)
-                            wait = (wait << 8) | r.ReadByte();
-                        output.Add(new Tuple<byte, object[]>(0x00, new object[] { (short)wait }));
 
                         if ((code & 0xC0) == 0x40)
                             output.Add(new Tuple<byte, object[]>(0x40, new object[] { r.ReadByte()}));
+                        else
+                        {
+                            var wait = code & 0x1F;
+                            if ((code & 0x20) != 0)
+                                wait = (wait << 8) | r.ReadByte();
+                            output.Add(new Tuple<byte, object[]>(0x00, new object[] { (short)wait }));
+                        }
 
                         continue;
                     }

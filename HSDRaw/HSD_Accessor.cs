@@ -53,13 +53,30 @@ namespace HSDRaw
         }
 
         /// <summary>
-        /// Warning: Experimental DO not use
+        /// Warning: Experimental
         /// </summary>
         public virtual int Trim()
         {
+            return Trim(new HashSet<HSDStruct>());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Trim(HashSet<HSDStruct> trimmedList = null)
+        {
             var trimmed = 0;
 
-            if (TrimmedSize != -1 && _s.Length > TrimmedSize 
+            if (trimmedList == null)
+                trimmedList = new HashSet<HSDStruct>();
+
+            if (trimmedList.Contains(_s))
+                return trimmed;
+
+            trimmedList.Add(_s);
+
+            if (TrimmedSize != -1 
+                && _s.Length > TrimmedSize 
                 && GetType() != typeof(Common.HSD_DOBJ)) // skip dobj for unknown reasons
             {
                 System.Diagnostics.Debug.WriteLine(GetType().Name + ": 0x" + _s.Length.ToString("X") + " => 0x" + TrimmedSize.ToString("X"));
@@ -72,13 +89,13 @@ namespace HSDRaw
                 if (v.PropertyType.IsSubclassOf(typeof(HSDAccessor)) && v.GetIndexParameters().Length == 0 && v.GetValue(this) is HSDAccessor ac)
                 {
                     if(ac != this)
-                        trimmed += ac.Trim();
+                        trimmed += ac.Trim(trimmedList);
                 }
                 if (v.PropertyType.IsArray && v.GetValue(this) is HSDAccessor[] arr)
                 {
                     foreach (var ai in arr)
                         if(ai != null && ai != this)
-                            trimmed += ai.Trim();
+                            trimmed += ai.Trim(trimmedList);
                 }
             }
 

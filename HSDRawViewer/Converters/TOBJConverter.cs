@@ -2,12 +2,12 @@
 using HSDRaw.GX;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using DirectXTexNet;
 using System.Windows.Forms;
 using HSDRawViewer.GUI;
 using System.IO;
 using System;
 using HSDRawViewer.Tools;
+using Chadsoft.CTools.Image;
 
 namespace HSDRawViewer.Converters
 {
@@ -227,7 +227,7 @@ namespace HSDRawViewer.Converters
                         using (Bitmap bmp = new Bitmap(f))
                         {
                             settings.ApplySettings(bmp);
-                            TOBJConverter.InjectBitmap(bmp, TOBJ, settings.TextureFormat, settings.PaletteFormat);
+                            InjectBitmap(bmp, TOBJ, settings.TextureFormat, settings.PaletteFormat);
                             return TOBJ;
                         }
                 }
@@ -322,57 +322,24 @@ namespace HSDRawViewer.Converters
         /// <param name="palFormat"></param>
         public static void InjectBitmap(Bitmap bmp, HSD_TOBJ tobj, GXTexFmt imgFormat, GXTlutFmt palFormat)
         {
-            if (imgFormat != GXTexFmt.CMP)
-            {
-               // if (imgFormat == GXTexFmt.CI8) // doesn't work well with alpha
-               //     bmp = ReduceColors(bmp, 256);
-                //if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
-                //    bmp = BitmapTools.ReduceColors(bmp, 16);
+             if (imgFormat == GXTexFmt.CI8) // doesn't work well with alpha
+                bmp = BitmapTools.ReduceColors(bmp, 256);
+            if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
+                bmp = BitmapTools.ReduceColors(bmp, 16);
 
-                var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                var length = bitmapData.Stride * bitmapData.Height;
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
 
-                byte[] bytes = new byte[length];
+            byte[] bytes = new byte[length];
 
-                Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
-                bmp.UnlockBits(bitmapData);
+            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+            bmp.UnlockBits(bitmapData);
 
-                tobj.EncodeImageData(bytes, bmp.Width, bmp.Height, imgFormat, palFormat);
+            tobj.EncodeImageData(bytes, bmp.Width, bmp.Height, imgFormat, palFormat);
 
-                // dispose if we use our color reduced bitmap
-                if (imgFormat == GXTexFmt.CI8 || imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
-                    bmp.Dispose();
-            }
-            else
-            {
-                MemoryStream stream = new MemoryStream();
-
-                bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-
-                byte[] bytes = stream.ToArray();
-                stream.Close();
-                stream.Dispose();
-
-                IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytes.Length);
-                Marshal.Copy(bytes, 0, unmanagedPointer, bytes.Length);
-
-                using (var origImage = TexHelper.Instance.LoadFromWICMemory(unmanagedPointer, bytes.Length, WIC_FLAGS.NONE))
-                {
-                    var scratch = origImage.Compress(0, DXGI_FORMAT.BC1_UNORM, TEX_COMPRESS_FLAGS.DEFAULT, 1);
-                    var ptr = scratch.GetPixels();
-                    var length = scratch.GetPixelsSize();
-                    byte[] data = new byte[length];
-
-                    Marshal.Copy(ptr, data, 0, (int)length);
-
-                    scratch.Dispose();
-
-                    tobj.EncodeImageData(data, bmp.Width, bmp.Height, GXTexFmt.CMP, GXTlutFmt.IA8);
-                }
-
-                // Call unmanaged code
-                Marshal.FreeHGlobal(unmanagedPointer);
-            }
+            // dispose if we use our color reduced bitmap
+            //if (imgFormat == GXTexFmt.CI8 || imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
+            //    bmp.Dispose();
         }
     }
 }

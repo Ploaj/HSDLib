@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Drawing;
 using System.ComponentModel;
 using System.Collections.Generic;
-using static System.Windows.Forms.ListBox;
 using HSDRaw.Common;
+using static System.Windows.Forms.ListBox;
 
 namespace HSDRawViewer.GUI
 {
@@ -598,5 +598,4 @@ namespace HSDRawViewer.GUI
             return "";
         }
     }
-
 }

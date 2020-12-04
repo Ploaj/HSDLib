@@ -1,5 +1,4 @@
-﻿using nQuant;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -53,16 +52,49 @@ namespace HSDRawViewer.Tools
         /// 
         /// </summary>
         /// <param name="bmp"></param>
-        public static Bitmap ReduceColors(Bitmap bitmap, int colorCount)
+        public static Bitmap ReduceColors(Bitmap bmp, int colorCount)
         {
-            if (bitmap.Width <= 16 && bitmap.Height <= 16) // no need
-                return bitmap;
+            if (bmp.Width <= 16 && bmp.Height <= 16) // no need
+                return bmp;
 
-            var quantizer = new WuQuantizer();
-            using (var quantized = quantizer.QuantizeImage(bitmap, 10, 70, colorCount))
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
+
+            byte[] bytes = new byte[length];
+            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+
+
+            // edit bytes
+            var quantizer = new SimplePaletteQuantizer.Quantizers.XiaolinWu.WuColorQuantizer();
+            quantizer.Prepare(bmp.Width, bmp.Height);
+            for (int i = 0; i < bytes.Length; i+=4)
+            {
+                var color = Color.FromArgb(bytes[i], bytes[i+1], bytes[i+2], bytes[i+3]);
+                quantizer.AddColor(color);
+            }
+
+            var palette = quantizer.GetPalette(colorCount);
+
+            for (int i = 0; i < bytes.Length; i += 4)
+            {
+                var color = Color.FromArgb(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
+                var index = quantizer.GetPaletteIndex(color);
+                var newColor = palette[index];
+                bytes[i] = newColor.A;
+                bytes[i + 1] = newColor.R;
+                bytes[i + 2] = newColor.G;
+                bytes[i + 3] = newColor.B;
+            }
+
+            Marshal.Copy(bytes, 0, bitmapData.Scan0, length);
+            bmp.UnlockBits(bitmapData);
+
+            return bmp;
+
+            /*using (var quantized = quantizer.QuantizeImage(bitmap, 10, 70, colorCount))
             {
                 return new Bitmap(quantized);
-            }
+            }*/
         }
 
         /// <summary>

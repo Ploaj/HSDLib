@@ -236,7 +236,7 @@ namespace HSDRawViewer.GUI
                     {
                         if (parent.Accessor is SBM_FighterData plDat)
                         {
-                            ModelScale = plDat.Attributes.ModelScale;
+                            ModelScale = plDat.ParametersCommon.ModelScale;
 
                             if (plDat.Hurtboxes != null)
                                 Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
