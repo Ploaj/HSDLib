@@ -328,7 +328,7 @@
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editToolStripMenuItem.Text = "Edit";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
@@ -336,7 +336,7 @@
             // 
             this.importToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
             // 
@@ -344,7 +344,7 @@
             // 
             this.exportToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
@@ -391,6 +391,7 @@
             // 
             // textureArrayEditor
             // 
+            this.textureArrayEditor.AllowDrop = true;
             this.textureArrayEditor.DisplayItemImages = true;
             this.textureArrayEditor.DisplayItemIndices = true;
             this.textureArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -407,6 +408,8 @@
             this.textureArrayEditor.Size = new System.Drawing.Size(304, 197);
             this.textureArrayEditor.TabIndex = 0;
             this.textureArrayEditor.SelectedObjectChanged += new System.EventHandler(this.textureArrayEditor_SelectedObjectChanged);
+            this.textureArrayEditor.DragDrop += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragDrop);
+            this.textureArrayEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragEnter);
             // 
             // toolStrip4
             // 
@@ -605,7 +608,7 @@
             // 
             this.displaySettingsToolStripMenuItem.Name = "displaySettingsToolStripMenuItem";
             this.displaySettingsToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.displaySettingsToolStripMenuItem.Text = "Joint Display Settings";
+            this.displaySettingsToolStripMenuItem.Text = "Display Settings";
             this.displaySettingsToolStripMenuItem.Click += new System.EventHandler(this.displaySettingsToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
@@ -627,8 +630,8 @@
             this.showSelectionOutlineToolStripMenuItem.CheckOnClick = true;
             this.showSelectionOutlineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showSelectionOutlineToolStripMenuItem.Name = "showSelectionOutlineToolStripMenuItem";
-            this.showSelectionOutlineToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.showSelectionOutlineToolStripMenuItem.Text = "Show Selection Outline";
+            this.showSelectionOutlineToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
+            this.showSelectionOutlineToolStripMenuItem.Text = "Show Object Selection Outline";
             // 
             // toolStripLabel2
             // 

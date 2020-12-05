@@ -1557,17 +1557,61 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void replaceTextureButton_Click(object sender, EventArgs e)
         {
+            var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+            if (f != null)
+                ReplaceTexture(f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textureArrayEditor_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textureArrayEditor_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+
+            if (s != null && s.Length > 0)
+                ReplaceTexture(s[0]);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="f"></param>
+        private void ReplaceTexture(string f)
+        {
             if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
             {
-                var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
-                if (f != null)
+                if (!TOBJConverter.FormatFromString(f, out GXTexFmt imgFormat, out GXTlutFmt palFormat))
+                {
                     using (var teximport = new TextureImportDialog())
                         if (teximport.ShowDialog() == DialogResult.OK)
                         {
-                            proxy.Replace(TOBJConverter.ImportTOBJFromFile(f, teximport.TextureFormat, teximport.PaletteFormat));
-                            textureArrayEditor.Invalidate();
-                            JOBJManager.RefreshRendering = true;
+                            imgFormat = teximport.TextureFormat;
+                            palFormat = teximport.PaletteFormat;
                         }
+                        else
+                            return;
+                }
+
+                proxy.Replace(TOBJConverter.ImportTOBJFromFile(f, imgFormat, palFormat));
+                JOBJManager.RefreshRendering = true;
+                textureArrayEditor.Invalidate();
+                textureArrayEditor.Update();
             }
         }
     }

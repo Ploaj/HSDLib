@@ -87,7 +87,7 @@ namespace HSDRawViewer.Converters
             {
                 FlipUVs = settings.FlipUVs,
                 Optimize = settings.Optimize,
-                FlipWindingOrder = true,
+                //FlipWindingOrder = true,
                 ExportTextureInfo = settings.ExportTextureInfo
             };
 

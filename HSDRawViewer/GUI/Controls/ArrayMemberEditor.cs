@@ -117,7 +117,7 @@ namespace HSDRawViewer.GUI
         private bool _enablePropertyView = true;
 
         public bool EnablePropertyViewDescription { get => propertyGrid.HelpVisible; set => propertyGrid.HelpVisible = value; }
-        
+
         public bool IsResetting { get; internal set; } = false;
 
         /// <summary>

@@ -397,6 +397,7 @@ namespace HSDRawViewer.GUI.Extra
                     if(tobj.TEV == null)
                         tobj.TEV = new HSD_TOBJ_TEV();
 
+                    tevPropertyGrid.SelectedObject = tobj.TEV;
                     tevPropertyGrid.Visible = true;
                 }
                 else

@@ -73,6 +73,8 @@
             this.treeView1.TabIndex = 0;
             this.treeView1.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_BeforeLabelEdit);
             this.treeView1.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_AfterLabelEdit);
+            this.treeView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.treeView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
             this.treeView1.DoubleClick += new System.EventHandler(this.treeView1_DoubleClick);
             this.treeView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView1_KeyDown);
             // 

@@ -211,7 +211,7 @@ namespace HSDRawViewer
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        private void OpenFile(string filePath)
+        public void OpenFile(string filePath)
         {
             FilePath = filePath;
 
