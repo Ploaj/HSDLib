@@ -123,8 +123,8 @@ namespace HSDRawViewer.Rendering
             if (GXShader == null)
             {
                 GXShader = new Shader();
-                GXShader.LoadShader(@"Shader\gx.vert");
-                GXShader.LoadShader(@"Shader\gx.frag");
+                GXShader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.vert"));
+                GXShader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.frag"));
             }
 
             GL.UseProgram(GXShader.programId);

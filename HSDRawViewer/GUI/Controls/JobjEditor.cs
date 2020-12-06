@@ -1484,9 +1484,19 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         public class SceneSettings
         {
+            public bool CSPMode { get; set; } = false;
+
+            public bool ShowGrid { get; set; } = true;
+
+            public bool ShowBackdrop { get; set; } = true;
+
             public Camera Camera { get; set; }
 
             public JOBJManagerSettings Settings { get; set; }
+
+            public JointAnimManager Animation { get; set; }
+
+            public int[] HiddenNodes { get; set; }
 
             /// <summary>
             /// 
@@ -1497,6 +1507,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .IgnoreUnmatchedProperties()
                 .Build();
 
                 return deserializer.Deserialize<SceneSettings>(File.ReadAllText(filePath));
@@ -1518,6 +1529,11 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void exportSceneSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var f = FileIO.SaveFile("Scene (*.yaml)|*.yml");
@@ -1526,13 +1542,23 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 SceneSettings settings = new SceneSettings()
                 {
+                    CSPMode = viewport.CSPMode,
+                    ShowGrid = viewport.EnableFloor,
+                    ShowBackdrop = viewport.EnableBack,
                     Camera = viewport.Camera,
-                    Settings = JOBJManager.settings
+                    Settings = JOBJManager.settings,
+                    Animation = JOBJManager.Animation,
+                    HiddenNodes = JOBJManager.GetHiddenDOBJIndices().ToArray()
                 };
                 settings.Serialize(f);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importSceneSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var f = FileIO.OpenFile("Scene (*.yaml)|*.yml");
@@ -1540,8 +1566,23 @@ namespace HSDRawViewer.GUI.Plugins
             if (f != null)
             {
                 var settings = SceneSettings.Deserialize(f);
-                viewport.Camera = settings.Camera;
-                JOBJManager.settings = settings.Settings;
+                
+                viewport.CSPMode = settings.CSPMode;
+                viewport.EnableBack = settings.ShowBackdrop;
+                viewport.EnableFloor = settings.ShowGrid;
+
+                if (settings.Camera != null)
+                    viewport.Camera = settings.Camera;
+
+                if (settings.Settings != null)
+                    JOBJManager.settings = settings.Settings;
+
+                if (settings.Animation != null)
+                    JOBJManager.Animation = settings.Animation;
+
+                if (settings.HiddenNodes != null)
+                    for (int i = 0; i < listDOBJ.Items.Count; i++)
+                        listDOBJ.SetItemChecked(i, !settings.HiddenNodes.Contains(i));
             }
         }
 

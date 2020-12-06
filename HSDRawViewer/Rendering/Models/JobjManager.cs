@@ -340,6 +340,51 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        public void SetHiddenDOBJs(IEnumerable<int> indices)
+        {
+            var dobjs = GetDOBJs();
+
+            DOBJManager.HiddenDOBJs.Clear();
+
+            foreach (var i in indices)
+                DOBJManager.HiddenDOBJs.Add(dobjs[i]);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<int> GetHiddenDOBJIndices()
+        {
+            var dobjs = GetDOBJs();
+
+            foreach(var dobj in DOBJManager.HiddenDOBJs)
+            {
+                var index = dobjs.IndexOf(dobj);
+                if (index != -1)
+                    yield return index;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public List<HSD_DOBJ> GetDOBJs()
+        {
+            var list = new List<HSD_DOBJ>();
+
+            foreach (var b in jobjToCache)
+                if (b.Key.Dobj != null)
+                    foreach (var d in b.Key.Dobj.List)
+                        list.Add(d);
+
+            return list;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void Render(Camera camera, bool update = true)
         {
             if (RefreshRendering)

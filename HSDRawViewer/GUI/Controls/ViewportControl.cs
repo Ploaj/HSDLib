@@ -128,13 +128,42 @@ namespace HSDRawViewer.GUI
 
         public bool EnableFloor { get; set; } = false;
 
-        public bool EnableBack { get; set; } = true;
+        private bool _enableBack = true;
+        public bool EnableBack
+        {
+            get => _enableBack;
+            set
+            {
+                _enableBack = value;
+
+                if (EnableBack)
+                    GL.ClearColor(ViewportBackColor);
+                else
+                    GL.ClearColor(0, 0, 0, 0);
+            }
+        }
 
         private bool TakeScreenShot = false;
 
-        private bool CSPMode = false;
-
         public bool EnableCSPMode { get; set; } = false;
+        private bool _cspMode = false;
+        public bool CSPMode
+        {
+            get => _cspMode;
+            set
+            {
+                _cspMode = value;
+                if (_cspMode && EnableCSPMode)
+                {
+                    panel1.Dock = DockStyle.Top;
+                    panel1.Height = CSPHeight * 2;
+                }
+                else
+                {
+                    panel1.Dock = DockStyle.Fill;
+                }
+            }
+        }
 
         private static Color ViewportBackColor = Color.FromArgb(50, 50, 50);
 
@@ -190,13 +219,7 @@ namespace HSDRawViewer.GUI
                 if (args.Alt)
                 {
                     if (args.KeyCode == Keys.B)
-                    {
                         EnableBack = !EnableBack;
-                        if (EnableBack)
-                            GL.ClearColor(ViewportBackColor);
-                        else
-                            GL.ClearColor(0, 0, 0, 0);
-                    }
 
                     if (args.KeyCode == Keys.G)
                         EnableFloor = !EnableFloor;
@@ -204,20 +227,8 @@ namespace HSDRawViewer.GUI
                     if (args.KeyCode == Keys.P)
                         TakeScreenShot = true;
 
-                    if (args.KeyCode == Keys.O && EnableCSPMode)
-                    {
-
+                    if (args.KeyCode == Keys.O)
                         CSPMode = !CSPMode;
-                        if(CSPMode)
-                        {
-                            panel1.Dock = DockStyle.Top;
-                            panel1.Height = CSPHeight * 2;
-                        }
-                        else
-                        {
-                            panel1.Dock = DockStyle.Fill;
-                        }
-                    }
 
                     if (args.KeyCode == Keys.R)
                         _camera.RestoreDefault();
