@@ -543,6 +543,16 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public void TakeScreenShot()
+        {
+            Show();
+            viewport.TakeScreenShot = true;
+            viewport.ForceDraw();
+        }
+
+        /// <summary>
         /// Render Mode
         /// </summary>
         /// <param name="sender"></param>
@@ -1484,6 +1494,8 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         public class SceneSettings
         {
+            public float Frame { get; set; } = 0;
+
             public bool CSPMode { get; set; } = false;
 
             public bool ShowGrid { get; set; } = true;
@@ -1542,6 +1554,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 SceneSettings settings = new SceneSettings()
                 {
+                    Frame = viewport.Frame,
                     CSPMode = viewport.CSPMode,
                     ShowGrid = viewport.EnableFloor,
                     ShowBackdrop = viewport.EnableBack,
@@ -1564,28 +1577,58 @@ namespace HSDRawViewer.GUI.Plugins
             var f = FileIO.OpenFile("Scene (*.yaml)|*.yml");
 
             if (f != null)
+                LoadSceneYAML(f);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void LoadSceneYAML(string filePath)
+        {
+            var settings = SceneSettings.Deserialize(filePath);
+            
+            viewport.CSPMode = settings.CSPMode;
+
+            if (settings.CSPMode && showSelectionOutlineToolStripMenuItem.Checked)
+                showSelectionOutlineToolStripMenuItem.PerformClick();
+
+            viewport.EnableBack = settings.ShowBackdrop;
+            viewport.EnableFloor = settings.ShowGrid;
+
+            if (settings.Camera != null)
+                viewport.Camera = settings.Camera;
+
+            if (settings.Settings != null)
+                JOBJManager.settings = settings.Settings;
+
+            if (settings.Animation != null)
             {
-                var settings = SceneSettings.Deserialize(f);
-                
-                viewport.CSPMode = settings.CSPMode;
-                viewport.EnableBack = settings.ShowBackdrop;
-                viewport.EnableFloor = settings.ShowGrid;
+                // load animations
+                LoadAnimation(settings.Animation);
 
-                if (settings.Camera != null)
-                    viewport.Camera = settings.Camera;
+                // load material animation if exists
+                var symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
+                var matAnim = MainForm.Instance.GetSymbol(symbol);
+                if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
+                    LoadAnimation(maj);
 
-                if (settings.Settings != null)
-                    JOBJManager.settings = settings.Settings;
-
-                if (settings.Animation != null)
-                    JOBJManager.Animation = settings.Animation;
-
-                if (settings.HiddenNodes != null)
-                    for (int i = 0; i < listDOBJ.Items.Count; i++)
-                        listDOBJ.SetItemChecked(i, !settings.HiddenNodes.Contains(i));
+                // set frames
+                //JOBJManager.Frame = settings.Frame;
+                //JOBJManager.MaterialFrame = settings.Frame;
+                viewport.Frame = settings.Frame;
             }
+
+            if (settings.HiddenNodes != null)
+                for (int i = 0; i < listDOBJ.Items.Count; i++)
+                    listDOBJ.SetItemChecked(i, !settings.HiddenNodes.Contains(i));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textureArrayEditor_SelectedObjectChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = textureArrayEditor.SelectedObject;

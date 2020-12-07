@@ -1,4 +1,9 @@
-﻿using System.Drawing;
+﻿using HSDRaw;
+using HSDRaw.Common;
+using HSDRaw.Common.Animation;
+using HSDRawViewer.GUI.Plugins;
+using HSDRawViewer.Rendering;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -124,5 +129,29 @@ namespace HSDRawViewer.Tools
 
             return bmp;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /*public static void GenerateCSP(string datPath, string yamlPath)
+        {
+            using (JobjEditor editor = new JobjEditor())
+            {
+                HSDRawFile file = new HSDRawFile(datPath);
+
+                foreach(var root in file.Roots)
+                {
+                    if (root.Data is HSD_JOBJ jobj)
+                        editor.SetJOBJ(jobj);
+
+                    if (root.Data is HSD_MatAnimJoint matAnim)
+                        editor.LoadAnimation(matAnim);
+                }
+
+                editor.LoadSceneYAML(yamlPath);
+
+                editor.TakeScreenShot();
+            }
+        }*/
     }
 }

@@ -143,7 +143,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        private bool TakeScreenShot = false;
+        public bool TakeScreenShot = false;
 
         public bool EnableCSPMode { get; set; } = false;
         private bool _cspMode = false;
@@ -481,13 +481,21 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
+            ForceDraw();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ForceDraw()
+        {
             if (!ReadyToRender)
                 return;
-            
+
             panel1.MakeCurrent();
 
             GL.Viewport(0, 0, panel1.Width, panel1.Height);
-            
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.PushAttrib(AttribMask.AllAttribBits);
@@ -511,10 +519,10 @@ namespace HSDRawViewer.GUI
 
             foreach (var r in Drawables)
                 r.Draw(_camera, panel1.Width, panel1.Height);
-            
+
             GL.PopAttrib();
-            
-            if(Selecting)
+
+            if (Selecting)
             {
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.LoadIdentity();
@@ -545,10 +553,10 @@ namespace HSDRawViewer.GUI
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
                 // 136 x 188
-                
+
                 float width = CSPWidth / (float)panel1.Width;
                 float height = CSPHeight / (float)panel1.Height;
-                
+
                 GL.Color4(0.5f, 0.5f, 0.5f, 0.5f);
 
                 GL.Begin(PrimitiveType.Quads);
@@ -596,7 +604,13 @@ namespace HSDRawViewer.GUI
 
             if (TakeScreenShot)
             {
-                var fileName = "render_" + System.DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss") + ".png";
+                string fileName;
+
+                if (CSPMode)
+                    fileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath), "csp_" + System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + ".png");
+                else
+                    fileName = "render_" + System.DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss") + ".png";
+
                 using (var bitmap = ReadDefaultFramebufferImagePixels(Camera.RenderWidth, Camera.RenderHeight, true))
                 {
                     if (CSPMode)

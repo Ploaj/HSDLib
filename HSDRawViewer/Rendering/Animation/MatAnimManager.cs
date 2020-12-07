@@ -179,13 +179,13 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void FromMatAnim(HSD_MatAnimJoint joint)
+        public MatAnimManager FromMatAnim(HSD_MatAnimJoint joint)
         {
             Nodes.Clear();
             FrameCount = 0;
 
             if (joint == null)
-                return;
+                return this;
 
             foreach (var j in joint.BreathFirstList)
             {
@@ -230,6 +230,8 @@ namespace HSDRawViewer.Rendering
                     }
                 Nodes.Add(matjoint);
             }
+
+            return this;
         }
 
         /// <summary>
