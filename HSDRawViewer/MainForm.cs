@@ -9,16 +9,21 @@ using HSDRawViewer.GUI.Plugins;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Extra;
 using System.ComponentModel;
+using System.IO;
+using VCDiff.Encoders;
+using VCDiff.Includes;
+using VCDiff.Decoders;
 
 namespace HSDRawViewer
 {
     public partial class MainForm : DockContent
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static MainForm Instance { get; internal set; }
 
+        private const string DIFFF = ".diff";
         private PropertyView _nodePropertyViewer;
         public CommonViewport Viewport { get; internal set; }
         private SubactionEditor _ScriptEditor;
@@ -45,7 +50,7 @@ namespace HSDRawViewer
         {
             return RawHSDFile.GetOffsetFromStruct(str);
         }
-        
+
         public MainForm()
         {
             InitializeComponent();
@@ -58,7 +63,7 @@ namespace HSDRawViewer
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
-            
+
             //dockPanel.ShowDocumentIcon = true;
             dockPanel.ActiveContentChanged += (sender, args) =>
             {
@@ -170,7 +175,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="cast"></param>
         public void SelectNode<T>(T cast = null) where T : HSDAccessor
@@ -194,7 +199,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="root"></param>
         public static void DeleteRoot(DataNode root)
@@ -208,7 +213,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="filePath"></param>
         public void OpenFile(string filePath)
@@ -240,7 +245,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -274,7 +279,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -288,8 +293,85 @@ namespace HSDRawViewer
             }
         }
 
+
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveDiffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            var originalFileName = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+            var modifiedFileName = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+            var diffFileName = Tools.FileIO.SaveFile("HSD Diff(*.dat.diff,*.usd.diff,*.ssm.diff,*.sem.diff)|*.dat.diff;*.usd.diff;*.ssm.diff;*.sem.diff");
+
+            if (originalFileName != null && modifiedFileName != null)
+            {
+
+
+                using (FileStream origStream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read))
+                using (FileStream modifiedStream = new FileStream(modifiedFileName, FileMode.Open, FileAccess.Read))
+                using (FileStream diffStream = new FileStream(diffFileName, FileMode.Create, FileAccess.Write))
+                {
+
+                    VCCoder coder = new VCCoder(origStream, modifiedStream, diffStream);
+                    VCDiffResult result = coder.Encode(); //encodes with no checksum and not interleaved
+                    if (result != VCDiffResult.SUCCESS)
+                    {
+                        //error was not able to encode properly
+                    }
+                }
+
+
+            }
+        }
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void loadDiffToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            var originalFileName = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+            var diffFileName = Tools.FileIO.OpenFile("HSD Diff(*.dat.diff,*.usd.diff,*.ssm.diff,*.sem.diff)|*.dat.diff;*.usd.diff;*.ssm.diff;*.sem.diff");
+            var mergedFileName = Tools.FileIO.SaveFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+
+            if (originalFileName != null && diffFileName != null)
+            {
+
+
+                using (FileStream origStream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read))
+                using (FileStream modifiedStream = new FileStream(diffFileName, FileMode.Open, FileAccess.Read))
+                using (FileStream mergedStream = new FileStream(mergedFileName, FileMode.Create, FileAccess.Write))
+                {
+
+                    VCDecoder decoder = new VCDecoder(origStream, modifiedStream, mergedStream);
+                    VCDiffResult result = decoder.Start(); //encodes with no checksum and not interleaved
+                    if (result != VCDiffResult.SUCCESS)
+                    {
+                        //error was not able to encode properly
+                    } else
+                    {
+                        long bytesWritten = 0;
+                        result = decoder.Decode(out bytesWritten);
+
+                        if(result != VCDiffResult.SUCCESS)
+                        {
+
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        /// <summary>
+        ///
         /// </summary>
         public void SaveDAT()
         {
@@ -298,7 +380,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -341,7 +423,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -421,7 +503,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
@@ -439,7 +521,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
@@ -511,7 +593,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="c"></param>
         public void TryClose(Control c)
@@ -528,7 +610,7 @@ namespace HSDRawViewer
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -578,7 +660,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -589,9 +671,9 @@ namespace HSDRawViewer
                 d.ShowDialog();
             }
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -603,7 +685,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -616,7 +698,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -631,7 +713,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -645,7 +727,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -658,7 +740,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -671,7 +753,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -692,11 +774,11 @@ namespace HSDRawViewer
             /*[Browsable(true),
              TypeConverter(typeof(HSDTypeConverter))]
             public Type Type { get; set; } = typeof(HSDAccessor);*/
-            
+
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -726,7 +808,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -749,7 +831,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -763,7 +845,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -774,9 +856,9 @@ namespace HSDRawViewer
                 d.RootText = e.Label;
             }
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -786,7 +868,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -802,7 +884,7 @@ namespace HSDRawViewer
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="symbol"></param>
         /// <returns></returns>
@@ -815,5 +897,5 @@ namespace HSDRawViewer
             return null;
         }
     }
-    
+
 }

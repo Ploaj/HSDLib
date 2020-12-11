@@ -197,43 +197,50 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static HSD_TOBJ ImportTOBJFromFile()
         {
-            var TOBJ = new HSD_TOBJ()
+            try
             {
-                MagFilter = GXTexFilter.GX_LINEAR,
-                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                HScale = 1,
-                WScale = 1,
-                WrapS = GXWrapMode.CLAMP,
-                WrapT = GXWrapMode.CLAMP,
-                SX = 1,
-                SY = 1,
-                SZ = 1,
-                GXTexGenSrc = 4,
-                Blending = 1
-            };
 
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
-            if (f != null)
-            {
-                using (TextureImportDialog settings = new TextureImportDialog())
+                var TOBJ = new HSD_TOBJ()
                 {
-                    if (FormatFromString(f, out GXTexFmt fmt, out GXTlutFmt pal))
+                    MagFilter = GXTexFilter.GX_LINEAR,
+                    Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
+                    HScale = 1,
+                    WScale = 1,
+                    WrapS = GXWrapMode.CLAMP,
+                    WrapT = GXWrapMode.CLAMP,
+                    SX = 1,
+                    SY = 1,
+                    SZ = 1,
+                    GXTexGenSrc = 4,
+                    Blending = 1
+                };
+
+                var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                if (f != null)
+                {
+                    using (TextureImportDialog settings = new TextureImportDialog())
                     {
-                        settings.PaletteFormat = pal;
-                        settings.TextureFormat = fmt;
-                    }
-
-                    if (settings.ShowDialog() == DialogResult.OK)
-                        using (Bitmap bmp = new Bitmap(f))
+                        if (FormatFromString(f, out GXTexFmt fmt, out GXTlutFmt pal))
                         {
-                            settings.ApplySettings(bmp);
-                            InjectBitmap(bmp, TOBJ, settings.TextureFormat, settings.PaletteFormat);
-                            return TOBJ;
+                            settings.PaletteFormat = pal;
+                            settings.TextureFormat = fmt;
                         }
-                }
-            }
 
-            return null;
+                        if (settings.ShowDialog() == DialogResult.OK)
+                            using (Bitmap bmp = new Bitmap(f))
+                            {
+                                settings.ApplySettings(bmp);
+                                InjectBitmap(bmp, TOBJ, settings.TextureFormat, settings.PaletteFormat);
+                                return TOBJ;
+                            }
+                    }
+                }
+
+                return null;
+            } catch (Exception e)
+            {
+                return null;
+            }
         }
 
         /// <summary>

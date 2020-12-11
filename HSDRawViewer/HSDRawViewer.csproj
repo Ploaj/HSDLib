@@ -799,6 +799,10 @@
       <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
       <Name>HSDRaw</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VCDiff\VCDiff.csproj">
+      <Project>{4d676f4e-e66d-4a41-861f-600f0ffcd052}</Project>
+      <Name>VCDiff</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <ItemDefinitionGroup>

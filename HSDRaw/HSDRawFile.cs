@@ -404,9 +404,9 @@ namespace HSDRaw
         /// Saves dat data to filepath
         /// </summary>
         /// <param name="fileName"></param>
-        public void Save(string fileName, bool bufferAlign = true, bool optimize = true, bool trim = false)
+        public Stream Save(string fileName, bool bufferAlign = true, bool optimize = true, bool trim = false)
         {
-            Save(new FileStream(fileName, FileMode.Create), bufferAlign, optimize, trim);
+            return Save(new FileStream(fileName, FileMode.Create), bufferAlign, optimize, trim);
         }
         
         /// <summary>
@@ -561,7 +561,7 @@ namespace HSDRaw
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="bufferAlign"></param>
-        public void Save(Stream stream, bool bufferAlign = true, bool optimize = true, bool trim = false)
+        public Stream Save(Stream stream, bool bufferAlign = true, bool optimize = true, bool trim = false)
         {
             if (Roots.Count > 0 && Roots[0].Data is MEX_Data)
                 bufferAlign = false;
@@ -711,7 +711,9 @@ namespace HSDRaw
                 writer.Write(Roots.Count);
                 writer.Write(References.Count);
                 writer.Write(VersionChars);
+
             }
+            return stream;
         }
 
 
