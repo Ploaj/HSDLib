@@ -170,6 +170,12 @@
     <Compile Include="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GUI\Extra\DiffTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\DiffTool.Designer.cs">
+      <DependentUpon>DiffTool.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -573,6 +579,9 @@
     </None>
     <None Include="Resources\ts_stop.png" />
     <None Include="Resources\ts_play.png" />
+    <EmbeddedResource Include="GUI\Extra\DiffTool.resx">
+      <DependentUpon>DiffTool.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\PopoutJointAnimationEditor.resx">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
     </EmbeddedResource>

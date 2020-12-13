@@ -13,6 +13,7 @@ using System.IO;
 using VCDiff.Encoders;
 using VCDiff.Includes;
 using VCDiff.Decoders;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer
 {
@@ -251,7 +252,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+            var f = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
             if (f != null)
             {
                 if (f.ToLower().EndsWith(".sem"))
@@ -302,9 +303,9 @@ namespace HSDRawViewer
         private void saveDiffToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            var originalFileName = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
-            var modifiedFileName = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
-            var diffFileName = Tools.FileIO.SaveFile("HSD Diff(*.dat.diff,*.usd.diff,*.ssm.diff,*.sem.diff)|*.dat.diff;*.usd.diff;*.ssm.diff;*.sem.diff");
+            var originalFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
+            var modifiedFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
+            var diffFileName = Tools.FileIO.SaveFile(FileIO.DIFF_EXTENSIONS);
 
             if (originalFileName != null && modifiedFileName != null)
             {
@@ -315,12 +316,7 @@ namespace HSDRawViewer
                 using (FileStream diffStream = new FileStream(diffFileName, FileMode.Create, FileAccess.Write))
                 {
 
-                    VCCoder coder = new VCCoder(origStream, modifiedStream, diffStream);
-                    VCDiffResult result = coder.Encode(); //encodes with no checksum and not interleaved
-                    if (result != VCDiffResult.SUCCESS)
-                    {
-                        //error was not able to encode properly
-                    }
+                    FileIO.SaveDiffToFile(origStream, modifiedStream, diffStream);
                 }
 
 
@@ -336,9 +332,9 @@ namespace HSDRawViewer
         private void loadDiffToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            var originalFileName = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
-            var diffFileName = Tools.FileIO.OpenFile("HSD Diff(*.dat.diff,*.usd.diff,*.ssm.diff,*.sem.diff)|*.dat.diff;*.usd.diff;*.ssm.diff;*.sem.diff");
-            var mergedFileName = Tools.FileIO.SaveFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+            var originalFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
+            var diffFileName = Tools.FileIO.OpenFile(FileIO.DIFF_EXTENSIONS);
+            var mergedFileName = Tools.FileIO.SaveFile(FileIO.NORMAL_EXTENSIONS);
 
             if (originalFileName != null && diffFileName != null)
             {
@@ -349,21 +345,7 @@ namespace HSDRawViewer
                 using (FileStream mergedStream = new FileStream(mergedFileName, FileMode.Create, FileAccess.Write))
                 {
 
-                    VCDecoder decoder = new VCDecoder(origStream, modifiedStream, mergedStream);
-                    VCDiffResult result = decoder.Start(); //encodes with no checksum and not interleaved
-                    if (result != VCDiffResult.SUCCESS)
-                    {
-                        //error was not able to encode properly
-                    } else
-                    {
-                        long bytesWritten = 0;
-                        result = decoder.Decode(out bytesWritten);
-
-                        if(result != VCDiffResult.SUCCESS)
-                        {
-
-                        }
-                    }
+                    FileIO.MergeDiffToDat(origStream, modifiedStream, mergedStream);
                 }
 
 
@@ -895,6 +877,14 @@ namespace HSDRawViewer
                     return d.Accessor;
 
             return null;
+        }
+
+        private void diffToolToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (DiffTool d = new DiffTool())
+            {
+                d.ShowDialog();
+            }
         }
     }
 

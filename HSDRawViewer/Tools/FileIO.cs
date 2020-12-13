@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Forms;
+using VCDiff.Decoders;
+using VCDiff.Encoders;
+using VCDiff.Includes;
 
 namespace HSDRawViewer.Tools
 {
@@ -8,7 +12,11 @@ namespace HSDRawViewer.Tools
         private static string PrevSaveLocation = null;
 
         private static string PrevOpenLocation = null;
-        
+
+        public static string NORMAL_EXTENSIONS = "HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem";
+
+        public static string DIFF_EXTENSIONS = "HSD (*.dat.diff,*.usd.diff,*.ssm.diff,*.sem.diff, *.diff)|*.diff";
+
         /// <summary>
         /// 
         /// </summary>
@@ -70,6 +78,36 @@ namespace HSDRawViewer.Tools
                 }
             }
             return null;
+        }
+
+        internal static void SaveDiffToFile(Stream origStream, Stream modifiedStream, Stream diffStream)
+        {
+            VCCoder coder = new VCCoder(origStream, modifiedStream, diffStream);
+            VCDiffResult result = coder.Encode(); //encodes with no checksum and not interleaved
+            if (result != VCDiffResult.SUCCESS)
+            {
+                //error was not able to encode properly
+            }
+        }
+
+        internal static void MergeDiffToDat(Stream origStream, Stream modifiedStream, Stream mergedStream)
+        {
+            VCDecoder decoder = new VCDecoder(origStream, modifiedStream, mergedStream);
+            VCDiffResult result = decoder.Start(); //encodes with no checksum and not interleaved
+            if (result != VCDiffResult.SUCCESS)
+            {
+                //error was not able to encode properly
+            }
+            else
+            {
+                long bytesWritten = 0;
+                result = decoder.Decode(out bytesWritten);
+
+                if (result != VCDiffResult.SUCCESS)
+                {
+
+                }
+            }
         }
 
         /// <summary>
