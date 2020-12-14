@@ -147,5 +147,13 @@ namespace HSDRawViewer.Tools
             }
             return null;
         }
+
+        internal static Stream ToUnwritableMemoryStream(Stream stream)
+        {
+            stream.Position = 0;
+            byte[] buffer = new byte[stream.Length];
+            stream.Read(buffer, 0, (int)stream.Length);
+            return new MemoryStream(buffer, false);
+        }
     }
 }

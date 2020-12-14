@@ -563,6 +563,8 @@ namespace HSDRaw
         /// <param name="bufferAlign"></param>
         public Stream Save(Stream stream, bool bufferAlign = true, bool optimize = true, bool trim = false)
         {
+            MemoryStream result = new MemoryStream();
+
             if (Roots.Count > 0 && Roots[0].Data is MEX_Data)
                 bufferAlign = false;
 
@@ -610,6 +612,7 @@ namespace HSDRaw
             // remove duplicate buffers--------------------------------------------------------------------------
             if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_FighterData) && !(Roots[0].Data is MEX_Data))
                 RemoveDuplicateBuffers();
+
 
             // build file --------------------------------------------------------------------------
             using (BinaryWriterExt writer = new BinaryWriterExt(stream))
@@ -712,8 +715,11 @@ namespace HSDRaw
                 writer.Write(References.Count);
                 writer.Write(VersionChars);
 
+                stream.Position = 0;
+                stream.CopyTo(result);
+
             }
-            return stream;
+            return result;
         }
 
 

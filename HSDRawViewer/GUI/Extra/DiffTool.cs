@@ -24,6 +24,7 @@ namespace HSDRawViewer.GUI.Extra
 
         }
 
+        // TODO: I forgot to change the buttons reference names before double clicking them. oops?
         private void button1_Click(object sender, EventArgs e)
         {
              this.saveOriginalFileInput.Text = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);

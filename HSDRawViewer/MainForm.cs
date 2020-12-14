@@ -31,9 +31,13 @@ namespace HSDRawViewer
 
         public string FilePath { get; internal set; }
 
+
         private HSDRawFile RawHSDFile = new HSDRawFile();
 
         public static DataNode SelectedDataNode { get; internal set; } = null;
+
+        public Stream OpenFileStream;
+        public String OpenFilePath { get; private set; }
 
         public static bool RefreshNode = false;
 
@@ -213,6 +217,16 @@ namespace HSDRawViewer
             }
         }
 
+        public void OpenFile(Stream s)
+        {
+            this.OpenFileStream = new MemoryStream();
+            s.CopyTo(this.OpenFileStream);
+            s.Position = 0;
+            RawHSDFile = new HSDRawFile();
+            RawHSDFile.Open(s);
+            RefreshTree();
+        }
+
         /// <summary>
         ///
         /// </summary>
@@ -220,11 +234,12 @@ namespace HSDRawViewer
         public void OpenFile(string filePath)
         {
             FilePath = filePath;
+            this.OpenFilePath = filePath.Clone().ToString();
 
-            RawHSDFile = new HSDRawFile();
-            RawHSDFile.Open(filePath);
-            RefreshTree();
 
+            FileStream fs = new FileStream(filePath, FileMode.Open);
+
+            OpenFile(fs);
 #if !DEBUG
             if(RawHSDFile.Roots.Count > 0 && RawHSDFile.Roots[0].Data is HSDRaw.MEX.MEX_Data)
             {
@@ -241,8 +256,8 @@ namespace HSDRawViewer
                 }
             }
 #endif
-
             Text = "HSD DAT Browser - " + filePath;
+
         }
 
         /// <summary>
@@ -295,6 +310,24 @@ namespace HSDRawViewer
         }
 
 
+        private void saveDiffToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (this.OpenFileStream == null) return;
+
+            var originalFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
+            if (originalFileName == null) return;
+
+            var targetFileName = Tools.FileIO.SaveFile(FileIO.DIFF_EXTENSIONS);
+            if (targetFileName == null) return;
+
+            var originalFileStream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read);
+            var currentChangesStream = RawHSDFile.Save(new MemoryStream());
+            FileStream diffStream = new FileStream(targetFileName, FileMode.Create, FileAccess.Write);
+
+            saveDiffFile(originalFileStream, currentChangesStream, diffStream);
+        }
+
+
         /// <summary>
         ///
         /// </summary>
@@ -302,27 +335,42 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveDiffToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (this.OpenFileStream == null) return;
 
-            var originalFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
-            var modifiedFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
-            var diffFileName = Tools.FileIO.SaveFile(FileIO.DIFF_EXTENSIONS);
+            var originalFileStream = this.OpenFileStream;
+            var currentChangesStream = RawHSDFile.Save(new MemoryStream());
+            var outputPath = this.OpenFilePath + ".diff";
+            FileStream diffStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
 
-            if (originalFileName != null && modifiedFileName != null)
-            {
-
-
-                using (FileStream origStream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read))
-                using (FileStream modifiedStream = new FileStream(modifiedFileName, FileMode.Open, FileAccess.Read))
-                using (FileStream diffStream = new FileStream(diffFileName, FileMode.Create, FileAccess.Write))
-                {
-
-                    FileIO.SaveDiffToFile(origStream, modifiedStream, diffStream);
-                }
-
-
-            }
+            saveDiffFile(originalFileStream, currentChangesStream, diffStream);
         }
 
+        void saveDiffFile(Stream source, Stream changes, FileStream target)
+        {
+            if (source == null) return;
+            if (changes == null) return;
+            if (target == null) return;
+
+            var bk = FileIO.ToUnwritableMemoryStream(this.OpenFileStream);
+            using (source)
+            using (changes)
+            using (target)
+            {
+                source.Position = 0;
+                changes.Position = 0;
+
+                source = FileIO.ToUnwritableMemoryStream(source);
+                //source = FileIO.ToUnwritableMemoryStream(source);
+
+                FileIO.SaveDiffToFile(source, changes, target);
+                MessageBox.Show("Diff file saved to: " + target.Name);
+                if (target.CanWrite)
+                {
+                    target.Close();
+                }
+            }
+            this.OpenFileStream = bk;
+        }
 
         /// <summary>
         ///
@@ -331,25 +379,27 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void loadDiffToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
-            var originalFileName = Tools.FileIO.OpenFile(FileIO.NORMAL_EXTENSIONS);
+            if (this.OpenFileStream == null) return;
+            //MessageBox.Show("Select a Diff file to merge with the current open file. Saving your changes is recommended first.");
             var diffFileName = Tools.FileIO.OpenFile(FileIO.DIFF_EXTENSIONS);
-            var mergedFileName = Tools.FileIO.SaveFile(FileIO.NORMAL_EXTENSIONS);
 
-            if (originalFileName != null && diffFileName != null)
+            if (diffFileName == null) return;
+
+            byte[] buffer = new byte[this.OpenFileStream.Length];
+
+            this.OpenFileStream.Position = 0;
+            this.OpenFileStream.Read(buffer, 0, (int)this.OpenFileStream.Length);
+
+            using (MemoryStream originalFileStream = new MemoryStream(buffer, false))
+            using (FileStream modifiedStream = new FileStream(diffFileName, FileMode.Open, FileAccess.Read))
+            using (MemoryStream mergedFileStream = new MemoryStream())
             {
 
-
-                using (FileStream origStream = new FileStream(originalFileName, FileMode.Open, FileAccess.Read))
-                using (FileStream modifiedStream = new FileStream(diffFileName, FileMode.Open, FileAccess.Read))
-                using (FileStream mergedStream = new FileStream(mergedFileName, FileMode.Create, FileAccess.Write))
-                {
-
-                    FileIO.MergeDiffToDat(origStream, modifiedStream, mergedStream);
-                }
-
-
+                FileIO.MergeDiffToDat(originalFileStream, modifiedStream, mergedFileStream);
+                mergedFileStream.Position = 0;
+                OpenFile(mergedFileStream);
             }
+
         }
 
         /// <summary>
@@ -357,7 +407,7 @@ namespace HSDRawViewer
         /// </summary>
         public void SaveDAT()
         {
-            if(RawHSDFile != null)
+            if (RawHSDFile != null)
                 RawHSDFile.Save(FilePath);
         }
 
@@ -556,7 +606,8 @@ namespace HSDRawViewer
             {
                 var editor = GetEditors(SelectedDataNode);
                 editor[0].BringToFront();
-            } else
+            }
+            else
             if (!IsChildOpened(SelectedDataNode.Accessor._s) &&
                 edit != null &&
                 edit is DockContent dc)
@@ -769,7 +820,7 @@ namespace HSDRawViewer
             var settings = new NewRootSettings();
             using (HSDTypeDialog t = new HSDTypeDialog())
             {
-                if(t.ShowDialog() == DialogResult.OK)
+                if (t.ShowDialog() == DialogResult.OK)
                 {
                     using (PropertyDialog d = new PropertyDialog("New Root", settings))
                     {
@@ -798,12 +849,12 @@ namespace HSDRawViewer
         {
             var f = Tools.FileIO.OpenFile("All Files |*.*");
 
-            if(f != null)
+            if (f != null)
             {
                 var root = new HSDRootNode();
 
                 root.Name = System.IO.Path.GetFileNameWithoutExtension(f);
-                root.Data = new HSDAccessor() ;
+                root.Data = new HSDAccessor();
                 root.Data._s.SetData(System.IO.File.ReadAllBytes(f));
 
                 RawHSDFile.Roots.Add(root);
@@ -820,7 +871,7 @@ namespace HSDRawViewer
         private void treeView1_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
             // Can only edit root node labels
-            if(!(e.Node is DataNode d && d.IsRootNode && !d.IsReferenceNode))
+            if (!(e.Node is DataNode d && d.IsRootNode && !d.IsReferenceNode))
             {
                 e.CancelEdit = true;
             }
@@ -857,9 +908,9 @@ namespace HSDRawViewer
         private void trimExcessDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var trimmed = 0;
-            foreach(DataNode d in treeView1.Nodes)
+            foreach (DataNode d in treeView1.Nodes)
             {
-                if(d.Accessor != null)
+                if (d.Accessor != null)
                     trimmed += d.Accessor.Trim();
             }
             MessageBox.Show($"Trimmed 0x{trimmed.ToString("X")} bytes", "Trimmed File");
@@ -886,6 +937,7 @@ namespace HSDRawViewer
                 d.ShowDialog();
             }
         }
+
     }
 
 }
