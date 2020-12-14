@@ -46,3 +46,7 @@ This program is still a work-in-progress so expect bugs and incomplete features.
 * YamlDotNet
 * Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014 Antoine Aubry and contributors
 * MIT License: https://www.nuget.org/packages/YamlDotNet/8.1.0/license
+
+* VCDiff.Core
+* Copyright (c) 2020 MatthiWare and contributors
+* Apache License: https://github.com/MatthiWare/VCDiff.Core/blob/master/LICENSE
