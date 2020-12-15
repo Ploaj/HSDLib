@@ -460,8 +460,12 @@ namespace HSDRawViewer.Converters
                 var hasBump = false;
 
                 // Assess needed attributes based on the material MOBJ
-                if (mesh.Name.Contains("REFLECTIVE") || Settings.MetalModel)
+                if (mesh.Name.Contains("REFLECTIVE") )
                     hasReflection = true;
+#if DEBUG
+                if(Settings.MetalModel)
+                    hasReflection = true;
+#endif
 
                 if (mesh.Name.Contains("BUMP"))
                     hasBump = true;
@@ -488,8 +492,13 @@ namespace HSDRawViewer.Converters
                     {
                         Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
-                        if ((dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1) || Settings.MetalModel)
+                        if (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)
                             Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+
+#if DEBUG
+                        if (Settings.MetalModel && !Attributes.Contains(GXAttribName.GX_VA_TEX1MTXIDX))
+                            Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+#endif
                     }
                 }
 
