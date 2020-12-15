@@ -34,6 +34,9 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveDiffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveDiffToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadDiffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsUnoptimizedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,6 +48,7 @@
             this.propertyViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.diffToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sEMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -98,7 +102,10 @@
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem1,
             this.saveToolStripMenuItem,
-            this.saveAsUnoptimizedToolStripMenuItem});
+            this.saveAsUnoptimizedToolStripMenuItem,
+            this.saveDiffToolStripMenuItem,
+            this.saveDiffToolStripMenuItem1,
+            this.loadDiffToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -107,7 +114,7 @@
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -115,23 +122,53 @@
             // 
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
             this.saveToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(192, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(204, 22);
             this.saveToolStripMenuItem1.Text = "Save";
             this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem1_Click);
+            // 
+            // saveDiffToolStripMenuItem
+            // 
+            this.saveDiffToolStripMenuItem.Name = "saveDiffToolStripMenuItem";
+            this.saveDiffToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.D)));
+            this.saveDiffToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.saveDiffToolStripMenuItem.Text = "Save Diff";
+            this.saveDiffToolStripMenuItem.ToolTipText = "Saves Diff changes into \"{filename}.diff\" (overwrites existing file)";
+            this.saveDiffToolStripMenuItem.Click += new System.EventHandler(this.saveDiffToolStripMenuItem_Click);
+            // 
+            // saveDiffToolStripMenuItem1
+            // 
+            this.saveDiffToolStripMenuItem1.AutoToolTip = true;
+            this.saveDiffToolStripMenuItem1.Name = "saveDiffToolStripMenuItem1";
+            this.saveDiffToolStripMenuItem1.Size = new System.Drawing.Size(204, 22);
+            this.saveDiffToolStripMenuItem1.Text = "Save Diff...";
+            this.saveDiffToolStripMenuItem1.ToolTipText = "Select Original File To Diff Against";
+            this.saveDiffToolStripMenuItem1.Click += new System.EventHandler(this.saveDiffToolStripMenuItem1_Click);
+            // 
+            // loadDiffToolStripMenuItem
+            // 
+            this.loadDiffToolStripMenuItem.AutoToolTip = true;
+            this.loadDiffToolStripMenuItem.Name = "loadDiffToolStripMenuItem";
+            this.loadDiffToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.L)));
+            this.loadDiffToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+            this.loadDiffToolStripMenuItem.Text = "Import Diff";
+            this.loadDiffToolStripMenuItem.ToolTipText = "Merges Diff into current project";
+            this.loadDiffToolStripMenuItem.Click += new System.EventHandler(this.loadDiffToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.saveToolStripMenuItem.Text = "Save As";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsUnoptimizedToolStripMenuItem
             // 
             this.saveAsUnoptimizedToolStripMenuItem.Name = "saveAsUnoptimizedToolStripMenuItem";
-            this.saveAsUnoptimizedToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.saveAsUnoptimizedToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
             this.saveAsUnoptimizedToolStripMenuItem.Text = "Save As (No Optimize)";
             this.saveAsUnoptimizedToolStripMenuItem.Click += new System.EventHandler(this.saveAsUnoptimizedToolStripMenuItem_Click);
             // 
@@ -206,12 +243,20 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.diffToolToolStripMenuItem,
             this.aJToolToolStripMenuItem,
             this.sSMEditorToolStripMenuItem,
             this.sEMEditorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // diffToolToolStripMenuItem
+            // 
+            this.diffToolToolStripMenuItem.Name = "diffToolToolStripMenuItem";
+            this.diffToolToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.diffToolToolStripMenuItem.Text = "Diff Tool";
+            this.diffToolToolStripMenuItem.Click += new System.EventHandler(this.diffToolToolStripMenuItem_Click);
             // 
             // aJToolToolStripMenuItem
             // 
@@ -339,6 +384,8 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveDiffToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadDiffToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addRootFromFileToolStripMenuItem;
         private System.Windows.Forms.Label LocationLabel;
@@ -360,6 +407,8 @@
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem selectAudioPlaybackDeviceToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem trimExcessDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem diffToolToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveDiffToolStripMenuItem1;
     }
 }
 

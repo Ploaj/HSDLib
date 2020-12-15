@@ -170,6 +170,12 @@
     <Compile Include="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GUI\Extra\DiffTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\DiffTool.Designer.cs">
+      <DependentUpon>DiffTool.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -573,6 +579,9 @@
     </None>
     <None Include="Resources\ts_stop.png" />
     <None Include="Resources\ts_play.png" />
+    <EmbeddedResource Include="GUI\Extra\DiffTool.resx">
+      <DependentUpon>DiffTool.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\PopoutJointAnimationEditor.resx">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -798,6 +807,10 @@
     <ProjectReference Include="..\HSDRaw\HSDRaw.csproj">
       <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
       <Name>HSDRaw</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VCDiff\VCDiff.csproj">
+      <Project>{4d676f4e-e66d-4a41-861f-600f0ffcd052}</Project>
+      <Name>VCDiff</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
