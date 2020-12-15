@@ -50,6 +50,9 @@ namespace HSDRawViewer.Converters
 #if DEBUG
         [Category("Debug Options"), DisplayName("Merge"), Description("")]
         public bool Merge { get; set; } = false;
+
+        [Category("Debug Options"), DisplayName("Metal Model"), Description("")]
+        public bool MetalModel { get; set; } = false;
 #endif
 
 
@@ -70,10 +73,10 @@ namespace HSDRawViewer.Converters
 
 
 
-        [Category("Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("")]
+        [Category("Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("Enables importing of vertex colors")]
         public bool ImportVertexColor { get; set; } = false;
 
-        [Category("Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha color from vertex colors")]
+        [Category("Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha channel from vertex colors")]
         public bool ImportVertexAlpha { get; set; } = false;
 
         [Category("Vertex Color Options"), DisplayName("Multiply by 2"), Description("Multiplies vertex colors by 2")]
@@ -457,7 +460,7 @@ namespace HSDRawViewer.Converters
                 var hasBump = false;
 
                 // Assess needed attributes based on the material MOBJ
-                if (mesh.Name.Contains("REFLECTIVE"))
+                if (mesh.Name.Contains("REFLECTIVE") || Settings.MetalModel)
                     hasReflection = true;
 
                 if (mesh.Name.Contains("BUMP"))
@@ -482,10 +485,12 @@ namespace HSDRawViewer.Converters
                     Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
 
                     if (hasReflection)
+                    {
                         Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
-                    if (hasReflection && dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)
-                        Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+                        if ((dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1) || Settings.MetalModel)
+                            Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+                    }
                 }
 
                 

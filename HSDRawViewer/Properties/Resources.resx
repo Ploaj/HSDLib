@@ -142,6 +142,9 @@
   <data name="ico_dobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_dobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ico_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_file.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ico_fobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_fobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -153,6 +156,9 @@
   </data>
   <data name="ico_group" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_group.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ico_hatchling" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_hatchling.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ico_iobj" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_iobj.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -198,6 +204,9 @@
   </data>
   <data name="ico_unknown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_unknown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="iso_disc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\iso_disc.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="melee_font" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\melee_font.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

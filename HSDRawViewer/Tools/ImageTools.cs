@@ -1,16 +1,88 @@
-﻿using HSDRaw;
-using HSDRaw.Common;
-using HSDRaw.Common.Animation;
-using HSDRawViewer.GUI.Plugins;
-using HSDRawViewer.Rendering;
-using System.Drawing;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+
+namespace System.Drawing
+{
+    public static class BitmapExt
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
+        public static byte[] GetBGRAData(this Bitmap bmp)
+        {
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
+
+            byte[] bytes = new byte[length];
+
+            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+            bmp.UnlockBits(bitmapData);
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
+        public static byte[] GetRGBAData(this Bitmap bmp)
+        {
+            var bytes = bmp.GetBGRAData();
+
+            for(int i = 0; i < bytes.Length; i+=4)
+            {
+                var temp = bytes[i];
+                bytes[i] = bytes[i + 2];
+                bytes[i + 2] = temp;
+            }
+
+            return bytes;
+        }
+
+    }
+}
 
 namespace HSDRawViewer.Tools
 {
     public class BitmapTools
     {
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -109,7 +181,26 @@ namespace HSDRawViewer.Tools
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        public static Bitmap RgbaToImage(byte[] data, int width, int height)
+        public static Bitmap RGBAToBitmap(byte[] data, int width, int height)
+        {
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                var temp = data[i];
+                data[i] = data[i + 2];
+                data[i + 2] = temp;
+            }
+
+            return BGRAToBitmap(data, width, height);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static Bitmap BGRAToBitmap(byte[] data, int width, int height)
         {
             if (width == 0) width = 1;
             if (height == 0) height = 1;
@@ -118,11 +209,11 @@ namespace HSDRawViewer.Tools
 
             try
             {
-                System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(
+                BitmapData bmpData = bmp.LockBits(
                                      new Rectangle(0, 0, bmp.Width, bmp.Height),
-                                     System.Drawing.Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat);
+                                     ImageLockMode.WriteOnly, bmp.PixelFormat);
 
-                System.Runtime.InteropServices.Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+                Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
                 bmp.UnlockBits(bmpData);
             }
             catch { bmp.Dispose(); throw; }

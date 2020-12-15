@@ -1,13 +1,43 @@
-﻿using OpenTK;
+﻿using HSDRaw.Common;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
     public class DrawShape
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="spline"></param>
+        public static void RenderSpline(HSD_Spline spline)
+        {
+            GL.UseProgram(-1);
+
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.LineWidth(2);
+            GL.Begin(PrimitiveType.Lines);
+
+            var points = spline.Points.Array;
+
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                GL.Color3(Color.Yellow);
+                GL.Vertex3(points[i].X, points[i].Y, points[i].Z);
+
+                GL.Color3(Color.Blue);
+                GL.Vertex3(points[i + 1].X, points[i + 1].Y, points[i + 1].Z);
+            }
+
+            GL.End();
+
+            GL.PopAttrib();
+        }
+
         /// <summary>
         /// 
         /// </summary>

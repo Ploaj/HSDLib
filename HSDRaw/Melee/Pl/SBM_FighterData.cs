@@ -9,9 +9,9 @@ namespace HSDRaw.Melee.Pl
     {
         public override int TrimmedSize => 0x60;
 
-        public SBM_CommonFighterAttributes ParametersCommon { get => _s.GetReference<SBM_CommonFighterAttributes>(0x00); set => _s.SetReference(0x00, value); }
+        public SBM_CommonFighterAttributes Attributes { get => _s.GetReference<SBM_CommonFighterAttributes>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSDAccessor ParametersExt { get => _s.GetReference<HSDAccessor>(0x04); set => _s.SetReference(0x04, value); }
+        public HSDAccessor Attributes2 { get => _s.GetReference<HSDAccessor>(0x04); set => _s.SetReference(0x04, value); }
         
         public SBM_PlayerModelLookupTables ModelLookupTables { get => _s.GetReference<SBM_PlayerModelLookupTables>(0x08); set => _s.SetReference(0x08, value); }
 

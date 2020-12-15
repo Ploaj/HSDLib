@@ -33,6 +33,8 @@ namespace HSDRawViewer.GUI.Plugins
 
         private ViewportControl viewport;
 
+        private PopoutJointAnimationEditor jointAnimEditor = new PopoutJointAnimationEditor(false);
+
         /// <summary>
         /// 
         /// </summary>
@@ -79,6 +81,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             Disposed += (sender, args) =>
             {
+                jointAnimEditor.Dispose();
                 if (PluginManager.GetCommonViewport() != null)
                 {
                     if (PluginManager.GetCommonViewport() != null)
@@ -1373,7 +1376,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             JOBJTools.UpdateJOBJFlags(root);
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -1381,13 +1384,15 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void viewAnimationGraphToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(JOBJManager.Animation != null)
-            {
-                var joint = treeJOBJ.SelectedNode.Tag as HSD_JOBJ;
+            jointAnimEditor.SetJoint(root, JOBJManager.Animation);
+            jointAnimEditor.Show();
+            jointAnimEditor.WindowState = FormWindowState.Maximized;
 
+            /*if (JOBJManager.Animation != null && treeJOBJ.SelectedNode.Tag is HSD_JOBJ joint)
+            {
                 var boneIndex = JOBJManager.IndexOf(joint);
 
-                if(boneIndex < JOBJManager.Animation.NodeCount && boneIndex >= 0)
+                if (boneIndex < JOBJManager.Animation.NodeCount && boneIndex >= 0)
                 {
                     var node = JOBJManager.Animation.Nodes[boneIndex];
 
@@ -1396,7 +1401,7 @@ namespace HSDRawViewer.GUI.Plugins
                         editor.ShowDialog(this);
                     }
                 }
-            }
+            }*/
         }
 
         /// <summary>

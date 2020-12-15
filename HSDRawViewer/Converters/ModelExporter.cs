@@ -460,7 +460,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private static Vector3 ProcessUVTransform(GXVector2 gvVec, HSD_MOBJ mobj, int texIndex)
         {
-            if (mobj == null || mobj.Textures == null)
+            if (mobj == null || mobj.Textures == null || texIndex >= mobj.Textures.List.Count)
                 return new Vector3(gvVec.X, gvVec.Y, 1);
 
             var tex = mobj.Textures.List[texIndex];

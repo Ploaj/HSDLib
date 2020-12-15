@@ -56,7 +56,7 @@ namespace HSDRawViewer.GUI.Extra
                 int index = 0;
                 foreach(var t in tex)
                 {
-                    var bmp = Tools.BitmapTools.RgbaToImage(t.GetDecodedImageData(), t.ImageData.Width, t.ImageData.Height);
+                    var bmp = Tools.BitmapTools.BGRAToBitmap(t.GetDecodedImageData(), t.ImageData.Width, t.ImageData.Height);
 
                     TextureList.Images.Add(bmp);
 
@@ -298,7 +298,7 @@ namespace HSDRawViewer.GUI.Extra
 
             if(tobj != null)
             {
-                var bmp = Tools.BitmapTools.RgbaToImage(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
+                var bmp = Tools.BitmapTools.BGRAToBitmap(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
 
                 listTexture.Items.Add(new TextureContainer(tobj)
                 {
@@ -334,7 +334,7 @@ namespace HSDRawViewer.GUI.Extra
                     var image = TextureList.Images[con.ImageIndex];
                     image.Dispose();
 
-                    var newImage = Tools.BitmapTools.RgbaToImage(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
+                    var newImage = Tools.BitmapTools.BGRAToBitmap(tobj.GetDecodedImageData(), tobj.ImageData.Width, tobj.ImageData.Height);
 
                     TextureList.Images[con.ImageIndex] = newImage;
                     

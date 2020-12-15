@@ -1,13 +1,11 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using HSDRawViewer.GUI;
 using System.IO;
 using System;
 using HSDRawViewer.Tools;
-using Chadsoft.CTools.Image;
 
 namespace HSDRawViewer.Converters
 {
@@ -142,7 +140,7 @@ namespace HSDRawViewer.Converters
                                     scan[i + 3] = data[d + 3];
                                 }
 
-                            return BitmapTools.RgbaToImage(scan, width, height);
+                            return BitmapTools.BGRAToBitmap(scan, width, height);
                         }
                     }
                 }
@@ -161,7 +159,7 @@ namespace HSDRawViewer.Converters
         {
             var rgba = tobj.GetDecodedImageData();
 
-            return BitmapTools.RgbaToImage(rgba, tobj.ImageData.Width, tobj.ImageData.Height);
+            return BitmapTools.BGRAToBitmap(rgba, tobj.ImageData.Width, tobj.ImageData.Height);
         }
 
 
@@ -326,16 +324,8 @@ namespace HSDRawViewer.Converters
                 bmp = BitmapTools.ReduceColors(bmp, 256);
             if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
                 bmp = BitmapTools.ReduceColors(bmp, 16);
-
-            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var length = bitmapData.Stride * bitmapData.Height;
-
-            byte[] bytes = new byte[length];
-
-            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
-            bmp.UnlockBits(bitmapData);
-
-            tobj.EncodeImageData(bytes, bmp.Width, bmp.Height, imgFormat, palFormat);
+            
+            tobj.EncodeImageData(bmp.GetBGRAData(), bmp.Width, bmp.Height, imgFormat, palFormat);
 
             // dispose if we use our color reduced bitmap
             //if (imgFormat == GXTexFmt.CI8 || imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)

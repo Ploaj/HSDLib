@@ -156,8 +156,10 @@ namespace HSDRawViewer.Rendering
             GXShader.SetVector3("light.position", jobjManager.settings.LightX, jobjManager.settings.LightY, jobjManager.settings.LightZ);
             GXShader.SetColor("light.ambient", jobjManager.settings.AmbientColor, 1);
             GXShader.SetColor("light.diffuse", jobjManager.settings.DiffuseColor, 1);
+            //GXShader.SetColor("light.specular", jobjManager.settings.SpecularColor, 1);
             GXShader.SetFloat("light.ambientPower", jobjManager.settings.AmbientPower);
             GXShader.SetFloat("light.diffusePower", jobjManager.settings.DiffusePower);
+            //GXShader.SetFloat("light.specularPower", jobjManager.settings.SpecularPower);
 
             //
             var tb = jobjManager.GetBindTransforms();

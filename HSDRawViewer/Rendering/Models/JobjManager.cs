@@ -97,6 +97,20 @@ namespace HSDRawViewer.Rendering
         public byte DiffuseG { get => DiffuseColor.G; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, DiffuseColor.R, value, DiffuseColor.B); }
         [Browsable(false)]
         public byte DiffuseB { get => DiffuseColor.B; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, DiffuseColor.R, DiffuseColor.G, value); }
+
+        /*[Category("3. Lighting Color"), DisplayName("Specular Intensity"), Description("The intensity of the specular highlight")]
+        public float SpecularPower { get; set; } = 1;
+
+        [Category("3. Lighting Color"), DisplayName("Specular Color"), Description("The color of the specular highlight")]
+        [YamlIgnore]
+        public Color SpecularColor { get; set; } = Color.White;
+
+        [Browsable(false)]
+        public byte SpecularR { get => SpecularColor.R; set => SpecularColor = Color.FromArgb(SpecularColor.A, value, SpecularColor.G, SpecularColor.B); }
+        [Browsable(false)]
+        public byte SpecularG { get => SpecularColor.G; set => SpecularColor = Color.FromArgb(SpecularColor.A, SpecularColor.R, value, SpecularColor.B); }
+        [Browsable(false)]
+        public byte SpecularB { get => SpecularColor.B; set => SpecularColor = Color.FromArgb(SpecularColor.A, SpecularColor.R, SpecularColor.G, value); }*/
     }
 
     /// <summary>
@@ -112,13 +126,15 @@ namespace HSDRawViewer.Rendering
 
         public bool EnableMaterialFrame { get; set; } = false;
 
+        public bool EnableDepth { get; set; } = true;
+
+        public bool RenderSplines { get; set; } = false;
+
         public float MaterialFrame { get; set; }
 
         private HSD_JOBJ RootJOBJ { get; set; }
 
         public DOBJManager DOBJManager = new DOBJManager();
-
-        public bool EnableDepth { get; set; } = true;
 
         public RenderMode RenderMode { get; set; } = RenderMode.Default;
 
@@ -432,6 +448,11 @@ namespace HSDRawViewer.Rendering
                             MatAnimation.DOBJIndex++;
                         }
                     }
+
+                    // render splines if possible
+                    if (RenderSplines && b.Key.Spline != null)
+                        DrawShape.RenderSpline(b.Key.Spline);
+
                     MatAnimation.JOBJIndex++;
                 }
 

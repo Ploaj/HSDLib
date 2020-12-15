@@ -618,7 +618,8 @@ namespace HSDRawViewer.GUI.Controls
         private void trackTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             _selectedPlayerIndex = _players.IndexOf(e.Node.Tag as FOBJ_Player);
-            trackTypeBox.SelectedIndex = (e.Node.Tag as FOBJ_Player).TrackType;
+            if ((e.Node.Tag as FOBJ_Player).TrackType < trackTypeBox.Items.Count)
+                trackTypeBox.SelectedIndex = (e.Node.Tag as FOBJ_Player).TrackType;
             _graph.Invalidate();
         }
 

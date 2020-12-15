@@ -46,6 +46,10 @@
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
       <HintPath>..\packages\CSCore.1.2.1.2\lib\net35-client\CSCore.dll</HintPath>
     </Reference>
+    <Reference Include="GCILib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\GCILib.dll</HintPath>
+    </Reference>
     <Reference Include="IONET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\IONET.dll</HintPath>
@@ -170,6 +174,18 @@
     <Compile Include="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GUI\Controls\ISOEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\ISOEditor.Designer.cs">
+      <DependentUpon>ISOEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Extra\ISOFileTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\ISOFileTool.Designer.cs">
+      <DependentUpon>ISOFileTool.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -193,6 +209,9 @@
     </Compile>
     <Compile Include="GUI\MEX\Controls\MEXStockIconControl.Designer.cs">
       <DependentUpon>MEXStockIconControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionEditorRendering.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\Plugins\ParticleGenEditorPanel.cs">
       <SubType>Form</SubType>
@@ -532,6 +551,7 @@
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\ParticleManager.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\iso_disc.png" />
     <None Include="Resources\ts_x.png" />
     <None Include="Resources\ts_check.png" />
     <None Include="Melee\command_color.yml">
@@ -557,9 +577,14 @@
     <None Include="Resources\ico_kabii.png" />
     <None Include="Resources\ico_fuma.png" />
     <None Include="Resources\doc_kabii.png" />
+    <Content Include="lib\GCILib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="lib\IONET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\ico_file.png" />
+    <None Include="Resources\ico_hatchling.png" />
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />
@@ -573,6 +598,12 @@
     </None>
     <None Include="Resources\ts_stop.png" />
     <None Include="Resources\ts_play.png" />
+    <EmbeddedResource Include="GUI\Controls\ISOEditor.resx">
+      <DependentUpon>ISOEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\ISOFileTool.resx">
+      <DependentUpon>ISOFileTool.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\PopoutJointAnimationEditor.resx">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
     </EmbeddedResource>

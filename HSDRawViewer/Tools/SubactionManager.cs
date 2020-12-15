@@ -211,20 +211,26 @@ namespace HSDRawViewer.Tools
             string clrsa = "";
             string csa = "";
 
-            if (File.Exists(@"Melee\command_controls.yml"))
-                sa = File.ReadAllText(@"Melee\command_controls.yml");
+            string controlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_controls.yml");
+            string fighterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_fighter.yml");
+            string itemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_item.yml");
+            string colorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_color.yml");
+            string customPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_custom.yml");
 
-            if (File.Exists(@"Melee\command_fighter.yml"))
-                fsa = File.ReadAllText(@"Melee\command_fighter.yml");
+            if (File.Exists(controlPath))
+                sa = File.ReadAllText(controlPath);
 
-            if (File.Exists(@"Melee\command_item.yml"))
-                isa = File.ReadAllText(@"Melee\command_item.yml");
+            if (File.Exists(fighterPath))
+                fsa = File.ReadAllText(fighterPath);
 
-            if (File.Exists(@"Melee\command_color.yml"))
-                clrsa = File.ReadAllText(@"Melee\command_color.yml");
+            if (File.Exists(itemPath))
+                isa = File.ReadAllText(itemPath);
 
-            if (File.Exists(@"Melee\command_custom.yml"))
-                csa = File.ReadAllText(@"Melee\command_custom.yml");
+            if (File.Exists(colorPath))
+                clrsa = File.ReadAllText(colorPath);
+
+            if (File.Exists(customPath))
+                csa = File.ReadAllText(customPath);
 
             var subs = deserializer.Deserialize<Subaction[]>(sa);
             var fsubs = deserializer.Deserialize<Subaction[]>(fsa);

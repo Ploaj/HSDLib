@@ -10,6 +10,8 @@ namespace HSDRawViewer.GUI.Extra
 {
     public partial class PopoutJointAnimationEditor : Form
     {
+        public bool CloseOnExit { get; set; } = true;
+
         /// <summary>
         /// 
         /// </summary>
@@ -25,14 +27,19 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         /// <param name="jobj"></param>
         /// <param name="animManager"></param>
-        public PopoutJointAnimationEditor()
+        public PopoutJointAnimationEditor(bool closeOnExit)
         {
             InitializeComponent();
 
+            CloseOnExit = closeOnExit;
+
             FormClosing += (sender, args) =>
             {
-                args.Cancel = true;
-                Visible = false;
+                if (!CloseOnExit)
+                {
+                    args.Cancel = true;
+                    Visible = false;
+                }
             };
 
             graphEditor1.OnTrackListUpdate += (s, a) =>
@@ -58,7 +65,7 @@ namespace HSDRawViewer.GUI.Extra
             
             for(int i = 0; i < Math.Min(animManager.NodeCount, jobjs.Count); i++)
             {
-                var node = new JointNode() { JOBJ = jobjs[i], AnimNode = animManager.Nodes[i], Text = $"JOINT_{i}" };
+                var node = new JointNode() { JOBJ = jobjs[i], AnimNode = animManager.Nodes[i], Text = $"Joint_{i}" };
                 
                 foreach (var c in jobjs[i].Children)
                     childToParent.Add(c, node);
