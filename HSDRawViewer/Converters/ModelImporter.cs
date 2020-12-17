@@ -152,7 +152,7 @@ namespace HSDRawViewer.Converters
                         ImportSettings ioSettings = new ImportSettings()
                         {
                             FlipUVs = settings.FlipUVs,
-                            FlipWindingOrder = settings.FlipFaces,
+                            FlipWindingOrder = !settings.FlipFaces,
                             SmoothNormals = settings.SmoothNormals,
                             Triangulate = true,
                             //WeightLimit = true,

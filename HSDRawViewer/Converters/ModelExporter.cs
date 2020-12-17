@@ -36,6 +36,8 @@ namespace HSDRawViewer.Converters
         public bool ExportScaledUVs { get => ModelExporter.ScaleUVs; set => ModelExporter.ScaleUVs = value; }
 
         public bool ExportTextureInfo { get; set; } = true;
+
+        public bool BlenderExportMode { get; set; } = false;
     }
 
     /// <summary>
@@ -87,8 +89,9 @@ namespace HSDRawViewer.Converters
             {
                 FlipUVs = settings.FlipUVs,
                 Optimize = settings.Optimize,
-                //FlipWindingOrder = true,
-                ExportTextureInfo = settings.ExportTextureInfo
+                FlipWindingOrder = true,
+                ExportTextureInfo = settings.ExportTextureInfo,
+                BlenderMode = settings.BlenderExportMode
             };
 
             IOManager.ExportScene(exp.Scene, filePath, exportsettings);
