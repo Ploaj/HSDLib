@@ -8,6 +8,11 @@ namespace HSDRawViewer.GUI.Extra
     {
         private ISOEditor _editor;
 
+        public string FilePath
+        {
+            get => _editor.OpenFilePath;
+        }
+
         public byte[] FileData
         {
             get => _editor.OpenFile;

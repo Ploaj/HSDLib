@@ -58,8 +58,12 @@ namespace HSDRawViewer.GUI.Plugins
             };
 
             listDOBJ.SelectedIndexChanged += (sender, args) => {
-                propertyGrid1.SelectedObject = listDOBJ.SelectedItem;
+                propertyGrid1.SelectedObject = listDOBJ.SelectedItems;
                 JOBJManager.DOBJManager.SelectedDOBJ = ((listDOBJ.SelectedItem as DOBJContainer)?.DOBJ);
+
+                materialDropDownButton1.Enabled = listDOBJ.SelectedItems.Count == 1;
+                buttonMoveDown.Enabled = materialDropDownButton1.Enabled;
+                buttonMoveUp.Enabled = materialDropDownButton1.Enabled;
             };
 
             propertyGrid1.PropertyValueChanged += (sender, args) =>
@@ -68,6 +72,7 @@ namespace HSDRawViewer.GUI.Plugins
                 listDOBJ.SelectedItem = listDOBJ.SelectedItem;
             };
 
+            //listDOBJ.SelectionMode = SelectionMode.MultiExtended;
 
             viewport = new ViewportControl();
             viewport.Dock = DockStyle.Fill;
@@ -920,17 +925,27 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonDOBJDelete_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete Object?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            DeleteSelectedDOBJs();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DeleteSelectedDOBJs()
+        {
+            if (listDOBJ.SelectedItems.Count > 0 && MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete Object?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                var dobj = listDOBJ.SelectedItem as DOBJContainer;
-                if(dobj != null)
+                foreach (DOBJContainer dobj in listDOBJ.SelectedItems)
                 {
+                    /*if (listDOBJ.CheckedItems.Contains(dobj))
+                        continue;*/
+
                     var dobjs = dobj.ParentJOBJ.Dobj.List;
 
                     HSD_DOBJ prev = null;
-                    foreach(var d in dobjs)
+                    foreach (var d in dobjs)
                     {
-                        if(d == dobj.DOBJ)
+                        if (d == dobj.DOBJ)
                         {
                             if (prev == null)
                                 dobj.ParentJOBJ.Dobj = d.Next;
@@ -940,10 +955,10 @@ namespace HSDRawViewer.GUI.Plugins
                         }
                         prev = d;
                     }
-
-                    JOBJManager.RefreshRendering = true;
-                    RefreshGUI();
                 }
+
+                JOBJManager.RefreshRendering = true;
+                RefreshGUI();
             }
         }
 
@@ -1702,6 +1717,26 @@ namespace HSDRawViewer.GUI.Plugins
                 textureArrayEditor.Invalidate();
                 textureArrayEditor.Update();
             }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeJOBJ_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listDOBJ_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            DeleteSelectedDOBJs();
         }
     }
 }

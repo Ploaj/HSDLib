@@ -74,10 +74,12 @@
             this.asAnimJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asMotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.asXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.createAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editAnimationTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.importSceneSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportSceneSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
@@ -94,8 +96,6 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.editAnimationTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -117,6 +117,7 @@
             this.listDOBJ.TabIndex = 0;
             this.listDOBJ.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListDOBJ_ItemCheck);
             this.listDOBJ.BindingContextChanged += new System.EventHandler(this.listDOBJ_BindingContextChanged);
+            this.listDOBJ.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.listDOBJ_KeyPress);
             // 
             // tabControl1
             // 
@@ -152,6 +153,7 @@
             this.treeJOBJ.Name = "treeJOBJ";
             this.treeJOBJ.Size = new System.Drawing.Size(298, 191);
             this.treeJOBJ.TabIndex = 0;
+            this.treeJOBJ.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.treeJOBJ_KeyPress);
             // 
             // toolStrip3
             // 
@@ -538,12 +540,24 @@
             this.asXMLToolStripMenuItem.Text = "As XML";
             this.asXMLToolStripMenuItem.Click += new System.EventHandler(this.xmlToolStripMenuItem_Click);
             // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(196, 6);
+            // 
             // createAnimationToolStripMenuItem
             // 
             this.createAnimationToolStripMenuItem.Name = "createAnimationToolStripMenuItem";
             this.createAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.createAnimationToolStripMenuItem.Text = "Create Animation";
             this.createAnimationToolStripMenuItem.Click += new System.EventHandler(this.createAnimationToolStripMenuItem_Click);
+            // 
+            // editAnimationTracksToolStripMenuItem
+            // 
+            this.editAnimationTracksToolStripMenuItem.Name = "editAnimationTracksToolStripMenuItem";
+            this.editAnimationTracksToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.editAnimationTracksToolStripMenuItem.Text = "Edit Animation";
+            this.editAnimationTracksToolStripMenuItem.Click += new System.EventHandler(this.viewAnimationGraphToolStripMenuItem_Click);
             // 
             // editAnimationToolStripMenuItem
             // 
@@ -559,10 +573,10 @@
             this.clearAnimationToolStripMenuItem.Text = "Clear Animation";
             this.clearAnimationToolStripMenuItem.Click += new System.EventHandler(this.clearAnimButton_Click);
             // 
-            // toolStripSeparator8
+            // toolStripSeparator7
             // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(196, 6);
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(196, 6);
             // 
             // importSceneSettingsToolStripMenuItem
             // 
@@ -704,18 +718,6 @@
             this.splitter1.Size = new System.Drawing.Size(3, 477);
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
-            // 
-            // editAnimationTracksToolStripMenuItem
-            // 
-            this.editAnimationTracksToolStripMenuItem.Name = "editAnimationTracksToolStripMenuItem";
-            this.editAnimationTracksToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.editAnimationTracksToolStripMenuItem.Text = "Edit Animation";
-            this.editAnimationTracksToolStripMenuItem.Click += new System.EventHandler(this.viewAnimationGraphToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(196, 6);
             // 
             // JobjEditor
             // 

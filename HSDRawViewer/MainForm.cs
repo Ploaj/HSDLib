@@ -1000,10 +1000,19 @@ namespace HSDRawViewer
                 isoTool.ShowDialog();
 
                 // todo: open file
-                /*if(isoTool.FileData != null)
+                if(isoTool.FileData != null)
                 {
-                    OpenFile(isoTool.FileData);
-                }*/
+                    var tempDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp/");
+                    var datPath = System.IO.Path.Combine(tempDir, isoTool.FilePath);
+                    var dir = System.IO.Path.GetDirectoryName(datPath);
+
+                    if (!System.IO.Directory.Exists(dir))
+                        System.IO.Directory.CreateDirectory(dir);
+
+                    System.IO.File.WriteAllBytes(datPath, isoTool.FileData);
+
+                    OpenFile(datPath);
+                }
             }
         }
 

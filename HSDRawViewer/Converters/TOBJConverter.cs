@@ -320,10 +320,11 @@ namespace HSDRawViewer.Converters
         /// <param name="palFormat"></param>
         public static void InjectBitmap(Bitmap bmp, HSD_TOBJ tobj, GXTexFmt imgFormat, GXTlutFmt palFormat)
         {
-             if (imgFormat == GXTexFmt.CI8) // doesn't work well with alpha
+            // todo: this only works without alpha :/
+            /*if (imgFormat == GXTexFmt.CI8) // doesn't work well with alpha
                 bmp = BitmapTools.ReduceColors(bmp, 256);
             if (imgFormat == GXTexFmt.CI4 || imgFormat == GXTexFmt.CI14X2)
-                bmp = BitmapTools.ReduceColors(bmp, 16);
+                bmp = BitmapTools.ReduceColors(bmp, 16);*/
             
             tobj.EncodeImageData(bmp.GetBGRAData(), bmp.Width, bmp.Height, imgFormat, palFormat);
 

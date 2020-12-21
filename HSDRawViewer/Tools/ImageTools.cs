@@ -146,7 +146,7 @@ namespace HSDRawViewer.Tools
             quantizer.Prepare(bmp.Width, bmp.Height);
             for (int i = 0; i < bytes.Length; i+=4)
             {
-                var color = Color.FromArgb(bytes[i], bytes[i+1], bytes[i+2], bytes[i+3]);
+                var color = Color.FromArgb(bytes[i + 3], bytes[i], bytes[i + 1], bytes[i + 2]);
                 quantizer.AddColor(color);
             }
 
@@ -154,24 +154,21 @@ namespace HSDRawViewer.Tools
 
             for (int i = 0; i < bytes.Length; i += 4)
             {
-                var color = Color.FromArgb(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
+                var color = Color.FromArgb(bytes[i + 3], bytes[i], bytes[i + 1], bytes[i + 2]);
                 var index = quantizer.GetPaletteIndex(color);
                 var newColor = palette[index];
-                bytes[i] = newColor.A;
-                bytes[i + 1] = newColor.R;
-                bytes[i + 2] = newColor.G;
-                bytes[i + 3] = newColor.B;
+                bytes[i] = newColor.R;
+                bytes[i + 1] = newColor.G;
+                bytes[i + 2] = newColor.B;
+                bytes[i + 3] = newColor.A;
+                if (newColor.A != 255)
+                    System.Console.WriteLine(newColor.A);
             }
 
             Marshal.Copy(bytes, 0, bitmapData.Scan0, length);
             bmp.UnlockBits(bitmapData);
 
             return bmp;
-
-            /*using (var quantized = quantizer.QuantizeImage(bitmap, 10, 70, colorCount))
-            {
-                return new Bitmap(quantized);
-            }*/
         }
 
         /// <summary>

@@ -25,6 +25,7 @@ namespace HSDRawViewer.GUI.Controls
         public string GameCode { get => _iso.GameCodeString; set => _iso.GameCodeString = value; }
         public string MakerName { get => _iso.MakerCodeString; set => _iso.MakerCodeString = value; }
 
+        public string OpenFilePath = null;
         public byte[] OpenFile = null;
 
         // banner data
@@ -569,7 +570,9 @@ namespace HSDRawViewer.GUI.Controls
         {
             if (e.Button == MouseButtons.Left && fileTree.SelectedNode is FileNode file)
             {
-                OpenFile = _iso.GetFileData(GetISOPath(file));
+                OpenFilePath = GetISOPath(file);
+                OpenFile = _iso.GetFileData(OpenFilePath);
+                
                 if (Parent is ISOFileTool tool)
                     tool.Close();
             }
