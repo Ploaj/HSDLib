@@ -60,8 +60,8 @@ void main()
 {
 	vec4 pos = vec4(GX_VA_POS, 1);
 	
-	tan = normalize(GX_VA_TAN);
-	bitan = normalize(GX_VA_BTAN);
+	tan = GX_VA_TAN;
+	bitan = GX_VA_BTAN;
 	normal = GX_VA_NRM;
 
 	vbones = vec4(0, 0, 0, 0);

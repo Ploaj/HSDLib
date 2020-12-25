@@ -55,6 +55,8 @@ struct TevUnit
 // textures
 uniform sampler2D textures[4];
 
+uniform int BumpTexture;
+
 uniform int hasTEX0;
 uniform int hasTEX0Tev;
 uniform TexUnit TEX0;
@@ -112,6 +114,7 @@ uniform mat4 sphereMatrix;
 uniform int renderOverride;
 uniform int selectedBone;
 uniform int perPixelLighting;
+uniform float saturate;
 
 ///
 /// Gets spherical UV coords, this is used for reflection effects
@@ -289,9 +292,9 @@ vec4 ApplyTev(vec4 texColor, TevUnit tev)
 }
 
 ///
-/// Gets the texture color after applying all necessary transforms and TEV
 ///
-vec4 MixTextureColor(TexUnit tex, vec2 texCoord)
+///
+vec2 CalculateCoords(TexUnit tex, vec2 texCoord)
 {
     vec2 coords = GetCoordType(tex.coord_type, texCoord);
 
@@ -302,7 +305,16 @@ vec4 MixTextureColor(TexUnit tex, vec2 texCoord)
 	if(tex.mirror_fix == 1) // GX OPENGL difference
 		coords.y += 1;
 
-    return texture(textures[tex.texIndex], coords);
+	return coords;
+}
+
+///
+/// Gets the texture color after applying all necessary transforms and TEV
+///
+vec4 MixTextureColor(TexUnit tex, vec2 texCoord)
+{
+
+    return texture(textures[tex.texIndex], CalculateCoords(tex, texCoord));
 }
 
 ///
@@ -342,12 +354,12 @@ vec4 GetSpecularMaterial(vec3 V, vec3 N)
 vec4 ColorMap_Pass(vec4 passColor, TexUnit tex, bool enableTev, TevUnit tev, vec2 texCoord)
 {
 	vec4 pass = MixTextureColor(tex, texCoord);
-
+	
 	//if(enableTev)
 	//	pass = ApplyTev(pass, tev);
 
 	if(tex.color_operation == 1 && pass.a != 0) // Alpha Mask
-		passColor.rgb = pass.rgb;
+		passColor.rgb = mix(passColor.rgb, pass.rgb, pass.a);
 		
 	//TODO: I don't know what this is
 	if(tex.color_operation == 2) // 8 RGB Mask 
@@ -410,6 +422,16 @@ vec4 ColorMap_Pass(vec4 passColor, TexUnit tex, bool enableTev, TevUnit tev, vec
 }
 
 ///
+/// Algorithm from Chapter 16 of OpenGL Shading Language
+///
+vec3 saturation(vec3 rgb)
+{
+    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+    vec3 intensity = vec3(dot(rgb, W));
+    return mix(intensity, rgb, saturate);
+}
+
+///
 /// Main mixing function
 ///
 void main()
@@ -451,7 +473,6 @@ void main()
 		if(TEX3.light_type == 2) specularPass = ColorMap_Pass(specularPass, TEX3, hasTEX3Tev == 1, TEX3Tev, texcoord3);
 	}
 	
-
 	// calculate material
 	vec3 V = vertPosition - cameraPos;
 
@@ -459,13 +480,25 @@ void main()
 		V = light.position;
 
 	V = normalize(V);
+	vec3 N = normalize(normal);
 
 	fragColor.rgb =  ambientPass.rgb * diffusePass.rgb * light.ambient.rgb * vec3(light.ambientPower)
-					+ diffusePass.rgb * GetDiffuseMaterial(normalize(normal), V).rgb * light.diffuse.rgb * vec3(light.diffusePower)
-					+ specularPass.rgb * GetSpecularMaterial(normalize(normal), V).rgb;
+					+ diffusePass.rgb * GetDiffuseMaterial(N, V).rgb * light.diffuse.rgb * vec3(light.diffusePower)
+					+ specularPass.rgb * GetSpecularMaterial(N, V).rgb;
 
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));
+	
+    // TODO: Bump mapping?
+	if(BumpTexture == 0)
+    {
+        vec2 tex0 = CalculateCoords(TEX0, texcoord0);
+        vec2 tex1 = tex0 + vec2(dot(V, bitan.xyz), dot(V, tan.xyz));
 
+        vec3 bump0 = texture(textures[TEX0.texIndex], tex0).rgb;
+        vec3 bump1 = texture(textures[TEX0.texIndex], tex1).rgb;
+
+        fragColor.rgb *= (bump0 - bump1) + 1.0;
+    }
 
 	// ext light map
 	vec4 extColor = vec4(1, 1, 1, 1);
@@ -514,9 +547,9 @@ void main()
 	// debug render modes
 	switch(renderOverride)
 	{
-	case 1: fragColor = vec4(vec3(0.5) + normal / 2, 1); break;
-	case 2: fragColor = vec4(tan, 1); break;
-	case 3: fragColor = vec4(bitan, 1); break;
+	case 1: fragColor = vec4(vec3(0.5) + N / 2, 1); break;
+	case 2: fragColor = vec4(normalize(tan), 1); break;
+	case 3: fragColor = vec4(normalize(bitan), 1); break;
 	case 4: fragColor = vertexColor; break;
 	case 5: fragColor = vec4(texcoord0.x, 0, texcoord0.y, 1); break;
 	case 6: fragColor = vec4(texcoord1.x, 0, texcoord1.y, 1); break;
@@ -560,4 +593,8 @@ void main()
 		fragColor.gb = fragColor.rr;
 		break;
 	}
+
+	// adjust saturation if needed
+	if(saturate != 1)
+		fragColor.rgb = saturation(fragColor.rgb);
 }

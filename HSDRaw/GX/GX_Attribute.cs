@@ -104,12 +104,12 @@ namespace HSDRaw.GX
                     break;
                 default:
                     for (int i = 0; i < size; i++)
-                        a[i] = accessor._s.GetByte(offset + i); //d.ReadByte();
+                        a[i] = accessor._s.GetByte(offset + i);
                     break;
             }
 
             for (int i = 0; i < a.Length; i++)
-                a[i] = a[i] / (float)Math.Pow(2, Scale);
+                a[i] = a[i] / (1 << Scale);
 
             return a;
         }

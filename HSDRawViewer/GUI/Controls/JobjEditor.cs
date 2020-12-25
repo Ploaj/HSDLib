@@ -58,7 +58,7 @@ namespace HSDRawViewer.GUI.Plugins
             };
 
             listDOBJ.SelectedIndexChanged += (sender, args) => {
-                propertyGrid1.SelectedObject = listDOBJ.SelectedItems;
+                propertyGrid1.SelectedObject = listDOBJ.SelectedItem;
                 JOBJManager.DOBJManager.SelectedDOBJ = ((listDOBJ.SelectedItem as DOBJContainer)?.DOBJ);
 
                 materialDropDownButton1.Enabled = listDOBJ.SelectedItems.Count == 1;

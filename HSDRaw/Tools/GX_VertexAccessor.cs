@@ -50,14 +50,7 @@ namespace HSDRaw.Tools
                     float[] f = new float[4];
 
                     if(attribute.AttributeType != GXAttribType.GX_DIRECT)
-                    {
-                        var values = attribute.GetDecodedDataAt(index);
-
-                        // convert to float
-                        f = new float[values.Length];
-                        for (int j = 0; j < f.Length; j++)
-                            f[j] = (float)values[j];
-                    }
+                        f = attribute.GetDecodedDataAt(index);
 
                     switch (attribute.AttributeName)
                     {

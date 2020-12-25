@@ -56,6 +56,9 @@ namespace HSDRawViewer.Rendering
         [Category("4. Enhancements"), DisplayName("Use Per Pixel Lighting"), Description("Calculates lighting per pixel for a smoother look. Set to false for gamecube style.")]
         public bool UsePerPixelLighting { get; set; } = true;
 
+        [Category("4. Enhancements"), DisplayName("Adjust Saturation"), Description("")]
+        public float Saturation { get; set; } = 1;
+
 
         [Category("2. Lighting Settings"), DisplayName("Use Camera Light"), Description("When true makes the light source emit from the camera's location")]
         public bool UseCameraLight { get; set; } = true;

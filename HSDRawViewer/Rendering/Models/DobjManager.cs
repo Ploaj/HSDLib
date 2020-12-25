@@ -151,6 +151,7 @@ namespace HSDRawViewer.Rendering
 
 
             // lighting
+            GXShader.SetFloat("saturate", jobjManager.settings.Saturation);
             GXShader.SetBoolToInt("perPixelLighting", jobjManager.settings.UsePerPixelLighting);
             GXShader.SetBoolToInt("light.useCamera", jobjManager.settings.UseCameraLight);
             GXShader.SetVector3("light.position", jobjManager.settings.LightX, jobjManager.settings.LightY, jobjManager.settings.LightZ);
@@ -188,10 +189,10 @@ namespace HSDRawViewer.Rendering
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"));
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"));
+            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"));
             GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
 
             GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"));
@@ -425,6 +426,8 @@ namespace HSDRawViewer.Rendering
             shader.SetBoolToInt("hasTEX2", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX2) || enableAll);
             shader.SetBoolToInt("hasTEX3", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX3) || enableAll);
 
+            shader.SetInt("BumpTexture", -1);
+
             //LoadTextureConstants(shader);
 
             // these are always uniform
@@ -498,7 +501,14 @@ namespace HSDRawViewer.Rendering
                     int coordType = (int)flags & 0xF;
                     int colorOP = ((int)flags >> 16) & 0xF;
                     int alphaOP = ((int)flags >> 20) & 0xF;
-                    
+
+                    if (flags.HasFlag(TOBJ_FLAGS.BUMP))
+                    {
+                        shader.SetInt("BumpTexture", i);
+                        lightType = 6;
+                        colorOP = 4;
+                    }
+
                     shader.SetInt($"TEX{i}.texIndex", i);
                     shader.SetInt($"TEX{i}.light_type", lightType);
                     shader.SetInt($"TEX{i}.color_operation", colorOP);
