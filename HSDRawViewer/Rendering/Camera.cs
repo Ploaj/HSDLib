@@ -409,7 +409,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         protected virtual void UpdatePerspectiveMatrix()
         {
-            perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView((float)(2 * Math.Atan(Math.Tan(fovRadians / 2) / Math.Max(AspectRatio,1))), RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
+            perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView((float)(2 * Math.Atan(Math.Tan(fovRadians / 2) / Math.Min(AspectRatio,1))), RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
         }
 
         /// <summary>
