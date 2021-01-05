@@ -22,8 +22,8 @@
         public int Unknown3 { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
         public float NearClip { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
         public float FarClip { get => _s.GetFloat(0x2C); set => _s.SetFloat(0x2C, value); }
-        public HSD_Camera SelfReference { get => _s.GetReference<HSD_Camera>(0x30); set => _s.SetReference(0x30, value); }
-        public float FieldOfView { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
+        public float FieldOfView { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
+        public float AspectRatio { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
     }
     
 }
