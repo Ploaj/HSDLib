@@ -372,12 +372,12 @@ namespace HSDRawViewer.GUI
                 if (matflag == 1)
                 {
                     foreach (var v in plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Array)
-                        JOBJManager.MatAnimation.SetFrame(v.Value, frame);
+                        JOBJManager.MatAnimation.SetFrame(v, frame);
                 }
                 else
                 {
                     var idx = plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries[index];
-                    JOBJManager.MatAnimation.SetFrame(idx.Value, frame);
+                    JOBJManager.MatAnimation.SetFrame(idx, frame);
                 }
             }
         }

@@ -78,6 +78,15 @@ namespace HSDRaw.Common
             }
         }
 
+        public HSD_ShiftJIS_String() : base()
+        {
+        }
+
+        public HSD_ShiftJIS_String(string value) : base()
+        {
+            Value = value;
+        }
+
         public override void New()
         {
             base.New();
@@ -106,10 +115,13 @@ namespace HSDRaw.Common
             }
             set
             {
-                _s.SetData(Encoding.UTF8.GetBytes(value));
-                _s.Resize(_s.Length + 1);
-                if (_s.Length % 4 != 0)
-                    _s.Resize(_s.Length + (4 - (_s.Length % 4)));
+                if(value != null)
+                {
+                    _s.SetData(Encoding.UTF8.GetBytes(value));
+                    _s.Resize(_s.Length + 1);
+                    if (_s.Length % 4 != 0)
+                        _s.Resize(_s.Length + (4 - (_s.Length % 4)));
+                }
             }
         }
 
@@ -117,6 +129,12 @@ namespace HSDRaw.Common
         {
 
         }
+
+        public HSD_String(string value) : base()
+        {
+            Value = value;
+        }
+
 
         public override void New()
         {
@@ -139,45 +157,5 @@ namespace HSDRaw.Common
         public float Y { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
 
         public float Z { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
-    }
-
-    public class HSD_UShort : HSDAccessor
-    {
-        public override int TrimmedSize => 0x02;
-
-        public ushort Value { get => (ushort)_s.GetInt16(0x00); set => _s.SetInt16(0x00, (short)value); }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
-    }
-
-    public class HSD_Byte : HSDAccessor
-    {
-        public override int TrimmedSize => 0x01;
-
-        public byte Value { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
-    }
-
-    public class HSD_UInt : HSDAccessor
-    {
-        public override int TrimmedSize => 0x04;
-
-        public uint Value { get => (uint)_s.GetInt32(0x00); set => _s.SetInt32(0x00, (int)value); }
-    }
-
-    public class HSD_Int : HSDAccessor
-    {
-        public override int TrimmedSize => 0x04;
-
-        public int Value { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
-    }
-
-    public class HSD_Float : HSDAccessor
-    {
-        public override int TrimmedSize => 0x04;
-
-        public float Value { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
     }
 }

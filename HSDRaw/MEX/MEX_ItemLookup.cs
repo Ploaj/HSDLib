@@ -1,6 +1,4 @@
-﻿using HSDRaw.Common;
-
-namespace HSDRaw.MEX
+﻿namespace HSDRaw.MEX
 {
     public class MEX_ItemLookup : HSDAccessor
     {
@@ -8,14 +6,14 @@ namespace HSDRaw.MEX
 
         public int Count { get => _s.GetInt32(0x00); internal set => _s.SetInt32(0x00, value); }
 
-        public HSD_UShort[] Entries
+        public ushort[] Entries
         {
             get
             {
-                var ar = _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x04);
+                var ar = _s.GetReference<HSDUShortArray>(0x04);
 
                 if (ar == null)
-                    return new HSD_UShort[0];
+                    return new ushort[0];
 
                 var arr = ar.Array;
                 System.Array.Resize(ref arr, Count);
@@ -31,7 +29,7 @@ namespace HSDRaw.MEX
                 else
                 {
                     Count = value.Length;
-                    _s.GetCreateReference<HSDArrayAccessor<HSD_UShort>>(0x04).Array = value;
+                    _s.GetCreateReference<HSDUShortArray>(0x04).Array = value;
                 }
             }
         }

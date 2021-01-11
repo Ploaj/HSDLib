@@ -21,9 +21,9 @@
 
         public float TotalLength { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
 
-        public HSDArrayAccessor<HSD_Float> Lengths
+        public HSDFloatArray Lengths
         {
-            get => _s.GetReference<HSDArrayAccessor<HSD_Float>>(0x10);
+            get => _s.GetReference<HSDFloatArray>(0x10);
             set => _s.SetReference(0x10, value);
         }
 

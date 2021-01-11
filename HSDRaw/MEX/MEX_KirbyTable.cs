@@ -14,34 +14,52 @@ namespace HSDRaw.MEX
 
         public HSDAccessor CostumeRuntime { get => _s.GetReference<HSDAccessor>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public HSDArrayAccessor<HSD_Byte> KirbyEffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x10); set => _s.SetReference(0x10, value); }
+        public HSDByteArray KirbyEffectIDs { get => _s.GetReference<HSDByteArray>(0x10); set => _s.SetReference(0x10, value); }
 
         public HSDAccessor CapFtCmdRuntime { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
 
         public HSDAccessor MoveLogicRuntime { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
 
-        //public HSDArrayAccessor<HSD_UShort> KirbyNState { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x14); set => _s.SetReference(0x14, value); }
-
-        //public HSDArrayAccessor<HSD_UShort> KirbyNStateAir { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x18); set => _s.SetReference(0x18, value); }
-
+        public override void New()
+        {
+            base.New();
+            CapFiles = new HSDArrayAccessor<MEX_KirbyCapFiles>();
+            CapFileRuntime = new HSDAccessor();
+            KirbyCostumes = new HSDFixedLengthPointerArrayAccessor<MEX_KirbyCostume>();
+            CostumeRuntime = new HSDAccessor();
+            KirbyEffectIDs = new HSDByteArray();
+            CapFtCmdRuntime = new HSDAccessor();
+            MoveLogicRuntime = new HSDAccessor();
+        }
     }
 
     public class MEX_KirbyFunctionTable : HSDAccessor
     {
         public override int TrimmedSize => 0x20;
 
-        public HSDArrayAccessor<HSD_UInt> OnAbilityGain { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x00); set => _s.SetReference(0x00, value); }
+        public HSDUIntArray OnAbilityGain { get => _s.GetReference<HSDUIntArray>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSDArrayAccessor<HSD_UInt> OnAbilityLose { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x04); set => _s.SetReference(0x04, value); }
+        public HSDUIntArray OnAbilityLose { get => _s.GetReference<HSDUIntArray>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDArrayAccessor<HSD_UInt> KirbySpecialN { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDUIntArray KirbySpecialN { get => _s.GetReference<HSDUIntArray>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSDArrayAccessor<HSD_UInt> KirbySpecialNAir { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSDUIntArray KirbySpecialNAir { get => _s.GetReference<HSDUIntArray>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public HSDArrayAccessor<HSD_UInt> KirbyOnHit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x10); set => _s.SetReference(0x10, value); }
+        public HSDUIntArray KirbyOnHit { get => _s.GetReference<HSDUIntArray>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSDArrayAccessor<HSD_UInt> KirbyOnItemInit { get => _s.GetReference<HSDArrayAccessor<HSD_UInt>>(0x14); set => _s.SetReference(0x14, value); }
+        public HSDUIntArray KirbyOnItemInit { get => _s.GetReference<HSDUIntArray>(0x14); set => _s.SetReference(0x14, value); }
 
+        public override void New()
+        {
+            base.New();
+
+            OnAbilityGain = new HSDUIntArray();
+            OnAbilityLose = new HSDUIntArray();
+            KirbySpecialN = new HSDUIntArray();
+            KirbySpecialNAir = new HSDUIntArray();
+            KirbyOnHit = new HSDUIntArray();
+            KirbyOnItemInit = new HSDUIntArray();
+        }
     }
 
     public class MEX_KirbyCapFiles : HSDAccessor

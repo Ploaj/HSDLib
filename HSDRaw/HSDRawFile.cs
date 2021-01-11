@@ -41,8 +41,8 @@ namespace HSDRaw
         /// <summary>
         /// Trying to keep the order of structs intact if possible
         /// </summary>
-        private List<HSDStruct> _structCache = new List<HSDStruct>();
-        private Dictionary<HSDStruct, int> _structCacheToOffset = new Dictionary<HSDStruct, int>();
+        private readonly List<HSDStruct> _structCache = new List<HSDStruct>();
+        private readonly Dictionary<HSDStruct, int> _structCacheToOffset = new Dictionary<HSDStruct, int>();
 
         public HSDRootNode this[string i]
         {
@@ -544,7 +544,7 @@ namespace HSDRaw
         public void TrimData()
         {
             foreach (var r in Roots)
-                r.Data.Trim();
+                r.Data.Optimize();
         }
 
         /// <summary>
@@ -751,7 +751,7 @@ namespace HSDRaw
         }
 
 
-        private static Func<string, HSDAccessor>[] symbol_identificators = new Func<string, HSDAccessor>[]
+        private readonly static Func<string, HSDAccessor>[] symbol_identificators = new Func<string, HSDAccessor>[]
         {
                 x => x.EndsWith("shapeanim_joint") ? new HSDAccessor() : null,
                 x => x.EndsWith("matanim_joint") ? new HSD_MatAnimJoint() : null,
@@ -787,7 +787,7 @@ namespace HSDRaw
                 x => x.StartsWith("itPublicData") ?  new itPublicData() : null,
                 x => x.StartsWith("itemdata") ?  new HSDNullPointerArrayAccessor<SBM_MapItem>() : null,
                 x => x.StartsWith("smSoundTestLoadData") ?  new smSoundTestLoadData() : null,
-                x => x.StartsWith("ftLoadCommonData") ?  new ftLoadCommonData() : null,
+                x => x.StartsWith("ftLoadCommonData") ?  new SBM_ftLoadCommonData() : null,
                 x => x.StartsWith("quake_model_set") ?  new SBM_Quake_Model_Set() : null,
                 x => x.StartsWith("mexData") ?  new MEX_Data() : null,
                 x => x.StartsWith("mexMapData") ?  new MEX_mexMapData() : null,
@@ -804,7 +804,7 @@ namespace HSDRaw
                 x => new HSDAccessor(),
         };
 
-        private static Func<string, HSDAccessor> @symbol_switch = symbol_identificators.Aggregate((x, y) => z => x(z) ?? y(z));
+        private readonly static Func<string, HSDAccessor> @symbol_switch = symbol_identificators.Aggregate((x, y) => z => x(z) ?? y(z));
 
         /// <summary>
         /// Attempts to guess the structure type based on the root name

@@ -108,7 +108,7 @@ namespace HSDRaw
 
         public override string ToString()
         {
-            return $"HSDStruct: (Length: 0x{_data.Length.ToString("X")}, ReferenceCount: {_references.Count})";
+            return $"HSDStruct: (Length: 0x{_data.Length:X}, ReferenceCount: {_references.Count})";
         }
 
         /// <summary>

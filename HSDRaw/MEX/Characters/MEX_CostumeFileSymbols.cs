@@ -17,16 +17,21 @@ namespace HSDRaw.MEX
 
     public class MEX_CostumeFileSymbol : HSDAccessor
     {
-        public override int TrimmedSize => 0x0C;
+        public override int TrimmedSize => 0x10;
 
         public string FileName
         {
             get => FileNameS?.Value;
             set
             {
-                if (FileNameS == null)
-                    FileNameS = new HSD_String();
-                FileNameS.Value = value;
+                if (string.IsNullOrEmpty(value))
+                    FileNameS = null;
+                else
+                {
+                    if (FileNameS == null)
+                        FileNameS = new HSD_String();
+                    FileNameS.Value = value;
+                }
             }
         }
 
@@ -35,9 +40,15 @@ namespace HSDRaw.MEX
             get => JointS?.Value;
             set
             {
-                if (JointS == null)
-                    JointS = new HSD_String();
-                JointS.Value = value;
+                if(string.IsNullOrEmpty(value))
+                    JointS = null;
+                else
+                {
+
+                    if (JointS == null)
+                        JointS = new HSD_String();
+                    JointS.Value = value;
+                }
             }
         }
 
@@ -46,9 +57,14 @@ namespace HSDRaw.MEX
             get => MatS?.Value;
             set
             {
-                if (MatS == null)
-                    MatS = new HSD_String();
-                MatS.Value = value;
+                if (string.IsNullOrEmpty(value))
+                    MatS = null;
+                else
+                {
+                    if (MatS == null)
+                        MatS = new HSD_String();
+                    MatS.Value = value;
+                }
             }
         }
 
@@ -57,6 +73,8 @@ namespace HSDRaw.MEX
         private HSD_String JointS { get => _s.GetReference<HSD_String>(0x04); set => _s.SetReference(0x04, value); }
 
         private HSD_String MatS { get => _s.GetReference<HSD_String>(0x08); set => _s.SetReference(0x08, value); }
+
+        public int VisibilityLookupIndex { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
 
         public override string ToString()
         {

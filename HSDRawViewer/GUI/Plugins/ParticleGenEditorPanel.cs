@@ -212,7 +212,7 @@ namespace HSDRawViewer.GUI.Plugins
             if (des == null)
                 return $"{Code.ToString("X")} {string.Join(", ", Params)}";
             else
-                return $"{des.Name} {string.Join(", ", Params)}";
+                return $"{des?.Name} {string.Join(", ", Params)}";
         }
     }
 }

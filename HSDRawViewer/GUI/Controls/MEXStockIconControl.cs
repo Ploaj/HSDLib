@@ -157,7 +157,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             newTexAnim.AnimationObject.FObjDesc.Next.SetKeys(keys, (byte)TexTrackType.HSD_A_T_TCLT);
 
             newTexAnim.FromTOBJs(tobjs, false);
-            newTexAnim.Trim();
+            newTexAnim.Optimize();
 
             StockNode.MatAnimJoint = new HSD_MatAnimJoint();
             StockNode.MatAnimJoint.MaterialAnimation = new HSD_MatAnim();

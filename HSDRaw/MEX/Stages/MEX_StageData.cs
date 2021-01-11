@@ -1,5 +1,4 @@
 ﻿using HSDRaw.Common;
-using HSDRaw.Melee;
 using HSDRaw.MEX.Sounds;
 
 namespace HSDRaw.MEX.Stages
@@ -20,6 +19,16 @@ namespace HSDRaw.MEX.Stages
 
         public HSDArrayAccessor<MEX_Playlist> StagePlaylists { get => _s.GetReference<HSDArrayAccessor<MEX_Playlist>>(0x14); set => _s.SetReference(0x14, value); }
 
+        public override void New()
+        {
+            base.New();
+            StageIDTable = new HSDArrayAccessor<MEX_StageIDTable>();
+            ReverbTable = new HSDArrayAccessor<MEX_StageReverb>();
+            CollisionTable = new HSDArrayAccessor<MEX_StageCollision>();
+            StageItemLookup = new HSDArrayAccessor<MEX_ItemLookup>();
+            StageNames = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            StagePlaylists = new HSDArrayAccessor<MEX_Playlist>();
+        }
 
     }
 

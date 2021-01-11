@@ -1,6 +1,7 @@
 ﻿using HSDRaw.GX;
 using HSDRaw.Tools;
 using System;
+using System.Collections.Generic;
 
 namespace HSDRaw.Common
 {

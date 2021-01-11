@@ -71,12 +71,14 @@ namespace HSDRaw.Common
 
         //public int Unknown { get; set; } // TODO: this is pointer
 
-        public HSD_Float InfiniteData
+        public float InfiniteData
         {
-            get => Flags.HasFlag(LOBJ_Flags.LOBJ_INFINITE) ? _s.GetReference<HSD_Float>(0x18) : null;
+            get => Flags.HasFlag(LOBJ_Flags.LOBJ_INFINITE) ? _s.GetReference<HSDAccessor>(0x18)._s.GetFloat(0) : 0;
             set
             {
-                _s.SetReference(0x18, value);
+                var str = new HSDAccessor();
+                str._s.SetFloat(0, value);
+                _s.SetReference(0x18, str); 
                 Flags &= ~LOBJ_Flags.LOBJ_POINT;
                 Flags |= LOBJ_Flags.LOBJ_INFINITE;
             }

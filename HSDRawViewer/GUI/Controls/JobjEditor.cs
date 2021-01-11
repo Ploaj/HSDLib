@@ -753,7 +753,7 @@ namespace HSDRawViewer.GUI.Plugins
                         {
                             dobj.Mobj.RenderFlags |= RENDER_MODE.TEX0;
                             dobj.Mobj.Textures = TOBJConverter.BitmapToTOBJ(dummy, HSDRaw.GX.GXTexFmt.I4, HSDRaw.GX.GXTlutFmt.IA8);
-                            dobj.Mobj.Textures.Trim();
+                            dobj.Mobj.Textures.Optimize();
                         }
 
                         root.Dobj.Add(dobj);

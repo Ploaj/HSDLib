@@ -42,5 +42,14 @@ namespace HSDRaw.MEX
 
         private HSD_String SymbolS { get => _s.GetReference<HSD_String>(0x04); set => _s.SetReference(0x04, value); }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return FileNameS?.Value;
+        }
+
     }
 }

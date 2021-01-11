@@ -5,7 +5,7 @@ using HSDRaw.Melee.Cmd;
 
 namespace HSDRaw.Melee
 {
-    public class ftLoadCommonData : HSDAccessor
+    public class SBM_ftLoadCommonData : HSDAccessor
     {
         public ftLoadCommandDataCommonAttributes CommonAttributes { get => _s.GetReference<ftLoadCommandDataCommonAttributes>(0x00); set => _s.SetReference(0x00, value); }
 

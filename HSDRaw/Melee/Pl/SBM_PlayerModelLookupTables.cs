@@ -92,6 +92,6 @@ namespace HSDRaw.Melee.Pl
     {
         public override int TrimmedSize => 0x4;
 
-        public HSDArrayAccessor<HSD_UShort> Entries { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x00); set => _s.SetReference(0x00, value); }
+        public HSDUShortArray Entries { get => _s.GetReference<HSDUShortArray>(0x00); set => _s.SetReference(0x00, value); }
     }
 }

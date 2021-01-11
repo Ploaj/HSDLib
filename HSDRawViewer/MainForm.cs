@@ -796,8 +796,9 @@ namespace HSDRawViewer
             var trimmed = 0;
             foreach(DataNode d in treeView1.Nodes)
             {
+                Console.WriteLine(d.Text);
                 if(d.Accessor != null)
-                    trimmed += d.Accessor.Trim();
+                    trimmed += d.Accessor.Optimize();
             }
             MessageBox.Show($"Trimmed 0x{trimmed.ToString("X")} bytes", "Trimmed File");
         }

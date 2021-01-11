@@ -11,7 +11,7 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<MEX_CharFileStrings> CharFiles { get => _s.GetReference<HSDArrayAccessor<MEX_CharFileStrings>>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDArrayAccessor<HSD_Byte> InsigniaIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDByteArray InsigniaIDs { get => _s.GetReference<HSDByteArray>(0x08); set => _s.SetReference(0x08, value); }
 
         public HSDArrayAccessor<MEX_CharDefineIDs> DefineIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharDefineIDs>>(0x0C); set => _s.SetReference(0x0C, value); }
 
@@ -25,15 +25,15 @@ namespace HSDRaw.MEX
 
         public HSDArrayAccessor<MEX_AnimCount> AnimCount { get => _s.GetReference<HSDArrayAccessor<MEX_AnimCount>>(0x20); set => _s.SetReference(0x20, value); }
 
-        public HSDArrayAccessor<HSD_Byte> EffectIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x24); set => _s.SetReference(0x24, value); }
+        public HSDByteArray EffectIDs { get => _s.GetReference<HSDByteArray>(0x24); set => _s.SetReference(0x24, value); }
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> ResultAnimFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x28); set => _s.SetReference(0x28, value); }
 
-        public HSDArrayAccessor<HSD_Float> ResultScale { get => _s.GetReference<HSDArrayAccessor<HSD_Float>>(0x2C); set => _s.SetReference(0x2C, value); }
+        public HSDFloatArray ResultScale { get => _s.GetReference<HSDFloatArray>(0x2C); set => _s.SetReference(0x2C, value); }
 
-        public HSDArrayAccessor<HSD_Int> VictoryThemeIDs { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x30); set => _s.SetReference(0x30, value); }
+        public HSDIntArray VictoryThemeIDs { get => _s.GetReference<HSDIntArray>(0x30); set => _s.SetReference(0x30, value); }
 
-        public HSDArrayAccessor<HSD_Int> AnnouncerCalls { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x34); set => _s.SetReference(0x34, value); }
+        public HSDIntArray AnnouncerCalls { get => _s.GetReference<HSDIntArray>(0x34); set => _s.SetReference(0x34, value); }
 
         public HSDArrayAccessor<MEX_CharSSMFileID> SSMFileIDs { get => _s.GetReference<HSDArrayAccessor<MEX_CharSSMFileID>>(0x38); set => _s.SetReference(0x38, value); }
 
@@ -41,13 +41,13 @@ namespace HSDRaw.MEX
 
         // 0x40 ft Data Runtime Pointer Struct. Size is internalIDCount * 8
 
-        public HSDArrayAccessor<HSD_Byte> WallJump { get => _s.GetReference<HSDArrayAccessor<HSD_Byte>>(0x44); set => _s.SetReference(0x44, value); }
+        public HSDByteArray WallJump { get => _s.GetReference<HSDByteArray>(0x44); set => _s.SetReference(0x44, value); }
         
         public HSDArrayAccessor<MEX_RstRuntime> RstRuntime { get => _s.GetReference<HSDArrayAccessor<MEX_RstRuntime>>(0x48); set => _s.SetReference(0x48, value); }
         
         public HSDArrayAccessor<MEX_ItemLookup> FighterItemLookup { get => _s.GetReference<HSDArrayAccessor<MEX_ItemLookup>>(0x4C); set => _s.SetReference(0x4C, value); }
 
-        public HSDArrayAccessor<HSD_UShort> TargetTestStageLookups { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x50); set => _s.SetReference(0x50, value); }
+        public HSDUShortArray TargetTestStageLookups { get => _s.GetReference<HSDUShortArray>(0x50); set => _s.SetReference(0x50, value); }
 
         public HSDArrayAccessor<MEX_FighterSongID> FighterSongIDs { get => _s.GetReference<HSDArrayAccessor<MEX_FighterSongID>>(0x54); set => _s.SetReference(0x54, value); }
 
@@ -61,9 +61,42 @@ namespace HSDRaw.MEX
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> EndMovieFiles { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x68); set => _s.SetReference(0x68, value); }
 
-        public HSDArrayAccessor<HSD_Int> RaceToFinishTimeLimits { get => _s.GetReference<HSDArrayAccessor<HSD_Int>>(0x6C); set => _s.SetReference(0x6C, value); }
+        public HSDIntArray RaceToFinishTimeLimits { get => _s.GetReference<HSDIntArray>(0x6C); set => _s.SetReference(0x6C, value); }
 
         //public HSDArrayAccessor<HSD_UShort> AdventureTrophyLookup { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x5C); set => _s.SetReference(0x5C, value); }
 
+        public override void New()
+        {
+            base.New();
+
+            NameText = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            CharFiles = new HSDArrayAccessor<MEX_CharFileStrings>();
+            InsigniaIDs = new HSDByteArray();
+            DefineIDs = new HSDArrayAccessor<MEX_CharDefineIDs>();
+            CostumeIDs = new HSDArrayAccessor<MEX_CostumeIDs>();
+            CostumeFileSymbols = new HSDArrayAccessor<MEX_CostumeFileSymbolTable>();
+            FtDemo_SymbolNames = new HSDFixedLengthPointerArrayAccessor<MEX_FtDemoSymbolNames>();
+            AnimFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            AnimCount = new HSDArrayAccessor<MEX_AnimCount>();
+            EffectIDs = new HSDByteArray();
+            ResultAnimFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            ResultScale = new HSDFloatArray();
+            VictoryThemeIDs = new HSDIntArray();
+            AnnouncerCalls = new HSDIntArray();
+            SSMFileIDs = new HSDArrayAccessor<MEX_CharSSMFileID>();
+            CostumePointers = new HSDArrayAccessor<MEX_CostumeRuntimePointers>();
+            WallJump = new HSDByteArray();
+            RstRuntime = new HSDArrayAccessor<MEX_RstRuntime>();
+            FighterItemLookup = new HSDArrayAccessor<MEX_ItemLookup>();
+            TargetTestStageLookups = new HSDUShortArray();
+            FighterSongIDs = new HSDArrayAccessor<MEX_FighterSongID>();
+            VIFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            EndAdventureFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            EndAllStarFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            EndClassicFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            EndMovieFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
+            RaceToFinishTimeLimits = new HSDIntArray();
+
+        }
     }
 }
