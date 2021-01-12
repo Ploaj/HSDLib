@@ -4,11 +4,11 @@
     {
         public override int TrimmedSize => 0x14;
         
-        public SBM_Physics[] Physics
+        public SBM_DynamicDesc[] Physics
         {
             get
             {
-                var re = _s.GetReference<HSDArrayAccessor<SBM_Physics>>(0x04);
+                var re = _s.GetReference<HSDArrayAccessor<SBM_DynamicDesc>>(0x04);
                 if (re == null)
                     return null;
                 return re.Array;
@@ -23,7 +23,7 @@
                 else
                 {
                     _s.SetInt32(0x00, value.Length);
-                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_Physics>>(0x04);
+                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_DynamicDesc>>(0x04);
                     re.Array = value;
                 }
             }
@@ -49,7 +49,7 @@
         public float Size { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
     }
 
-    public class SBM_Physics : HSDAccessor
+    public class SBM_DynamicDesc : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
 
@@ -59,11 +59,11 @@
         public float PARAM2 { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
         public float PARAM3 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
 
-        public SBM_PhysicParameters[] Parameters
+        public SBM_DynamicParams[] Parameters
         {
             get
             {
-                var re = _s.GetReference<HSDArrayAccessor<SBM_PhysicParameters>>(0x04);
+                var re = _s.GetReference<HSDArrayAccessor<SBM_DynamicParams>>(0x04);
                 if (re == null)
                     return null;
                 return re.Array;
@@ -78,14 +78,14 @@
                 else
                 {
                     _s.SetInt32(0x08, value.Length);
-                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_PhysicParameters>>(0x04);
+                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_DynamicParams>>(0x04);
                     re.Array = value;
                 }
             }
         }
     }
 
-    public class SBM_PhysicParameters : HSDAccessor
+    public class SBM_DynamicParams : HSDAccessor
     {
         public override int TrimmedSize => 0x3C;
 
