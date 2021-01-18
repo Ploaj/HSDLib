@@ -31,11 +31,10 @@ namespace HSDRaw.Common.Animation
             set
             {
                 // create count table
+                _s.References.Clear();
 
-                if (_s.GetReference<HSDAccessor>(0x0C) == null)
-                    _s.SetReferenceStruct(0x0C, new HSDStruct(4));
-                
-                var n = _s.GetReference<HSDAccessor>(0x0C);
+                var n = _s.GetCreateReference<HSDAccessor>(0x0C);
+
                 int length = value.Count + 1;
                 if (length % 4 != 0)
                     length += 4 - (length % 4);
@@ -47,10 +46,7 @@ namespace HSDRaw.Common.Animation
 
                 // create track structure
                 
-                if (_s.GetReference<HSDAccessor>(0x10) == null)
-                    _s.SetReference(0x10, new HSDAccessor());
-
-                var tracks = _s.GetReference<HSDAccessor>(0x10);
+                var tracks = _s.GetCreateReference<HSDAccessor>(0x10);
 
                 tracks._s.SetData(new byte[TrackCount * 0xC]);
 

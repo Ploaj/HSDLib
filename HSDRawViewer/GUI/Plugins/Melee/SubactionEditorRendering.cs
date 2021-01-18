@@ -250,6 +250,9 @@ namespace HSDRawViewer.GUI
                 // update symbol name
                 ftcmd.Name = a.Symbol;
 
+                if (a.Symbol == null)
+                    continue;
+
                 // offset
                 var ofst = animOffsets[a.Symbol];
 
@@ -610,7 +613,7 @@ namespace HSDRawViewer.GUI
                     Action throwAction = null;
                     foreach (Action a in actionList.Items)
                     {
-                        if (a.Symbol.Contains("Taro") && a.Symbol.Contains(name) && !a.Symbol.Equals(anim.Roots[0].Name))
+                        if (a.Symbol != null && a.Symbol.Contains("Taro") && a.Symbol.Contains(name) && !a.Symbol.Equals(anim.Roots[0].Name))
                         {
                             throwAction = a;
                             break;

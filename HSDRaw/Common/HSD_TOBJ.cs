@@ -95,10 +95,10 @@ namespace HSDRaw.Common
         public byte[] GetDecodedImageData()
         {
             if(ImageData != null && TlutData != null)
-                return TPLConv.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData, TlutData.Format, TlutData.ColorCount, TlutData.TlutData);
+                return GXImageConverter.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData, TlutData.Format, TlutData.ColorCount, TlutData.TlutData);
 
             if (ImageData != null && TlutData == null)
-                return TPLConv.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData);
+                return GXImageConverter.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData);
 
             return null;
         }
@@ -114,9 +114,9 @@ namespace HSDRaw.Common
             if (format != GXTexFmt.CMP)
             {
                 byte[] palData;
-                var encodedData = TPLConv.EncodeTPL(data, width, height, format, palFormat, out palData);
+                var encodedData = GXImageConverter.EncodeTPL(data, width, height, format, palFormat, out palData);
 
-                if (TPLConv.IsPalettedFormat(format))
+                if (GXImageConverter.IsPalettedFormat(format))
                 {
                     if(TlutData == null)
                         TlutData = new HSD_Tlut();
@@ -140,7 +140,7 @@ namespace HSDRaw.Common
 
                 if(ImageData == null)
                     ImageData = new HSD_Image();
-                ImageData.ImageData = TPLConv.ToCMP(data, width, height);
+                ImageData.ImageData = GXImageConverter.ToCMP(data, width, height);
                 ImageData.Width = (short)width;
                 ImageData.Height = (short)height;
                 ImageData.Format = format;
@@ -187,12 +187,12 @@ namespace HSDRaw.Common
         public float MinLOD { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
         public float MaxLOD { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
 
-        public override int Trim()
+        protected override int Trim()
         {
             if (_s.References.ContainsKey(0x00))
                 _s.References[0x00].IsBufferAligned = true;
 
-            //Console.WriteLine("Trimmed Image " + Width + " " + Height);
+            Console.WriteLine("Trimmed Image " + Width + " " + Height);
 
             return base.Trim();
         }
@@ -210,7 +210,7 @@ namespace HSDRaw.Common
 
         public short ColorCount { get => _s.GetInt16(0x0C); set => _s.SetInt16(0x0C, value); }
 
-        public override int Trim()
+        protected override int Trim()
         {
             if (_s.References.ContainsKey(0x00))
                 _s.References[0x00].IsBufferAligned = true;

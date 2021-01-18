@@ -55,7 +55,7 @@ namespace HSDRaw
         /// <summary>
         /// Warning: Experimental
         /// </summary>
-        public virtual int Trim()
+        protected virtual int Trim()
         {
             var trimmed = 0;
 
@@ -82,12 +82,9 @@ namespace HSDRaw
         /// <summary>
         /// Warning: Experimental
         /// </summary>
-        private int Optimize(HashSet<HSDStruct> trimmedList = null)
+        private int Optimize(HashSet<HSDStruct> trimmedList)
         {
             var trimmed = 0;
-
-            if (trimmedList == null)
-                trimmedList = new HashSet<HSDStruct>();
 
             if (trimmedList.Contains(_s))
                 return trimmed;
@@ -98,12 +95,15 @@ namespace HSDRaw
 
             foreach (var v in GetType().GetProperties())
             {
-                if (v.PropertyType.IsSubclassOf(typeof(HSDAccessor)) && v.GetIndexParameters().Length == 0 && v.GetValue(this) is HSDAccessor ac)
+                if (v.PropertyType.IsSubclassOf(typeof(HSDAccessor)) && 
+                    v.GetIndexParameters().Length == 0 && 
+                    v.GetValue(this) is HSDAccessor ac)
                 {
                     if (ac != this)
                         trimmed += ac.Optimize(trimmedList);
                 }
-                if (v.PropertyType.IsArray && v.GetValue(this) is HSDAccessor[] arr)
+                if (v.PropertyType.IsArray && 
+                    v.GetValue(this) is HSDAccessor[] arr)
                 {
                     foreach (var ai in arr)
                         if (ai != null && ai != this)

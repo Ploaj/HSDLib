@@ -2,7 +2,7 @@
 {
     public class SBM_FighterSubactionData : HSDAccessor
     {
-        public override int Trim()
+        protected override int Trim()
         {
             _s.CanBeBuffer = false;
             _s.Align = false;

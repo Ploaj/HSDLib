@@ -16,5 +16,11 @@
         public override int TrimmedSize => 0x10;
 
         public float CSSHandScale { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+
+        public float StageSelectCursorStartX { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+
+        public float StageSelectCursorStartY { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+
+        public float StageSelectCursorStartZ { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
     }
 }

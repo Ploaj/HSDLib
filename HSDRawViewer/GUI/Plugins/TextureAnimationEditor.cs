@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRaw.GX;
-using Chadsoft.CTools.Image;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -266,7 +265,7 @@ namespace HSDRawViewer.GUI.Plugins
                     buf.Data = tobj.ImageData;
                     imgs.Add(buf);
 
-                    if (ImageDataFormat.IsPalettedFormat(tobj.ImageData.Format))
+                    if (GXImageConverter.IsPalettedFormat(tobj.ImageData.Format))
                     {
                         HSD_TlutBuffer palbuf = new HSD_TlutBuffer();
                         palbuf.Data = tobj.TlutData;
@@ -280,7 +279,7 @@ namespace HSDRawViewer.GUI.Plugins
 
                 TexAnim.ImageBuffers = ib;
 
-                if (tobjs.Length > 0 && ImageDataFormat.IsPalettedFormat(tobjs[0].ImageData.Format))
+                if (tobjs.Length > 0 && GXImageConverter.IsPalettedFormat(tobjs[0].ImageData.Format))
                 {
                     var tb = new HSDRaw.HSDArrayAccessor<HSD_TlutBuffer>();
                     tb.Array = pals.ToArray();
@@ -754,7 +753,7 @@ namespace HSDRawViewer.GUI.Plugins
                                 buf.Data = temp.ImageData;
                                 tobjs.Add(buf);
 
-                                if (ImageDataFormat.IsPalettedFormat(td.TextureFormat))
+                                if (GXImageConverter.IsPalettedFormat(td.TextureFormat))
                                 {
                                     HSD_TlutBuffer palbuf = new HSD_TlutBuffer();
                                     palbuf.Data = temp.TlutData;
@@ -771,7 +770,7 @@ namespace HSDRawViewer.GUI.Plugins
 
                         TexAnim.ImageBuffers = ib;
 
-                        if (ImageDataFormat.IsPalettedFormat(td.TextureFormat))
+                        if (GXImageConverter.IsPalettedFormat(td.TextureFormat))
                         {
                             var tb = new HSDRaw.HSDArrayAccessor<HSD_TlutBuffer>();
                             tb.Array = pals.ToArray();

@@ -666,7 +666,6 @@ namespace HSDRawViewer.Rendering
             if (animatedBoneIndex != -1 && Animation != null)
             {
                 Transform = Animation.GetAnimatedMatrix(Frame, animatedBoneIndex, jobj);
-                animatedBoneIndex++;
             }
             
             return Transform;

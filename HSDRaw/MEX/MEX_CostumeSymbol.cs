@@ -45,6 +45,7 @@ namespace HSDRaw.MEX
     public class MEX_CostumeSymbolMatLookup : HSDAccessor
     {
         public override int TrimmedSize => 0x04;
+
         public HSDShortArray LookupTable { get => _s.GetReference<HSDShortArray>(0x00); set => _s.SetReference(0x00, value); }
     }
 }

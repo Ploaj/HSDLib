@@ -209,8 +209,9 @@ namespace HSDRaw.Common
         /// 
         /// </summary>
         /// <returns></returns>
-        public override int Trim()
+        protected override int Trim()
         {
+            var trimmed = base.Trim();
 
             var attr = _s.GetReference<HSDAccessor>(0x08);
             // align attribute buffers
@@ -234,8 +235,7 @@ namespace HSDRaw.Common
 
             }
 
-
-            return base.Trim();
+            return trimmed;
         }
 
     }

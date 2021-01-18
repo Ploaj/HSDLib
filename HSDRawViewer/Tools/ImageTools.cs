@@ -2,11 +2,46 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using ExoQuantSharp;
 
 namespace System.Drawing
 {
     public static class BitmapExt
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
+        public static void ReduceColors(this Bitmap bmp, int colorCount, bool highQuality)
+        {
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
+
+            byte[] data = new byte[length];
+            Marshal.Copy(bitmapData.Scan0, data, 0, length);
+
+            ExoQuant exq = new ExoQuant();
+            exq.Feed(data);
+            exq.QuantizeEx(colorCount, highQuality);
+
+            exq.GetPalette(out byte[] rgba32Palette, colorCount);
+            exq.MapImageOrdered(bmp.Width, bmp.Height, data, out byte[] ci8Data);
+
+            Console.WriteLine(rgba32Palette.Length / 4);
+
+            for(int i = 0; i < ci8Data.Length; i++)
+            {
+                data[i * 4] = rgba32Palette[ci8Data[i] * 4];
+                data[i * 4 + 1] = rgba32Palette[ci8Data[i] * 4 + 1];
+                data[i * 4 + 2] = rgba32Palette[ci8Data[i] * 4 + 2];
+                data[i * 4 + 3] = rgba32Palette[ci8Data[i] * 4 + 3];
+            }
+
+            Marshal.Copy(data, 0, bitmapData.Scan0, data.Length);
+            bmp.UnlockBits(bitmapData);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -44,6 +79,71 @@ namespace System.Drawing
             return bytes;
         }
 
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static Bitmap GetAlphaMask(this Bitmap alpha)
+        {
+            var alphaData = alpha.GetBGRAData();
+            var data = new byte[alphaData.Length];
+
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                data[i] = alphaData[i + 3];
+                data[i + 1] = alphaData[i + 3];
+                data[i + 2] = alphaData[i + 3];
+                data[i + 3] = 255;
+            }
+
+            var bmp = new Bitmap(alpha.Width, alpha.Height);
+
+            try
+            {
+                BitmapData bmpData = bmp.LockBits(
+                                     new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                     ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+                Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+                bmp.UnlockBits(bmpData);
+            }
+            catch { bmp.Dispose(); throw; }
+
+            return bmp;
+        }
+
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static void ApplyAlpha(this Bitmap bmp, Bitmap alpha)
+        {
+            var alphaData = alpha.GetBGRAData();
+            var data = bmp.GetBGRAData();
+
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                data[i + 3] = alphaData[i + 3];
+            }
+
+            try
+            {
+                BitmapData bmpData = bmp.LockBits(
+                                     new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                     ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+                Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+                bmp.UnlockBits(bmpData);
+            }
+            catch { bmp.Dispose(); throw; }
+        }
+
     }
 }
 
@@ -51,6 +151,7 @@ namespace HSDRawViewer.Tools
 {
     public class BitmapTools
     {
+
         /// <summary>
         /// Resize the image to the specified width and height.
         /// </summary>
@@ -61,16 +162,15 @@ namespace HSDRawViewer.Tools
         public static Bitmap ResizeImage(Image image, int width, int height)
         {
             var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
+            var destImage = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
             destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
 
             using (var graphics = Graphics.FromImage(destImage))
             {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.Clear(Color.FromArgb(0, 255, 0, 0));
+                graphics.InterpolationMode = InterpolationMode.Default;
+                //graphics.SmoothingMode = SmoothingMode.HighQuality;
                 graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
                 using (var wrapMode = new ImageAttributes())
@@ -123,53 +223,6 @@ namespace HSDRawViewer.Tools
             return result;
         }
 
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bmp"></param>
-        public static Bitmap ReduceColors(Bitmap bmp, int colorCount)
-        {
-            if (bmp.Width <= 16 && bmp.Height <= 16) // no need
-                return bmp;
-
-            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var length = bitmapData.Stride * bitmapData.Height;
-
-            byte[] bytes = new byte[length];
-            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
-
-
-            // edit bytes
-            var quantizer = new SimplePaletteQuantizer.Quantizers.XiaolinWu.WuColorQuantizer();
-            quantizer.Prepare(bmp.Width, bmp.Height);
-            for (int i = 0; i < bytes.Length; i+=4)
-            {
-                var color = Color.FromArgb(bytes[i + 3], bytes[i], bytes[i + 1], bytes[i + 2]);
-                quantizer.AddColor(color);
-            }
-
-            var palette = quantizer.GetPalette(colorCount);
-
-            for (int i = 0; i < bytes.Length; i += 4)
-            {
-                var color = Color.FromArgb(bytes[i + 3], bytes[i], bytes[i + 1], bytes[i + 2]);
-                var index = quantizer.GetPaletteIndex(color);
-                var newColor = palette[index];
-                bytes[i] = newColor.R;
-                bytes[i + 1] = newColor.G;
-                bytes[i + 2] = newColor.B;
-                bytes[i + 3] = newColor.A;
-                if (newColor.A != 255)
-                    System.Console.WriteLine(newColor.A);
-            }
-
-            Marshal.Copy(bytes, 0, bitmapData.Scan0, length);
-            bmp.UnlockBits(bitmapData);
-
-            return bmp;
-        }
 
         /// <summary>
         /// 

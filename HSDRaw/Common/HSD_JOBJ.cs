@@ -79,7 +79,7 @@ namespace HSDRaw.Common
 
         public HSD_ROBJ ROBJ { get => _s.GetReference<HSD_ROBJ>(0x3C); set => _s.SetReference(0x3C, value); }
 
-        public override int Trim()
+        protected override int Trim()
         {
             // quit optimizing these away
             _s.CanBeBuffer = false;

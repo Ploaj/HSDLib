@@ -74,7 +74,7 @@ namespace HSDRaw.Common
 
         public void SubtractOffset(int amt)
         {
-            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
+            bool isPaletted = GXImageConverter.IsPalettedFormat(ImageFormat);
             for (int i = 0; i < ImageCount; i++)
             {
                 _s.SetInt32(i * 4 + 0x18, _s.GetInt32(i * 4 + 0x18) - amt);
@@ -85,7 +85,7 @@ namespace HSDRaw.Common
 
         public void AddOffset(int amt)
         {
-            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
+            bool isPaletted = GXImageConverter.IsPalettedFormat(ImageFormat);
             for (int i = 0; i < ImageCount; i++)
             {
                 _s.SetInt32(i * 4 + 0x18, _s.GetInt32(i * 4 + 0x18) + amt);
@@ -102,8 +102,8 @@ namespace HSDRaw.Common
         {
             List<byte[]> images = new List<byte[]>();
 
-            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
-            int imageSize = TPLConv.GetImageSize(ImageFormat, Width, Height);
+            bool isPaletted = GXImageConverter.IsPalettedFormat(ImageFormat);
+            int imageSize = GXImageConverter.GetImageSize(ImageFormat, Width, Height);
             int paletteSize = 0x200;
 
             for (int i = 0; i < ImageCount; i++)
@@ -117,11 +117,11 @@ namespace HSDRaw.Common
                     var paloffset = _s.GetInt32((i + ImageCount) * 4 + 0x18);
                     var palData = _s.GetBytes(paloffset, paletteSize);
 
-                    images.Add(TPLConv.DecodeTPL(ImageFormat, Width, Height, imageData, PaletteFormat, 0x100, palData));
+                    images.Add(GXImageConverter.DecodeTPL(ImageFormat, Width, Height, imageData, PaletteFormat, 0x100, palData));
                 }
                 else
                 {
-                    images.Add(TPLConv.DecodeTPL(ImageFormat, Width, Height, imageData));
+                    images.Add(GXImageConverter.DecodeTPL(ImageFormat, Width, Height, imageData));
                 }
             }
             
@@ -136,8 +136,8 @@ namespace HSDRaw.Common
         {
             HSD_TOBJ[] tobjs = new HSD_TOBJ[ImageCount];
 
-            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
-            int imageSize = TPLConv.GetImageSize(ImageFormat, Width, Height);
+            bool isPaletted = GXImageConverter.IsPalettedFormat(ImageFormat);
+            int imageSize = GXImageConverter.GetImageSize(ImageFormat, Width, Height);
             int paletteSize = 0x200;
 
             for (int i = 0; i < ImageCount; i++)
@@ -190,8 +190,8 @@ namespace HSDRaw.Common
                 PaletteFormat = tobjs[0].TlutData.Format;
             
             //
-            bool isPaletted = TPLConv.IsPalettedFormat(ImageFormat);
-            int imageSize = TPLConv.GetImageSize(ImageFormat, Width, Height);
+            bool isPaletted = GXImageConverter.IsPalettedFormat(ImageFormat);
+            int imageSize = GXImageConverter.GetImageSize(ImageFormat, Width, Height);
 
             // header length 
             var newLength = 0x18;
