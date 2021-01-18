@@ -111,40 +111,26 @@ namespace HSDRaw.Common
         /// <param name="palFormat"></param>
         public void EncodeImageData(byte[] data, int width, int height, GXTexFmt format, GXTlutFmt palFormat)
         {
-            if (format != GXTexFmt.CMP)
+            byte[] palData;
+            var encodedData = GXImageConverter.EncodeImage(data, width, height, format, palFormat, out palData);
+
+            if (GXImageConverter.IsPalettedFormat(format))
             {
-                byte[] palData;
-                var encodedData = GXImageConverter.EncodeTPL(data, width, height, format, palFormat, out palData);
-
-                if (GXImageConverter.IsPalettedFormat(format))
-                {
-                    if(TlutData == null)
-                        TlutData = new HSD_Tlut();
-                    TlutData.Format = palFormat;
-                    TlutData.TlutData = palData;
-                    TlutData.ColorCount = (short)(palData.Length / 2);
-                }
-                else
-                    TlutData = null;
-
-                if(ImageData == null)
-                    ImageData = new HSD_Image();
-                ImageData.ImageData = encodedData;
-                ImageData.Width = (short)width;
-                ImageData.Height = (short)height;
-                ImageData.Format = format;
+                if (TlutData == null)
+                    TlutData = new HSD_Tlut();
+                TlutData.Format = palFormat;
+                TlutData.TlutData = palData;
+                TlutData.ColorCount = (short)(palData.Length / 2);
             }
             else
-            {
                 TlutData = null;
 
-                if(ImageData == null)
-                    ImageData = new HSD_Image();
-                ImageData.ImageData = GXImageConverter.ToCMP(data, width, height);
-                ImageData.Width = (short)width;
-                ImageData.Height = (short)height;
-                ImageData.Format = format;
-            }
+            if (ImageData == null)
+                ImageData = new HSD_Image();
+            ImageData.ImageData = encodedData;
+            ImageData.Width = (short)width;
+            ImageData.Height = (short)height;
+            ImageData.Format = format;
         }
 
         public override void New()

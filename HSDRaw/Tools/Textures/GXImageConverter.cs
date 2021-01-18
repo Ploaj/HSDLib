@@ -45,7 +45,7 @@ namespace HSDRaw.Tools
         /// <param name="palformat"></param>
         /// <param name="paletteData"></param>
         /// <returns></returns>
-        public static byte[] EncodeTPL(byte[] rgba, int width, int height, GXTexFmt format, GXTlutFmt palformat, out byte[] paletteData)
+        public static byte[] EncodeImage(byte[] rgba, int width, int height, GXTexFmt format, GXTlutFmt palformat, out byte[] paletteData)
         {
             return FromImage(rgba, width, height, format, palformat, out paletteData);
         }

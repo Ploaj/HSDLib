@@ -474,8 +474,8 @@ namespace HSDRawViewer.GUI.Plugins
                     {
                         if (t.TlutData == null)
                             t.TlutData = new HSD_Tlut();
-                        newTOBJ.TlutData.TlutData = newTOBJ.TlutData.TlutData;
-                        newTOBJ.TlutData.Format = newTOBJ.TlutData.Format;
+                        t.TlutData.TlutData = newTOBJ.TlutData.TlutData;
+                        t.TlutData.Format = newTOBJ.TlutData.Format;
                     }
                     else
                         t.TlutData = null;
