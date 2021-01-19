@@ -346,20 +346,7 @@ namespace HSDRaw.Tools
                 }
                 else //RGB5A3
                 {
-                    if ((pixel & (1 << 15)) != 0) //RGB555
-                    {
-                        a = 255;
-                        b = (((pixel >> 10) & 0x1F) * 255) / 31;
-                        g = (((pixel >> 5) & 0x1F) * 255) / 31;
-                        r = (((pixel >> 0) & 0x1F) * 255) / 31;
-                    }
-                    else //RGB4A3
-                    {
-                        a = (((pixel >> 12) & 0x07) * 255) / 7;
-                        b = (((pixel >> 8) & 0x0F) * 255) / 15;
-                        g = (((pixel >> 4) & 0x0F) * 255) / 15;
-                        r = (((pixel >> 0) & 0x0F) * 255) / 15;
-                    }
+                    DecodeRGBA3(pixel, out a, out r, out g, out b);
                 }
 
                 output[i] = (uint)((r << 0) | (g << 8) | (b << 16) | (a << 24));
@@ -469,8 +456,6 @@ namespace HSDRaw.Tools
         {
             uint[] output = new uint[width * height];
             int inp = 0;
-            int r, g, b;
-            int a = 0;
 
             for (int y = 0; y < height; y += 4)
             {
@@ -485,20 +470,7 @@ namespace HSDRaw.Tools
                             if (y1 >= height || x1 >= width)
                                 continue;
 
-                            if ((pixel & (1 << 15)) != 0)
-                            {
-                                b = (((pixel >> 10) & 0x1F) * 255) / 31;
-                                g = (((pixel >> 5) & 0x1F) * 255) / 31;
-                                r = (((pixel >> 0) & 0x1F) * 255) / 31;
-                                a = 255;
-                            }
-                            else
-                            {
-                                a = (((pixel >> 12) & 0x07) * 255) / 7;
-                                b = (((pixel >> 8) & 0x0F) * 255) / 15;
-                                g = (((pixel >> 4) & 0x0F) * 255) / 15;
-                                r = (((pixel >> 0) & 0x0F) * 255) / 15;
-                            }
+                            DecodeRGBA3(pixel, out int a, out int r, out int g, out int b);
 
                             output[(y1 * width) + x1] = (uint)((r << 0) | (g << 8) | (b << 16) | (a << 24));
                         }
@@ -560,29 +532,53 @@ namespace HSDRaw.Tools
         {
             int newpixel = 0;
 
-            if (a <= 0xda) //RGB4A3
+            if (a < 0xff) //RGB4A3
             {
-                newpixel &= ~(1 << 15);
+                r /= 16;
+                g /= 16;
+                b /= 16;
+                a /= 32;
 
-                r = ((r * 15) / 255) & 0xf;
-                g = ((g * 15) / 255) & 0xf;
-                b = ((b * 15) / 255) & 0xf;
-                a = ((a * 7) / 255) & 0x7;
-
-                newpixel |= (a << 12) | (r << 8) | (g << 4) | b;
+                newpixel = (a << 12) | (r << 8) | (g << 4) | b;
             }
             else //RGB5
             {
                 newpixel |= (1 << 15);
 
-                r = ((r * 31) / 255) & 0x1f;
-                g = ((g * 31) / 255) & 0x1f;
-                b = ((b * 31) / 255) & 0x1f;
+                r /= 8;
+                g /= 8;
+                b /= 8;
 
                 newpixel |= (r << 10) | (g << 5) | b;
             }
 
             return (ushort)newpixel;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="r"></param>
+        /// <param name="g"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static void DecodeRGBA3(ushort pixel, out int a, out int r, out int g, out int b)
+        {
+            if ((pixel & (1 << 15)) != 0) //RGB555
+            {
+                a = 255;
+                b = (((pixel >> 10) & 0x1F) * 255) / 31;
+                g = (((pixel >> 5) & 0x1F) * 255) / 31;
+                r = (((pixel >> 0) & 0x1F) * 255) / 31;
+            }
+            else //RGB4A3
+            {
+                a = (((pixel >> 12) & 0x07) * 255) / 7;
+                b = (((pixel >> 8) & 0x0F) * 255) / 15;
+                g = (((pixel >> 4) & 0x0F) * 255) / 15;
+                r = (((pixel >> 0) & 0x0F) * 255) / 15;
+            }
         }
 
         #endregion
