@@ -177,6 +177,12 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GUI\Controls\MEXStockIconControl.Designer.cs" />
+    <Compile Include="GUI\Controls\TexturePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\Controls\TexturePanel.Designer.cs">
+      <DependentUpon>TexturePanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Extra\ISOFileTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -209,6 +215,24 @@
     </Compile>
     <Compile Include="GUI\Plugins\ParticleGenEditor.Designer.cs">
       <DependentUpon>ParticleGenEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\TexAnimEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\TexAnimEditor.Designer.cs">
+      <DependentUpon>TexAnimEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\TEXGEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\TEXGEditor.Designer.cs">
+      <DependentUpon>TEXGEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Plugins\TOBJEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\TOBJEditor.Designer.cs">
+      <DependentUpon>TOBJEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -374,12 +398,6 @@
     <Compile Include="GUI\Plugins\Melee\SubActionPanel.Designer.cs">
       <DependentUpon>SubActionPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\TextureAnimationEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\TextureAnimationEditor.Designer.cs">
-      <DependentUpon>TextureAnimationEditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\PropertyDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -491,6 +509,7 @@
     </Content>
     <None Include="Resources\ico_file.png" />
     <None Include="Resources\ico_hatchling.png" />
+    <None Include="Resources\back_checker.png" />
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />
@@ -508,6 +527,9 @@
       <DependentUpon>ISOEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Controls\MEXStockIconControl.resx" />
+    <EmbeddedResource Include="GUI\Controls\TexturePanel.resx">
+      <DependentUpon>TexturePanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\ISOFileTool.resx">
       <DependentUpon>ISOFileTool.cs</DependentUpon>
     </EmbeddedResource>
@@ -522,6 +544,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\ParticleGenEditorPanel.resx">
       <DependentUpon>ParticleGenEditorPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\TexAnimEditor.resx">
+      <DependentUpon>TexAnimEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\TEXGEditor.resx">
+      <DependentUpon>TEXGEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\TOBJEditor.resx">
+      <DependentUpon>TOBJEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -600,9 +631,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\Melee\SubActionPanel.resx">
       <DependentUpon>SubActionPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\TextureAnimationEditor.resx">
-      <DependentUpon>TextureAnimationEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\PropertyDialog.resx">
       <DependentUpon>PropertyDialog.cs</DependentUpon>

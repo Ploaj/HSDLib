@@ -459,7 +459,12 @@ namespace HSDRawViewer.GUI
                     var indSize = TextRenderer.MeasureText(indText, e.Font);
 
                     var indexBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, indSize.Width, indSize.Height);
-                    e.Graphics.DrawString(indText, e.Font, ApplicationSettings.SystemGrayTextColorBrush, indexBound, StringFormat.GenericDefault);
+
+                    if (e.State == DrawItemState.Selected)
+                        using (var selectedColor = new SolidBrush(Color.White))
+                            e.Graphics.DrawString(indText, e.Font, selectedColor, indexBound, StringFormat.GenericDefault);
+                    else
+                        e.Graphics.DrawString(indText, e.Font, ApplicationSettings.SystemGrayTextColorBrush, indexBound, StringFormat.GenericDefault);
 
                     offset += indSize.Width;
                 }

@@ -41,7 +41,7 @@ namespace HSDRawViewer.GUI
             }
             set
             {
-                cbFormat.SelectedItem = value.ToString();
+                cbFormat.SelectedItem = value;
             }
         }
         public GXTlutFmt PaletteFormat
@@ -54,7 +54,7 @@ namespace HSDRawViewer.GUI
             }
             set
             {
-                sbPalFormat.SelectedItem = value.ToString();
+                sbPalFormat.SelectedItem = value;
             }
         }
 

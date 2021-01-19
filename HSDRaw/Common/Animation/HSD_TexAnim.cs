@@ -51,31 +51,37 @@ namespace HSDRaw.Common.Animation
         /// </summary>
         /// <param name="tobj"></param>
         /// <returns>-1 is TOBJ is inavlid format and new index otherwise</returns>
-        public int AddImage(HSD_TOBJ tobj)
+        public bool AddImage(HSD_TOBJ tobj, out int imageIndex, out int paletteIndex)
         {
+            imageIndex = 0;
+            paletteIndex = 0;
+
+
             if (tobj == null)
-                return -1;
+                return false;
 
-            if (ImageCount > 0 && tobj.ImageData.Format != ImageBuffers[0].Data.Format)
-                return -1;
-
-            if (TlutCount > 0 && tobj.TlutData != null && tobj.TlutData.Format != TlutBuffers[0].Data.Format)
-                return -1;
 
             if (ImageBuffers == null)
                 ImageBuffers = new HSDArrayAccessor<HSD_TexBuffer>();
+
             ImageBuffers.Add(new HSD_TexBuffer() { Data = tobj.ImageData });
             ImageCount++;
 
-            if(tobj.TlutData != null)
+            imageIndex = ImageBuffers.Length - 1;
+
+
+            if (tobj.TlutData != null)
             {
                 if (TlutBuffers == null)
                     TlutBuffers = new HSDArrayAccessor<HSD_TlutBuffer>();
+
                 TlutBuffers.Add(new HSD_TlutBuffer() { Data = tobj.TlutData });
                 TlutCount++;
+
+                paletteIndex = TlutBuffers.Length - 1;
             }
 
-            return ImageBuffers.Length - 1;
+            return true;
         }
 
         /// <summary>
@@ -105,6 +111,18 @@ namespace HSDRaw.Common.Animation
         {
             HSD_TOBJ[] tobj = new HSD_TOBJ[ImageCount];
 
+            /*FOBJ_Player palPlayer = null;
+            
+            if(AnimationObject != null && AnimationObject.FObjDesc != null)
+            {
+                var palTrack = AnimationObject.FObjDesc.List.Find(e => e.TexTrackType == TexTrackType.HSD_A_T_TCLT);
+                if (palTrack != null)
+                {
+                    palPlayer = new FOBJ_Player();
+                    palPlayer.Keys = palTrack.GetDecodedKeys();
+                }
+            }*/
+
             for(int i = 0; i < tobj.Length; i++)
             {
                 tobj[i] = new HSD_TOBJ()
@@ -114,8 +132,14 @@ namespace HSDRaw.Common.Animation
                     SY = 1,
                     SZ = 1,
                 };
+
+                var palKey = i;
+
+                //if(palPlayer != null)
+                 //   palKey = (int)palPlayer.GetValue(i);
+
                 if (i < TlutCount)
-                    tobj[i].TlutData = TlutBuffers[i].Data;
+                    tobj[i].TlutData = TlutBuffers[palKey].Data;
             }
 
             return tobj;
@@ -129,11 +153,13 @@ namespace HSDRaw.Common.Animation
             ImageBuffers = null;
             TlutBuffers = null;
             List<FOBJKey> keys = new List<FOBJKey>();
+            List<FOBJKey> palkeys = new List<FOBJKey>();
             int index = 0;
             foreach (var t in tobjs)
             {
-                AddImage(t);
-                keys.Add(new FOBJKey() { Frame = index, Value = index, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                AddImage(t, out int imgIndex, out int palIndex);
+                keys.Add(new FOBJKey() { Frame = index, Value = imgIndex, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                palkeys.Add(new FOBJKey() { Frame = index, Value = palIndex, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
                 index++;
             }
 
@@ -147,7 +173,7 @@ namespace HSDRaw.Common.Animation
                 if (TlutCount != 0)
                 {
                     AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();
-                    AnimationObject.FObjDesc.Next.SetKeys(keys, (byte)TexTrackType.HSD_A_T_TCLT);
+                    AnimationObject.FObjDesc.Next.SetKeys(palkeys, (byte)TexTrackType.HSD_A_T_TCLT);
                 }
             }
         }

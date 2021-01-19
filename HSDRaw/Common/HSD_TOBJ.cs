@@ -1,7 +1,7 @@
 ﻿using HSDRaw.GX;
 using HSDRaw.Tools;
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace HSDRaw.Common
 {
@@ -41,6 +41,50 @@ namespace HSDRaw.Common
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public enum COORD_TYPE
+    {
+        UV,
+        REFLECTION,
+        HILIGHT,
+        SHADOW,
+        TOON,
+        GRADATION
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum COLORMAP
+    {
+        NONE,
+        ALPHA_MASK,
+        RGB_MASK,
+        BLEND,
+        MODULATE,
+        REPLACE,
+        PASS,
+        ADD,
+        SUB,
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum ALPHAMAP
+    {
+        NONE,
+        ALPHA_MASK,
+        BLEND,
+        MODULATE,
+        REPLACE,
+        PASS,
+        ADD,
+        SUB,
+    }
+
+    /// <summary>
     /// Texture Object
     /// Contains surface information
     /// </summary>
@@ -48,44 +92,120 @@ namespace HSDRaw.Common
     {
         public override int TrimmedSize { get; } = 0x5C;
 
-        //public uint NameOffset { get; set; }
+        [Category("0 - General")]
+        public string ClassName
+        {
+            get => _s.GetString(0x00);
+            set => _s.SetString(0x00, value);
+        }
 
+        [Browsable(false)]
         public override HSD_TOBJ Next { get => _s.GetReference<HSD_TOBJ>(0x04); set => _s.SetReference(0x04, value); }
 
+
+        [Category("0 - General"), Description("Texture ID used for binding texture.")]
         public GXTexMapID TexMapID { get => (GXTexMapID)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
-        
+
+        [Category("0 - General"), Description("Used for generating mipmaps. (Use 4)")]
         public int GXTexGenSrc { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
-        
-        public float RX { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
-        public float RY { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
-        public float RZ { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
-        public float SX { get => _s.GetFloat(0x1C); set => _s.SetFloat(0x1C, value); }
-        public float SY { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
-        public float SZ { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
-        public float TX { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
-        public float TY { get => _s.GetFloat(0x2C); set => _s.SetFloat(0x2C, value); }
-        public float TZ { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
 
-        public GXWrapMode WrapS { get => (GXWrapMode)_s.GetInt32(0x34); set => _s.SetInt32(0x34, (int)value); }
 
-        public GXWrapMode WrapT { get => (GXWrapMode)_s.GetInt32(0x38); set => _s.SetInt32(0x38, (int)value); }
-        
+        [Category("0 - General"), Description("Amount to scale UVs (U) by when applied to a model")]
         public byte WScale { get => _s.GetByte(0x3C); set => _s.SetByte(0x3C, value); }
 
+        [Category("0 - General"), Description("Amount to scale UVs (V) by when applied to a model")]
         public byte HScale { get => _s.GetByte(0x3D); set => _s.SetByte(0x3D, value); }
-        
+
+
+        [Category("2- Transform")]
+        public float RX { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+        [Category("2- Transform")]
+        public float RY { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+        [Category("2- Transform")]
+        public float RZ { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        [Category("2- Transform")]
+        public float SX { get => _s.GetFloat(0x1C); set => _s.SetFloat(0x1C, value); }
+        [Category("2- Transform")]
+        public float SY { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
+        [Category("2- Transform")]
+        public float SZ { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
+        [Category("2- Transform")]
+        public float TX { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
+        [Category("2- Transform")]
+        public float TY { get => _s.GetFloat(0x2C); set => _s.SetFloat(0x2C, value); }
+        [Category("2- Transform")]
+        public float TZ { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
+
+
+        [Browsable(false)]
         public TOBJ_FLAGS Flags { get => (TOBJ_FLAGS)_s.GetInt32(0x40); set => _s.SetInt32(0x40, (int)value); }
 
+
+        [Category("1 - Rendering"), Description("Indicates if texture map is used for Diffuse lighting.")]
+        public bool DiffuseLightmap { get => Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_DIFFUSE); set { if (value) Flags |= TOBJ_FLAGS.LIGHTMAP_DIFFUSE; else Flags &= ~TOBJ_FLAGS.LIGHTMAP_DIFFUSE; } }
+
+        [Category("1 - Rendering"), Description("Indicates if texture map is used for Specular lighting.")]
+        public bool SpecularLightmap { get => Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SPECULAR); set { if (value) Flags |= TOBJ_FLAGS.LIGHTMAP_SPECULAR; else Flags &= ~TOBJ_FLAGS.LIGHTMAP_SPECULAR; } }
+
+        [Category("1 - Rendering"), Description("Indicates if texture map is used for Ambient lighting.")]
+        public bool AmbientLightmap { get => Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_AMBIENT); set { if (value) Flags |= TOBJ_FLAGS.LIGHTMAP_AMBIENT; else Flags &= ~TOBJ_FLAGS.LIGHTMAP_AMBIENT; } }
+
+        [Category("1 - Rendering"), Description("Indicates if texture map is used for Shadow mapping.")]
+        public bool ShadowLightmap { get => Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SHADOW); set { if (value) Flags |= TOBJ_FLAGS.LIGHTMAP_SHADOW; else Flags &= ~TOBJ_FLAGS.LIGHTMAP_SHADOW; } }
+
+        [Category("1 - Rendering"), Description("Indicates if texture map is used for ext lighting.")]
+        public bool ExtLightmap { get => Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_EXT); set { if (value) Flags |= TOBJ_FLAGS.LIGHTMAP_EXT; else Flags &= ~TOBJ_FLAGS.LIGHTMAP_EXT; } }
+
+        [Category("1 - Rendering"), Description("The color operation this to perform with this texture.")]
+        public COLORMAP ColorOperation
+        {
+            get => (COLORMAP)((((int)Flags) >> 16) & 0xF);
+            set
+            {
+                Flags = (TOBJ_FLAGS)(((int)Flags) & ~(0xF << 16) | (((int)value & 0xF) << 16));
+            }
+        }
+        [Category("1 - Rendering"), Description("The alpha operation this to perform with this texture.")]
+        public ALPHAMAP AlphaOperation
+        {
+            get => (ALPHAMAP)((((int)Flags) >> 20) & 0xF);
+            set
+            {
+                Flags = (TOBJ_FLAGS)(((int)Flags) & ~(0xF << 20) | (((int)value & 0xF) << 20));
+            }
+        }
+        [Category("1 - Rendering"), Description("Indicates whether or not this texture is a bump map")]
+        public bool BumpMap { get => Flags.HasFlag(TOBJ_FLAGS.BUMP); set { if (value) Flags |= TOBJ_FLAGS.BUMP; else Flags &= ~TOBJ_FLAGS.BUMP; } }
+
+
+        [Category("1 - Rendering"), Description("Horizontal wrap mode for the texture.")]
+        public GXWrapMode WrapS { get => (GXWrapMode)_s.GetInt32(0x34); set => _s.SetInt32(0x34, (int)value); }
+
+        [Category("1 - Rendering"), Description("Vertical wrap mode for the texture.")]
+        public GXWrapMode WrapT { get => (GXWrapMode)_s.GetInt32(0x38); set => _s.SetInt32(0x38, (int)value); }
+
+
+
+        [Category("1 - Rendering"), Description("Blending value to use when ColorOperation or AlphaOperation is set to BLEND.")]
         public float Blending { get => _s.GetFloat(0x44); set => _s.SetFloat(0x44, value); }
 
+        [Category("1 - Rendering"), Description("Texture magnification filtering.")]
         public GXTexFilter MagFilter { get => (GXTexFilter)_s.GetInt32(0x48); set => _s.SetInt32(0x48, (int)value); }
 
+
+        [Browsable(false)]
         public HSD_Image ImageData { get => _s.GetReference<HSD_Image>(0x4C); set => _s.SetReference(0x4C, value); }
 
+        [Browsable(false)]
         public HSD_Tlut TlutData { get => _s.GetReference<HSD_Tlut>(0x50); set => _s.SetReference(0x50, value); }
 
+
+        [Category("3 - Ext"), Description("Defines level-of-detail texture information.")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_TOBJ_LOD LOD { get => _s.GetReference<HSD_TOBJ_LOD>(0x54); set => _s.SetReference(0x54, value); }
 
+        [Category("3 - Ext"), Description("Texture Environment Unit (TEV) operations for this texture.")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_TOBJ_TEV TEV { get => _s.GetReference<HSD_TOBJ_TEV>(0x58); set => _s.SetReference(0x58, value); }
 
         /// <summary>
