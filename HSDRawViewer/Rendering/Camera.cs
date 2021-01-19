@@ -247,6 +247,9 @@ namespace HSDRawViewer.Rendering
         [YamlIgnore]
         private int renderHeight = 1;
 
+        [YamlIgnore]
+        public bool MirrorScreenshot { get; set; } = false;
+
         /// <summary>
         /// The ratio for <see cref="RenderWidth"/> / <see cref="RenderHeight"/>.
         /// </summary>

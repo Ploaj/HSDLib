@@ -157,6 +157,9 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static Bitmap ToBitmap(HSD_TOBJ tobj)
         {
+            if (tobj.ImageData == null)
+                return null;
+
             var rgba = tobj.GetDecodedImageData();
 
             return BitmapTools.BGRAToBitmap(rgba, tobj.ImageData.Width, tobj.ImageData.Height);

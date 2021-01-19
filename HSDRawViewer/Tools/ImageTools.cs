@@ -47,6 +47,37 @@ namespace System.Drawing
         /// </summary>
         /// <param name="bmp"></param>
         /// <returns></returns>
+        public static void MirrorX(this Bitmap bmp)
+        {
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
+
+            byte[] bytes = new byte[length];
+            byte[] mirror = new byte[length];
+
+            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+
+            for(int x = 0; x < bmp.Width; x++)
+            {
+                for (int y = 0; y < bmp.Height; y++)
+                {
+                    mirror[(x + y * bmp.Width) * 4 + 0] = bytes[(bmp.Width - 1 - x + y * bmp.Width) * 4 + 0];
+                    mirror[(x + y * bmp.Width) * 4 + 1] = bytes[(bmp.Width - 1 - x + y * bmp.Width) * 4 + 1];
+                    mirror[(x + y * bmp.Width) * 4 + 2] = bytes[(bmp.Width - 1 - x + y * bmp.Width) * 4 + 2];
+                    mirror[(x + y * bmp.Width) * 4 + 3] = bytes[(bmp.Width - 1 - x + y * bmp.Width) * 4 + 3];
+                }
+            }
+
+            Marshal.Copy(mirror, 0, bitmapData.Scan0, length);
+
+            bmp.UnlockBits(bitmapData);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
         public static byte[] GetBGRAData(this Bitmap bmp)
         {
             var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);

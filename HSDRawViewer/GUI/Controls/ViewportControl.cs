@@ -617,6 +617,9 @@ namespace HSDRawViewer.GUI
                     {
                         using (var resize = ResizeImage(bitmap, Camera.RenderWidth / 2, Camera.RenderHeight / 2))
                         {
+                            if (_camera.MirrorScreenshot)
+                                resize.MirrorX();
+
                             Converters.SBM.CSPMaker.MakeCSP(resize);
 
                             using (var csp = resize.Clone(new Rectangle((panel1.Width - CSPWidth) / 4, (panel1.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2), bitmap.PixelFormat))

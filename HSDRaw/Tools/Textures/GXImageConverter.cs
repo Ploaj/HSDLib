@@ -1036,8 +1036,8 @@ namespace HSDRaw.Tools
 
             byte[] swizzle = new byte[Shared.AddPadding(width, 8) * Shared.AddPadding(height, 8) / 2];
 
-            int numBlocksH = height / 8;
-            int numBlocksW = width / 8;
+            int numBlocksH = Shared.AddPadding(height, 8) / 8;
+            int numBlocksW = Shared.AddPadding(width, 8) / 8;
 
             int index = 0;
             for (int yBlock = 0; yBlock < numBlocksH; yBlock++)
@@ -1048,8 +1048,13 @@ namespace HSDRaw.Tools
                     {
                         for (int pX = 0; pX < 8; pX+=2)
                         {
-                            swizzle[index] = (byte)((ci4Data[width * ((yBlock * 8) + pY) + (xBlock * 8) + pX] & 0xF) << 4);
-                            swizzle[index++] |= (byte)(ci4Data[width * ((yBlock * 8) + pY) + (xBlock * 8) + pX + 1] & 0xF);
+                            if ((xBlock * 8) + pX < width && (yBlock * 8) + pY < height)
+                                swizzle[index] = (byte)((ci4Data[width * ((yBlock * 8) + pY) + (xBlock * 8) + pX] & 0xF) << 4);
+
+                            if ((xBlock * 8) + pX + 1 < width && (yBlock * 8) + pY < height)
+                                swizzle[index] |= (byte)(ci4Data[width * ((yBlock * 8) + pY) + (xBlock * 8) + pX + 1] & 0xF);
+
+                            index++;
                         }
                     }
                 }
@@ -1105,8 +1110,8 @@ namespace HSDRaw.Tools
 
             byte[] swizzle = new byte[Shared.AddPadding(width, 8) * Shared.AddPadding(height, 4)];
 
-            int numBlocksH = height / 4;
-            int numBlocksW = width / 8;
+            int numBlocksH = Shared.AddPadding(height, 4) / 4;
+            int numBlocksW = Shared.AddPadding(width, 8) / 8;
 
             int index = 0;
             for (int yBlock = 0; yBlock < numBlocksH; yBlock++)
@@ -1117,7 +1122,10 @@ namespace HSDRaw.Tools
                     {
                         for (int pX = 0; pX < 8; pX++)
                         {
-                            swizzle[index++] = ci8Data[width * ((yBlock * 4) + pY) + (xBlock * 8) + pX];
+                            if ((xBlock * 8) + pX < width && (yBlock * 4) + pY < height)
+                                swizzle[index] = ci8Data[width * ((yBlock * 4) + pY) + (xBlock * 8) + pX];
+
+                            index++;
                         }
                     }
                 }
@@ -1170,8 +1178,8 @@ namespace HSDRaw.Tools
 
             byte[] swizzle = new byte[Shared.AddPadding(width, 4) * Shared.AddPadding(height, 4) * 2];
 
-            int numBlocksH = height / 4;
-            int numBlocksW = width / 4;
+            int numBlocksH = Shared.AddPadding(height, 4) / 4;
+            int numBlocksW = Shared.AddPadding(width, 4) / 4;
 
             int index = 0;
             for (int yBlock = 0; yBlock < numBlocksH; yBlock++)
@@ -1182,8 +1190,12 @@ namespace HSDRaw.Tools
                     {
                         for (int pX = 0; pX < 4; pX++)
                         {
-                            swizzle[index++] = 0;
-                            swizzle[index++] = ci14[width * ((yBlock * 4) + pY) + (xBlock * 4) + pX];
+                            if ((xBlock * 4) + pX < width && (yBlock * 4) + pY < height)
+                            {
+                                swizzle[index] = 0;
+                                swizzle[index + 1] = ci14[width * ((yBlock * 4) + pY) + (xBlock * 4) + pX];
+                            }
+                            index += 2;
                         }
                     }
                 }
