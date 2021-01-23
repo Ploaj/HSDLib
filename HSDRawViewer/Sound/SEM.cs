@@ -123,7 +123,8 @@ namespace HSDRawViewer.Sound
                     {
                         var ssm = new SSM();
                         ssm.Open(f);
-                        indexToSSM.Add(ssm.StartIndex, ssm);
+                        if(!indexToSSM.ContainsKey(ssm.StartIndex))
+                            indexToSSM.Add(ssm.StartIndex, ssm);
                     }
                 }
             }

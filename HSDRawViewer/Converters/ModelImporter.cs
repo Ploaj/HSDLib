@@ -314,6 +314,8 @@ namespace HSDRawViewer.Converters
             if (Settings.ImportBoneNames)
                 jobj.ClassName = bone.Name;
 
+            Console.WriteLine(bone.Name + " " + bone.WorldTransform);
+
             _cache.NameToJOBJ.Add(bone.Name, jobj);
             _cache.jobjToWorldTransform.Add(jobj, MatrixNumericsToTKMatrix(bone.WorldTransform));
 
@@ -412,7 +414,7 @@ namespace HSDRawViewer.Converters
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
 
-            var skeleton = rootnode.BreathFirstList;
+            //var skeleton = rootnode.BreathFirstList;
             Console.WriteLine("Processing " + mesh.Name);
 
             bool singleBinded = mesh.Name.Contains("SINGLE");
@@ -562,10 +564,13 @@ namespace HSDRawViewer.Converters
                     
                     var parentTransform = _cache.jobjToWorldTransform[parent].Inverted();
                     
-                    tkvert = Vector3.TransformPosition(tkvert, parentTransform);
-                    tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
-                    tktan = Vector3.TransformNormal(tktan, parentTransform).Normalized();
-                    tkbitan = Vector3.TransformNormal(tkbitan, parentTransform).Normalized();
+                    if(_cache.jobjToWorldTransform[parent] != Matrix4.Identity)
+                    {
+                        tkvert = Vector3.TransformPosition(tkvert, parentTransform);
+                        tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
+                        tktan = Vector3.TransformNormal(tktan, parentTransform).Normalized();
+                        tkbitan = Vector3.TransformNormal(tkbitan, parentTransform).Normalized();
+                    }
 
 
                     if (mesh.HasEnvelopes() && Settings.ImportRigging)
