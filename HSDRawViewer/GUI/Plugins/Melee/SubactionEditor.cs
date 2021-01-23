@@ -325,7 +325,7 @@ namespace HSDRawViewer.GUI
                 Index++;
 
                 if (v.SubAction == null)
-                    continue;
+                    v.SubAction = new SBM_FighterSubactionData();
 
                 if (!aHash.Contains(v.SubAction._s))
                     aHash.Add(v.SubAction._s);
@@ -576,6 +576,7 @@ namespace HSDRawViewer.GUI
             {
                 var ftcmd = new SBM_FighterCommand();
                 ftcmd._s = _node.Accessor._s.GetEmbeddedStruct(0x18 * index, ftcmd.TrimmedSize);
+
                 ftcmd.Name = a.Symbol;
                 ftcmd.AnimationOffset = a.AnimOffset;
                 ftcmd.AnimationSize = a.AnimSize;
@@ -603,7 +604,6 @@ namespace HSDRawViewer.GUI
             // update struct
             a._struct.SetData(scriptData.ToArray());
             SubactionProcess.SetStruct(a._struct, SubactionGroup);
-
         }
 
         /// <summary>

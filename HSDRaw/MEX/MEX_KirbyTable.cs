@@ -18,8 +18,6 @@ namespace HSDRaw.MEX
 
         public HSDAccessor CapFtCmdRuntime { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
 
-        public HSDAccessor MoveLogicRuntime { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
-
         public override void New()
         {
             base.New();
@@ -29,7 +27,6 @@ namespace HSDRaw.MEX
             CostumeRuntime = new HSDAccessor();
             KirbyEffectIDs = new HSDByteArray();
             CapFtCmdRuntime = new HSDAccessor();
-            MoveLogicRuntime = new HSDAccessor();
         }
     }
 
@@ -49,6 +46,8 @@ namespace HSDRaw.MEX
 
         public HSDUIntArray KirbyOnItemInit { get => _s.GetReference<HSDUIntArray>(0x14); set => _s.SetReference(0x14, value); }
 
+        public HSDAccessor MoveLogicRuntime { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
+
         public override void New()
         {
             base.New();
@@ -59,6 +58,7 @@ namespace HSDRaw.MEX
             KirbySpecialNAir = new HSDUIntArray();
             KirbyOnHit = new HSDUIntArray();
             KirbyOnItemInit = new HSDUIntArray();
+            MoveLogicRuntime = new HSDAccessor();
         }
     }
 
