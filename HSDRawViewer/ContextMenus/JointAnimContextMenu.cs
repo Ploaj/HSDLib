@@ -57,6 +57,18 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             addChild.MenuItems.Add(createJOBJFromFile);
+
+
+            MenuItem compress = new MenuItem("Compress");
+            compress.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
+                {
+                    Tools.AnimationCompressor.CompressAnimation(anim, 0.001f);
+                    MainForm.SelectedDataNode.Refresh();
+                }
+            };
+            MenuItems.Add(compress);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using HSDRawViewer.Tools;
+﻿using HSDRawViewer.GUI.Plugins.Melee;
+using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

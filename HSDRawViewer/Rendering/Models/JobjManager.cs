@@ -271,6 +271,22 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="jobj"></param>
         /// <returns></returns>
+        public int ParentIndex(HSD_JOBJ jobj)
+        {
+            if (jobj == null)
+                return -1;
+
+            if (jobjToCache.ContainsKey(jobj) && jobjToCache[jobj].Parent != null)
+                return jobjToCache[jobj].Parent.Index;
+            else
+                return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
         public int IndexOf(HSD_JOBJ jobj)
         {
             if (jobj == null)
@@ -581,7 +597,7 @@ namespace HSDRawViewer.Rendering
             if(jobjToCache.ContainsKey(root))
                 index = jobjToCache[root].Index;
 
-            var local = CreateLocalTransform(root, index);
+            var local = GetLocalTransform(root, index);
             var world = local;
 
             if (parent != null)
@@ -657,7 +673,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="jobj"></param>
         /// <returns></returns>
-        private Matrix4 CreateLocalTransform(HSD_JOBJ jobj, int animatedBoneIndex = -1)
+        public Matrix4 GetLocalTransform(HSD_JOBJ jobj, int animatedBoneIndex = -1)
         {
             Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *

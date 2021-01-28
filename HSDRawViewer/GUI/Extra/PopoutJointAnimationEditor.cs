@@ -12,6 +12,8 @@ namespace HSDRawViewer.GUI.Extra
     {
         public bool CloseOnExit { get; set; } = true;
 
+        public bool MadeChanges { get; internal set; } = false;
+
         /// <summary>
         /// 
         /// </summary>
@@ -42,10 +44,15 @@ namespace HSDRawViewer.GUI.Extra
                 }
             };
 
-            graphEditor1.OnTrackListUpdate += (s, a) =>
+            graphEditor1.TrackListUpdated += (s, a) =>
             {
                 if (jointTree.SelectedNode is JointNode node)
                     node.AnimNode.Tracks = graphEditor1.TrackPlayers.ToList();
+            };
+
+            graphEditor1.TrackEdited += (s, a) =>
+            {
+                MadeChanges = true;
             };
 
             TopMost = true;
@@ -56,6 +63,8 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         public void SetJoint(HSD_JOBJ jobj, JointAnimManager animManager)
         {
+            MadeChanges = false;
+            graphEditor1.ClearTracks();
             jointTree.BeginUpdate();
             jointTree.Nodes.Clear();
 
@@ -91,11 +100,10 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void jointTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if(jointTree.SelectedNode is JointNode node)
-            {
-                graphEditor1.ClearTracks();
+            graphEditor1.ClearTracks();
+
+            if (jointTree.SelectedNode is JointNode node)
                 graphEditor1.LoadTracks(AnimType.Joint, node.AnimNode.Tracks);
-            }
         }
     }
 }

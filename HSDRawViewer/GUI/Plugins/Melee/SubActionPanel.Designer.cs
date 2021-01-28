@@ -1,4 +1,4 @@
-﻿namespace HSDRawViewer.GUI.Plugins
+﻿namespace HSDRawViewer.GUI.Plugins.Melee
 {
     partial class SubActionPanel
     {

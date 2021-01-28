@@ -195,6 +195,9 @@
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.Designer.cs">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionEditorActions.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionEditorRendering.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -462,6 +465,8 @@
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
+    <Compile Include="Tools\AnimationCompressor.cs" />
+    <Compile Include="Tools\AnimationRetarget.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <Compile Include="Tools\FlagEnumEditor.cs">
       <SubType>Component</SubType>

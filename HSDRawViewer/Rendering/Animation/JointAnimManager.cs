@@ -190,10 +190,14 @@ namespace HSDRawViewer.Rendering
                 AnimNode n = new AnimNode();
                 if (j.AOBJ != null)
                 {
-                    FrameCount = (int)Math.Max(FrameCount, j.AOBJ.EndFrame);
+                    FrameCount = (int)Math.Max(FrameCount, j.AOBJ.EndFrame + 1);
 
                     foreach (var fdesc in j.AOBJ.FObjDesc.List)
-                        n.Tracks.Add(new FOBJ_Player(fdesc));
+                    {
+                        var players = new FOBJ_Player(fdesc);
+                        FrameCount = Math.Max(FrameCount, players.Keys.Max(e => e.Frame + 1));
+                        n.Tracks.Add(players);
+                    }
                 }
                 Nodes.Add(n);
             }

@@ -10,6 +10,7 @@ using HSDRaw.Tools;
 using HSDRawViewer.Rendering.Renderers;
 using OpenTK.Input;
 using HSDRawViewer.Converters.Animation;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.GUI.Controls
 {
@@ -163,7 +164,22 @@ namespace HSDRawViewer.GUI.Controls
         private static Pen LineColor = new Pen(Color.Gray);
         private static Pen SelectedLineColor = new Pen(Color.White);
 
-        public event EventHandler OnTrackListUpdate;
+        public event EventHandler TrackListUpdated;
+        protected virtual void OnTrackListUpdated(EventArgs e)
+        {
+            EventHandler handler = TrackListUpdated;
+            OnTrackEdited(EventArgs.Empty);
+            if (handler != null)
+                handler(this, e);
+        }
+
+        public event EventHandler TrackEdited;
+        protected virtual void OnTrackEdited(EventArgs e)
+        {
+            EventHandler handler = TrackEdited;
+            if (handler != null)
+                handler(this, e);
+        }
 
         public float Zoom = 0.9f;
 
@@ -402,10 +418,11 @@ namespace HSDRawViewer.GUI.Controls
             if (trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
         }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="type"></param>
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
         private void SetTrackType(AnimType type)
         {
             _animType = type;
@@ -544,6 +561,8 @@ namespace HSDRawViewer.GUI.Controls
             keyProperty.SelectedObject = null;
 
             _graph.Invalidate();
+
+            OnTrackEdited(EventArgs.Empty);
         }
 
         /// <summary>
@@ -581,6 +600,8 @@ namespace HSDRawViewer.GUI.Controls
             }
 
             _graph.Invalidate();
+
+            OnTrackEdited(EventArgs.Empty);
         }
 
         /// <summary>
@@ -607,6 +628,8 @@ namespace HSDRawViewer.GUI.Controls
                 }
 
                 _graph.Invalidate();
+
+                OnTrackEdited(EventArgs.Empty);
             }
         }
 
@@ -645,6 +668,8 @@ namespace HSDRawViewer.GUI.Controls
         {
             if (_selectedPlayer != null)
             {
+                if ((byte)trackTypeBox.SelectedIndex != _selectedPlayer.TrackType)
+                    OnTrackEdited(EventArgs.Empty);
                 _selectedPlayer.TrackType = (byte)trackTypeBox.SelectedIndex;
                 trackTree.Nodes[_selectedPlayerIndex].Text = GetTrackName(_selectedPlayer.TrackType);
             }
@@ -670,8 +695,7 @@ namespace HSDRawViewer.GUI.Controls
 
             _graph.Invalidate();
 
-            if(OnTrackListUpdate != null)
-                OnTrackListUpdate.Invoke(this, EventArgs.Empty);
+            OnTrackListUpdated(EventArgs.Empty);
         }
 
         /// <summary>
@@ -692,8 +716,7 @@ namespace HSDRawViewer.GUI.Controls
 
             _graph.Invalidate();
 
-            if (OnTrackListUpdate != null)
-                OnTrackListUpdate.Invoke(this, EventArgs.Empty);
+            OnTrackListUpdated(EventArgs.Empty);
         }
 
         /// <summary>
@@ -717,6 +740,7 @@ namespace HSDRawViewer.GUI.Controls
             {
                 _selectedPlayer.Keys = HSDK.LoadKeys();
                 _graph.Invalidate();
+                OnTrackEdited(EventArgs.Empty);
             }
         }
 
@@ -805,6 +829,53 @@ NONE - None (do not use)";
             _options.ShowFrameTicks = showFrameTicksToolStripMenuItem.Checked;
             _options.ShowTangents = showTangentsToolStripMenuItem.Checked;
             _graph.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonBakeTrack_Click(object sender, EventArgs e)
+        {
+            if (_selectedPlayer != null)
+            {
+                AnimationCompressor.BakeTrack(_selectedPlayer);
+                _graph.Invalidate();
+                OnTrackEdited(EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class CompSettings
+        {
+            [Category("Settings"), DisplayName("Compression Level"), Description("Acceptable error range for compression.\nThe smaller the value the more accurate the compression but the larger the key count.")]
+            public float CompressionLevel { get; set; } = 0.001f;
+        }
+
+        private static CompSettings _compSettings = new CompSettings();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonCompressTrack_Click(object sender, EventArgs e)
+        {
+            if (_selectedPlayer != null)
+            {
+                using (PropertyDialog d = new PropertyDialog("Compression Settings", _compSettings))
+                {
+                    if(d.ShowDialog() == DialogResult.OK)
+                    {
+                        AnimationCompressor.CompressTrack(_selectedPlayer, _compSettings.CompressionLevel);
+                        _graph.Invalidate();
+                        OnTrackEdited(EventArgs.Empty);
+                    }
+                }
+            }
         }
     }
 

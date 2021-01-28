@@ -10,6 +10,7 @@ namespace HSDRawViewer.GUI
             InitializeComponent();
 
             CenterToScreen();
+            TopMost = true;
 
             Text = name;
             propertyGrid1.SelectedObject = propertyObject;

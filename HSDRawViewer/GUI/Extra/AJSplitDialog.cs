@@ -5,6 +5,7 @@ using HSDRaw.Melee.Pl;
 using HSDRaw;
 using System.ComponentModel;
 using System.Collections.Generic;
+using HSDRaw.Common.Animation;
 
 namespace HSDRawViewer.GUI
 {
@@ -16,6 +17,43 @@ namespace HSDRawViewer.GUI
 
             public byte[] Data;
 
+            /// <summary>
+            /// 
+            /// </summary>
+            public void SetFromFile(string filePath)
+            {
+                try
+                {
+                    var figaFile = new HSDRawFile(filePath);
+                    if(figaFile.Roots.Count > 0 && figaFile.Roots[0].Data is HSD_FigaTree tree)
+                    {
+                        if(figaFile.Roots[0].Name.Equals(Name))
+                            Data = File.ReadAllBytes(filePath);
+                        else
+                        {
+                            // rename symbol if necessary
+                            //if(MessageBox.Show($"The animation symbol does not match./nRename It?\n{Name}\n{figaFile.Roots[0].Name}", "Symbol Mismatch", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+                            {
+                                figaFile.Roots[0].Name = Name;
+                                using (MemoryStream stream = new MemoryStream())
+                                {
+                                    figaFile.Save(stream);
+                                    Data = stream.ToArray();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("Error replacing animation", "Animation Replace Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
             public override string ToString()
             {
                 return Name;
@@ -316,7 +354,9 @@ namespace HSDRawViewer.GUI
                     if(v is Animation anim)
                     {
                         if (f != null)
-                            anim.Data = File.ReadAllBytes(f);
+                        {
+                            anim.SetFromFile(f);
+                        }
                     }
             }
         }
@@ -365,7 +405,9 @@ namespace HSDRawViewer.GUI
                     foreach (var a in Animations)
                     {
                         if (a.Name == fname)
-                            a.Data = File.ReadAllBytes(file);
+                        {
+                            a.SetFromFile(file);
+                        }
                     }
                 }
             }

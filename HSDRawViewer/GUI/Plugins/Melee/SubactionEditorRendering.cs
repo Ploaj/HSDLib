@@ -2,7 +2,6 @@
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
-using HSDRawViewer.GUI.Plugins.Melee;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
@@ -15,10 +14,13 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace HSDRawViewer.GUI
+namespace HSDRawViewer.GUI.Plugins.Melee
 {
     public partial class SubactionEditor : IDrawable
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public class ModelPartAnimations : IJointFrameModifier
         {
             private byte[] Entries;
@@ -64,13 +66,15 @@ namespace HSDRawViewer.GUI
         private JOBJManager JOBJManager = new JOBJManager();
         private JOBJManager ThrowDummyManager = new JOBJManager();
 
+        private SBM_EnvironmentCollision ECB = null;
+
         public DrawOrder DrawOrder => DrawOrder.Last;
 
         private string AJFilePath;
 
-        private string ResultFilePath;
-        private string EndingFilePath;
-        private string IntroFilePath;
+        //private string ResultFilePath;
+        //private string EndingFilePath;
+        //private string IntroFilePath;
 
         private Dictionary<string, byte[]> SymbolToAnimation = new Dictionary<string, byte[]>();
 
@@ -86,8 +90,6 @@ namespace HSDRawViewer.GUI
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private float ModelScale = 1f;
-
-        private string AnimationName = "";
 
         /// <summary>
         /// 
@@ -604,7 +606,7 @@ namespace HSDRawViewer.GUI
                 ThrowDummyManager.CleanupRendering();
                 ThrowDummyManager = new JOBJManager();
 
-                AnimationName = name;
+                //AnimationName = name;
 
                 // load throw dummy for thrown animations
                 if (name.Contains("Throw") && !name.Contains("Taro"))

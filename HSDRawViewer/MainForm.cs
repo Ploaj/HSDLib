@@ -10,6 +10,7 @@ using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Extra;
 using System.ComponentModel;
 using GCILib;
+using HSDRawViewer.GUI.Plugins.Melee;
 
 namespace HSDRawViewer
 {
@@ -22,7 +23,7 @@ namespace HSDRawViewer
 
         private PropertyView _nodePropertyViewer;
         public CommonViewport Viewport { get; internal set; }
-        private SubactionEditor _ScriptEditor;
+        //private SubactionEditor _ScriptEditor;
 
         public string FilePath { get; internal set; }
 
@@ -71,8 +72,8 @@ namespace HSDRawViewer
             Viewport.Dock = DockStyle.Fill;
             Viewport.Show(dockPanel);
 
-            _ScriptEditor = new SubactionEditor();
-            _ScriptEditor.Dock = DockStyle.Fill;
+            //_ScriptEditor = new SubactionEditor();
+            //_ScriptEditor.Dock = DockStyle.Fill;
 
             ImageList myImageList = new ImageList();
             myImageList.ImageSize = new System.Drawing.Size(24, 24);

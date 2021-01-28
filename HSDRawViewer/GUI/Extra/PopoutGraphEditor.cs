@@ -18,7 +18,7 @@ namespace HSDRawViewer.GUI.Extra
             _node = node;
             graphEditor.LoadTracks(AnimType.Joint, node.Tracks);
 
-            graphEditor.OnTrackListUpdate += (sender, args) =>
+            graphEditor.TrackListUpdated += (sender, args) =>
             {
                 _node.Tracks = graphEditor.TrackPlayers.ToList();
             };

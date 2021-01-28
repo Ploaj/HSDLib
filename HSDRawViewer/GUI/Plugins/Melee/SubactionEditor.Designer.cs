@@ -1,4 +1,4 @@
-﻿namespace HSDRawViewer.GUI
+﻿namespace HSDRawViewer.GUI.Plugins.Melee
 {
     partial class SubactionEditor
     {
@@ -67,7 +67,7 @@
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.popoutEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAnimationChangesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.renderPanel = new System.Windows.Forms.Panel();
             this.buttonGoto = new System.Windows.Forms.Button();
             this.referenceLabel = new System.Windows.Forms.Label();
             this.cbReference = new System.Windows.Forms.ComboBox();
@@ -92,7 +92,7 @@
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
             this.toolStrip3.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.renderPanel.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -112,7 +112,7 @@
             this.groupBox1.Controls.Add(this.toolStrip2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.previewBox);
-            this.groupBox1.Controls.Add(this.panel1);
+            this.groupBox1.Controls.Add(this.renderPanel);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(200, 0);
             this.groupBox1.Name = "groupBox1";
@@ -458,7 +458,7 @@
             // 
             this.popoutEditorToolStripMenuItem.Name = "popoutEditorToolStripMenuItem";
             this.popoutEditorToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.popoutEditorToolStripMenuItem.Text = "Popout Editor";
+            this.popoutEditorToolStripMenuItem.Text = "Edit Animation";
             this.popoutEditorToolStripMenuItem.Click += new System.EventHandler(this.popoutEditorToolStripMenuItem_Click);
             // 
             // saveAnimationChangesToolStripMenuItem
@@ -468,17 +468,17 @@
             this.saveAnimationChangesToolStripMenuItem.Text = "Save Animation Changes";
             this.saveAnimationChangesToolStripMenuItem.Click += new System.EventHandler(this.saveAnimationChangesToolStripMenuItem_Click);
             // 
-            // panel1
+            // renderPanel
             // 
-            this.panel1.AutoSize = true;
-            this.panel1.Controls.Add(this.buttonGoto);
-            this.panel1.Controls.Add(this.referenceLabel);
-            this.panel1.Controls.Add(this.cbReference);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(3, 16);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(540, 29);
-            this.panel1.TabIndex = 6;
+            this.renderPanel.AutoSize = true;
+            this.renderPanel.Controls.Add(this.buttonGoto);
+            this.renderPanel.Controls.Add(this.referenceLabel);
+            this.renderPanel.Controls.Add(this.cbReference);
+            this.renderPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.renderPanel.Location = new System.Drawing.Point(3, 16);
+            this.renderPanel.Name = "renderPanel";
+            this.renderPanel.Size = new System.Drawing.Size(540, 29);
+            this.renderPanel.TabIndex = 6;
             // 
             // buttonGoto
             // 
@@ -678,8 +678,8 @@
             this.previewBox.PerformLayout();
             this.toolStrip3.ResumeLayout(false);
             this.toolStrip3.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.renderPanel.ResumeLayout(false);
+            this.renderPanel.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
@@ -701,7 +701,7 @@
         private System.Windows.Forms.ToolStripButton buttonEdit;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label referenceLabel;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel renderPanel;
         private System.Windows.Forms.Button buttonGoto;
         private System.Windows.Forms.ComboBox cbReference;
         private System.Windows.Forms.ToolStripButton buttonUp;

@@ -6,7 +6,7 @@ using System.Globalization;
 using System;
 using Be.Windows.Forms;
 
-namespace HSDRawViewer.GUI.Plugins
+namespace HSDRawViewer.GUI.Plugins.Melee
 {
     public partial class SubActionPanel : Form
     {

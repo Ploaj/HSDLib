@@ -156,6 +156,16 @@ namespace HSDRaw.Common
         [Category("1 - Rendering"), Description("Indicates if texture map is used for ext lighting.")]
         public bool ExtLightmap { get => Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_EXT); set { if (value) Flags |= TOBJ_FLAGS.LIGHTMAP_EXT; else Flags &= ~TOBJ_FLAGS.LIGHTMAP_EXT; } }
 
+        [Category("1 - Rendering"), Description("UV coordinate type")]
+        public COORD_TYPE CoordType
+        {
+            get => (COORD_TYPE)(((int)Flags) & 0xF);
+            set
+            {
+                Flags = (TOBJ_FLAGS)(((int)Flags) & ~(0xF) | ((int)value & 0xF));
+            }
+        }
+
         [Category("1 - Rendering"), Description("The color operation this to perform with this texture.")]
         public COLORMAP ColorOperation
         {
