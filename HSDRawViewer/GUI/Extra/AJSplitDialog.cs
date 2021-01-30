@@ -73,6 +73,9 @@ namespace HSDRawViewer.GUI
 
         private SBM_FighterData PlayerData;
 
+        private string ftDataPath;
+        private string ftAJPath;
+
         public AJSplitDialog()
         {
             InitializeComponent();
@@ -176,6 +179,7 @@ namespace HSDRawViewer.GUI
                 {
                     if(root.Data is SBM_FighterData plData)
                     {
+                        ftDataPath = f;
                         PlayerFile = file;
                         PlayerData = plData;
                         FighterName = root.Name.Replace("ftData", "");
@@ -251,6 +255,7 @@ namespace HSDRawViewer.GUI
             lbFighting.EndUpdate();
 
             AJLoaded = true;
+            ftAJPath = filePath;
         }
 
         /// <summary>
@@ -429,12 +434,12 @@ namespace HSDRawViewer.GUI
         /// <param name="filePath"></param>
         private void ExportFiles()
         {
-            var filePath = Tools.FileIO.SaveFile("Pl**.dat (*.dat)|*.dat", "Pl" + FighterName + ".dat");
+            var filePath = Tools.FileIO.SaveFile("Pl**.dat (*.dat)|*.dat", Path.GetFileName(ftDataPath));
             if (filePath != null)
             {
                 if (AJLoaded)
                 {
-                    var AJPath = Tools.FileIO.SaveFile("Pl**AJ.dat (*.dat)|*.dat", "Pl" + FighterName + "AJ.dat");
+                    var AJPath = Tools.FileIO.SaveFile("Pl**AJ.dat (*.dat)|*.dat", Path.GetFileName(ftAJPath));
                     if (AJPath != null)
                         using (BinaryWriter w = new BinaryWriter(new FileStream(AJPath, FileMode.Create)))
                         {

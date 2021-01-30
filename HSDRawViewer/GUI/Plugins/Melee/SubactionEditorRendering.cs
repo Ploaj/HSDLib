@@ -180,7 +180,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // enable preview box
             previewBox.Visible = true;
-            savePlayerRenderingFilesToolStripMenuItem.Enabled = true;
 
             // reselect action
             if (actionList.SelectedItem is Action action)

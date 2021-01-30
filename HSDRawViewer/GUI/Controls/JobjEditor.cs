@@ -29,7 +29,7 @@ namespace HSDRawViewer.GUI.Plugins
         [Browsable(false)]
         private bool SelectDOBJ { get => (toolStripComboBox2.SelectedIndex == 1); }
 
-        private Dictionary<int, string> BoneLabelMap = new Dictionary<int, string>();
+        private JointMap _jointMap = new JointMap();
 
         private ViewportControl viewport;
 
@@ -272,8 +272,8 @@ namespace HSDRawViewer.GUI.Plugins
                 index = 0;
             TreeNode tree = new TreeNode();
 
-            if (BoneLabelMap.ContainsKey(index))
-                tree.Text = BoneLabelMap[index];
+            if (_jointMap[index] != null)
+                tree.Text = _jointMap[index];
             else
             if (!string.IsNullOrEmpty(jobj.ClassName))
                 tree.Text = $"(Joint_{index})" + jobj.ClassName;
@@ -621,7 +621,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             ModelImporter.ReplaceModelFromFile(root);
             JOBJManager.RefreshRendering = true;
-            BoneLabelMap.Clear();
+            _jointMap.Clear();
             RefreshGUI();
         }
 
@@ -632,7 +632,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void exportModelToFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ModelExporter.ExportFile(root, BoneLabelMap);
+            ModelExporter.ExportFile(root, _jointMap);
         }
         
         /// <summary>
@@ -849,31 +849,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importBoneLabelINIToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BoneLabelMap.Clear();
-
             var f = Tools.FileIO.OpenFile("Label INI (*.ini)|*.ini");
 
             if(f != null)
             {
-                var text = File.ReadAllText(f);
-                text = Regex.Replace(text, @"\#.*", "");
-
-                var lines = text.Split('\n');
-
-                foreach(var r in lines)
-                {
-                    var args = r.Split('=');
-
-                    if(args.Length == 2)
-                    {
-                        var name = args[1].Trim();
-                        var i = 0;
-                        if(int.TryParse(new string(args[0].Where(c => char.IsDigit(c)).ToArray()), out i))
-                        {
-                            BoneLabelMap.Add(i, name);
-                        }
-                    }
-                }
+                _jointMap.Load(f);
             }
 
             RefreshGUI();
@@ -986,7 +966,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 if (Path.GetExtension(f).ToLower().Equals(".chr0"))
                 {
-                    LoadAnimation(CHR0Converter.LoadCHR0(f, BoneLabelMap));
+                    LoadAnimation(CHR0Converter.LoadCHR0(f, _jointMap));
                 }
                 else
                 if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta") ||
@@ -1000,7 +980,7 @@ namespace HSDRawViewer.GUI.Plugins
                 else
                 if (Path.GetExtension(f).ToLower().Equals(".anim"))
                 {
-                    LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f));
+                    LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f, _jointMap));
                 }
                 else
                 if (Path.GetExtension(f).ToLower().Equals(".dat"))
@@ -1042,7 +1022,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             if (f != null)
             {
-                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation, BoneLabelMap);
+                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation, _jointMap);
             }
         }
 
@@ -1360,26 +1340,7 @@ namespace HSDRawViewer.GUI.Plugins
             var f = Tools.FileIO.SaveFile("Label INI (*.ini)|*.ini");
 
             if (f != null)
-            {
-                using (FileStream stream = new FileStream(f, FileMode.Create))
-                using (StreamWriter w = new StreamWriter(stream))
-                    if (BoneLabelMap.Count > 0)
-                    {
-                        foreach (var b in BoneLabelMap)
-                            w.WriteLine($"JOBJ_{b.Key}={b.Value}");
-                    }
-                    else
-                    {
-                        var bones = root.BreathFirstList;
-                        var ji = 0;
-                        foreach(var j in bones)
-                        {
-                            if (!string.IsNullOrEmpty(j.ClassName))
-                                w.WriteLine($"JOBJ_{ji}={j.ClassName}");
-                            ji++;
-                        }
-                    }
-            }
+                _jointMap.Save(f, root);
         }
 
         /// <summary>

@@ -272,7 +272,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private void SaveFile()
         {
             //SaveFighterAnimationFile();
-            MessageBox.Show("This feature has not yet been implemented");
+            //MessageBox.Show("This feature has not yet been implemented");
         }
 
         /// <summary>

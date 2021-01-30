@@ -77,7 +77,6 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.savePlayerRenderingFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewSubroutineToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -561,7 +560,6 @@
             this.editDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.editDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadPlayerFilesToolStripMenuItem,
-            this.savePlayerRenderingFilesToolStripMenuItem,
             this.toolStripSeparator2,
             this.createNewSubroutineToolStripMenuItem,
             this.createNewSubroutineToolStripMenuItem1,
@@ -583,14 +581,6 @@
             this.loadPlayerFilesToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
             this.loadPlayerFilesToolStripMenuItem.Text = "Load Player Rendering Files";
             this.loadPlayerFilesToolStripMenuItem.Click += new System.EventHandler(this.loadPlayerFilesToolStripMenuItem_Click);
-            // 
-            // savePlayerRenderingFilesToolStripMenuItem
-            // 
-            this.savePlayerRenderingFilesToolStripMenuItem.Enabled = false;
-            this.savePlayerRenderingFilesToolStripMenuItem.Name = "savePlayerRenderingFilesToolStripMenuItem";
-            this.savePlayerRenderingFilesToolStripMenuItem.Size = new System.Drawing.Size(255, 22);
-            this.savePlayerRenderingFilesToolStripMenuItem.Text = "Save Player Rendering Files";
-            this.savePlayerRenderingFilesToolStripMenuItem.Click += new System.EventHandler(this.savePlayerRenderingFilesToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -740,7 +730,6 @@
         private System.Windows.Forms.ToolStripMenuItem importFromTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteSelectedActionToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripMenuItem savePlayerRenderingFilesToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem importFigatreeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportFigatreeToolStripMenuItem;

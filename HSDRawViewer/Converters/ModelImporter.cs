@@ -21,6 +21,9 @@ namespace HSDRawViewer.Converters
     /// </summary>
     public class ModelImportSettings
     {
+        [Category("Importing Options"), DisplayName("Classical Scaling"), Description("Leave this true if you don't know what it is.")]
+        public bool ClassicalScaling { get; set; } = true;
+
         [Category("Importing Options"), DisplayName("Flip Faces"), Description("Flips direction of faces, useful if model imports inside out")]
         public bool FlipFaces { get; set; } = false;
 
@@ -281,6 +284,9 @@ namespace HSDRawViewer.Converters
 
             // update flags
             JOBJTools.UpdateJOBJFlags(NewModel);
+
+            if (Settings.ClassicalScaling)
+                NewModel.Flags |= JOBJ_FLAG.CLASSICAL_SCALING;
 
 #if DEBUG
             if (Settings.Merge)

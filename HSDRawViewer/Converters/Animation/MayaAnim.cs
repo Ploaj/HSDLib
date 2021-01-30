@@ -2,6 +2,7 @@
 using HSDRaw.Tools;
 using HSDRawViewer.GUI;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="nodes"></param>
-        public static void ExportToMayaAnim(string filePath, JointAnimManager animation, Dictionary<int, string> boneLabelMap)
+        public static void ExportToMayaAnim(string filePath, JointAnimManager animation, JointMap jointMap)
         {
             using (PropertyDialog d = new PropertyDialog("Maya Settings", MayaSettings))
             {
@@ -59,7 +60,7 @@ namespace HSDRawViewer.Converters
             foreach(var n in animation.Nodes)
             {
                 MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
-                mnode.name = boneLabelMap.ContainsKey(nodeIndex) ? boneLabelMap[nodeIndex] : "JOBJ_" + nodeIndex;
+                mnode.name = !string.IsNullOrEmpty(jointMap[nodeIndex]) ? jointMap[nodeIndex] : "JOBJ_" + nodeIndex;
                 a.Nodes.Add(mnode);
                 
                 foreach(var t in n.Tracks)
@@ -162,7 +163,7 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        public static JointAnimManager ImportFromMayaAnim(string filePath)
+        public static JointAnimManager ImportFromMayaAnim(string filePath, JointMap jointMap)
         {
             var mayaFile = new MayaAnim();
             mayaFile.Open(filePath);
@@ -170,10 +171,27 @@ namespace HSDRawViewer.Converters
             JointAnimManager animation = new JointAnimManager();
             animation.FrameCount = mayaFile.header.endTime - mayaFile.header.startTime;
 
+            var nodeCount = jointMap == null || jointMap.Count == 0 ? mayaFile.Nodes.Count : Math.Max(mayaFile.Nodes.Count, jointMap.Count);
+
+            for (int i = 0; i < nodeCount; i++)
+                animation.Nodes.Add(new AnimNode());
+
             // process and encode FOBJ keys
-            foreach(var mNode in mayaFile.Nodes)
+            int index = 0;
+            foreach (var mNode in mayaFile.Nodes)
             {
-                AnimNode node = new AnimNode();
+                var node = animation.Nodes[index++];
+
+                if (jointMap != null)
+                {
+                    var nodeIndex = jointMap.IndexOf(mNode.name);
+
+                    if (nodeIndex == -1)
+                        continue;
+
+                    node = animation.Nodes[nodeIndex];
+                }
+
                 //Debug.WriteLine(mNode.name);
                 foreach (var mTrack in mNode.atts)
                 {
@@ -258,7 +276,7 @@ namespace HSDRawViewer.Converters
 
                     node.Tracks.Add(t);
                 }
-                animation.Nodes.Add(node);
+                
             }
 
             return animation;

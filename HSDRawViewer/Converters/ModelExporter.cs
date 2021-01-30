@@ -13,6 +13,7 @@ using IONET;
 using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.Converters
 {
@@ -53,7 +54,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="rootJOBJ"></param>
         /// <param name="boneLabels"></param>
-        public static void ExportFile(HSD_JOBJ rootJOBJ, Dictionary<int, string> boneLabels = null)
+        public static void ExportFile(HSD_JOBJ rootJOBJ, JointMap jointMap = null)
         {
             var f = Tools.FileIO.SaveFile(IOManager.GetModelExportFileFilter());
 
@@ -64,7 +65,7 @@ namespace HSDRawViewer.Converters
                 {
                     if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        ExportFile(f, rootJOBJ, settings, boneLabels);
+                        ExportFile(f, rootJOBJ, settings, jointMap);
                     }
                 }
             }
@@ -76,14 +77,14 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="rootJOBJ"></param>
-        public static void ExportFile(string filePath, HSD_JOBJ rootJOBJ, ModelExportSettings settings = null, Dictionary<int, string> boneLabels = null)
+        public static void ExportFile(string filePath, HSD_JOBJ rootJOBJ, ModelExportSettings settings = null, JointMap jointMap = null)
         {
             settings.Directory = System.IO.Path.GetDirectoryName(filePath) + "\\";
 
             if (settings == null)
                 settings = new ModelExportSettings();
 
-            ModelExporter exp = new ModelExporter(rootJOBJ, settings, boneLabels);
+            ModelExporter exp = new ModelExporter(rootJOBJ, settings, jointMap);
             
             ExportSettings exportsettings = new ExportSettings()
             {
@@ -114,14 +115,14 @@ namespace HSDRawViewer.Converters
         /// <param name="settings"></param>
         /// <param name="boneLabels"></param>
         /// <returns></returns>
-        public ModelExporter(HSD_JOBJ jobj, ModelExportSettings settings, Dictionary<int, string> boneLabels)
+        public ModelExporter(HSD_JOBJ jobj, ModelExportSettings settings, JointMap jointMap)
         {
             _root = jobj;
             _settings = settings;
 
             Scene.Models.Add(_model);
 
-            _model.Skeleton.RootBones.Add(ProcessJoints(jobj, boneLabels, System.Numerics.Matrix4x4.Identity));
+            _model.Skeleton.RootBones.Add(ProcessJoints(jobj, jointMap, System.Numerics.Matrix4x4.Identity));
 
             ProcessDOBJs();
         }
@@ -130,12 +131,12 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        private IOBone ProcessJoints(HSD_JOBJ jobj, Dictionary<int, string> boneLabels, System.Numerics.Matrix4x4 transform)
+        private IOBone ProcessJoints(HSD_JOBJ jobj, JointMap jointMap, System.Numerics.Matrix4x4 transform)
         {
             // create iobone
             IOBone root = new IOBone()
             {
-                Name = boneLabels.ContainsKey(jobjToBone.Count) ? boneLabels[jobjToBone.Count] : "JOBJ_" + jobjToBone.Count,
+                Name = jointMap[jobjToBone.Count] != null ? jointMap[jobjToBone.Count] : "JOBJ_" + jobjToBone.Count,
                 Scale = new System.Numerics.Vector3(jobj.SX, jobj.SY, jobj.SZ),
                 RotationEuler = new System.Numerics.Vector3(jobj.RX, jobj.RY, jobj.RZ),
                 Translation = new System.Numerics.Vector3(jobj.TX, jobj.TY, jobj.TZ)
@@ -145,7 +146,7 @@ namespace HSDRawViewer.Converters
             jobjToBone.Add(jobj, root);
 
             // check if name is stored in jobj itself and it doesn't have a label
-            if (!boneLabels.ContainsKey(jobjToBone.Count) &&
+            if (jointMap[jobjToBone.Count] != null &&
                 !string.IsNullOrEmpty(jobj.ClassName))
                 root.Name = jobj.ClassName;
 
@@ -169,7 +170,7 @@ namespace HSDRawViewer.Converters
 
             // process children
             foreach (var c in jobj.Children)
-                root.AddChild(ProcessJoints(c, boneLabels, transform));
+                root.AddChild(ProcessJoints(c, jointMap, transform));
             
             return root;
         }

@@ -53,7 +53,7 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_FighterBoneIDs FighterBoneTable { get => _s.GetReference<SBM_FighterBoneIDs>(0x54); set => _s.SetReference(0x54, value); }
 
-        public HSDAccessor Unknown0x58 { get => _s.GetReference<HSDAccessor>(0x58); set => _s.SetReference(0x58, value); }
+        public SBM_FighterIK FighterIK { get => _s.GetReference<SBM_FighterIK>(0x58); set => _s.SetReference(0x58, value); }
 
         public HSD_JOBJ MetalModel { get => _s.GetReference<HSD_JOBJ>(0x5C); set => _s.SetReference(0x5C, value); }
 

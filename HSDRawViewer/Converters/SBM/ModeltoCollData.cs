@@ -174,7 +174,7 @@ namespace HSDRawViewer.Converters
         public static List<Vector2> ModelToLines(HSD_JOBJ root)
         {
             // get model as easier to access form
-            ModelExporter mx = new ModelExporter(root, new ModelExportSettings() { Optimize = true }, new Dictionary<int, string>());
+            ModelExporter mx = new ModelExporter(root, new ModelExportSettings() { Optimize = true }, new Tools.JointMap());
             var scene = mx.Scene;
 
             HashSet<Line> lines = new HashSet<Line>();

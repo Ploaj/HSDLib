@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using HSDRaw.MEX;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace HSDRaw.Melee.Gr
 {
@@ -8,7 +10,8 @@ namespace HSDRaw.Melee.Gr
 
         public float StageScale { get => _s.GetFloat(0x0); set => _s.SetFloat(0x0, value); }
 
-        public float DeltaCam1 { get => _s.GetFloat(0x4); set => _s.SetFloat(0x4, value); }
+        [TypeConverter(typeof(HexType))]
+        public uint DeltaCam1 { get => (uint)_s.GetInt32(0x4); set => _s.SetInt32(0x4, (int)value); }
 
         public short FieldOfView { get => _s.GetInt16(0x8); set => _s.SetInt16(0x8, value); }
 

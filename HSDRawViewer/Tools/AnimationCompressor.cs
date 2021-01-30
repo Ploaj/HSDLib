@@ -64,8 +64,9 @@ namespace HSDRawViewer.Tools
 
             float error = 0.001f;
 
-            //if (index < 16)
-            //    error = 0.001f;
+            //TODO: adaptive error
+            if (index < 16)
+                error = 0.001f;
 
             if (j.AOBJ != null)
                 foreach (var t in j.AOBJ.FObjDesc.List)

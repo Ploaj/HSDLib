@@ -2,11 +2,10 @@
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Tools;
 using OpenTK;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace HSDRawViewer.Converters
 {
@@ -17,15 +16,12 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static JointAnimManager LoadCHR0(string filePath, Dictionary<int, string> BoneLabelMap)
+        public static JointAnimManager LoadCHR0(string filePath, JointMap jointMap)
         {
             JointAnimManager anim = new JointAnimManager();
-
-            Dictionary<string, int> nameToIndex = new Dictionary<string, int>();
             
-            foreach(var v in BoneLabelMap)
+            for(int i = 0; i < jointMap.Count; i++)
             {
-                nameToIndex.Add(v.Value, v.Key);
                 anim.Nodes.Add(new AnimNode());
             }
 
@@ -72,14 +68,14 @@ namespace HSDRawViewer.Converters
                         continue;
                     }
 
-                    if (!nameToIndex.ContainsKey(boneName))
+                    if (jointMap.IndexOf(boneName) == -1)
                         continue;
 
                     r.Seek(dataOffset);
 
                     var nameOff = r.Position + r.ReadUInt32();
                     var flags = r.ReadInt32();
-
+                    //01BFE019
                     int t_type = (flags >> 0x1e) & 0x3;
                     int r_type = (flags >> 0x1b) & 0x7;
                     int s_type = (flags >> 0x19) & 0x3;
@@ -124,15 +120,15 @@ namespace HSDRawViewer.Converters
                     if (hasT == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackX, trackY, trackZ, Tiso == 1, Xfixed == 1, Yfixed == 1, Zfixed == 1, t_type, dataOffset);
 
-                    if (trackX.Keys.Count > 1) node.Tracks.Add(trackX);
-                    if (trackY.Keys.Count > 1) node.Tracks.Add(trackY);
-                    if (trackZ.Keys.Count > 1) node.Tracks.Add(trackZ);
-                    if (trackRX.Keys.Count > 1) node.Tracks.Add(trackRX);
-                    if (trackRY.Keys.Count > 1) node.Tracks.Add(trackRY);
-                    if (trackRZ.Keys.Count > 1) node.Tracks.Add(trackRZ);
-                    if (trackSX.Keys.Count > 1) node.Tracks.Add(trackSX);
-                    if (trackSY.Keys.Count > 1) node.Tracks.Add(trackSY);
-                    if (trackSZ.Keys.Count > 1) node.Tracks.Add(trackSZ);
+                    if (trackX.Keys.Count > 0) node.Tracks.Add(trackX);
+                    if (trackY.Keys.Count > 0) node.Tracks.Add(trackY);
+                    if (trackZ.Keys.Count > 0) node.Tracks.Add(trackZ);
+                    if (trackRX.Keys.Count > 0) node.Tracks.Add(trackRX);
+                    if (trackRY.Keys.Count > 0) node.Tracks.Add(trackRY);
+                    if (trackRZ.Keys.Count > 0) node.Tracks.Add(trackRZ);
+                    if (trackSX.Keys.Count > 0) node.Tracks.Add(trackSX);
+                    if (trackSY.Keys.Count > 0) node.Tracks.Add(trackSY);
+                    if (trackSZ.Keys.Count > 0) node.Tracks.Add(trackSZ);
 
                     foreach (var k in trackRX.Keys)
                     {
@@ -150,11 +146,11 @@ namespace HSDRawViewer.Converters
                         k.Tan = MathHelper.DegreesToRadians(k.Value);
                     }
 
-                    Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count);
+                    Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count + " " + flags.ToString("X"));
                     Console.WriteLine($"{trackX.Keys.Count} {trackY.Keys.Count} {trackZ.Keys.Count}");
                     Console.WriteLine($"{trackRX.Keys.Count} {trackRY.Keys.Count} {trackRZ.Keys.Count}");
                     Console.WriteLine($"{trackSX.Keys.Count} {trackSY.Keys.Count} {trackSZ.Keys.Count}");
-                    anim.Nodes[nameToIndex[boneName]] = node;
+                    anim.Nodes[jointMap.IndexOf(boneName)] = node;
                 }
             }
 
@@ -166,24 +162,24 @@ namespace HSDRawViewer.Converters
             if (isIsotrophic)
             {
                 float iss = r.ReadSingle();
-                xtrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_CON});
-                ytrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
-                ztrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                xtrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
+                ytrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
+                ztrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
             }
             else
             {
                 if (isXFixed)
-                    xtrack.Keys.Add(new FOBJKey() { Frame = 0, Value = r.ReadSingle(), InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                    xtrack.Keys.Add(new FOBJKey() { Frame = 0, Value = r.ReadSingle(), InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
                 else
                     ReadTrack(r, frameCount, type, xtrack, dataOffset, node);
 
                 if (isYFixed)
-                    ytrack.Keys.Add(new FOBJKey() { Frame = 0, Value = r.ReadSingle(), InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                    ytrack.Keys.Add(new FOBJKey() { Frame = 0, Value = r.ReadSingle(), InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
                 else
                     ReadTrack(r, frameCount, type, ytrack, dataOffset, node);
 
                 if (isZFixed)
-                    ztrack.Keys.Add(new FOBJKey() { Frame = 0, Value = r.ReadSingle(), InterpolationType = GXInterpolationType.HSD_A_OP_CON });
+                    ztrack.Keys.Add(new FOBJKey() { Frame = 0, Value = r.ReadSingle(), InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
                 else
                     ReadTrack(r, frameCount, type, ztrack, dataOffset, node);
             }

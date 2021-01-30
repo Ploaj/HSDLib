@@ -5,9 +5,6 @@ using HSDRawViewer.Rendering;
 using OpenTK;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Tools
 {
@@ -20,26 +17,7 @@ namespace HSDRawViewer.Tools
         /// <param name="target"></param>
         /// <param name="animation"></param>
         /// <returns></returns>
-        public static HSD_FigaTree Retarget(HSD_JOBJ source, HSD_JOBJ target, HSD_FigaTree animation)
-        {
-            JointAnimManager manager = new JointAnimManager();
-            manager.FromFigaTree(animation);
-
-            var retarget = Retarget(source, target, manager.ToAnimJoint(source, AOBJ_Flags.ANIM_LOOP));
-
-            manager.FromAnimJoint(retarget);
-
-            return manager.ToFigaTree();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <param name="animation"></param>
-        /// <returns></returns>
-        public static HSD_AnimJoint Retarget(HSD_JOBJ source, HSD_JOBJ target, HSD_AnimJoint animation)
+        public static JointAnimManager Retarget(HSD_JOBJ source, HSD_JOBJ target, JointAnimManager animation, JointMap sourceMap = null, JointMap targetMap = null)
         {
             var sourceManager = new JOBJManager();
             sourceManager.SetJOBJ(source);
@@ -48,40 +26,22 @@ namespace HSDRawViewer.Tools
             for (int i = 0; i < sourceManager.JointCount; i++)
                 sourceInverseWorldTransforms.Add(sourceManager.GetWorldTransform(i).Inverted());
 
-            sourceManager.SetAnimJoint(animation);
-
+            sourceManager.Animation = animation;
 
 
             var targetManager = new JOBJManager();
             targetManager.SetJOBJ(target);
 
-
-            JointAnimManager manager = new JointAnimManager();
-            manager.FrameCount = sourceManager.Animation.FrameCount;
+            JointAnimManager newAnim = new JointAnimManager();
+            newAnim.FrameCount = sourceManager.Animation.FrameCount;
             var targetWorldTransforms = new List<Matrix4>();
             for (int i = 0; i < targetManager.JointCount; i++)
             {
                 targetWorldTransforms.Add(targetManager.GetWorldTransform(i));
-
-                List<FOBJ_Player> players = new List<FOBJ_Player>();
-
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAX });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAY });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAZ });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTX });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTY });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTZ });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAX });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAY });
-                players.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAZ });
-
-                manager.Nodes.Add(new AnimNode()
-                {
-                    Tracks = players
-                });
+                newAnim.Nodes.Add(new AnimNode());
             }
 
-            targetManager.Animation = manager;
+            targetManager.Animation = newAnim;
             for(int f = 0; f <= sourceManager.Animation.FrameCount; f++)
             {
                 sourceManager.Frame = f - 1;
@@ -93,30 +53,37 @@ namespace HSDRawViewer.Tools
                 // bake animation on target skeleton
                 for (int i = 0; i < sourceManager.JointCount; i++)
                 {
-                    int parentIndex = targetManager.ParentIndex(targetManager.GetJOBJ(i));
+                    int targetIndex = i;
+                    int sourceIndex = i;
 
-                    var inverseSourceWorldRotation = sourceInverseWorldTransforms[i];
-                    var sourceAnimatedWorldRotation = sourceManager.GetWorldTransform(i);
+                    // remap bone if joint maps are present
+                    if (sourceMap != null && targetMap != null && !string.IsNullOrEmpty(sourceMap[i]))
+                        targetIndex = targetMap.IndexOf(sourceMap[i]);
 
-                    var targetWorldRotation = targetWorldTransforms[i];
-                    var targetParentAnimatedWorldRotation =
-                        parentIndex == -1 ?
-                        Matrix4.Identity :
-                        targetManager.GetWorldTransform(parentIndex);
+                    if (targetIndex == -1)
+                        continue;
+
+                    int targetParentIndex = targetManager.ParentIndex(targetManager.GetJOBJ(targetIndex));
+
+                    var inverseSourceWorldRotation = sourceInverseWorldTransforms[sourceIndex];
+                    var sourceAnimatedWorldRotation = sourceManager.GetWorldTransform(sourceIndex);
+
+                    var targetWorldRotation = targetWorldTransforms[targetIndex];
 
                     var rel = targetWorldRotation *
                         inverseSourceWorldRotation *
                         sourceAnimatedWorldRotation;
 
-                    rel *= targetParentAnimatedWorldRotation.Inverted();
+                    if(targetParentIndex != -1)
+                        rel *= targetManager.GetWorldTransform(targetParentIndex).Inverted();
 
                     var rot = Math3D.ToEulerAngles(rel.ExtractRotation().Inverted());
 
-                    var targetJOBJ = targetManager.GetJOBJ(i);
-                    var sourceJOBJ = sourceManager.GetJOBJ(i);
+                    var targetJOBJ = targetManager.GetJOBJ(targetIndex);
+                    var sourceJOBJ = sourceManager.GetJOBJ(sourceIndex);
 
 
-                    sourceManager.Animation.GetAnimatedState(f, i, sourceJOBJ, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
+                    sourceManager.Animation.GetAnimatedState(f - 1, sourceIndex, sourceJOBJ, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
 
 
                     var relTranslate = new Vector3(sourceJOBJ.TX - TX, sourceJOBJ.TY - TY, sourceJOBJ.TZ - TZ);
@@ -129,29 +96,29 @@ namespace HSDRawViewer.Tools
                     //relScale = Vector3.TransformNormal(relScale, targetWorldRotation);
 
 
-                    AddKey(i, f, targetJOBJ.TX - relTranslate.X, JointTrackType.HSD_A_J_TRAX, manager);
-                    AddKey(i, f, targetJOBJ.TY - relTranslate.Y, JointTrackType.HSD_A_J_TRAY, manager);
-                    AddKey(i, f, targetJOBJ.TZ - relTranslate.Z, JointTrackType.HSD_A_J_TRAZ, manager);
+                    AddKey(targetIndex, f, targetJOBJ.TX - relTranslate.X, JointTrackType.HSD_A_J_TRAX, newAnim);
+                    AddKey(targetIndex, f, targetJOBJ.TY - relTranslate.Y, JointTrackType.HSD_A_J_TRAY, newAnim);
+                    AddKey(targetIndex, f, targetJOBJ.TZ - relTranslate.Z, JointTrackType.HSD_A_J_TRAZ, newAnim);
 
-                    AddKey(i, f, rot.X, JointTrackType.HSD_A_J_ROTX, manager);
-                    AddKey(i, f, rot.Y, JointTrackType.HSD_A_J_ROTY, manager);
-                    AddKey(i, f, rot.Z, JointTrackType.HSD_A_J_ROTZ, manager);
+                    AddKey(targetIndex, f, rot.X, JointTrackType.HSD_A_J_ROTX, newAnim);
+                    AddKey(targetIndex, f, rot.Y, JointTrackType.HSD_A_J_ROTY, newAnim);
+                    AddKey(targetIndex, f, rot.Z, JointTrackType.HSD_A_J_ROTZ, newAnim);
 
-                    AddKey(i, f, targetJOBJ.SX - relScale.X, JointTrackType.HSD_A_J_SCAX, manager);
-                    AddKey(i, f, targetJOBJ.SY - relScale.Y, JointTrackType.HSD_A_J_SCAY, manager);
-                    AddKey(i, f, targetJOBJ.SZ - relScale.Z, JointTrackType.HSD_A_J_SCAZ, manager);
+                    AddKey(targetIndex, f, targetJOBJ.SX - relScale.X, JointTrackType.HSD_A_J_SCAX, newAnim);
+                    AddKey(targetIndex, f, targetJOBJ.SY - relScale.Y, JointTrackType.HSD_A_J_SCAY, newAnim);
+                    AddKey(targetIndex, f, targetJOBJ.SZ - relScale.Z, JointTrackType.HSD_A_J_SCAZ, newAnim);
 
                     targetManager.UpdateNoRender();
                 }
             }
 
-            var targetAnim = manager.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
+            var targetAnim = newAnim.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
             AnimationCompressor.AdaptiveCompressAnimation(targetAnim);
             RemoveUnusedTracks(target, targetAnim);
-            manager.FromAnimJoint(targetAnim);
+            newAnim.FromAnimJoint(targetAnim);
 
 
-            return targetAnim;
+            return newAnim;
         }
 
         /// <summary>
@@ -230,9 +197,20 @@ namespace HSDRawViewer.Tools
         /// <param name="value"></param>
         /// <param name="track"></param>
         /// <param name="manager"></param>
-        private static void AddKey(int node, int frame, float value, JointTrackType track, JointAnimManager manager)
+        private static void AddKey(int node, int frame, float value, JointTrackType tracktype, JointAnimManager manager)
         {
-            manager.Nodes[node].Tracks.Find(e => e.JointTrackType == track).Keys.Add(new FOBJKey()
+            var track = manager.Nodes[node].Tracks.Find(e => e.JointTrackType == tracktype);
+
+            if(track == null)
+            {
+                track = new FOBJ_Player()
+                {
+                    JointTrackType = tracktype
+                };
+                manager.Nodes[node].Tracks.Add(track);
+            }
+
+            track.Keys.Add(new FOBJKey()
             {
                 Frame = frame,
                 Value = value,
