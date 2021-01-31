@@ -67,7 +67,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(particleArrayEditor.SelectedObject is HSD_ParticleGenerator partgen)
             {
-                OpCodes = HSDRaw.Tools.ParticleEncoding.DecodeParticleOpCodes(partgen.TrackData).Select(t => new ParticleOpCode() { Code = t.Item1, Params = t.Item2 }).ToArray();
+                OpCodes = ParticleEncoding.DecodeParticleOpCodes(partgen.TrackData).Select(t => new ParticleOpCode() { Code = t.Item1, Params = t.Item2 }).ToArray();
                 OpCodeArrayEditor.SetArrayFromProperty(this, "OpCodes");
             }
         }
@@ -93,7 +93,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void OpCodeArrayEditor_ArrayUpdated(object sender, EventArgs e)
         {
-            //RecompileTrack();
+            RecompileTrack();
         }
 
         /// <summary>

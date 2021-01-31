@@ -88,11 +88,12 @@ namespace HSDRaw.Tools
                             {
                                 byte param_count = 0;
 
-                                for (int j = 0; j < p.Length; j++)
+                                for (int j = 0; j < p.Length - i; j++)
                                     param_count |= (byte)(1 << j);
 
-                                code = ((byte)((code & 0xF0) | param_count));
-                                for (int j = 1; j < p.Length; j++)
+                                code = ((byte)((code & 0xF0) | (param_count & 0x0F)));
+
+                                for (int j = i; j < p.Length; j++)
                                     w.Write((byte)p[j]);
                             }
                             break;
@@ -370,7 +371,9 @@ namespace HSDRaw.Tools
                     var code = c.Item1;
                     var p = c.Item2;
 
-                    if(code == 0x00)
+                    System.Diagnostics.Debug.WriteLine(stream.Position.ToString("X8") + " " + code.ToString("X"));
+
+                    if (code == 0x00)
                     {
                         if (p.Length != 1)
                             throw new ArgumentOutOfRangeException($"Op Code 0x{code.ToString("X")} expected 1 argument(s) and recieved {p.Length}");
@@ -392,7 +395,7 @@ namespace HSDRaw.Tools
                     else
                     if(code == 0x40)
                     {
-                        w.Write(0x40);
+                        w.Write((byte)0x40);
                         w.Write((byte)p[0]);
                     }
                     else

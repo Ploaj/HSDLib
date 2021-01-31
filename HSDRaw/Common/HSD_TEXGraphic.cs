@@ -62,6 +62,8 @@ namespace HSDRaw.Common
 
     public class HSD_TexGraphic : HSDAccessor
     {
+        public override int TrimmedSize => 0x14;
+
         public int ImageCount { get => _s.GetInt32(0x00); internal set => _s.SetInt32(0x00, value); }
 
         public GXTexFmt ImageFormat { get => (GXTexFmt)_s.GetInt32(0x04); internal set => _s.SetInt32(0x04, (int)value); }

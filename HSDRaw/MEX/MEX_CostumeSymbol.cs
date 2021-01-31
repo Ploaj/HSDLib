@@ -14,6 +14,17 @@ namespace HSDRaw.MEX
         public int AccessoryCount { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
         public HSDFixedLengthPointerArrayAccessor<MEX_CostumeAccessory> Accessories { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<MEX_CostumeAccessory>>(0x0C); set => _s.SetReference(0x0C, value); }
+
+        public override void New()
+        {
+            base.New();
+
+            CostumeVisLookup = new MEX_CostumeSymbolVisLookup();
+
+            CostumeMatLookup = new MEX_CostumeSymbolMatLookup();
+
+            Accessories = new HSDFixedLengthPointerArrayAccessor<MEX_CostumeAccessory>();
+        }
     }
 
     public class MEX_CostumeAccessory : HSDAccessor

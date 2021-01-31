@@ -408,7 +408,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public void SetFloatValue(float value)
         {
-            FloatValue = value;
+            Text = value.ToString();
         }
 
         public float GetFloatValue()

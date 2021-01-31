@@ -8,11 +8,11 @@
 
 - code: 0x40
   range: 1
-  name: Unknown0x40
-  description: 
+  name: Set Texture Index
+  description: Sets the texture index from the referenced texg
   paramDesc: b
   params:
-  - Unknown
+  - Image Index
 
 - code: 0x80
   range: 8
