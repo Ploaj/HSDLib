@@ -13,6 +13,7 @@ using IONET.Core.Skeleton;
 using IONET.Core;
 using IONET.Core.Model;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Converters
 {
@@ -196,6 +197,22 @@ namespace HSDRawViewer.Converters
         /// <param name="w"></param>
         public override void Work(BackgroundWorker w)
         {
+            try
+            {
+                Import(w);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Failed to import model: {e.ToString()}");
+                w.ReportProgress(100);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void Import(BackgroundWorker w)
+        {
             // settings
             if (Settings == null)
                 Settings = new ModelImportSettings();
@@ -206,7 +223,7 @@ namespace HSDRawViewer.Converters
             _cache.POBJGen.UseTriangleStrips = Settings.UseStrips;
             _cache.POBJGen.UseVertexAlpha = Settings.ImportVertexAlpha;
             _cache.FolderPath = Path.GetDirectoryName(FilePath);
-            
+
 
             // import model
             ProgressStatus = "Importing Model Data...";
@@ -219,25 +236,26 @@ namespace HSDRawViewer.Converters
             ProgressStatus = "Processing Joints...";
             w.ReportProgress(30);
             HSD_JOBJ root = null;
-            foreach(var r in model.Skeleton.RootBones)
+            foreach (var r in model.Skeleton.RootBones)
             {
                 if (root == null)
                     root = IOBoneToJOBJ(r);
                 else
                     root.Add(IOBoneToJOBJ(r));
             }
-            if(root == null)
+            if (root == null)
             {
                 root = IOBoneToJOBJ(
-                    new IOBone() {
-                    Name = "Root"
-                });
+                    new IOBone()
+                    {
+                        Name = "Root"
+                    });
             }
 
 
             // get root of skeleton
             root.Flags = JOBJ_FLAG.SKELETON_ROOT;
-            
+
 
             // process mesh
             ProgressStatus = "Processing Mesh...";
@@ -245,7 +263,7 @@ namespace HSDRawViewer.Converters
             {
                 ProcessMesh(scene, mesh, root);
 
-                if(root.Dobj != null)
+                if (root.Dobj != null)
                 {
                     ProgressStatus = $"Processing Mesh {root.Dobj.List.Count} {model.Meshes.Count + 1}...";
                     w.ReportProgress((int)(30 + 60 * (root.Dobj.List.Count / (float)model.Meshes.Count)));
@@ -256,7 +274,7 @@ namespace HSDRawViewer.Converters
             // set flags
             if (_cache.EnvelopedJOBJs.Count > 0)
                 root.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
-            
+
             // enable xlu if anything needs it
             if (_cache.HasXLU)
                 root.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
@@ -272,7 +290,7 @@ namespace HSDRawViewer.Converters
                 if (_cache.jobjToWorldTransform.ContainsKey(jobj))
                     jobj.InverseWorldTransform = Matrix4ToHSDMatrix(_cache.jobjToWorldTransform[jobj].Inverted());
             }
-            
+
 
             // SAVE POBJ buffers
             ProgressStatus = "Generating and compressing vertex buffers...";
@@ -411,6 +429,10 @@ namespace HSDRawViewer.Converters
         private void ProcessMesh(IOScene scene, IOMesh mesh, HSD_JOBJ rootnode)
         {
             HSD_JOBJ parent = rootnode;
+
+            HashSet<HSD_JOBJ> nodes = new HashSet<HSD_JOBJ>();
+            foreach(var j in rootnode.BreathFirstList)
+                nodes.Add(j);
             
 
             if (mesh.ParentBone != null && _cache.NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
@@ -582,13 +604,41 @@ namespace HSDRawViewer.Converters
                     if (mesh.HasEnvelopes() && Settings.ImportRigging)
                     {
                         // create weighting lists
-                        jobjList.Add(v.Envelope.Weights.Select(e => _cache.NameToJOBJ[e.BoneName]).ToArray());
-                        weightList.Add(v.Envelope.Weights.Select(e => e.Weight).ToArray());
-                        
-                        // indicate enveloped jobjs
-                        foreach (var bw in v.Envelope.Weights)
-                            if (!_cache.EnvelopedJOBJs.Contains(_cache.NameToJOBJ[bw.BoneName]))
-                                _cache.EnvelopedJOBJs.Add(_cache.NameToJOBJ[bw.BoneName]);
+                        List<float> weight = new List<float>();
+                        List<HSD_JOBJ> bones = new List<HSD_JOBJ>();
+
+                        if(v.Envelope.Weights.Count == 0)
+                        {
+                            weight.Add(1);
+                            bones.Add(rootnode);
+                        }
+
+                        if (v.Envelope.Weights.Count > 4)
+                        {
+                            throw new Exception($"Too many weights! {v.Envelope.Weights.Count} in {mesh.Name}");
+                        }
+
+                        foreach(var bw in v.Envelope.Weights)
+                        {
+                            // check if skeleton actually contains bone
+                            if(nodes.Contains(_cache.NameToJOBJ[bw.BoneName]))
+                            {
+                                // add envelope
+                                bones.Add(_cache.NameToJOBJ[bw.BoneName]);
+                                weight.Add(bw.Weight);
+
+                                // indicate enveloped jobjs
+                                if (!_cache.EnvelopedJOBJs.Contains(_cache.NameToJOBJ[bw.BoneName]))
+                                    _cache.EnvelopedJOBJs.Add(_cache.NameToJOBJ[bw.BoneName]);
+                            }
+                            else
+                            {
+                                throw new Exception($"Bone not found \"{bw.BoneName}\" Weight: {bw.Weight} in {mesh.Name}");
+                            }
+                        }
+
+                        jobjList.Add(bones.ToArray());
+                        weightList.Add(weight.ToArray());
 
                         // invert single binds
                         if (v.Envelope.Weights.Count == 1)

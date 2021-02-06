@@ -181,18 +181,16 @@ namespace HSDRawViewer.Converters
             foreach (var mNode in mayaFile.Nodes)
             {
                 var node = animation.Nodes[index++];
+                //Debug.WriteLine(mNode.name);
 
                 if (jointMap != null)
                 {
                     var nodeIndex = jointMap.IndexOf(mNode.name);
 
-                    if (nodeIndex == -1)
-                        continue;
-
-                    node = animation.Nodes[nodeIndex];
+                    if (nodeIndex != -1)
+                        node = animation.Nodes[nodeIndex];
                 }
 
-                //Debug.WriteLine(mNode.name);
                 foreach (var mTrack in mNode.atts)
                 {
                     FOBJ_Player t = new FOBJ_Player();
