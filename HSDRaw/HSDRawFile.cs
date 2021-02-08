@@ -802,6 +802,7 @@ namespace HSDRaw
                 x => x.Equals("bgm") ?  new MEX_BGMModel() : null,
                 x => x.Equals("mexCostume") ?  new MEX_CostumeSymbol() : null,
                 x => x.StartsWith("mnName") ?  new HSDFixedLengthPointerArrayAccessor<HSD_ShiftJIS_String>() : null,
+                x => x.EndsWith("move_logic") ?  new HSDArrayAccessor<MEX_MoveLogic>() : null,
                 x => new HSDAccessor(),
         };
 

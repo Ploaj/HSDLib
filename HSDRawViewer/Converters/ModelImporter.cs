@@ -621,7 +621,7 @@ namespace HSDRawViewer.Converters
                         foreach(var bw in v.Envelope.Weights)
                         {
                             // check if skeleton actually contains bone
-                            if(nodes.Contains(_cache.NameToJOBJ[bw.BoneName]))
+                            if(_cache.NameToJOBJ.ContainsKey(bw.BoneName) && nodes.Contains(_cache.NameToJOBJ[bw.BoneName]))
                             {
                                 // add envelope
                                 bones.Add(_cache.NameToJOBJ[bw.BoneName]);

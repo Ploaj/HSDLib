@@ -337,7 +337,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private void SaveAllActionChanges()
         {
             for (int i = 0; i < AllActions.Count; i++)
-                SaveActionChanges(i);
+                SaveActionChanges(i, false, false);
         }
 
         /// <summary>
@@ -347,13 +347,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             int index = actionList.SelectedIndex;
             if (index != -1)
-                SaveActionChanges(index);
+                SaveActionChanges(index, true, true);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void SaveActionChanges(int index)
+        private void SaveActionChanges(int index, bool recompile, bool enableUndo)
         {
             var a = AllActions[index];
             AddActionToUndo();
@@ -367,6 +367,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 ftcmd.AnimationOffset = a.AnimOffset;
                 ftcmd.AnimationSize = a.AnimSize;
                 ftcmd.Flags = a.Flags;
+                if (a._struct == null || a._struct.Length == 0)
+                    ftcmd.SubAction = null;
+                else
+                    ftcmd.SubAction = new SBM_FighterSubactionData() { _s = a._struct };
 
                 if (_node.Accessor._s.Length <= 0x18 * index + 0x18)
                     _node.Accessor._s.Resize(0x18 * index + 0x18);
@@ -375,21 +379,25 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             }
 
             // compile subaction
-            a._struct.References.Clear();
-            List<byte> scriptData = new List<byte>();
-            foreach (SubActionScript scr in subActionList.Items)
+            if(recompile)
             {
-                // TODO: are all references in this position?
-                if (scr.Reference != null)
+                a._struct.References.Clear();
+                List<byte> scriptData = new List<byte>();
+                foreach (SubActionScript scr in subActionList.Items)
                 {
-                    a._struct.References.Add(scriptData.Count + 4, scr.Reference);
+                    // TODO: are all references in this position?
+                    if (scr.Reference != null)
+                    {
+                        a._struct.References.Add(scriptData.Count + 4, scr.Reference);
+                    }
+                    scriptData.AddRange(scr.data);
                 }
-                scriptData.AddRange(scr.data);
-            }
 
-            // update struct
-            a._struct.SetData(scriptData.ToArray());
-            SubactionProcess.SetStruct(a._struct, SubactionGroup);
+                // update struct
+                a._struct.SetData(scriptData.ToArray());
+
+                SubactionProcess.SetStruct(a._struct, SubactionGroup);
+            }
         }
     }
 }

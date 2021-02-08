@@ -317,16 +317,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 _struct = new HSDStruct(data)
             };
 
-            var index = actionList.SelectedIndex;
+            var index = -1;// actionList.SelectedIndex;
 
             if (index == -1 || index > ActionCount)
                 index = ActionCount;
 
             AllActions.Insert(index, action);
             RefreshActionList();
-            actionList.SelectedItem = action;
-
             SaveAllActionChanges();
+            actionList.SelectedItem = action;
         }
         
         /// <summary>

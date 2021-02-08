@@ -193,7 +193,7 @@
     bitCount: 26
 
 - code: 19
-  name: Autocancel
+  name: Set Flag
   parameters:
   - name: Flag
     bitCount: 2
