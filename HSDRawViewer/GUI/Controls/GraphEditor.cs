@@ -866,7 +866,14 @@ NONE - None (do not use)";
         {
             if (_selectedPlayer != null)
             {
-                using (PropertyDialog d = new PropertyDialog("Compression Settings", _compSettings))
+                for (int i = 0; i < _selectedPlayer.Keys.Count; i++)
+                {
+                    Simpoly.SimplyPoly(_selectedPlayer, new Simpoly.Options());
+                    Console.WriteLine(_selectedPlayer.Keys[i].Frame + " " + _selectedPlayer.Keys[i].Tan);
+                    _graph.Invalidate();
+                    OnTrackEdited(EventArgs.Empty);
+                }
+                /*using (PropertyDialog d = new PropertyDialog("Compression Settings", _compSettings))
                 {
                     if(d.ShowDialog() == DialogResult.OK)
                     {
@@ -874,7 +881,7 @@ NONE - None (do not use)";
                         _graph.Invalidate();
                         OnTrackEdited(EventArgs.Empty);
                     }
-                }
+                }*/
             }
         }
     }

@@ -12,6 +12,9 @@ namespace HSDRawViewer.Rendering
 
         private static OpenTK.GLControl control { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static void MakeCurrentDummy()
         {
             control.MakeCurrent();

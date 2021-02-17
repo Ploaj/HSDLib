@@ -49,24 +49,9 @@ namespace HSDRawViewer.Tools
         /// 
         /// </summary>
         /// <param name="animJoint"></param>
-        public static int AdaptiveCompressAnimation(HSD_AnimJoint j, int index = 0)
+        public static int AdaptiveCompressAnimation(HSD_AnimJoint j, JointMap map, int index = 0)
         {
-            //float rangeStart = 0.05f;
-            //float rangeEnd = 0.001f;
-
-            //var percent = ((float)depth / maxDepth);
-
-            //var lerp = ((rangeStart - rangeEnd) - ((rangeStart - rangeEnd) * percent)) + rangeEnd;
-
-            //lerp = rangeEnd;
-
-            //Console.WriteLine(index + " " + 0.005f);
-
-            float error = 0.001f;
-
-            //TODO: adaptive error
-            if (index < 16)
-                error = 0.001f;
+            float error = map == null ? 0.001f : map.GetError(index);
 
             if (j.AOBJ != null)
                 foreach (var t in j.AOBJ.FObjDesc.List)
@@ -80,7 +65,7 @@ namespace HSDRawViewer.Tools
 
             if (j.Child != null)
                 foreach (var c in j.Children)
-                    index = AdaptiveCompressAnimation(c, index + 1);
+                    index = AdaptiveCompressAnimation(c, map, index + 1);
 
             return index;
         }

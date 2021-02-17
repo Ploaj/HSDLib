@@ -19,7 +19,6 @@ namespace HSDRawViewer
             ApplicationSettings.Init();
             if(args.Length > 0)
                 MainForm.Instance.OpenFile(args[0]);
-
             Application.Run(MainForm.Instance);
         }
     }

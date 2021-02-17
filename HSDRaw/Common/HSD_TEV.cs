@@ -121,5 +121,6 @@ namespace HSDRaw.Common
         public Color tev1 { get => _s.GetColorRGB(0x18); set => _s.SetColorRGB(0x18, value); }
         
         public TOBJ_TEVREG_ACTIVE active { get => (TOBJ_TEVREG_ACTIVE)_s.GetInt32(0x1C); set => _s.SetInt32(0x1C, (int)value); }
+
     }
 }

@@ -57,6 +57,9 @@ namespace HSDRawViewer.Converters
 
         [Category("Debug Options"), DisplayName("Metal Model"), Description("")]
         public bool MetalModel { get; set; } = false;
+
+        [Category("Debug Options"), DisplayName("Clean Root Node"), Description("")]
+        public bool CleanRoot { get; set; } = false;
 #endif
 
 
@@ -115,7 +118,10 @@ namespace HSDRawViewer.Converters
         
         // Indicates jobjs that need the SKELETON flag set along with inverted transform
         public List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
-        
+
+        // for cleaning root
+        public Matrix4 CleanRotMatrix = Matrix4.Identity;
+
         // 
         public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
 
@@ -256,7 +262,6 @@ namespace HSDRawViewer.Converters
             // get root of skeleton
             root.Flags = JOBJ_FLAG.SKELETON_ROOT;
 
-
             // process mesh
             ProgressStatus = "Processing Mesh...";
             foreach (var mesh in model.Meshes)
@@ -282,7 +287,6 @@ namespace HSDRawViewer.Converters
             // just always enable opaque
             root.Flags |= JOBJ_FLAG.OPA;
 
-
             // calculate inverse binds
             foreach (var jobj in _cache.EnvelopedJOBJs)
             {
@@ -301,14 +305,15 @@ namespace HSDRawViewer.Converters
             NewModel = root;
 
             // update flags
-            JOBJTools.UpdateJOBJFlags(NewModel);
+            JOBJExtensions.UpdateJOBJFlags(NewModel);
 
             if (Settings.ClassicalScaling)
                 NewModel.Flags |= JOBJ_FLAG.CLASSICAL_SCALING;
 
 #if DEBUG
+            //
             if (Settings.Merge)
-                JOBJTools.MergeIntoOneObject(NewModel);
+                JOBJExtensions.MergeIntoOneObject(NewModel);
 #endif
 
             ProgressStatus = "Done!";
@@ -322,6 +327,27 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private HSD_JOBJ IOBoneToJOBJ(IOBone bone)
         {
+#if DEBUG
+            //
+            if (Settings.CleanRoot)
+            {
+                if (bone.Parent == null)
+                {
+                    _cache.CleanRotMatrix = Matrix4.CreateFromQuaternion(new Quaternion(bone.Rotation.X, bone.Rotation.Y, bone.Rotation.Z, bone.Rotation.W));
+                    bone.Rotation = System.Numerics.Quaternion.Identity;
+                }
+                else
+                {
+                    // fix position
+                    var pos = Vector3.TransformNormal(new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ), _cache.CleanRotMatrix);
+                    bone.Translation = new System.Numerics.Vector3(pos.X, pos.Y, pos.Z);
+                }
+
+                // clean scale
+                bone.Scale = new System.Numerics.Vector3(1, 1, 1);
+            }
+#endif
+
             HSD_JOBJ jobj = new HSD_JOBJ()
             {
                 TX = bone.TranslationX,
@@ -337,6 +363,7 @@ namespace HSDRawViewer.Converters
 
             if (Settings.ImportBoneNames)
                 jobj.ClassName = bone.Name;
+
 
             Console.WriteLine(bone.Name + " " + bone.WorldTransform);
 

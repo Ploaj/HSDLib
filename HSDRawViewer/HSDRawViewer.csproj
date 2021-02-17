@@ -129,6 +129,9 @@
     <Compile Include="ContextMenus\MatAnimJointContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ContextMenus\Melee\FighterDataContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ContextMenus\Melee\MeleeEffectTable.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -151,7 +154,7 @@
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
-    <Compile Include="Converters\JOBJTools.cs" />
+    <Compile Include="Converters\JOBJExtensions.cs" />
     <Compile Include="Converters\Animation\MayaAnim.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
@@ -480,6 +483,7 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\ParticleManager.cs" />
+    <Compile Include="Tools\Simpoly.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
     <None Include="Resources\iso_disc.png" />
     <None Include="Resources\ts_x.png" />

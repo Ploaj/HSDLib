@@ -11,18 +11,23 @@ namespace HSDRawViewer.Tools
     /// </summary>
     public class JointMap
     {
+        private class JointInfo
+        {
+            public string Name;
+            public float Error = 0.001f;
+        }
 
-        private Dictionary<int, string> _indexToName = new Dictionary<int, string>();
+        private Dictionary<int, JointInfo> _indexToName = new Dictionary<int, JointInfo>();
 
         public string this[int i]
         {
-            get { return _indexToName.ContainsKey(i) ? _indexToName[i] : null; }
+            get { return _indexToName.ContainsKey(i) ? _indexToName[i].Name : null; }
             set 
             {
                 if (_indexToName.ContainsKey(i))
-                    _indexToName[i] = value;
+                    _indexToName[i].Name = value;
                 else
-                    _indexToName.Add(i, value);
+                    _indexToName.Add(i, new JointInfo() { Name = value });
             }
         }
 
@@ -52,10 +57,23 @@ namespace HSDRawViewer.Tools
         public int IndexOf(string name)
         {
             foreach (var v in _indexToName)
-                if (v.Value == name)
+                if (v.Value.Name == name)
                     return v.Key;
 
             return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public float GetError(int index)
+        {
+            if (_indexToName.ContainsKey(index))
+                return _indexToName[index].Error;
+
+            return 0.01f;
         }
 
         /// <summary>
@@ -81,13 +99,17 @@ namespace HSDRawViewer.Tools
             {
                 var args = r.Split('=');
 
-                if (args.Length == 2)
+                if (args.Length >= 2)
                 {
                     var name = args[1].Trim();
                     var i = 0;
                     if (int.TryParse(new string(args[0].Where(c => char.IsDigit(c)).ToArray()), out i))
                     {
                         this[i] = name;
+                        if (args.Length > 2 && float.TryParse(args[2], out float result))
+                        {
+                            _indexToName[i].Error = result;
+                        }
                     }
                 }
             }

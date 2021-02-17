@@ -20,6 +20,10 @@ namespace HSDRaw.Tools
             HSD_FOBJ fobj = new HSD_FOBJ();
             fobj.JointTrackType = (JointTrackType)TrackType;
 
+            // automatically set single key interpolation type
+            if (Keys.Count == 1)
+                Keys[0].InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
+
             // perform quantization
             FOBJQuantanizer valueQ = new FOBJQuantanizer();
             FOBJQuantanizer tangentQ = new FOBJQuantanizer();
@@ -41,7 +45,6 @@ namespace HSDRaw.Tools
             {
                 Writer.BigEndian = false;
 
-                int time = 0;
                 for (int i = 0; i < Keys.Count;)
                 {
                     GXInterpolationType ip = Keys[i].InterpolationType;
@@ -63,7 +66,15 @@ namespace HSDRaw.Tools
                         int DeltaTime = 0;
 
                         if (k + 1 < Keys.Count)
-                            DeltaTime = (int)(Keys[k + 1].Frame - Keys[k].Frame);
+                        {
+                            var nextKey = 
+                                Keys.Find(e => 
+                                e.Frame > Keys[k].Frame && 
+                                e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
+
+                            if (nextKey != null)
+                                DeltaTime = (int)(nextKey.Frame - Keys[k].Frame);
+                        }
 
                         if (k == Keys.Count)
                             DeltaTime = 1;
@@ -94,9 +105,6 @@ namespace HSDRaw.Tools
                                 valueQ.WriteValue(Writer, Keys[k].Value);
                                 break;
                         }
-
-                        if (ip != GXInterpolationType.HSD_A_OP_SLP)
-                            time = (int)Keys[k].Frame;
                     }
 
                     i += j;

@@ -1325,7 +1325,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(MessageBox.Show("Reorient Bones", "This makes changes to bones and cannot be undone", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
             {
-                JOBJTools.ApplyMeleeFighterTransforms(root);
+                JOBJExtensions.ApplyMeleeFighterTransforms(root);
                 JOBJManager.RecalculateInverseBinds();
             }
         }
@@ -1350,7 +1350,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void autoUpdateFlagsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJTools.UpdateJOBJFlags(root);
+            JOBJExtensions.UpdateJOBJFlags(root);
         }
 
         /// <summary>
@@ -1457,7 +1457,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importTexturesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJTools.ImportTextures(root);
+            JOBJExtensions.ImportTextures(root);
         }
 
         /// <summary>
@@ -1467,7 +1467,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void tsExportTextures_Click(object sender, EventArgs e)
         {
-            JOBJTools.ExportTextures(root);
+            JOBJExtensions.ExportTextures(root);
         }
 
         /// <summary>

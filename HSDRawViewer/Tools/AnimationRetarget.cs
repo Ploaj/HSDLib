@@ -16,6 +16,39 @@ namespace HSDRawViewer.Tools
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <param name="animation"></param>
+        /// <param name="sourceMap"></param>
+        /// <param name="targetMap"></param>
+        /// <returns></returns>
+        public static JointAnimManager Port(JointAnimManager animation, JointMap sourceMap, JointMap targetMap)
+        {
+            JointAnimManager newAnim = new JointAnimManager();
+            newAnim.FrameCount = animation.FrameCount;
+
+            for (int i = 0; i < targetMap.Count; i++)
+            {
+                var bone = targetMap[i];
+
+                var index = sourceMap.IndexOf(bone);
+
+                if(index != -1 && index < animation.Nodes.Count)
+                {
+                    newAnim.Nodes.Add(animation.Nodes[index]);
+                }
+                else
+                {
+                    newAnim.Nodes.Add(new AnimNode());
+                }
+            }
+
+            return newAnim;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <param name="animation"></param>
         /// <returns></returns>
         public static JointAnimManager Retarget(HSD_JOBJ source, HSD_JOBJ target, JointAnimManager animation, JointMap sourceMap = null, JointMap targetMap = null)
         {
@@ -112,13 +145,44 @@ namespace HSDRawViewer.Tools
                 }
             }
 
-            var targetAnim = newAnim.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
-            AnimationCompressor.AdaptiveCompressAnimation(targetAnim);
-            RemoveUnusedTracks(target, targetAnim);
-            newAnim.FromAnimJoint(targetAnim);
+            EulerFilter(newAnim);
+
+            //var targetAnim = newAnim.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
+            //AnimationCompressor.AdaptiveCompressAnimation(targetAnim, targetMap);
+            //RemoveUnusedTracks(target, targetAnim);
+            //newAnim.FromAnimJoint(targetAnim);
 
 
             return newAnim;
+        }
+
+        private static void EulerFilter(JointAnimManager anim)
+        {
+            foreach (var n in anim.Nodes)
+            {
+                foreach (var t in n.Tracks)
+                {
+                    if (t.JointTrackType == JointTrackType.HSD_A_J_ROTX ||
+                        t.JointTrackType == JointTrackType.HSD_A_J_ROTY ||
+                        t.JointTrackType == JointTrackType.HSD_A_J_ROTZ)
+                    {
+                        // filter
+                        for (int i = 1; i < t.Keys.Count; i++)
+                        {
+                            var prevKey = t.Keys[i - 1];
+                            var key = t.Keys[i];
+
+                            if(Math.Abs(prevKey.Value - key.Value) > Math.PI)
+                            {
+                                if (prevKey.Value < key.Value)
+                                    key.Value -= (float)(2 * Math.PI);
+                                else
+                                    key.Value += (float)(2 * Math.PI);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -1,19 +1,55 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
+using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using OpenTK;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
-namespace HSDRawViewer.Converters
+namespace HSDRawViewer
 {
-    public class JOBJTools
+    public static class JOBJExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        public static void CleanRootNode(this HSD_JOBJ jobj)
+        {
+            var joints = jobj.BreathFirstList;
+
+            Matrix4 rot = Matrix4.Identity; ;
+            for (int i = 0; i < joints.Count; i++)
+            {
+                var j = joints[i];
+
+                if(i == 0)
+                {
+                    rot = Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(j.RZ, j.RY, j.RX));
+                    j.RX = 0;
+                    j.RY = 0;
+                    j.RZ = 0;
+                }
+                else
+                {
+                    // fix position
+                    var pos = Vector3.TransformNormal(new Vector3(j.TX, j.TY, j.TZ), rot);
+                    j.TX = pos.X;
+                    j.TY = pos.Y;
+                    j.TZ = pos.Z;
+                }
+
+                // clean scale
+                j.SX = 1;
+                j.SY = 1;
+                j.SZ = 1;
+            }
+        }
+
         /// <summary>
         /// Automatically updates jobj flags
         /// </summary>
-        public static void UpdateJOBJFlags(HSD_JOBJ jobj)
+        public static void UpdateJOBJFlags(this HSD_JOBJ jobj)
         {
             var list = jobj.BreathFirstList;
             list.Reverse();

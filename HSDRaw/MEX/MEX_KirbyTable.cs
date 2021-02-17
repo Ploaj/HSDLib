@@ -48,6 +48,8 @@ namespace HSDRaw.MEX
 
         public HSDAccessor MoveLogicRuntime { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
 
+        public HSDUIntArray KirbyOnFrame { get => _s.GetReference<HSDUIntArray>(0x1C); set => _s.SetReference(0x1C, value); }
+
         public override void New()
         {
             base.New();
@@ -59,6 +61,7 @@ namespace HSDRaw.MEX
             KirbyOnHit = new HSDUIntArray();
             KirbyOnItemInit = new HSDUIntArray();
             MoveLogicRuntime = new HSDAccessor();
+            KirbyOnFrame = new HSDUIntArray();
         }
     }
 

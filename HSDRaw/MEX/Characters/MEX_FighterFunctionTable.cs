@@ -61,9 +61,9 @@
 
         public HSDUIntArray onUnknownItemRelated { get => _s.GetReference<HSDUIntArray>(0x48); set => _s.SetReference(0x48, value); }
 
-        public HSDUIntArray onUnknownCharacterModelFlags1 { get => _s.GetReference<HSDUIntArray>(0x4C); set => _s.SetReference(0x4C, value); }
+        public HSDUIntArray onApplyHeadItem { get => _s.GetReference<HSDUIntArray>(0x4C); set => _s.SetReference(0x4C, value); }
 
-        public HSDUIntArray onUnknownCharacterModelFlags2 { get => _s.GetReference<HSDUIntArray>(0x50); set => _s.SetReference(0x50, value); }
+        public HSDUIntArray onRemoveHeadItem { get => _s.GetReference<HSDUIntArray>(0x50); set => _s.SetReference(0x50, value); }
 
         public HSDUIntArray onHit { get => _s.GetReference<HSDUIntArray>(0x54); set => _s.SetReference(0x54, value); }
 
@@ -139,8 +139,8 @@
             onItemDrop = new HSDUIntArray();
             onItemCatch = new HSDUIntArray();
             onUnknownItemRelated = new HSDUIntArray();
-            onUnknownCharacterModelFlags1 = new HSDUIntArray();
-            onUnknownCharacterModelFlags2 = new HSDUIntArray();
+            onApplyHeadItem = new HSDUIntArray();
+            onRemoveHeadItem = new HSDUIntArray();
             onHit = new HSDUIntArray();
             onUnknownEyeTextureRelated = new HSDUIntArray();
             onFrame = new HSDUIntArray();
