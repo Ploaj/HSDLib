@@ -31,7 +31,8 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new OpenTK.GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 16, 0, 8));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewportControl));
+            this.panel1 = new OpenTK.GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             this.animationGroup = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.nudPlaybackSpeed = new System.Windows.Forms.NumericUpDown();
@@ -45,20 +46,33 @@ namespace HSDRawViewer.GUI
             this.nudFrame = new System.Windows.Forms.NumericUpDown();
             this.animationTrack = new System.Windows.Forms.CustomPaintTrackBar();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toggleGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toggleBackgroundToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.backgroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toggleCSPModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetCameraButton = new System.Windows.Forms.ToolStripButton();
+            this.editCameraButton = new System.Windows.Forms.ToolStripButton();
+            this.screenshotButton = new System.Windows.Forms.ToolStripButton();
+            this.gridColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.animationGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPlaybackSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.animationTrack)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Black;
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Location = new System.Drawing.Point(0, 25);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(404, 222);
+            this.panel1.Size = new System.Drawing.Size(404, 197);
             this.panel1.TabIndex = 0;
             this.panel1.VSync = false;
             this.panel1.Load += new System.EventHandler(this.panel1_Load);
@@ -242,11 +256,114 @@ namespace HSDRawViewer.GUI
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripDropDownButton1,
+            this.resetCameraButton,
+            this.editCameraButton,
+            this.screenshotButton});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(404, 25);
+            this.toolStrip1.TabIndex = 3;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleGridToolStripMenuItem,
+            this.gridColorToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.toggleBackgroundToolStripMenuItem,
+            this.backgroundColorToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.toggleCSPModeToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(45, 22);
+            this.toolStripDropDownButton1.Text = "View";
+            // 
+            // toggleGridToolStripMenuItem
+            // 
+            this.toggleGridToolStripMenuItem.Name = "toggleGridToolStripMenuItem";
+            this.toggleGridToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.toggleGridToolStripMenuItem.Text = "Toggle Grid";
+            this.toggleGridToolStripMenuItem.Click += new System.EventHandler(this.toggleGridToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(186, 6);
+            // 
+            // toggleBackgroundToolStripMenuItem
+            // 
+            this.toggleBackgroundToolStripMenuItem.Name = "toggleBackgroundToolStripMenuItem";
+            this.toggleBackgroundToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.toggleBackgroundToolStripMenuItem.Text = "Toggle Background";
+            this.toggleBackgroundToolStripMenuItem.Click += new System.EventHandler(this.toggleBackgroundToolStripMenuItem_Click);
+            // 
+            // backgroundColorToolStripMenuItem
+            // 
+            this.backgroundColorToolStripMenuItem.Name = "backgroundColorToolStripMenuItem";
+            this.backgroundColorToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.backgroundColorToolStripMenuItem.Text = "Set Background Color";
+            this.backgroundColorToolStripMenuItem.Click += new System.EventHandler(this.backgroundColorToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(186, 6);
+            // 
+            // toggleCSPModeToolStripMenuItem
+            // 
+            this.toggleCSPModeToolStripMenuItem.Name = "toggleCSPModeToolStripMenuItem";
+            this.toggleCSPModeToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.toggleCSPModeToolStripMenuItem.Text = "Toggle CSP Mode";
+            this.toggleCSPModeToolStripMenuItem.Click += new System.EventHandler(this.toggleCSPModeToolStripMenuItem_Click);
+            // 
+            // resetCameraButton
+            // 
+            this.resetCameraButton.Image = ((System.Drawing.Image)(resources.GetObject("resetCameraButton.Image")));
+            this.resetCameraButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.resetCameraButton.Name = "resetCameraButton";
+            this.resetCameraButton.Size = new System.Drawing.Size(99, 22);
+            this.resetCameraButton.Text = "Reset Camera";
+            this.resetCameraButton.Click += new System.EventHandler(this.resetCameraButton_Click);
+            // 
+            // editCameraButton
+            // 
+            this.editCameraButton.Image = ((System.Drawing.Image)(resources.GetObject("editCameraButton.Image")));
+            this.editCameraButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.editCameraButton.Name = "editCameraButton";
+            this.editCameraButton.Size = new System.Drawing.Size(113, 22);
+            this.editCameraButton.Text = "Camera Settings";
+            this.editCameraButton.Click += new System.EventHandler(this.editCameraButton_Click);
+            // 
+            // screenshotButton
+            // 
+            this.screenshotButton.Image = ((System.Drawing.Image)(resources.GetObject("screenshotButton.Image")));
+            this.screenshotButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.screenshotButton.Name = "screenshotButton";
+            this.screenshotButton.Size = new System.Drawing.Size(111, 22);
+            this.screenshotButton.Text = "Take Screenshot";
+            this.screenshotButton.Click += new System.EventHandler(this.screenshotButton_Click);
+            // 
+            // gridColorToolStripMenuItem
+            // 
+            this.gridColorToolStripMenuItem.Name = "gridColorToolStripMenuItem";
+            this.gridColorToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.gridColorToolStripMenuItem.Text = "Set Grid Color";
+            this.gridColorToolStripMenuItem.Click += new System.EventHandler(this.gridColorToolStripMenuItem_Click);
+            // 
             // ViewportControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.animationGroup);
             this.Name = "ViewportControl";
@@ -257,7 +374,10 @@ namespace HSDRawViewer.GUI
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.animationTrack)).EndInit();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -277,5 +397,17 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.CheckBox cbLoop;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown nudPlaybackSpeed;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton resetCameraButton;
+        private System.Windows.Forms.ToolStripButton editCameraButton;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem toggleGridToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toggleBackgroundToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem backgroundColorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton screenshotButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem toggleCSPModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem gridColorToolStripMenuItem;
     }
 }

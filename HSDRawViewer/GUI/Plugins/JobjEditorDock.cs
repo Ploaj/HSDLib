@@ -27,7 +27,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
         private DataNode _node;
 
-        private JobjEditor Editor;
+        public JobjEditor Editor { get; internal set; }
 
         /// <summary>
         /// 

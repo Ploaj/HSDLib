@@ -153,13 +153,22 @@ namespace HSDRawViewer.Rendering.Renderers
                     x += _xOffset;
                     y += _yOffset;
 
+                    float prevFrame = 0 - 5;
+                    float nextFrame = _player.FrameCount + 5;
+
+                    if (i + 1 < _player.Keys.Count)
+                        nextFrame = _player.Keys[i + 1].Frame;
+
+                    if (i > 0)
+                        prevFrame = _player.Keys[i - 1].Frame;
+
                     if (RenderTangents &&
                         (
                         key.InterpolationType == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL ||
                         key.InterpolationType == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL0
                         )
                        )
-                        DrawTangent(g, key, outTan, selected);
+                        DrawTangent(g, key, prevFrame, nextFrame, outTan, selected);
 
                     var rect = new Rectangle((int)(x - _xScale / 2), (int)(y - _xScale / 2), (int)(_xScale), (int)(_xScale));
 
@@ -191,7 +200,6 @@ namespace HSDRawViewer.Rendering.Renderers
         }
 
         private float _tanLen = 5;
-        private float _precision = 4;
 
         /// <summary>
         /// 
@@ -199,7 +207,7 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="g"></param>
         /// <param name="key"></param>
         /// <param name="selected"></param>
-        private void DrawTangent(Graphics g, FOBJKey key, float outTangent, bool selected)
+        private void DrawTangent(Graphics g, FOBJKey key, float prevFrame, float nextFrame, float outTangent, bool selected)
         {
             var x = key.Frame;
             var y = key.Value;
@@ -208,7 +216,7 @@ namespace HSDRawViewer.Rendering.Renderers
             var i1 = -(_tanLen / 2);
             var i2 = (_tanLen / 2);
 
-            var p = (float)Math.Sqrt(_precision / 4.0f);
+            var p = (float)Math.Sqrt((x - prevFrame) ) / 3;
 
             var one_x = (x + i1 * p) * _xScale + _xOffset;
             var one_y = (y - _minValue + tan * i1 * p) * _yScale + _yOffset;
@@ -216,6 +224,7 @@ namespace HSDRawViewer.Rendering.Renderers
             var two_x = (x) * _xScale + _xOffset;
             var two_y = (y - _minValue) * _yScale + _yOffset;
 
+            p = (float)Math.Sqrt((nextFrame - x)) / 3;
 
             var one_x_o = (x) * _xScale + _xOffset;
             var one_y_o = (y - _minValue) * _yScale + _yOffset;

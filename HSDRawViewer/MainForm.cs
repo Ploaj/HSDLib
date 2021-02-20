@@ -11,6 +11,7 @@ using HSDRawViewer.GUI.Extra;
 using System.ComponentModel;
 using GCILib;
 using HSDRawViewer.GUI.Plugins.Melee;
+using HSDRaw.Common;
 
 namespace HSDRawViewer
 {
@@ -474,7 +475,9 @@ namespace HSDRawViewer
             if (SelectedDataNode.Accessor is HSD_AnimJoint
                 || SelectedDataNode.Accessor is HSD_FigaTree
                 || SelectedDataNode.Accessor is HSD_MatAnimJoint
-                || SelectedDataNode.Accessor is HSD_ShapeAnimJoint)
+                || SelectedDataNode.Accessor is HSD_ShapeAnimJoint
+                || SelectedDataNode.Accessor is HSD_FogDesc
+                || SelectedDataNode.Accessor is HSD_Camera)
             {
                 //foreach (var v in dockPanel.Contents)
                 {
@@ -491,6 +494,12 @@ namespace HSDRawViewer
 
                         if (SelectedDataNode.Accessor is HSD_FigaTree tree)
                             jedit.LoadAnimation(new JointAnimManager(tree));
+
+                        if (SelectedDataNode.Accessor is HSD_FogDesc fog)
+                            jedit.Editor.SetFog(fog);
+
+                        if (SelectedDataNode.Accessor is HSD_Camera camera)
+                            jedit.Editor.SetCamera(camera);
                     }
                 }
             }

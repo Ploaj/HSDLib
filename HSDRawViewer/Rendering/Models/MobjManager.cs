@@ -58,6 +58,8 @@ namespace HSDRawViewer.Rendering.Models
             GL.Enable(EnableCap.AlphaTest);
             GL.AlphaFunc(AlphaFunction.Greater, 0f);
 
+            GL.DepthMask(!mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE));
+
             // Pixel Processing
             shader.SetInt("alphaComp0", 7); // always
             shader.SetInt("alphaComp1", 7);

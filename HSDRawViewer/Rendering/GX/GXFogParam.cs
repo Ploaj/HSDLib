@@ -38,6 +38,7 @@ namespace HSDRawViewer.Rendering.GX
         public void LoadFromHSD(HSDRaw.Common.HSD_FogDesc fog)
         {
             Type = (int)fog.Type;
+            FogEnabled = true;
             Start = fog.Start;
             End = fog.End;
             Color = fog.Color;

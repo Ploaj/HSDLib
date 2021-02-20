@@ -328,6 +328,24 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="fog"></param>
+        public void SetFog(HSD_FogDesc fog)
+        {
+            JOBJManager._fogParam.LoadFromHSD(fog);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="camera"></param>
+        public void SetCamera(HSD_Camera camera)
+        {
+            // TODO: load camera
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="animation"></param>
         public void LoadAnimation(JointAnimManager animation)
         {

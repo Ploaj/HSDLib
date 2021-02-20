@@ -25,6 +25,9 @@ namespace HSDRawViewer.GUI
         public Camera Camera { get => _camera; set { _camera = value; RefreshSize(); } }
         private Camera _camera;
 
+        public Color ViewportBackColor { get; set; } = Color.FromArgb(30, 30, 40);
+        public Color GridColor { get; set; } = Color.White;
+
         [Browsable(false)]
         public bool ReadyToRender { get; internal set; } = false;
 
@@ -104,8 +107,8 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        public int CSPWidth = 136 * 2;
-        public int CSPHeight = 188 * 2;
+        public static int CSPWidth { get; internal set; } = 136 * 2;
+        public static int CSPHeight { get; internal set; } = 188 * 2;
 
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
@@ -165,8 +168,6 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        private static Color ViewportBackColor = Color.FromArgb(50, 50, 50);
-
         public ViewportControl()
         {
             InitializeComponent();
@@ -216,7 +217,7 @@ namespace HSDRawViewer.GUI
 
             panel1.KeyDown += (sender, args) =>
             {
-                if (args.Alt)
+                /*if (args.Alt)
                 {
                     if (args.KeyCode == Keys.B)
                         EnableBack = !EnableBack;
@@ -236,7 +237,7 @@ namespace HSDRawViewer.GUI
                     if (args.KeyCode == Keys.C)
                         using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
                             d.ShowDialog();
-                }
+                }*/
 
                 var keyState = OpenTK.Input.Keyboard.GetState();
                 foreach (var v in Drawables)
@@ -515,7 +516,7 @@ namespace HSDRawViewer.GUI
             }
 
             if (EnableFloor)
-                DrawShape.Floor();
+                DrawShape.Floor(GridColor, 50, 5);
 
             foreach (var r in Drawables)
                 r.Draw(_camera, panel1.Width, panel1.Height);
@@ -584,7 +585,7 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
-            if (EnableHelpDisplay && !TakeScreenShot)
+            /*if (EnableHelpDisplay && !TakeScreenShot)
             {
                 if (IsAltAction)
                 {
@@ -598,7 +599,7 @@ namespace HSDRawViewer.GUI
                 {
                     GLTextRenderer.RenderText(_camera, "Alt+", 0, 0);
                 }
-            }
+            }*/
 
             panel1.SwapBuffers();
 
@@ -915,6 +916,104 @@ namespace HSDRawViewer.GUI
 
             bmp.UnlockBits(bmpData);
             return bmp;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void resetCameraButton_Click(object sender, EventArgs e)
+        {
+            _camera.RestoreDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editCameraButton_Click(object sender, EventArgs e)
+        {
+            using (PropertyDialog d = new PropertyDialog("Camera Settings", _camera))
+                d.ShowDialog();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toggleGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EnableFloor = !EnableFloor;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toggleBackgroundToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EnableBack = !EnableBack;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void screenshotButton_Click(object sender, EventArgs e)
+        {
+            TakeScreenShot = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toggleCSPModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CSPMode = !CSPMode;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void backgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog d = new ColorDialog())
+            {
+                d.Color = ViewportBackColor;
+
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    ViewportBackColor = d.Color;
+
+                    if (EnableBack)
+                        GL.ClearColor(ViewportBackColor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void gridColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog d = new ColorDialog())
+            {
+                d.Color = GridColor;
+
+                if (d.ShowDialog() == DialogResult.OK)
+                    GridColor = d.Color;
+            }
         }
     }
 }

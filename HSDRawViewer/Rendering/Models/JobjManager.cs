@@ -421,6 +421,7 @@ namespace HSDRawViewer.Rendering.Models
                 }
 
                 //GL.Disable(EnableCap.DepthTest);
+                GL.DepthFunc(DepthFunction.Always);
 
                 if (DOBJManager.SelectedDOBJ != null && _settings.OutlineSelected)
                 {

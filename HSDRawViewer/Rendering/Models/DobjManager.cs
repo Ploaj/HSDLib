@@ -150,8 +150,7 @@ namespace HSDRawViewer.Rendering.Models
                     GL.Enable(EnableCap.CullFace);
                     if (selected)
                     {
-                        GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-                        GL.Disable(EnableCap.CullFace);
+                        GL.PolygonMode(MaterialFace.Back, PolygonMode.Line);
                     }
                     else
                     if (p.Flag.HasFlag(POBJ_FLAG.CULLFRONT))

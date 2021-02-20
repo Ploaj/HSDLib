@@ -62,15 +62,12 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public static void Floor()
+        public static void Floor(Color color, int size, int space)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
-            int size = 50;
-            int space = 5;
-
             GL.LineWidth(1f);
-            GL.Color4(1f, 1f, 1f, 1f);
+            GL.Color4(color);
             GL.Begin(PrimitiveType.Lines);
 
             for (int i = -size; i <= size; i += space)
