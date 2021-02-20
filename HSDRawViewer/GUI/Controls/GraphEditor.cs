@@ -330,7 +330,9 @@ namespace HSDRawViewer.GUI.Controls
                     gr.SetKeys(p);
 
                     if (IsControl)
-                        gr.Draw(args.Graphics, rect, Math.Min(_frame, _startSelectionFrame), Math.Max(_frame, _startSelectionFrame) );
+                        gr.Draw(args.Graphics, rect, 
+                            Math.Min(_frame, _startSelectionFrame), 
+                            Math.Max(_frame, _startSelectionFrame));
                     else
                         gr.Draw(args.Graphics, rect, _frame, _frame);
                 }
@@ -641,6 +643,8 @@ namespace HSDRawViewer.GUI.Controls
         private void trackTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             _selectedPlayerIndex = _players.IndexOf(e.Node.Tag as FOBJ_Player);
+            keyProperty.SelectedObject = null;
+            _frame = 0;
             if ((e.Node.Tag as FOBJ_Player).TrackType < trackTypeBox.Items.Count)
                 trackTypeBox.SelectedIndex = (e.Node.Tag as FOBJ_Player).TrackType;
             _graph.Invalidate();
@@ -866,14 +870,14 @@ NONE - None (do not use)";
         {
             if (_selectedPlayer != null)
             {
-                for (int i = 0; i < _selectedPlayer.Keys.Count; i++)
+                /*for (int i = 0; i < _selectedPlayer.Keys.Count; i++)
                 {
                     Simpoly.SimplyPoly(_selectedPlayer, new Simpoly.Options());
                     Console.WriteLine(_selectedPlayer.Keys[i].Frame + " " + _selectedPlayer.Keys[i].Tan);
                     _graph.Invalidate();
                     OnTrackEdited(EventArgs.Empty);
-                }
-                /*using (PropertyDialog d = new PropertyDialog("Compression Settings", _compSettings))
+                }*/
+                using (PropertyDialog d = new PropertyDialog("Compression Settings", _compSettings))
                 {
                     if(d.ShowDialog() == DialogResult.OK)
                     {
@@ -881,7 +885,7 @@ NONE - None (do not use)";
                         _graph.Invalidate();
                         OnTrackEdited(EventArgs.Empty);
                     }
-                }*/
+                }
             }
         }
     }

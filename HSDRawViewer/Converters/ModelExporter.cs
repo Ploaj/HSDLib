@@ -250,10 +250,10 @@ namespace HSDRawViewer.Converters
                         if (dobj.Pobj != null)
                             foreach (var pobj in dobj.Pobj.List)
                             {
-                                if (pobj.Attributes.Any(e => e.AttributeName == GXAttribName.GX_TEX_MTX_ARRAY))
+                                if (pobj.HasAttribute(GXAttribName.GX_TEX_MTX_ARRAY))
                                     reflective = true;
 
-                                if (pobj.Attributes.Any(e => e.AttributeName == GXAttribName.GX_VA_PNMTXIDX))
+                                if (pobj.HasAttribute(GXAttribName.GX_VA_PNMTXIDX))
                                     single = false;
                                 
                                 var poly = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ, dobj.Mobj, mesh);
@@ -342,10 +342,10 @@ namespace HSDRawViewer.Converters
 
                     //
                     System.Numerics.Matrix4x4 singleMatrix = System.Numerics.Matrix4x4.Identity;
-                    bool hasEnvelopes = pobj.Attributes.ToList().Exists(r => r.AttributeName == GXAttribName.GX_VA_PNMTXIDX);
+                    bool hasEnvelopes = pobj.HasAttribute(GXAttribName.GX_VA_PNMTXIDX);
 
                     // process attributes
-                    foreach (var a in pobj.Attributes)
+                    foreach (var a in pobj.ToGXAttributes())
                     {
                         switch (a.AttributeName)
                         {

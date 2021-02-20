@@ -13,6 +13,29 @@ namespace HSDRaw.Tools
         /// <param name="DisplayList">Display list belonging to given PBOJ</param>
         /// <param name="Polygon"><see cref="HSD_POBJ"/> the the display list belong to</param>
         /// <returns>Array of <see cref="GXVertex"/></returns>
+        public static GX_Shape[] GetShapeSet(GX_DisplayList DisplayList, HSD_POBJ Polygon, int shapeset)
+        {
+            // Create Vertex List
+            List<GX_Shape> Vertices = new List<GX_Shape>();
+
+            // Read through the Display Lists
+            foreach (GX_PrimitiveGroup pg in DisplayList.Primitives)
+            {
+                var v = GetDecodedVertices(pg, DisplayList.Attributes, Polygon, shapeset);
+
+                foreach (var gv in v)
+                    Vertices.Add(new GX_Shape() { POS = gv.POS, NRM = gv.NRM });
+            }
+
+            return Vertices.ToArray();
+        }
+
+        /// <summary>
+        /// Reads the vertex buffer into a more accessable format : <see cref="GXVertex"/>
+        /// </summary>
+        /// <param name="DisplayList">Display list belonging to given PBOJ</param>
+        /// <param name="Polygon"><see cref="HSD_POBJ"/> the the display list belong to</param>
+        /// <returns>Array of <see cref="GXVertex"/></returns>
         public static GX_Vertex[] GetDecodedVertices(GX_DisplayList DisplayList, HSD_POBJ Polygon)
         {
             // Create Vertex List
@@ -21,7 +44,7 @@ namespace HSDRaw.Tools
             // Read through the Display Lists
             foreach (GX_PrimitiveGroup pg in DisplayList.Primitives)
             {
-                Vertices.AddRange(GetDecodedVertices(pg, Polygon.Attributes));
+                Vertices.AddRange(GetDecodedVertices(pg, DisplayList.Attributes, Polygon, 0));
             }
 
             return Vertices.ToArray();
@@ -33,7 +56,7 @@ namespace HSDRaw.Tools
         /// <param name="PrimitiveGroup"></param>
         /// <param name="Attributes"></param>
         /// <returns></returns>
-        private static GX_Vertex[] GetDecodedVertices(GX_PrimitiveGroup PrimitiveGroup, GX_Attribute[] Attributes)
+        private static GX_Vertex[] GetDecodedVertices(GX_PrimitiveGroup PrimitiveGroup, List<GX_Attribute> Attributes, HSD_POBJ Polygon, int shapeset)
         {
             // Create Vertex List
             List<GX_Vertex> Vertices = new List<GX_Vertex>();
@@ -42,7 +65,7 @@ namespace HSDRaw.Tools
             foreach (GX_IndexGroup ig in PrimitiveGroup.Indices)
             {
                 GX_Vertex Vertex = new GX_Vertex();
-                for (int i = 0; i < Attributes.Length; i++)
+                for (int i = 0; i < Attributes.Count; i++)
                 {
                     var attribute = Attributes[i];
                     
@@ -69,9 +92,14 @@ namespace HSDRaw.Tools
                                 Vertex.TEX1MTXIDX = (ushort)index;
                             break;
                         case GXAttribName.GX_VA_POS:
-
                             if (attribute.AttributeType != GXAttribType.GX_DIRECT)
                             {
+                                if (Polygon.ShapeSet != null)
+                                {
+                                    var ss = Polygon.ShapeSet.VertexIndices[shapeset];
+                                    f = attribute.GetDecodedDataAt(ss[index]);
+                                }
+
                                 if (f.Length > 0)
                                     Vertex.POS.X = f[0];
                                 if (f.Length > 1)
@@ -83,6 +111,12 @@ namespace HSDRaw.Tools
                         case GXAttribName.GX_VA_NRM:
                             if (attribute.AttributeType != GXAttribType.GX_DIRECT)
                             {
+                                if (Polygon.ShapeSet != null)
+                                {
+                                    var ss = Polygon.ShapeSet.NormalIndicies[shapeset];
+                                    f = attribute.GetDecodedDataAt(ss[index]);
+                                }
+
                                 Vertex.NRM.X = f[0];
                                 Vertex.NRM.Y = f[1];
                                 Vertex.NRM.Z = f[2];

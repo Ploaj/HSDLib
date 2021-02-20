@@ -76,7 +76,12 @@ namespace HSDRaw.Tools
                 if (Keys == null || Keys.Count == 0)
                     return 0;
 
-                return (int)Keys.Max(e => e.Frame);
+                var max = (int)Keys.Max(e => e.Frame);
+
+                if (max < 1)
+                    max = 1;
+
+                return max;
             }
         }
 

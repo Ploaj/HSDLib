@@ -14,6 +14,7 @@ using IONET.Core;
 using IONET.Core.Model;
 using System.Linq;
 using System.Windows.Forms;
+using HSDRawViewer.Rendering.GX;
 
 namespace HSDRawViewer.Converters
 {

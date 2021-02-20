@@ -514,5 +514,14 @@ namespace HSDRawViewer.Rendering
 
             RotationYRadians = (float)Math.Acos(Vector3.Dot(new Vector3(rotationXRadians, 0, 0), end));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fog"></param>
+        public void LoadFromHSD(HSDRaw.Common.HSD_Camera camera)
+        {
+            // TODO load camera
+        }
     }
 }

@@ -5,125 +5,18 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;
-using System.Drawing;
-using System.ComponentModel;
-using YamlDotNet.Serialization;
+using HSDRawViewer.Rendering.Animation;
+using HSDRawViewer.Rendering.GX;
+using HSDRawViewer.Tools;
 
-namespace HSDRawViewer.Rendering
+namespace HSDRawViewer.Rendering.Models
 {
-    public enum RenderMode
-    {
-        Default,
-        Normals,
-        Tangents, 
-        BiNormal,
-        VertexColor,
-        UV0,
-        UV1,
-        UV2,
-        UV3,
-        TEX0,
-        TEX1,
-        TEX2,
-        TEX3,
-        AmbientColor,
-        DiffuseColor,
-        SpecularColor,
-        ExtColor,
-        DiffusePass,
-        SpecularPass,
-        BoneWeight,
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class JOBJManagerSettings
-    {
-        [Category("1. Display"), DisplayName("Show Bones"), Description("")]
-        public bool RenderBones { get; set; } = true;
-
-        [Category("1. Display"), DisplayName("Show Objects"), Description("")]
-        public bool RenderObjects { get; set; } = true;
-
-        [Category("1. Display"), DisplayName("Show Bone Orientation"), Description("")]
-        public bool RenderOrientation { get; set; } = false;
-
-
-        //public bool RenderMaterials { get; set; } = true;
-
-
-        [Category("4. Enhancements"), DisplayName("Use Per Pixel Lighting"), Description("Calculates lighting per pixel for a smoother look. Set to false for gamecube style.")]
-        public bool UsePerPixelLighting { get; set; } = true;
-
-        [Category("4. Enhancements"), DisplayName("Adjust Saturation"), Description("")]
-        public float Saturation { get; set; } = 1;
-
-
-        [Category("2. Lighting Settings"), DisplayName("Use Camera Light"), Description("When true makes the light source emit from the camera's location")]
-        public bool UseCameraLight { get; set; } = true;
-
-        [Category("2. Lighting Settings"), DisplayName("Light X"), Description("X position of light in world when camera light is disabled")]
-        public float LightX { get; set; } = 0;
-
-        [Category("2. Lighting Settings"), DisplayName("Light Y"), Description("Y position of light in world when camera light is disabled")]
-        public float LightY { get; set; } = 10;
-
-        [Category("2. Lighting Settings"), DisplayName("Light Z"), Description("Z position of light in world when camera light is disabled")]
-        public float LightZ { get; set; } = 50;
-
-
-        [Category("3. Lighting Color"), DisplayName("Ambient Intensity"), Description("The intensity of the ambient lighting")]
-        public float AmbientPower { get; set; } = 0.5f;
-
-        [Category("3. Lighting Color"), DisplayName("Ambient Color"), Description("The color of the ambient light")]
-        [YamlIgnore]
-        public Color AmbientColor { get; set; } = Color.White;
-
-        [Browsable(false)]
-        public byte AmbientR { get => AmbientColor.R; set => AmbientColor = Color.FromArgb(AmbientColor.A, value, AmbientColor.G, AmbientColor.B); }
-        [Browsable(false)]
-        public byte AmbientG { get => AmbientColor.G; set => AmbientColor = Color.FromArgb(AmbientColor.A, AmbientColor.R, value, AmbientColor.B); }
-        [Browsable(false)]
-        public byte AmbientB { get => AmbientColor.B; set => AmbientColor = Color.FromArgb(AmbientColor.A, AmbientColor.R, AmbientColor.G, value); }
-
-        [Category("3. Lighting Color"), DisplayName("Diffuse Intensity"), Description("The intensity of the diffuse lighting")]
-        public float DiffusePower { get; set; } = 1;
-
-        [Category("3. Lighting Color"), DisplayName("Diffuse Color"), Description("The color of the diffuse light")]
-        [YamlIgnore]
-        public Color DiffuseColor { get; set; } = Color.White;
-        
-        [Browsable(false)]
-        public byte DiffuseR { get => DiffuseColor.R; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, value, DiffuseColor.G, DiffuseColor.B); }
-        [Browsable(false)]
-        public byte DiffuseG { get => DiffuseColor.G; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, DiffuseColor.R, value, DiffuseColor.B); }
-        [Browsable(false)]
-        public byte DiffuseB { get => DiffuseColor.B; set => DiffuseColor = Color.FromArgb(DiffuseColor.A, DiffuseColor.R, DiffuseColor.G, value); }
-
-        /*[Category("3. Lighting Color"), DisplayName("Specular Intensity"), Description("The intensity of the specular highlight")]
-        public float SpecularPower { get; set; } = 1;
-
-        [Category("3. Lighting Color"), DisplayName("Specular Color"), Description("The color of the specular highlight")]
-        [YamlIgnore]
-        public Color SpecularColor { get; set; } = Color.White;
-
-        [Browsable(false)]
-        public byte SpecularR { get => SpecularColor.R; set => SpecularColor = Color.FromArgb(SpecularColor.A, value, SpecularColor.G, SpecularColor.B); }
-        [Browsable(false)]
-        public byte SpecularG { get => SpecularColor.G; set => SpecularColor = Color.FromArgb(SpecularColor.A, SpecularColor.R, value, SpecularColor.B); }
-        [Browsable(false)]
-        public byte SpecularB { get => SpecularColor.B; set => SpecularColor = Color.FromArgb(SpecularColor.A, SpecularColor.R, SpecularColor.G, value); }*/
-    }
-
     /// <summary>
     /// 
     /// </summary>
     public class JOBJManager
     {
-        public JOBJManagerSettings settings = new JOBJManagerSettings();
-
-        public HSD_JOBJ SelectetedJOBJ = null;
+        public HSD_JOBJ SelectedJOBJ = null;
 
         public float Frame { get; set; }
 
@@ -139,7 +32,15 @@ namespace HSDRawViewer.Rendering
 
         public DOBJManager DOBJManager = new DOBJManager();
 
-        public RenderMode RenderMode { get; set; } = RenderMode.Default;
+        public RenderMode RenderMode { get => _gxShader.RenderMode; set => _gxShader.RenderMode = value; }
+
+        private GXShader _gxShader = new GXShader();
+
+        public JobjDisplaySettings _settings { get; internal set; } = new JobjDisplaySettings();
+
+        public GXLightParam _lightParam { get; internal set; } = new GXLightParam();
+
+        public GXFogParam _fogParam { get; internal set; } = new GXFogParam();
 
         public int JointCount { get => jobjToCache.Count; }
 
@@ -368,7 +269,7 @@ namespace HSDRawViewer.Rendering
             Animation = anim;
             foreach(var v in jobjToCache)
             {
-                v.Key.InverseWorldTransform = TKMatixToHSDMatrix(v.Value.WorldTransform.Inverted());
+                v.Key.InverseWorldTransform = v.Value.WorldTransform.Inverted().ToHsdMatrix();
             }
         }
 
@@ -439,8 +340,28 @@ namespace HSDRawViewer.Rendering
                 GL.DepthFunc(DepthFunction.Lequal);
             }
 
+            // prepare shader
+            SetupShader();
+
+            // render with shader
+            _gxShader.Bind(camera, _lightParam, _fogParam);
+
             // Render DOBJS
-            if (settings.RenderObjects)
+            RenderDOBJs(camera);
+
+            GL.PopAttrib();
+            GL.UseProgram(0);
+
+            // bone overlay
+            RenderBoneOverlay();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RenderDOBJs(Camera camera)
+        {
+            if (_settings.RenderObjects)
             {
                 HSD_JOBJ parent = null;
                 List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>> XLU = new List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>>();
@@ -448,10 +369,14 @@ namespace HSDRawViewer.Rendering
                 if (!EnableMaterialFrame)
                     MatAnimation.SetAllFrames(Frame);
                 MatAnimation.JOBJIndex = 0;
+                ShapeAnimation.JOBJIndex = 0;
+                ShapeAnimation.SetAllFrames(Frame);
 
                 foreach (var b in jobjToCache)
                 {
                     MatAnimation.DOBJIndex = 0;
+                    ShapeAnimation.DOBJIndex = 0;
+
                     if (b.Key.Dobj != null)
                     {
                         foreach (var dobj in b.Key.Dobj.List)
@@ -459,12 +384,16 @@ namespace HSDRawViewer.Rendering
                             if (dobj == DOBJManager.SelectedDOBJ)
                                 parent = b.Key;
 
+                            // get shape blend amt
+                            DOBJManager.ShapeBlend = ShapeAnimation.GetBlending();
+
                             if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
                                 XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ, int, int>(dobj, b.Key, MatAnimation.JOBJIndex, MatAnimation.DOBJIndex));
                             else
-                                DOBJManager.RenderDOBJShader(camera, dobj, b.Key, this, MatAnimation);
+                                DOBJManager.RenderDOBJShader(GXShader._shader, dobj, b.Key, this, MatAnimation);
 
                             MatAnimation.DOBJIndex++;
+                            ShapeAnimation.DOBJIndex++;
                         }
                     }
 
@@ -473,26 +402,54 @@ namespace HSDRawViewer.Rendering
                         DrawShape.RenderSpline(b.Key.Spline);
 
                     MatAnimation.JOBJIndex++;
+                    ShapeAnimation.JOBJIndex++;
                 }
 
+                //XLU.OrderBy(e => CameraDistance(camera, e.Item2));
+
                 // render xlu lookups last
-                foreach(var xlu in XLU)
+                foreach (var xlu in XLU)
                 {
                     MatAnimation.JOBJIndex = xlu.Item3;
                     MatAnimation.DOBJIndex = xlu.Item4;
-                    DOBJManager.RenderDOBJShader(camera, xlu.Item1, xlu.Item2, this, MatAnimation);
+
+                    ShapeAnimation.JOBJIndex = xlu.Item3;
+                    ShapeAnimation.DOBJIndex = xlu.Item4;
+
+                    DOBJManager.ShapeBlend = ShapeAnimation.GetBlending();
+                    DOBJManager.RenderDOBJShader(GXShader._shader, xlu.Item1, xlu.Item2, this, MatAnimation);
                 }
 
-                GL.Disable(EnableCap.DepthTest);
+                //GL.Disable(EnableCap.DepthTest);
 
-                if (DOBJManager.SelectedDOBJ != null && DOBJManager.OutlineSelected)
+                if (DOBJManager.SelectedDOBJ != null && _settings.OutlineSelected)
                 {
-                    DOBJManager.RenderDOBJShader(camera, DOBJManager.SelectedDOBJ, parent, this, null, true);
+                    DOBJManager.RenderDOBJShader(GXShader._shader, DOBJManager.SelectedDOBJ, parent, this, null, true);
                 }
             }
+        }
 
-            GL.PopAttrib();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public float CameraDistance(Camera c, HSD_JOBJ jobj)
+        {
+            var jointPosition = Vector3.TransformPosition(Vector3.Zero, GetWorldTransform(jobj));
+            var cameraPos = c.TransformedPosition;
 
+            return Vector3.DistanceSquared(jointPosition, cameraPos);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RenderBoneOverlay()
+        {
+            if (!_settings.RenderBones)
+                return;
 
             GL.PushAttrib(AttribMask.AllAttribBits);
 
@@ -501,17 +458,27 @@ namespace HSDRawViewer.Rendering
 
             float mag = 0;
 
-            if(settings.RenderOrientation)
-                mag = Vector3.TransformPosition(new Vector3(1, 0, 0), camera.MvpMatrix.Inverted()).Length / 30;
+            if (_settings.RenderOrientation)
+                mag = 2; //Vector3.TransformPosition(new Vector3(1, 0, 0), camera.MvpMatrix.Inverted()).Length / 30;
 
-            if (settings.RenderBones)
-                foreach (var b in jobjToCache)
-                {
-                    RenderBone(mag, b.Value, b.Key.Equals(SelectetedJOBJ));
-                }
+            foreach (var b in jobjToCache)
+                RenderBone(mag, b.Value, b.Key.Equals(SelectedJOBJ));
 
             GL.PopAttrib();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="shader"></param>
+        public void SetupShader()
+        {
+            // ui
+            _gxShader.SelectedBone = IndexOf(SelectedJOBJ);
+            _gxShader.WorldTransforms = GetWorldTransforms();
+            _gxShader.BindTransforms = GetBindTransforms();
+        }
+
 
         /// <summary>
         /// 
@@ -564,9 +531,9 @@ namespace HSDRawViewer.Rendering
             GL.Vertex3(0, 0, 0);
             GL.End();
 
-            if (settings.RenderOrientation)
+            if (_settings.RenderOrientation)
             {
-                GL.LineWidth(2.5f);
+                GL.LineWidth(1.5f);
 
                 GL.Begin(PrimitiveType.Lines);
                 GL.Color3(1f, 0f, 0f);
@@ -647,7 +614,7 @@ namespace HSDRawViewer.Rendering
                 };
                 if (root.Flags.HasFlag(JOBJ_FLAG.SKELETON) || root.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) && root.InverseWorldTransform != null)
                 {
-                    jcache.InvertedTransform = HSDMatrixToTKMatrix(root.InverseWorldTransform);
+                    jcache.InvertedTransform = root.InverseWorldTransform.ToTKMatrix();
                 }
                 jobjToCache.Add(root, jcache);
             }
@@ -722,6 +689,17 @@ namespace HSDRawViewer.Rendering
 
         public JointAnimManager Animation = new JointAnimManager();
         public MatAnimManager MatAnimation = new MatAnimManager();
+        public ShapeAnimManager ShapeAnimation = new ShapeAnimManager();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public void SetShapeAnimJoint(HSD_ShapeAnimJoint joint)
+        {
+            ShapeAnimation = new ShapeAnimManager();
+            ShapeAnimation.FromShapeAnim(joint);
+        }
 
         /// <summary>
         /// 
@@ -830,46 +808,6 @@ namespace HSDRawViewer.Rendering
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <param name="X"></param>
-        /// <param name="Y"></param>
-        /// <param name="Z"></param>
-        /// <returns></returns>
-        public static Matrix4 HSDMatrixToTKMatrix(HSD_Matrix4x3 mat)
-        {
-            return new Matrix4(
-                mat.M11, mat.M21, mat.M31, 0,
-                mat.M12, mat.M22, mat.M32, 0,
-                mat.M13, mat.M23, mat.M33, 0,
-                mat.M14, mat.M24, mat.M34, 1);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mat"></param>
-        /// <returns></returns>
-        public static HSD_Matrix4x3 TKMatixToHSDMatrix(Matrix4 mat)
-        {
-            return new HSD_Matrix4x3()
-            {
-                M11 = mat.M11,
-                M21 = mat.M12,
-                M31 = mat.M13,
-                M12 = mat.M21,
-                M22 = mat.M22,
-                M32 = mat.M23,
-                M13 = mat.M31,
-                M23 = mat.M32,
-                M33 = mat.M33,
-                M14 = mat.M41,
-                M24 = mat.M42,
-                M34 = mat.M43,
-            };
-        }
 
         #endregion
     }

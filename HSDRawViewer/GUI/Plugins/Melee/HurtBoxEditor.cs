@@ -2,6 +2,7 @@
 using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
 using OpenTK;

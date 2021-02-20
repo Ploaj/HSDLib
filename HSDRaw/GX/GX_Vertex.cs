@@ -32,4 +32,21 @@
             return !(y == x);
         }
     }
+
+    public struct GX_Shape
+    {
+        public GXVector3 POS;
+        public GXVector3 NRM;
+
+        public static int Stride = (3 + 3) * 4;
+
+        public static bool operator ==(GX_Shape x, GX_Shape y)
+        {
+            return x.POS == y.POS && x.NRM == y.NRM;
+        }
+        public static bool operator !=(GX_Shape x, GX_Shape y)
+        {
+            return !(y == x);
+        }
+    }
 }

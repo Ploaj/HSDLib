@@ -25,8 +25,10 @@ namespace HSDRaw.GX
         public bool Read(BinaryReaderExt Reader, GX_Attribute[] Attributes)
         {
             PrimitiveType = (GXPrimitiveType)Reader.ReadByte();
+
             if (PrimitiveType == 0)
                 return false;
+
             var count = Reader.ReadInt16();
 
             Indices = new GX_IndexGroup[count];

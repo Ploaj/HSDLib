@@ -29,6 +29,8 @@ namespace HSDRaw
         public Dictionary<int, HSDStruct> References { get => _references; }
         private Dictionary<int, HSDStruct> _references = new Dictionary<int, HSDStruct>();
 
+        public HSDStruct _nextStruct;
+
         public int Length => _data.Length;
         
         /// <summary>
@@ -276,6 +278,15 @@ namespace HSDRaw
 
             return s;
         }
+
+        /// <summary>
+        /// Adds a struct onto the end of this one
+        /// </summary>
+        /// <param name="str"></param>
+        public void AppendStruct(HSDStruct str)
+        {
+            SetEmbededStruct(Length, str);
+        }
         
         /// <summary>
         /// Embeddeds a given <see cref="HSDStruct"/> at given location
@@ -286,6 +297,10 @@ namespace HSDRaw
         {
             if(str == null)
                 return;
+
+            // reset to fit new
+            if (loc + str.Length > Length)
+                Resize(loc + str.Length);
 
             // Sets the bytes for this range
             SetBytes(loc, str.GetData());
@@ -302,7 +317,6 @@ namespace HSDRaw
             {
                 SetReferenceStruct(loc + v.Key, v.Value);
             }
-            
         }
 
         /// <summary>

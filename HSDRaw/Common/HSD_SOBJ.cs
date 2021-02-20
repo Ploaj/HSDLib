@@ -14,7 +14,7 @@ namespace HSDRaw.Common
 
         public HSDNullPointerArrayAccessor<HSD_Light> Lights { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_Light>>(0x08); set => _s.SetReference(0x08, value); }
 
-        //public int Fog { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        public HSD_FogAdjDesc Fog { get => _s.GetReference<HSD_FogAdjDesc>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 
     /// <summary>

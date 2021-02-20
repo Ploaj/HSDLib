@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Animation;
 using System;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
@@ -54,6 +55,15 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         /// <param name="anim"></param>
         public void LoadAnimation(JointAnimManager anim)
+        {
+            Editor.LoadAnimation(anim);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="anim"></param>
+        public void LoadAnimation(HSD_ShapeAnimJoint anim)
         {
             Editor.LoadAnimation(anim);
         }

@@ -2,7 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace HSDRawViewer.Rendering
+namespace HSDRawViewer.Rendering.GX
 {
     /// <summary>
     /// Translates GX enums to opengl equivalent 

@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using HSDRaw;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.GX;
+using HSDRawViewer.Rendering.GX;
 using OpenTK.Graphics.OpenGL;
 
 namespace HSDRawViewer.Rendering.Renderers

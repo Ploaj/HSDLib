@@ -113,7 +113,7 @@ namespace HSDRawViewer.Converters
 
                     if (hasS == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackSX, trackSY, trackSZ, Siso == 1, SXfixed == 1, SYfixed == 1, SZfixed == 1, s_type, dataOffset);
-
+                    
                     if (hasR == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackRX, trackRY, trackRZ, Riso == 1, RXfixed == 1, RYfixed == 1, RZfixed == 1, r_type, dataOffset);
 
@@ -133,17 +133,17 @@ namespace HSDRawViewer.Converters
                     foreach (var k in trackRX.Keys)
                     {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
-                        k.Tan = MathHelper.DegreesToRadians(k.Value);
+                        k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
                     foreach (var k in trackRY.Keys)
                     {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
-                        k.Tan = MathHelper.DegreesToRadians(k.Value);
+                        k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
                     foreach (var k in trackRZ.Keys)
                     {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
-                        k.Tan = MathHelper.DegreesToRadians(k.Value);
+                        k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
 
                     Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count + " " + flags.ToString("X"));
@@ -161,10 +161,14 @@ namespace HSDRawViewer.Converters
         {
             if (isIsotrophic)
             {
+                var offset = r.ReadUInt32() + r.Position;
+                var temp = r.Position;
+                r.Seek(offset);
                 float iss = r.ReadSingle();
                 xtrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
                 ytrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
                 ztrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
+                r.Seek(temp);
             }
             else
             {

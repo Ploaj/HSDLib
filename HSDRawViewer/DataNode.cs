@@ -91,6 +91,7 @@ namespace HSDRawViewer
             { typeof(KAR_grCollisionNode), "coll" },
             { typeof(HSD_AnimJoint), "anim_joint" },
             { typeof(HSD_MatAnimJoint), "anim_material" },
+            { typeof(HSD_ShapeAnimJoint), "anim_shape" },
             { typeof(HSD_ParticleGroup), "group" },
             { typeof(HSD_TEXGraphicBank), "group" },
             { typeof(HSD_TexGraphic), "anim_texture" },

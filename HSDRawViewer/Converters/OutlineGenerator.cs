@@ -69,7 +69,7 @@ namespace HSDRawViewer.Converters
                         GXAttribName.GX_VA_NULL
                 };
 
-                if(pobj.Attributes.Select(e=>e.AttributeName).Contains(GXAttribName.GX_VA_PNMTXIDX))
+                if(pobj.HasAttribute(GXAttribName.GX_VA_PNMTXIDX))
                 {
                     attrs = new GXAttribName[]
                     {

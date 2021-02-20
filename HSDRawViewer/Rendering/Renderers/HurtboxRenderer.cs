@@ -1,5 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Shapes;
 using OpenTK;
 using System.Collections.Generic;

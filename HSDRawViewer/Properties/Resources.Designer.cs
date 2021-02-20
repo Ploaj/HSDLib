@@ -103,6 +103,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ico_anim_shape {
+            get {
+                object obj = ResourceManager.GetObject("ico_anim_shape", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ico_anim_texture {
             get {
                 object obj = ResourceManager.GetObject("ico_anim_texture", resourceCulture);

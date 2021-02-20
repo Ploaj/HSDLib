@@ -97,6 +97,11 @@ namespace HSDRaw.Common.Animation
         HSD_A_J_SETFLOAT9
     }
 
+    public enum ShapeTrackType
+    {
+        HSD_A_S_BLEND = 1
+    }
+
     public enum GXInterpolationType
     {
         HSD_A_OP_NONE = 0,

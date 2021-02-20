@@ -62,7 +62,7 @@ namespace HSDRawViewer.Rendering.Renderers
             _minValue = float.MaxValue;
             _maxValue = float.MinValue;
             _valueCache.Clear();
-            for(int i = 0; i < _player.FrameCount; i++)
+            for(int i = 0; i < (_player.FrameCount == 0 ? _player.Keys.Count : _player.FrameCount); i++)
             {
                 var v = _player.GetValue(i);
                 _minValue = Math.Min(_minValue, v);
@@ -78,10 +78,13 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="e"></param>
         public void Draw(Graphics g, Rectangle bounds, int selectedFrameStart, int selectedFrameEnd)
         {
+            if (_frameCount == 0)
+                return;
+
             _xOffset = 0;
             _yOffset = _zoom;
 
-            _xScale = bounds.Width / (float)(_frameCount);
+            _xScale = bounds.Width / (float)_frameCount;
             _yScale = (bounds.Height - _zoom * 2) / _range;
 
             if (_yScale < 1)

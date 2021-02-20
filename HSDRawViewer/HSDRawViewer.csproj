@@ -440,14 +440,22 @@
     <Compile Include="Rendering\Animation\AnimManager.cs" />
     <Compile Include="Rendering\Animation\AnimNode.cs" />
     <Compile Include="Rendering\Animation\MotAnimManager.cs" />
+    <Compile Include="Rendering\Animation\ShapeAnimManager.cs" />
     <Compile Include="Rendering\Camera.cs" />
+    <Compile Include="Rendering\GX\GXFogParam.cs" />
+    <Compile Include="Rendering\GX\GXLightParam.cs" />
+    <Compile Include="Rendering\GX\GXShader.cs" />
     <Compile Include="Rendering\Models\DobjManager.cs" />
     <Compile Include="Rendering\Animation\MatAnimManager.cs" />
+    <Compile Include="Rendering\Models\JobjDisplaySettings.cs" />
+    <Compile Include="Rendering\Models\MobjManager.cs" />
+    <Compile Include="Rendering\Models\VertexBufferManager.cs" />
+    <Compile Include="Rendering\GX\RenderMode.cs" />
     <Compile Include="Rendering\Renderers\GraphRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
     <Compile Include="Rendering\Renderers\TextRenderer.cs" />
     <Compile Include="Rendering\Shapes\DrawShape.cs" />
-    <Compile Include="Rendering\GXTranslator.cs" />
+    <Compile Include="Rendering\GX\GXTranslator.cs" />
     <Compile Include="Rendering\IDrawable.cs" />
     <Compile Include="Rendering\Models\JobjManager.cs" />
     <Compile Include="Rendering\Math3D.cs" />
@@ -477,6 +485,7 @@
     <Compile Include="Tools\GUITools.cs" />
     <Compile Include="Tools\ImageTools.cs" />
     <Compile Include="Tools\JointMap.cs" />
+    <Compile Include="Tools\MatrixExtensions.cs" />
     <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
@@ -520,6 +529,7 @@
     <None Include="Resources\ico_file.png" />
     <None Include="Resources\ico_hatchling.png" />
     <None Include="Resources\back_checker.png" />
+    <None Include="Resources\ico_anim_shape.png" />
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />

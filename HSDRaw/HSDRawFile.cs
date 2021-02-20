@@ -566,17 +566,15 @@ namespace HSDRaw
             if (Roots.Count > 0 && Roots[0].Data is MEX_Data)
                 bufferAlign = false;
 
+            // trim data if desired
             if (trim)
                 TrimData();
 
-            // TODO:
-            //SetStructFlags();
-
-            // gather all structs--------------------------------------------------------------------------
+            // gather all structs-----------------------
             var allStructs = GetAllStructs();
 
             // struct cache cleanup
-            // remove unused structs--------------------------------------------------------------------------
+            // remove unused structs--------------------
             var unused = new List<HSDStruct>();
 
             foreach (var s in _structCache)
@@ -584,17 +582,14 @@ namespace HSDRaw
                 if (!allStructs.Contains(s))
                     unused.Add(s);
             }
+
+            // remove unused structs---------------------
             if (optimize)
                 foreach (var s in unused)
-                {
-                    //TODO: this may be bugged?
                     if (_structCache.Contains(s))
-                    {
-                        System.Diagnostics.Debug.WriteLine("Removing " + s.Length.ToString("X") + " " + GetOffsetFromStruct(s).ToString("X"));
                         _structCache.Remove(s);
-                    }
-                }
-            // add missing structs--------------------------------------------------------------------------
+
+            // add missing structs-----------------------
             foreach (var s in allStructs)
             {
                 if (!_structCache.Contains(s))
@@ -607,9 +602,28 @@ namespace HSDRaw
             }
             allStructs.Clear();
 
-            // remove duplicate buffers--------------------------------------------------------------------------
-            if(optimize && Roots.Count > 0 && !(Roots[0].Data is SBM_FighterData) && !(Roots[0].Data is MEX_Data))
+            // remove duplicate buffers------------------
+            // don't remove duplicates for fighter or mex data
+            if(
+                optimize && 
+                Roots.Count > 0 && 
+                !(Roots[0].Data is SBM_FighterData) && 
+                !(Roots[0].Data is MEX_Data))
                 RemoveDuplicateBuffers();
+
+            // guarentee order
+            // this is specifically for shape anims which break the design of hsdraw
+            for(int i = 0; i < _structCache.Count - 1; i++)
+            {
+                var str = _structCache[i];
+                if (str._nextStruct != null &&
+                    str._nextStruct != _structCache[i + 1] &&
+                    _structCache.Contains(str._nextStruct))
+                {
+                    _structCache.Remove(str._nextStruct);
+                    _structCache.Insert(i + 1, str._nextStruct);
+                }
+            }
 
             // build file --------------------------------------------------------------------------
             using (BinaryWriterExt writer = new BinaryWriterExt(stream))
@@ -753,12 +767,13 @@ namespace HSDRaw
 
         private readonly static Func<string, HSDAccessor>[] symbol_identificators = new Func<string, HSDAccessor>[]
         {
-                x => x.EndsWith("shapeanim_joint") ? new HSDAccessor() : null,
                 x => x.EndsWith("matanim_joint") ? new HSD_MatAnimJoint() : null,
-                x => x.EndsWith("_joint") ?  new HSD_JOBJ() : null,
+                x => x.EndsWith("shapeanim_joint") ?  new HSD_ShapeAnimJoint() : null,
                 x => x.EndsWith("_animjoint") ?  new HSD_AnimJoint() : null,
+                x => x.EndsWith("_joint") ?  new HSD_JOBJ() : null,
                 x => x.EndsWith("_texanim") ?  new HSD_TexAnim() : null,
                 x => x.EndsWith("_figatree") ?  new HSD_FigaTree() : null,
+                x => x.EndsWith("_camera") ?  new HSD_Camera() : null,
                 x => x.EndsWith("_scene_models") ||
                     x.Equals("Stc_rarwmdls") ||
                     x.Equals("Stc_scemdls") ||
@@ -768,6 +783,7 @@ namespace HSDRaw
                 x => x.EndsWith("MnSelectChrDataTable") ?  new SBM_SelectChrDataTable() : null,
                 x => x.EndsWith("MnSelectStageDataTable") ?  new SBM_MnSelectStageDataTable() : null,
                 x => x.EndsWith("coll_data") ?  new SBM_Coll_Data() : null,
+                x => x.EndsWith("_fog") ?  new HSD_FogDesc() : null,
                 x => x.EndsWith("scene_data") ||
                     x.Equals("pnlsce") ||
                     x.Equals("flmsce") ||

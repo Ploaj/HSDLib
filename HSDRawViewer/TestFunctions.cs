@@ -80,7 +80,7 @@ namespace HSDRawViewer
                                 }
                             }
 
-                            dobj.Pobj = compressor.CreatePOBJsFromTriangleList(triList, dobj.Pobj.Attributes.Select(e=>e.AttributeName).ToArray(), bones, weights);
+                            dobj.Pobj = compressor.CreatePOBJsFromTriangleList(triList, dobj.Pobj.ToGXAttributes().Select(e=>e.AttributeName).ToArray(), bones, weights);
                         }
                     }
             }

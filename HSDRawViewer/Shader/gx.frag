@@ -12,6 +12,7 @@ in vec2 texcoord3;
 in vec4 vertexColor;
 in vec4 vbones;
 in vec4 vweights;
+in float fogAmt;
 
 out vec4 fragColor;
 
@@ -77,6 +78,12 @@ uniform int hasTEX3Tev;
 uniform TexUnit TEX3;
 uniform TevUnit TEX3Tev;
 
+// pixel processing
+uniform int alphaComp0;
+uniform int alphaComp1;
+uniform float alphaRef0;
+uniform float alphaRef1;
+
 // material
 uniform vec4 ambientColor;
 uniform vec4 diffuseColor;
@@ -106,6 +113,16 @@ struct Light
 };
 
 uniform Light light;
+
+struct Fog
+{
+	int type;
+	float start;
+	float end;
+	vec4 color;
+};
+
+uniform Fog fog;
 
 uniform vec3 cameraPos;
 uniform int colorOverride;
@@ -432,6 +449,22 @@ vec3 saturation(vec3 rgb)
 }
 
 ///
+/// preforms gx alpha test
+///
+bool discard_alpha_test(int comp, float ref, float alpha)
+{
+	return (
+		(comp == 1 && alpha < ref) ||
+		(comp == 2 && alpha == ref) ||
+		(comp == 3 && alpha <= ref) || 
+		(comp == 4 && alpha > ref) ||
+		(comp == 5 && alpha != ref) ||
+		(comp == 6 && alpha >= ref) ||
+		(comp == 7)
+	);
+}
+
+///
 /// Main mixing function
 ///
 void main()
@@ -538,11 +571,21 @@ void main()
 		fragColor.rgb *= vertexColor.rgb * vertexColor.aaa;
 		fragColor.a *= vertexColor.a;
 	}
+
+	// prefrom alpha test
+	if(!discard_alpha_test(alphaComp0, alphaRef0, fragColor.a))
+		discard;
+
+	if(!discard_alpha_test(alphaComp1, alphaRef1, fragColor.a))
+		discard;
 		
 
 	// gx overlay
 	fragColor.xyz *= overlayColor;
 
+	// apply fog
+	if(fogAmt != 0)
+		fragColor.rgb = mix(fragColor.rgb, fog.color.rgb, fogAmt);
 
 	// debug render modes
 	switch(renderOverride)
@@ -592,6 +635,7 @@ void main()
 				fragColor.r += vweights[i];
 		fragColor.gb = fragColor.rr;
 		break;
+	case 20: fragColor = vec4(vec3(fogAmt), 1); break;
 	}
 
 	// adjust saturation if needed

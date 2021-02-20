@@ -23,6 +23,8 @@ namespace HSDRaw.Common
     {
         public override int TrimmedSize => 0x08;
 
+        public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x00); set => _s.SetReference(0x00, value); }
+
     }
 
     public class HSD_FogDesc : HSDAccessor

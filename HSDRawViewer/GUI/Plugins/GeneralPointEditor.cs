@@ -11,6 +11,7 @@ using OpenTK;
 using OpenTK.Input;
 using System.Collections.Generic;
 using HSDRawViewer.Converters.Melee;
+using HSDRawViewer.Rendering.Models;
 
 namespace HSDRawViewer.GUI.Plugins
 {

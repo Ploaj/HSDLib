@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
 using HSDRawViewer.Tools;
@@ -162,7 +163,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             JOBJManager.DOBJManager.HiddenDOBJs.Clear();
 
             // don't render bones by default
-            JOBJManager.settings.RenderBones = false;
+            JOBJManager._settings.RenderBones = false;
 
             // reset model visibility
             ResetModelVis();
@@ -447,7 +448,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // update display info
             JOBJManager.DOBJManager.OverlayColor = SubactionProcess.OverlayColor;
-            JOBJManager.settings.RenderBones = bonesToolStripMenuItem.Checked;
+            JOBJManager._settings.RenderBones = bonesToolStripMenuItem.Checked;
 
             // apply model animations
             JOBJManager.Frame = viewport.Frame;

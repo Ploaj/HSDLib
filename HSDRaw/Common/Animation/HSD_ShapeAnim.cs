@@ -6,7 +6,7 @@
 
         public override HSD_ShapeAnim Next { get => _s.GetReference<HSD_ShapeAnim>(0x00); set => _s.SetReference(0x00, value); }
 
-        public HSD_AOBJDesc AnimationObject { get => _s.GetReference<HSD_AOBJDesc>(0x04); set => _s.SetReference(0x04, value); }
+        public HSD_AOBJDesc Animation { get => _s.GetReference<HSD_AOBJDesc>(0x04); set => _s.SetReference(0x04, value); }
 
     }
 }

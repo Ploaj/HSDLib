@@ -1,0 +1,83 @@
+﻿using System;
+using OpenTK.Graphics.OpenGL;
+using System.ComponentModel;
+using YamlDotNet.Serialization;
+using OpenTK;
+
+namespace HSDRawViewer.Rendering.GX
+{
+    public class GXShader
+    {
+        // Shader
+        public static Shader _shader;
+
+        [YamlIgnore, Browsable(false)]
+        public RenderMode RenderMode { get; set; }
+
+
+        [YamlIgnore, Browsable(false)]
+        public int SelectedBone { get; set; }
+
+        public Matrix4[] WorldTransforms;
+        public Matrix4[] BindTransforms;
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Bind(Camera camera, GXLightParam light, GXFogParam fog)
+        {
+            // load shader if it's not ready yet
+            if (_shader == null)
+            {
+                _shader = new Shader();
+                _shader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.vert"));
+                _shader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.frag"));
+            }
+
+            // bind shader
+            GL.UseProgram(_shader.programId);
+
+
+            // load model view matrix
+            var mvp = camera.MvpMatrix;
+            GL.UniformMatrix4(_shader.GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
+
+            // set camera position
+            var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
+            _shader.SetVector3("cameraPos", campos);
+
+            // create sphere matrix
+            Matrix4 sphereMatrix = camera.ModelViewMatrix;
+            sphereMatrix.Invert();
+            sphereMatrix.Transpose();
+            _shader.SetMatrix4x4("sphereMatrix", ref sphereMatrix);
+
+            // ui
+            _shader.SetInt("selectedBone", SelectedBone);
+            _shader.SetInt("renderOverride", (int)RenderMode);
+
+            // setup bone binds
+            _shader.SetWorldTransformBones(WorldTransforms);
+
+            var tb = BindTransforms;
+            if (tb.Length > 0)
+                _shader.SetMatrix4x4("binds", tb);
+
+            // lighting
+            light.Bind(_shader);
+
+            // fog
+            fog.Bind(_shader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Unbind()
+        {
+            GL.UseProgram(0);
+        }
+
+    }
+}
