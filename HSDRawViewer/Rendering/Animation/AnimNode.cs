@@ -1,4 +1,5 @@
-﻿using HSDRaw.Tools;
+﻿using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
 using System.Collections.Generic;
 
 namespace HSDRawViewer.Rendering

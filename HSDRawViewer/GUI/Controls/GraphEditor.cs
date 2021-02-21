@@ -152,6 +152,8 @@ namespace HSDRawViewer.GUI.Controls
             }
         }
 
+        private Button _ptclButton;
+        private Label _ptclLabel;
         private DrawingPanel _graph;
 
         public static Brush BackgroundColor = new SolidBrush(Color.FromArgb(255, 40, 40, 40));
@@ -187,6 +189,35 @@ namespace HSDRawViewer.GUI.Controls
         private Font _markerFont;
         private StringFormat _markerFormat = new StringFormat();
 
+        public class ParticleOptions
+        {
+            public int ParticleBank
+            {
+                get => _ptclBank;
+                set
+                {
+                    if (value < 0x3F)
+                        _ptclBank = value;
+                    else
+                        _ptclBank = 0x3F;
+                }
+            }
+            private int _ptclBank;
+
+            public int ParticleId
+            {
+                get => _ptclId;
+                set
+                {
+                    if (value < 0x3FFFF)
+                        _ptclId = value;
+                    else
+                        _ptclId = 0x3FFFF;
+                }
+            }
+            private int _ptclId;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -198,6 +229,30 @@ namespace HSDRawViewer.GUI.Controls
             _graph.Dock = DockStyle.Fill;
             graphBox.Controls.Add(_graph);
             _graph.BringToFront();
+
+            _ptclButton = new Button();
+            _ptclButton.Dock = DockStyle.Top;
+            _ptclButton.Click += (sender, args) =>
+            {
+                var options = new ParticleOptions()
+                {
+                    ParticleBank = _selectedPlayer.PtclBank,
+                    ParticleId = _selectedPlayer.PtclId
+                };
+                using (PropertyDialog d = new PropertyDialog("Particle Options", options))
+                    if(d.ShowDialog() == DialogResult.OK)
+                    {
+                        _selectedPlayer.PtclBank = options.ParticleBank;
+                        _selectedPlayer.PtclId = options.ParticleId;
+                        UpdatePtclLabel();
+                    }
+            };
+            graphBox.Controls.Add(_ptclButton);
+
+            _ptclLabel = new Label();
+            _ptclLabel.Dock = DockStyle.Top;
+            _ptclLabel.Text = "Effect Bank: Effect ID:";
+            graphBox.Controls.Add(_ptclLabel);
 
             _markerFont = new Font("Arial", 8);
             _markerFormat.LineAlignment = StringAlignment.Center;
@@ -362,14 +417,53 @@ namespace HSDRawViewer.GUI.Controls
         /// <summary>
         /// 
         /// </summary>
+        private void UpdatePtclLabel()
+        {
+            if (_selectedPlayer == null)
+                _ptclLabel.Text = "";
+            else
+                _ptclLabel.Text = $"Bank: {_selectedPlayer.PtclBank} ID: {_selectedPlayer.PtclId}";
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void PrepareGraph()
+        {
+            if(_selectedPlayer == null)
+            {
+                panel1.Visible = false;
+                _graph.Visible = false;
+                _ptclLabel.Visible = false;
+                _ptclButton.Visible = false;
+            }
+            if (_selectedPlayer.JointTrackType == JointTrackType.HSD_A_J_PTCL)
+            {
+                panel1.Visible = false;
+                _graph.Visible = false;
+                _ptclLabel.Visible = true;
+                _ptclButton.Visible = true;
+                UpdatePtclLabel();
+            }
+            else
+            {
+                panel1.Visible = true;
+                _graph.Visible = true;
+                _ptclLabel.Visible = false;
+                _ptclButton.Visible = false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public HSD_FOBJDesc ToFOBJs()
         {
             HSD_FOBJDesc fobj = null;
             foreach(var p in _players)
             {
-                HSD_FOBJDesc f = new HSD_FOBJDesc();
-                f.SetKeys(p.Keys, p.TrackType);
+                HSD_FOBJDesc f = p.ToFobjDesc();
 
                 if (fobj == null)
                     fobj = f;
@@ -399,7 +493,7 @@ namespace HSDRawViewer.GUI.Controls
             
             if (aobj.FObjDesc != null)
                 foreach (var v in aobj.FObjDesc.List)
-                    AddPlayer(new FOBJ_Player(v.TrackType, v.GetDecodedKeys()));
+                    AddPlayer(new FOBJ_Player(v));
 
             if(trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
@@ -643,10 +737,14 @@ namespace HSDRawViewer.GUI.Controls
         private void trackTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             _selectedPlayerIndex = _players.IndexOf(e.Node.Tag as FOBJ_Player);
+
             keyProperty.SelectedObject = null;
             _frame = 0;
+
             if ((e.Node.Tag as FOBJ_Player).TrackType < trackTypeBox.Items.Count)
                 trackTypeBox.SelectedIndex = (e.Node.Tag as FOBJ_Player).TrackType;
+
+            PrepareGraph();
             _graph.Invalidate();
         }
 
@@ -674,8 +772,12 @@ namespace HSDRawViewer.GUI.Controls
             {
                 if ((byte)trackTypeBox.SelectedIndex != _selectedPlayer.TrackType)
                     OnTrackEdited(EventArgs.Empty);
+
                 _selectedPlayer.TrackType = (byte)trackTypeBox.SelectedIndex;
+
                 trackTree.Nodes[_selectedPlayerIndex].Text = GetTrackName(_selectedPlayer.TrackType);
+
+                PrepareGraph();
             }
         }
 

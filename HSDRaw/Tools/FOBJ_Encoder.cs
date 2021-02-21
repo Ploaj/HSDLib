@@ -20,6 +20,9 @@ namespace HSDRaw.Tools
             HSD_FOBJ fobj = new HSD_FOBJ();
             fobj.JointTrackType = (JointTrackType)TrackType;
 
+            if (fobj.JointTrackType == JointTrackType.HSD_A_J_PTCL)
+                return fobj;
+
             // automatically set single key interpolation type
             if (Keys.Count == 1)
                 Keys[0].InterpolationType = GXInterpolationType.HSD_A_OP_KEY;

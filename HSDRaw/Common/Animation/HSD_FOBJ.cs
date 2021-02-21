@@ -94,7 +94,8 @@ namespace HSDRaw.Common.Animation
         HSD_A_J_SETFLOAT6,
         HSD_A_J_SETFLOAT7,
         HSD_A_J_SETFLOAT8,
-        HSD_A_J_SETFLOAT9
+        HSD_A_J_SETFLOAT9,
+        HSD_A_J_PTCL = 40
     }
 
     public enum ShapeTrackType

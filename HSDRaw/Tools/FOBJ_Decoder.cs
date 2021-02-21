@@ -45,6 +45,10 @@ namespace HSDRaw.Tools
         public List<FOBJKey> GetKeys(float FrameCount = -1)
         {
             List<FOBJKey> Keys = new List<FOBJKey>();
+
+            if (FOBJ.JointTrackType == JointTrackType.HSD_A_J_PTCL)
+                return Keys;
+
             int clock = 0;
             Reader.Seek(0);
             while (Reader.Position < Reader.BaseStream.Length)

@@ -164,8 +164,7 @@ namespace HSDRawViewer.Rendering
                 foreach (var t in e.Tracks)
                 {
                     HSD_Track track = new HSD_Track();
-                    HSD_FOBJ fobj = new HSD_FOBJ();
-                    fobj.SetKeys(t.Keys, t.JointTrackType);
+                    HSD_FOBJ fobj = t.ToFobj();
                     track.FOBJ = fobj;
                     fn.Tracks.Add(track);
                 }
@@ -183,8 +182,10 @@ namespace HSDRawViewer.Rendering
         {
             Nodes.Clear();
             FrameCount = 0;
+
             if (joint == null)
                 return;
+
             foreach (var j in joint.BreathFirstList)
             {
                 AnimNode n = new AnimNode();
@@ -199,6 +200,7 @@ namespace HSDRawViewer.Rendering
                         n.Tracks.Add(players);
                     }
                 }
+
                 Nodes.Add(n);
             }
         }
@@ -235,22 +237,30 @@ namespace HSDRawViewer.Rendering
             else
                 n = Nodes[index++];
 
+            // set flags
             if (n.Tracks.Count > 0)
             {
                 joint.AOBJ = new HSD_AOBJ();
                 joint.AOBJ.Flags = flags;
             }
+
+            // add all tracks
             foreach (var t in n.Tracks)
             {
                 joint.AOBJ.EndFrame = Math.Max(joint.AOBJ.EndFrame, t.FrameCount);
 
-                HSD_FOBJDesc fobj = new HSD_FOBJDesc();
-                fobj.SetKeys(t.Keys, (byte)t.TrackType);
+                HSD_FOBJDesc fobj = t.ToFobjDesc();
 
                 if (joint.AOBJ.FObjDesc == null)
                     joint.AOBJ.FObjDesc = fobj;
                 else
                     joint.AOBJ.FObjDesc.Add(fobj);
+            }
+
+            // set particle flag
+            if (n.Tracks.Any(e=>e.JointTrackType == JointTrackType.HSD_A_J_PTCL))
+            {
+                joint.AOBJ.EndFrame += 0.1f;
             }
 
             foreach (var c in root.Children)

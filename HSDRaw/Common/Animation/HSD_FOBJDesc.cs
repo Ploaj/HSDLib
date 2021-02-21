@@ -16,7 +16,7 @@ namespace HSDRaw.Common.Animation
 
         public int DataLength { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
-        public int StartFrame { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+        public float  StartFrame { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
 
         public byte TrackType { get => _s.GetByte(0x0C); set => _s.SetByte(0x0C, value); }
 
