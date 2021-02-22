@@ -33,9 +33,19 @@ namespace HSDRawViewer.Rendering.Models
                 var width = tobj.ImageData.Width;
                 var height = tobj.ImageData.Height;
 
-                var rgbaData = tobj.GetDecodedImageData();
+                List<byte[]> mips = new List<byte[]>();
 
-                var index = TextureManager.Add(rgbaData, width, height);
+                if(tobj.LOD != null)
+                {
+                    for(int i = 0; i < tobj.ImageData.MaxLOD - 1; i++)
+                        mips.Add(tobj.GetDecodedImageData(i));
+                }
+                else
+                {
+                    mips.Add(tobj.GetDecodedImageData());
+                }
+
+                var index = TextureManager.Add(mips, width, height);
 
                 imageBufferTextureIndex.Add(rawImageData, index);
             }

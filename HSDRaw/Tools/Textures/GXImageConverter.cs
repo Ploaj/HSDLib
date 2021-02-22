@@ -58,9 +58,9 @@ namespace HSDRaw.Tools
         /// <param name="height"></param>
         /// <param name="imageData"></param>
         /// <returns></returns>
-        public static byte[] DecodeTPL(GXTexFmt format, int width, int height, byte[] imageData)
+        public static byte[] DecodeTPL(GXTexFmt format, int width, int height, byte[] imageData, int mipmap = 0)
         {
-            return DecodeTPL(format, width, height, imageData, GXTlutFmt.RGB565, 0, new byte[0]);
+            return DecodeTPL(format, width, height, imageData, GXTlutFmt.RGB565, 0, new byte[0], mipmap);
         }
 
         /// <summary>
@@ -74,9 +74,33 @@ namespace HSDRaw.Tools
         /// <param name="colorCount"></param>
         /// <param name="paletteData"></param>
         /// <returns></returns>
-        public static byte[] DecodeTPL(GXTexFmt format, int width, int height, byte[] imageData, GXTlutFmt palformat, int colorCount, byte[] paletteData)
+        public static byte[] DecodeTPL(GXTexFmt format, int width, int height, byte[] imageData, GXTlutFmt palformat, int colorCount, byte[] paletteData, int mipmap = 0)
         {
             var paletteDataRgba = new uint[0];
+
+            if(mipmap != 0)
+            {
+                int mipOff = 0;
+                for(int i = 0; i < mipmap; i++)
+                {
+                    mipOff += GetImageSize(format, (int)(width / Math.Pow(2, i)), (int)(height / Math.Pow(2, i)));
+                }
+
+                var nw = (int)(width / Math.Pow(2, mipmap));
+                var nh = (int)(height / Math.Pow(2, mipmap));
+                var datalength = GetImageSize(format, nw, nh);
+
+                Console.WriteLine(imageData.Length.ToString("X"));
+                Console.WriteLine(mipOff.ToString("X"));
+                Console.WriteLine($"{nw} {nh} {datalength.ToString("X")}");
+
+                byte[] newmip = new byte[datalength];
+                Array.Copy(imageData, mipOff, newmip, 0, datalength);
+
+                imageData = newmip;
+                width = nw;
+                height = nh;
+            }
 
             if (IsPalettedFormat(format))
                 paletteDataRgba = PaletteToRGBA(palformat, colorCount, paletteData);
@@ -265,11 +289,11 @@ namespace HSDRaw.Tools
             {
                 case GXTexFmt.CI4:
                 case GXTexFmt.I4:
+                case GXTexFmt.CMP:
                     return size / 2;
                 case GXTexFmt.IA4:
                 case GXTexFmt.I8:
                 case GXTexFmt.CI14X2:
-                case GXTexFmt.CMP:
                 case GXTexFmt.CI8:
                     return size;
                 case GXTexFmt.IA8:

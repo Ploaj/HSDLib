@@ -196,7 +196,8 @@ namespace HSDRawViewer.Rendering
                     foreach (var fdesc in j.AOBJ.FObjDesc.List)
                     {
                         var players = new FOBJ_Player(fdesc);
-                        FrameCount = Math.Max(FrameCount, players.Keys.Max(e => e.Frame + 1));
+                        if(players.Keys != null && players.Keys.Count > 0)
+                            FrameCount = Math.Max(FrameCount, players.Keys.Max(e => e.Frame + 1));
                         n.Tracks.Add(players);
                     }
                 }

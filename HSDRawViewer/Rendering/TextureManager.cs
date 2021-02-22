@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using System.Drawing;
+using System.Linq;
 
 namespace HSDRawViewer.Rendering
 {
@@ -31,7 +32,7 @@ namespace HSDRawViewer.Rendering
 
             public int Height { get; internal set; }
 
-            private byte[] RGBAData;
+            private List<byte[]> RGBAData;
 
             /// <summary>
             /// 
@@ -39,7 +40,7 @@ namespace HSDRawViewer.Rendering
             /// <param name="rgba"></param>
             /// <param name="width"></param>
             /// <param name="height"></param>
-            public GLTexture(byte[] rgba, int width, int height)
+            public GLTexture(List<byte[]> rgba, int width, int height)
             {
                 RGBAData = rgba;
                 Width = width;
@@ -58,11 +59,45 @@ namespace HSDRawViewer.Rendering
 
                 GL.BindTexture(TextureTarget.Texture2D, _glid);
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, RGBAData);
+                if (RGBAData.Count == 1)
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 0);
+                }
+                else
+                {
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, RGBAData.Count);
+                }
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 1);
+                GL.TexImage2D(
+                    TextureTarget.Texture2D,
+                    0,
+                    PixelInternalFormat.Rgba,
+                    Width,
+                    Height,
+                    0,
+                    PixelFormat.Bgra,
+                    PixelType.UnsignedByte,
+                    RGBAData[0]);
 
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+                for (int i = 1; i < RGBAData.Count; i++)
+                {
+                    GL.TexImage2D(
+                        TextureTarget.Texture2D, 
+                        i, 
+                        PixelInternalFormat.Rgba, 
+                        Width / (int)Math.Pow(2, i), 
+                        Height / (int)Math.Pow(2, i), 
+                        0, 
+                        PixelFormat.Bgra, 
+                        PixelType.UnsignedByte, 
+                        RGBAData[i]);
+                }
+
+
 
                 GL.BindTexture(TextureTarget.Texture2D, 0);
 
@@ -146,9 +181,22 @@ namespace HSDRawViewer.Rendering
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns>Index of Texture</returns>
+        public int Add(IEnumerable<byte[]> mips, int width, int height)
+        {
+            Textures.Add(new GLTexture(mips.ToList(), width, height));
+            return Textures.Count - 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rgba"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns>Index of Texture</returns>
         public int Add(byte[] rgba, int width, int height)
         {
-            Textures.Add(new TextureManager.GLTexture(rgba, width, height));
+            Textures.Add(new GLTexture(new List<byte[]>() { rgba }, width, height));
             return Textures.Count - 1;
         }
 

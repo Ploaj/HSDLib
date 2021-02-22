@@ -120,4 +120,15 @@
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="texturePanel.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wwAADsMBx2+oZAAAAOlJREFUeF7t0KERxDAAA8Ev3aW5s3wDhzcgAkuEbvS79z5vOue8agdUlFRR0g6o
+        KKmipB1QUVJFSTugoqSKknZARUkVJe2AipIqStoBFSVVlLQDKkqqKGkHVJRUUdIOqCipoqQdUFFSRUk7
+        oKKkipJ2QEVJFSXtgIqSKkraARUlVZS0A2qU6hRpB1SUVFHSDqgoqaKkHVBRUkVJO6CipIqSdkBFSRUl
+        7YCKkipK2gEVJVWUtAMqSqooaQdUlFRR0g6oKKmipB1QUVJFSTugoqSKknZARUkVJe2AipIqStoBFSVV
+        lPTxA+7zB9Tl8qRMedSgAAAAAElFTkSuQmCC
+</value>
+  </data>
 </root>

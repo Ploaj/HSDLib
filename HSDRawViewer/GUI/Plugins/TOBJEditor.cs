@@ -54,10 +54,23 @@ namespace HSDRawViewer.GUI.Plugins
             }
 
             propertyGrid.SelectedObject = null;
+            panel1.Visible = false;
 
-            if (_tobj != null)
+            if (_tobj != null && _tobj.ImageData != null)
             {
-                texturePanel.Image = Converters.TOBJConverter.ToBitmap(_tobj);
+                if(_tobj.LOD != null && _tobj.ImageData.MaxLOD > 0)
+                {
+                    customPaintTrackBar1.Maximum = (int)_tobj.ImageData.MaxLOD - 1;
+                    texturePanel.Image = Tools.BitmapTools.BGRAToBitmap(
+                        _tobj.GetDecodedImageData(customPaintTrackBar1.Value), 
+                        (int)Math.Ceiling(_tobj.ImageData.Width / Math.Pow(2, customPaintTrackBar1.Value)),
+                        (int)Math.Ceiling(_tobj.ImageData.Height / Math.Pow(2, customPaintTrackBar1.Value)));
+                    panel1.Visible = true;
+                }
+                else
+                {
+                    texturePanel.Image = Converters.TOBJConverter.ToBitmap(_tobj);
+                }
                 propertyGrid.SelectedObject = _tobj;
             }
         }
@@ -106,6 +119,16 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
 
+            RefreshControl();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void customPaintTrackBar1_ValueChanged(object sender, EventArgs e)
+        {
             RefreshControl();
         }
     }

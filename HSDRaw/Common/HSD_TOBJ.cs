@@ -1,6 +1,7 @@
 ﻿using HSDRaw.GX;
 using HSDRaw.Tools;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace HSDRaw.Common
@@ -222,15 +223,67 @@ namespace HSDRaw.Common
         /// 
         /// </summary>
         /// <returns>byte array containing rgba pixel values for the texture</returns>
-        public byte[] GetDecodedImageData()
+        public byte[] GetDecodedImageData(int mipmap = 0)
         {
             if(ImageData != null && TlutData != null)
-                return GXImageConverter.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData, TlutData.Format, TlutData.ColorCount, TlutData.TlutData);
+                return GXImageConverter.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData, TlutData.Format, TlutData.ColorCount, TlutData.TlutData, mipmap);
 
             if (ImageData != null && TlutData == null)
-                return GXImageConverter.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData);
+                return GXImageConverter.DecodeTPL(ImageData.Format, ImageData.Width, ImageData.Height, ImageData.ImageData, mipmap);
 
             return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rgba"></param>
+        /// <param name="format"></param>
+        /// <param name="palFormat"></param>
+        public void EncodeImageData(IEnumerable<byte[]> mips, int width, int height, GXTexFmt format, GXTlutFmt palFormat)
+        {
+            if (GXImageConverter.IsPalettedFormat(format))
+                throw new Exception("Paletted image mips not currently supported");
+
+            // calculate image size
+            int dataSize = 0;
+            int level = 0;
+            foreach (var mip in mips)
+            {
+                dataSize += GXImageConverter.GetImageSize(
+                    format, 
+                    (int) Math.Ceiling(width / Math.Pow(2, level)),
+                    (int) Math.Ceiling(width / Math.Pow(2, level)));
+                level++;
+            }
+
+            level = 0;
+            var encodedData = new byte[dataSize];
+            var dataOffset = 0;
+            byte[] palData;
+            foreach (var mip in mips)
+            {
+                var w = (int)Math.Ceiling(width / Math.Pow(2, level));
+                var h = (int)Math.Ceiling(width / Math.Pow(2, level));
+
+                var mipSize = GXImageConverter.GetImageSize(
+                    format,
+                    w,h);
+
+                var encoded = GXImageConverter.EncodeImage(mip, w, h, format, palFormat, out palData);
+
+                Array.Copy(encoded, 0, encodedData, dataOffset, mipSize);
+
+                dataOffset += mipSize;
+                level++;
+            }
+
+            if (ImageData == null)
+                ImageData = new HSD_Image();
+            ImageData.ImageData = encodedData;
+            ImageData.Width = (short)width;
+            ImageData.Height = (short)height;
+            ImageData.Format = format;
         }
 
         /// <summary>
