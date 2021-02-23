@@ -806,7 +806,7 @@ namespace HSDRawViewer.GUI
         /// <param name="hsdCam"></param>
         public void LoadHSDCamera(HSDRaw.Common.HSD_Camera hsdCam)
         {
-            if (hsdCam.ProjectionType != 1)
+            if (hsdCam.ProjectionType != HSDRaw.Common.CameraProjection.PERSPECTIVE)
                 return;
 
             _camera.RenderWidth = hsdCam.ViewportRight;
