@@ -245,6 +245,9 @@ namespace HSDRawViewer.Converters
             HSD_JOBJ root = null;
             foreach (var r in model.Skeleton.RootBones)
             {
+                if (r.Name == "Armature")
+                    continue;
+
                 if (root == null)
                     root = IOBoneToJOBJ(r);
                 else
@@ -365,8 +368,7 @@ namespace HSDRawViewer.Converters
             if (Settings.ImportBoneNames)
                 jobj.ClassName = bone.Name;
 
-
-            Console.WriteLine(bone.Name + " " + bone.WorldTransform);
+            Console.WriteLine(bone.Name + " " + jobj.Children.Length);
 
             _cache.NameToJOBJ.Add(bone.Name, jobj);
             _cache.jobjToWorldTransform.Add(jobj, MatrixNumericsToTKMatrix(bone.WorldTransform));
