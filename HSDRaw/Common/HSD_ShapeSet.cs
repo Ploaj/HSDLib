@@ -168,6 +168,8 @@ namespace HSDRaw.Common
                     var a = r.Value;
                     if (a == null)
                         return null;
+                    if (a.Length < NormalIndexCount * 2)
+                        continue;
                     short[] data = new short[NormalIndexCount];
                     for (int i = 0; i < data.Length; i++)
                         data[i] = a.GetInt16(i * 2);

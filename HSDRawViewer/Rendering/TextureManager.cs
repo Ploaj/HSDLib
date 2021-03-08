@@ -52,7 +52,7 @@ namespace HSDRawViewer.Rendering
             /// </summary>
             private void Load()
             {
-                if (Loaded)
+                if (Loaded || RGBAData.Count == 0)
                     return;
                 
                 GL.GenTextures(1, out _glid);

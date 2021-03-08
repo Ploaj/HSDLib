@@ -303,19 +303,20 @@ namespace HSDRawViewer.Rendering
             {
                 foreach (var t in n.Tracks)
                 {
+                    int keyIndex = 0;
                     foreach (var k in t.Keys)
                     {
                         // scale frames in range
                         if (k.Frame >= startFrame && k.Frame <= endFrame)
                         {
                             k.Frame = (float)Math.Round(k.Frame * value);
-                            //TODO: How do you scale tangent?
-                            k.Tan *= value;// Math.Sign(k.Tan) * (float)Math.Log(Math.Abs(k.Tan), value);
+                            k.Tan = (float)(Math.Atan2(Math.Tan(k.Tan), value) * Math.PI / 180);
                         }
                         else
                         // adjust range
                         if (k.Frame > endFrame)
                             k.Frame -= adjust;
+                        keyIndex++;
                     }
 
                     // remove keys that share frames

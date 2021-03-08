@@ -7,6 +7,7 @@
         Tangents,
         BiNormal,
         VertexColor,
+        Alpha,
         UV0,
         UV1,
         UV2,

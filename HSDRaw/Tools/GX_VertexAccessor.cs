@@ -71,8 +71,18 @@ namespace HSDRaw.Tools
                     
                     int index = ig.Indices[i];
                     float[] f = new float[4];
+                    
+                    // check if index is in range of buffer
+                    if (attribute.AttributeType != GXAttribType.GX_DIRECT && 
+                        attribute.Buffer != null && 
+                        index >= attribute.Count)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Warning: Attribute index out of range {index} >= {attribute.Count}");
+                        continue;
+                    }
 
-                    if(attribute.AttributeType != GXAttribType.GX_DIRECT)
+                    // check if data is direct
+                    if (attribute.AttributeType != GXAttribType.GX_DIRECT)
                         f = attribute.GetDecodedDataAt(index);
 
                     switch (attribute.AttributeName)

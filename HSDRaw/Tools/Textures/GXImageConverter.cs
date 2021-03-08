@@ -88,11 +88,17 @@ namespace HSDRaw.Tools
 
                 var nw = (int)(width / Math.Pow(2, mipmap));
                 var nh = (int)(height / Math.Pow(2, mipmap));
+
+                if (nw < 8)
+                    nw = 8;
+                if (nh < 8)
+                    nh = 8;
+
                 var datalength = GetImageSize(format, nw, nh);
 
-                Console.WriteLine(imageData.Length.ToString("X"));
-                Console.WriteLine(mipOff.ToString("X"));
-                Console.WriteLine($"{nw} {nh} {datalength.ToString("X")}");
+                //Console.WriteLine(imageData.Length.ToString("X"));
+                //Console.WriteLine(mipOff.ToString("X"));
+                //Console.WriteLine($"{nw} {nh} {datalength.ToString("X")}");
 
                 byte[] newmip = new byte[datalength];
                 Array.Copy(imageData, mipOff, newmip, 0, datalength);
@@ -104,6 +110,9 @@ namespace HSDRaw.Tools
 
             if (IsPalettedFormat(format))
                 paletteDataRgba = PaletteToRGBA(palformat, colorCount, paletteData);
+
+            if (imageData.Length < GetImageSize(format, width, height))
+                return new byte[width * height * 4];
 
             byte[] rgba;
             switch (format)
@@ -696,6 +705,9 @@ namespace HSDRaw.Tools
         {
             uint[] output = new uint[width * height];
             int inp = 0;
+
+            if (width < 8 || height < 8)
+                return Shared.UIntArrayToByteArray(output);
 
             for (int y = 0; y < height; y += 8)
             {

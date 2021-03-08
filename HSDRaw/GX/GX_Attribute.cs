@@ -19,6 +19,18 @@ namespace HSDRaw.GX
 
         public short Stride { get => _s.GetInt16(0x12); set => _s.SetInt16(0x12, value); }
 
+        public int Count
+        {
+            get
+            {
+                if(Buffer != null && Buffer._s != null && Stride != 0)
+                {
+                    return Buffer._s.Length / Stride;
+                }
+                return 0;
+            }
+        }
+
         public HSDAccessor Buffer
         {
             get => _s.GetReference<HSDAccessor>(0x14);

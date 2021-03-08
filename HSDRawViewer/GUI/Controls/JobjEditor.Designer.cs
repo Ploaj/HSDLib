@@ -58,7 +58,6 @@
             this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
             this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.textureArrayEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.replaceTextureButton = new System.Windows.Forms.ToolStripButton();
             this.previewBox = new System.Windows.Forms.GroupBox();
@@ -84,6 +83,7 @@
             this.exportSceneSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.displaySettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fogSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.showBonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showBoneOrientationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -100,7 +100,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.fogSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.textureArrayEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -384,29 +384,6 @@
             this.tabPage3.Text = "Textures";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // textureArrayEditor
-            // 
-            this.textureArrayEditor.AllowDrop = true;
-            this.textureArrayEditor.DisplayItemImages = true;
-            this.textureArrayEditor.DisplayItemIndices = true;
-            this.textureArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textureArrayEditor.EnablePropertyView = false;
-            this.textureArrayEditor.EnablePropertyViewDescription = false;
-            this.textureArrayEditor.EnableToolStrip = false;
-            this.textureArrayEditor.ImageHeight = ((ushort)(64));
-            this.textureArrayEditor.ImageWidth = ((ushort)(64));
-            this.textureArrayEditor.ItemHeight = 64;
-            this.textureArrayEditor.ItemIndexOffset = 0;
-            this.textureArrayEditor.Location = new System.Drawing.Point(0, 27);
-            this.textureArrayEditor.Margin = new System.Windows.Forms.Padding(4);
-            this.textureArrayEditor.Name = "textureArrayEditor";
-            this.textureArrayEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
-            this.textureArrayEditor.Size = new System.Drawing.Size(304, 195);
-            this.textureArrayEditor.TabIndex = 0;
-            this.textureArrayEditor.SelectedObjectChanged += new System.EventHandler(this.textureArrayEditor_SelectedObjectChanged);
-            this.textureArrayEditor.DragDrop += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragDrop);
-            this.textureArrayEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragEnter);
-            // 
             // toolStrip4
             // 
             this.toolStrip4.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -628,6 +605,13 @@
             this.displaySettingsToolStripMenuItem.Text = "Light Settings";
             this.displaySettingsToolStripMenuItem.Click += new System.EventHandler(this.displaySettingsToolStripMenuItem_Click);
             // 
+            // fogSettingsToolStripMenuItem
+            // 
+            this.fogSettingsToolStripMenuItem.Name = "fogSettingsToolStripMenuItem";
+            this.fogSettingsToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.fogSettingsToolStripMenuItem.Text = "Fog Settings";
+            this.fogSettingsToolStripMenuItem.Click += new System.EventHandler(this.fogSettingsToolStripMenuItem_Click);
+            // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
@@ -760,12 +744,28 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // fogSettingsToolStripMenuItem
+            // textureArrayEditor
             // 
-            this.fogSettingsToolStripMenuItem.Name = "fogSettingsToolStripMenuItem";
-            this.fogSettingsToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.fogSettingsToolStripMenuItem.Text = "Fog Settings";
-            this.fogSettingsToolStripMenuItem.Click += new System.EventHandler(this.fogSettingsToolStripMenuItem_Click);
+            this.textureArrayEditor.AllowDrop = true;
+            this.textureArrayEditor.DisplayItemImages = true;
+            this.textureArrayEditor.DisplayItemIndices = true;
+            this.textureArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textureArrayEditor.EnablePropertyView = false;
+            this.textureArrayEditor.EnablePropertyViewDescription = false;
+            this.textureArrayEditor.EnableToolStrip = false;
+            this.textureArrayEditor.ImageHeight = ((ushort)(64));
+            this.textureArrayEditor.ImageWidth = ((ushort)(64));
+            this.textureArrayEditor.ItemHeight = 64;
+            this.textureArrayEditor.ItemIndexOffset = 0;
+            this.textureArrayEditor.Location = new System.Drawing.Point(0, 27);
+            this.textureArrayEditor.Margin = new System.Windows.Forms.Padding(4);
+            this.textureArrayEditor.Name = "textureArrayEditor";
+            this.textureArrayEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            this.textureArrayEditor.Size = new System.Drawing.Size(304, 195);
+            this.textureArrayEditor.TabIndex = 0;
+            this.textureArrayEditor.SelectedObjectChanged += new System.EventHandler(this.textureArrayEditor_SelectedObjectChanged);
+            this.textureArrayEditor.DragDrop += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragDrop);
+            this.textureArrayEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragEnter);
             // 
             // JobjEditor
             // 

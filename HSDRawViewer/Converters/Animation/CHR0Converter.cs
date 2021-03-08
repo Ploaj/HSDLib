@@ -38,15 +38,13 @@ namespace HSDRawViewer.Converters
                 if (versionNum != 4)
                     throw new InvalidDataException($"CHR0 version {versionNum} not supported");
 
-                System.Console.WriteLine("Reading Track ");
-
                 r.Seek(0x10);
 
                 var indexGroupOffset = r.ReadUInt32();
                 var animName = r.ReadString(r.ReadInt32(), -1);
 
                 r.Skip(4);
-                anim.FrameCount = r.ReadUInt16();
+                anim.FrameCount = r.ReadUInt16() - 1;
                 int animDataCount = r.ReadUInt16();
                 r.Skip(8);
 
@@ -75,6 +73,8 @@ namespace HSDRawViewer.Converters
 
                     var nameOff = r.Position + r.ReadUInt32();
                     var flags = r.ReadInt32();
+                    //Console.WriteLine(boneName + " " + flags.ToString("X"));
+                    //r.PrintPosition();
                     //01BFE019
                     int t_type = (flags >> 0x1e) & 0x3;
                     int r_type = (flags >> 0x1b) & 0x7;
@@ -146,10 +146,10 @@ namespace HSDRawViewer.Converters
                         k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
 
-                    Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count + " " + flags.ToString("X"));
-                    Console.WriteLine($"{trackX.Keys.Count} {trackY.Keys.Count} {trackZ.Keys.Count}");
-                    Console.WriteLine($"{trackRX.Keys.Count} {trackRY.Keys.Count} {trackRZ.Keys.Count}");
-                    Console.WriteLine($"{trackSX.Keys.Count} {trackSY.Keys.Count} {trackSZ.Keys.Count}");
+                    //Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count + " " + flags.ToString("X"));
+                    //Console.WriteLine($"{trackX.Keys.Count} {trackY.Keys.Count} {trackZ.Keys.Count}");
+                    //Console.WriteLine($"{trackRX.Keys.Count} {trackRY.Keys.Count} {trackRZ.Keys.Count}");
+                    //Console.WriteLine($"{trackSX.Keys.Count} {trackSY.Keys.Count} {trackSZ.Keys.Count}");
                     anim.Nodes[jointMap.IndexOf(boneName)] = node;
                 }
             }
@@ -161,9 +161,12 @@ namespace HSDRawViewer.Converters
         {
             if (isIsotrophic)
             {
-                var offset = r.ReadUInt32() + r.Position;
-                var temp = r.Position;
-                r.Seek(offset);
+                var temp = r.Position + 4;
+                if (!isXFixed && !isYFixed && !isZFixed)
+                {
+                    var offset = r.ReadUInt32() + r.Position;
+                    r.Seek(offset);
+                }
                 float iss = r.ReadSingle();
                 xtrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });
                 ytrack.Keys.Add(new FOBJKey() { Frame = 0, Value = iss, InterpolationType = GXInterpolationType.HSD_A_OP_KEY });

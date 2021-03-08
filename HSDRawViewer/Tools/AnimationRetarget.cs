@@ -6,6 +6,7 @@ using HSDRawViewer.Rendering.Models;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HSDRawViewer.Tools
 {
@@ -44,6 +45,77 @@ namespace HSDRawViewer.Tools
             return newAnim;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <param name="animation"></param>
+        /// <param name="sourceMap"></param>
+        /// <param name="targetMap"></param>
+        /// <returns></returns>
+        public static JointAnimManager SmartPort(HSD_JOBJ source, HSD_JOBJ target, JointAnimManager animation, JointMap sourceMap = null, JointMap targetMap = null)
+        {
+            var sourceManager = new JOBJManager();
+            sourceManager.SetJOBJ(source);
+
+            var sourceInverseWorldTransforms = new List<Matrix4>();
+            for (int i = 0; i < sourceManager.JointCount; i++)
+                sourceInverseWorldTransforms.Add(sourceManager.GetWorldTransform(i).Inverted());
+
+            sourceManager.Animation = animation;
+
+
+            var targetManager = new JOBJManager();
+            targetManager.SetJOBJ(target);
+
+            JointAnimManager newAnim = new JointAnimManager();
+            newAnim.FrameCount = sourceManager.Animation.FrameCount;
+
+            newAnim.Nodes.Clear();
+            for (int i = 0; i < targetManager.JointCount; i++)
+                newAnim.Nodes.Add(new AnimNode());
+            for (int i = 0; i < sourceManager.JointCount; i++)
+            {
+                int targetIndex = i;
+                int sourceIndex = i;
+
+                Console.WriteLine(sourceMap[i]);
+
+                // remap bone if joint maps are present
+                if (sourceMap != null && targetMap != null && !string.IsNullOrEmpty(sourceMap[i]))
+                    targetIndex = targetMap.IndexOf(sourceMap[i]);
+
+                if (targetIndex == -1)
+                    continue;
+
+                var sourceJoint = sourceManager.GetJOBJ(sourceIndex);
+                var targetJoint = targetManager.GetJOBJ(targetIndex);
+
+                Console.WriteLine($"\t {sourceJoint.RX} {sourceJoint.RY} {sourceJoint.RZ}");
+                Console.WriteLine($"\t {targetJoint.RX} {targetJoint.RY} {targetJoint.RZ}");
+
+                /*if(sourceMap[i] == "RLegJ")
+                {
+                    var track = animation.Nodes[sourceIndex].Tracks.Find(e => e.JointTrackType == JointTrackType.HSD_A_J_ROTX);
+
+                    if (track != null)
+                        foreach (var k in track.Keys)
+                            k.Value += (float)Math.PI / 2;
+
+                    track = animation.Nodes[sourceIndex].Tracks.Find(e => e.JointTrackType == JointTrackType.HSD_A_J_ROTZ);
+
+                    if (track != null)
+                        foreach (var k in track.Keys)
+                            k.Value += (float)Math.PI / 2;
+                }*/
+
+                newAnim.Nodes[targetIndex].Tracks = animation.Nodes[sourceIndex].Tracks; ;
+                
+            }
+
+            return newAnim;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -148,11 +220,56 @@ namespace HSDRawViewer.Tools
 
             EulerFilter(newAnim);
 
-            //var targetAnim = newAnim.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
-            //AnimationCompressor.AdaptiveCompressAnimation(targetAnim, targetMap);
-            //RemoveUnusedTracks(target, targetAnim);
-            //newAnim.FromAnimJoint(targetAnim);
+            var targetAnim = newAnim.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
+            AnimationCompressor.AdaptiveCompressAnimation(targetAnim, targetMap);
+            RemoveUnusedTracks(target, targetAnim);
+            newAnim.FromAnimJoint(targetAnim);
 
+            // apply additional single frame filter check
+            for (int i = 0; i < sourceManager.JointCount; i++)
+            {
+                int targetIndex = i;
+                int sourceIndex = i;
+
+                // remap bone if joint maps are present
+                if (sourceMap != null && targetMap != null && !string.IsNullOrEmpty(sourceMap[i]))
+                    targetIndex = targetMap.IndexOf(sourceMap[i]);
+
+                if (targetIndex == -1)
+                    continue;
+
+                var sourceNode = animation.Nodes[sourceIndex];
+                var targetNode = newAnim.Nodes[targetIndex];
+
+                FOBJ_Player sourceXRot = null;
+                FOBJ_Player sourceYRot = null;
+                FOBJ_Player sourceZRot = null;
+
+                foreach (var t in sourceNode.Tracks)
+                {
+                    if (t.JointTrackType == JointTrackType.HSD_A_J_ROTX)
+                        sourceXRot = t;
+                    if (t.JointTrackType == JointTrackType.HSD_A_J_ROTY)
+                        sourceYRot = t;
+                    if (t.JointTrackType == JointTrackType.HSD_A_J_ROTZ)
+                        sourceZRot = t;
+                }
+
+                if(sourceXRot != null && sourceYRot != null && sourceZRot != null &&
+                    sourceXRot.Keys.Count == 1 && sourceYRot.Keys.Count == 1 && sourceZRot.Keys.Count == 1)
+                {
+                    foreach (var t in targetNode.Tracks)
+                    {
+                        if (t.JointTrackType == JointTrackType.HSD_A_J_ROTX ||
+                            t.JointTrackType == JointTrackType.HSD_A_J_ROTY ||
+                            t.JointTrackType == JointTrackType.HSD_A_J_ROTZ)
+                        {
+                            t.Keys.RemoveAll(e => e.Frame > 0);
+                            t.Keys[0].InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
+                        }
+                    }
+                }
+            }
 
             return newAnim;
         }
@@ -185,6 +302,22 @@ namespace HSDRawViewer.Tools
                 }
             }
         }
+
+        /*
+         *
+def flip_euler(euler, rotation_mode):
+    ret = euler.copy()
+    inner_axis = rotation_mode[0]
+    outer_axis = rotation_mode[2]
+    middle_axis = rotation_mode[1]
+
+    ret[euler_axis_index(z)] += pi
+    ret[euler_axis_index(x)] += pi
+    ret[euler_axis_index(y)] *= -1
+    ret[euler_axis_index(y)] += pi
+    return ret 
+         * */
+
 
         /// <summary>
         /// 

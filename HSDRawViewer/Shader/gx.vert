@@ -1,5 +1,7 @@
 ﻿#version 330
 
+#define MAX_TEX 4
+
 in float PNMTXIDX;
 in vec3 GX_VA_POS;
 in vec3 GX_VA_NRM;
@@ -19,10 +21,7 @@ out vec3 normal;
 out vec3 tan;
 out vec3 bitan;
 out float spec;
-out vec2 texcoord0;
-out vec2 texcoord1;
-out vec2 texcoord2;
-out vec2 texcoord3;
+out vec2 texcoord[MAX_TEX];
 out vec4 vertexColor;
 out vec4 vbones;
 out vec4 vweights;
@@ -148,10 +147,10 @@ void main()
 	vertPosition = pos.xyz;
 	normal = normalize(normal);
 
-	texcoord0 = GX_VA_TEX0;
-	texcoord1 = GX_VA_TEX1;
-	texcoord2 = GX_VA_TEX2;
-	texcoord3 = GX_VA_TEX3;
+	texcoord[0] = GX_VA_TEX0;
+	texcoord[1] = GX_VA_TEX1;
+	texcoord[2] = GX_VA_TEX2;
+	texcoord[3] = GX_VA_TEX3;
 
 	vertexColor = GX_VA_CLR0;
 	
