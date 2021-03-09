@@ -122,7 +122,7 @@
     enums:
     - false
     - true
-  - name: Unk4
+  - name: Hit Cooldown (per fighter)
     bitCount: 8
   - name: Flag4 (0x08 @ 0x41)
     bitCount: 1
