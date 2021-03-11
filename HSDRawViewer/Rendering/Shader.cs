@@ -310,31 +310,12 @@ namespace HSDRawViewer.Rendering
 
         public void LoadShader(string filePath)
         {
-            // Compile and attach before linking.
             LoadShaderBasedOnType(filePath);
-            GL.LinkProgram(programId);
-
-            LoadAttributes();
-            LoadUniforms();
         }
-        public void LoadShader(ShaderType type, string[] filePaths)
+
+        // Compile and attach before linking.
+        public void Link()
         {
-            // Compile and attach before linking.
-            AttachAndCompileShader(filePaths, type, programId, out int id);
-
-            switch (type)
-            {
-                case ShaderType.VertexShader:
-                    vertShaderId = id;
-                    break;
-                case ShaderType.FragmentShader:
-                    fragShaderId = id;
-                    break;
-                case ShaderType.GeometryShader:
-                    geomShaderId = id;
-                    break;
-            }
-
             GL.LinkProgram(programId);
 
             LoadAttributes();
@@ -362,18 +343,11 @@ namespace HSDRawViewer.Rendering
             }
         }
 
-        private void AttachAndCompileShader(string[] shaderFile, ShaderType type, int program, out int id)
+        private void AttachAndCompileShader(string shaderFile, ShaderType type, int program, out int id)
         {
-            string[] shaderText = new string[shaderFile.Length];
-            int[] lengths = new int[shaderFile.Length];
-            for (int i = 0; i < shaderText.Length; i++)
-            {
-                shaderText[i] = File.ReadAllText(shaderFile[i]);
-                lengths[i] = shaderText[i].Length;
-            }
             id = GL.CreateShader(type);
 
-            GL.ShaderSource(id, shaderText.Length, shaderText, lengths);
+            GL.ShaderSource(id, File.ReadAllText(shaderFile));
             GL.CompileShader(id);
             GL.AttachShader(program, id);
             
@@ -384,11 +358,6 @@ namespace HSDRawViewer.Rendering
                 File.WriteAllText(type + "_error.txt", error);
             }
             //errorLog.AppendShaderInfoLog(shaderName, id, type);
-        }
-
-        private void AttachAndCompileShader(string shaderFile, ShaderType type, int program, out int id)
-        {
-            AttachAndCompileShader(new string[] { shaderFile }, type, program, out id);
         }
 
         public bool ProgramCreatedSuccessfully()
