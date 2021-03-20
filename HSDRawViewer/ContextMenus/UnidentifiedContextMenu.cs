@@ -34,6 +34,10 @@ namespace HSDRawViewer.ContextMenus
             MenuItem OpenAsAJ = new MenuItem("Open As AnimJoint");
             OpenAsAJ.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_AnimJoint());
             MenuItems.Add(OpenAsAJ);
+
+            MenuItem OpenAsmah = new MenuItem("Open As MatAnimJoint");
+            OpenAsmah.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_MatAnimJoint());
+            MenuItems.Add(OpenAsmah);
         }
 
     }

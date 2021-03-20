@@ -30,11 +30,11 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AriRideGrModelEditor));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.arrayMemberEditor1 = new HSDRawViewer.GUI.ArrayMemberEditor();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -49,6 +49,18 @@
             this.toolStrip1.Size = new System.Drawing.Size(706, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.Checked = true;
+            this.toolStripButton1.CheckOnClick = true;
+            this.toolStripButton1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(107, 22);
+            this.toolStripButton1.Text = "Draw View Ranges";
             // 
             // tabControl1
             // 
@@ -84,27 +96,20 @@
             // 
             // arrayMemberEditor1
             // 
+            this.arrayMemberEditor1.DisplayItemImages = false;
             this.arrayMemberEditor1.DisplayItemIndices = false;
             this.arrayMemberEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.arrayMemberEditor1.EnablePropertyViewDescription = true;
+            this.arrayMemberEditor1.ImageHeight = ((ushort)(24));
+            this.arrayMemberEditor1.ImageWidth = ((ushort)(24));
+            this.arrayMemberEditor1.ItemHeight = 13;
             this.arrayMemberEditor1.ItemIndexOffset = 0;
             this.arrayMemberEditor1.Location = new System.Drawing.Point(3, 3);
             this.arrayMemberEditor1.Name = "arrayMemberEditor1";
             this.arrayMemberEditor1.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.arrayMemberEditor1.Size = new System.Drawing.Size(692, 422);
             this.arrayMemberEditor1.TabIndex = 0;
-            // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.Checked = true;
-            this.toolStripButton1.CheckOnClick = true;
-            this.toolStripButton1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(107, 22);
-            this.toolStripButton1.Text = "Draw View Ranges";
+            this.arrayMemberEditor1.SelectedObjectChanged += new System.EventHandler(this.arrayMemberEditor1_SelectedObjectChanged);
             // 
             // AriRideGrModelEditor
             // 

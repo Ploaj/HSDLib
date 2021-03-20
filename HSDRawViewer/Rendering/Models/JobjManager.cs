@@ -809,6 +809,15 @@ namespace HSDRawViewer.Rendering.Models
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public void HideAllDOBJs()
+        {
+            for (int i = 0; i < DOBJManager.DOBJCount; i++)
+                HideDOBJ(i);
+        }
+
 
         #endregion
     }

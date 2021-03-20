@@ -24,10 +24,9 @@ namespace HSDRaw.Common
 
     public enum TOBJ_TEV_CA
     {
-        GX_CC_TEXC = 8,
+        ONE = 4,
+        NONE = 7,
         GX_CC_TEXA = 9,
-        GX_CC_ONE = 12,
-        GX_CC_HALF = 13,
         GX_CC_ZERO = 15,
         KONST_R = (0x01 << 6 | 0),
         KONST_G = (0x01 << 6 | 1),

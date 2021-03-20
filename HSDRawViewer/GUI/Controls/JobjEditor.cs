@@ -29,9 +29,6 @@ namespace HSDRawViewer.GUI.Plugins
     {
         public DrawOrder DrawOrder => DrawOrder.First;
 
-        [Browsable(false)]
-        private bool SelectDOBJ { get => (toolStripComboBox2.SelectedIndex == 1); }
-
         private JointMap _jointMap = new JointMap();
 
         private ViewportControl viewport;
@@ -45,12 +42,12 @@ namespace HSDRawViewer.GUI.Plugins
         {
             InitializeComponent();
 
-            JOBJManager = new JOBJManager();
+            JointManager = new JOBJManager();
 
-            showBonesToolStripMenuItem.Checked = JOBJManager._settings.RenderBones;
-            showMeshToolStripMenuItem.Checked = JOBJManager._settings.RenderObjects;
-            showBoneOrientationToolStripMenuItem.Checked = JOBJManager._settings.RenderOrientation;
-            showSelectionOutlineToolStripMenuItem.Checked = JOBJManager._settings.OutlineSelected;
+            showBonesToolStripMenuItem.Checked = JointManager._settings.RenderBones;
+            showMeshToolStripMenuItem.Checked = JointManager._settings.RenderObjects;
+            showBoneOrientationToolStripMenuItem.Checked = JointManager._settings.RenderOrientation;
+            showSelectionOutlineToolStripMenuItem.Checked = JointManager._settings.OutlineSelected;
 
             renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
             renderModeBox.SelectedIndex = 0;
@@ -62,12 +59,12 @@ namespace HSDRawViewer.GUI.Plugins
             treeJOBJ.AfterSelect += (sender, args) =>
             {
                 propertyGrid1.SelectedObject = treeJOBJ.SelectedNode.Tag;
-                JOBJManager.SelectedJOBJ = treeJOBJ.SelectedNode.Tag as HSD_JOBJ;
+                JointManager.SelectedJOBJ = treeJOBJ.SelectedNode.Tag as HSD_JOBJ;
             };
 
             listDOBJ.SelectedIndexChanged += (sender, args) => {
                 propertyGrid1.SelectedObject = listDOBJ.SelectedItem;
-                JOBJManager.DOBJManager.SelectedDOBJ = ((listDOBJ.SelectedItem as DOBJContainer)?.DOBJ);
+                JointManager.DOBJManager.SelectedDOBJ = ((listDOBJ.SelectedItem as DOBJContainer)?.DOBJ);
 
                 materialDropDownButton1.Enabled = listDOBJ.SelectedItems.Count == 1;
                 buttonMoveDown.Enabled = materialDropDownButton1.Enabled;
@@ -103,7 +100,7 @@ namespace HSDRawViewer.GUI.Plugins
                         PluginManager.GetCommonViewport().RemoveRenderer(this);
                     }
                     viewport.Dispose();
-                    JOBJManager.CleanupRendering();
+                    JointManager.CleanupRendering();
                 }
             };
         }
@@ -235,14 +232,14 @@ namespace HSDRawViewer.GUI.Plugins
 
         private BindingList<DOBJContainer> dobjList = new BindingList<DOBJContainer>();
 
-        private JOBJManager JOBJManager;
+        public JOBJManager JointManager { get; internal set; }
 
         private HSD_JOBJ root;
 
         public void SetJOBJ(HSD_JOBJ jobj)
         {
             root = jobj;
-            JOBJManager.SetJOBJ(root);
+            JointManager.SetJOBJ(root);
             RefreshGUI();
         }
 
@@ -263,7 +260,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             treeJOBJ.ExpandAll();
 
-            JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+            JointManager.DOBJManager.HiddenDOBJs.Clear();
             CheckAll();
         }
 
@@ -331,7 +328,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="fog"></param>
         public void SetFog(HSD_FogDesc fog)
         {
-            JOBJManager._fogParam.LoadFromHSD(fog);
+            JointManager._fogParam.LoadFromHSD(fog);
         }
 
         /// <summary>
@@ -353,7 +350,7 @@ namespace HSDRawViewer.GUI.Plugins
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = animation.FrameCount;
-            JOBJManager.Animation = animation;
+            JointManager.Animation = animation;
         }
 
         /// <summary>
@@ -362,11 +359,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="joint"></param>
         public void LoadAnimation(HSD_MatAnimJoint joint)
         {
-            JOBJManager.SetMatAnimJoint(joint);
+            JointManager.SetMatAnimJoint(joint);
             var vp = viewport;
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
-            vp.MaxFrame = JOBJManager.MatAnimation.FrameCount;
+            vp.MaxFrame = JointManager.MatAnimation.FrameCount;
         }
 
         /// <summary>
@@ -375,11 +372,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="animation"></param>
         public void LoadAnimation(HSD_ShapeAnimJoint animation)
         {
-            JOBJManager.SetShapeAnimJoint(animation);
+            JointManager.SetShapeAnimJoint(animation);
             var vp = viewport;
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
-            vp.MaxFrame = JOBJManager.ShapeAnimation.FrameCount;
+            vp.MaxFrame = JointManager.ShapeAnimation.FrameCount;
         }
 
         /// <summary>
@@ -392,7 +389,7 @@ namespace HSDRawViewer.GUI.Plugins
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = motFile.EndTime * 60;
-            JOBJManager.SetMOT(jointTable, motFile);
+            JointManager.SetMOT(jointTable, motFile);
         }
 
         /// <summary>
@@ -403,12 +400,12 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            JOBJManager.Frame = viewport.Frame;
-            JOBJManager._settings.RenderBones = showBonesToolStripMenuItem.Checked;
-            JOBJManager._settings.RenderOrientation = showBoneOrientationToolStripMenuItem.Checked;
-            JOBJManager._settings.RenderObjects = showMeshToolStripMenuItem.Checked;
-            JOBJManager._settings.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
-            JOBJManager.Render(cam);
+            JointManager.Frame = viewport.Frame;
+            JointManager._settings.RenderBones = showBonesToolStripMenuItem.Checked;
+            JointManager._settings.RenderOrientation = showBoneOrientationToolStripMenuItem.Checked;
+            JointManager._settings.RenderObjects = showMeshToolStripMenuItem.Checked;
+            JointManager._settings.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
+            JointManager.Render(cam);
 
             foreach (var d in _drawables)
                 d.Draw(cam, windowWidth, windowHeight);
@@ -611,18 +608,18 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(toolStripComboBox2.SelectedIndex == 0)
             {
-                JOBJManager._settings.RenderObjects = true;
-                JOBJManager.DOBJManager.OnlyRenderSelected = false;
+                JointManager._settings.RenderObjects = true;
+                JointManager.DOBJManager.OnlyRenderSelected = false;
             }
             if (toolStripComboBox2.SelectedIndex == 1)
             {
-                JOBJManager._settings.RenderObjects = true;
-                JOBJManager.DOBJManager.OnlyRenderSelected = true;
+                JointManager._settings.RenderObjects = true;
+                JointManager.DOBJManager.OnlyRenderSelected = true;
             }
             if (toolStripComboBox2.SelectedIndex == 2)
             {
-                JOBJManager._settings.RenderObjects = false;
-                JOBJManager.DOBJManager.OnlyRenderSelected = false;
+                JointManager._settings.RenderObjects = false;
+                JointManager.DOBJManager.OnlyRenderSelected = false;
             }
         }
 
@@ -662,7 +659,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void importModelFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ModelImporter.ReplaceModelFromFile(root);
-            JOBJManager.RefreshRendering = true;
+            JointManager.RefreshRendering = true;
             _jointMap.Clear();
             RefreshGUI();
         }
@@ -737,10 +734,10 @@ namespace HSDRawViewer.GUI.Plugins
             else
                 checkedItems.Remove(listDOBJ.Items[e.Index] as DOBJContainer);
             
-            JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+            JointManager.DOBJManager.HiddenDOBJs.Clear();
             foreach(var i in checkedItems)
             {
-                JOBJManager.DOBJManager.HiddenDOBJs.Add(i.DOBJ);
+                JointManager.DOBJManager.HiddenDOBJs.Add(i.DOBJ);
             }
         }
 
@@ -935,7 +932,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     v.DOBJ.Pobj = null;
                 }
-                JOBJManager.RefreshRendering = true;
+                JointManager.RefreshRendering = true;
                 RefreshGUI();
             }
         }
@@ -979,7 +976,7 @@ namespace HSDRawViewer.GUI.Plugins
                     }
                 }
 
-                JOBJManager.RefreshRendering = true;
+                JointManager.RefreshRendering = true;
                 RefreshGUI();
             }
         }
@@ -992,7 +989,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void clearAnimButton_Click(object sender, EventArgs e)
         {
             viewport.AnimationTrackEnabled = false;
-            JOBJManager.Animation = null;
+            JointManager.Animation = null;
         }
 
         /// <summary>
@@ -1054,7 +1051,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void mayaANIMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
+            if (JointManager.Animation == null || JointManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -1064,7 +1061,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             if (f != null)
             {
-                ConvMayaAnim.ExportToMayaAnim(f, JOBJManager.Animation, _jointMap);
+                ConvMayaAnim.ExportToMayaAnim(f, JointManager.Animation, _jointMap);
             }
         }
 
@@ -1084,7 +1081,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void figaTreeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
+            if (JointManager.Animation == null || JointManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -1099,7 +1096,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRawFile animFile = new HSDRawFile();
                     animFile.Roots.Add(new HSDRootNode()
                     {
-                        Data = JOBJManager.Animation.ToFigaTree(),
+                        Data = JointManager.Animation.ToFigaTree(),
                         Name = setting.Symbol
                     });
                     animFile.Save(f);
@@ -1125,7 +1122,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void animJointToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || JOBJManager.Animation.NodeCount == 0)
+            if (JointManager.Animation == null || JointManager.Animation.NodeCount == 0)
             {
                 MessageBox.Show("No animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -1141,7 +1138,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRawFile animFile = new HSDRawFile();
                     animFile.Roots.Add(new HSDRootNode()
                     {
-                        Data = JOBJManager.Animation.ToAnimJoint(JOBJManager.GetJOBJ(0), setting.Flags),
+                        Data = JointManager.Animation.ToAnimJoint(JointManager.GetJOBJ(0), setting.Flags),
                         Name = setting.Symbol
                     });
                     animFile.Save(f);
@@ -1155,13 +1152,13 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void motToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || !(JOBJManager.Animation is MotAnimManager))
+            if (JointManager.Animation == null || !(JointManager.Animation is MotAnimManager))
             {
                 MessageBox.Show("No mot animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            MotAnimManager anim = (MotAnimManager)(JOBJManager.Animation);
+            MotAnimManager anim = (MotAnimManager)(JointManager.Animation);
 
             var f = Tools.FileIO.SaveFile("EightingMOT|*.mota;*.gnta");
 
@@ -1171,13 +1168,13 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void xmlToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (JOBJManager.Animation == null || !(JOBJManager.Animation is MotAnimManager))
+            if (JointManager.Animation == null || !(JointManager.Animation is MotAnimManager))
             {
                 MessageBox.Show("No mot animation is loaded", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            MotAnimManager anim = (MotAnimManager)(JOBJManager.Animation);
+            MotAnimManager anim = (MotAnimManager)(JointManager.Animation);
             var f = Tools.FileIO.SaveFile("XML|*.xml;");
 
             MOT_FILE file = anim.GetMOT();
@@ -1191,11 +1188,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void renderModeBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(JOBJManager != null)
+            if(JointManager != null)
             {
-                RenderMode mode = JOBJManager.RenderMode;
+                RenderMode mode = JointManager.RenderMode;
                 Enum.TryParse<RenderMode>(renderModeBox.Text, out mode);
-                JOBJManager.RenderMode = mode;
+                JointManager.RenderMode = mode;
             }
         }
 
@@ -1231,27 +1228,27 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void editAnimationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(JOBJManager.Animation == null)
+            if(JointManager.Animation == null)
                 return;
 
             var settings = new EditAnimationSettings();
-            settings.EndFrame = (int)JOBJManager.Animation.FrameCount;
-            settings.ScaleRangeEndFrame = (int)JOBJManager.Animation.FrameCount;
+            settings.EndFrame = (int)JointManager.Animation.FrameCount;
+            settings.ScaleRangeEndFrame = (int)JointManager.Animation.FrameCount;
             using (PropertyDialog d = new PropertyDialog("Animation Edit Options", settings))
             {
                 if(d.ShowDialog() == DialogResult.OK)
                 {
                     // trim animation
                     if (settings.TrimAnimation)
-                        JOBJManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
+                        JointManager.Animation.Trim(settings.StartFrame, settings.EndFrame);
 
                     // Scale animation
                     if (settings.ScaleRangeFactor != 1)
-                        JOBJManager.Animation.ScaleBy(settings.ScaleRangeFactor, settings.ScaleRangeStartFrame, settings.ScaleRangeEndFrame);
+                        JointManager.Animation.ScaleBy(settings.ScaleRangeFactor, settings.ScaleRangeStartFrame, settings.ScaleRangeEndFrame);
                     
                     
                     // reload edited animation
-                    LoadAnimation(JOBJManager.Animation);
+                    LoadAnimation(JointManager.Animation);
                 }
             }
         }
@@ -1263,7 +1260,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void recalculateInverseBindsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJManager.RecalculateInverseBinds();
+            JointManager.RecalculateInverseBinds();
         }
 
         /// <summary>
@@ -1284,11 +1281,11 @@ namespace HSDRawViewer.GUI.Plugins
                     temp.SetJOBJ(jobj);
                     temp.UpdateNoRender();
 
-                    if(temp.JointCount == JOBJManager.JointCount)
+                    if(temp.JointCount == JointManager.JointCount)
                     {
                         for(int i = 0; i < temp.JointCount; i++)
                         {
-                            var old = JOBJManager.GetJOBJ(i);
+                            var old = JointManager.GetJOBJ(i);
                             var n = temp.GetJOBJ(i);
                             old.TX = n.TX; old.TY = n.TY; old.TZ = n.TZ;
                             old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
@@ -1353,7 +1350,7 @@ namespace HSDRawViewer.GUI.Plugins
                         }
                     }
 
-                    JOBJManager.RefreshRendering = true;
+                    JointManager.RefreshRendering = true;
                 }
             }
         }
@@ -1368,7 +1365,7 @@ namespace HSDRawViewer.GUI.Plugins
             if(MessageBox.Show("Reorient Bones", "This makes changes to bones and cannot be undone", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
             {
                 JOBJExtensions.ApplyMeleeFighterTransforms(root);
-                JOBJManager.RecalculateInverseBinds();
+                JointManager.RecalculateInverseBinds();
             }
         }
 
@@ -1402,7 +1399,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void viewAnimationGraphToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            jointAnimEditor.SetJoint(root, JOBJManager.Animation);
+            jointAnimEditor.SetJoint(root, JointManager.Animation);
             jointAnimEditor.Show();
             jointAnimEditor.WindowState = FormWindowState.Maximized;
 
@@ -1434,7 +1431,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if (propertyGrid1.SelectedObject is DOBJContainer con)
                     con.DOBJ.Pobj = null;
 
-                JOBJManager.RefreshRendering = true;
+                JointManager.RefreshRendering = true;
 
                 RefreshGUI();
             }
@@ -1460,13 +1457,13 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 if (d.ShowDialog() == DialogResult.OK && settings.FrameCount > 0)
                 {
-                    JOBJManager.Animation = new JointAnimManager()
+                    JointManager.Animation = new JointAnimManager()
                     {
                         FrameCount = settings.FrameCount
                     };
 
-                    for (int i = 0; i < JOBJManager.JointCount; i++)
-                        JOBJManager.Animation.Nodes.Add(
+                    for (int i = 0; i < JointManager.JointCount; i++)
+                        JointManager.Animation.Nodes.Add(
                             new AnimNode()
                         {
                             Tracks = new List<HSDRaw.Tools.FOBJ_Player>()
@@ -1573,10 +1570,10 @@ namespace HSDRawViewer.GUI.Plugins
                     ShowGrid = viewport.EnableFloor,
                     ShowBackdrop = viewport.EnableBack,
                     Camera = viewport.Camera,
-                    Lighting = JOBJManager._lightParam,
-                    Settings = JOBJManager._settings,
-                    Animation = JOBJManager.Animation,
-                    HiddenNodes = JOBJManager.GetHiddenDOBJIndices().ToArray()
+                    Lighting = JointManager._lightParam,
+                    Settings = JointManager._settings,
+                    Animation = JointManager.Animation,
+                    HiddenNodes = JointManager.GetHiddenDOBJIndices().ToArray()
                 };
                 settings.Serialize(f);
             }
@@ -1615,10 +1612,10 @@ namespace HSDRawViewer.GUI.Plugins
                 viewport.Camera = settings.Camera;
 
             if (settings.Settings != null)
-                JOBJManager._settings = settings.Settings;
+                JointManager._settings = settings.Settings;
 
             if (settings.Lighting != null)
-                JOBJManager._lightParam = settings.Lighting;
+                JointManager._lightParam = settings.Lighting;
 
             if (settings.Animation != null)
             {
@@ -1711,7 +1708,7 @@ namespace HSDRawViewer.GUI.Plugins
                 }
 
                 proxy.Replace(TOBJConverter.ImportTOBJFromFile(f, imgFormat, palFormat));
-                JOBJManager.RefreshRendering = true;
+                JointManager.RefreshRendering = true;
                 textureArrayEditor.Invalidate();
                 textureArrayEditor.Update();
             }
@@ -1744,7 +1741,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void displaySettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Light Settings", JOBJManager._lightParam))
+            using (PropertyDialog d = new PropertyDialog("Light Settings", JointManager._lightParam))
                 d.ShowDialog();
         }
 
@@ -1755,7 +1752,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void fogSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Fog Settings", JOBJManager._fogParam))
+            using (PropertyDialog d = new PropertyDialog("Fog Settings", JointManager._fogParam))
                 d.ShowDialog();
         }
     }

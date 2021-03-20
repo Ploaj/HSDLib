@@ -53,6 +53,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// </summary>
         private KAR_grMainModel mainModel;
 
+        public KAR_grViewRegion[] ViewRegions { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -61,7 +63,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         {
             mainModel = model;
             _jointEditor.SetJOBJ(model.RootNode);
-            arrayMemberEditor1.SetArrayFromProperty(model.ModelBounding, "ViewRegions");
+            ViewRegions = model.ModelBounding.ViewRegions;
+            arrayMemberEditor1.SetArrayFromProperty(this, "ViewRegions");
         }
 
         /// <summary>
@@ -73,10 +76,35 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             if (toolStripButton1.Checked)
-                foreach (var v in mainModel.ModelBounding.ViewRegions)
+                foreach (var v in ViewRegions)
                 {
-                    DrawShape.DrawBox(Color.Red, v.MinX, v.MinY, v.MinZ, v.MaxX, v.MaxY, v.MaxZ);
+                    if (SelectedRegion == v)
+                        DrawShape.DrawBox(Color.Red, v.MinX, v.MinY, v.MinZ, v.MaxX, v.MaxY, v.MaxZ);
+                    //else
+                    //    DrawShape.DrawBox(Color.Red, v.MinX, v.MinY, v.MinZ, v.MaxX, v.MaxY, v.MaxZ);
                 }
+        }
+
+        private KAR_grViewRegion SelectedRegion = null;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void arrayMemberEditor1_SelectedObjectChanged(object sender, EventArgs e)
+        {
+            if(arrayMemberEditor1.SelectedObject is KAR_grViewRegion bounding)
+            {
+                var jointManager = _jointEditor.JointManager;
+
+                jointManager.HideAllDOBJs();
+
+                foreach (var i in bounding.Indices)
+                    jointManager.ShowDOBJ(i);
+
+                SelectedRegion = bounding;
+            }
         }
     }
 }

@@ -101,6 +101,10 @@ namespace HSDRaw.Tools
                 //Console.WriteLine($"{nw} {nh} {datalength.ToString("X")}");
 
                 byte[] newmip = new byte[datalength];
+
+                if (mipOff + datalength > imageData.Length)
+                    return newmip;
+
                 Array.Copy(imageData, mipOff, newmip, 0, datalength);
 
                 imageData = newmip;

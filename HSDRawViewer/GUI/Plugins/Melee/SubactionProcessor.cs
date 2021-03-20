@@ -253,16 +253,19 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         }
                         break;
                     case 31 << 2: // struct vis change
-                        UpdateVISMethod(cmd.Parameters[0], cmd.Parameters[2]);
+                        if (UpdateVISMethod != null)
+                            UpdateVISMethod(cmd.Parameters[0], cmd.Parameters[2]);
                         break;
                     case 37 << 2:
                         CharacterInvisibility = cmd.Parameters[1] == 1;
                         break;
                     case 40 << 2:
-                        AnimateMaterialMethod(cmd.Parameters[1], cmd.Parameters[3], cmd.Parameters[0], cmd.Parameters[2]);
+                        if (AnimateMaterialMethod != null)
+                            AnimateMaterialMethod(cmd.Parameters[1], cmd.Parameters[3], cmd.Parameters[0], cmd.Parameters[2]);
                         break;
                     case 41 << 2:
-                        AnimateModelMethod(cmd.Parameters[0], cmd.Parameters[1]);
+                        if (AnimateModelMethod != null)
+                            AnimateModelMethod(cmd.Parameters[0], cmd.Parameters[1]);
                         break;
                     case 46 << 2: //overlay color
                         if(cmd.Parameters[0] == 1)

@@ -702,9 +702,7 @@
     <None Include="Shader\gx_material.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\gx_tev.frag">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Shader\gx_tev_old.frag" />
     <None Include="Shader\gx_uv.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
