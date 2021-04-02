@@ -10,7 +10,7 @@ namespace HSDRawViewer.Rendering
         public Vector3 Origin { get; internal set; }
         public Vector3 End { get; internal set; }
 
-        public Vector3 Dir { get { return (Origin - End).Normalized(); } }
+        public Vector3 Direction { get { return (Origin - End).Normalized(); } }
 
         /// <summary>
         /// 
@@ -75,7 +75,14 @@ namespace HSDRawViewer.Rendering
             return (float)Math.Sqrt(dx * dx + dy * dy);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="P1"></param>
+        /// <param name="P2"></param>
+        /// <param name="P3"></param>
+        /// <param name="P4"></param>
+        /// <returns></returns>
         public bool IntersectsQuad(Vector3 P1, Vector3 P2, Vector3 P3, Vector3 P4)
         {
             Vector3 temp;
@@ -122,7 +129,7 @@ namespace HSDRawViewer.Rendering
         public Vector3 GetPlaneIntersection(Vector3 Norm, Vector3 Position)
         {
             Vector3 rayP = Origin;
-            Vector3 rayD = Dir;
+            Vector3 rayD = Direction;
             Vector3 planeN = Norm;
             var d = Vector3.Dot(Position, -Norm);
             var t = -(d + rayP.Z * planeN.Z + rayP.Y * planeN.Y + rayP.X * planeN.X) / (rayD.Z * planeN.Z + rayD.Y * planeN.Y + rayD.X * planeN.X);
@@ -136,24 +143,29 @@ namespace HSDRawViewer.Rendering
         /// <param name="rad"></param>
         /// <param name="closest"></param>
         /// <returns></returns>
-        public bool CheckSphereHit(Vector3 sphere, float rad, out Vector3 closest)
+        public bool CheckSphereHit(Vector3 sphere, float rad, out float distance)
         {
-            Vector3 dirToSphere = sphere - Origin;
-            Vector3 vLineDir = (End - Origin).Normalized();
-            float fLineLength = 100;
+            Vector3 difference = sphere - Origin;
+            float differenceLengthSquared = difference.LengthSquared;
+            float sphereRadiusSquared = rad * rad;
+            float distanceAlongRay;
+            if (differenceLengthSquared < sphereRadiusSquared)
+            {
+                distance = 0;
+                return true;
+            }
+            Vector3 refDirection = Direction;
+            Vector3.Dot(ref refDirection, ref difference, out distanceAlongRay);
+            if (distanceAlongRay < 0)
+            {
+                distance = 0;
+                return false;
+            }
+            float dist = sphereRadiusSquared + distanceAlongRay * distanceAlongRay - differenceLengthSquared;
 
-            float t = Vector3.Dot(dirToSphere, vLineDir);
+            distance = dist;// distanceAlongRay - (float?)Math.Sqrt(dist);
 
-            if (t <= 0.0f)
-                closest = Origin;
-            else if (t >= fLineLength)
-                closest = End;
-            else
-                closest = Origin + vLineDir * t;
-
-            return (Math.Pow(sphere.X - closest.X, 2)
-                + Math.Pow(sphere.Y - closest.Y, 2)
-                + Math.Pow(sphere.Z - closest.Z, 2) <= rad * rad);
+            return (dist < 0) ? false : true;
         }
 
 
@@ -184,9 +196,15 @@ namespace HSDRawViewer.Rendering
         private float coPlanerThreshold = 0.7f; // Some threshold value that is application dependent
         private float lengthErrorThreshold = 1e-3f;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public bool IntersectsLine(Vector3 start, Vector3 end)
         {
-            Vector3 da = Dir;  // Unnormalized direction of the ray
+            Vector3 da = Direction;  // Unnormalized direction of the ray
             Vector3 db = end - start;
             Vector3 dc = start - Origin;
 
@@ -204,6 +222,195 @@ namespace HSDRawViewer.Rendering
                     return true;
             }
 
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public bool CheckAABBHit(Vector3 center, float size, ref Vector3 hit)
+        {
+            return CheckAABBHit(center - new Vector3(size), center + new Vector3(size), ref hit);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public bool CheckAABBHit(Vector3 start, Vector3 end, ref Vector3 hit)
+        {
+            return CheckLineBox(start, end, Origin, End, ref hit);
+        }
+
+        private const double Epsilon = 0.000001d;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rayOrigin"></param>
+        /// <param name="rayDirection"></param>
+        /// <param name="vert0"></param>
+        /// <param name="vert1"></param>
+        /// <param name="vert2"></param>
+        /// <returns></returns>
+        public bool CheckTriangleHit(Vector3 vert0, Vector3 vert1, Vector3 vert2, ref Vector3 hit)
+        {
+            Vector3 rayOrigin = Origin;
+            Vector3 rayDirection = Direction; 
+
+            var edge1 = vert1 - vert0;
+            var edge2 = vert2 - vert0;
+
+            var pvec = Vector3.Cross(rayDirection, edge2);
+
+            var det = Vector3.Dot(edge1, pvec);
+
+            if (det > -Epsilon && det < Epsilon)
+            {
+                return false;
+            }
+
+            var invDet = 1d / det;
+
+            var tvec = rayOrigin - vert0;
+
+            var u = Vector3.Dot(tvec, pvec) * invDet;
+
+            if (u < 0 || u > 1)
+            {
+                return false;
+            }
+
+            var qvec = Vector3.Cross(tvec, edge1);
+
+            var v = Vector3.Dot(rayDirection, qvec) * invDet;
+
+            if (v < 0 || u + v > 1)
+            {
+                return false;
+            }
+
+            var t = Vector3.Dot(edge2, qvec) * invDet;
+
+            hit = new Vector3((float)t, (float)u, (float)v);
+            return true;
+        }
+
+        public bool CheckTriangleHit2(Vector3 v0, Vector3 v1, Vector3 v2, ref Vector3 hit, out float depth)
+        {
+            depth = float.MaxValue;
+            var e1 = v1 - v0;
+            var e2 = v2 - v0;
+            var d = -Direction;
+            var p = Origin;
+
+            var h = Vector3.Cross(d, e2);
+
+            var a = Vector3.Dot(e1, h);
+
+            if (a > -0.00001 && a < 0.00001)
+                return (false);
+
+            var f = 1 / a;
+            var s = p - v0;
+            var u = f * (Vector3.Dot(s, h));
+
+            if (u < 0.0 || u > 1.0)
+                return (false);
+
+            var q = Vector3.Cross(s, e1);
+            var v = f * Vector3.Dot(d, q);
+
+            if (v < 0.0 || u + v > 1.0)
+                return (false);
+
+            // at this stage we can compute t to find out where
+            // the intersection point is on the line
+            var t = f * Vector3.Dot(e2, q);
+
+
+            if (t > 0.00001) // ray intersection
+            {
+                depth = t;
+                hit = Origin - Direction * t;
+                return (true);
+            }
+            else // this means that there is a line intersection
+                 // but not a ray intersection
+                return (false);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="B1"></param>
+        /// <param name="B2"></param>
+        /// <param name="L1"></param>
+        /// <param name="L2"></param>
+        /// <param name="Hit"></param>
+        /// <returns></returns>
+        public static bool CheckLineBox(Vector3 B1, Vector3 B2, Vector3 L1, Vector3 L2, ref Vector3 Hit)
+        {
+            if (L2.X < B1.X && L1.X < B1.X) return false;
+            if (L2.X > B2.X && L1.X > B2.X) return false;
+            if (L2.Y < B1.Y && L1.Y < B1.Y) return false;
+            if (L2.Y > B2.Y && L1.Y > B2.Y) return false;
+            if (L2.Z < B1.Z && L1.Z < B1.Z) return false;
+            if (L2.Z > B2.Z && L1.Z > B2.Z) return false;
+            if (L1.X > B1.X && L1.X < B2.X &&
+                L1.Y > B1.Y && L1.Y < B2.Y &&
+                L1.Z > B1.Z && L1.Z < B2.Z)
+            {
+                Hit = L1;
+                return true;
+            }
+            if ((GetIntersection(L1.X - B1.X, L2.X - B1.X, L1, L2, ref Hit) && InBox(Hit, B1, B2, 1))
+              || (GetIntersection(L1.Y - B1.Y, L2.Y - B1.Y, L1, L2, ref Hit) && InBox(Hit, B1, B2, 2))
+              || (GetIntersection(L1.Z - B1.Z, L2.Z - B1.Z, L1, L2, ref Hit) && InBox(Hit, B1, B2, 3))
+              || (GetIntersection(L1.X - B2.X, L2.X - B2.X, L1, L2, ref Hit) && InBox(Hit, B1, B2, 1))
+              || (GetIntersection(L1.Y - B2.Y, L2.Y - B2.Y, L1, L2, ref Hit) && InBox(Hit, B1, B2, 2))
+              || (GetIntersection(L1.Z - B2.Z, L2.Z - B2.Z, L1, L2, ref Hit) && InBox(Hit, B1, B2, 3)))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fDst1"></param>
+        /// <param name="fDst2"></param>
+        /// <param name="P1"></param>
+        /// <param name="P2"></param>
+        /// <param name="Hit"></param>
+        /// <returns></returns>
+        public static bool GetIntersection(float fDst1, float fDst2, Vector3 P1, Vector3 P2, ref Vector3 Hit)
+        {
+            if ((fDst1 * fDst2) >= 0.0f) return false;
+            if (fDst1 == fDst2) return false;
+            Hit = P1 + (P2 - P1) * (-fDst1 / (fDst2 - fDst1));
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Hit"></param>
+        /// <param name="B1"></param>
+        /// <param name="B2"></param>
+        /// <param name="Axis"></param>
+        /// <returns></returns>
+        public static bool InBox(Vector3 Hit, Vector3 B1, Vector3 B2, int Axis)
+        {
+            if (Axis == 1 && Hit.Z > B1.Z && Hit.Z < B2.Z && Hit.Y > B1.Y && Hit.Y < B2.Y) return true;
+            if (Axis == 2 && Hit.Z > B1.Z && Hit.Z < B2.Z && Hit.X > B1.X && Hit.X < B2.X) return true;
+            if (Axis == 3 && Hit.X > B1.X && Hit.X < B2.X && Hit.Y > B1.Y && Hit.Y < B2.Y) return true;
             return false;
         }
     }

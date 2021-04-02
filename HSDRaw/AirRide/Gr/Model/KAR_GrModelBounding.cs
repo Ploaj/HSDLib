@@ -18,7 +18,7 @@
             }
             set
             {
-                if(value == null)
+                if(value == null || value.Length == 0)
                 {
                     ViewRegionCount = 0;
                     _s.SetReference(0x00, null);
@@ -33,7 +33,7 @@
 
         public short ViewRegionCount { get => _s.GetInt16(0x04); internal set => _s.SetInt16(0x04, value); }
 
-        public KAR_grUnknownBounding[] UnknownBounding
+        public KAR_grDynamicBoundingBoxes[] DynamicBoundingBoxes
         {
             get
             {
@@ -41,16 +41,16 @@
                 if (str == null)
                     return null;
 
-                var regions = str._s.GetEmbeddedAccessorArray<KAR_grUnknownBounding>(0x00, UnknownCount);
+                var regions = str._s.GetEmbeddedAccessorArray<KAR_grDynamicBoundingBoxes>(0x00, UnknownCount);
 
                 return regions;
             }
             set
             {
-                if (value == null)
+                if (value == null || value.Length == 0)
                 {
                     UnknownCount = 0;
-                    _s.SetReference(0x00, null);
+                    _s.SetReference(0x08, null);
                 }
                 else
                 {
@@ -62,7 +62,7 @@
 
         public short UnknownCount { get => _s.GetInt16(0x0C); internal set => _s.SetInt16(0x0C, value); }
 
-        public KAR_grBoundingBox[] BoundingBoxes
+        public KAR_grStaticBoundingBox[] StaticBoundingBoxes
         {
             get
             {
@@ -70,13 +70,13 @@
                 if (str == null)
                     return null;
 
-                var regions = str._s.GetEmbeddedAccessorArray<KAR_grBoundingBox>(0x00, BoundingBoxCount);
+                var regions = str._s.GetEmbeddedAccessorArray<KAR_grStaticBoundingBox>(0x00, BoundingBoxCount);
 
                 return regions;
             }
             set
             {
-                if (value == null)
+                if (value == null || value.Length == 0)
                 {
                     BoundingBoxCount = 0;
                     _s.SetReference(0x10, null);
@@ -110,7 +110,7 @@
             }
             set
             {
-                if (value == null)
+                if (value == null || value.Length == 0)
                 {
                     Count = 0;
                     _s.SetReference(0x18, null);

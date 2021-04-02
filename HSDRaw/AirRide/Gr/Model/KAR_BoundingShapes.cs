@@ -54,7 +54,7 @@
         public float MaxZ { get => _s.GetFloat(0x1C); set => _s.SetFloat(0x1C, value); }
     }
 
-    public class KAR_grUnknownBounding : HSDAccessor
+    public class KAR_grDynamicBoundingBoxes : HSDAccessor
     {
         public override int TrimmedSize => 0x24;
 
@@ -107,10 +107,10 @@
 
         public float MaxZ { get => _s.GetFloat(0x1C); set => _s.SetFloat(0x1C, value); }
 
-        public int Unknown { get => _s.GetInt32(0x20); set => _s.SetInt32(0x20, value); }
+        public int BoneIndex { get => _s.GetInt32(0x20); set => _s.SetInt32(0x20, value); }
     }
 
-    public class KAR_grBoundingBox : HSDAccessor
+    public class KAR_grStaticBoundingBox : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
         

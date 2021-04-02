@@ -72,29 +72,29 @@ namespace HSDRaw.AirRide.Gr.Data
 
         //public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
 
-        public int UnknownStart1 { get => _s.GetInt32(0x1c); set => _s.SetInt32(0x1c, value); }
+        public float UnknownStart1 { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
 
-        public int UnknownSize1 { get => _s.GetInt32(0x20); set => _s.SetInt32(0x20, value); }
+        public float UnknownSize1 { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
 
-        public int UnknownStart2 { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
+        public float UnknownStart2 { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
 
-        public int UnknownSize2 { get => _s.GetInt32(0x28); set => _s.SetInt32(0x28, value); }
+        public float UnknownSize2 { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
 
-        public int UnknownStart3 { get => _s.GetInt32(0x2c); set => _s.SetInt32(0x2c, value); }
+        public float UnknownStart3 { get => _s.GetFloat(0x2c); set => _s.SetFloat(0x2c, value); }
 
-        public int UnknownSize3 { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }
+        public float UnknownSize3 { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
 
-        public int UnknownStart4 { get => _s.GetInt32(0x34); set => _s.SetInt32(0x34, value); }
+        public float UnknownStart4 { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
 
-        public int UnknownSize4 { get => _s.GetInt32(0x38); set => _s.SetInt32(0x38, value); }
+        public float UnknownSize4 { get => _s.GetFloat(0x38); set => _s.SetFloat(0x38, value); }
 
-        public int UnknownStart5 { get => _s.GetInt32(0x3c); set => _s.SetInt32(0x3c, value); }
+        public float UnknownStart5 { get => _s.GetFloat(0x3c); set => _s.SetFloat(0x3c, value); }
 
-        public int UnknownSize5 { get => _s.GetInt32(0x40); set => _s.SetInt32(0x40, value); }
+        public float UnknownSize5 { get => _s.GetFloat(0x40); set => _s.SetFloat(0x40, value); }
 
-        public int UnknownStart6 { get => _s.GetInt32(0x44); set => _s.SetInt32(0x44, value); }
+        public float UnknownStart6 { get => _s.GetFloat(0x44); set => _s.SetFloat(0x44, value); }
 
-        public int UnknownSize6 { get => _s.GetInt32(0x48); set => _s.SetInt32(0x48, value); }
+        public float UnknownSize6 { get => _s.GetFloat(0x48); set => _s.SetFloat(0x48, value); }
     }
 
     public class KAR_grCollisionNode : HSDAccessor
@@ -243,7 +243,7 @@ namespace HSDRaw.AirRide.Gr.Data
         {
             get
             {
-                var r = _s.GetReference<HSDAccessor>(0x1C);
+                var r = _s.GetReference<HSDAccessor>(0x20);
                 if (r == null)
                     return null;
                 return r._s.GetEmbeddedAccessorArray<KAR_ZoneCollisionTriangle>(0x00, ZoneTriangleCount);
@@ -253,12 +253,12 @@ namespace HSDRaw.AirRide.Gr.Data
                 if (value == null)
                 {
                     ZoneTriangleCount = 0;
-                    _s.SetReference(0x1C, null);
+                    _s.SetReference(0x20, null);
                 }
                 else
                 {
                     ZoneTriangleCount = value.Length;
-                    var r = _s.GetCreateReference<HSDAccessor>(0x1C);
+                    var r = _s.GetCreateReference<HSDAccessor>(0x20);
                     r._s.SetEmbeddedAccessorArray(0x00, value);
                 }
             }

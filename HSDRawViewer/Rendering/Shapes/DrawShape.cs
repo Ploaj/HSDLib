@@ -1,4 +1,5 @@
 ﻿using HSDRaw.Common;
+using HSDRawViewer.Rendering.Renderers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -13,7 +14,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="spline"></param>
-        public static void RenderSpline(HSD_Spline spline)
+        public static void RenderSpline(HSD_Spline spline, Color c1, Color c2)
         {
             GL.UseProgram(-1);
 
@@ -22,20 +23,44 @@ namespace HSDRawViewer.Rendering
             GL.LineWidth(2);
             GL.Begin(PrimitiveType.Lines);
 
-            var points = spline.Points.Array;
+            var points = spline.Points;
+
+            var pointMax = points.Length;
 
             for (int i = 0; i < points.Length - 1; i++)
             {
-                GL.Color3(Color.Yellow);
+                GL.Color3(Mix(c1, c2, i / (float)pointMax));
                 GL.Vertex3(points[i].X, points[i].Y, points[i].Z);
 
-                GL.Color3(Color.Blue);
+                GL.Color3(Mix(c1, c2, (i + 1) / (float)pointMax));
                 GL.Vertex3(points[i + 1].X, points[i + 1].Y, points[i + 1].Z);
             }
 
             GL.End();
 
+            GL.Color3(1f, 1f, 1f);
+            GL.PointSize(4f);
+            GL.Begin(PrimitiveType.Points);
+            foreach(var p in points)
+                GL.Vertex3(p.X, p.Y, p.Z);
+            GL.End();
+
             GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="amt"></param>
+        /// <returns></returns>
+        private static Color Mix(Color a, Color b, float amt)
+        {
+            return Color.FromArgb(
+                (int)(a.R + (b.R - a.R) * amt),
+                (int)(a.G + (b.G - a.G) * amt),
+                (int)(a.B + (b.B - a.B) * amt));
         }
 
         /// <summary>
@@ -409,6 +434,38 @@ namespace HSDRawViewer.Rendering
                 y = sine * temp + cosine * y;
             }
             GL.End();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="cx"></param>
+        /// <param name="cy"></param>
+        /// <param name="cz"></param>
+        /// <param name="size"></param>
+        public static void DrawBox(Color color, float cx, float cy, float cz, float size)
+        {
+            DrawBox(color, Matrix4.Identity, cx - size, cy - size, cz - size, cx + size, cy + size, cz + size);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="z1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="z2"></param>
+        public static void DrawBox(Color color, Matrix4 transform, float x1, float y1, float z1, float x2, float y2, float z2)
+        {
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.MultMatrix(ref transform);
+            DrawBox(color, x1, y1, z1, x2, y2, z2);
+            GL.PopMatrix();
         }
 
         /// <summary>

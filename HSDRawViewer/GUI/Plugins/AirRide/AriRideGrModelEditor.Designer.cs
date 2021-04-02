@@ -35,6 +35,8 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.arrayMemberEditor1 = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.recalBoundingButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -43,7 +45,9 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1});
+            this.toolStripButton1,
+            this.recalBoundingButton,
+            this.toolStripButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(706, 25);
@@ -111,6 +115,26 @@
             this.arrayMemberEditor1.TabIndex = 0;
             this.arrayMemberEditor1.SelectedObjectChanged += new System.EventHandler(this.arrayMemberEditor1_SelectedObjectChanged);
             // 
+            // recalBoundingButton
+            // 
+            this.recalBoundingButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.recalBoundingButton.Image = ((System.Drawing.Image)(resources.GetObject("recalBoundingButton.Image")));
+            this.recalBoundingButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.recalBoundingButton.Name = "recalBoundingButton";
+            this.recalBoundingButton.Size = new System.Drawing.Size(23, 22);
+            this.recalBoundingButton.Text = "toolStripButton2";
+            this.recalBoundingButton.Click += new System.EventHandler(this.recalBoundingButton_Click);
+            // 
+            // toolStripButton2
+            // 
+            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton2.Text = "toolStripButton2";
+            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            // 
             // AriRideGrModelEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -138,5 +162,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private ArrayMemberEditor arrayMemberEditor1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton recalBoundingButton;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
     }
 }

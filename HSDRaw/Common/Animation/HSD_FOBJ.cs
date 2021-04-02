@@ -210,9 +210,9 @@ namespace HSDRaw.Common.Animation
             return FOBJFrameDecoder.GetKeys(this);
         }
 
-        public void SetKeys(List<FOBJKey> keys, JointTrackType type)
+        public void SetKeys(List<FOBJKey> keys, JointTrackType type, float error = 0.0001f)
         {
-            var fobj = FOBJFrameEncoder.EncodeFrames(keys, type);
+            var fobj = FOBJFrameEncoder.EncodeFrames(keys, type, error);
 
             JointTrackType = type;
             ValueFlag = fobj.ValueFlag;

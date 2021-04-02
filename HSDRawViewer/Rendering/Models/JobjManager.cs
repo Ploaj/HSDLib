@@ -8,6 +8,7 @@ using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Tools;
+using System.Drawing;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -399,7 +400,7 @@ namespace HSDRawViewer.Rendering.Models
 
                     // render splines if possible
                     if (RenderSplines && b.Key.Spline != null)
-                        DrawShape.RenderSpline(b.Key.Spline);
+                        DrawShape.RenderSpline(b.Key.Spline, Color.Yellow, Color.Blue);
 
                     MatAnimation.JOBJIndex++;
                     ShapeAnimation.JOBJIndex++;

@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.ComponentModel;
+using HSDRaw.Common;
 
 namespace HSDRaw
 {
@@ -542,6 +543,15 @@ namespace HSDRaw
             var arr = Array.ToList();
             arr.Add(value);
             Array = arr.ToArray();
+        }
+
+        public T[] Slice(short pointCount)
+        {
+            T[] o = new T[Math.Min(Length, pointCount)];
+            for (int i = 0; i < o.Length; i++)
+                o[i] = this[i];
+            return o;
+
         }
     }
 

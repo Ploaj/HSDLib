@@ -203,8 +203,9 @@ namespace HSDRawViewer.Rendering.Models
                     shader.SetMatrix4x4($"TEX[{i}].transform", ref transform);
 
                     var tev = tex.TEV;
-                    shader.SetBoolToInt($"hasTev[{i}]", tev != null);
-                    if (tev != null)
+                    bool useTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.COLOR_TEV);
+                    shader.SetBoolToInt($"hasTev[{i}]", useTev);
+                    if (useTev)
                     {
                         shader.SetInt($"Tev[{i}].color_op", (int)tev.color_op);
                         shader.SetInt($"Tev[{i}].color_bias", (int)tev.color_bias);

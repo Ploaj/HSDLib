@@ -13,10 +13,25 @@
 
         public float Tension { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
 
-        public HSDArrayAccessor<HSD_Vector3> Points
+        public HSD_Vector3[] Points
         {
-            get => _s.GetReference<HSDArrayAccessor<HSD_Vector3>>(0x08);
-            set => _s.SetReference(0x08, value);
+            get
+            {
+                return _s.GetReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Slice(PointCount);
+            }
+            set
+            {
+                if(value == null || value.Length == 0)
+                {
+                    _s.SetReference(0x08, null);
+                    PointCount = 0;
+                }
+                else
+                {
+                    _s.GetCreateReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Array = value;
+                    PointCount = (short)value.Length;
+                }
+            }
         }
 
         public float TotalLength { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }

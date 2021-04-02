@@ -10,12 +10,12 @@ namespace HSDRaw.Tools
     /// </summary>
     public class FOBJFrameEncoder
     {
-        public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, JointTrackType TrackType)
+        public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, JointTrackType TrackType, float error = 0.0001f)
         {
-            return EncodeFrames(Keys, (byte)TrackType);
+            return EncodeFrames(Keys, (byte)TrackType, error);
         }
 
-        public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, byte TrackType)
+        public static HSD_FOBJ EncodeFrames(List<FOBJKey> Keys, byte TrackType, float error = 0.0001f)
         {
             HSD_FOBJ fobj = new HSD_FOBJ();
             fobj.JointTrackType = (JointTrackType)TrackType;
@@ -28,8 +28,8 @@ namespace HSDRaw.Tools
                 Keys[0].InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
 
             // perform quantization
-            FOBJQuantanizer valueQ = new FOBJQuantanizer();
-            FOBJQuantanizer tangentQ = new FOBJQuantanizer();
+            FOBJQuantanizer valueQ = new FOBJQuantanizer(error);
+            FOBJQuantanizer tangentQ = new FOBJQuantanizer(error);
 
             foreach (FOBJKey key in Keys)
             {

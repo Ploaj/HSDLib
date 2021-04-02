@@ -17,6 +17,16 @@ namespace HSDRaw.Tools
         public float Error { get; set; } = 0.0001f;
         private List<float> Values = new List<float>();
 
+        public FOBJQuantanizer()
+        {
+
+        }
+
+        public FOBJQuantanizer(float error)
+        {
+            Error = error;
+        }
+
         public void AddValue(float value)
         {
             if (value < 0) ValueSigned = true;
