@@ -1,12 +1,15 @@
 ﻿using System.Text;
 using HSDRaw.Melee.Cmd;
 using HSDRaw.Common.Animation;
+using HSDRaw.Common;
 
 namespace HSDRaw.Melee.Pl
 {
     public class SBM_FighterCommand : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
+
+        public HSD_String SymbolName { get => _s.GetReference<HSD_String>(0x00); set => _s.SetReference(0x00, value); }
 
         public string Name {
             get

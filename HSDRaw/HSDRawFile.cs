@@ -824,6 +824,17 @@ namespace HSDRaw
 
         private readonly static Func<string, HSDAccessor> @symbol_switch = symbol_identificators.Aggregate((x, y) => z => x(z) ?? y(z));
 
+        private static List<Func<string, HSDAccessor>> _additionRules = new List<Func<string, HSDAccessor>>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rule"></param>
+        public static void AddSymbolRule(Func<string, HSDAccessor> rule)
+        {
+            _additionRules.Add(rule);
+        }
+
         /// <summary>
         /// Attempts to guess the structure type based on the root name
         /// </summary>
@@ -832,6 +843,16 @@ namespace HSDRaw
         /// <returns></returns>
         private HSDAccessor GuessAccessor(string rootString, HSDStruct str)
         {
+            foreach (var r in _additionRules)
+            {
+                var ar = r(rootString);
+                if (ar != null)
+                {
+                    ar._s = str;
+                    return ar;
+                }
+            }
+
             HSDAccessor acc = @symbol_switch(rootString);
             acc._s = str;
             return acc;

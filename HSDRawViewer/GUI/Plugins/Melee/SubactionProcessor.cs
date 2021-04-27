@@ -270,7 +270,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     case 46 << 2: //overlay color
                         if(cmd.Parameters[0] == 1)
                         {
-                            OverlayColor = new Vector3(cmd.Parameters[1] / 255f, cmd.Parameters[2] / 255f, cmd.Parameters[3] / 255f);
+                            //OverlayColor = new Vector3(cmd.Parameters[1] / 255f, cmd.Parameters[2] / 255f, cmd.Parameters[3] / 255f);
                         }
                         break;
                 }

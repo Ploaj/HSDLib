@@ -43,6 +43,18 @@ namespace HSDRawViewer.ContextMenus.Melee
                 }
             };
             MenuItems.Add(genMatAnim);
+
+
+            MenuItem addFog = new MenuItem("Add Fog Struct");
+            addFog.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj)
+                {
+                    gobj.Fog = new HSD_FogDesc();
+                    MainForm.SelectedDataNode.Refresh();
+                }
+            };
+            MenuItems.Add(addFog);
         }
     }
 }

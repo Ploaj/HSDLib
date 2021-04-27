@@ -291,8 +291,17 @@ namespace HSDRawViewer.Rendering.Models
                     {
                         if (i >= 4)
                             break;
+
+                        var jobj = v.GetJOBJAt(i);
+
                         w[i] = v.GetWeightAt(i);
-                        b[i] = jobjManager.IndexOf(v.GetJOBJAt(i));
+                        b[i] = jobjManager.IndexOf(jobj);
+
+                        if (jobj.InverseWorldTransform == null || b[i] == -1)
+                            Console.WriteLine("Warning: Inverse Matrix not set");
+
+                        if (jobj.InverseWorldTransform != null && !jobj.Flags.HasFlag(JOBJ_FLAG.SKELETON))
+                            Console.WriteLine("Skeleton flag not set");
                     }
                     pobjCache.Weights[eni] = w;
                     pobjCache.Envelopes[eni] = b;

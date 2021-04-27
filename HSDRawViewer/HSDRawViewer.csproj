@@ -117,7 +117,7 @@
     <Compile Include="ContextMenus\JOBJDescContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\MapHeadContextMenu.cs">
+    <Compile Include="ContextMenus\Melee\MapHeadContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\MatAnimContextMenu.cs">
@@ -159,7 +159,7 @@
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
-    <Compile Include="Converters\JOBJExtensions.cs" />
+    <Compile Include="Extensions\JOBJExtensions.cs" />
     <Compile Include="Converters\Animation\MayaAnim.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
     <Compile Include="Converters\ModelImporter.cs" />
@@ -172,6 +172,7 @@
     <Compile Include="Converters\SBM\SSFConverter.cs" />
     <Compile Include="Converters\TOBJConverter.cs" />
     <Compile Include="DataNode.cs" />
+    <Compile Include="Extensions\KarCollisionExtensions.cs" />
     <Compile Include="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>

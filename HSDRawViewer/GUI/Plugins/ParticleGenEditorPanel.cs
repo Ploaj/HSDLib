@@ -74,8 +74,8 @@ namespace HSDRawViewer.GUI.Plugins
                     throw new Exception("Param count mismatch");
 
                 Editors = new Control[paramdesc.Length];
-                
-                for(int i = 0; i < paramdesc.Length; i++)
+
+                for (int i = 0; i < paramdesc.Length; i++)
                 {
                     var panel = new Panel();
                     panel.Width = 400;
@@ -205,6 +205,12 @@ namespace HSDRawViewer.GUI.Plugins
     {
         public byte Code;
         public object[] Params;
+
+        public ParticleOpCode()
+        {
+            Code = 0xFE;
+            Params = new object[0];
+        }
 
         public override string ToString()
         {

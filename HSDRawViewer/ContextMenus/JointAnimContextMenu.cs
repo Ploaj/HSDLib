@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common.Animation;
 using System;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -69,6 +70,36 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(compress);
+
+#if DEBUG
+
+            MenuItem reverse = new MenuItem("Reverse");
+            reverse.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
+                {
+                    foreach (var n in anim.BreathFirstList)
+                    {
+                        if (n.AOBJ != null)
+                            foreach(var a in n.AOBJ.FObjDesc.List)
+                            {
+                                var keys = a.GetDecodedKeys();
+                                var frameCount = keys.Max(e=>e.Frame);
+
+                                Console.WriteLine(frameCount);
+                                
+                                foreach (var k in keys)
+                                {
+                                    k.Frame = frameCount - k.Frame;
+                                }
+
+                                a.SetKeys(keys, a.TrackType);
+                            }
+                    }
+                }
+            };
+            MenuItems.Add(reverse);
+#endif
         }
     }
 }

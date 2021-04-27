@@ -42,7 +42,7 @@ namespace HSDRaw.Tools
             /// <returns></returns>
             public void Encode(byte code, object[] p, BinaryWriterExt w)
             {
-                if(Parameters.Length != p.Length 
+                if(Parameters.Length > p.Length 
                     && (code & 0xF0) != 0xC0 
                     && (code & 0xF0) != 0xD0
                     && (code & 0xF8) != 0x80

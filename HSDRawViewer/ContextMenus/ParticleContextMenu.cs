@@ -30,6 +30,19 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(addFromFile);
+
+            MenuItem export = new MenuItem("Export PTL");
+            export.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_ParticleGroup root)
+                {
+                    var f = Tools.FileIO.SaveFile("Particle (*.ptl)|*.ptl");
+
+                    if (f != null)
+                        System.IO.File.WriteAllBytes(f, root._s.GetData());
+                }
+            };
+            MenuItems.Add(export);
         }
     }
 
@@ -72,6 +85,20 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(scratch);
+
+
+            MenuItem export = new MenuItem("Export TXG");
+            export.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
+                {
+                    var f = Tools.FileIO.SaveFile("TEXG (*.txg)|*.txg");
+
+                    if (f != null)
+                        System.IO.File.WriteAllBytes(f, root._s.GetData());
+                }
+            };
+            MenuItems.Add(export);
         }
     }
 }

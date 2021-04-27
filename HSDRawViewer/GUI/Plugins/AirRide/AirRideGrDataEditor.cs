@@ -1,10 +1,15 @@
 ﻿using HSDRaw;
+using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using HSDRaw.GX;
+using HSDRawViewer.Converters;
 using HSDRawViewer.Converters.AirRide;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.GX;
+using IONET;
+using IONET.Core;
+using IONET.Core.Model;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -352,6 +357,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// </summary>
         private void RenderCollisions(float alpha, HashSet<int> visible = null)
         {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Enable(EnableCap.CullFace);
+
             // render collisions
             GL.Begin(PrimitiveType.Triangles);
             foreach (var j in _joints)
@@ -371,9 +380,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     if (visible != null && visible.Contains(i))
                         GL.Color3(Color.Yellow);
 
-                    GL.Vertex3(GXTranslator.toVector3(_vertices[t.V1]));
-                    GL.Vertex3(GXTranslator.toVector3(_vertices[t.V2]));
                     GL.Vertex3(GXTranslator.toVector3(_vertices[t.V3]));
+                    GL.Vertex3(GXTranslator.toVector3(_vertices[t.V2]));
+                    GL.Vertex3(GXTranslator.toVector3(_vertices[t.V1]));
                 }
             }
             GL.End();
@@ -397,6 +406,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 }
             }
             GL.End();
+
+            GL.PopAttrib();
         }
 
         /// <summary>
@@ -404,6 +415,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// </summary>
         private void RenderZones()
         {
+            if (_zoneJoints == null)
+                return;
+
             // render collisions
             GL.Begin(PrimitiveType.Triangles);
             foreach (var j in _zoneJoints)
@@ -578,7 +592,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
                 _triangles.Clear();
                 if (selected_index != -1)
+                {
+                    Console.WriteLine(_tris[selected_index].Flags.ToString("X"));
                     _triangles.Add(selected_index);
+                }
             }
 
             if (_editMode == EditorMode.CourseSpline)
@@ -614,6 +631,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             {
                 var node = KCLConv.KCLtoKAR(f, out KAR_grCollisionTree tree);
 
+                node.CalculateCollisionFlags();
+
                 LoadCollisionData(node);
                 LoadPartitionData(tree);
             }
@@ -633,12 +652,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            _data.CollisionNode = new KAR_grCollisionNode()
-            {
-                Joints = _joints,
-                Triangles = _tris,
-                Vertices = _vertices
-            };
+            _data.CollisionNode = GenerateCollisionNode();
 
             _data.SplineNode.SplineSetup.CourseSplineList.Splines = _splines;
             if (_rangeSplines != null && _rangeSplines.Length > 0)
@@ -659,6 +673,23 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             // generate jobj model and set indices
 
             // set position data
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public KAR_grCollisionNode GenerateCollisionNode()
+        {
+            return new KAR_grCollisionNode()
+            {
+                Joints = _joints,
+                Triangles = _tris,
+                Vertices = _vertices,
+                ZoneJoints = _zoneJoints,
+                ZoneTriangles = _zoneTris,
+                ZoneVertices = _zoneVertices
+            };
         }
 
         private void generateRangeSplinesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -726,6 +757,176 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             left.Points = lp;
             right.Points = rp;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importFromOBJToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var filePath = Tools.FileIO.OpenFile(IOManager.GetModelImportFileFilter());
+
+            if (filePath == null)
+                return;
+
+            var scene = IOManager.LoadScene(filePath, new ImportSettings()
+            {
+                SmoothNormals = true
+            });
+
+            ImportCollisionFromScene(scene);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scene"></param>
+        private void ImportCollisionFromScene(IOScene scene)
+        {
+            List<GXVector3> points = new List<GXVector3>();
+
+            List<KAR_CollisionTriangle> triangles = new List<KAR_CollisionTriangle>();
+
+            // calculate mesh bounding
+            int meshIndex = 0;
+            foreach (var m in scene.Models[0].Meshes)
+            {
+                // make sure the mesh is in triangle form
+                m.MakeTriangles();
+
+                int pointStart = points.Count;
+
+                // add vertices
+                foreach (var v in m.Vertices)
+                    points.Add(new GXVector3() { X = v.Position.X, Y = v.Position.Y, Z = v.Position.Z });
+
+                // add triangles
+                foreach (var p in m.Polygons)
+                {
+                    for (int i = 0; i < p.Indicies.Count; i += 3)
+                    {
+                        triangles.Add(new KAR_CollisionTriangle()
+                        {
+                            V1 = p.Indicies[i + 0] + pointStart,
+                            V2 = p.Indicies[i + 1] + pointStart,
+                            V3 = p.Indicies[i + 2] + pointStart,
+                            Flags = 0x80
+                        });
+                    }
+                }
+
+                meshIndex++;
+            }
+
+            // generate a collision node
+            KAR_grCollisionNode collision = new KAR_grCollisionNode()
+            {
+                Vertices = points.ToArray(),
+                Triangles = triangles.ToArray(),
+                Joints = new KAR_CollisionJoint[]{
+                    new KAR_CollisionJoint()
+                    {
+                        BoneID = 0,
+                        FaceStart = 0,
+                        FaceSize = triangles.Count,
+                        VertexStart = 0,
+                        VertexSize = points.Count
+                    }
+                }
+            };
+
+            // calculate the collision flags
+            collision.CalculateCollisionFlags();
+
+            // load the collision data
+            LoadCollisionData(collision);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportOBJToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.SaveFile("Waveform OBJ (*.obj)|*.obj");
+
+            if (f == null)
+                return;
+
+            ExportCollisionModel(f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="f"></param>
+        private void ExportCollisionModel(string f)
+        {
+            IOScene scene = new IOScene();
+
+            IOModel model = new IOModel();
+            scene.Models.Add(model);
+
+            foreach (var j in _joints)
+            {
+                var mesh = new IOMesh();
+                mesh.Name = $"Joint_{j.BoneID}";
+                model.Meshes.Add(mesh);
+
+                var poly = new IOPolygon()
+                {
+                    PrimitiveType = IOPrimitive.TRIANGLE,
+                    Indicies = new List<int>()
+                };
+                mesh.Polygons.Add(poly);
+
+                for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
+                {
+                    var tri = _tris[i];
+
+                    var v1 = _vertices[tri.V1];
+                    var v2 = _vertices[tri.V2];
+                    var v3 = _vertices[tri.V3];
+
+                    mesh.Vertices.Add(new IOVertex()
+                    {
+                        Position = new System.Numerics.Vector3(v1.X, v1.Y, v1.Z)
+                    });
+                    mesh.Vertices.Add(new IOVertex()
+                    {
+                        Position = new System.Numerics.Vector3(v2.X, v2.Y, v2.Z)
+                    });
+                    mesh.Vertices.Add(new IOVertex()
+                    {
+                        Position = new System.Numerics.Vector3(v3.X, v3.Y, v3.Z)
+                    });
+
+                    poly.Indicies.Add(poly.Indicies.Count);
+                    poly.Indicies.Add(poly.Indicies.Count);
+                    poly.Indicies.Add(poly.Indicies.Count);
+                }
+
+                mesh.Optimize();
+            }
+
+            // TODO: zones
+
+            IOManager.ExportScene(scene, f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void recalculateCollisionFlagsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var coll = GenerateCollisionNode();
+            coll.CalculateCollisionFlags();
+            LoadCollisionData(coll);
         }
     }
 
