@@ -140,7 +140,7 @@ namespace HSDRawViewer.Rendering
                 AnimNode n = new AnimNode();
                 foreach (HSD_Track t in tracks.Tracks)
                 {
-                    n.Tracks.Add(new FOBJ_Player(t.FOBJ));
+                    n.Tracks.Add(new FOBJ_Player(t.TrackType, t.GetKeys()));
                 }
                 Nodes.Add(n);
             }
@@ -165,7 +165,7 @@ namespace HSDRawViewer.Rendering
                 {
                     HSD_Track track = new HSD_Track();
                     HSD_FOBJ fobj = t.ToFobj();
-                    track.FOBJ = fobj;
+                    track.FromFOBJ(fobj);
                     fn.Tracks.Add(track);
                 }
 

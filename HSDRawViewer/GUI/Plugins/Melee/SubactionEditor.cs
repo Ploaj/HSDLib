@@ -120,7 +120,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             FormClosing += (sender, args) =>
             {
                 SaveFile();
-                JOBJManager.CleanupRendering();
+                JointManager.CleanupRendering();
                 viewport.Dispose();
                 _animEditor.CloseOnExit = true;
                 _animEditor.Dispose();

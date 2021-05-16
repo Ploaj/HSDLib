@@ -207,7 +207,7 @@ namespace HSDRaw.Common.Animation
 
         public List<FOBJKey> GetDecodedKeys()
         {
-            return FOBJFrameDecoder.GetKeys(this);
+            return FOBJFrameDecoder.GetKeys(this, 0);
         }
 
         public void SetKeys(List<FOBJKey> keys, JointTrackType type, float error = 0.0001f)

@@ -25,7 +25,7 @@ namespace HSDRaw.Tools
         private BinaryReaderExt Reader;
         private MemoryStream Stream;
 
-        public FOBJFrameDecoder(HSD_FOBJ FOBJ)
+        public FOBJFrameDecoder(HSD_FOBJ FOBJ, float startframe)
         {
             if (FOBJ.Buffer == null)
                 FOBJ.SetKeys(new List<FOBJKey>() { new FOBJKey() }, JointTrackType.HSD_A_J_ROTX);
@@ -34,22 +34,22 @@ namespace HSDRaw.Tools
             this.FOBJ = FOBJ;
         }
 
-        public static List<FOBJKey> GetKeys(HSD_FOBJ FOBJ)
+        public static List<FOBJKey> GetKeys(HSD_FOBJ FOBJ, float startframe)
         {
-            FOBJFrameDecoder e = new FOBJFrameDecoder(FOBJ);
+            FOBJFrameDecoder e = new FOBJFrameDecoder(FOBJ, startframe);
             {
-                return e.GetKeys();
+                return e.GetKeys(startframe);
             }
         }
 
-        public List<FOBJKey> GetKeys(float FrameCount = -1)
+        public List<FOBJKey> GetKeys(float startframe, float frame_count = -1)
         {
             List<FOBJKey> Keys = new List<FOBJKey>();
 
             if (FOBJ.JointTrackType == JointTrackType.HSD_A_J_PTCL)
                 return Keys;
 
-            int clock = 0;
+            float clock = startframe;
             Reader.Seek(0);
             while (Reader.Position < Reader.BaseStream.Length)
             {
@@ -101,6 +101,13 @@ namespace HSDRaw.Tools
                     clock += time;
                 }
             }
+
+            // hack for animations that don't start on frame 0
+            if (Keys.Count > 0 && Keys[0].Frame != 0)
+            {
+                Keys.Insert(0, new FOBJKey() { Frame = 0, Value = Keys[0].Value, InterpolationType = GXInterpolationType.HSD_A_OP_CON});
+            }
+
             return Keys;
         }
 

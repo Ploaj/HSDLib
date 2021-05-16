@@ -64,7 +64,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private ViewportControl viewport;
 
-        private JOBJManager JOBJManager = new JOBJManager();
+        private JOBJManager JointManager = new JOBJManager();
         private JOBJManager ThrowDummyManager = new JOBJManager();
 
         private SBM_EnvironmentCollision ECB = null;
@@ -144,26 +144,26 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             var modelFile = new HSDRawFile(cFile);
             if (modelFile.Roots.Count > 0 && modelFile.Roots[0].Data is HSD_JOBJ jobj)
             {
-                JOBJManager.SetJOBJ(jobj);
+                JointManager.SetJOBJ(jobj);
 
                 // load material animation if it exists
                 if (modelFile.Roots.Count > 1 && modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
                 {
-                    JOBJManager.SetMatAnimJoint(matanim);
-                    JOBJManager.EnableMaterialFrame = true;
+                    JointManager.SetMatAnimJoint(matanim);
+                    JointManager.EnableMaterialFrame = true;
                 }
             }
             else
                 return;
 
             // set model scale
-            JOBJManager.ModelScale = ModelScale;
+            JointManager.ModelScale = ModelScale;
 
             // clear hidden dobjs
-            JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+            JointManager.DOBJManager.HiddenDOBJs.Clear();
 
             // don't render bones by default
-            JOBJManager._settings.RenderBones = false;
+            JointManager._settings.RenderBones = false;
 
             // reset model visibility
             ResetModelVis();
@@ -285,7 +285,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             var plDat = FighterData;
 
-            if (plDat != null && plDat.ModelPartAnimations != null && JOBJManager.JointCount != 0)
+            if (plDat != null && plDat.ModelPartAnimations != null && JointManager.JointCount != 0)
             {
                 ModelPartsIndices = plDat.ModelPartAnimations.Array.Select(
                     e => new ModelPartAnimations(e)
@@ -300,11 +300,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             var plDat = FighterData;
 
-            JOBJManager.MatAnimation.SetAllFrames(0);
+            JointManager.MatAnimation.SetAllFrames(0);
 
-            if (plDat != null && plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
+            if (plDat != null && plDat.ModelLookupTables != null && JointManager.JointCount != 0)
             {
-                JOBJManager.DOBJManager.HiddenDOBJs.Clear();
+                JointManager.DOBJManager.HiddenDOBJs.Clear();
 
                 // only show struct 0 vis
                 for (int i = 0; i < plDat.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly.Length; i++)
@@ -321,8 +321,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 for (int i = 0; i < ModelPartsIndices.Length; i++)
                     ModelPartsIndices[i].AnimIndex = -1;
 
-                JOBJManager.Animation.FrameModifier.Clear();
-                JOBJManager.Animation.FrameModifier.AddRange(ModelPartsIndices);
+                JointManager.Animation.FrameModifier.Clear();
+                JointManager.Animation.FrameModifier.AddRange(ModelPartsIndices);
             }
         }
 
@@ -335,7 +335,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             var plDat = FighterData;
 
-            if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0)
+            if (plDat.ModelLookupTables != null && JointManager.JointCount != 0)
                 SetModelVis(plDat.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly[structid], objectid);
         }
 
@@ -348,7 +348,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             var plDat = FighterData;
 
-            if (plDat.ModelLookupTables != null && JOBJManager.JointCount != 0 && lookuptable.LookupEntries != null)
+            if (plDat.ModelLookupTables != null && JointManager.JointCount != 0 && lookuptable.LookupEntries != null)
             {
                 var structs = lookuptable.LookupEntries.Array;
 
@@ -356,9 +356,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 {
                     foreach (var v in structs[i].Entries)
                         if (i == objectid)
-                            JOBJManager.ShowDOBJ(v);
+                            JointManager.ShowDOBJ(v);
                         else
-                            JOBJManager.HideDOBJ(v);
+                            JointManager.HideDOBJ(v);
                 }
             }
         }
@@ -372,17 +372,17 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             var plDat = FighterData;
 
-            if (plDat.ModelLookupTables != null && index < plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Length)
+            if (plDat != null && plDat.ModelLookupTables != null && index < plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Length)
             {
                 if (matflag == 1)
                 {
                     foreach (var v in plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Array)
-                        JOBJManager.MatAnimation.SetFrame(v, frame);
+                        JointManager.MatAnimation.SetFrame(v, frame);
                 }
                 else
                 {
                     var idx = plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries[index];
-                    JOBJManager.MatAnimation.SetFrame(idx, frame);
+                    JointManager.MatAnimation.SetFrame(idx, frame);
                 }
             }
         }
@@ -409,8 +409,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             Dictionary<int, Vector3> previousPosition = new Dictionary<int, Vector3>();
 
-            JOBJManager.Frame = viewport.Frame - 1;
-            JOBJManager.UpdateNoRender();
+            JointManager.Frame = viewport.Frame - 1;
+            JointManager.UpdateNoRender();
             SubactionProcess.SetFrame(viewport.Frame - 1);
 
             foreach (var hb in SubactionProcess.Hitboxes)
@@ -418,7 +418,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 var boneID = hb.BoneID;
                 if (boneID == 0)
                     boneID = 1;
-                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JointManager.GetWorldTransform(boneID);
                 transform = transform.ClearScale();
                 var pos = Vector3.TransformPosition(Vector3.Zero, transform);
                 previousPosition.Add(hb.ID, pos);
@@ -447,32 +447,32 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             SubactionProcess.SetFrame(viewport.Frame);
 
             // update display info
-            JOBJManager.DOBJManager.OverlayColor = SubactionProcess.OverlayColor;
-            JOBJManager._settings.RenderBones = bonesToolStripMenuItem.Checked;
+            JointManager.DOBJManager.OverlayColor = SubactionProcess.OverlayColor;
+            JointManager._settings.RenderBones = bonesToolStripMenuItem.Checked;
 
             // apply model animations
-            JOBJManager.Frame = viewport.Frame;
-            JOBJManager.UpdateNoRender();
+            JointManager.Frame = viewport.Frame;
+            JointManager.UpdateNoRender();
 
             // character invisibility
             if (!SubactionProcess.CharacterInvisibility && modelToolStripMenuItem.Checked)
-                JOBJManager.Render(cam, false);
+                JointManager.Render(cam, false);
 
             // hurtbox collision
             if (hurtboxesToolStripMenuItem.Checked)
-                HurtboxRenderer.Render(JOBJManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
+                HurtboxRenderer.Render(JointManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
 
             // hitbox collision
             foreach (var hb in SubactionProcess.Hitboxes)
             {
                 var boneID = hb.BoneID;
                 if (boneID == 0)
-                    if (JOBJManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
+                    if (JointManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
                         boneID = 2;
                     else
                         boneID = 1;
 
-                var transform = Matrix4.CreateTranslation(hb.Point1) * JOBJManager.GetWorldTransform(boneID);
+                var transform = Matrix4.CreateTranslation(hb.Point1) * JointManager.GetWorldTransform(boneID);
 
                 transform = transform.ClearScale();
 
@@ -508,14 +508,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // environment collision
             if (ECB != null)
             {
-                var topN = JOBJManager.GetWorldTransform(1).ExtractTranslation();
+                var topN = JointManager.GetWorldTransform(1).ExtractTranslation();
 
-                var bone1 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone1));
-                var bone2 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone2));
-                var bone3 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone3));
-                var bone4 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone4));
-                var bone5 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone5));
-                var bone6 = Vector3.TransformPosition(Vector3.Zero, JOBJManager.GetWorldTransform(ECB.ECBBone6));
+                var bone1 = Vector3.TransformPosition(Vector3.Zero, JointManager.GetWorldTransform(ECB.ECBBone1));
+                var bone2 = Vector3.TransformPosition(Vector3.Zero, JointManager.GetWorldTransform(ECB.ECBBone2));
+                var bone3 = Vector3.TransformPosition(Vector3.Zero, JointManager.GetWorldTransform(ECB.ECBBone3));
+                var bone4 = Vector3.TransformPosition(Vector3.Zero, JointManager.GetWorldTransform(ECB.ECBBone4));
+                var bone5 = Vector3.TransformPosition(Vector3.Zero, JointManager.GetWorldTransform(ECB.ECBBone5));
+                var bone6 = Vector3.TransformPosition(Vector3.Zero, JointManager.GetWorldTransform(ECB.ECBBone6));
 
                 var minx = float.MaxValue;
                 var miny = float.MaxValue;
@@ -564,7 +564,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 if (viewport.Frame < ThrowDummyManager.Animation.FrameCount)
                     ThrowDummyManager.Frame = viewport.Frame;
-                ThrowDummyManager.SetWorldTransform(4, JOBJManager.GetWorldTransform(JOBJManager.JointCount - 2));
+                ThrowDummyManager.SetWorldTransform(4, JointManager.GetWorldTransform(JointManager.JointCount - 2));
                 ThrowDummyManager.Render(cam, false);
 
                 DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(35), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
@@ -575,7 +575,18 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, ThrowDummyColor, 0.5f);
             }
 
+            // sword trail
+            //AfterImageRenderer.RenderAfterImage(JointManager, viewport.Frame, after_desc);
         }
+        
+        private static AfterImageDesc after_desc = new AfterImageDesc()
+        {
+            Bone = 75,
+            Bottom = 1.75f,
+            Top = 9.63f,
+            Color1 = new Vector3(1),
+            Color2 = new Vector3()
+        };
 
         /// <summary>
         /// 
@@ -585,7 +596,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private void LoadAnimation(string symbol)
         {
             // clear animation
-            JOBJManager.SetFigaTree(null);
+            JointManager.SetFigaTree(null);
 
             // check if animation exists
             if (symbol == null || !SymbolToAnimation.ContainsKey(symbol))
@@ -597,9 +608,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 var name = new Action() { Symbol = anim.Roots[0].Name }.ToString();
 
-                JOBJManager.SetFigaTree(tree);
+                JointManager.SetFigaTree(tree);
 
-                _animEditor.SetJoint(JOBJManager.GetJOBJ(0), JOBJManager.Animation);
+                _animEditor.SetJoint(JointManager.GetJOBJ(0), JointManager.Animation);
 
                 viewport.MaxFrame = tree.FrameCount;
 
@@ -648,7 +659,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 f.Roots.Add(new HSDRootNode()
                 {
                     Name = action.Symbol,
-                    Data = JOBJManager.Animation.ToFigaTree()
+                    Data = JointManager.Animation.ToFigaTree()
                 });
                 var tempFileName = Path.GetTempFileName();
                 f.Save(tempFileName);

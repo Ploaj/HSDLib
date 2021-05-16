@@ -456,6 +456,7 @@
     <Compile Include="Rendering\Models\MobjManager.cs" />
     <Compile Include="Rendering\Models\VertexBufferManager.cs" />
     <Compile Include="Rendering\GX\RenderMode.cs" />
+    <Compile Include="Rendering\Renderers\AfterImageRenderer.cs" />
     <Compile Include="Rendering\Renderers\GraphRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
     <Compile Include="Rendering\Renderers\TextRenderer.cs" />

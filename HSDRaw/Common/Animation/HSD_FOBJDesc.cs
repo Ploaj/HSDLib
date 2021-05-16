@@ -121,7 +121,7 @@ namespace HSDRaw.Common.Animation
 
         public List<FOBJKey> GetDecodedKeys()
         {
-            return FOBJFrameDecoder.GetKeys(ToFOBJ());
+            return FOBJFrameDecoder.GetKeys(ToFOBJ(), StartFrame);
         }
 
         public void SetKeys(List<FOBJKey> keys, byte trackType)

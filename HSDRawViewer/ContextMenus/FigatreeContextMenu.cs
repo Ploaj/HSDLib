@@ -31,11 +31,11 @@ namespace HSDRawViewer.ContextMenus
 
                                 foreach(var t in n.Tracks)
                                 {
-                                    w.WriteLine($"{t.FOBJ.JointTrackType}");
+                                    w.WriteLine($"{t.JointTrackType}");
 
                                     w.WriteLine("{");
 
-                                    foreach(var k in t.FOBJ.GetDecodedKeys())
+                                    foreach(var k in t.GetKeys())
                                     {
                                         w.WriteLine($"\t{k.Frame} {k.Value} {k.Tan} {k.InterpolationType}");
                                     }
