@@ -272,6 +272,7 @@
 
 - code: 30
   name: Toggle Jab Follow Up
+  parameters:
   - name: Value
     bitCount: 26
 
