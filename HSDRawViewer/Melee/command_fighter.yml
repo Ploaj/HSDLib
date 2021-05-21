@@ -272,6 +272,8 @@
 
 - code: 30
   name: Toggle Jab Follow Up
+  - name: Value
+    bitCount: 26
 
 - code: 31
   name: Change Model State
