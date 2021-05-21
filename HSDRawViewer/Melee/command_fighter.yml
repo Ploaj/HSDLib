@@ -271,7 +271,7 @@
   name: Enable Jab Followup
 
 - code: 30
-  name: Toggle Jab Follow Up
+  name: Set Rapid Jab Flag
   parameters:
   - name: Value
     bitCount: 26
