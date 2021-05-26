@@ -7,18 +7,16 @@ using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing;
 using HSDRawViewer.Tools;
 using System.Linq;
-using HSDRawViewer.Rendering;
 using HSDRaw.Melee.Cmd;
 using System.IO;
 using HSDRawViewer.GUI.Extra;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
+    [SupportedTypes(new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) })]
     public partial class SubactionEditor : DockContent, EditorBase
     {
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) };
 
         public DataNode Node
         {
@@ -140,6 +138,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             SubactionProcess.UpdateVISMethod = SetModelVis;
             SubactionProcess.AnimateMaterialMethod = AnimateMaterial;
             SubactionProcess.AnimateModelMethod = AnimateModel;
+
+            // prepare rendering
+            SetupRendering();
         }
 
         /// <summary>

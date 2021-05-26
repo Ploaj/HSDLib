@@ -6,11 +6,10 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(MEX_Stock) })]
     public partial class MEXStockIconEditor : DockContent, EditorBase
     {
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(MEX_Stock) };
 
         public DataNode Node { get => node;
             set

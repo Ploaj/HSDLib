@@ -1,6 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Melee;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
@@ -66,6 +67,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private JOBJManager JointManager = new JOBJManager();
         private JOBJManager ThrowDummyManager = new JOBJManager();
+        private Dictionary<int, int> ThrowDummyLookupTable = new Dictionary<int, int>();
 
         private SBM_EnvironmentCollision ECB = null;
 
@@ -91,6 +93,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private float ModelScale = 1f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SetupRendering()
+        {
+        }
 
         /// <summary>
         /// 
@@ -185,6 +194,37 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // reselect action
             if (actionList.SelectedItem is Action action)
                 SelectAction(action);
+
+            // load bone table if plco is found
+
+            string DummyModelFile = "PLMrNr.dat";
+            int DummyModelExternalId = 0;
+
+            /*var plcoFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "PlCo.dat");
+            var plmrFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), DummyModelFile);
+            if (File.Exists(plcoFile) && File.Exists(plmrFile))
+            {
+                ThrowDummyManager.SetJOBJ(new HSDRawFile(plmrFile).Roots[0].Data as HSD_JOBJ);
+
+                ThrowDummyManager._settings.RenderBones = false;
+
+                ThrowDummyManager.DOBJManager.OverlayColor = new Vector3(1.5f, 1.5f, 1.5f);
+
+                // load bone lookup table
+                var plco = new HSDRawFile(plcoFile).Roots[0].Data as SBM_ftLoadCommonData;
+                var lookuptable = plco.BoneTables[DummyModelExternalId]._s.GetReference<HSDByteArray>(0x04);
+                ThrowDummyLookupTable.Clear();
+                for (int i = 0; i < 54; i++)
+                {
+                    var bone = lookuptable[i];
+                    if (bone != 255 && !ThrowDummyLookupTable.ContainsKey(bone))
+                        ThrowDummyLookupTable.Add(bone, i);
+                }
+            }
+            else*/
+            {
+                ThrowDummyManager.SetJOBJ(DummyThrowModel.GenerateThrowDummy());
+            }
         }
 
 
@@ -298,20 +338,21 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         private void ResetModelVis()
         {
-            var plDat = FighterData;
-
             JointManager.MatAnimation.SetAllFrames(0);
 
-            if (plDat != null && plDat.ModelLookupTables != null && JointManager.JointCount != 0)
+            var ftData = FighterData;
+
+            // lookup table
+            if (ftData != null && ftData.ModelLookupTables != null && JointManager.JointCount != 0)
             {
                 JointManager.DOBJManager.HiddenDOBJs.Clear();
 
                 // only show struct 0 vis
-                for (int i = 0; i < plDat.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly.Length; i++)
+                for (int i = 0; i < ftData.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly.Length; i++)
                     SetModelVis(i, 0);
 
                 // hide low poly
-                foreach (var lut in plDat.ModelLookupTables.CostumeVisibilityLookups[0].LowPoly.Array)
+                foreach (var lut in ftData.ModelLookupTables.CostumeVisibilityLookups[0].LowPoly.Array)
                     SetModelVis(lut, -1);
             }
 
@@ -505,6 +546,21 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 }
             }
 
+            // gfx spawn indicator
+            foreach (var gfx in SubactionProcess.GFXOnFrame)
+            {
+                var boneID = gfx.Bone;
+                if (boneID == 0)
+                    if (JointManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
+                        boneID = 2;
+                    else
+                        boneID = 1;
+                var transform = Matrix4.CreateTranslation(gfx.Position) * JointManager.GetWorldTransform(boneID);
+                transform = transform.ClearScale();
+
+                DrawShape.DrawSphere(transform, 1f, 16, 16, ThrowDummyColor, 0.5f);
+            }
+
             // environment collision
             if (ECB != null)
             {
@@ -560,19 +616,26 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             }
 
             // throw dummy
-            if (throwModelToolStripMenuItem.Checked && !SubactionProcess.ThrownFighter && ThrowDummyManager.JointCount > 0)
+            if (ThrowDummyManager.Animation.NodeCount != 0 && 
+                throwModelToolStripMenuItem.Checked && 
+                !SubactionProcess.ThrownFighter && 
+                ThrowDummyManager.JointCount > 0)
             {
                 if (viewport.Frame < ThrowDummyManager.Animation.FrameCount)
                     ThrowDummyManager.Frame = viewport.Frame;
+
                 ThrowDummyManager.SetWorldTransform(4, JointManager.GetWorldTransform(JointManager.JointCount - 2));
                 ThrowDummyManager.Render(cam, false);
 
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(35), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(4), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(10), 1f, 16, 16, ThrowDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(15), 1f, 16, 16, ThrowDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(22), 1f, 16, 16, ThrowDummyColor, 0.5f);
-                DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                if (ThrowDummyLookupTable.Count == 0)
+                {
+                    DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(35), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
+                    DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(4), 1.5f, 16, 16, ThrowDummyColor, 0.5f);
+                    DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(10), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                    DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(15), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                    DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(22), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                    DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, ThrowDummyColor, 0.5f);
+                }
             }
 
             // sword trail
@@ -597,6 +660,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             // clear animation
             JointManager.SetFigaTree(null);
+            ThrowDummyManager.SetFigaTree(null);
 
             // check if animation exists
             if (symbol == null || !SymbolToAnimation.ContainsKey(symbol))
@@ -608,16 +672,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 var name = new Action() { Symbol = anim.Roots[0].Name }.ToString();
 
+                // load figatree to manager and anim editor
                 JointManager.SetFigaTree(tree);
-
                 _animEditor.SetJoint(JointManager.GetJOBJ(0), JointManager.Animation);
 
+                // set frame
                 viewport.MaxFrame = tree.FrameCount;
-
-                ThrowDummyManager.CleanupRendering();
-                ThrowDummyManager = new JOBJManager();
-
-                //AnimationName = name;
 
                 // load throw dummy for thrown animations
                 if (name.Contains("Throw") && !name.Contains("Taro"))
@@ -626,22 +686,32 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     Action throwAction = null;
                     foreach (Action a in actionList.Items)
                     {
-                        if (a.Symbol != null && a.Symbol.Contains("Taro") && a.Symbol.Contains(name) && !a.Symbol.Equals(anim.Roots[0].Name))
+                        if (a.Symbol != null && 
+                            a.Symbol.Contains("Taro") && 
+                            a.Symbol.Contains(name) && 
+                            !a.Symbol.Equals(anim.Roots[0].Name))
                         {
                             throwAction = a;
                             break;
                         }
                     }
 
-                    if (throwAction != null && throwAction.Symbol != null && SymbolToAnimation.ContainsKey(throwAction.Symbol))
+                    // if throw animation is found
+                    if (throwAction != null && 
+                        throwAction.Symbol != null && 
+                        SymbolToAnimation.ContainsKey(throwAction.Symbol))
                     {
-                        // load throw dummy
-                        ThrowDummyManager.SetJOBJ(DummyThrowModel.GenerateThrowDummy());
-
                         // load throw animation
                         var tanim = new HSDRawFile(SymbolToAnimation[throwAction.Symbol]);
                         if (tanim.Roots[0].Data is HSD_FigaTree tree2)
+                        {
                             ThrowDummyManager.SetFigaTree(tree2);
+                            if (ThrowDummyLookupTable.Count > 0)
+                            {
+                                ThrowDummyManager.Animation.EnableBoneLookup = true;
+                                ThrowDummyManager.Animation.BoneLookup = ThrowDummyLookupTable;
+                            }
+                        }
                     }
 
                 }

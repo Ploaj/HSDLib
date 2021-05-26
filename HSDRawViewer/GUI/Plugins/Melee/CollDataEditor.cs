@@ -14,10 +14,9 @@ using HSDRawViewer.GUI.Plugins.Melee;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(SBM_Coll_Data) })]
     public partial class CollDataEditor : DockContent, EditorBase, IDrawableInterface
     {
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_Coll_Data) };
-
         public DataNode Node
         {
             get => _node;

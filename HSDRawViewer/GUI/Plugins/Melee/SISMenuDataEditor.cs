@@ -15,11 +15,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// <summary>
     /// big TODO: op codes and editing
     /// </summary>
+    [SupportedTypes(new Type[] { typeof(SBM_SISData) })]
     public partial class SISMenuDataEditor : DockContent, EditorBase
     {
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(SBM_SISData) };
 
         public MeleeMenuText[] MenuTexts { get; set; }
 

@@ -124,15 +124,15 @@ namespace HSDRawViewer
             {
                 if (t != typeof(EditorBase))
                 {
-                    var ren = (EditorBase)Activator.CreateInstance(t);
+                    SupportedTypes suppTypes = (SupportedTypes)Attribute.GetCustomAttribute(t, typeof(SupportedTypes));
 
-                    foreach (var v in ren.SupportedTypes)
+                    if (suppTypes != null)
                     {
-                        typeToEditor.Add(v, t);
+                        foreach (var v in suppTypes.Types)
+                        {
+                            typeToEditor.Add(v, t);
+                        }
                     }
-
-                    if (ren is IDisposable dis)
-                        dis.Dispose();
                 }
             }
         }

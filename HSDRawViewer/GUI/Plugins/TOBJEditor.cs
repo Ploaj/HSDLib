@@ -6,6 +6,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSD_TOBJ) })]
     public partial class TOBJEditor : DockContent, EditorBase
     {
         private HSD_TOBJ _tobj => _node.Accessor as HSD_TOBJ;
@@ -28,8 +29,6 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_TOBJ) };
 
         public DataNode Node
         {

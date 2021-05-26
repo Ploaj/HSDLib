@@ -1,18 +1,16 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.Animation;
 using System;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSD_JOBJ) })]
     public partial class JobjEditorDock : DockContent, EditorBase
     {
         public DockState DefaultDockState => DockState.DockLeft;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_JOBJ) };
 
         public DataNode Node
         {

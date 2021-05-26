@@ -26,6 +26,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
+    [SupportedTypes(new Type[] { typeof(KAR_grData) })]
     public partial class AirRideGrDataEditor : DockContent, EditorBase, IDrawableInterface
     {
         public enum EditorMode
@@ -61,8 +62,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             set => SwitchMode(value);
         }
         private EditorMode _editMode = EditorMode.Collision;
-
-        public Type[] SupportedTypes => new Type[] { typeof(KAR_grData) };
 
         public DataNode Node { get => _node;
             set

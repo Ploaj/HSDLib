@@ -8,6 +8,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSD_TexAnim) })]
     public partial class TexAnimEditor : DockContent, EditorBase
     {
         private HSD_TexAnim _texAnim => _node.Accessor as HSD_TexAnim;
@@ -15,8 +16,6 @@ namespace HSDRawViewer.GUI.Plugins
         public TOBJProxy[] Images { get; set; }
 
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_TexAnim) };
 
         public DataNode Node
         {

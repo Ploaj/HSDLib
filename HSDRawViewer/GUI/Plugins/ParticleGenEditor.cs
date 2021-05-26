@@ -1,24 +1,17 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Tools;
-using HSDRawViewer.Tools;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSD_ParticleGroup) })]
     public partial class ParticleGenEditor : DockContent, EditorBase
     {
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_ParticleGroup) };
 
         public DataNode Node
         {

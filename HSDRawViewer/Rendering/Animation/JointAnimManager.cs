@@ -29,6 +29,10 @@ namespace HSDRawViewer.Rendering
 
         public List<IJointFrameModifier> FrameModifier = new List<IJointFrameModifier>();
 
+        public bool EnableBoneLookup = false;
+
+        public Dictionary<int, int> BoneLookup = new Dictionary<int, int>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -97,6 +101,16 @@ namespace HSDRawViewer.Rendering
             SY = jobj.SY;
             SZ = jobj.SZ;
 
+            // use bone lookup if enabled
+            if (EnableBoneLookup)
+            {
+                if (BoneLookup.ContainsKey(boneIndex))
+                    boneIndex = BoneLookup[boneIndex];
+                else
+                    return;
+            }
+
+            // set keys to animated values
             if (boneIndex < Nodes.Count)
             {
                 AnimNode node = Nodes[boneIndex];
@@ -117,6 +131,7 @@ namespace HSDRawViewer.Rendering
                 }
             }
 
+            // apply frame modifiers
             foreach (var fm in FrameModifier)
                 fm.OverrideAnim(frame, boneIndex, jobj, ref TX, ref TY, ref TZ, ref RX, ref RY, ref RZ, ref SX, ref SY, ref SZ);
         }

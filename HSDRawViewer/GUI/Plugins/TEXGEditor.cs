@@ -8,6 +8,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
+    [SupportedTypes(new Type[] { typeof(HSD_TexGraphic) })]
     public partial class TEXGEditor : DockContent, EditorBase
     {
         private HSD_TexGraphic _texGraphic => _node.Accessor as HSD_TexGraphic;
@@ -15,8 +16,6 @@ namespace HSDRawViewer.GUI.Plugins
         public TOBJProxy[] Images { get; set; }
 
         public DockState DefaultDockState => DockState.Document;
-
-        public Type[] SupportedTypes => new Type[] { typeof(HSD_TexGraphic) };
 
         public DataNode Node
         {

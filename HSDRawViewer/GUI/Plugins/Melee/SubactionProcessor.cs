@@ -22,9 +22,20 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             public List<Command> ReferenceCommands = new List<Command>();
         }
 
+        public class GFXSpawn
+        {
+            public float Frame;
+            public int Bone;
+            public int ID;
+            public Vector3 Position;
+            public Vector3 Range;
+        }
+
         private List<Command> Commands = new List<Command>();
 
         public List<Hitbox> Hitboxes { get; internal set; } = new List<Hitbox>();
+
+        public List<GFXSpawn> GFXOnFrame { get; internal set; } = new List<GFXSpawn>();
 
         public Vector3 OverlayColor { get; internal set; } = Vector3.One;
 
@@ -47,6 +58,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public delegate void AnimateModel(int part_index, int anim_index);
         public AnimateModel AnimateModelMethod;
+
+
+        public delegate void SpawnGFX(int bone, int gfxid, float x, float y, float z, float range_x, float range_y, float range_z);
+        public SpawnGFX SpawnGFXMethod;
 
 
         private HSDStruct Struct;
@@ -148,12 +163,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         // prevent recursion...
         private HashSet<List<Command>> CommandHashes = new HashSet<List<Command>>();
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="frame"></param>
         public void SetFrame(float frame)
         {
+            GFXOnFrame.Clear();
             Hitboxes.Clear();
             ResetState();
             CommandHashes.Clear();
@@ -169,6 +186,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             int loopPos = 0;
             for (int i = 0; i < commands.Count; i++)
             {
+                var prev_time = time;
                 var cmd = commands[i];
                 switch (cmd.Action.Code)
                 {
@@ -197,6 +215,21 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         return time;
                     case 7 << 2: //goto
                         time = SetFrame(frame, time, cmd.ReferenceCommands);
+                        break;
+
+                    // fighter specific
+                    case 10 << 2: //spawn gfx
+                        {
+                            GFXOnFrame.Add(new GFXSpawn()
+                            {
+                                Frame = time,
+                                Bone = cmd.Parameters[0],
+                                ID = cmd.Parameters[4],
+                                Position = new Vector3(cmd.Parameters[6] / 256f, cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f),
+                                Range = new Vector3(cmd.Parameters[9] / 256f, cmd.Parameters[10] / 256f, cmd.Parameters[11] / 256f),
+                            });
+                        }
+                        //SpawnGFXMethod(cmd.Parameters[0], cmd.Parameters[4], cmd.Parameters[6] / 256f, cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f, cmd.Parameters[10] / 256f, cmd.Parameters[11] / 256f);
                         break;
                     case 11 << 2: // Create Hitbox
                         // remove the current hitbox with this id
@@ -278,6 +311,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 if (time > frame)
                     break;
             }
+
+            GFXOnFrame.RemoveAll(e => e.Frame != frame);
+
             return time;
         }
 
