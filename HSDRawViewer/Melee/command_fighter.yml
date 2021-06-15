@@ -478,8 +478,10 @@
 - code: 47
   name: Remove Color Animation
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: ID
+    bitCount: 8
+  - name: Padding
+    bitCount: 18
 
 - code: 48
   name: Unknown0xC0
