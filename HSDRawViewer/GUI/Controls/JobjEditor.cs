@@ -1072,6 +1072,9 @@ namespace HSDRawViewer.GUI.Plugins
         {
             [DisplayName("Symbol Name"), Description("Name of animation used by the game")]
             public string Symbol { get; set; } = "_figatree";
+
+            [DisplayName("Compression Error"), Description("A larger value will make a smaller file but with loss of accuracy")]
+            public float CompressionError { get; set; } = 0.0001f;
         }
 
         /// <summary>
@@ -1096,7 +1099,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRawFile animFile = new HSDRawFile();
                     animFile.Roots.Add(new HSDRootNode()
                     {
-                        Data = JointManager.Animation.ToFigaTree(),
+                        Data = JointManager.Animation.ToFigaTree(setting.CompressionError),
                         Name = setting.Symbol
                     });
                     animFile.Save(f);

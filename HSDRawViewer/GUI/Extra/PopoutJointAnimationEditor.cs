@@ -1,4 +1,5 @@
 ﻿using HSDRaw.Common;
+using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,15 @@ namespace HSDRawViewer.GUI.Extra
 {
     public partial class PopoutJointAnimationEditor : Form
     {
+
+        private class OptimizeSettings
+        {
+            //public bool BakeAnimation = true;
+            public float ErrorMargin { get; set; } = 0.001f;
+        }
+
+        private static OptimizeSettings _settings = new OptimizeSettings();
+
         public bool CloseOnExit { get; set; } = true;
 
         public bool MadeChanges { get; internal set; } = false;
@@ -22,6 +32,38 @@ namespace HSDRawViewer.GUI.Extra
             public HSD_JOBJ JOBJ;
 
             public AnimNode AnimNode;
+
+            public void Optimize(OptimizeSettings settings, bool optimizeChildren = true)
+            {
+                if (AnimNode == null || JOBJ == null)
+                    return;
+
+                List<FOBJ_Player> toRemove = new List<FOBJ_Player>();
+
+                foreach (var track in AnimNode.Tracks)
+                {
+                    if (track.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_NONE)
+                    {
+                        toRemove.Add(track);
+                        continue;
+                    }
+                    Tools.AnimationCompressor.BakeTrack(track);
+                    Tools.AnimationCompressor.CompressTrack(track, settings.ErrorMargin);
+
+                    // check if constant 
+                    if (Tools.AnimationCompressor.IsConstant(track))
+                        if (Math.Abs(JOBJ.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
+                            toRemove.Add(track);
+                    
+                }
+
+                foreach (var rem in toRemove)
+                    AnimNode.Tracks.Remove(rem);
+
+                if (optimizeChildren)
+                    foreach (JointNode child in Nodes)
+                        child.Optimize(settings, optimizeChildren);
+            }
         }
 
         /// <summary>
@@ -104,6 +146,23 @@ namespace HSDRawViewer.GUI.Extra
 
             if (jointTree.SelectedNode is JointNode node)
                 graphEditor1.LoadTracks(AnimType.Joint, node.AnimNode.Tracks);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void optimizeAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (PropertyDialog d = new PropertyDialog("Animation Optimize Settings", _settings))
+            {
+                if (d.ShowDialog() == DialogResult.OK)
+                    foreach (JointNode node in jointTree.Nodes)
+                    {
+                        node.Optimize(_settings);
+                    }
+            }
         }
     }
 }

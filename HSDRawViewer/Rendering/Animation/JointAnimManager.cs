@@ -167,7 +167,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="nodes"></param>
         /// <param name="frameCount"></param>
         /// <returns></returns>
-        public HSD_FigaTree ToFigaTree()
+        public HSD_FigaTree ToFigaTree(float error = 0.0001f)
         {
             HSD_FigaTree tree = new HSD_FigaTree();
             tree.FrameCount = FrameCount;
@@ -179,7 +179,7 @@ namespace HSDRawViewer.Rendering
                 foreach (var t in e.Tracks)
                 {
                     HSD_Track track = new HSD_Track();
-                    HSD_FOBJ fobj = t.ToFobj();
+                    HSD_FOBJ fobj = t.ToFobj(error);
                     track.FromFOBJ(fobj);
                     fn.Tracks.Add(track);
                 }

@@ -75,6 +75,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private string AJFilePath;
 
+        private float DisplayShieldSize = 0;
+
         //private string ResultFilePath;
         //private string EndingFilePath;
         //private string IntroFilePath;
@@ -88,7 +90,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private List<SBM_Hurtbox> Hurtboxes = new List<SBM_Hurtbox>();
 
         private HurtboxRenderer HurtboxRenderer = new HurtboxRenderer();
-        
+
+        private static Vector3 ShieldColor = new Vector3(1, 0.4f, 0.4f);
         private static Vector3 ThrowDummyColor = new Vector3(0, 1, 1);
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
@@ -546,6 +549,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 }
             }
 
+            // draw shield during guard animation
+            if (DisplayShieldSize > 0)
+                DrawShape.DrawSphere(JointManager.GetWorldTransform(JointManager.JointCount - 2), DisplayShieldSize, 16, 16, ShieldColor, 0.5f);
+
             // gfx spawn indicator
             foreach (var gfx in SubactionProcess.GFXOnFrame)
             {
@@ -661,6 +668,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // clear animation
             JointManager.SetFigaTree(null);
             ThrowDummyManager.SetFigaTree(null);
+            DisplayShieldSize = 0;
 
             // check if animation exists
             if (symbol == null || !SymbolToAnimation.ContainsKey(symbol))
@@ -678,6 +686,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
                 // set frame
                 viewport.MaxFrame = tree.FrameCount;
+
+
+                // enable shield display
+                if (FighterData != null && name.Equals("Guard"))
+                    DisplayShieldSize = FighterData.Attributes.ShieldSize / 2;
+
 
                 // load throw dummy for thrown animations
                 if (name.Contains("Throw") && !name.Contains("Taro"))

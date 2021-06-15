@@ -286,6 +286,8 @@ namespace HSDRawViewer.GUI
                 {
                     if (v.Name != null && !AnimationLoaded(v.Name))
                     {
+                        Console.WriteLine(v.Name + " " + v.AnimationOffset.ToString("X") + " " + v.AnimationSize.ToString("X"));
+
                         r.BaseStream.Position = v.AnimationOffset;
                         var data = r.ReadBytes(v.AnimationSize);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSDRaw.Common.Animation;
+using System;
 using System.ComponentModel;
 using System.Text;
 
@@ -85,6 +86,28 @@ namespace HSDRaw.Common
             _s.CanBeBuffer = false;
 
             return base.Trim();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public float GetDefaultValue(JointTrackType type)
+        {
+            switch (type)
+            {
+                case JointTrackType.HSD_A_J_TRAX: return TX;
+                case JointTrackType.HSD_A_J_TRAY: return TY;
+                case JointTrackType.HSD_A_J_TRAZ: return TZ;
+                case JointTrackType.HSD_A_J_ROTX: return RX;
+                case JointTrackType.HSD_A_J_ROTY: return RY;
+                case JointTrackType.HSD_A_J_ROTZ: return RZ;
+                case JointTrackType.HSD_A_J_SCAX: return SX;
+                case JointTrackType.HSD_A_J_SCAY: return SY;
+                case JointTrackType.HSD_A_J_SCAZ: return SZ;
+            }
+            return 0;
         }
     }
 }

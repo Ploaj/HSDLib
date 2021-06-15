@@ -311,5 +311,23 @@ namespace HSDRawViewer.Tools
                     i++;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public static bool IsConstant(FOBJ_Player player, float epsilon = 0.001f)
+        {
+            var start = player.GetValue(0);
+
+            for (int i = 0; i < player.FrameCount; i++)
+            {
+                if (Math.Abs(player.GetValue(i) - start) >= epsilon)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

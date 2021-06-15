@@ -272,7 +272,7 @@ namespace HSDRaw.Tools
         /// 
         /// </summary>
         /// <returns></returns>
-        public HSD_FOBJ ToFobj()
+        public HSD_FOBJ ToFobj(float error = 0.0001f)
         {
             HSD_FOBJ fobj = new HSD_FOBJ();
 
@@ -284,7 +284,7 @@ namespace HSDRaw.Tools
             }
             else
             if (Keys.Count > 0)
-                fobj.SetKeys(Keys, JointTrackType);
+                fobj.SetKeys(Keys, JointTrackType, error);
 
             return fobj;
         }
@@ -293,7 +293,7 @@ namespace HSDRaw.Tools
         /// 
         /// </summary>
         /// <returns></returns>
-        public HSD_FOBJDesc ToFobjDesc()
+        public HSD_FOBJDesc ToFobjDesc(float error = 0.0001f)
         {
             HSD_FOBJDesc fobj = new HSD_FOBJDesc();
 
@@ -306,7 +306,7 @@ namespace HSDRaw.Tools
             }
             else
             if (Keys.Count > 0)
-                fobj.SetKeys(Keys, TrackType);
+                fobj.SetKeys(Keys, TrackType, error);
 
             return fobj;
         }
