@@ -38,6 +38,39 @@
         }
     }
 
+    public class ItemDynamics : HSDAccessor
+    {
+        public int DynamicsNum { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+        public SBM_DynamicDesc[] DynamicsDesc
+        {
+            get
+            {
+                var re = _s.GetReference<HSDArrayAccessor<SBM_DynamicDesc>>(0x04);
+                if (re == null)
+                    return null;
+                return re.Array;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    _s.SetInt32(0x00, 0);
+                    _s.SetReference(0x04, null);
+                }
+                else
+                {
+                    _s.SetInt32(0x00, value.Length);
+                    var re = _s.GetCreateReference<HSDArrayAccessor<SBM_DynamicDesc>>(0x04);
+                    re.Array = value;
+                }
+            }
+        }
+
+        //public SBM_DynamicDesc DynamicDesc { get => _s.GetReference<SBM_DynamicDesc>(0x4); set => _s.SetReference(0x4, value); }
+
+    }
+
+
     public class SBM_DynamicHitBubble : HSDAccessor
     {
         public override int TrimmedSize => 0x14;

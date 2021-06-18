@@ -55,7 +55,7 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_ItemModel Model { get => _s.GetReference<SBM_ItemModel>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSDAccessor ItemDynamics { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
+        public ItemDynamics ItemDynamics { get => _s.GetReference<ItemDynamics>(0x14); set => _s.SetReference(0x14, value); }
     }
 
     /// <summary>
