@@ -66,8 +66,6 @@
             }
         }
 
-        //public SBM_DynamicDesc DynamicDesc { get => _s.GetReference<SBM_DynamicDesc>(0x4); set => _s.SetReference(0x4, value); }
-
     }
 
 
