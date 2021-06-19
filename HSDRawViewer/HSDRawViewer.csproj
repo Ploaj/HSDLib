@@ -158,6 +158,7 @@
     <Compile Include="Converters\Animation\CHR0Converter.cs" />
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />
+    <Compile Include="Converters\Animation\JointAnimationLoader.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Extensions\JOBJExtensions.cs" />
     <Compile Include="Converters\Animation\MayaAnim.cs" />
@@ -482,7 +483,6 @@
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
-    <Compile Include="Tools\AnimationCompressor.cs" />
     <Compile Include="Tools\AnimationRetarget.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <Compile Include="Tools\FlagEnumEditor.cs">

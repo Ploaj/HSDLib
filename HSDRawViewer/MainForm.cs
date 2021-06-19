@@ -297,7 +297,13 @@ namespace HSDRawViewer
         /// </summary>
         public void SaveDAT()
         {
-            if(RawHSDFile != null)
+            foreach (var editor in Editors)
+            {
+                if (editor is SaveableEditorBase save)
+                    save.OnDatFileSave();
+            }
+
+            if (RawHSDFile != null)
                 RawHSDFile.Save(FilePath);
         }
 
@@ -657,7 +663,7 @@ namespace HSDRawViewer
                 FilePath = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
             if (FilePath != null)
-                RawHSDFile.Save(FilePath);
+                SaveDAT();
         }
 
         /// <summary>

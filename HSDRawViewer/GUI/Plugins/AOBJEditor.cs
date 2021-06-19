@@ -61,5 +61,13 @@ namespace HSDRawViewer.GUI.Plugins
             aobj.FObjDesc = graphEditor.ToFOBJs();
             MessageBox.Show("Saved Changes");
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void OnFileSave()
+        {
+
+        }
     }
 }

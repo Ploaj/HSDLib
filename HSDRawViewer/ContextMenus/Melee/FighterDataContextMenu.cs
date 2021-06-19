@@ -55,7 +55,7 @@ namespace HSDRawViewer.ContextMenus.Melee
 
                             if (inlcudeVictoryAnim)
                             {
-                                var vc = root.WinCommandTable.Commands;
+                                var vc = root.DemoCommandTable.Commands;
 
                                 foreach (var s in vc)
                                     if (s.SymbolName != null)

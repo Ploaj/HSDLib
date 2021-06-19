@@ -3,6 +3,9 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee;
 using HSDRaw.Melee.Pl;
+using HSDRaw.Tools.Melee;
+using HSDRawViewer.Converters.Animation;
+using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
@@ -65,6 +68,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private ViewportControl viewport;
 
+        private PopoutJointAnimationEditor _animEditor = new PopoutJointAnimationEditor(false);
+
         private JOBJManager JointManager = new JOBJManager();
         private JOBJManager ThrowDummyManager = new JOBJManager();
         private Dictionary<int, int> ThrowDummyLookupTable = new Dictionary<int, int>();
@@ -73,15 +78,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private string AJFilePath;
-
         private float DisplayShieldSize = 0;
-
-        //private string ResultFilePath;
-        //private string EndingFilePath;
-        //private string IntroFilePath;
-
-        private Dictionary<string, byte[]> SymbolToAnimation = new Dictionary<string, byte[]>();
 
         private ModelPartAnimations[] ModelPartsIndices;
 
@@ -97,11 +94,112 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private float ModelScale = 1f;
 
+        private FighterAJManager AJManager;
+
+        private string AJFilePath;
+
+        private string ResultFilePath;
+        private string EndingFilePath;
+        private string IntroFilePath;
+        private string WaitFilePath;
+
+        private string ResultSymbol;
+        private string EndingSymbol;
+        private string IntroSymbol;
+        private string WaitSymbol;
+
         /// <summary>
         /// 
         /// </summary>
-        private void SetupRendering()
+        public void OnDatFileSave()
         {
+            if (!string.IsNullOrEmpty(AJFilePath))
+                SaveFighterAnimationFile();
+
+            if (!string.IsNullOrEmpty(ResultFilePath))
+                SaveDemoAnimationFiles();
+        }
+
+        /// <summary>
+        /// Initializes rendering
+        /// </summary>
+        private void InitRendering()
+        {
+            // set model scale
+            JointManager.ModelScale = ModelScale;
+
+            // clear hidden dobjs
+            JointManager.DOBJManager.HiddenDOBJs.Clear();
+
+            // don't render bones by default
+            JointManager._settings.RenderBones = false;
+
+            // reset model visibility
+            ResetModelVis();
+
+            // load the model parts
+            LoadModelParts();
+
+            // enable preview box
+            previewBox.Visible = true;
+
+            // reselect action
+            if (actionList.SelectedItem is Action action)
+                SelectAction(action);
+
+            // load bone table if plco is found
+
+            //string DummyModelFile = "PLMrNr.dat";
+            //int DummyModelExternalId = 0;
+
+            /*var plcoFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "PlCo.dat");
+            var plmrFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), DummyModelFile);
+            if (File.Exists(plcoFile) && File.Exists(plmrFile))
+            {
+                ThrowDummyManager.SetJOBJ(new HSDRawFile(plmrFile).Roots[0].Data as HSD_JOBJ);
+
+                ThrowDummyManager._settings.RenderBones = false;
+
+                ThrowDummyManager.DOBJManager.OverlayColor = new Vector3(1.5f, 1.5f, 1.5f);
+
+                // load bone lookup table
+                var plco = new HSDRawFile(plcoFile).Roots[0].Data as SBM_ftLoadCommonData;
+                var lookuptable = plco.BoneTables[DummyModelExternalId]._s.GetReference<HSDByteArray>(0x04);
+                ThrowDummyLookupTable.Clear();
+                for (int i = 0; i < 54; i++)
+                {
+                    var bone = lookuptable[i];
+                    if (bone != 255 && !ThrowDummyLookupTable.ContainsKey(bone))
+                        ThrowDummyLookupTable.Add(bone, i);
+                }
+            }
+            else*/
+            {
+                ThrowDummyManager.SetJOBJ(DummyThrowModel.GenerateThrowDummy());
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="modelPath"></param>
+        private void LoadModel(string modelPath)
+        {
+            // load model
+            var modelFile = new HSDRawFile(modelPath);
+            if (modelFile.Roots.Count > 0 && modelFile.Roots[0].Data is HSD_JOBJ jobj)
+            {
+                JointManager.SetJOBJ(jobj);
+
+                // load material animation if it exists
+                if (modelFile.Roots.Count > 1 && modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
+                {
+                    JointManager.SetMatAnimJoint(matanim);
+                    JointManager.EnableMaterialFrame = true;
+                }
+            }
+            else
+                return;
         }
 
         /// <summary>
@@ -109,7 +207,51 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         private void LoadDemoAnimationFiles()
         {
+            // attempt to automatically locate files
+            var modelFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
 
+            var path = Path.GetDirectoryName(MainForm.Instance.FilePath);
+            var fighterKey = Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath).Replace("Pl", "");
+            var fighterName = _node.Parent.Text.Replace("ftData", "");
+
+            ResultFilePath = Path.Combine(path, $"GmRstM{fighterKey}.dat");
+            WaitFilePath = Path.Combine(path, $"Pl{fighterKey}DViWaitAJ.dat");
+            IntroFilePath = Path.Combine(path, $"ftDemoIntroMotionFile{fighterName}.dat");
+            EndingFilePath = Path.Combine(path, $"ftDemoEndingMotionFile{fighterName}.dat");
+
+            if (!File.Exists(modelFile))
+                modelFile = FileIO.OpenFile("Fighter Model (Pl**Nr.dat)|*.dat", $"Pl{fighterKey}Nr.dat");
+
+            if (string.IsNullOrEmpty(modelFile))
+                return;
+
+            if (!File.Exists(ResultFilePath))
+                ResultFilePath = FileIO.OpenFile("Fighter Result Anim (GmRstM**.dat)|*.dat", $"GmRstM{fighterKey}.dat");
+
+            if (!File.Exists(WaitFilePath))
+                WaitFilePath = FileIO.OpenFile("Fighter Wait Anim (Pl**DViWaitAJ.dat)|*.dat", $"Pl{fighterKey}DViWaitAJ.dat");
+
+            if (!File.Exists(IntroFilePath))
+                IntroFilePath = FileIO.OpenFile("Fighter Intro Anim Bank (ftDemoIntroMotionFile**.dat)|*.dat", $"ftDemoIntroMotionFile{fighterName}.dat");
+
+            if (!File.Exists(EndingFilePath))
+                EndingFilePath = FileIO.OpenFile("Fighter Ending Anim Bank (ftDemoEndingMotionFile**.dat)|*.dat", $"ftDemoEndingMotionFile{fighterName}.dat");
+
+            // load animation data
+            AJManager = new FighterAJManager();
+
+            ResultSymbol = AJManager.ScanAJFile(ResultFilePath);
+            WaitSymbol = AJManager.ScanAJFile(WaitFilePath);
+            IntroSymbol = AJManager.ScanAJFile(IntroFilePath);
+            EndingSymbol = AJManager.ScanAJFile(EndingFilePath);
+
+            MessageBox.Show($"Loaded:\nResultBank: {ResultFilePath}\nWaitBank: {WaitFilePath}\nIntroBank: {IntroFilePath}\nEndingBank: {EndingFilePath}");
+
+            // load model
+            LoadModel(modelFile);
+
+            // shared rendering init
+            InitRendering();
         }
 
         /// <summary>
@@ -117,7 +259,59 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         private void SaveDemoAnimationFiles()
         {
+            //private byte[] ResultFile; 0-9
+            //private byte[] IntroFile; 10-11
+            //private byte[] EndingFile; 12
+            //private byte[] WaitFile; 13
+            // 14 and 15 are mario and luigi exclusive
 
+            BuildDemoAJFile(ResultSymbol, ResultFilePath, 0, 9);
+            BuildDemoAJFile(IntroSymbol, IntroFilePath, 10, 11);
+            BuildDemoAJFile(EndingSymbol, EndingFilePath, 12, 12);
+            BuildDemoAJFile(WaitSymbol, WaitFilePath, 13, 13);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private bool BuildDemoAJFile(string symbol, string ajpath, int actionstart, int actionend)
+        {
+            if (string.IsNullOrEmpty(symbol))
+                return false;
+
+            // get actions
+            var actions = new Action[actionend - actionstart + 1];
+            for (int i = actionstart; i <= actionend; i++)
+                actions[i - actionstart] = AllActions[i];
+
+            // rebuild aj file
+            var data = AJManager.RebuildAJFile(actions.Select(e => e.Symbol).ToArray(), false);
+
+            // update animation offset and sizes
+            foreach (var a in actions)
+            {
+                // don't write subroutines
+                if (a.Subroutine)
+                    continue;
+
+                // update animation size and offset
+                if (!string.IsNullOrEmpty(a.Symbol))
+                {
+                    var offsize = AJManager.GetSizeOffset(a.Symbol);
+                    a.AnimOffset = offsize.Item1;
+                    a.AnimSize = offsize.Item2;
+                }
+            }
+
+            // save action changes to dat file
+            SaveAllActionChanges();
+
+            // save aj file
+            HSDRawFile file = new HSDRawFile();
+            file.Roots.Add(new HSDRootNode() { Name = symbol, Data = new HSDAccessor() { _s = new HSDStruct(data) } });
+            file.Save(ajpath);
+
+            return true;
         }
 
         /// <summary>
@@ -152,82 +346,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     return;
             }
 
-            // load model
-            var modelFile = new HSDRawFile(cFile);
-            if (modelFile.Roots.Count > 0 && modelFile.Roots[0].Data is HSD_JOBJ jobj)
-            {
-                JointManager.SetJOBJ(jobj);
-
-                // load material animation if it exists
-                if (modelFile.Roots.Count > 1 && modelFile.Roots[1].Data is HSD_MatAnimJoint matanim)
-                {
-                    JointManager.SetMatAnimJoint(matanim);
-                    JointManager.EnableMaterialFrame = true;
-                }
-            }
-            else
-                return;
-
-            // set model scale
-            JointManager.ModelScale = ModelScale;
-
-            // clear hidden dobjs
-            JointManager.DOBJManager.HiddenDOBJs.Clear();
-
-            // don't render bones by default
-            JointManager._settings.RenderBones = false;
-
-            // reset model visibility
-            ResetModelVis();
-
-            // load the model parts
-            LoadModelParts();
-
-            // populate animation dictionary
+            // load animation data
             AJFilePath = aFile;
-            SymbolToAnimation.Clear();
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(aFile, FileMode.Open)))
-                foreach (var a in AllActions)
-                    if (a.Symbol != null && !SymbolToAnimation.ContainsKey(a.Symbol))
-                        SymbolToAnimation.Add(a.Symbol, r.GetSection((uint)a.AnimOffset, a.AnimSize));
+            AJManager = new FighterAJManager(File.ReadAllBytes(aFile));
 
-            // enable preview box
-            previewBox.Visible = true;
+            // load model
+            LoadModel(cFile);
 
-            // reselect action
-            if (actionList.SelectedItem is Action action)
-                SelectAction(action);
-
-            // load bone table if plco is found
-
-            string DummyModelFile = "PLMrNr.dat";
-            int DummyModelExternalId = 0;
-
-            /*var plcoFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), "PlCo.dat");
-            var plmrFile = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), DummyModelFile);
-            if (File.Exists(plcoFile) && File.Exists(plmrFile))
-            {
-                ThrowDummyManager.SetJOBJ(new HSDRawFile(plmrFile).Roots[0].Data as HSD_JOBJ);
-
-                ThrowDummyManager._settings.RenderBones = false;
-
-                ThrowDummyManager.DOBJManager.OverlayColor = new Vector3(1.5f, 1.5f, 1.5f);
-
-                // load bone lookup table
-                var plco = new HSDRawFile(plcoFile).Roots[0].Data as SBM_ftLoadCommonData;
-                var lookuptable = plco.BoneTables[DummyModelExternalId]._s.GetReference<HSDByteArray>(0x04);
-                ThrowDummyLookupTable.Clear();
-                for (int i = 0; i < 54; i++)
-                {
-                    var bone = lookuptable[i];
-                    if (bone != 255 && !ThrowDummyLookupTable.ContainsKey(bone))
-                        ThrowDummyLookupTable.Add(bone, i);
-                }
-            }
-            else*/
-            {
-                ThrowDummyManager.SetJOBJ(DummyThrowModel.GenerateThrowDummy());
-            }
+            // shared rendering init
+            InitRendering();
         }
 
 
@@ -240,85 +367,33 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (string.IsNullOrEmpty(AJFilePath))
                 return;
 
-            // make sure okay to overwrite
-            if (MessageBox.Show($"Is it okay to overwrite {AJFilePath}?", "Save Animation File Changes?", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                return;
-
             // collect used symbols from all actions
-            var usedSymbols = AllActions.Select(e => e.Symbol);
+            var usedSymbols = AllActions.Select(e => e.Symbol).ToArray();
 
             // generate new aj file
-            Dictionary<string, Tuple<int, int>> animOffsets = new Dictionary<string, Tuple<int, int>>();
+            var newAJFile = AJManager.RebuildAJFile(usedSymbols, false);
 
-            using (MemoryStream ajBuffer = new MemoryStream())
-            using (BinaryWriterExt w = new BinaryWriterExt(ajBuffer))
-            {
-                // collect used symbols
-                foreach (var sym in usedSymbols)
-                {
-                    if (sym != null)
-                    {
-                        if (SymbolToAnimation.ContainsKey(sym) && !animOffsets.ContainsKey(sym))
-                        {
-                            // write animation
-                            var anim = SymbolToAnimation[sym];
-                            animOffsets.Add(sym, new Tuple<int, int>((int)ajBuffer.Position, anim.Length));
-                            w.Write(anim);
-                            w.Align(0x20, 0xFF);
-                        }
-                        else
-                        if (!animOffsets.ContainsKey(sym))
-                        {
-                            // animation not found
-                            MessageBox.Show($"\"{sym}\" animation not found", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            animOffsets.Add(sym, new Tuple<int, int>(0, 0));
-                        }
-                    }
-                }
-
-                // dump to file
-                File.WriteAllBytes(AJFilePath, ajBuffer.ToArray());
-            }
-
-
-            int index = 0;
+            // update animation offset and sizes
             foreach (var a in AllActions)
             {
                 // don't write subroutines
                 if (a.Subroutine)
                     continue;
 
-                // get embedded script
-                var ftcmd = new SBM_FighterCommand();
-                ftcmd._s = _node.Accessor._s.GetEmbeddedStruct(0x18 * index, ftcmd.TrimmedSize);
-
-                // update symbol name
-                ftcmd.Name = a.Symbol;
-
-                if (a.Symbol == null)
-                    continue;
-
-                // offset
-                var ofst = animOffsets[a.Symbol];
-
-                // update action offset and size
-                a.AnimOffset = ofst.Item1;
-                a.AnimSize = ofst.Item2;
-
-                // update file offset and size
-                ftcmd.AnimationOffset = a.AnimOffset;
-                ftcmd.AnimationSize = a.AnimSize;
-
-                // resize if needed
-                if (_node.Accessor._s.Length <= 0x18 * index + 0x18)
-                    _node.Accessor._s.Resize(0x18 * index + 0x18);
-
-                // update script
-                _node.Accessor._s.SetEmbededStruct(0x18 * index, ftcmd._s);
-                index++;
+                // update animation size and offset
+                if (!string.IsNullOrEmpty(a.Symbol))
+                {
+                    var offsize = AJManager.GetSizeOffset(a.Symbol);
+                    a.AnimOffset = offsize.Item1;
+                    a.AnimSize = offsize.Item2;
+                }
             }
 
-            MainForm.Instance.SaveDAT();
+            // save action changes to dat file
+            SaveAllActionChanges();
+
+            // dump to file
+            File.WriteAllBytes(AJFilePath, newAJFile);
         }
 
         /// <summary>
@@ -670,12 +745,17 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             ThrowDummyManager.SetFigaTree(null);
             DisplayShieldSize = 0;
 
+            // check if animations are loaded
+            if (AJManager == null)
+                return;
+
             // check if animation exists
-            if (symbol == null || !SymbolToAnimation.ContainsKey(symbol))
+            var animData = AJManager.GetAnimationData(symbol);
+            if (animData == null)
                 return;
 
             // load animation
-            var anim = new HSDRawFile(SymbolToAnimation[symbol]);
+            var anim = new HSDRawFile(animData);
             if (anim.Roots[0].Data is HSD_FigaTree tree)
             {
                 var name = new Action() { Symbol = anim.Roots[0].Name }.ToString();
@@ -700,9 +780,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     Action throwAction = null;
                     foreach (Action a in actionList.Items)
                     {
-                        if (a.Symbol != null && 
-                            a.Symbol.Contains("Taro") && 
-                            a.Symbol.Contains(name) && 
+                        if (a.Symbol != null &&
+                            a.Symbol.Contains("Taro") &&
+                            a.Symbol.Contains(name) &&
                             !a.Symbol.Equals(anim.Roots[0].Name))
                         {
                             throwAction = a;
@@ -711,19 +791,23 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     }
 
                     // if throw animation is found
-                    if (throwAction != null && 
-                        throwAction.Symbol != null && 
-                        SymbolToAnimation.ContainsKey(throwAction.Symbol))
+                    if (throwAction != null &&
+                        throwAction.Symbol != null)
                     {
-                        // load throw animation
-                        var tanim = new HSDRawFile(SymbolToAnimation[throwAction.Symbol]);
-                        if (tanim.Roots[0].Data is HSD_FigaTree tree2)
+                        var throwData = AJManager.GetAnimationData(throwAction.Symbol);
+
+                        if (throwData != null)
                         {
-                            ThrowDummyManager.SetFigaTree(tree2);
-                            if (ThrowDummyLookupTable.Count > 0)
+                            // load throw animation
+                            var tanim = new HSDRawFile(throwData);
+                            if (tanim.Roots[0].Data is HSD_FigaTree tree2)
                             {
-                                ThrowDummyManager.Animation.EnableBoneLookup = true;
-                                ThrowDummyManager.Animation.BoneLookup = ThrowDummyLookupTable;
+                                ThrowDummyManager.SetFigaTree(tree2);
+                                if (ThrowDummyLookupTable.Count > 0)
+                                {
+                                    ThrowDummyManager.Animation.EnableBoneLookup = true;
+                                    ThrowDummyManager.Animation.BoneLookup = ThrowDummyLookupTable;
+                                }
                             }
                         }
                     }
@@ -735,21 +819,121 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <summary>
         /// 
         /// </summary>
-        private void SaveAnimation()
+        private void SaveAnimationChanges()
         {
             if (actionList.SelectedItem is Action action)
             {
                 HSDRawFile f = new HSDRawFile();
+
                 f.Roots.Add(new HSDRootNode()
                 {
                     Name = action.Symbol,
                     Data = JointManager.Animation.ToFigaTree()
                 });
-                var tempFileName = Path.GetTempFileName();
-                f.Save(tempFileName);
-                SymbolToAnimation[action.Symbol] = File.ReadAllBytes(tempFileName);
-                File.Delete(tempFileName);
+
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    f.Save(stream);
+                    AJManager.SetAnimation(action.Symbol, stream.ToArray());
+                }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importFigatreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (actionList.SelectedItem is Action a)
+            {
+                var f = FileIO.OpenFile("Supported Formats |*.dat;*.anim");
+
+                HSDRawFile file;
+
+                // if it's a maya anim then convert to figatree and set the symbol
+                if (f.ToLower().EndsWith(".anim"))
+                {
+                    var anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
+
+                    file = new HSDRawFile(f);
+                    file.Roots.Add(new HSDRootNode()
+                    {
+                        Name = a.Symbol,
+                        Data = anim.ToFigaTree(0.01f)
+                    });
+                }
+                else
+                    // just load dat normally
+                    try
+                    {
+                        file = new HSDRawFile(f);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+
+                // check if figatree data is found
+                if (file == null || file.Roots.Count > 0 && file.Roots[0].Data is HSD_FigaTree tree)
+                {
+                    //grab symbol
+                    var symbol = file.Roots[0].Name;
+
+                    //check if symbol exists and ok to overwrite
+                    if (AJManager.GetAnimationData(symbol) != null)
+                    {
+                        if (MessageBox.Show($"Symbol \"{symbol}\" already exists.\nIs it okay to overwrite?", "Overwrite Symbol", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                            return;
+                    }
+
+                    // set animation data
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        file.Save(stream);
+                        AJManager.SetAnimation(symbol, stream.ToArray());
+                    }
+
+                    //set action symbol
+                    a.Symbol = symbol;
+
+                    //reselect action
+                    LoadAnimation(symbol);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void figatreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (actionList.SelectedItem is Action a)
+            {
+                var figaData = AJManager.GetAnimationData(a.Symbol);
+
+                if (a.Symbol != null && figaData != null)
+                {
+                    var f = FileIO.SaveFile(ApplicationSettings.HSDFileFilter, a.Symbol + ".dat");
+
+                    if (f != null)
+                        File.WriteAllBytes(f, figaData);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void popoutEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _animEditor.Show();
+            _animEditor.Visible = true;
         }
     }
 }

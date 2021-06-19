@@ -165,6 +165,14 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <summary>
         /// 
         /// </summary>
+        public void OnFileSave()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="mode"></param>
         public void SwitchMode(EditorMode mode)
         {

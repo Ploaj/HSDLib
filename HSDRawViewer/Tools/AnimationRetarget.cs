@@ -221,7 +221,7 @@ namespace HSDRawViewer.Tools
             EulerFilter(newAnim);
 
             var targetAnim = newAnim.ToAnimJoint(target, AOBJ_Flags.ANIM_LOOP);
-            AnimationCompressor.AdaptiveCompressAnimation(targetAnim, targetMap);
+            //AnimationKeyCompressor.CompressTrack(targetAnim, targetMap);
             RemoveUnusedTracks(target, targetAnim);
             newAnim.FromAnimJoint(targetAnim);
 

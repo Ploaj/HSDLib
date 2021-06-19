@@ -19,6 +19,7 @@ using HSDRaw.GX;
 using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.GX;
+using HSDRawViewer.Converters.Animation;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -1003,11 +1004,6 @@ namespace HSDRawViewer.GUI.Plugins
 
             if (f != null)
             {
-                if (Path.GetExtension(f).ToLower().Equals(".chr0"))
-                {
-                    LoadAnimation(CHR0Converter.LoadCHR0(f, _jointMap));
-                }
-                else
                 if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta") ||
                     (Path.GetExtension(f).ToLower().Equals(".xml") && MOT_FILE.IsMotXML(f)))
                 {
@@ -1017,20 +1013,8 @@ namespace HSDRawViewer.GUI.Plugins
                         LoadAnimation(MOTLoader.GetJointTable(jointTable), new MOT_FILE(f));
                 }
                 else
-                if (Path.GetExtension(f).ToLower().Equals(".anim"))
                 {
-                    LoadAnimation(ConvMayaAnim.ImportFromMayaAnim(f, _jointMap));
-                }
-                else
-                if (Path.GetExtension(f).ToLower().Equals(".dat"))
-                {
-                    var dat = new HSDRaw.HSDRawFile(f);
-
-                    if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
-                        LoadAnimation(new JointAnimManager(tree));
-
-                    if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_AnimJoint joint)
-                        LoadAnimation(new JointAnimManager(joint));
+                    LoadAnimation(JointAnimationLoader.LoadJointAnimFromFile(_jointMap, f));
                 }
             }
         }

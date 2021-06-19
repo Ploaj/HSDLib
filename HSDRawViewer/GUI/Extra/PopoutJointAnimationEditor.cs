@@ -11,7 +11,9 @@ namespace HSDRawViewer.GUI.Extra
 {
     public partial class PopoutJointAnimationEditor : Form
     {
-
+        /// <summary>
+        /// settings class for animation key compression
+        /// </summary>
         private class OptimizeSettings
         {
             //public bool BakeAnimation = true;
@@ -38,27 +40,7 @@ namespace HSDRawViewer.GUI.Extra
                 if (AnimNode == null || JOBJ == null)
                     return;
 
-                List<FOBJ_Player> toRemove = new List<FOBJ_Player>();
-
-                foreach (var track in AnimNode.Tracks)
-                {
-                    if (track.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_NONE)
-                    {
-                        toRemove.Add(track);
-                        continue;
-                    }
-                    Tools.AnimationCompressor.BakeTrack(track);
-                    Tools.AnimationCompressor.CompressTrack(track, settings.ErrorMargin);
-
-                    // check if constant 
-                    if (Tools.AnimationCompressor.IsConstant(track))
-                        if (Math.Abs(JOBJ.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
-                            toRemove.Add(track);
-                    
-                }
-
-                foreach (var rem in toRemove)
-                    AnimNode.Tracks.Remove(rem);
+                AnimationKeyCompressor.OptimizeJointTracks(JOBJ, ref AnimNode.Tracks, settings.ErrorMargin);
 
                 if (optimizeChildren)
                     foreach (JointNode child in Nodes)

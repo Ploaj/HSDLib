@@ -18,4 +18,9 @@ namespace HSDRawViewer.GUI.Plugins
 
         DataNode Node { get; set; }
     }
+
+    public interface SaveableEditorBase : EditorBase
+    {
+        void OnDatFileSave();
+    }
 }

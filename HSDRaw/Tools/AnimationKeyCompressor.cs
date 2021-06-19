@@ -1,129 +1,55 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
-using HSDRaw.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HSDRawViewer.Tools
+namespace HSDRaw.Tools
 {
-    public class AnimationCompressor
+    /// <summary>
+    /// Very basic spline key fitting to help reduce animation file size
+    /// </summary>
+    public class AnimationKeyCompressor
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="animJoint"></param>
-        public static void OptimizeTracks(HSD_JOBJ model, HSD_AnimJoint animJoint, float epsilon = 0.001f)
+        /// <param name="tracks"></param>
+        /// <param name="joint"></param>
+        /// <param name="settings"></param>
+        /// <param name="optimizeChildren"></param>
+        public static void OptimizeJointTracks(HSD_JOBJ joint, ref List<FOBJ_Player> tracks, float error = 0.001f)
         {
-            var joints = model.BreathFirstList;
-            var anim_joints = animJoint.BreathFirstList;
+            List<FOBJ_Player> toRemove = new List<FOBJ_Player>();
 
-            if (joints.Count != anim_joints.Count)
-                return;
-
-            for(int i = 0; i < joints.Count; i++)
+            // process each track
+            foreach (var track in tracks)
             {
-                if (anim_joints[i].AOBJ != null)
+                // remove the none tracks
+                if (track.JointTrackType == JointTrackType.HSD_A_J_NONE)
                 {
-                    Dictionary<JointTrackType, float> typeToDefaultValue = new Dictionary<JointTrackType, float>();
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_TRAX, joints[i].TX);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_TRAY, joints[i].TY);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_TRAZ, joints[i].TZ);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_ROTX, joints[i].RX);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_ROTY, joints[i].RY);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_ROTZ, joints[i].RZ);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_SCAX, joints[i].SX);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_SCAY, joints[i].SY);
-                    typeToDefaultValue.Add(JointTrackType.HSD_A_J_SCAZ, joints[i].SZ);
-
-                    var tracks = anim_joints[i].AOBJ.FObjDesc.List;
-
-                    HSD_FOBJDesc prev = null;
-                    foreach (var t in tracks)
-                    {
-                        var keys = t.GetDecodedKeys();
-                        if (typeToDefaultValue.ContainsKey(t.JointTrackType) && 
-                            ConstantTrack(keys, typeToDefaultValue[t.JointTrackType], epsilon))
-                        {
-                            if (prev != null)
-                                prev.Next = t;
-                            else
-                                anim_joints[i].AOBJ.FObjDesc = t;
-                        }
-                        else
-                        {
-                            prev = t;
-                        }
-                    }
-
-                    if (anim_joints[i].AOBJ.FObjDesc != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"{tracks.Count} -> {anim_joints[i].AOBJ.FObjDesc.List.Count}");
-                    }
-                    else
-                    {
-                        anim_joints[i].AOBJ = null;
-                    }
+                    toRemove.Add(track);
                 }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="keys"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="epsilon"></param>
-        /// <returns></returns>
-        private static bool ConstantTrack(List<FOBJKey> keys, float defaultValue, float epsilon)
-        {
-            return keys.Count == 1 && Math.Abs(keys[0].Value - defaultValue) < epsilon;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="animJoint"></param>
-        public static void CompressAnimation(HSD_AnimJoint animJoint, float epsilon = 0.001f)
-        {
-            foreach (var j in animJoint.BreathFirstList)
-            {
-                if (j.AOBJ != null)
-                    foreach (var t in j.AOBJ.FObjDesc.List)
-                    {
-                        var player = new FOBJ_Player();
-                        player.Keys = t.GetDecodedKeys();
-                        BakeTrack(player);
-                        CompressTrack(player, epsilon);
-                        t.SetKeys(player.Keys, t.TrackType);
-                    }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="animJoint"></param>
-        public static int AdaptiveCompressAnimation(HSD_AnimJoint j, JointMap map, int index = 0)
-        {
-            float error = map == null ? 0.001f : map.GetError(index);
-
-            if (j.AOBJ != null)
-                foreach (var t in j.AOBJ.FObjDesc.List)
+                else
                 {
-                    var player = new FOBJ_Player();
-                    player.Keys = t.GetDecodedKeys();
-                    BakeTrack(player);
-                    CompressTrack(player, error);
-                    t.SetKeys(player.Keys, t.TrackType);
+                    // bake keys
+                    // they need to be backed before being compressed
+                    BakeTrack(track);
+
+                    // perform key fitting compression
+                    CompressTrack(track, error);
+
+                    // remove constant tracks that don't change value
+                    if (IsConstant(track) &&
+                        Math.Abs(joint.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
+                            toRemove.Add(track);
                 }
 
-            if (j.Child != null)
-                foreach (var c in j.Children)
-                    index = AdaptiveCompressAnimation(c, map, index + 1);
+            }
 
-            return index;
+            // remove certain tracks
+            foreach (var rem in toRemove)
+                tracks.Remove(rem);
         }
 
         /// <summary>
@@ -197,19 +123,6 @@ namespace HSDRawViewer.Tools
             RemoveUselessKeys(newPlayer, epsilon);
 
             player.Keys = newPlayer.Keys;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="player"></param>
-        private static void CalculateTangents(FOBJ_Player player)
-        {
-            for (int i = 0; i < player.Keys.Count; i++)
-            {
-                player.Keys[i].InterpolationType = GXInterpolationType.HSD_A_OP_SPL;
-                player.Keys[i].Tan = CalculateTangent(player, i);
-            }
         }
 
         /// <summary>

@@ -46,11 +46,6 @@ namespace HSDRawViewer.Sound
         /// <summary>
         /// 
         /// </summary>
-        private static readonly int NullEntryID = 55;
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="data"></param>
         public static string DecompileSEMScript(byte[] data)
         {

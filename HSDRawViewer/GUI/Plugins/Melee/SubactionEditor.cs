@@ -14,7 +14,7 @@ using HSDRawViewer.GUI.Extra;
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
     [SupportedTypes(new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) })]
-    public partial class SubactionEditor : DockContent, EditorBase
+    public partial class SubactionEditor : DockContent, SaveableEditorBase
     {
         public DockState DefaultDockState => DockState.Document;
 
@@ -117,7 +117,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             FormClosing += (sender, args) =>
             {
-                SaveFile();
+                // if animation stuff is loaded save changes
+                if (previewBox.Visible)
+                {
+                    if (MessageBox.Show("Save Fighter DAT and Animation Changes?", "Save Changes", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+                    {
+                        MainForm.Instance.SaveDAT();
+                    }
+                }
                 JointManager.CleanupRendering();
                 viewport.Dispose();
                 _animEditor.CloseOnExit = true;
@@ -131,16 +138,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 {
                    // MessageBox.Show("Changes Made");
                     //if (MessageBox.Show("Save Changes to Animation?", "Save Animation", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
-                    SaveAnimation();
+                    SaveAnimationChanges();
                 }
             };
             
             SubactionProcess.UpdateVISMethod = SetModelVis;
             SubactionProcess.AnimateMaterialMethod = AnimateMaterial;
             SubactionProcess.AnimateModelMethod = AnimateModel;
-
-            // prepare rendering
-            SetupRendering();
         }
 
         /// <summary>
@@ -224,6 +228,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             else
             if (_node.Text.Contains("Demo"))
                 LoadDemoAnimationFiles();
+            else
+            {
+                MessageBox.Show("Rendering Files not supported for this node", "Unsupported Rendering", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 
@@ -265,16 +273,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         }
 
         #endregion
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void SaveFile()
-        {
-            //SaveFighterAnimationFile();
-            //MessageBox.Show("This feature has not yet been implemented");
-        }
 
         /// <summary>
         /// 
@@ -969,104 +967,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         // process attribute
 
 
-
-
                         // process script
 
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void savePlayerRenderingFilesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFile();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void importFigatreeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (actionList.SelectedItem is Action a)
-            {
-                var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
-
-                if (f != null)
-                {
-                    // check valid dat file
-                    var file = new HSDRawFile(f);
-
-                    // grab symbol
-                    var symbol = file.Roots[0].Name;
-
-                    // check if symbol exists and ok to overwrite
-                    if(SymbolToAnimation.ContainsKey(symbol))
-                    {
-                        if(MessageBox.Show($"Symbol \"{symbol}\" already exists.\nIs it okay to overwrite?", "Overwrite Symbol", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
-                            return;
-
-                        SymbolToAnimation[symbol] = File.ReadAllBytes(f);
-                    }
-                    else
-                        SymbolToAnimation.Add(symbol, File.ReadAllBytes(f));
-                        
-                    // set action symbol
-                    a.Symbol = symbol;
-
-                    // reselect action
-                    LoadAnimation(symbol);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void exportFigatreeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if(actionList.SelectedItem is Action a)
-            {
-                if(a.Symbol != null && SymbolToAnimation.ContainsKey(a.Symbol))
-                {
-                    var f = FileIO.SaveFile(ApplicationSettings.HSDFileFilter, a.Symbol + ".dat");
-
-                    if (f != null)
-                        File.WriteAllBytes(f, SymbolToAnimation[a.Symbol]);
-                }
-            }
-        }
-
-        private PopoutJointAnimationEditor _animEditor = new PopoutJointAnimationEditor(false);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void popoutEditorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _animEditor.Show();
-            _animEditor.Visible = true;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveAnimationChangesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveAnimation();
         }
     }
 }

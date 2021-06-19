@@ -301,5 +301,13 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             });
             f2.Save(Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "partition.dat"));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void OnFileSave()
+        {
+
+        }
     }
 }

@@ -240,7 +240,7 @@ namespace HSDRawViewer.GUI
             using (BinaryReader r = new BinaryReader(new FileStream(filePath, FileMode.Open)))
             {
                 var subs = PlayerData.FighterCommandTable.Commands;
-                var winsubs = PlayerData.WinCommandTable.Commands;
+                var winsubs = PlayerData.DemoCommandTable.Commands;
 
                 foreach (var v in subs)
                 {
@@ -280,7 +280,7 @@ namespace HSDRawViewer.GUI
             lbResult.BeginUpdate();
             using (BinaryReader r = new BinaryReader(new MemoryStream(gmDat.Roots[0].Data._s.GetData())))
             {
-                var winsubs = PlayerData.WinCommandTable.Commands;
+                var winsubs = PlayerData.DemoCommandTable.Commands;
 
                 foreach (var v in winsubs)
                 {
@@ -458,7 +458,7 @@ namespace HSDRawViewer.GUI
                         res.Roots.Add(new HSDRootNode() { Name = "ftDemoResultMotionFile" + FighterName, Data = new HSDAccessor() });
                         using (BinaryWriter w = new BinaryWriter(new MemoryStream()))
                         {
-                            PlayerData.WinCommandTable.Commands = CreateAnimationFile(w, PlayerData.WinCommandTable.Commands, ResultAnimations);
+                            PlayerData.DemoCommandTable.Commands = CreateAnimationFile(w, PlayerData.DemoCommandTable.Commands, ResultAnimations);
 
                             res.Roots[0].Data._s.SetData(((MemoryStream)w.BaseStream).ToArray());
                         }
