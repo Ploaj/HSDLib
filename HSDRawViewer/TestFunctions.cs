@@ -183,7 +183,7 @@ namespace HSDRawViewer
 
                                 ActionDecompiler d = new ActionDecompiler();
 
-                                var sa = pl.FighterCommandTable.Commands;
+                                var sa = pl.FighterActionTable.Commands;
 
                                 int index = 0;
                                 foreach (var v in sa)

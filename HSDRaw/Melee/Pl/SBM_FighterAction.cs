@@ -5,7 +5,7 @@ using HSDRaw.Common;
 
 namespace HSDRaw.Melee.Pl
 {
-    public class SBM_FighterCommand : HSDAccessor
+    public class SBM_FighterAction : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
 

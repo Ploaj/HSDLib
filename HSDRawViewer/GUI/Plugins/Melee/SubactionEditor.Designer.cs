@@ -453,7 +453,7 @@
             // figatreeToolStripMenuItem
             // 
             this.figatreeToolStripMenuItem.Name = "figatreeToolStripMenuItem";
-            this.figatreeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.figatreeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.figatreeToolStripMenuItem.Text = "Figatree";
             this.figatreeToolStripMenuItem.Click += new System.EventHandler(this.figatreeToolStripMenuItem_Click);
             // 

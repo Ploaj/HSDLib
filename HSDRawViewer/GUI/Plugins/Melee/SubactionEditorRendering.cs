@@ -895,11 +895,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         AJManager.SetAnimation(symbol, stream.ToArray());
                     }
 
-                    //set action symbol
+                    // set action symbol
                     a.Symbol = symbol;
 
-                    //reselect action
+                    // reselect action
                     LoadAnimation(symbol);
+
+                    // 
+                    actionList.Invalidate();
                 }
             }
         }

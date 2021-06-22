@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Melee\Pl\SBM_FighterCommand.cs" />
-    <None Include="Melee\Pl\SBM_FighterCommandTable.cs" />
+    <None Include="Melee\Pl\SBM_FighterAction.cs" />
+    <None Include="Melee\Pl\SBM_FighterActionTable.cs" />
     <None Include="Melee\Pl\SBM_FighterData.cs" />
   </ItemGroup>
 

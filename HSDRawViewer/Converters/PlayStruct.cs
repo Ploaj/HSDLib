@@ -83,7 +83,7 @@ namespace HSDRawViewer.Converters
 
                     for (int i = 0; i < f.Actions.Length; i++)
                     {
-                        SBM_FighterCommand subaction = new HSDRaw.Melee.Pl.SBM_FighterCommand();
+                        SBM_FighterAction subaction = new HSDRaw.Melee.Pl.SBM_FighterAction();
                         subaction._s = val._s.GetEmbeddedStruct(0x18 * i, 0x18);
 
                         if (!ExportedAnimations.Contains(subaction.Name) && subaction.Name != null && subaction.Name != "")
@@ -198,8 +198,8 @@ namespace HSDRawViewer.Converters
 
                     Dictionary<string, Tuple<int, int>> animationToOffset = new Dictionary<string, Tuple<int, int>>();
                     
-                    List<SBM_FighterCommand> SubActions = new List<SBM_FighterCommand>();
-                    Dictionary<SBM_FighterCommand, string> subActionToScript = new Dictionary<SBM_FighterCommand, string>();
+                    List<SBM_FighterAction> SubActions = new List<SBM_FighterAction>();
+                    Dictionary<SBM_FighterAction, string> subActionToScript = new Dictionary<SBM_FighterAction, string>();
 
                     Dictionary<string, HSDStruct> stringToStruct = new Dictionary<string, HSDStruct>();
 
@@ -207,7 +207,7 @@ namespace HSDRawViewer.Converters
                     {
                         foreach (var s in script.Actions)
                         {
-                            SBM_FighterCommand subaction = new SBM_FighterCommand();
+                            SBM_FighterAction subaction = new SBM_FighterAction();
                             subaction.Flags = (uint)s.flags;
                             if (s.animation_name != null)
                             {
@@ -258,13 +258,13 @@ namespace HSDRawViewer.Converters
 
                     }
                     
-                    ftData.FighterCommandTable = new SBM_FighterCommandTable();
+                    ftData.FighterActionTable = new SBM_FighterActionTable();
 
                     ActionCompiler.LinkStructs();
 
-                    ftData.FighterCommandTable.Commands = SubActions.ToArray();
+                    ftData.FighterActionTable.Commands = SubActions.ToArray();
 
-                    Console.WriteLine("recompiled count " + ftData.FighterCommandTable._s.GetSubStructs().Count);
+                    Console.WriteLine("recompiled count " + ftData.FighterActionTable._s.GetSubStructs().Count);
                 }
             }
 

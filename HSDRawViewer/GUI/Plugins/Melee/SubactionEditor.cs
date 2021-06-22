@@ -13,7 +13,7 @@ using HSDRawViewer.GUI.Extra;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-    [SupportedTypes(new Type[] { typeof(SBM_FighterCommandTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) })]
+    [SupportedTypes(new Type[] { typeof(SBM_FighterActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) })]
     public partial class SubactionEditor : DockContent, SaveableEditorBase
     {
         public DockState DefaultDockState => DockState.Document;
@@ -32,9 +32,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     if (value.Accessor is SBM_ColorSubactionData)
                         SubactionGroup = SubactionGroup.Color;
 
-                    SBM_FighterCommand[] su = new SBM_FighterCommand[]
+                    SBM_FighterAction[] su = new SBM_FighterAction[]
                     {
-                        new SBM_FighterCommand()
+                        new SBM_FighterAction()
                         {
                             SubAction = sudata,
                             Name = "Script"
@@ -49,7 +49,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     propertyGrid1.Visible = false;
                 }
                 else
-                if(value.Accessor is SBM_FighterCommandTable SubactionTable)
+                if(value.Accessor is SBM_FighterActionTable SubactionTable)
                 {
                     LoadActions(SubactionTable.Commands);
                     RefreshActionList();
@@ -76,7 +76,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             get
             {
-                if (_node.Accessor is SBM_FighterCommandTable SubactionTable)
+                if (_node.Accessor is SBM_FighterActionTable SubactionTable)
                     if (Node.Parent is DataNode parent)
                         if (parent.Accessor is SBM_FighterData plDat)
                             return plDat;

@@ -220,7 +220,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="Subactions"></param>
-        private void LoadActions(SBM_FighterCommand[] Subactions)
+        private void LoadActions(SBM_FighterAction[] Subactions)
         {
             HashSet<HSDStruct> aHash = new HashSet<HSDStruct>();
             Queue<HSDStruct> extra = new Queue<HSDStruct>();
@@ -360,7 +360,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             if (!a.Subroutine)
             {
-                var ftcmd = new SBM_FighterCommand();
+                var ftcmd = new SBM_FighterAction();
                 ftcmd._s = _node.Accessor._s.GetEmbeddedStruct(0x18 * index, ftcmd.TrimmedSize);
 
                 ftcmd.Name = a.Symbol;

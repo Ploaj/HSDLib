@@ -7,7 +7,7 @@ namespace HSDRawViewer.ContextMenus
 {
     public class SubactionTableContextMenu : CommonContextMenu
     {
-        public override Type[] SupportedTypes { get; } = new Type[] { typeof(SBM_FighterCommandTable) };
+        public override Type[] SupportedTypes { get; } = new Type[] { typeof(SBM_FighterActionTable) };
 
         public SubactionTableContextMenu() : base()
         {
@@ -16,9 +16,9 @@ namespace HSDRawViewer.ContextMenus
             {
                 var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
-                if(f != null && MainForm.SelectedDataNode.Accessor is SBM_FighterCommandTable table)
+                if(f != null && MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
                 {
-                    var dataToImport = new SBM_FighterCommandTable();
+                    var dataToImport = new SBM_FighterActionTable();
 
                     dataToImport._s = new HSDRawFile(f).Roots[0].Data._s;
 

@@ -56,7 +56,7 @@
     bitCount: 9
   - name: Weight Set Knockback
     bitCount: 9
-  - name: Hitbox Interaction
+  - name: Padding
     bitCount: 5
   - name: Base Knockback
     bitCount: 9
@@ -86,9 +86,10 @@
     - false
     - true
   - name: Shield Damage
-    bitCount: 9
+    bitCount: 8
+    signed: true
   - name: SFX Severity
-    bitCount: 2
+    bitCount: 3
     enums:
     - Weak
     - Moderate

@@ -48,14 +48,14 @@ namespace HSDRawViewer.ContextMenus.Melee
                     {
                         if (MainForm.SelectedDataNode.Accessor is SBM_FighterData root)
                         {
-                            var sa = root.FighterCommandTable.Commands;
+                            var sa = root.FighterActionTable.Commands;
                             foreach (var s in sa)
                                 if (s.SymbolName != null)
                                     s.SymbolName.Value = s.SymbolName.Value.Replace(rn.OldName, rn.NewName);
 
                             if (inlcudeVictoryAnim)
                             {
-                                var vc = root.DemoCommandTable.Commands;
+                                var vc = root.DemoActionTable.Commands;
 
                                 foreach (var s in vc)
                                     if (s.SymbolName != null)

@@ -812,7 +812,7 @@ namespace HSDRaw
                 x => x.StartsWith("SIS_") ?  new SBM_SISData() : null,
                 x => x.Equals("evMenu") ?  new SBM_EventMenu() : null,
                 x => x.Equals("lbBgFlashColAnimData") ?  new HSDArrayAccessor<ftCommonColorEffect>() : null,
-                x => x.Equals("ftcmd") ?  new SBM_FighterCommandTable() : null,
+                x => x.Equals("ftcmd") ?  new SBM_FighterActionTable() : null,
                 x => x.Equals("Stc_icns") ?  new MEX_Stock() : null,
                 x => x.Equals("mexMenu") ?  new MEX_Menu() : null,
                 x => x.Equals("bgm") ?  new MEX_BGMModel() : null,

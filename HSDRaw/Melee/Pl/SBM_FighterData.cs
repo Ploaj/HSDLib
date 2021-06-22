@@ -15,13 +15,13 @@ namespace HSDRaw.Melee.Pl
         
         public SBM_PlayerModelLookupTables ModelLookupTables { get => _s.GetReference<SBM_PlayerModelLookupTables>(0x08); set => _s.SetReference(0x08, value); }
 
-        public SBM_FighterCommandTable FighterCommandTable { get => _s.GetReference<SBM_FighterCommandTable>(0x0C); set => _s.SetReference(0x0C, value); }
+        public SBM_FighterActionTable FighterActionTable { get => _s.GetReference<SBM_FighterActionTable>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public SBM_DynamicBehaviorIDs CommandDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x10); set => _s.SetReference(0x10, value); }
+        public SBM_DynamicBehaviorIDs FighterActionDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x10); set => _s.SetReference(0x10, value); }
 
-        public SBM_FighterCommandTable DemoCommandTable { get => _s.GetReference<SBM_FighterCommandTable>(0x14); set => _s.SetReference(0x14, value); }
+        public SBM_FighterActionTable DemoActionTable { get => _s.GetReference<SBM_FighterActionTable>(0x14); set => _s.SetReference(0x14, value); }
 
-        public SBM_DynamicBehaviorIDs DemoCommandDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x18); set => _s.SetReference(0x18, value); }
+        public SBM_DynamicBehaviorIDs DemoActionDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x18); set => _s.SetReference(0x18, value); }
 
         public HSDFixedLengthPointerArrayAccessor<SBM_ModelPart> ModelPartAnimations { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_ModelPart>>(0x1C); set => _s.SetReference(0x1C, value); }
         

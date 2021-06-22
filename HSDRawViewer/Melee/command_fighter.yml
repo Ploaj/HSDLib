@@ -37,14 +37,22 @@
   parameters:
   - name: ID
     bitCount: 3
-  - name: Unk1
-    bitCount: 5
+  - name: Hit Group
+    bitCount: 3
+  - name: Only Hit Grabbed Fighter (bugged)
+    bitCount: 1
+    enums:
+    - false
+    - true
   - name: Bone
-    bitCount: 7
-  - name: Unk2
-    bitCount: 2
+    bitCount: 8
+  - name: Use Common Bone IDs
+    bitCount: 1
+    enums:
+    - false
+    - true
   - name: Damage
-    bitCount: 9
+    bitCount: 10
   - name: Size
     bitCount: 16
   - name: Z-Offset
@@ -62,15 +70,31 @@
     bitCount: 9
   - name: Weight Set Knockback
     bitCount: 9
-  - name: Unk3
-    bitCount: 3
-  - name: Hitbox Interaction
-    bitCount: 2
+  - name: Item Hit Interaction
+    bitCount: 1
     enums:
-    - Unknown
-    - Normal Does not Clank
-    - Can Clank
-    - Normal Can Clank
+    - false
+    - true
+  - name: Ignore Thrown Fighters
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Ignore Fighter Scale
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Clank
+    bitCount: 1
+    enums:
+    - false
+    - true
+  - name: Rebound
+    bitCount: 1
+    enums:
+    - false
+    - true
   - name: Base Knockback
     bitCount: 9
   - name: Element
@@ -93,10 +117,8 @@
     - Screw Attack
     - Poison Flower
     - Nothing (No Graphic)
-  - name: Unk4
-    bitCount: 1
   - name: Shield Damage
-    bitCount: 7
+    bitCount: 8
   - name: Hit SFX Severity
     bitCount: 3
     enums:
@@ -182,9 +204,8 @@
     bitCount: 16
   - name: Volume
     bitCount: 8
-  - name: Unknown
+  - name: Panning
     bitCount: 8
-    hex: true
 
 - code: 18
   name: Random Smash SFX
@@ -402,17 +423,25 @@
   name: Unknown0x27
   parameters:
   - name: Unknown1
-    bitCount: 26
-    hex: true
+    bitCount: 2
   - name: Unknown2
-    bitCount: 32
-    hex: true
+    bitCount: 8
   - name: Unknown3
-    bitCount: 32
-    hex: true
+    bitCount: 8
   - name: Unknown4
+    bitCount: 8
+  - name: SFX ID
     bitCount: 32
-    hex: true
+  - name: Unknown5
+    bitCount: 32
+  - name: Unknown6
+    bitCount: 8
+  - name: Unknown7
+    bitCount: 8
+  - name: Unknown8
+    bitCount: 8
+  - name: Unknown9
+    bitCount: 8
 
 - code: 40
   name: Animate Texture
