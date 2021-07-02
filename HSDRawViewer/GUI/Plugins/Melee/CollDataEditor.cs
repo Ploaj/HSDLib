@@ -1078,5 +1078,145 @@ namespace HSDRawViewer.GUI.Plugins
                 PushState();
             }*/
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void splitCollisionGroupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SelectedLineGroup != null)
+            {
+                // use buckets to split collisions
+
+                var lines = SelectedGroupLines;
+
+                var limit = 20;
+
+                // split lines into sections
+                List<CollLineGroup> groups = new List<CollLineGroup>();
+                groups.Add(SelectedLineGroup);
+
+                int splitGroup = CheckLineGroupLimit(groups, limit);
+                while (splitGroup != -1)
+                {
+                    var group_to_split = groups[splitGroup];
+
+                    foreach (var l in GetLinesInRange(lines, group_to_split.Range))
+                    {
+                        l.Group = null;
+                        l.AltNext = null;
+                        l.AltPrevious = null;
+                    }
+
+                    // decide vertical vs horizontal split
+                    var range1 = new Vector4(
+                        group_to_split.Range.X, 
+                        group_to_split.Range.Y, 
+                        (group_to_split.Range.X + group_to_split.Range.Z) / 2, 
+                        group_to_split.Range.W);
+
+                    var range2 = new Vector4(
+                        (group_to_split.Range.X + group_to_split.Range.Z) / 2,
+                        group_to_split.Range.Y,
+                        group_to_split.Range.Z,
+                        group_to_split.Range.W);
+
+                    var newGroup = new CollLineGroup();
+                    newGroup.Range = range2;
+                    group_to_split.Range = range1;
+
+                    foreach (var l in GetLinesInRange(lines, range1))
+                        l.Group = group_to_split;
+
+                    var lines2 = GetLinesInRange(lines, range2).ToList();
+                    foreach (var l in lines2)
+                    {
+                        if (l.Group == null)
+                        {
+                            l.Group = newGroup;
+                        }
+                        else
+                        {
+                            // duplicate line
+                            //var copy = ObjectExtensions.Copy(l);
+                            //copy.Group = newGroup;
+                            //Lines.Add(copy);
+                        }
+                    }
+
+                    LineGroups.Add(newGroup);
+                    groups.Add(newGroup);
+
+                    splitGroup = CheckLineGroupLimit(groups, limit);
+                }
+
+                foreach (var g in groups)
+                {
+                    var verts = new List<CollVertex>();
+                    foreach (var l in Lines.Where(p => p.Group == g))
+                    {
+                        verts.Add(l.v1);
+                        verts.Add(l.v2);
+                    }
+                    g.CalcuateRange(verts);
+                }
+            }
+        }
+
+        public CollLine GetNextLine(CollLine line)
+        {
+            foreach (var l in Lines)
+            {
+                if (l == line)
+                    continue;
+
+                if (line.v2 == l.v1)
+                    return l;
+            }
+            return null;
+        }
+
+        public CollLine GetPrevLine(CollLine line)
+        {
+            foreach (var l in Lines)
+            {
+                if (l == line)
+                    continue;
+
+                if (line.v1 == l.v2)
+                    return l;
+            }
+            return null;
+        }
+
+        private int CheckLineGroupLimit(IEnumerable<CollLineGroup> groups, int limit)
+        {
+            int index = 0;
+            foreach (var g in groups)
+            {
+                if (GetNumberOfLinesInGroup(g) > limit)
+                    return index;
+                index++;
+            }
+            return -1;
+        }
+
+        private int GetNumberOfLinesInGroup(CollLineGroup group)
+        {
+            int num = 0;
+            foreach (var l in Lines)
+                if (l.Group == group)
+                    num++;
+            return num;
+        }
+
+        private IEnumerable<CollLine> GetLinesInRange(IEnumerable<CollLine> lines, Vector4 range)
+        {
+            foreach (var l in lines)
+                if (l.InRange(range))
+                    yield return l;
+        }
     }
 }

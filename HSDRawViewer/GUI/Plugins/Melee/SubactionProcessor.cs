@@ -238,11 +238,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         Hitboxes.Add(new Hitbox()
                         {
                             ID = cmd.Parameters[0],
-                            BoneID = cmd.Parameters[2],
-                            Size = ((short)cmd.Parameters[5] / 256f),
-                            Point1 = new Vector3(cmd.Parameters[6] / 256f, cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f),
-                            Angle = cmd.Parameters[9],
-                            Element = cmd.Parameters[15]
+                            BoneID = cmd.Parameters[3],
+                            Size = ((short)cmd.Parameters[6] / 256f),
+                            Point1 = new Vector3(cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f),
+                            Angle = cmd.Parameters[10],
+                            Element = cmd.Parameters[19]
                         });
                         break;
                     case 13 << 2: // adjust size

@@ -353,6 +353,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public bool DynamicCollision { get; set; } = false;
 
+        public bool LinksToAnotherGroup
+        {
+            get
+            {
+                return AltNext != null || AltPrevious != null;
+            }
+        }
+
         public CollPhysics CollisionFlag { get; set; } = CollPhysics.Bottom;
         public CollProperty Flag { get; set; } = 0;
         public CollMaterial Material { get; set; } = CollMaterial.Basic;
@@ -393,6 +401,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 else
                     CollisionFlag = CollPhysics.Top;
             }
+        }
+
+        public bool InRange(Vector4 range)
+        {
+            return (X1 >= range.X && X1 < range.Z && Y1 >= range.Y && Y1 < range.W) ||
+                (X2 >= range.X && X2 < range.Z && Y2 >= range.Y && Y2 < range.W);
         }
 
         public override string ToString()

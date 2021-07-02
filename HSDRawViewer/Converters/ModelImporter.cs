@@ -61,6 +61,9 @@ namespace HSDRawViewer.Converters
 
         [Category("Debug Options"), DisplayName("Clean Root Node"), Description("")]
         public bool CleanRoot { get; set; } = false;
+
+        [Category("Debug Options"), DisplayName("Melee-ify"), Description("")]
+        public bool Meleeify { get; set; } = false;
 #endif
 
 
@@ -327,6 +330,88 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="root"></param>
+        private static void Meleeify(IOBone root)
+        {
+            Dictionary<IOBone, System.Numerics.Matrix4x4> worldTransform = new Dictionary<IOBone, System.Numerics.Matrix4x4>();
+            Queue<IOBone> queue = new Queue<IOBone>();
+
+            // gather final positions
+            queue.Enqueue(root);
+            while (queue.Count > 0)
+            {
+                var bone = queue.Dequeue();
+
+                worldTransform.Add(bone, bone.WorldTransform);
+
+                foreach (var child in bone.Children)
+                    queue.Enqueue(child);
+            }
+
+            // reset skeleton
+            queue.Enqueue(root);
+            while (queue.Count > 0)
+            {
+                var bone = queue.Dequeue();
+
+                // reset rotation and scale
+                List<string> specialBones = new List<string>() { "LShoulderJA", "RShoulderJA",
+    "RHaveN", "LHaveN",
+    "LLegJA", "LFootJA",
+    "RLegJA", "RFootJA"};
+
+                List<string> commonBones = new List<string>()
+                {
+                    "TopN", "TransN", "XRotN", "YRotN", "HipN", "WaistN", "LLegJA", "LLegJ", "LKneeJ", "LFootJA", "LFootJ", "RLegJA", "RLegJ", "RKneeJ", "RFootJA", "RFootJ", "BustN", "LShoulderN", "LShoulderJA", "LShoulderJ", "LArmJ", "LHandN", "L1stNa", "L1stNb", "L2ndNa", "L2ndNb", "L3rdNa", "L3rdNb", "L4thNa", "L4thNb", "LThumbNa", "LThumbNb", "LHandNb", "NeckN", "HeadN", "RShoulderN", "RShoulderJA", "RShoulderJ", "RArmJ", "RHandN", "R1stNa", "R1stNb", "R2ndNa", "R2ndNb", "R3rdNa", "R3rdNb", "R4thNa", "R4thNb", "RThumbNa", "RThumbNb", "RHandNb", "ThrowN", "TransN2"
+                };
+
+                Vector3[] specialBoneRotations = new Vector3[]
+                {
+                    new Vector3(-90, 0, 0), new Vector3(-90, 0,-180),
+                    new Vector3(0, -90, -180), new Vector3(-90, -90, 270),
+                    new Vector3(-90, 0, -90), new Vector3(0, 0, -90),
+                    new Vector3(-90, 0, -90), new Vector3(0, 0, -90)
+                };
+
+                var boneIndex = specialBones.IndexOf(bone.Name);
+
+                if (boneIndex != -1)
+                {
+                    var r = specialBoneRotations[boneIndex];
+                    bone.RotationEuler = new System.Numerics.Vector3((float)(r.X * Math.PI / 180), (float)(r.Y * Math.PI / 180), (float)(r.Z * Math.PI / 180));
+                }
+                else
+                if (commonBones.Contains(bone.Name))
+                {
+                    bone.Rotation = new System.Numerics.Quaternion(0, 0, 0, 1);
+                }
+                bone.Scale = new System.Numerics.Vector3(1, 1, 1);
+
+                bone.Translation = new System.Numerics.Vector3(0, 0, 0);
+
+                // calcuate new translation
+                if (bone.Parent != null)
+                {
+                    var currentPoint = System.Numerics.Vector3.Transform(System.Numerics.Vector3.Zero, bone.WorldTransform);
+                    var targetPoint = System.Numerics.Vector3.Transform(System.Numerics.Vector3.Zero, worldTransform[bone]);
+                    var dis = System.Numerics.Vector3.Subtract(targetPoint, currentPoint);
+
+                    if (System.Numerics.Matrix4x4.Invert(bone.Parent.WorldTransform, out System.Numerics.Matrix4x4 inverse))
+                    {
+                        bone.Translation = System.Numerics.Matrix4x4.Multiply(worldTransform[bone], inverse).Translation;
+
+                        Console.WriteLine(bone.Name + " " + bone.Translation.ToString());
+                    }
+                }
+
+                foreach (var child in bone.Children)
+                    queue.Enqueue(child);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="bone"></param>
         /// <returns></returns>
         private HSD_JOBJ IOBoneToJOBJ(IOBone bone)
@@ -349,6 +434,12 @@ namespace HSDRawViewer.Converters
 
                 // clean scale
                 bone.Scale = new System.Numerics.Vector3(1, 1, 1);
+            }
+
+            //
+            if (bone.Parent == null && Settings.Meleeify)
+            {
+                Meleeify(bone);
             }
 #endif
 

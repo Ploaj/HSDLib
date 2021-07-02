@@ -42,9 +42,9 @@
             this.editLineMenu = new System.Windows.Forms.ToolStripDropDownButton();
             this.addToSelectedGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.cbSelectType = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Groups = new System.Windows.Forms.TabPage();
@@ -54,13 +54,15 @@
             this.flipDirectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.guessCollisionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addGroupButton = new System.Windows.Forms.ToolStripButton();
+            this.deleteGroupButton = new System.Windows.Forms.ToolStripButton();
             this.showAllCheckBox = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listLines = new System.Windows.Forms.ListBox();
             this.toolStrip3 = new System.Windows.Forms.ToolStrip();
             this.saveButton = new System.Windows.Forms.ToolStripButton();
             this.cbRenderModes = new System.Windows.Forms.ToolStripComboBox();
-            this.deleteGroupButton = new System.Windows.Forms.ToolStripButton();
+            this.splitCollisionGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolBox.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -195,6 +197,18 @@
             this.splitLineToolStripMenuItem.Text = "Split Line";
             this.splitLineToolStripMenuItem.Click += new System.EventHandler(this.splitLineToolStripMenuItem_Click);
             // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.propertyGrid1.Location = new System.Drawing.Point(6, 44);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.propertyGrid1.Size = new System.Drawing.Size(264, 243);
+            this.propertyGrid1.TabIndex = 4;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
+            // 
             // cbSelectType
             // 
             this.cbSelectType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -217,18 +231,6 @@
             this.label1.Size = new System.Drawing.Size(70, 13);
             this.label1.TabIndex = 3;
             this.label1.Text = "Select Mode:";
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.propertyGrid1.Location = new System.Drawing.Point(6, 44);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid1.Size = new System.Drawing.Size(264, 243);
-            this.propertyGrid1.TabIndex = 4;
-            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
             // listBox1
             // 
@@ -283,7 +285,9 @@
             this.optionsDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.calculateRangeToolStripMenuItem,
             this.flipDirectionToolStripMenuItem,
-            this.guessCollisionsToolStripMenuItem});
+            this.guessCollisionsToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.splitCollisionGroupToolStripMenuItem});
             this.optionsDropDown.Image = ((System.Drawing.Image)(resources.GetObject("optionsDropDown.Image")));
             this.optionsDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.optionsDropDown.Name = "optionsDropDown";
@@ -293,21 +297,21 @@
             // calculateRangeToolStripMenuItem
             // 
             this.calculateRangeToolStripMenuItem.Name = "calculateRangeToolStripMenuItem";
-            this.calculateRangeToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.calculateRangeToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.calculateRangeToolStripMenuItem.Text = "Calculate Range";
             this.calculateRangeToolStripMenuItem.Click += new System.EventHandler(this.buttonCalculateRange_Click);
             // 
             // flipDirectionToolStripMenuItem
             // 
             this.flipDirectionToolStripMenuItem.Name = "flipDirectionToolStripMenuItem";
-            this.flipDirectionToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.flipDirectionToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.flipDirectionToolStripMenuItem.Text = "Flip Direction";
             this.flipDirectionToolStripMenuItem.Click += new System.EventHandler(this.flipDirectionToolStripMenuItem_Click);
             // 
             // guessCollisionsToolStripMenuItem
             // 
             this.guessCollisionsToolStripMenuItem.Name = "guessCollisionsToolStripMenuItem";
-            this.guessCollisionsToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.guessCollisionsToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
             this.guessCollisionsToolStripMenuItem.Text = "Guess Collisions";
             this.guessCollisionsToolStripMenuItem.Click += new System.EventHandler(this.guessCollisionsToolStripMenuItem_Click);
             // 
@@ -320,6 +324,16 @@
             this.addGroupButton.Size = new System.Drawing.Size(23, 22);
             this.addGroupButton.Text = "Add Group";
             this.addGroupButton.Click += new System.EventHandler(this.buttonAddGroup_Click);
+            // 
+            // deleteGroupButton
+            // 
+            this.deleteGroupButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.deleteGroupButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
+            this.deleteGroupButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.deleteGroupButton.Name = "deleteGroupButton";
+            this.deleteGroupButton.Size = new System.Drawing.Size(23, 22);
+            this.deleteGroupButton.Text = "Delete Group";
+            this.deleteGroupButton.Click += new System.EventHandler(this.buttonDeleteGroup_Click);
             // 
             // showAllCheckBox
             // 
@@ -384,15 +398,17 @@
             this.cbRenderModes.Name = "cbRenderModes";
             this.cbRenderModes.Size = new System.Drawing.Size(121, 25);
             // 
-            // deleteGroupButton
+            // splitCollisionGroupToolStripMenuItem
             // 
-            this.deleteGroupButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.deleteGroupButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
-            this.deleteGroupButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.deleteGroupButton.Name = "deleteGroupButton";
-            this.deleteGroupButton.Size = new System.Drawing.Size(23, 22);
-            this.deleteGroupButton.Text = "Delete Group";
-            this.deleteGroupButton.Click += new System.EventHandler(this.buttonDeleteGroup_Click);
+            this.splitCollisionGroupToolStripMenuItem.Name = "splitCollisionGroupToolStripMenuItem";
+            this.splitCollisionGroupToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.splitCollisionGroupToolStripMenuItem.Text = "Split Collision Group";
+            this.splitCollisionGroupToolStripMenuItem.Click += new System.EventHandler(this.splitCollisionGroupToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(179, 6);
             // 
             // CollDataEditor
             // 
@@ -455,5 +471,7 @@
         private System.Windows.Forms.ToolStripButton saveButton;
         private System.Windows.Forms.ToolStripComboBox cbRenderModes;
         private System.Windows.Forms.ToolStripButton deleteGroupButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem splitCollisionGroupToolStripMenuItem;
     }
 }

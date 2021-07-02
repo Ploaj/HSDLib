@@ -1,10 +1,17 @@
 ﻿using HSDRaw;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI;
 using System;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
 {
+#if DEBUG
+    public class SubactionTableRename
+    {
+        public string Name { get; set; }
+    }
+#endif
     public class SubactionTableContextMenu : CommonContextMenu
     {
         public override Type[] SupportedTypes { get; } = new Type[] { typeof(SBM_FighterActionTable) };
@@ -33,7 +40,41 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(Export);
-            
+
+#if DEBUG
+
+            MenuItem rename = new MenuItem("Rename Symbols");
+            rename.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
+                {
+                    var prop = new SubactionTableRename();
+                    using (PropertyDialog d = new PropertyDialog("Fighter Symbol Rename", prop))
+                    {
+                        if (d.ShowDialog() == DialogResult.OK)
+                        {
+                            var tables = table.Commands;
+
+                            foreach (var c in tables)
+                            {
+                                if (c.SymbolName != null && !string.IsNullOrEmpty(c.SymbolName.Value))
+                                {
+                                    var sym = c.SymbolName.Value;
+
+                                    var newsym = System.Text.RegularExpressions.Regex.Replace(sym, @"(?=Ply)(.)*(?=5K)", prop.Name); ;
+
+                                    c.SymbolName.Value = newsym;
+                                }
+                            }
+
+                            table.Commands = tables;
+                        }
+                    }
+                }
+            };
+            MenuItems.Add(rename);
+#endif
+
         }
     }
 }

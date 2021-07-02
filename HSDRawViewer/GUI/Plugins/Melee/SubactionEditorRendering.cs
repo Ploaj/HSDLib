@@ -729,8 +729,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             Bone = 75,
             Bottom = 1.75f,
             Top = 9.63f,
-            Color1 = new Vector3(1),
-            Color2 = new Vector3()
+            Color1 = new Vector3(1, 1, 1),
+            Color2 = new Vector3(0, 1, 1)
         };
 
         /// <summary>

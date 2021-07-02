@@ -119,6 +119,7 @@
     - Nothing (No Graphic)
   - name: Shield Damage
     bitCount: 8
+    signed: true
   - name: Hit SFX Severity
     bitCount: 3
     enums:
@@ -172,12 +173,20 @@
     bitCount: 23
 
 - code: 14
-  name: Set Hitbox Flags
+  name: Set Hitbox Interaction
   parameters:
   - name: Hitbox ID
     bitCount: 24
-  - name: Flags
-    bitCount: 2
+  - name: Type
+    bitCount: 1
+    enums:
+    - Fighter interaction
+    - Non-fighter interaction
+  - name: Value
+    bitCount: 1
+    enums:
+    - Cannot interact
+    - Can interact
 
 - code: 15
   name: Remove Hitbox

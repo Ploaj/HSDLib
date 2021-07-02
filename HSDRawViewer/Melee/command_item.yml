@@ -80,7 +80,7 @@
     - Screw Attack
     - Poison Flower
     - Nothing
-  - name: Flag1
+  - name: Can Clank
     bitCount: 1
     enums:
     - false
@@ -125,27 +125,27 @@
     - true
   - name: Hit Cooldown (per fighter)
     bitCount: 8
-  - name: Flag4 (0x08 @ 0x41)
+  - name: Timed Rehit on Non-Fighter Enabled
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag5 (0x04 @ 0x41)
+  - name: Timed Rehit on Fighter Enabled
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag6 (0x02 @ 0x41)
+  - name: Timed Rehit on Shield Enabled
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag7 (0x01 @ 0x41)
+  - name: Reflectable
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag8 (0x80 @ 0x42)
+  - name: Absorbable
     bitCount: 1
     enums:
     - false
@@ -160,7 +160,7 @@
     enums:
     - false
     - true
-  - name: Flag11 (0x10 @ 0x42)
+  - name: Deflectable
     bitCount: 1
     enums:
     - false
@@ -175,22 +175,22 @@
     enums:
     - false
     - true
-  - name: Flag14 (0x02 @ 0x42)
+  - name: Ignore Ungrabbable Hurtboxes
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag15 (0x01 @ 0x42)
+  - name: Interact with Non-Fighter
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag16 (0x80 @ 0x43)
+  - name: Item Hit Interaction
     bitCount: 1
     enums:
     - false
     - true
-  - name: Flag17 
+  - name: Pokemon and Warp Star Hitbox
     bitCount: 1
     enums:
     - false
