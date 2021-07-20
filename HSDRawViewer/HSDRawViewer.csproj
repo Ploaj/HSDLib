@@ -147,9 +147,7 @@
     <Compile Include="ContextMenus\SplineContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\SubactionTableContextMenu.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="ContextMenus\SubactionTableContextMenu.cs" />
     <Compile Include="ContextMenus\UnidentifiedContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -443,6 +441,7 @@
     <Compile Include="PluginManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RawCommand.cs" />
     <Compile Include="Rendering\Animation\AnimManager.cs" />
     <Compile Include="Rendering\Animation\AnimNode.cs" />
     <Compile Include="Rendering\Animation\MotAnimManager.cs" />

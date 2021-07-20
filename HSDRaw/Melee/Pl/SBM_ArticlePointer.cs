@@ -63,7 +63,7 @@ namespace HSDRaw.Melee.Pl
         Normal,
         OpenPalm,
         Grip,
-        Outward
+        BentWrist
     }
 
     /// <summary>

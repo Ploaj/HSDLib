@@ -20,6 +20,7 @@
         UseJointPosFtDir_Ground,
         FollowJointPos,
         FollowJointPos_FtDir,
+        FollowJointPosUseGObjScale
     }
 
     public class MEX_EffectTypeLookup : HSDAccessor

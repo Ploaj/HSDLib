@@ -19,11 +19,11 @@ namespace HSDRawViewer.Converters
             { CollMaterial.Wood, "stroke:#c08040" },
             { CollMaterial.HeavyMetal, "stroke:#604040" },
             { CollMaterial.LightMetal, "stroke:#404040" },
-            { CollMaterial.UnkFlatZone, "stroke:#c0c0c0" },
+            { CollMaterial.Felt, "stroke:#c0c0c0" },
             { CollMaterial.AlienGoop, "stroke:#df8f7f" },
             { CollMaterial.Water, "stroke:#3030ff" },
             { CollMaterial.Glass, "stroke:#c0c0ff" },
-            { CollMaterial.Checkered, "stroke:#ffffc0" },
+            { CollMaterial.Cardboard, "stroke:#ffffc0" },
             { CollMaterial.FlatZone, "stroke:#c0c0c0" },
         };
 

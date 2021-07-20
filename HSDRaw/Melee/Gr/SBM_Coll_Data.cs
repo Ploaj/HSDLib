@@ -11,18 +11,18 @@ namespace HSDRaw.Melee.Gr
         Wood        = 4,
         LightMetal  = 5,
         HeavyMetal  = 6,
-        UnkFlatZone = 7,
+        Cloth       = 7,
         AlienGoop   = 8,
-        Unknown9    = 9,
+        Felt        = 9,
         Water       = 10,
         Unknown11   = 11,
         Glass       = 12,
-        GreatBay    = 13,
-        Unknown14   = 14,
-        Unknown15   = 15,
+        TurtleShell = 13,
+        Snow        = 14,
+        Ice         = 15,
         FlatZone    = 16,
-        Unknown17   = 17,
-        Checkered   = 18
+        Swamp       = 17,
+        Cardboard   = 18
     }
 
     [Flags]

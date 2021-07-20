@@ -490,13 +490,13 @@ namespace HSDRawViewer.GUI.Plugins
             { CollMaterial.Wood, new Vector3(0xC0 / 255f, 0x80 / 255f, 0x40 / 255f) },
             { CollMaterial.HeavyMetal, new Vector3(0x60 / 255f, 0x40 / 255f, 0x40 / 255f) },
             { CollMaterial.LightMetal, new Vector3(0x40 / 255f, 0x40 / 255f, 0x40 / 255f) },
-            { CollMaterial.UnkFlatZone, new Vector3(0xC0 / 255f, 0xC0 / 255f, 0xC0 / 255f) },
+            { CollMaterial.Felt, new Vector3(0xC0 / 255f, 0xC0 / 255f, 0xC0 / 255f) },
             { CollMaterial.AlienGoop, new Vector3(0xDF / 255f, 0x8F / 255f, 0x7F / 255f) },
             { CollMaterial.Water, new Vector3(0x30 / 255f, 0x30 / 255f, 0xFF / 255f) },
             { CollMaterial.Glass, new Vector3(0xC0 / 255f, 0xC0 / 255f, 0xFF / 255f) },
-            { CollMaterial.Checkered, new Vector3(0xFF / 255f, 0xFF / 255f, 0xC0 / 255f) },
+            { CollMaterial.Cardboard, new Vector3(0xFF / 255f, 0xFF / 255f, 0xC0 / 255f) },
             { CollMaterial.FlatZone, new Vector3(0xC0 / 255f, 0xC0 / 255f, 0xC0 / 255f) },
-            { CollMaterial.GreatBay, new Vector3(1f, 0, 0) },
+            { CollMaterial.TurtleShell, new Vector3(1f, 0, 0) },
         };
 
         //private int BlinkTimer = 0;
@@ -1161,6 +1161,16 @@ namespace HSDRawViewer.GUI.Plugins
                         verts.Add(l.v2);
                     }
                     g.CalcuateRange(verts);
+                }
+
+                foreach (var l in lines)
+                {
+                    var next = GetNextLine(l);
+                    if (next != null && next.Group != l.Group)
+                    {
+                        l.AltNext = next;
+                        next.AltPrevious = l;
+                    }    
                 }
             }
         }

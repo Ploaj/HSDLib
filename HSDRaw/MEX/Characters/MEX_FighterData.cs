@@ -5,7 +5,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_FighterData : HSDAccessor
     {
-        public override int TrimmedSize => 0x70;
+        public override int TrimmedSize => 0x80;
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -63,6 +63,8 @@ namespace HSDRaw.MEX
 
         public HSDIntArray RaceToFinishTimeLimits { get => _s.GetReference<HSDIntArray>(0x6C); set => _s.SetReference(0x6C, value); }
 
+        public HSDIntArray RuntimeIntroParamLookup { get => _s.GetReference<HSDIntArray>(0x70); set => _s.SetReference(0x70, value); }
+
         //public HSDArrayAccessor<HSD_UShort> AdventureTrophyLookup { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x5C); set => _s.SetReference(0x5C, value); }
 
         public override void New()
@@ -96,6 +98,7 @@ namespace HSDRaw.MEX
             EndClassicFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
             EndMovieFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
             RaceToFinishTimeLimits = new HSDIntArray();
+            RuntimeIntroParamLookup = new HSDIntArray();
 
         }
     }

@@ -34,8 +34,6 @@ namespace HSDRawViewer
 
         public static bool RefreshNode = false;
 
-        private List<EditorBase> Editors = new List<EditorBase>();
-
         private IDockContent LastActiveContent = null;
 
         public static void Init()
@@ -297,10 +295,13 @@ namespace HSDRawViewer
         /// </summary>
         public void SaveDAT()
         {
-            foreach (var editor in Editors)
+            foreach (var c in dockPanel.Contents)
             {
-                if (editor is SaveableEditorBase save)
+                if (c is SaveableEditorBase save)
+                {
+                    System.Diagnostics.Debug.WriteLine($"{c.GetType()} is saving...");
                     save.OnDatFileSave();
+                }
             }
 
             if (RawHSDFile != null)
@@ -519,7 +520,7 @@ namespace HSDRawViewer
                 edit != null &&
                 edit is DockContent dc)
             {
-                Editors.Add(edit);
+                //Editors.Add(edit);
                 SelectedDataNode.Collapse();
                 edit.Node = SelectedDataNode;
 
