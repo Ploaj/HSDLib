@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using HSDRawViewer.Tools;
 using HSDRaw;
+using HSDRawViewer.Rendering.Models;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -33,7 +34,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private List<Command> Commands = new List<Command>();
 
-        public List<Hitbox> Hitboxes { get; internal set; } = new List<Hitbox>();
+        public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[4];
 
         public List<GFXSpawn> GFXOnFrame { get; internal set; } = new List<GFXSpawn>();
 
@@ -71,7 +72,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         public SubactionProcessor()
         {
-
+            for (int i = 0; i < Hitboxes.Length; i++)
+                Hitboxes[i] = new Hitbox();
         }
 
         /// <summary>
@@ -171,7 +173,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public void SetFrame(float frame)
         {
             GFXOnFrame.Clear();
-            Hitboxes.Clear();
+            // disable hitboxes
+            foreach (var v in Hitboxes)
+                v.Active = false;
+
             ResetState();
             CommandHashes.Clear();
             SetFrame(frame, 0, Commands);
@@ -184,9 +189,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             int loopAmt = 0;
             int loopPos = 0;
+
+            // process commands
             for (int i = 0; i < commands.Count; i++)
             {
-                var prev_time = time;
                 var cmd = commands[i];
                 switch (cmd.Action.Code)
                 {
@@ -233,32 +239,33 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 11 << 2: // Create Hitbox
                         // remove the current hitbox with this id
-                        Hitboxes.RemoveAll(e => e.ID == cmd.Parameters[0]);
-                        // add hitbox
-                        Hitboxes.Add(new Hitbox()
+                        if (cmd.Parameters[0] < Hitboxes.Length)
                         {
-                            ID = cmd.Parameters[0],
-                            BoneID = cmd.Parameters[3],
-                            Size = ((short)cmd.Parameters[6] / 256f),
-                            Point1 = new Vector3(cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f),
-                            Angle = cmd.Parameters[10],
-                            Element = cmd.Parameters[19]
-                        });
+                            var hb = Hitboxes[cmd.Parameters[0]];
+                            hb.CreatedOnFrame = time;
+                            hb.Active = true;
+                            hb.BoneID = cmd.Parameters[3];
+                            hb.Size = ((short)cmd.Parameters[6] / 256f);
+                            hb.Point1 = new Vector3(cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f);
+                            hb.Angle = cmd.Parameters[10];
+                            hb.Element = cmd.Parameters[19];
+                        }
                         break;
                     case 13 << 2: // adjust size
                         {
-                            var hb = Hitboxes.Find(e=>e.ID == cmd.Parameters[0]);
-                            if(hb != null)
-                            {
-                                hb.Size = (short)cmd.Parameters[1] / 150f;
-                            }
+                            if (cmd.Parameters[0] < Hitboxes.Length)
+                                Hitboxes[cmd.Parameters[0]].Size = ((short)cmd.Parameters[6] / 256f); //TODO: ? (short)cmd.Parameters[1] / 150f;
                         }
                         break;
                     case 15 << 2:
-                        Hitboxes.RemoveAll(e=>e.ID == cmd.Parameters[0]);
+                        if (cmd.Parameters[0] < Hitboxes.Length)
+                            Hitboxes[cmd.Parameters[0]].Active = false;
                         break;
                     case 16 << 2:
-                        Hitboxes.Clear();
+                        {
+                            foreach (var hb in Hitboxes)
+                                hb.Active = false;
+                        }
                         break;
                     case 20 << 2: // throw
                         ThrownFighter = true;
@@ -310,6 +317,16 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
                 if (time > frame)
                     break;
+
+            }
+
+            // Update hitbox interpolation
+            foreach (var v in Hitboxes)
+            {
+                if (v.Active)
+                {
+                    v.Interpolate = v.CreatedOnFrame != frame;
+                }
             }
 
             GFXOnFrame.RemoveAll(e => e.Frame != frame);
@@ -324,12 +341,33 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// </summary>
     public class Hitbox
     {
-        public int ID;
+        public bool Active { get => _active; set { _active = value; } }
+        private bool _active;
+        public float CreatedOnFrame;
+        public bool Interpolate;
         public int BoneID;
         public float Size;
         public int Angle;
         public int Element;
         public Vector3 Point1;
         public Vector3 Point2;
+
+        public Vector3 GetWorldPosition(JOBJManager manager)
+        {
+            if (manager == null)
+                return Point1;
+
+            var boneID = BoneID;
+            if (boneID == 0)
+                if (manager.GetJOBJ(1) != null && manager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
+                    boneID = 2;
+                else
+                    boneID = 1;
+
+            var transform = Matrix4.CreateTranslation(Point1) * manager.GetWorldTransform(boneID);
+            transform.ClearScale();
+
+            return Vector3.TransformPosition(Vector3.Zero, transform);
+        }
     }
 }

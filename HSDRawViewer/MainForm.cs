@@ -212,6 +212,22 @@ namespace HSDRawViewer
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="root"></param>
+        public static void AddRoot(string name, HSDAccessor accesor)
+        {
+            var root = new HSDRootNode()
+            {
+                Name = name,
+                Data = accesor
+            };
+
+            Instance.RawHSDFile.Roots.Add(root);
+            Instance.treeView1.Nodes.Add(new DataNode(name, accesor, root: root));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="filePath"></param>
         public void OpenFile(string filePath)
         {

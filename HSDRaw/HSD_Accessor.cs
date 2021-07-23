@@ -62,7 +62,8 @@ namespace HSDRaw
 
             if (TrimmedSize != -1
                 && _s.Length > TrimmedSize
-                && GetType() != typeof(Common.HSD_DOBJ)) // skip dobj for unknown reasons
+                && GetType() != typeof(Common.HSD_DOBJ)// skip dobj for unknown reasons
+                && GetType() != typeof(Melee.Pl.SBM_Article)) // skip article since other data can be stored there
             {
                 System.Diagnostics.Debug.WriteLine(GetType().Name + ": 0x" + _s.Length.ToString("X") + " => 0x" + TrimmedSize.ToString("X"));
                 trimmed += _s.Length - TrimmedSize;

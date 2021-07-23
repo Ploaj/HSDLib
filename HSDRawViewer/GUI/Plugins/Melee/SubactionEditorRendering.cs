@@ -274,7 +274,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <summary>
         /// 
         /// </summary>
-        private bool BuildDemoAJFile(string symbol, string ajpath, int actionstart, int actionend)
+        private bool BuildDemoAJFile(string symbol, string ajpath, int actionstart, int actionend, bool introFile)
         {
             if (string.IsNullOrEmpty(symbol))
                 return false;
@@ -308,7 +308,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // save aj file
             HSDRawFile file = new HSDRawFile();
-            file.Roots.Add(new HSDRootNode() { Name = symbol, Data = new HSDAccessor() { _s = new HSDStruct(data) } });
+            if (File.Exists(ajpath))
+            {
+                file = new HSDRawFile(ajpath);
+            }
+            var dataAccessor = new HSDAccessor() { _s = new HSDStruct(data) };
+            if (file[symbol] != null)
+                file[symbol].Data = dataAccessor;
+            else
+                file.Roots.Add(new HSDRootNode() { Name = symbol, Data = dataAccessor });
             file.Save(ajpath);
 
             return true;
@@ -521,30 +529,27 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// Calcuates the previous state hitboxes positions and returns them as a dictionary
         /// </summary>
         /// <returns></returns>
-        private Dictionary<int, Vector3> CalculatePreviousState()
+        private void CalculatePreviousState()
         {
             if (viewport.Frame == 0 || !interpolationToolStripMenuItem.Checked)
-                return null;
-
-            Dictionary<int, Vector3> previousPosition = new Dictionary<int, Vector3>();
+                return;
 
             JointManager.Frame = viewport.Frame - 1;
             JointManager.UpdateNoRender();
             SubactionProcess.SetFrame(viewport.Frame - 1);
 
+            int hitboxId = 0;
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var boneID = hb.BoneID;
-                if (boneID == 0)
-                    boneID = 1;
-                var transform = Matrix4.CreateTranslation(hb.Point1) * JointManager.GetWorldTransform(boneID);
-                transform = transform.ClearScale();
-                var pos = Vector3.TransformPosition(Vector3.Zero, transform);
-                previousPosition.Add(hb.ID, pos);
-            }
+                if (hb.Active)
+                    PreviousPositions[hitboxId] = hb.GetWorldPosition(JointManager);
 
-            return previousPosition;
+                hitboxId++;
+            }
         }
+
+        private Vector3[] PreviousPositions = new Vector3[4];
+        private Capsule capsule = new Capsule(Vector3.Zero, Vector3.Zero, 0);
 
         /// <summary>
         /// 
@@ -554,8 +559,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
+            // if model not loaded do nothing
+            if (JointManager == null)
+                return;
+
             // store previous hitbox state info
-            Dictionary<int, Vector3> previousPosition = CalculatePreviousState();
+            CalculatePreviousState();
 
             // reset model parts
             if (ModelPartsIndices != null)
@@ -582,46 +591,47 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 HurtboxRenderer.Render(JointManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
 
             // hitbox collision
+            int hitboxId = 0;
             foreach (var hb in SubactionProcess.Hitboxes)
             {
-                var boneID = hb.BoneID;
-                if (boneID == 0)
-                    if (JointManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
-                        boneID = 2;
-                    else
-                        boneID = 1;
-
-                var transform = Matrix4.CreateTranslation(hb.Point1) * JointManager.GetWorldTransform(boneID);
-
-                transform = transform.ClearScale();
+                if (!hb.Active)
+                {
+                    hitboxId++;
+                    continue;
+                }
 
                 float alpha = 0.4f;
                 Vector3 hbColor = HitboxColor;
+
+                var worldPosition = hb.GetWorldPosition(JointManager);
+                var worldTransform = Matrix4.CreateTranslation(worldPosition);
 
                 if (hb.Element == 8)
                     hbColor = GrabboxColor;
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
-                if (interpolationToolStripMenuItem.Checked && previousPosition != null && previousPosition.ContainsKey(hb.ID))
+                if (hb.Interpolate &&
+                    interpolationToolStripMenuItem.Checked)
                 {
-                    var pos = Vector3.TransformPosition(Vector3.Zero, transform);
-                    var cap = new Capsule(pos, previousPosition[hb.ID], hb.Size);
-                    cap.Draw(Matrix4.Identity, new Vector4(hbColor, alpha));
+                    capsule.SetParameters(worldPosition, PreviousPositions[hitboxId], hb.Size);
+                    capsule.Draw(Matrix4.Identity, new Vector4(hbColor, alpha));
                 }
                 else
                 {
-                    DrawShape.DrawSphere(transform, hb.Size, 16, 16, hbColor, alpha);
+                    DrawShape.DrawSphere(worldTransform, hb.Size, 16, 16, hbColor, alpha);
                 }
 
                 // draw hitbox angle
                 if (hitboxInfoToolStripMenuItem.Checked)
                 {
                     if (hb.Angle != 361)
-                        DrawShape.DrawAngleLine(cam, transform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
+                        DrawShape.DrawAngleLine(cam, worldTransform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
                     else
-                        DrawShape.DrawSakuraiAngle(cam, transform, hb.Size);
-                    GLTextRenderer.RenderText(cam, hb.ID.ToString(), transform, StringAlignment.Center, true);
+                        DrawShape.DrawSakuraiAngle(cam, worldTransform, hb.Size);
+
+                    GLTextRenderer.RenderText(cam, hitboxId.ToString(), worldTransform, StringAlignment.Center, true);
                 }
+                hitboxId++;
             }
 
             // draw shield during guard animation

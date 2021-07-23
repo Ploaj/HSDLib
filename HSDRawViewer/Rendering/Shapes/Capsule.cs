@@ -34,6 +34,17 @@ namespace HSDRawViewer.Rendering.Shapes
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="rad"></param>
+        public void SetParam(Vector3 p1, Vector3 p2, float rad)
+        {
+            SetParameters(p1, p2, rad);
+        }
+
+        /// <summary>
         /// Sets the parameters and regenerates the capsule if necessary
         /// </summary>
         /// <param name="p1"></param>
@@ -66,7 +77,6 @@ namespace HSDRawViewer.Rendering.Shapes
                 }
 
                 Orientation *= Matrix4.CreateTranslation(Point1);
-
 
                 CreateCapsule();
             }

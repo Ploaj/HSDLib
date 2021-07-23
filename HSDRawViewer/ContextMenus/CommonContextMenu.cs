@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSDRawViewer.GUI;
+using System;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
@@ -54,11 +55,29 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
 
+            MenuItem addRootReference = new MenuItem("Add Reference To Root");
+            addRootReference.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode != null)
+                {
+                    var setting = new RootNameCreator();
+                    using (var prop = new PropertyDialog("Symbol Name", setting))
+                        if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(setting.SymbolName))
+                            MainForm.AddRoot(setting.SymbolName, MainForm.SelectedDataNode.Accessor);
+                }
+            };
 
             MenuItems.Add(export);
             MenuItems.Add(import);
             MenuItems.Add(delete);
             MenuItems.Add("-");
+            MenuItems.Add(addRootReference);
+            MenuItems.Add("-");
+        }
+
+        public class RootNameCreator
+        {
+            public string SymbolName { get; set; } = "";
         }
     }
 }
