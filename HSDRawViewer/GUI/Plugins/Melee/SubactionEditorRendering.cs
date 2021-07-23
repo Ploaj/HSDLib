@@ -274,7 +274,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <summary>
         /// 
         /// </summary>
-        private bool BuildDemoAJFile(string symbol, string ajpath, int actionstart, int actionend, bool introFile)
+        private bool BuildDemoAJFile(string symbol, string ajpath, int actionstart, int actionend)
         {
             if (string.IsNullOrEmpty(symbol))
                 return false;
