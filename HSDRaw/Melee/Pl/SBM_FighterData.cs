@@ -27,19 +27,19 @@ namespace HSDRaw.Melee.Pl
         
         public SBM_ShieldModelContainer ShieldPoseContainer { get => _s.GetReference<SBM_ShieldModelContainer>(0x20); set => _s.SetReference(0x20, value); }
 
-        public HSDAccessor Unknown0x24 { get => _s.GetReference<HSDAccessor>(0x24); set => _s.SetReference(0x24, value); }
+        public HSDArrayAccessor<SBM_ActionChance> IdleActionChances { get => _s.GetReference<HSDArrayAccessor<SBM_ActionChance>>(0x24); set => _s.SetReference(0x24, value); }
 
-        public HSDAccessor Unknown0x28 { get => _s.GetReference<HSDAccessor>(0x28); set => _s.SetReference(0x28, value); }
+        public HSDArrayAccessor<SBM_ActionChance> WaitIdleActionChances { get => _s.GetReference<HSDArrayAccessor<SBM_ActionChance>>(0x28); set => _s.SetReference(0x28, value); }
 
         public SBM_PhysicsGroup Physics { get => _s.GetReference<SBM_PhysicsGroup>(0x2C); set => _s.SetReference(0x2C, value); }
 
         public SBM_HurtboxBank<SBM_Hurtbox> Hurtboxes { get => _s.GetReference<SBM_HurtboxBank<SBM_Hurtbox>>(0x30); set => _s.SetReference(0x30, value); }
 
-        public HSDAccessor Unknown0x34 { get => _s.GetReference<HSDAccessor>(0x34); set => _s.SetReference(0x34, value); }
+        public SBM_CenterBubble CenterBubble { get => _s.GetReference<SBM_CenterBubble>(0x34); set => _s.SetReference(0x34, value); }
 
         public HSDAccessor Unknown0x38 { get => _s.GetReference<HSDAccessor>(0x38); set => _s.SetReference(0x38, value); }
 
-        public HSDAccessor Unknown0x3C { get => _s.GetReference<HSDAccessor>(0x3C); set => _s.SetReference(0x3C, value); }
+        public SBM_Pl_CameraBox CameraBox { get => _s.GetReference<SBM_Pl_CameraBox>(0x3C); set => _s.SetReference(0x3C, value); }
 
         public HSDAccessor Unknown0x40 { get => _s.GetReference<HSDAccessor>(0x40); set => _s.SetReference(0x40, value); }
 
@@ -57,6 +57,41 @@ namespace HSDRaw.Melee.Pl
 
         public HSD_JOBJ MetalModel { get => _s.GetReference<HSD_JOBJ>(0x5C); set => _s.SetReference(0x5C, value); }
 
+    }
+
+    public class SBM_Pl_CameraBox : HSDAccessor
+    {
+        public override int TrimmedSize => 0x18;
+
+        public float YOffset { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+
+        public float ProjRight { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+
+        public float ProjLeft { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+
+        public float ProjTop { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+
+        public float ProjBottom { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+
+        public float x50_of_camera_box { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+    }
+
+    public class SBM_CenterBubble : HSDAccessor
+    {
+        public override int TrimmedSize => 0x08;
+
+        public int BoneIndex { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+
+        public float Size { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+    }
+
+    public class SBM_ActionChance : HSDAccessor
+    {
+        public override int TrimmedSize => 0x08;
+
+        public int ActionID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+
+        public int Chance { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
     }
 
     /// <summary>
