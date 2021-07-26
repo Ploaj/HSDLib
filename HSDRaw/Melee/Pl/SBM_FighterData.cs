@@ -37,11 +37,11 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_CenterBubble CenterBubble { get => _s.GetReference<SBM_CenterBubble>(0x34); set => _s.SetReference(0x34, value); }
 
-        public HSDAccessor Unknown0x38 { get => _s.GetReference<HSDAccessor>(0x38); set => _s.SetReference(0x38, value); }
+        public HSDArrayAccessor<SBM_Pl_CoinCollisionSphere> CoinCollisionSpheres { get => _s.GetReference<HSDArrayAccessor<SBM_Pl_CoinCollisionSphere>>(0x38); set => _s.SetReference(0x38, value); }
 
         public SBM_Pl_CameraBox CameraBox { get => _s.GetReference<SBM_Pl_CameraBox>(0x3C); set => _s.SetReference(0x3C, value); }
 
-        public HSDAccessor Unknown0x40 { get => _s.GetReference<HSDAccessor>(0x40); set => _s.SetReference(0x40, value); }
+        public SBM_Pl_ItemPickupParam ItemPickupParams { get => _s.GetReference<SBM_Pl_ItemPickupParam>(0x40); set => _s.SetReference(0x40, value); }
 
         public SBM_EnvironmentCollision EnvironmentCollision { get => _s.GetReference<SBM_EnvironmentCollision>(0x44); set => _s.SetReference(0x44, value); }
 
@@ -49,7 +49,7 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_PlayerSFXTable CommonSoundEffectTable { get => _s.GetReference<SBM_PlayerSFXTable>(0x4C); set => _s.SetReference(0x4C, value); }
 
-        public HSDAccessor Unknown0x50 { get => _s.GetReference<HSDAccessor>(0x50); set => _s.SetReference(0x50, value); }
+        public SBM_Pl_JostleBox JostleBox { get => _s.GetReference<SBM_Pl_JostleBox>(0x50); set => _s.SetReference(0x50, value); }
 
         public SBM_FighterBoneIDs FighterBoneTable { get => _s.GetReference<SBM_FighterBoneIDs>(0x54); set => _s.SetReference(0x54, value); }
 
@@ -57,6 +57,49 @@ namespace HSDRaw.Melee.Pl
 
         public HSD_JOBJ MetalModel { get => _s.GetReference<HSD_JOBJ>(0x5C); set => _s.SetReference(0x5C, value); }
 
+    }
+
+    public class SBM_Pl_CoinCollisionSphere : HSDAccessor
+    {
+        public override int TrimmedSize => 0x14;
+
+        public int BoneIndex { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+
+        public float XOffset { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+
+        public float YOffset { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+
+        public float ZOffset { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
+
+        public float Size { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+    }
+
+    public class SBM_Pl_JostleBox : HSDAccessor
+    {
+        public override int TrimmedSize => 0x8;
+
+        public float Offset { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+        public float Size { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+    }
+
+    public class SBM_Pl_ItemPickupParam : HSDAccessor
+    {
+        public override int TrimmedSize => 0x30;
+
+        public float LightGroundedXOffset { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+        public float LightGroundedYOffset { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+        public float LightGroundedXRange { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+        public float LightGroundedYRange { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
+
+        public float HeavyXOffset { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+        public float HeavyYOffset { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+        public float HeavyXRange { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        public float HeavyYRange { get => _s.GetFloat(0x1C); set => _s.SetFloat(0x1C, value); }
+
+        public float LightAerialXOffset { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
+        public float LightAerialYOffset { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
+        public float LightAerialXRange { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
+        public float LightAerialYRange { get => _s.GetFloat(0x2C); set => _s.SetFloat(0x2C, value); }
     }
 
     public class SBM_Pl_CameraBox : HSDAccessor
