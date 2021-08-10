@@ -643,7 +643,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 var boneID = gfx.Bone;
                 if (boneID == 0)
-                    if (JointManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
+                    if (JointManager.GetJOBJ(1) != null && JointManager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
                         boneID = 2;
                     else
                         boneID = 1;
@@ -733,15 +733,23 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // sword trail
             //AfterImageRenderer.RenderAfterImage(JointManager, viewport.Frame, after_desc);
         }
-        
-        private static AfterImageDesc after_desc = new AfterImageDesc()
-        {
-            Bone = 75,
-            Bottom = 1.75f,
-            Top = 9.63f,
-            Color1 = new Vector3(1, 1, 1),
-            Color2 = new Vector3(0, 1, 1)
-        };
+
+        //private static AfterImageDesc after_desc = new AfterImageDesc()
+        //{
+        //    Bone = 57,//27,
+        //    Bottom = 0,
+        //    Top = 4,
+        //    Color1 = new Vector3(1, 1, 1),
+        //    Color2 = new Vector3(0, 1, 1)
+        //};
+        //private static AfterImageDesc after_desc = new AfterImageDesc()
+        //{
+        //    Bone = 75,
+        //    Bottom = 1.75f,
+        //    Top = 9.63f,
+        //    Color1 = new Vector3(1, 1, 1),
+        //    Color2 = new Vector3(0, 1, 1)
+        //};
 
         /// <summary>
         /// 

@@ -20,6 +20,7 @@ using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Converters.Animation;
+using HSDRaw.Tools;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -1741,6 +1742,31 @@ namespace HSDRawViewer.GUI.Plugins
         {
             using (PropertyDialog d = new PropertyDialog("Fog Settings", JointManager._fogParam))
                 d.ShowDialog();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class FrameSpeedModifierSettings
+        {
+            public List<FrameSpeedMultiplier> Modifiers { get; set; } = new List<FrameSpeedMultiplier>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fSMApplyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var mult = new FrameSpeedModifierSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Frame Speed Multipler Settings", mult))
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    JointManager.Animation.ApplyFSMs(mult.Modifiers);
+                    viewport.MaxFrame = JointManager.Animation.FrameCount;
+                }
         }
     }
 }

@@ -2,6 +2,9 @@
 using HSDRaw;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI;
+using OpenTK.Graphics.OpenGL;
+using OpenTK;
+using System;
 
 namespace HSDRawViewer.Rendering
 {
@@ -45,6 +48,7 @@ namespace HSDRawViewer.Rendering
         
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
+
         }
     }
 }

@@ -3,7 +3,7 @@ using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using HSDRaw.GX;
-using HSDRawViewer.Converters;
+using HSDRaw.Tools.KAR;
 using HSDRawViewer.Converters.AirRide;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.GX;
@@ -15,12 +15,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -149,6 +144,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             _viewport.Dock = DockStyle.Fill;
             _viewport.AddRenderer(this);
             tabControl1.TabPages[0].Controls.Add(_viewport);
+            _viewport.BringToFront();
 
             // set mode selection
             modeComboBox.ComboBox.DataSource = Enum.GetValues(typeof(EditorMode));
@@ -177,6 +173,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         public void SwitchMode(EditorMode mode)
         {
             _editMode = mode;
+
+            arrayMemberEditor1.SetArrayFromProperty(null, null);
 
             switch (_editMode)
             {
@@ -526,7 +524,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             if (list == null)
                 return;
 
-            var selected_pos = arrayMemberEditor1.SelectedObject as AirRideGrDataPosition.AirRideGrDataPositionProxy;
+            var selected_pos = arrayMemberEditor1.SelectedObject as AirRideGrDataPositionProxy;
 
             foreach (var p in list._positions)
             {
@@ -709,61 +707,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 _rangeSplines[i].x08 = -1;
                 _rangeSplines[i].x0C = -1;
                 _rangeSplines[i].x10 = -1;
-                CreateRangeSpline(_splines[i], out HSD_Spline left, out HSD_Spline right);
+                KAR_SplineTools.CreateRangeSpline(_splines[i], out HSD_Spline left, out HSD_Spline right);
                 _rangeSplines[i].LeftSpline = left;
                 _rangeSplines[i].RightSpline = right;
             }
-        }
-
-        private void CreateRangeSpline(HSD_Spline spline, out HSD_Spline left, out HSD_Spline right)
-        {
-            left = new HSD_Spline()
-            {
-                Tension = spline.Tension,
-                Lengths = spline.Lengths,
-                TotalLength = spline.TotalLength,
-            };
-            right = new HSD_Spline()
-            {
-                Tension = spline.Tension,
-                Lengths = spline.Lengths,
-                TotalLength = spline.TotalLength,
-            };
-
-            var points = spline.Points;
-            HSD_Vector3[] lp = new HSD_Vector3[points.Length];
-            HSD_Vector3[] rp = new HSD_Vector3[points.Length];
-            for (int i = 0; i < points.Length; i++)
-            {
-                var p = new Vector3(points[i].X, points[i].Y, points[i].Z);
-                var nrm = Vector3.Zero;
-
-                if (i < points.Length - 1)
-                {
-                    var norm1 = new Vector2(-(points[i + 1].Z - points[i].Z), (points[i + 1].X - points[i].X)).Normalized();
-                    nrm = new Vector3(norm1.X, 0, norm1.Y);
-                }
-
-                if (i > 0)
-                {
-                    var norm1 = new Vector2(-(points[i].Z - points[i - 1].Z), (points[i].X - points[i - 1].X)).Normalized();
-                    if (nrm == Vector3.Zero)
-                        nrm = new Vector3(norm1.X, 0, norm1.Y);
-                    else
-                        nrm = (nrm + new Vector3(norm1.X, 0, norm1.Y)) / 2;
-                }
-
-                nrm *= 10;
-
-                var l = p + nrm;
-                var r = p - nrm;
-
-                lp[i] = new HSD_Vector3() { X = l.X, Y = l.Y, Z = l.Z };
-                rp[i] = new HSD_Vector3() { X = r.X, Y = r.Y, Z = r.Z };
-            }
-
-            left.Points = lp;
-            right.Points = rp;
         }
 
         /// <summary>
@@ -937,75 +884,4 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class AirRideGrDataPosition
-    {
-        public class AirRideGrDataPositionProxy
-        {
-            public HSD_JOBJ _joint;
-            public KAR_grPositionData _data;
-
-            public float X
-            {
-                get => _joint == null ? _data.X : _joint.TX;
-                set { if (_joint == null) _data.X = value; else _joint.TY = value; }
-            }
-
-            public float Y
-            {
-                get => _joint == null ? _data.Y : _joint.TY;
-                set { if (_joint == null) _data.Y = value; else _joint.TY = value; }
-            }
-
-            public float Z
-            {
-                get => _joint == null ? _data.Z : _joint.TZ;
-                set { if (_joint == null) _data.Z = value; else _joint.TZ = value; }
-            }
-
-            public AirRideGrDataPositionProxy()
-            {
-                _data = new KAR_grPositionData();
-            }
-
-            public AirRideGrDataPositionProxy(HSD_JOBJ joint)
-            {
-                _joint = joint;
-            }
-
-            public AirRideGrDataPositionProxy(KAR_grPositionData data)
-            {
-                _data = data;
-            }
-
-            public override string ToString()
-            {
-                return $"({X}, {Y}, {Z})";
-            }
-        }
-
-        public AirRideGrDataPositionProxy[] _positions { get; set; } = new AirRideGrDataPositionProxy[0];
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="joint"></param>
-        /// <param name="list"></param>
-        public AirRideGrDataPosition(HSD_JOBJ joint, KAR_grPositionList list)
-        {
-            if (list == null) 
-                return;
-
-            if (list.JointIndices != null)
-            {
-                var joints = joint.BreathFirstList;
-                _positions = list.JointIndices.Array.Select(e => new AirRideGrDataPositionProxy(joints[e])).ToArray();
-            }
-            else
-            if (list.PositionData != null)
-                _positions = list.PositionData.Select(e => new AirRideGrDataPositionProxy(e)).ToArray();
-        }
-    }
 }

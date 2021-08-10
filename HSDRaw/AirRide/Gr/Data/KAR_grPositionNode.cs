@@ -30,9 +30,9 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public KAR_grPositionList Yakumonopos { get => _s.GetReference<KAR_grPositionList>(0x2C); set => _s.SetReference(0x2C, value); }
 
-        public KAR_grPositionList ItemAreaPos { get => _s.GetReference<KAR_grPositionList>(0x30); set => _s.SetReference(0x30, value); }
+        public KAR_grAreaPositionList ItemAreaPos { get => _s.GetReference<KAR_grAreaPositionList>(0x30); set => _s.SetReference(0x30, value); }
 
-        public KAR_grPositionList VehicleAreapos { get => _s.GetReference<KAR_grPositionList>(0x34); set => _s.SetReference(0x34, value); }
+        public KAR_grAreaPositionList VehicleAreapos { get => _s.GetReference<KAR_grAreaPositionList>(0x34); set => _s.SetReference(0x34, value); }
 
     }
 

@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
@@ -290,6 +291,26 @@ namespace HSDRawViewer.Rendering
         #endregion
 
         #region Tools
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fsms"></param>
+        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> fsms)
+        {
+            foreach (var n in Nodes)
+                foreach (var t in n.Tracks)
+                    t.ApplyFSMs(fsms);
+
+            // recalculate frame count
+            FrameCount = 0;
+            foreach (var n in Nodes)
+                foreach (var t in n.Tracks)
+                {
+                    var maxFrame = t.Keys.Max(e => e.Frame);
+                    FrameCount = Math.Max(FrameCount, maxFrame);
+                }
+        }
 
         /// <summary>
         /// Scales animation frames to be new size

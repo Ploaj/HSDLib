@@ -7,6 +7,16 @@ namespace HSDRaw.Tools
     /// <summary>
     /// 
     /// </summary>
+    public class FrameSpeedMultiplier
+    {
+        public int Frame { get; set; }
+
+        public float Rate { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class FOBJAnimState
     {
         public float p0 = 0;
@@ -309,6 +319,48 @@ namespace HSDRaw.Tools
                 fobj.SetKeys(Keys, TrackType, error);
 
             return fobj;
+        }
+
+        /// <summary>
+        /// Applies frame speed multiplier's to animation
+        /// </summary>
+        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> frameSpeedMultiplers)
+        {
+            //
+            var newKeys = new List<FOBJKey>();
+
+            // process animation with fsm
+            float frameRate = 1;
+            int frame = 0;
+            float maxFrame = 0;
+            for (float f = 0; f <= FrameCount;)
+            {
+                // check fsm
+                foreach (var v in frameSpeedMultiplers)
+                    if (f >= v.Frame && v.Frame >= maxFrame)
+                    {
+                        frameRate = v.Rate;
+                        maxFrame = v.Frame;
+                    }
+
+                // add new key
+                newKeys.Add(new FOBJKey()
+                {
+                    Frame = frame,
+                    Value = GetValue(f),
+                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
+                });
+
+                // advance animation
+                frame += 1;
+                f += frameRate;
+            }
+
+            // 
+            Keys = newKeys;
+
+            // compress track
+            AnimationKeyCompressor.CompressTrack(this);
         }
     }
     

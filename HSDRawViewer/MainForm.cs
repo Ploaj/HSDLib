@@ -12,6 +12,7 @@ using System.ComponentModel;
 using GCILib;
 using HSDRawViewer.GUI.Plugins.Melee;
 using HSDRaw.Common;
+using HSDRaw.Melee.Pl;
 
 namespace HSDRawViewer
 {
@@ -484,6 +485,10 @@ namespace HSDRawViewer
                 v.Close();
         }
 
+        // For model part previewing
+        static SBM_ModelPart prev_selected_part = null;
+        static int part_select_index = 0;
+
         /// <summary>
         /// Opens editor for currently selected node if editor exists
         /// </summary>
@@ -500,7 +505,8 @@ namespace HSDRawViewer
                 || SelectedDataNode.Accessor is HSD_MatAnimJoint
                 || SelectedDataNode.Accessor is HSD_ShapeAnimJoint
                 || SelectedDataNode.Accessor is HSD_FogDesc
-                || SelectedDataNode.Accessor is HSD_Camera)
+                || SelectedDataNode.Accessor is HSD_Camera
+                || SelectedDataNode.Accessor is SBM_ModelPart)
             {
                 //foreach (var v in dockPanel.Contents)
                 {
@@ -523,6 +529,25 @@ namespace HSDRawViewer
 
                         if (SelectedDataNode.Accessor is HSD_Camera camera)
                             jedit.Editor.SetCamera(camera);
+
+                        if (SelectedDataNode.Accessor is SBM_ModelPart modelPart && modelPart.Anims.Length > 0)
+                        {
+                            if (prev_selected_part == modelPart)
+                                part_select_index++;
+                            else
+                                part_select_index = 0;
+
+                            prev_selected_part = modelPart;
+
+                            if (part_select_index > modelPart.Anims.Length)
+                                part_select_index = 0;
+
+                            JointAnimManager manager = new JointAnimManager();
+                            for (int i = 0; i < modelPart.StartingBone; i++)
+                                manager.Nodes.Add(new AnimNode());
+                            manager.Nodes.AddRange(new JointAnimManager(modelPart.Anims[part_select_index]).Nodes);
+                            jedit.LoadAnimation(manager);
+                        }
                     }
                 }
             }
@@ -1066,6 +1091,13 @@ namespace HSDRawViewer
 
         #endregion
 
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fsm = new FSMTool())
+            {
+                fsm.ShowDialog();
+            }
+        }
     }
     
 }

@@ -58,6 +58,7 @@
             this.buttonMoveDown = new System.Windows.Forms.ToolStripButton();
             this.buttonDOBJDelete = new System.Windows.Forms.ToolStripButton();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.textureArrayEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.replaceTextureButton = new System.Windows.Forms.ToolStripButton();
             this.previewBox = new System.Windows.Forms.GroupBox();
@@ -66,21 +67,21 @@
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.importAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asMayaANIMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asAnimJointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asMotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asXMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
-            this.createAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editAnimationTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clearAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.importSceneSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportSceneSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.createToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.trimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.displaySettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fogSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -100,7 +101,8 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.splitter1 = new System.Windows.Forms.Splitter();
-            this.textureArrayEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
+            this.fSMApplyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.toolStrip3.SuspendLayout();
@@ -384,6 +386,29 @@
             this.tabPage3.Text = "Textures";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // textureArrayEditor
+            // 
+            this.textureArrayEditor.AllowDrop = true;
+            this.textureArrayEditor.DisplayItemImages = true;
+            this.textureArrayEditor.DisplayItemIndices = true;
+            this.textureArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textureArrayEditor.EnablePropertyView = false;
+            this.textureArrayEditor.EnablePropertyViewDescription = false;
+            this.textureArrayEditor.EnableToolStrip = false;
+            this.textureArrayEditor.ImageHeight = ((ushort)(64));
+            this.textureArrayEditor.ImageWidth = ((ushort)(64));
+            this.textureArrayEditor.ItemHeight = 64;
+            this.textureArrayEditor.ItemIndexOffset = 0;
+            this.textureArrayEditor.Location = new System.Drawing.Point(0, 27);
+            this.textureArrayEditor.Margin = new System.Windows.Forms.Padding(4);
+            this.textureArrayEditor.Name = "textureArrayEditor";
+            this.textureArrayEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            this.textureArrayEditor.Size = new System.Drawing.Size(304, 195);
+            this.textureArrayEditor.TabIndex = 0;
+            this.textureArrayEditor.SelectedObjectChanged += new System.EventHandler(this.textureArrayEditor_SelectedObjectChanged);
+            this.textureArrayEditor.DragDrop += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragDrop);
+            this.textureArrayEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragEnter);
+            // 
             // toolStrip4
             // 
             this.toolStrip4.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -420,6 +445,7 @@
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton2,
+            this.toolStripDropDownButton1,
             this.renderDropDown,
             this.toolStripLabel2,
             this.renderModeBox,
@@ -438,14 +464,6 @@
             this.importModelFromFileToolStripMenuItem,
             this.exportModelToFileToolStripMenuItem,
             this.toolStripSeparator2,
-            this.importAnimationToolStripMenuItem,
-            this.exportAnimationToolStripMenuItem,
-            this.toolStripSeparator8,
-            this.createAnimationToolStripMenuItem,
-            this.editAnimationTracksToolStripMenuItem,
-            this.editAnimationToolStripMenuItem,
-            this.clearAnimationToolStripMenuItem,
-            this.toolStripSeparator7,
             this.importSceneSettingsToolStripMenuItem,
             this.exportSceneSettingsToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
@@ -473,98 +491,6 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(196, 6);
             // 
-            // importAnimationToolStripMenuItem
-            // 
-            this.importAnimationToolStripMenuItem.Name = "importAnimationToolStripMenuItem";
-            this.importAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.importAnimationToolStripMenuItem.Text = "Import Animation";
-            this.importAnimationToolStripMenuItem.Click += new System.EventHandler(this.importFromFileToolStripMenuItem_Click);
-            // 
-            // exportAnimationToolStripMenuItem
-            // 
-            this.exportAnimationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.asMayaANIMToolStripMenuItem,
-            this.asFigatreeToolStripMenuItem,
-            this.asAnimJointToolStripMenuItem,
-            this.asMotToolStripMenuItem,
-            this.asXMLToolStripMenuItem});
-            this.exportAnimationToolStripMenuItem.Name = "exportAnimationToolStripMenuItem";
-            this.exportAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.exportAnimationToolStripMenuItem.Text = "Export Animation";
-            // 
-            // asMayaANIMToolStripMenuItem
-            // 
-            this.asMayaANIMToolStripMenuItem.Name = "asMayaANIMToolStripMenuItem";
-            this.asMayaANIMToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.asMayaANIMToolStripMenuItem.Text = "As Maya ANIM";
-            this.asMayaANIMToolStripMenuItem.Click += new System.EventHandler(this.mayaANIMToolStripMenuItem_Click);
-            // 
-            // asFigatreeToolStripMenuItem
-            // 
-            this.asFigatreeToolStripMenuItem.Name = "asFigatreeToolStripMenuItem";
-            this.asFigatreeToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.asFigatreeToolStripMenuItem.Text = "As Figatree";
-            this.asFigatreeToolStripMenuItem.Click += new System.EventHandler(this.figaTreeToolStripMenuItem_Click);
-            // 
-            // asAnimJointToolStripMenuItem
-            // 
-            this.asAnimJointToolStripMenuItem.Name = "asAnimJointToolStripMenuItem";
-            this.asAnimJointToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.asAnimJointToolStripMenuItem.Text = "As AnimJoint";
-            this.asAnimJointToolStripMenuItem.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
-            // 
-            // asMotToolStripMenuItem
-            // 
-            this.asMotToolStripMenuItem.Name = "asMotToolStripMenuItem";
-            this.asMotToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.asMotToolStripMenuItem.Text = "As MOT";
-            this.asMotToolStripMenuItem.Click += new System.EventHandler(this.motToolStripMenuItem_Click);
-            // 
-            // asXMLToolStripMenuItem
-            // 
-            this.asXMLToolStripMenuItem.Name = "asXMLToolStripMenuItem";
-            this.asXMLToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.asXMLToolStripMenuItem.Text = "As XML";
-            this.asXMLToolStripMenuItem.Click += new System.EventHandler(this.xmlToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator8
-            // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(196, 6);
-            // 
-            // createAnimationToolStripMenuItem
-            // 
-            this.createAnimationToolStripMenuItem.Name = "createAnimationToolStripMenuItem";
-            this.createAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.createAnimationToolStripMenuItem.Text = "Create Animation";
-            this.createAnimationToolStripMenuItem.Click += new System.EventHandler(this.createAnimationToolStripMenuItem_Click);
-            // 
-            // editAnimationTracksToolStripMenuItem
-            // 
-            this.editAnimationTracksToolStripMenuItem.Name = "editAnimationTracksToolStripMenuItem";
-            this.editAnimationTracksToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.editAnimationTracksToolStripMenuItem.Text = "Edit Animation";
-            this.editAnimationTracksToolStripMenuItem.Click += new System.EventHandler(this.viewAnimationGraphToolStripMenuItem_Click);
-            // 
-            // editAnimationToolStripMenuItem
-            // 
-            this.editAnimationToolStripMenuItem.Name = "editAnimationToolStripMenuItem";
-            this.editAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.editAnimationToolStripMenuItem.Text = "Trim Animation";
-            this.editAnimationToolStripMenuItem.Click += new System.EventHandler(this.editAnimationToolStripMenuItem_Click);
-            // 
-            // clearAnimationToolStripMenuItem
-            // 
-            this.clearAnimationToolStripMenuItem.Name = "clearAnimationToolStripMenuItem";
-            this.clearAnimationToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.clearAnimationToolStripMenuItem.Text = "Clear Animation";
-            this.clearAnimationToolStripMenuItem.Click += new System.EventHandler(this.clearAnimButton_Click);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(196, 6);
-            // 
             // importSceneSettingsToolStripMenuItem
             // 
             this.importSceneSettingsToolStripMenuItem.Name = "importSceneSettingsToolStripMenuItem";
@@ -578,6 +504,112 @@
             this.exportSceneSettingsToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.exportSceneSettingsToolStripMenuItem.Text = "Export Scene Settings";
             this.exportSceneSettingsToolStripMenuItem.Click += new System.EventHandler(this.exportSceneSettingsToolStripMenuItem_Click);
+            // 
+            // toolStripDropDownButton1
+            // 
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importToolStripMenuItem1,
+            this.toolStripMenuItem1,
+            this.toolStripSeparator9,
+            this.createToolStripMenuItem,
+            this.editToolStripMenuItem1,
+            this.trimToolStripMenuItem,
+            this.clearToolStripMenuItem,
+            this.toolStripSeparator7,
+            this.fSMApplyToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(76, 22);
+            this.toolStripDropDownButton1.Text = "Animation";
+            // 
+            // createToolStripMenuItem
+            // 
+            this.createToolStripMenuItem.Name = "createToolStripMenuItem";
+            this.createToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.createToolStripMenuItem.Text = "Create";
+            this.createToolStripMenuItem.Click += new System.EventHandler(this.createAnimationToolStripMenuItem_Click);
+            // 
+            // importToolStripMenuItem1
+            // 
+            this.importToolStripMenuItem1.Name = "importToolStripMenuItem1";
+            this.importToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.importToolStripMenuItem1.Text = "Import";
+            this.importToolStripMenuItem1.Click += new System.EventHandler(this.importFromFileToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem3,
+            this.toolStripMenuItem4,
+            this.toolStripMenuItem5,
+            this.toolStripMenuItem6});
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem1.Text = "Export";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem2.Text = "As Maya ANIM";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.mayaANIMToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem3.Text = "As Figatree";
+            this.toolStripMenuItem3.Click += new System.EventHandler(this.figaTreeToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem4.Text = "As AnimJoint";
+            this.toolStripMenuItem4.Click += new System.EventHandler(this.animJointToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem5.Text = "As MOT";
+            this.toolStripMenuItem5.Click += new System.EventHandler(this.motToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem6.Text = "As XML";
+            this.toolStripMenuItem6.Click += new System.EventHandler(this.xmlToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(177, 6);
+            // 
+            // editToolStripMenuItem1
+            // 
+            this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.editToolStripMenuItem1.Text = "Edit";
+            this.editToolStripMenuItem1.Click += new System.EventHandler(this.viewAnimationGraphToolStripMenuItem_Click);
+            // 
+            // trimToolStripMenuItem
+            // 
+            this.trimToolStripMenuItem.Name = "trimToolStripMenuItem";
+            this.trimToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.trimToolStripMenuItem.Text = "Trim";
+            this.trimToolStripMenuItem.Click += new System.EventHandler(this.editAnimationToolStripMenuItem_Click);
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearToolStripMenuItem.Text = "Clear";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearAnimButton_Click);
             // 
             // renderDropDown
             // 
@@ -595,8 +627,8 @@
             this.renderDropDown.Image = ((System.Drawing.Image)(resources.GetObject("renderDropDown.Image")));
             this.renderDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.renderDropDown.Name = "renderDropDown";
-            this.renderDropDown.Size = new System.Drawing.Size(45, 22);
-            this.renderDropDown.Text = "View";
+            this.renderDropDown.Size = new System.Drawing.Size(74, 22);
+            this.renderDropDown.Text = "Rendering";
             // 
             // displaySettingsToolStripMenuItem
             // 
@@ -676,8 +708,8 @@
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(72, 22);
-            this.toolStripLabel3.Text = "DOBJ Mode:";
+            this.toolStripLabel3.Size = new System.Drawing.Size(107, 22);
+            this.toolStripLabel3.Text = "Object View Mode:";
             // 
             // toolStripComboBox2
             // 
@@ -744,28 +776,17 @@
             this.splitter1.TabIndex = 8;
             this.splitter1.TabStop = false;
             // 
-            // textureArrayEditor
+            // fSMApplyToolStripMenuItem
             // 
-            this.textureArrayEditor.AllowDrop = true;
-            this.textureArrayEditor.DisplayItemImages = true;
-            this.textureArrayEditor.DisplayItemIndices = true;
-            this.textureArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textureArrayEditor.EnablePropertyView = false;
-            this.textureArrayEditor.EnablePropertyViewDescription = false;
-            this.textureArrayEditor.EnableToolStrip = false;
-            this.textureArrayEditor.ImageHeight = ((ushort)(64));
-            this.textureArrayEditor.ImageWidth = ((ushort)(64));
-            this.textureArrayEditor.ItemHeight = 64;
-            this.textureArrayEditor.ItemIndexOffset = 0;
-            this.textureArrayEditor.Location = new System.Drawing.Point(0, 27);
-            this.textureArrayEditor.Margin = new System.Windows.Forms.Padding(4);
-            this.textureArrayEditor.Name = "textureArrayEditor";
-            this.textureArrayEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
-            this.textureArrayEditor.Size = new System.Drawing.Size(304, 195);
-            this.textureArrayEditor.TabIndex = 0;
-            this.textureArrayEditor.SelectedObjectChanged += new System.EventHandler(this.textureArrayEditor_SelectedObjectChanged);
-            this.textureArrayEditor.DragDrop += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragDrop);
-            this.textureArrayEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragEnter);
+            this.fSMApplyToolStripMenuItem.Name = "fSMApplyToolStripMenuItem";
+            this.fSMApplyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.fSMApplyToolStripMenuItem.Text = "FSM Apply";
+            this.fSMApplyToolStripMenuItem.Click += new System.EventHandler(this.fSMApplyToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
             // 
             // JobjEditor
             // 
@@ -822,19 +843,10 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripComboBox renderModeBox;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem importAnimationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem exportAnimationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem asMayaANIMToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem asFigatreeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem asAnimJointToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem asMotToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem asXMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
         private System.Windows.Forms.ToolStripDropDownButton renderDropDown;
         private System.Windows.Forms.ToolStripMenuItem showInViewportToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem clearAnimationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem editAnimationToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripDropDownButton jointOptionsDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem recalculateInverseBindsToolStripMenuItem;
@@ -858,20 +870,31 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem clearSelectedPOBJsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripMenuItem createAnimationToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripMenuItem importSceneSettingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportSceneSettingsToolStripMenuItem;
         private System.Windows.Forms.TabPage tabPage3;
         private ArrayMemberEditor textureArrayEditor;
         private System.Windows.Forms.ToolStrip toolStrip4;
         private System.Windows.Forms.ToolStripButton replaceTextureButton;
-        private System.Windows.Forms.ToolStripMenuItem editAnimationTracksToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem showBonesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showBoneOrientationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showMeshToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem fogSettingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem createToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem trimToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem fSMApplyToolStripMenuItem;
     }
 }

@@ -217,6 +217,30 @@
   <data name="melee_font" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\melee_font.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="pb_end" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_end.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_fastforward" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_fastforward.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_loop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_loop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_play" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_play_reverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_play_reverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_rewind" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_rewind.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pb_start" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pb_start.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ts_add" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

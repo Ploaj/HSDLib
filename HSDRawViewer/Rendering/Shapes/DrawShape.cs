@@ -439,6 +439,37 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <param name="precision"></param>
+        public static void DrawCircle(Vector3 center, float radius, uint precision, Vector3 color)
+        {
+            GL.Begin(PrimitiveType.TriangleFan);
+
+            GL.Color4(color.X, color.Y, color.Z, 1);
+            GL.Vertex3(center);
+
+            float twicePi = 2.0f * (float)Math.PI;
+            float x = 0;
+            float y = 0;
+
+            for (int i = 0; i <= precision; i++)
+            {
+                GL.Color4(color.X, color.Y, color.Z, 0f);
+                GL.Vertex3(
+                        center.X + (radius * Math.Cos(i * twicePi / precision)),
+                        center.Y + (radius * Math.Sin(i * twicePi / precision)),
+                        center.Z
+                );
+
+            }
+
+            GL.End();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="color"></param>
         /// <param name="cx"></param>
         /// <param name="cy"></param>

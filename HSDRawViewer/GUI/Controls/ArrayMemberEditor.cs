@@ -213,8 +213,9 @@ namespace HSDRawViewer.GUI
             elementList.BeginUpdate();
             IsResetting = true;
             Items.Clear();
-            foreach(var obj in (object[])Property.GetValue(_object))
-                Items.Add(obj);
+            if (_object != null)
+                foreach(var obj in (object[])Property.GetValue(_object))
+                    Items.Add(obj);
             IsResetting = false;
             elementList.EndUpdate();
         }

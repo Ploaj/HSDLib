@@ -157,5 +157,107 @@ namespace HSDRaw.Common
         public float Y { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
 
         public float Z { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+
+        public float Length
+        {
+            get
+            {
+                return (float)System.Math.Sqrt(X * X + Y * Y + Z * Z);
+            }
+        }
+
+        public HSD_Vector3()
+        {
+
+        }
+
+        public HSD_Vector3(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        /// <summary>
+        /// Adds two instances.
+        /// </summary>
+        /// <param name="left">The first instance.</param>
+        /// <param name="right">The second instance.</param>
+        /// <returns>The result of the calculation.</returns>
+        public static HSD_Vector3 operator +(HSD_Vector3 left, HSD_Vector3 right)
+        {
+            left.X += right.X;
+            left.Y += right.Y;
+            left.Z += right.Z;
+            return left;
+        }
+
+        /// <summary>
+        /// Subtracts two instances.
+        /// </summary>
+        /// <param name="left">The first instance.</param>
+        /// <param name="right">The second instance.</param>
+        /// <returns>The result of the calculation.</returns>
+        public static HSD_Vector3 operator -(HSD_Vector3 left, HSD_Vector3 right)
+        {
+            left.X -= right.X;
+            left.Y -= right.Y;
+            left.Z -= right.Z;
+            return left;
+        }
+
+        /// <summary>
+        /// Multiplies an instance by a scalar.
+        /// </summary>
+        /// <param name="vec">The instance.</param>
+        /// <param name="scale">The scalar.</param>
+        /// <returns>The result of the calculation.</returns>
+        public static HSD_Vector3 operator *(HSD_Vector3 vec, float scale)
+        {
+            vec.X *= scale;
+            vec.Y *= scale;
+            vec.Z *= scale;
+            return vec;
+        }
+
+        /// <summary>
+        /// Multiplies an instance by a scalar.
+        /// </summary>
+        /// <param name="scale">The scalar.</param>
+        /// <param name="vec">The instance.</param>
+        /// <returns>The result of the calculation.</returns>
+        public static HSD_Vector3 operator *(float scale, HSD_Vector3 vec)
+        {
+            vec.X *= scale;
+            vec.Y *= scale;
+            vec.Z *= scale;
+            return vec;
+        }
+
+        /// <summary>
+        /// Divides an instance by a scalar.
+        /// </summary>
+        /// <param name="vec">The instance.</param>
+        /// <param name="scale">The scalar.</param>
+        /// <returns>The result of the calculation.</returns>
+        public static HSD_Vector3 operator /(HSD_Vector3 vec, float scale)
+        {
+            float mult = 1.0f / scale;
+            vec.X *= mult;
+            vec.Y *= mult;
+            vec.Z *= mult;
+            return vec;
+        }
+
+        /// <summary>
+        /// Scales the Vector3 to unit length.
+        /// </summary>
+        public void Normalize()
+        {
+            float scale = 1.0f / this.Length;
+            X *= scale;
+            Y *= scale;
+            Z *= scale;
+        }
     }
 }

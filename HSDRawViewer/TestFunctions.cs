@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using HSDRaw.Melee.Pl;
 using HSDRaw.Tools.Melee;
 using System.Linq;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer
 {
@@ -194,6 +195,47 @@ namespace HSDRawViewer
                         }
                     }
                 }
+        }
+
+        public class RemapSettings
+        {
+            public bool IgnoreTranslation { get; set; } = true;
+        }
+
+        public static HSD_FigaTree RemapFigatree(RemapSettings settings, HSD_FigaTree from, int newBoneCount, JointMap mapFrom, JointMap mapTo)
+        {
+            var sourceNodes = from.Nodes;
+            var targetNodes = new List<FigaTreeNode>();
+            
+
+            for (int i = 0; i < newBoneCount; i++)
+            {
+                FigaTreeNode node = new FigaTreeNode();
+                targetNodes.Add(node);
+
+                var remapIndex = mapFrom.IndexOf(mapTo[i]);
+                if (remapIndex != -1)
+                {
+                    // port tracks
+                    node.Tracks.AddRange(sourceNodes[remapIndex].Tracks);
+
+                    if (settings.IgnoreTranslation)
+                    {
+                        node.Tracks.RemoveAll(
+                            e => 
+                            e.JointTrackType == JointTrackType.HSD_A_J_TRAX ||
+                            e.JointTrackType == JointTrackType.HSD_A_J_TRAY || 
+                            e.JointTrackType == JointTrackType.HSD_A_J_TRAZ);
+                    }
+                }
+            }
+
+
+            var newft = new HSD_FigaTree();
+            newft.Type = 1;
+            newft.FrameCount = from.FrameCount;
+            newft.Nodes = targetNodes;
+            return newft;
         }
     }
 }
