@@ -297,7 +297,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 // update animation size and offset
                 if (!string.IsNullOrEmpty(a.Symbol))
                 {
-                    var offsize = AJManager.GetSizeOffset(a.Symbol);
+                    var offsize = AJManager.GetOffsetSize(a.Symbol);
                     a.AnimOffset = offsize.Item1;
                     a.AnimSize = offsize.Item2;
                 }
@@ -391,7 +391,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 // update animation size and offset
                 if (!string.IsNullOrEmpty(a.Symbol))
                 {
-                    var offsize = AJManager.GetSizeOffset(a.Symbol);
+                    var offsize = AJManager.GetOffsetSize(a.Symbol);
                     a.AnimOffset = offsize.Item1;
                     a.AnimSize = offsize.Item2;
                 }
@@ -955,6 +955,78 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             _animEditor.Show();
             _animEditor.Visible = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateFrameTips()
+        {
+            // clear frame tips
+            viewport.FrameTips.Clear();
+
+            // update trackbar data
+            if (trackInfoToolStripMenuItem.Checked)
+            {
+                // add frame tips for each frame
+                for (int i = 0; i <= viewport.MaxFrame; i++)
+                {
+                    SubactionProcess.SetFrame(i);
+
+                    // hitbox indication
+                    if (SubactionProcess.HitboxesActive)
+                        viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                        {
+                            Frame = i,
+                            Color = Color.Red,
+                            Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color,
+                            Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Lower
+                        });
+
+                    // interrupt
+                    if (SubactionProcess.AllowInterrupt)
+                        viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                        {
+                            Frame = i,
+                            Color = Color.Green,
+                            Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color,
+                            Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Middle
+                        });
+
+                    // interrupt
+                    if (SubactionProcess.FighterFlagWasSetThisFrame.Any(e => e != false))
+                    {
+                        viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                        {
+                            Frame = i,
+                            Color = Color.Purple,
+                            Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color,
+                            Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
+                        });
+
+                        string set = "";
+
+                        for (int k = 0; k < SubactionProcess.FighterFlagWasSetThisFrame.Length; k++)
+                        {
+                            if (SubactionProcess.FighterFlagWasSetThisFrame[k])
+                            {
+                                set += k + " ";
+                            }
+                        }
+
+                        viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                        {
+                            Frame = i,
+                            Color = Color.White,
+                            Text = set,
+                            Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Text,
+                            Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
+                        });
+                    }
+                }
+
+                viewport.Invalidate();
+            }
         }
     }
 }

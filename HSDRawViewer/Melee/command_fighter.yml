@@ -253,7 +253,7 @@
 - code: 23
   name: Allow Interrupt
   parameters:
-  - name: Value
+  - name: None
     bitCount: 26
     hex: true
 
@@ -265,11 +265,14 @@
     hex: true
 
 - code: 25
-  name: Snap to Previous Surface
+  name: Set Jump State
   parameters:
   - name: Value
     bitCount: 26
-    hex: true
+    enums:
+    - Fighter Grounded
+    - Airborne 1 Jump
+    - Airborne No Jumps
 
 - code: 26
   name: Set Body Collision State

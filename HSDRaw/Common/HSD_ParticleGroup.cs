@@ -203,7 +203,7 @@ namespace HSDRaw.Common
 
         public override string ToString()
         {
-            return $"Particle {Type}";
+            return $"Particle: {Type} TexG: {TexGroup} ";
         }
     }
 }

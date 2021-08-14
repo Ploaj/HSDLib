@@ -181,7 +181,7 @@ namespace HSDRaw.Tools.Melee
         /// </summary>
         /// <param name="symbol"></param>
         /// <returns></returns>
-        public Tuple<int, int> GetSizeOffset(string symbol)
+        public Tuple<int, int> GetOffsetSize(string symbol)
         {
             if (symbol == null || Animations == null)
                 return new Tuple<int, int>(0, 0);

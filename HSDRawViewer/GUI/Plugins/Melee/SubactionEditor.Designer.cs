@@ -61,6 +61,7 @@
             this.groundECH = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.throwModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trackInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportFigatreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -330,7 +331,8 @@
             this.eCBToolStripMenuItem,
             this.groundECH,
             this.toolStripSeparator4,
-            this.throwModelToolStripMenuItem});
+            this.throwModelToolStripMenuItem,
+            this.trackInfoToolStripMenuItem});
             this.displayDropDown.Image = ((System.Drawing.Image)(resources.GetObject("displayDropDown.Image")));
             this.displayDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.displayDropDown.Name = "displayDropDown";
@@ -420,6 +422,16 @@
             this.throwModelToolStripMenuItem.Name = "throwModelToolStripMenuItem";
             this.throwModelToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.throwModelToolStripMenuItem.Text = "Throw Model";
+            // 
+            // trackInfoToolStripMenuItem
+            // 
+            this.trackInfoToolStripMenuItem.Checked = true;
+            this.trackInfoToolStripMenuItem.CheckOnClick = true;
+            this.trackInfoToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.trackInfoToolStripMenuItem.Name = "trackInfoToolStripMenuItem";
+            this.trackInfoToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.trackInfoToolStripMenuItem.Text = "Track Info";
+            this.trackInfoToolStripMenuItem.CheckedChanged += new System.EventHandler(this.trackInfoToolStripMenuItem_CheckedChanged);
             // 
             // toolStripDropDownButton1
             // 
@@ -740,5 +752,6 @@
         private System.Windows.Forms.ToolStripMenuItem createNewSubroutineToolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem figatreeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem trackInfoToolStripMenuItem;
     }
 }

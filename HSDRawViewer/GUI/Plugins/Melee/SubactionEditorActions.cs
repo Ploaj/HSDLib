@@ -6,6 +6,7 @@ using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -398,6 +399,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
                 SubactionProcess.SetStruct(a._struct, SubactionGroup);
             }
+
+            UpdateFrameTips();
         }
     }
 }

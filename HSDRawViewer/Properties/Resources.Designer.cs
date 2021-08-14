@@ -423,6 +423,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap pb_no_loop {
+            get {
+                object obj = ResourceManager.GetObject("pb_no_loop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap pb_pause {
             get {
                 object obj = ResourceManager.GetObject("pb_pause", resourceCulture);

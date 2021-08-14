@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using Be.Windows.Forms;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using HSDRawViewer.GUI.Controls;
 
 namespace HSDRawViewer.GUI
 {
@@ -124,6 +126,8 @@ namespace HSDRawViewer.GUI
 
             propertyGrid2.SelectedObject = Poker;
 
+            structSize.LostFocus += structSize_TextChanged;
+
             hexbox.SelectionStartChanged += (sender, args) =>
             {
                 selectedIndex = (int)hexbox.SelectionStart;
@@ -159,6 +163,8 @@ namespace HSDRawViewer.GUI
             Poker.accessor = accessor;
             propertyGrid1.SelectedObject = accessor;
             SetBytes();
+
+            structSize.Text = "0x" + accessor._s.Length.ToString("X");
 
             if (this.accessor != accessor)
                 offsetBox.Text = "0";
@@ -291,6 +297,61 @@ namespace HSDRawViewer.GUI
             UpdateValues();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void structSize_TextChanged(object sender, System.EventArgs e)
+        {
+            // good
+            if (Regex.Match(structSize.Text, @"^0[xX][0-9a-fA-F]{1,8}$").Success)
+            {
+                ResizeStruct();
+                return;
+            }
+
+            // missing header
+            if (Regex.Match(structSize.Text, @"^[0-9a-fA-F]{1,8}$").Success)
+            {
+                structSize.Text = "0x" + structSize.Text;
+                ResizeStruct();
+                return;
+            }
+
+            // bad
+            structSize.Text = "0x" + accessor._s.Length.ToString("X");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ResizeStruct()
+        {
+            if(int.TryParse(structSize.Text.Replace("0x", ""), 
+                System.Globalization.NumberStyles.HexNumber,
+                CultureInfo.InvariantCulture, 
+                out int value))
+            {
+                if (value < accessor._s.Length)
+                {
+                    // check if you want to resize
+                    if (MessageBox.Show("Are you sure you want to truncate this struct?", "Resize Struct", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        accessor._s.Resize(value);
+                        SetBytes();
+                    }
+                    structSize.Text = "0x" + accessor._s.Length.ToString("X");
+                }
+                else
+                {
+                    accessor._s.Resize(value);
+                    SetBytes();
+                }
+            }
+
+        }
+
         private bool IsReference(uint offset, int byteSize)
         {
             if (accessor == null)
@@ -366,6 +427,11 @@ namespace HSDRawViewer.GUI
         private void buttonRemovePointer_Click(object sender, System.EventArgs e)
         {
             RemovePointer();
+        }
+
+        private void structSize_TextChanged(object sender, TypeValidationEventArgs e)
+        {
+
         }
     }
 }

@@ -195,6 +195,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             LoadAnimation(script.Symbol);
 
             ResetModelVis();
+
+            UpdateFrameTips();
         }
 
         /// <summary>
@@ -972,6 +974,16 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void trackInfoToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateFrameTips();
         }
     }
 }

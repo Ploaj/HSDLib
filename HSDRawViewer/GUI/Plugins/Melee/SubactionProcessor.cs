@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using HSDRawViewer.Tools;
 using HSDRaw;
 using HSDRawViewer.Rendering.Models;
+using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -35,6 +36,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private List<Command> Commands = new List<Command>();
 
         public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[4];
+
+        public bool HitboxesActive { get => Hitboxes.Any(e => e.Active); }
+
+        public bool[] FighterFlagWasSetThisFrame { get; } = new bool[4];
+        public int[] FighterFlagValues { get; } = new int[4];
+
+        public bool AllowInterrupt { get; internal set; }
 
         public List<GFXSpawn> GFXOnFrame { get; internal set; } = new List<GFXSpawn>();
 
@@ -86,6 +94,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             OverlayColor = Vector3.One;
             CharacterInvisibility = false;
             ThrownFighter = false;
+            AllowInterrupt = false;
+
+            for (int i = 0; i < FighterFlagValues.Length; i++)
+                FighterFlagValues[i] = 0;
+            ClearFighterFlags();
         }
         
         /// <summary>
@@ -190,6 +203,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             int loopAmt = 0;
             int loopPos = 0;
 
+            float[] fighterFlagSetFrame = new float[4];
+
             // process commands
             for (int i = 0; i < commands.Count; i++)
             {
@@ -254,7 +269,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     case 13 << 2: // adjust size
                         {
                             if (cmd.Parameters[0] < Hitboxes.Length)
-                                Hitboxes[cmd.Parameters[0]].Size = ((short)cmd.Parameters[6] / 256f); //TODO: ? (short)cmd.Parameters[1] / 150f;
+                                Hitboxes[cmd.Parameters[0]].Size = ((short)cmd.Parameters[1] / 256f); //TODO: ? (short)cmd.Parameters[1] / 150f;
                         }
                         break;
                     case 15 << 2:
@@ -267,8 +282,19 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                                 hb.Active = false;
                         }
                         break;
+                    case 19 << 2:
+                        if (cmd.Parameters[0] < FighterFlagValues.Length)
+                        {
+                            fighterFlagSetFrame[cmd.Parameters[0]] = time;
+                            FighterFlagWasSetThisFrame[cmd.Parameters[0]] = true;
+                            FighterFlagValues[cmd.Parameters[0]] = cmd.Parameters[1];
+                        }
+                        break;
                     case 20 << 2: // throw
                         ThrownFighter = true;
+                        break;
+                    case 23 << 2: // allow interrupt
+                        AllowInterrupt = true;
                         break;
                     case 26 << 2:
                         BodyCollisionState = cmd.Parameters[0];
@@ -330,8 +356,22 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             }
 
             GFXOnFrame.RemoveAll(e => e.Frame != frame);
+            for (int i = 0; i < fighterFlagSetFrame.Length; i++)
+            {
+                if (fighterFlagSetFrame[i] != frame)
+                    FighterFlagWasSetThisFrame[i] = false;
+            }
 
             return time;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearFighterFlags()
+        {
+            for (int i = 0; i < FighterFlagWasSetThisFrame.Length; i++)
+                FighterFlagWasSetThisFrame[i] = false;
         }
 
     }

@@ -844,9 +844,13 @@ namespace HSDRawViewer.GUI.Controls
         {
             if (_selectedPlayer != null)
             {
-                _selectedPlayer.Keys = HSDK.LoadKeys();
-                _graph.Invalidate();
-                OnTrackEdited(EventArgs.Empty);
+                var keys = HSDK.LoadKeys();
+                if (keys != null)
+                {
+                    _selectedPlayer.Keys = keys;
+                    _graph.Invalidate();
+                    OnTrackEdited(EventArgs.Empty);
+                }
             }
         }
 

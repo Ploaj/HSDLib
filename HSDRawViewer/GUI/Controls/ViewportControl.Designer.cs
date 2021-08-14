@@ -32,37 +32,38 @@ namespace HSDRawViewer.GUI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewportControl));
-            this.panel1 = new OpenTK.GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
+            this.panel1 = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             this.animationGroup = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.nudPlaybackSpeed = new System.Windows.Forms.NumericUpDown();
             this.cbLoop = new System.Windows.Forms.CheckBox();
             this.nudMaxFrame = new System.Windows.Forms.NumericUpDown();
-            this.buttonPrevFrame = new System.Windows.Forms.Button();
-            this.buttonSeekStart = new System.Windows.Forms.Button();
-            this.buttonSeekEnd = new System.Windows.Forms.Button();
-            this.buttonNextFrame = new System.Windows.Forms.Button();
-            this.buttonPlay = new System.Windows.Forms.Button();
             this.nudFrame = new System.Windows.Forms.NumericUpDown();
-            this.animationTrack = new System.Windows.Forms.CustomPaintTrackBar();
+            this.animationTrack = new HSDRawViewer.GUI.Controls.PlaybackBar();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.toggleGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gridColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toggleBackgroundToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toggleCSPModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetCameraButton = new System.Windows.Forms.ToolStripButton();
-            this.editCameraButton = new System.Windows.Forms.ToolStripButton();
+            this.cameraDropDown = new System.Windows.Forms.ToolStripDropDownButton();
+            this.resetToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.screenshotButton = new System.Windows.Forms.ToolStripButton();
-            this.gridColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttonStart = new System.Windows.Forms.Button();
+            this.buttonRewind = new System.Windows.Forms.Button();
+            this.buttonEnd = new System.Windows.Forms.Button();
+            this.buttonFastForward = new System.Windows.Forms.Button();
+            this.buttonPlayReverse = new System.Windows.Forms.Button();
+            this.buttonPlayForward = new System.Windows.Forms.Button();
             this.animationGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudPlaybackSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.animationTrack)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -72,7 +73,7 @@ namespace HSDRawViewer.GUI
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 25);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(404, 197);
+            this.panel1.Size = new System.Drawing.Size(404, 172);
             this.panel1.TabIndex = 0;
             this.panel1.VSync = false;
             this.panel1.Load += new System.EventHandler(this.panel1_Load);
@@ -84,21 +85,24 @@ namespace HSDRawViewer.GUI
             // 
             // animationGroup
             // 
+            this.animationGroup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(40)))));
+            this.animationGroup.Controls.Add(this.buttonStart);
+            this.animationGroup.Controls.Add(this.buttonRewind);
+            this.animationGroup.Controls.Add(this.buttonEnd);
+            this.animationGroup.Controls.Add(this.buttonFastForward);
+            this.animationGroup.Controls.Add(this.buttonPlayReverse);
+            this.animationGroup.Controls.Add(this.buttonPlayForward);
             this.animationGroup.Controls.Add(this.label1);
             this.animationGroup.Controls.Add(this.nudPlaybackSpeed);
             this.animationGroup.Controls.Add(this.cbLoop);
             this.animationGroup.Controls.Add(this.nudMaxFrame);
-            this.animationGroup.Controls.Add(this.buttonPrevFrame);
-            this.animationGroup.Controls.Add(this.buttonSeekStart);
-            this.animationGroup.Controls.Add(this.buttonSeekEnd);
-            this.animationGroup.Controls.Add(this.buttonNextFrame);
-            this.animationGroup.Controls.Add(this.buttonPlay);
             this.animationGroup.Controls.Add(this.nudFrame);
             this.animationGroup.Controls.Add(this.animationTrack);
             this.animationGroup.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.animationGroup.Location = new System.Drawing.Point(0, 225);
+            this.animationGroup.ForeColor = System.Drawing.SystemColors.Control;
+            this.animationGroup.Location = new System.Drawing.Point(0, 200);
             this.animationGroup.Name = "animationGroup";
-            this.animationGroup.Size = new System.Drawing.Size(404, 116);
+            this.animationGroup.Size = new System.Drawing.Size(404, 141);
             this.animationGroup.TabIndex = 1;
             this.animationGroup.TabStop = false;
             this.animationGroup.Text = "Animation Track";
@@ -106,9 +110,9 @@ namespace HSDRawViewer.GUI
             // 
             // label1
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(201, 49);
+            this.label1.Location = new System.Drawing.Point(6, 72);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(77, 13);
             this.label1.TabIndex = 10;
@@ -116,8 +120,8 @@ namespace HSDRawViewer.GUI
             // 
             // nudPlaybackSpeed
             // 
-            this.nudPlaybackSpeed.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.nudPlaybackSpeed.Location = new System.Drawing.Point(115, 47);
+            this.nudPlaybackSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.nudPlaybackSpeed.Location = new System.Drawing.Point(89, 69);
             this.nudPlaybackSpeed.Maximum = new decimal(new int[] {
             120,
             0,
@@ -129,7 +133,7 @@ namespace HSDRawViewer.GUI
             0,
             0});
             this.nudPlaybackSpeed.Name = "nudPlaybackSpeed";
-            this.nudPlaybackSpeed.Size = new System.Drawing.Size(80, 20);
+            this.nudPlaybackSpeed.Size = new System.Drawing.Size(49, 20);
             this.nudPlaybackSpeed.TabIndex = 9;
             this.nudPlaybackSpeed.Value = new decimal(new int[] {
             60,
@@ -140,13 +144,15 @@ namespace HSDRawViewer.GUI
             // 
             // cbLoop
             // 
-            this.cbLoop.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.cbLoop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cbLoop.AutoSize = true;
             this.cbLoop.Checked = true;
             this.cbLoop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbLoop.Location = new System.Drawing.Point(12, 47);
+            this.cbLoop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbLoop.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.cbLoop.Location = new System.Drawing.Point(304, 70);
             this.cbLoop.Name = "cbLoop";
-            this.cbLoop.Size = new System.Drawing.Size(97, 17);
+            this.cbLoop.Size = new System.Drawing.Size(94, 17);
             this.cbLoop.TabIndex = 8;
             this.cbLoop.Text = "Loop Playback";
             this.cbLoop.UseVisualStyleBackColor = true;
@@ -164,62 +170,6 @@ namespace HSDRawViewer.GUI
             this.nudMaxFrame.Name = "nudMaxFrame";
             this.nudMaxFrame.Size = new System.Drawing.Size(61, 20);
             this.nudMaxFrame.TabIndex = 7;
-            // 
-            // buttonPrevFrame
-            // 
-            this.buttonPrevFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonPrevFrame.Location = new System.Drawing.Point(52, 70);
-            this.buttonPrevFrame.Name = "buttonPrevFrame";
-            this.buttonPrevFrame.Size = new System.Drawing.Size(40, 36);
-            this.buttonPrevFrame.TabIndex = 6;
-            this.buttonPrevFrame.Text = "<";
-            this.buttonPrevFrame.UseVisualStyleBackColor = true;
-            this.buttonPrevFrame.Click += new System.EventHandler(this.buttonPrevFrame_Click);
-            // 
-            // buttonSeekStart
-            // 
-            this.buttonSeekStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonSeekStart.Location = new System.Drawing.Point(6, 70);
-            this.buttonSeekStart.Name = "buttonSeekStart";
-            this.buttonSeekStart.Size = new System.Drawing.Size(40, 36);
-            this.buttonSeekStart.TabIndex = 5;
-            this.buttonSeekStart.Text = "<<";
-            this.buttonSeekStart.UseVisualStyleBackColor = true;
-            this.buttonSeekStart.Click += new System.EventHandler(this.buttonSeekStart_Click);
-            // 
-            // buttonSeekEnd
-            // 
-            this.buttonSeekEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSeekEnd.Location = new System.Drawing.Point(358, 70);
-            this.buttonSeekEnd.Name = "buttonSeekEnd";
-            this.buttonSeekEnd.Size = new System.Drawing.Size(40, 36);
-            this.buttonSeekEnd.TabIndex = 4;
-            this.buttonSeekEnd.Text = ">>";
-            this.buttonSeekEnd.UseVisualStyleBackColor = true;
-            this.buttonSeekEnd.Click += new System.EventHandler(this.buttonSeekEnd_Click);
-            // 
-            // buttonNextFrame
-            // 
-            this.buttonNextFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonNextFrame.Location = new System.Drawing.Point(312, 70);
-            this.buttonNextFrame.Name = "buttonNextFrame";
-            this.buttonNextFrame.Size = new System.Drawing.Size(40, 36);
-            this.buttonNextFrame.TabIndex = 3;
-            this.buttonNextFrame.Text = ">";
-            this.buttonNextFrame.UseVisualStyleBackColor = true;
-            this.buttonNextFrame.Click += new System.EventHandler(this.buttonNextFrame_Click);
-            // 
-            // buttonPlay
-            // 
-            this.buttonPlay.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonPlay.Location = new System.Drawing.Point(98, 70);
-            this.buttonPlay.Name = "buttonPlay";
-            this.buttonPlay.Size = new System.Drawing.Size(208, 36);
-            this.buttonPlay.TabIndex = 2;
-            this.buttonPlay.Text = "Play";
-            this.buttonPlay.UseVisualStyleBackColor = true;
-            this.buttonPlay.Click += new System.EventHandler(this.buttonPlay_Click);
             // 
             // nudFrame
             // 
@@ -239,18 +189,19 @@ namespace HSDRawViewer.GUI
             // 
             this.animationTrack.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.animationTrack.EndFrame = 1F;
+            this.animationTrack.Frame = 0F;
             this.animationTrack.Location = new System.Drawing.Point(6, 19);
-            this.animationTrack.Maximum = 1;
             this.animationTrack.Name = "animationTrack";
             this.animationTrack.Size = new System.Drawing.Size(325, 45);
+            this.animationTrack.StartFrame = 0F;
             this.animationTrack.TabIndex = 0;
-            this.animationTrack.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
             this.animationTrack.ValueChanged += new System.EventHandler(this.animationTrack_ValueChanged);
             // 
             // splitter1
             // 
             this.splitter1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter1.Location = new System.Drawing.Point(0, 222);
+            this.splitter1.Location = new System.Drawing.Point(0, 197);
             this.splitter1.Name = "splitter1";
             this.splitter1.Size = new System.Drawing.Size(404, 3);
             this.splitter1.TabIndex = 2;
@@ -260,8 +211,7 @@ namespace HSDRawViewer.GUI
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton1,
-            this.resetCameraButton,
-            this.editCameraButton,
+            this.cameraDropDown,
             this.screenshotButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -292,6 +242,13 @@ namespace HSDRawViewer.GUI
             this.toggleGridToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.toggleGridToolStripMenuItem.Text = "Toggle Grid";
             this.toggleGridToolStripMenuItem.Click += new System.EventHandler(this.toggleGridToolStripMenuItem_Click);
+            // 
+            // gridColorToolStripMenuItem
+            // 
+            this.gridColorToolStripMenuItem.Name = "gridColorToolStripMenuItem";
+            this.gridColorToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.gridColorToolStripMenuItem.Text = "Set Grid Color";
+            this.gridColorToolStripMenuItem.Click += new System.EventHandler(this.gridColorToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -324,39 +281,138 @@ namespace HSDRawViewer.GUI
             this.toggleCSPModeToolStripMenuItem.Text = "Toggle CSP Mode";
             this.toggleCSPModeToolStripMenuItem.Click += new System.EventHandler(this.toggleCSPModeToolStripMenuItem_Click);
             // 
-            // resetCameraButton
+            // cameraDropDown
             // 
-            this.resetCameraButton.Image = ((System.Drawing.Image)(resources.GetObject("resetCameraButton.Image")));
-            this.resetCameraButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.resetCameraButton.Name = "resetCameraButton";
-            this.resetCameraButton.Size = new System.Drawing.Size(99, 22);
-            this.resetCameraButton.Text = "Reset Camera";
-            this.resetCameraButton.Click += new System.EventHandler(this.resetCameraButton_Click);
+            this.cameraDropDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.cameraDropDown.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resetToolStripMenuItem1,
+            this.settingsToolStripMenuItem1});
+            this.cameraDropDown.Image = ((System.Drawing.Image)(resources.GetObject("cameraDropDown.Image")));
+            this.cameraDropDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cameraDropDown.Name = "cameraDropDown";
+            this.cameraDropDown.Size = new System.Drawing.Size(61, 22);
+            this.cameraDropDown.Text = "Camera";
             // 
-            // editCameraButton
+            // resetToolStripMenuItem1
             // 
-            this.editCameraButton.Image = ((System.Drawing.Image)(resources.GetObject("editCameraButton.Image")));
-            this.editCameraButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.editCameraButton.Name = "editCameraButton";
-            this.editCameraButton.Size = new System.Drawing.Size(113, 22);
-            this.editCameraButton.Text = "Camera Settings";
-            this.editCameraButton.Click += new System.EventHandler(this.editCameraButton_Click);
+            this.resetToolStripMenuItem1.Name = "resetToolStripMenuItem1";
+            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(116, 22);
+            this.resetToolStripMenuItem1.Text = "Reset";
+            this.resetToolStripMenuItem1.Click += new System.EventHandler(this.resetCameraButton_Click);
+            // 
+            // settingsToolStripMenuItem1
+            // 
+            this.settingsToolStripMenuItem1.Name = "settingsToolStripMenuItem1";
+            this.settingsToolStripMenuItem1.Size = new System.Drawing.Size(116, 22);
+            this.settingsToolStripMenuItem1.Text = "Settings";
+            this.settingsToolStripMenuItem1.Click += new System.EventHandler(this.editCameraButton_Click);
             // 
             // screenshotButton
             // 
+            this.screenshotButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.screenshotButton.Image = ((System.Drawing.Image)(resources.GetObject("screenshotButton.Image")));
             this.screenshotButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.screenshotButton.Name = "screenshotButton";
-            this.screenshotButton.Size = new System.Drawing.Size(111, 22);
+            this.screenshotButton.Size = new System.Drawing.Size(95, 22);
             this.screenshotButton.Text = "Take Screenshot";
             this.screenshotButton.Click += new System.EventHandler(this.screenshotButton_Click);
             // 
-            // gridColorToolStripMenuItem
+            // buttonStart
             // 
-            this.gridColorToolStripMenuItem.Name = "gridColorToolStripMenuItem";
-            this.gridColorToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
-            this.gridColorToolStripMenuItem.Text = "Set Grid Color";
-            this.gridColorToolStripMenuItem.Click += new System.EventHandler(this.gridColorToolStripMenuItem_Click);
+            this.buttonStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(70)))));
+            this.buttonStart.FlatAppearance.BorderSize = 0;
+            this.buttonStart.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(40)))), ((int)(((byte)(160)))));
+            this.buttonStart.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(100)))), ((int)(((byte)(200)))));
+            this.buttonStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonStart.Image = global::HSDRawViewer.Properties.Resources.pb_start;
+            this.buttonStart.Location = new System.Drawing.Point(6, 95);
+            this.buttonStart.Name = "buttonStart";
+            this.buttonStart.Size = new System.Drawing.Size(48, 40);
+            this.buttonStart.TabIndex = 11;
+            this.buttonStart.UseVisualStyleBackColor = false;
+            this.buttonStart.Click += new System.EventHandler(this.buttonSeekStart_Click);
+            // 
+            // buttonRewind
+            // 
+            this.buttonRewind.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonRewind.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(70)))));
+            this.buttonRewind.FlatAppearance.BorderSize = 0;
+            this.buttonRewind.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(40)))), ((int)(((byte)(160)))));
+            this.buttonRewind.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(100)))), ((int)(((byte)(200)))));
+            this.buttonRewind.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonRewind.Image = global::HSDRawViewer.Properties.Resources.pb_rewind;
+            this.buttonRewind.Location = new System.Drawing.Point(61, 95);
+            this.buttonRewind.Name = "buttonRewind";
+            this.buttonRewind.Size = new System.Drawing.Size(48, 40);
+            this.buttonRewind.TabIndex = 12;
+            this.buttonRewind.UseVisualStyleBackColor = false;
+            this.buttonRewind.Click += new System.EventHandler(this.buttonPrevFrame_Click);
+            // 
+            // buttonEnd
+            // 
+            this.buttonEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonEnd.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(70)))));
+            this.buttonEnd.FlatAppearance.BorderSize = 0;
+            this.buttonEnd.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(40)))), ((int)(((byte)(160)))));
+            this.buttonEnd.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(100)))), ((int)(((byte)(200)))));
+            this.buttonEnd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonEnd.Image = global::HSDRawViewer.Properties.Resources.pb_end;
+            this.buttonEnd.Location = new System.Drawing.Point(350, 95);
+            this.buttonEnd.Name = "buttonEnd";
+            this.buttonEnd.Size = new System.Drawing.Size(48, 40);
+            this.buttonEnd.TabIndex = 15;
+            this.buttonEnd.UseVisualStyleBackColor = false;
+            this.buttonEnd.Click += new System.EventHandler(this.buttonSeekEnd_Click);
+            // 
+            // buttonFastForward
+            // 
+            this.buttonFastForward.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonFastForward.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(70)))));
+            this.buttonFastForward.FlatAppearance.BorderSize = 0;
+            this.buttonFastForward.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(40)))), ((int)(((byte)(160)))));
+            this.buttonFastForward.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(100)))), ((int)(((byte)(200)))));
+            this.buttonFastForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonFastForward.Image = global::HSDRawViewer.Properties.Resources.pb_fastforward;
+            this.buttonFastForward.Location = new System.Drawing.Point(296, 95);
+            this.buttonFastForward.Name = "buttonFastForward";
+            this.buttonFastForward.Size = new System.Drawing.Size(48, 40);
+            this.buttonFastForward.TabIndex = 16;
+            this.buttonFastForward.UseVisualStyleBackColor = false;
+            this.buttonFastForward.Click += new System.EventHandler(this.buttonNextFrame_Click);
+            // 
+            // buttonPlayReverse
+            // 
+            this.buttonPlayReverse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonPlayReverse.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(70)))));
+            this.buttonPlayReverse.FlatAppearance.BorderSize = 0;
+            this.buttonPlayReverse.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(40)))), ((int)(((byte)(160)))));
+            this.buttonPlayReverse.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(100)))), ((int)(((byte)(200)))));
+            this.buttonPlayReverse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonPlayReverse.Image = global::HSDRawViewer.Properties.Resources.pb_play_reverse;
+            this.buttonPlayReverse.Location = new System.Drawing.Point(115, 95);
+            this.buttonPlayReverse.Name = "buttonPlayReverse";
+            this.buttonPlayReverse.Size = new System.Drawing.Size(48, 40);
+            this.buttonPlayReverse.TabIndex = 17;
+            this.buttonPlayReverse.UseVisualStyleBackColor = false;
+            this.buttonPlayReverse.Click += new System.EventHandler(this.buttonPlayReverse_Click);
+            // 
+            // buttonPlayForward
+            // 
+            this.buttonPlayForward.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonPlayForward.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(70)))));
+            this.buttonPlayForward.FlatAppearance.BorderSize = 0;
+            this.buttonPlayForward.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(40)))), ((int)(((byte)(160)))));
+            this.buttonPlayForward.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(100)))), ((int)(((byte)(200)))));
+            this.buttonPlayForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonPlayForward.Image = global::HSDRawViewer.Properties.Resources.pb_play;
+            this.buttonPlayForward.Location = new System.Drawing.Point(169, 95);
+            this.buttonPlayForward.Name = "buttonPlayForward";
+            this.buttonPlayForward.Size = new System.Drawing.Size(121, 40);
+            this.buttonPlayForward.TabIndex = 17;
+            this.buttonPlayForward.UseVisualStyleBackColor = false;
+            this.buttonPlayForward.Click += new System.EventHandler(this.buttonPlay_Click);
             // 
             // ViewportControl
             // 
@@ -373,7 +429,6 @@ namespace HSDRawViewer.GUI
             ((System.ComponentModel.ISupportInitialize)(this.nudPlaybackSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.animationTrack)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -387,19 +442,12 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.GroupBox animationGroup;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.NumericUpDown nudFrame;
-        private System.Windows.Forms.CustomPaintTrackBar animationTrack;
-        private System.Windows.Forms.Button buttonPrevFrame;
-        private System.Windows.Forms.Button buttonSeekStart;
-        private System.Windows.Forms.Button buttonSeekEnd;
-        private System.Windows.Forms.Button buttonNextFrame;
-        private System.Windows.Forms.Button buttonPlay;
+        private Controls.PlaybackBar animationTrack;
         private System.Windows.Forms.NumericUpDown nudMaxFrame;
         private System.Windows.Forms.CheckBox cbLoop;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown nudPlaybackSpeed;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton resetCameraButton;
-        private System.Windows.Forms.ToolStripButton editCameraButton;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem toggleGridToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toggleBackgroundToolStripMenuItem;
@@ -409,5 +457,14 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem toggleCSPModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gridColorToolStripMenuItem;
+        private System.Windows.Forms.Button buttonStart;
+        private System.Windows.Forms.Button buttonRewind;
+        private System.Windows.Forms.Button buttonEnd;
+        private System.Windows.Forms.Button buttonFastForward;
+        private System.Windows.Forms.Button buttonPlayForward;
+        private System.Windows.Forms.Button buttonPlayReverse;
+        private System.Windows.Forms.ToolStripDropDownButton cameraDropDown;
+        private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem1;
     }
 }

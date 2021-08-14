@@ -191,6 +191,10 @@
     <Compile Include="GUI\Controls\AnimationPlaybackControl.Designer.cs">
       <DependentUpon>AnimationPlaybackControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Controls\PlaybackBar.cs" />
+    <Compile Include="GUI\Controls\PlaybackBar.Designer.cs">
+      <DependentUpon>PlaybackBar.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Controls\TexturePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -510,8 +514,10 @@
     </Compile>
     <Compile Include="Sound\SSM.cs" />
     <Compile Include="Tools\ParticleManager.cs" />
+    <Compile Include="Tools\RawTimer.cs" />
     <Compile Include="Tools\Simpoly.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\pb_no_loop.png" />
     <None Include="Resources\pb_play_reverse.png" />
     <None Include="Resources\pb_start.png" />
     <None Include="Resources\pb_rewind.png" />
@@ -575,6 +581,9 @@
     <EmbeddedResource Include="GUI\Controls\MEXStockIconControl.resx" />
     <EmbeddedResource Include="GUI\Controls\AnimationPlaybackControl.resx">
       <DependentUpon>AnimationPlaybackControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Controls\PlaybackBar.resx">
+      <DependentUpon>PlaybackBar.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Controls\TexturePanel.resx">
       <DependentUpon>TexturePanel.cs</DependentUpon>

@@ -13,9 +13,22 @@ using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
+using HSDRawViewer.Tools;
+using System.Threading;
+using HSDRawViewer.GUI.Controls;
 
 namespace HSDRawViewer.GUI
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum PlaybackMode
+    {
+        None,
+        Forward,
+        Reverse
+    }
+
     ///new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
     /// <summary>
     /// 
@@ -37,6 +50,40 @@ namespace HSDRawViewer.GUI
         [Browsable(false)]
         public bool LoopPlayback { get => cbLoop.Checked; set => cbLoop.Checked = value; }
 
+        /// <summary>
+        /// Checks if track is currently playing
+        /// </summary>
+        public PlaybackMode PlaybackMode
+        {
+            get => _playbackMode; 
+            internal set
+            {
+                _playbackMode = value;
+
+                buttonPlayForward.Image = Properties.Resources.pb_play;
+                buttonPlayReverse.Image = Properties.Resources.pb_play_reverse;
+
+                switch (value)
+                {
+                    case PlaybackMode.Forward:
+                        buttonPlayForward.Image = Properties.Resources.pb_pause;
+                        break;
+                    case PlaybackMode.Reverse:
+                        buttonPlayReverse.Image = Properties.Resources.pb_pause;
+                        break;
+                }
+            }
+        }
+        private PlaybackMode _playbackMode = PlaybackMode.None;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private int _fps = 60;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public float Frame
         {
             get
@@ -51,6 +98,9 @@ namespace HSDRawViewer.GUI
         }
         private float _frame;
 
+        /// <summary>
+        /// 
+        /// </summary>
         [Browsable(false)]
         public float MaxFrame
         {
@@ -60,10 +110,11 @@ namespace HSDRawViewer.GUI
             }
             set
             {
-                animationTrack.Maximum = (int)value;
+                animationTrack.EndFrame = (int)value;
                 nudFrame.Maximum = (decimal)value;
                 nudMaxFrame.Maximum = (decimal)value;
                 nudMaxFrame.Value = (decimal)value;
+                animationTrack.Invalidate();
             }
         }
 
@@ -76,10 +127,15 @@ namespace HSDRawViewer.GUI
                 if (!value)
                 {
                     Frame = 0;
-                    buttonPlay.Text = "Play";
+                    PlaybackMode = PlaybackMode.None;
                 }
             }
         }
+
+        /// <summary>
+        /// Access to frame tips
+        /// </summary>
+        public List<PlaybackBarFrameTip> FrameTips { get => animationTrack?.FrameTips; }
 
         /// <summary>
         /// If set to try camera cannot be rotated in z direction
@@ -113,8 +169,6 @@ namespace HSDRawViewer.GUI
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
         private EventHandler RenderLoop;
-        private ElapsedEventHandler PlayerTimer;
-        private System.Timers.Timer pbTimer;
 
         private bool Selecting = false;
         private Vector2 mouseStart;
@@ -127,7 +181,7 @@ namespace HSDRawViewer.GUI
         private Vector3 CrossHair = new Vector3();
 
         [Browsable(false)]
-        public bool IsPlaying { get => (buttonPlay.Text == "Pause"); }
+        public bool IsPlaying { get => _playbackMode != PlaybackMode.None; }
 
         public bool EnableFloor { get; set; } = false;
 
@@ -172,10 +226,41 @@ namespace HSDRawViewer.GUI
         {
             InitializeComponent();
 
+            Thread drawLoop = new Thread(() =>
+              {
+                  RawTimer timer = new RawTimer();
+                  timer.Start();
+
+                  while (true)
+                  {
+                      if (IsDisposed)
+                          break;
+
+                      timer.Step();
+
+                      if (IsPlaying && timer.Total.Milliseconds > 1000 / _fps)
+                      {
+                          if (_playbackMode == PlaybackMode.Forward && !(!LoopPlayback && Frame == MaxFrame))
+                          {
+                              Frame++;
+                          }
+                          if (_playbackMode == PlaybackMode.Reverse && !(!LoopPlayback && Frame == 0))
+                          {
+                              Frame--;
+                          }
+                          timer.Restart();
+                      }
+                  }
+              }
+              );
+            drawLoop.Start();
+
+
             DateTime meansure = DateTime.Now;
 
             RenderLoop = (sender, args) =>
             {
+
                 //while (ReadyToRender && panel1 != null && panel1.IsIdle)
                 {
                     if (MainForm.Instance == null || 
@@ -195,24 +280,9 @@ namespace HSDRawViewer.GUI
 
                 }
             };
-            
-            PlayerTimer = (sender, args) =>
-            {
-                
-                if (buttonPlay.Text == "Pause")
-                {
-                    if(!(!LoopPlayback && Frame == MaxFrame))
-                    {
-                        Frame++;
-                    }
-                }
-            };
 
             Application.Idle += RenderLoop;
 
-            pbTimer = new System.Timers.Timer(60 / 1000d);
-            pbTimer.Elapsed += PlayerTimer;
-            pbTimer.Start();
             nudPlaybackSpeed.Value = 60;
 
             panel1.KeyDown += (sender, args) =>
@@ -319,9 +389,7 @@ namespace HSDRawViewer.GUI
             Disposed += (sender, args) =>
             {
                 Application.Idle -= RenderLoop;
-                pbTimer.Stop();
-                pbTimer.Elapsed -= PlayerTimer;
-                pbTimer.Dispose();
+                drawLoop.Abort();
             };
         }
         
@@ -346,19 +414,26 @@ namespace HSDRawViewer.GUI
             }
             else
             {
-                if (frame < 0)
-                    frame = 0;
                 if (frame > nudFrame.Maximum)
                 {
-                    if (!LoopPlayback)
-                    {
+                    if (_playbackMode == PlaybackMode.Forward && !LoopPlayback)
                         Stop();
-                    }
+
                     frame = 0;
                     _frame = 0;
                 }
+
+                if (frame < 0)
+                {
+                    if (_playbackMode == PlaybackMode.Reverse && !LoopPlayback)
+                        Stop();
+
+                    frame = nudFrame.Maximum;
+                    _frame = (float)nudFrame.Maximum;
+                }
+
                 nudFrame.Value = frame;
-                animationTrack.Value = (int)frame;
+                animationTrack.Frame = (int)frame;
             }
         }
 
@@ -417,8 +492,8 @@ namespace HSDRawViewer.GUI
 
         private void animationTrack_ValueChanged(object sender, EventArgs e)
         {
-            if (Frame != animationTrack.Value)
-                Frame = animationTrack.Value;
+            if (Frame != animationTrack.Frame)
+                Frame = animationTrack.Frame;
         }
 
         private void buttonSeekStart_Click(object sender, EventArgs e)
@@ -443,18 +518,23 @@ namespace HSDRawViewer.GUI
 
         private void buttonPlay_Click(object sender, EventArgs e)
         {
-            Play();
+            Play(PlaybackMode.Forward);
+        }
+
+        private void buttonPlayReverse_Click(object sender, EventArgs e)
+        {
+            Play(PlaybackMode.Reverse);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void Play()
+        public void Play(PlaybackMode mode)
         {
-            if (buttonPlay.Text == "Play")
-                buttonPlay.Text = "Pause";
+            if (PlaybackMode == PlaybackMode.None)
+                PlaybackMode = mode;
             else
-                buttonPlay.Text = "Play";
+                PlaybackMode = PlaybackMode.None;
         }
 
         /// <summary>
@@ -462,7 +542,7 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public void Stop()
         {
-            buttonPlay.Text = "Pause";
+            PlaybackMode = PlaybackMode.None;
             Frame = 0;
         }
 
@@ -795,9 +875,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void nudPlaybackSpeed_ValueChanged(object sender, EventArgs e)
         {
-            pbTimer.Stop();
-            pbTimer.Interval = (1000f / (float)nudPlaybackSpeed.Value);
-            pbTimer.Start();
+            _fps = (int)nudPlaybackSpeed.Value;
         }
 
         /// <summary>

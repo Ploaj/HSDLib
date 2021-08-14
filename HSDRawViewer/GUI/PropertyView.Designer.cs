@@ -35,12 +35,14 @@ namespace HSDRawViewer.GUI
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.hexbox = new Be.Windows.Forms.HexBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonRemovePointer = new System.Windows.Forms.Button();
+            this.buttonSetPointer = new System.Windows.Forms.Button();
             this.propertyGrid2 = new System.Windows.Forms.PropertyGrid();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.structSize = new System.Windows.Forms.MaskedTextBox();
             this.offsetBox = new System.Windows.Forms.MaskedTextBox();
-            this.buttonSetPointer = new System.Windows.Forms.Button();
-            this.buttonRemovePointer = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -92,7 +94,9 @@ namespace HSDRawViewer.GUI
             this.groupBox1.Controls.Add(this.buttonSetPointer);
             this.groupBox1.Controls.Add(this.propertyGrid2);
             this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.structSize);
             this.groupBox1.Controls.Add(this.offsetBox);
             this.groupBox1.Controls.Add(this.hexbox);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -103,51 +107,19 @@ namespace HSDRawViewer.GUI
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Hex View";
             // 
-            // propertyGrid2
+            // buttonRemovePointer
             // 
-            this.propertyGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.propertyGrid2.HelpVisible = false;
-            this.propertyGrid2.Location = new System.Drawing.Point(6, 128);
-            this.propertyGrid2.Name = "propertyGrid2";
-            this.propertyGrid2.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid2.Size = new System.Drawing.Size(146, 189);
-            this.propertyGrid2.TabIndex = 6;
-            this.propertyGrid2.ToolbarVisible = false;
-            this.propertyGrid2.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid2_PropertyValueChanged);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 112);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(72, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Memory Poke";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 13);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Offset:";
-            // 
-            // offsetBox
-            // 
-            this.offsetBox.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.offsetBox.InsertKeyMode = System.Windows.Forms.InsertKeyMode.Overwrite;
-            this.offsetBox.Location = new System.Drawing.Point(6, 36);
-            this.offsetBox.Name = "offsetBox";
-            this.offsetBox.Size = new System.Drawing.Size(146, 22);
-            this.offsetBox.TabIndex = 4;
-            this.offsetBox.TextChanged += new System.EventHandler(this.offsetBox_TextChanged);
-            this.offsetBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.offsetBox_KeyDown);
+            this.buttonRemovePointer.Location = new System.Drawing.Point(77, 104);
+            this.buttonRemovePointer.Name = "buttonRemovePointer";
+            this.buttonRemovePointer.Size = new System.Drawing.Size(75, 45);
+            this.buttonRemovePointer.TabIndex = 8;
+            this.buttonRemovePointer.Text = "Remove Pointer";
+            this.buttonRemovePointer.UseVisualStyleBackColor = true;
+            this.buttonRemovePointer.Click += new System.EventHandler(this.buttonRemovePointer_Click);
             // 
             // buttonSetPointer
             // 
-            this.buttonSetPointer.Location = new System.Drawing.Point(6, 64);
+            this.buttonSetPointer.Location = new System.Drawing.Point(6, 104);
             this.buttonSetPointer.Name = "buttonSetPointer";
             this.buttonSetPointer.Size = new System.Drawing.Size(65, 45);
             this.buttonSetPointer.TabIndex = 7;
@@ -155,15 +127,65 @@ namespace HSDRawViewer.GUI
             this.buttonSetPointer.UseVisualStyleBackColor = true;
             this.buttonSetPointer.Click += new System.EventHandler(this.buttonSetPointer_Click);
             // 
-            // buttonRemovePointer
+            // propertyGrid2
             // 
-            this.buttonRemovePointer.Location = new System.Drawing.Point(77, 64);
-            this.buttonRemovePointer.Name = "buttonRemovePointer";
-            this.buttonRemovePointer.Size = new System.Drawing.Size(75, 45);
-            this.buttonRemovePointer.TabIndex = 8;
-            this.buttonRemovePointer.Text = "Remove Pointer";
-            this.buttonRemovePointer.UseVisualStyleBackColor = true;
-            this.buttonRemovePointer.Click += new System.EventHandler(this.buttonRemovePointer_Click);
+            this.propertyGrid2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.propertyGrid2.HelpVisible = false;
+            this.propertyGrid2.Location = new System.Drawing.Point(6, 168);
+            this.propertyGrid2.Name = "propertyGrid2";
+            this.propertyGrid2.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.propertyGrid2.Size = new System.Drawing.Size(146, 149);
+            this.propertyGrid2.TabIndex = 6;
+            this.propertyGrid2.ToolbarVisible = false;
+            this.propertyGrid2.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid2_PropertyValueChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 152);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(72, 13);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Memory Poke";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 15);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(61, 13);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Struct Size:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 60);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(83, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Selected Offset:";
+            // 
+            // structSize
+            // 
+            this.structSize.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.structSize.InsertKeyMode = System.Windows.Forms.InsertKeyMode.Overwrite;
+            this.structSize.Location = new System.Drawing.Point(6, 31);
+            this.structSize.Name = "structSize";
+            this.structSize.Size = new System.Drawing.Size(146, 22);
+            this.structSize.TabIndex = 4;
+            // 
+            // offsetBox
+            // 
+            this.offsetBox.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.offsetBox.InsertKeyMode = System.Windows.Forms.InsertKeyMode.Overwrite;
+            this.offsetBox.Location = new System.Drawing.Point(6, 76);
+            this.offsetBox.Name = "offsetBox";
+            this.offsetBox.Size = new System.Drawing.Size(146, 22);
+            this.offsetBox.TabIndex = 4;
+            this.offsetBox.TextChanged += new System.EventHandler(this.offsetBox_TextChanged);
+            this.offsetBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.offsetBox_KeyDown);
             // 
             // PropertyView
             // 
@@ -190,5 +212,7 @@ namespace HSDRawViewer.GUI
         private System.Windows.Forms.PropertyGrid propertyGrid2;
         private System.Windows.Forms.Button buttonRemovePointer;
         private System.Windows.Forms.Button buttonSetPointer;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.MaskedTextBox structSize;
     }
 }
