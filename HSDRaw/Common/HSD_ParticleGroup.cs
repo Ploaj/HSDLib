@@ -3,6 +3,23 @@ using System.ComponentModel;
 
 namespace HSDRaw.Common
 {
+    public class HSD_ParticleJoint : HSDAccessor
+    {
+        public override int TrimmedSize => 0x08;
+
+        public int ParticleID
+        {
+            get => _s.GetInt32(0x04) >> 6;
+            set => _s.SetInt32(0x04, (value << 6) | (_s.GetInt32(0x04) & 0b111111));
+        }
+
+        public byte ParticleBank
+        {
+            get => (byte)(_s.GetInt32(0x04) & 0b111111);
+            set => _s.SetInt32(0x04, value | (_s.GetInt32(0x04) & ~0b111111));
+        }
+}
+
     public class HSD_ParticleGroup : HSDAccessor
     {
         public short Unknown1 { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }

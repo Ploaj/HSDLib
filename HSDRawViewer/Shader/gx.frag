@@ -99,7 +99,7 @@ void main()
 
 	// color passes
 	vec4 ambientPass = TexturePass(ambientColor, PASS_AMBIENT);
-	vec4 diffusePass = TexturePass(diffuseColor, PASS_DIFFUSE);
+	vec4 diffusePass = TexturePass(vec4(diffuseColor.rgb, alpha * diffuseColor.a), PASS_DIFFUSE);
 	vec4 specularPass = TexturePass(specularColor, PASS_SPECULAR);
 
 	// calculate material
@@ -135,7 +135,7 @@ void main()
 	else
 	{
 		// material alpha can only be used without vertex color
-		fragColor.a *= alpha;
+		//fragColor.a *= alpha;
 	}
 
 

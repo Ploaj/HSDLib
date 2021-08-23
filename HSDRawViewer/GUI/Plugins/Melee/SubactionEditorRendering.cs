@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee;
 using HSDRaw.Melee.Pl;
+using HSDRaw.Tools;
 using HSDRaw.Tools.Melee;
 using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Extra;
@@ -12,6 +13,7 @@ using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
 using HSDRawViewer.Tools;
 using OpenTK;
+using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,7 +23,7 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-    public partial class SubactionEditor : IDrawable
+    public partial class SubactionEditor : IDrawableInterface
     {
         /// <summary>
         /// 
@@ -92,6 +94,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private static Vector3 ThrowDummyColor = new Vector3(0, 1, 1);
         private static Vector3 HitboxColor = new Vector3(1, 0, 0);
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
+        private static Vector3 HitboxSelectedColor = new Vector3(1, 1, 1);
         private float ModelScale = 1f;
 
         private FighterAJManager AJManager;
@@ -107,6 +110,28 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private string EndingSymbol;
         private string IntroSymbol;
         private string WaitSymbol;
+
+        private JointAnimManager BackupAnim;
+
+        public List<FrameSpeedMultiplier> FrameSpeedModifiers { get; set; } = new List<FrameSpeedMultiplier>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fSMApplyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            /*var mult = new FrameSpeedModifierSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Frame Speed Multipler Settings", mult))
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    JointManager.Animation.ApplyFSMs(mult.Modifiers);
+                    viewport.MaxFrame = JointManager.Animation.FrameCount;
+                }*/
+        }
+
 
         /// <summary>
         /// 
@@ -609,6 +634,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 if (hb.Element == 8)
                     hbColor = GrabboxColor;
 
+                if (hb.CommandIndex == subActionList.SelectedIndex)
+                    hbColor = HitboxSelectedColor;
+
                 // drawing a capsule takes more processing power, so only draw it if necessary
                 if (hb.Interpolate &&
                     interpolationToolStripMenuItem.Checked)
@@ -758,9 +786,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="size"></param>
         private void LoadAnimation(string symbol)
         {
-            // clear animation
-            JointManager.SetFigaTree(null);
-            ThrowDummyManager.SetFigaTree(null);
+            // reset display sheild size
             DisplayShieldSize = 0;
 
             // check if animations are loaded
@@ -776,61 +802,82 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             var anim = new HSDRawFile(animData);
             if (anim.Roots[0].Data is HSD_FigaTree tree)
             {
-                var name = new Action() { Symbol = anim.Roots[0].Name }.ToString();
-
-                // load figatree to manager and anim editor
-                JointManager.SetFigaTree(tree);
-                _animEditor.SetJoint(JointManager.GetJOBJ(0), JointManager.Animation);
-
-                // set frame
-                viewport.MaxFrame = tree.FrameCount;
+                LoadFigaTree(anim.Roots[0].Name, tree);
+            }
 
 
-                // enable shield display
-                if (FighterData != null && name.Equals("Guard"))
-                    DisplayShieldSize = FighterData.Attributes.ShieldSize / 2;
+            if (FrameSpeedModifiers.Count > 0)
+                UpdateAnimationWithFSMs();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadFigaTree(string treeSymbol, HSD_FigaTree tree)
+        {
+            // clear animation
+            JointManager.SetFigaTree(null);
+            ThrowDummyManager.SetFigaTree(null);
+
+            // create new action
+            var name = new Action() { Symbol = treeSymbol }.ToString();
+
+            // load figatree to manager and anim editor
+            JointManager.SetFigaTree(tree);
+            _animEditor.SetJoint(JointManager.GetJOBJ(0), JointManager.Animation);
+
+            // set backup anim
+            BackupAnim = new JointAnimManager();
+            BackupAnim.FromFigaTree(tree);
+
+            // set frame
+            viewport.MaxFrame = tree.FrameCount;
 
 
-                // load throw dummy for thrown animations
-                if (name.Contains("Throw") && !name.Contains("Taro"))
+            // enable shield display
+            if (FighterData != null && name.Equals("Guard"))
+                DisplayShieldSize = FighterData.Attributes.ShieldSize / 2;
+
+
+            // load throw dummy for thrown animations
+            if (name.Contains("Throw") && !name.Contains("Taro"))
+            {
+                // find thrown anim
+                Action throwAction = null;
+                foreach (Action a in actionList.Items)
                 {
-                    // find thrown anim
-                    Action throwAction = null;
-                    foreach (Action a in actionList.Items)
+                    if (a.Symbol != null &&
+                        a.Symbol.Contains("Taro") &&
+                        a.Symbol.Contains(name) &&
+                        !a.Symbol.Equals(treeSymbol))
                     {
-                        if (a.Symbol != null &&
-                            a.Symbol.Contains("Taro") &&
-                            a.Symbol.Contains(name) &&
-                            !a.Symbol.Equals(anim.Roots[0].Name))
-                        {
-                            throwAction = a;
-                            break;
-                        }
+                        throwAction = a;
+                        break;
                     }
+                }
 
-                    // if throw animation is found
-                    if (throwAction != null &&
-                        throwAction.Symbol != null)
+                // if throw animation is found
+                if (throwAction != null &&
+                    throwAction.Symbol != null)
+                {
+                    var throwData = AJManager.GetAnimationData(throwAction.Symbol);
+
+                    if (throwData != null)
                     {
-                        var throwData = AJManager.GetAnimationData(throwAction.Symbol);
-
-                        if (throwData != null)
+                        // load throw animation
+                        var tanim = new HSDRawFile(throwData);
+                        if (tanim.Roots[0].Data is HSD_FigaTree tree2)
                         {
-                            // load throw animation
-                            var tanim = new HSDRawFile(throwData);
-                            if (tanim.Roots[0].Data is HSD_FigaTree tree2)
+                            ThrowDummyManager.SetFigaTree(tree2);
+                            if (ThrowDummyLookupTable.Count > 0)
                             {
-                                ThrowDummyManager.SetFigaTree(tree2);
-                                if (ThrowDummyLookupTable.Count > 0)
-                                {
-                                    ThrowDummyManager.Animation.EnableBoneLookup = true;
-                                    ThrowDummyManager.Animation.BoneLookup = ThrowDummyLookupTable;
-                                }
+                                ThrowDummyManager.Animation.EnableBoneLookup = true;
+                                ThrowDummyManager.Animation.BoneLookup = ThrowDummyLookupTable;
                             }
                         }
                     }
-
                 }
+
             }
         }
         
@@ -854,7 +901,30 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     f.Save(stream);
                     AJManager.SetAnimation(action.Symbol, stream.ToArray());
                 }
+
+                BackupAnim.FromFigaTree(JointManager.Animation.ToFigaTree());
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateAnimationWithFSMs()
+        {
+            // load backup animation
+            var tempanim = new JointAnimManager();
+            tempanim.FromFigaTree(BackupAnim.ToFigaTree());
+            var backup = BackupAnim;
+
+            // apply fsms to backup animation
+            tempanim.ApplyFSMs(FrameSpeedModifiers);
+
+            // load edited anim
+            LoadFigaTree(SelectedAction.Symbol, tempanim.ToFigaTree());
+            BackupAnim = backup;
+
+            // refresh fsm display tips
+            UpdateFrameTips();
         }
 
         /// <summary>
@@ -1024,9 +1094,97 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         });
                     }
                 }
-
-                viewport.Invalidate();
             }
+
+            if (fsmMode.Checked)
+            {
+                foreach (var fsm in FrameSpeedModifiers)
+                {
+                    viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                    {
+                        Frame = fsm.Frame,
+                        Color = Color.Purple,
+                        Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color,
+                        Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
+                    });
+
+                    viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                    {
+                        Frame = fsm.Frame,
+                        Color = Color.White,
+                        Text = fsm.Rate.ToString(),
+                        Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Text,
+                        Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
+                    });
+                }
+            }
+
+            viewport.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kbState"></param>
+        public void ViewportKeyPress(KeyboardState kbState)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="pick"></param>
+        public void ScreenClick(MouseButtons button, PickInformation pick)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pick"></param>
+        public void ScreenDoubleClick(PickInformation pick)
+        {
+            JointManager.Frame = viewport.Frame;
+            JointManager.UpdateNoRender();
+            SubactionProcess.SetFrame(viewport.Frame);
+
+            var shortestDistance = float.MaxValue;
+            foreach (var hb in SubactionProcess.Hitboxes)
+            {
+                if (hb.Active)
+                {
+                    Console.WriteLine("Hitbox Active " + hb.CommandIndex + " " + hb.GetWorldPosition(JointManager).ToString() + " " + hb.Size);
+                    if (pick.CheckSphereHit(hb.GetWorldPosition(JointManager), hb.Size, out float distance))
+                    {
+                        if (distance < shortestDistance)
+                        {
+                            shortestDistance = distance;
+                            subActionList.SelectedIndex = hb.CommandIndex;
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pick"></param>
+        /// <param name="deltaX"></param>
+        /// <param name="deltaY"></param>
+        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        public void ScreenSelectArea(PickInformation start, PickInformation end)
+        {
         }
     }
 }

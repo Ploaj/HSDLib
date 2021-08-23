@@ -99,6 +99,17 @@ namespace HSDRawViewer.GUI.Controls
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="e"></param>
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            if (!Focused)
+                Focus();
+            base.OnMouseDown(e);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void PlaybackBar_Paint(object sender, PaintEventArgs e)

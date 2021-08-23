@@ -4,6 +4,7 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.GX;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
+using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +19,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
     [SupportedTypes(new Type[] { typeof(KAR_grMainModel) })]
-    public partial class AriRideGrModelEditor : DockContent, EditorBase, IDrawable
+    public partial class AriRideGrModelEditor : DockContent, EditorBase, IDrawableInterface
     {
         private JobjEditor _jointEditor;
 
@@ -230,6 +231,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             RefreshBounding();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             ModelExporter exp = new ModelExporter(_jointEditor.JointManager.GetJOBJ(0), new ModelExportSettings(), new Tools.JointMap());
@@ -308,6 +314,26 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         public void OnFileSave()
         {
 
+        }
+
+        public void ViewportKeyPress(KeyboardState kbState)
+        {
+        }
+
+        public void ScreenClick(MouseButtons button, PickInformation pick)
+        {
+        }
+
+        public void ScreenDoubleClick(PickInformation pick)
+        {
+        }
+
+        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        {
+        }
+
+        public void ScreenSelectArea(PickInformation start, PickInformation end)
+        {
         }
     }
 }

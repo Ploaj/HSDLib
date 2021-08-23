@@ -71,7 +71,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private ViewportControl _viewport = new ViewportControl();
+        private ViewportControl _viewport;
 
         public HSD_Spline[] _splines { get; internal set; } = new HSD_Spline[0];
         public KAR_grRangeSpline[] _rangeSplines { get; internal set; } = new KAR_grRangeSpline[0];
@@ -137,7 +137,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 { EditorMode.ItemAreaPosition, () => RenderPosition(_itemAreaPos)},
                 { EditorMode.VehicleAreaPosition, () => RenderPosition(_vehicleAreaPos)},
             };
-            
+
 
             // initialize viewport
             _viewport = new ViewportControl();
@@ -151,9 +151,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             modeComboBox.SelectedIndex = 0;
 
             // dispose of viewport on close
-            FormClosing += (sender, args) =>
+            Disposed += (sender, args) =>
             {
-                _viewport.RemoveRenderer(this);
                 _viewport.Dispose();
             };
         }

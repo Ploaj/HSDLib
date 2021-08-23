@@ -53,6 +53,8 @@ namespace HSDRawViewer.Rendering.Models
             }
         }
 
+        private static MatAnimMaterialState MaterialState = new MatAnimMaterialState();
+
         /// <summary>
         /// 
         /// </summary>
@@ -77,32 +79,56 @@ namespace HSDRawViewer.Rendering.Models
             shader.SetInt("alphaComp0", 7); // always
             shader.SetInt("alphaComp1", 7);
 
+
+            // Materials
+            var color = mobj.Material;
+            if (color != null)
+            {
+                MaterialState.Ambient.X = color.AMB_R / 255f;
+                MaterialState.Ambient.Y = color.AMB_G / 255f;
+                MaterialState.Ambient.Z = color.AMB_B / 255f;
+                MaterialState.Ambient.W = color.AMB_A / 255f;
+
+                MaterialState.Diffuse.X = color.DIF_R / 255f;
+                MaterialState.Diffuse.Y = color.DIF_G / 255f;
+                MaterialState.Diffuse.Z = color.DIF_B / 255f;
+                MaterialState.Diffuse.W = color.DIF_A / 255f;
+
+                MaterialState.Specular.X = color.SPC_R / 255f;
+                MaterialState.Specular.Y = color.SPC_G / 255f;
+                MaterialState.Specular.Z = color.SPC_B / 255f;
+                MaterialState.Specular.W = color.SPC_A / 255f;
+
+                MaterialState.Shininess = color.Shininess;
+                MaterialState.Alpha = color.Alpha;
+
+                if (animation != null)
+                    animation.GetMaterialState(mobj, ref MaterialState);
+
+                shader.SetVector4("ambientColor", MaterialState.Ambient);
+                shader.SetVector4("diffuseColor", MaterialState.Diffuse);
+                shader.SetVector4("specularColor", MaterialState.Specular);
+                shader.SetFloat("shinniness", MaterialState.Shininess);
+                shader.SetFloat("alpha", MaterialState.Alpha);
+            }
+
             var pp = mobj.PEDesc;
             if (pp != null)
             {
+                MaterialState.Ref0 = pp.AlphaRef0 / 255f;
+                MaterialState.Ref1 = pp.AlphaRef1 / 255f;
+
+                if (animation != null)
+                    animation.GetMaterialState(mobj, ref MaterialState);
+
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
                 GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
 
                 shader.SetInt("alphaOp", (int)pp.AlphaOp);
                 shader.SetInt("alphaComp0", (int)pp.AlphaComp0);
                 shader.SetInt("alphaComp1", (int)pp.AlphaComp1);
-                shader.SetFloat("alphaRef0", pp.AlphaRef0 / 255f);
-                shader.SetFloat("alphaRef1", pp.AlphaRef1 / 255f);
-            }
-
-
-            // Materials
-            var color = mobj.Material;
-            if (color != null)
-            {
-                if (animation != null)
-                    color = animation.GetMaterialState(mobj);
-
-                shader.SetVector4("ambientColor", color.AMB_R / 255f, color.AMB_G / 255f, color.AMB_B / 255f, color.AMB_A / 255f);
-                shader.SetVector4("diffuseColor", color.DIF_R / 255f, color.DIF_G / 255f, color.DIF_B / 255f, color.DIF_A / 255f);
-                shader.SetVector4("specularColor", color.SPC_R / 255f, color.SPC_G / 255f, color.SPC_B / 255f, color.SPC_A / 255f);
-                shader.SetFloat("shinniness", color.Shininess);
-                shader.SetFloat("alpha", color.Alpha);
+                shader.SetFloat("alphaRef0", MaterialState.Ref0);
+                shader.SetFloat("alphaRef1", MaterialState.Ref1);
             }
 
             var enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);

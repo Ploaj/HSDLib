@@ -40,12 +40,12 @@ namespace HSDRawViewer.Converters.AirRide
                     r.Seek((uint)(triOffset + i * 0x10));
 
                     var length = r.ReadSingle();
-                    var pi = r.ReadInt16();
-                    var di = r.ReadInt16();
-                    var n1 = r.ReadInt16();
-                    var n2 = r.ReadInt16();
-                    var n3 = r.ReadInt16();
-                    var fl = r.ReadInt16();
+                    var pi = r.ReadUInt16();
+                    var di = r.ReadUInt16();
+                    var n1 = r.ReadUInt16();
+                    var n2 = r.ReadUInt16();
+                    var n3 = r.ReadUInt16();
+                    var fl = r.ReadUInt16();
 
                     r.Seek((uint)(posOffset + pi * 0xC));
                     var position = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());

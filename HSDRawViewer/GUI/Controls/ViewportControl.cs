@@ -238,7 +238,7 @@ namespace HSDRawViewer.GUI
 
                       timer.Step();
 
-                      if (IsPlaying && timer.Total.Milliseconds > 1000 / _fps)
+                      if (IsPlaying && timer.Total.Milliseconds > 1000 / (_fps * 2))
                       {
                           if (_playbackMode == PlaybackMode.Forward && !(!LoopPlayback && Frame == MaxFrame))
                           {
@@ -250,6 +250,8 @@ namespace HSDRawViewer.GUI
                           }
                           timer.Restart();
                       }
+                      else
+                          Thread.Sleep(1);
                   }
               }
               );
@@ -1092,6 +1094,16 @@ namespace HSDRawViewer.GUI
                 if (d.ShowDialog() == DialogResult.OK)
                     GridColor = d.Color;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void animationTrack_KeyDown(object sender, KeyEventArgs e)
+        {
+            Console.WriteLine(e.KeyCode);
         }
     }
 }

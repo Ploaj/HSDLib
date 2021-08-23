@@ -9,7 +9,8 @@ using HSDRawViewer.Tools;
 using System.Linq;
 using HSDRaw.Melee.Cmd;
 using System.IO;
-using HSDRawViewer.GUI.Extra;
+using HSDRawViewer.Rendering;
+using HSDRawViewer.GUI.Controls;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -984,6 +985,53 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private void trackInfoToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             UpdateFrameTips();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fsmMode_CheckedChanged(object sender, EventArgs e)
+        {
+            toolStripDropDownButton1.Enabled = !fsmMode.Checked;
+            editFsms.Visible = fsmMode.Checked;
+            applyFSM.Visible = fsmMode.Checked;
+
+            var temp = FrameSpeedModifiers.ToList();
+            FrameSpeedModifiers.Clear();
+            UpdateAnimationWithFSMs();
+            FrameSpeedModifiers.AddRange(temp);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editFsms_Click(object sender, EventArgs e)
+        {
+            // component box edit fsms
+            PopoutCollectionEditor.EditValue(this, this, "FrameSpeedModifiers");
+
+            UpdateAnimationWithFSMs();
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void applyFSM_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to apply fsms?\nThis operation cannot be undone.", "Apply FSMs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                FrameSpeedModifiers.Clear();
+                UpdateFrameTips();
+                SaveAnimationChanges();
+                fsmMode.Checked = false;
+            }
         }
     }
 }

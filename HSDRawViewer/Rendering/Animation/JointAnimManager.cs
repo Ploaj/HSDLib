@@ -70,6 +70,30 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="jointIndex"></param>
+        /// <returns></returns>
+        public bool IsJointVisible(float frame, int boneIndex, HSD_JOBJ jobj)
+        {
+            // set keys to animated values
+            if (boneIndex < Nodes.Count)
+            {
+                AnimNode node = Nodes[boneIndex];
+                foreach (FOBJ_Player t in node.Tracks)
+                {
+                    switch (t.JointTrackType)
+                    {
+                        case JointTrackType.HSD_A_J_BRANCH: 
+                            return t.GetValue(frame) != 0;
+                    }
+                }
+            }
+
+            return !jobj.Flags.HasFlag(JOBJ_FLAG.HIDDEN);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="frame"></param>
         /// <param name="boneIndex"></param>
         /// <param name="jobj"></param>
@@ -302,14 +326,31 @@ namespace HSDRawViewer.Rendering
                 foreach (var t in n.Tracks)
                     t.ApplyFSMs(fsms);
 
+            // calculate new frame count
+            float frameRate = 1;
+            float lastFrame = 0;
+            float frameCount = 0;
+            foreach (var fsm in fsms)
+            {
+                var dis = fsm.Frame - lastFrame;
+                frameCount += dis / frameRate;
+
+                frameRate = fsm.Rate;
+                lastFrame = fsm.Frame;
+            }
+            var finaldistance = FrameCount - lastFrame;
+            frameCount += finaldistance / frameRate;
+
+            FrameCount = frameCount;
+
             // recalculate frame count
-            FrameCount = 0;
-            foreach (var n in Nodes)
-                foreach (var t in n.Tracks)
-                {
-                    var maxFrame = t.Keys.Max(e => e.Frame);
-                    FrameCount = Math.Max(FrameCount, maxFrame);
-                }
+            //FrameCount = 0;
+            //foreach (var n in Nodes)
+            //    foreach (var t in n.Tracks)
+            //    {
+            //        var maxFrame = t.Keys.Max(e => e.Frame);
+            //        FrameCount = Math.Max(FrameCount, maxFrame);
+            //    }
         }
 
         /// <summary>

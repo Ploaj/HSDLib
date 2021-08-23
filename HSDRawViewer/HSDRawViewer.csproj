@@ -195,6 +195,7 @@
     <Compile Include="GUI\Controls\PlaybackBar.Designer.cs">
       <DependentUpon>PlaybackBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Controls\PopoutCollectionEditor.cs" />
     <Compile Include="GUI\Controls\TexturePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

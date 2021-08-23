@@ -378,10 +378,22 @@ namespace HSDRawViewer.Rendering.Models
                     MatAnimation.DOBJIndex = 0;
                     ShapeAnimation.DOBJIndex = 0;
 
+                    if (Animation != null && !Animation.IsJointVisible(Frame, b.Value.Index, b.Key))
+                    {
+                        MatAnimation.JOBJIndex++;
+                        ShapeAnimation.JOBJIndex++;
+                        continue;
+                    }
+
                     if (b.Key.Dobj != null)
                     {
                         foreach (var dobj in b.Key.Dobj.List)
                         {
+                            // skip dobjs without mobjs
+                            if (dobj.Mobj == null)
+                                continue;
+
+                            // 
                             if (dobj == DOBJManager.SelectedDOBJ)
                                 parent = b.Key;
 
@@ -424,7 +436,7 @@ namespace HSDRawViewer.Rendering.Models
                 //GL.Disable(EnableCap.DepthTest);
                 GL.DepthFunc(DepthFunction.Always);
 
-                if (DOBJManager.SelectedDOBJ != null && _settings.OutlineSelected)
+                if (DOBJManager.SelectedDOBJ != null && _settings.OutlineSelected && parent != null)
                 {
                     DOBJManager.RenderDOBJShader(GXShader._shader, DOBJManager.SelectedDOBJ, parent, this, null, true);
                 }

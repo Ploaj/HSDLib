@@ -11,7 +11,18 @@ namespace HSDRaw.Tools
     {
         public int Frame { get; set; }
 
-        public float Rate { get; set; }
+        public float Rate
+        {
+            get => _rate; set
+            {
+                _rate = value; 
+
+                if (_rate <= 0)
+                    _rate = 1;
+            }
+        }
+
+        private float _rate;
     }
 
     /// <summary>

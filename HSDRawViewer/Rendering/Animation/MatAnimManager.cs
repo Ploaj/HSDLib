@@ -6,6 +6,7 @@ using HSDRaw.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
@@ -68,6 +69,26 @@ namespace HSDRawViewer.Rendering
     /// <summary>
     /// 
     /// </summary>
+    public struct MatAnimMaterialState
+    {
+        public Vector4 Ambient;
+
+        public Vector4 Diffuse;
+
+        public Vector4 Specular;
+
+        public float Shininess;
+
+        public float Alpha;
+
+        public float Ref0;
+
+        public float Ref1;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class MatAnimManager : AnimManager
     {
         public override int NodeCount => Nodes.Count;
@@ -83,10 +104,8 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="mobj"></param>
         /// <returns></returns>
-        public HSD_Material GetMaterialState(HSD_MOBJ mobj)
+        public void GetMaterialState(HSD_MOBJ mobj, ref MatAnimMaterialState state)
         {
-            HSD_Material mat = HSDAccessor.DeepClone<HSD_Material>(mobj.Material);
-
             if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
             {
                 var node = Nodes[JOBJIndex].Nodes[DOBJIndex];
@@ -95,21 +114,21 @@ namespace HSDRawViewer.Rendering
                 {
                     switch ((MatTrackType)t.TrackType)
                     {
-                        case MatTrackType.HSD_A_M_ALPHA: mat.Alpha = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_R: mat.AMB_R = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_G: mat.AMB_G = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_B: mat.AMB_B = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_R: mat.DIF_R = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_G: mat.DIF_G = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_B: mat.DIF_B = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_R: mat.SPC_R = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_G: mat.SPC_G = (byte)(t.GetValue(node.Frame) * 0xFF); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_B: mat.SPC_B = (byte)(t.GetValue(node.Frame) * 0xFF); break;
+                        case MatTrackType.HSD_A_M_PE_REF0: state.Ref0 = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_PE_REF1: state.Ref1 = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_ALPHA: state.Alpha = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_AMBIENT_R: state.Ambient.X = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_AMBIENT_G: state.Ambient.Y = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_AMBIENT_B: state.Ambient.Z = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_DIFFUSE_R: state.Diffuse.X = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_DIFFUSE_G: state.Diffuse.Y = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_DIFFUSE_B: state.Diffuse.Z = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_SPECULAR_R: state.Specular.X = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_SPECULAR_G: state.Specular.Y = t.GetValue(node.Frame); break;
+                        case MatTrackType.HSD_A_M_SPECULAR_B: state.Specular.Z = t.GetValue(node.Frame); break;
                     }
                 }
             }
-
-            return mat;
         }
 
         /// <summary>

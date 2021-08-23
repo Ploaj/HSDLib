@@ -257,6 +257,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         if (cmd.Parameters[0] < Hitboxes.Length)
                         {
                             var hb = Hitboxes[cmd.Parameters[0]];
+                            hb.CommandIndex = i;
                             hb.CreatedOnFrame = time;
                             hb.Active = true;
                             hb.BoneID = cmd.Parameters[3];
@@ -391,6 +392,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public int Element;
         public Vector3 Point1;
         public Vector3 Point2;
+        public int CommandIndex;
 
         public Vector3 GetWorldPosition(JOBJManager manager)
         {

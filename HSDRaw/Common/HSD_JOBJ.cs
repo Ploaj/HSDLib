@@ -55,15 +55,25 @@ namespace HSDRaw.Common
             set => _s.SetString(0x00, value);
         }
 
-        public JOBJ_FLAG Flags { get => (JOBJ_FLAG)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
+        public JOBJ_FLAG Flags 
+        { 
+            get => (JOBJ_FLAG)_s.GetInt32(0x04); 
+            set => _s.SetInt32(0x04, (int)value);
+        }
 
         public override HSD_JOBJ Child { get => _s.GetReference<HSD_JOBJ>(0x08); set => _s.SetReference(0x08, value); }
 
         public override HSD_JOBJ Next { get => _s.GetReference<HSD_JOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
         
-        public HSD_DOBJ Dobj { get => !Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_DOBJ>(0x10) : null; set { _s.SetReference(0x10, value); Flags &= ~JOBJ_FLAG.SPLINE; } }
+        public HSD_DOBJ Dobj { get => !Flags.HasFlag(JOBJ_FLAG.SPLINE) && !Flags.HasFlag(JOBJ_FLAG.PTCL) ? _s.GetReference<HSD_DOBJ>(0x10) : null; set { _s.SetReference(0x10, value); Flags &= ~JOBJ_FLAG.SPLINE; Flags &= ~JOBJ_FLAG.PTCL; } }
 
+        
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_Spline Spline { get => Flags.HasFlag(JOBJ_FLAG.SPLINE) ? _s.GetReference<HSD_Spline>(0x10) : null; set { _s.SetReference(0x10, value); Flags |= JOBJ_FLAG.SPLINE; } }
+
+        
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public HSD_ParticleJoint ParticleJoint { get => Flags.HasFlag(JOBJ_FLAG.PTCL) ? _s.GetReference<HSD_ParticleJoint>(0x10) : null; set { _s.SetReference(0x10, value); Flags |= JOBJ_FLAG.PTCL; } }
 
         public float RX { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
         public float RY { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }

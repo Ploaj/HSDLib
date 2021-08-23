@@ -101,9 +101,9 @@ namespace HSDRawViewer.GUI.Plugins
                         PluginManager.GetCommonViewport().AnimationTrackEnabled = false;
                         PluginManager.GetCommonViewport().RemoveRenderer(this);
                     }
-                    viewport.Dispose();
-                    JointManager.CleanupRendering();
                 }
+                viewport.Dispose();
+                JointManager.CleanupRendering();
             };
         }
 
@@ -204,7 +204,7 @@ namespace HSDRawViewer.GUI.Plugins
             public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
 
             [Browsable(false)]
-            public int TextureCount { get => DOBJ.Mobj.Textures != null ? DOBJ.Mobj.Textures.List.Count : 0; }
+            public int TextureCount { get => DOBJ.Mobj == null ? -1 : (DOBJ.Mobj.Textures != null ? DOBJ.Mobj.Textures.List.Count : 0); }
 
             [Browsable(false)]
             public bool HasPixelProcessing { get => DOBJ.Mobj?.PEDesc != null; }
@@ -1767,6 +1767,27 @@ namespace HSDRawViewer.GUI.Plugins
                     JointManager.Animation.ApplyFSMs(mult.Modifiers);
                     viewport.MaxFrame = JointManager.Animation.FrameCount;
                 }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void makeParticleJointToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (JointManager.SelectedJOBJ != null)
+            {
+                if (MessageBox.Show(
+                    "Are you sure you want to make this joint a particle joint?\n" +
+                    "This will remove all objects on this joint", 
+                    "Make Particle Joint",
+                    MessageBoxButtons.YesNoCancel, 
+                    MessageBoxIcon.Warning) == DialogResult.Yes)
+                {
+                    JointManager.SelectedJOBJ.ParticleJoint = new HSD_ParticleJoint();
+                }
+            }
         }
     }
 }
