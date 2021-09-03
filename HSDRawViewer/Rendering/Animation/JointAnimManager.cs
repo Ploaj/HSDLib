@@ -72,7 +72,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="jointIndex"></param>
         /// <returns></returns>
-        public bool IsJointVisible(float frame, int boneIndex, HSD_JOBJ jobj)
+        public bool GetJointBranchState(float frame, int boneIndex, out float value)
         {
             // set keys to animated values
             if (boneIndex < Nodes.Count)
@@ -82,13 +82,15 @@ namespace HSDRawViewer.Rendering
                 {
                     switch (t.JointTrackType)
                     {
-                        case JointTrackType.HSD_A_J_BRANCH: 
-                            return t.GetValue(frame) != 0;
+                        case JointTrackType.HSD_A_J_BRANCH:
+                            value = t.GetValue(frame);
+                            return true;
                     }
                 }
             }
 
-            return !jobj.Flags.HasFlag(JOBJ_FLAG.HIDDEN);
+            value = 0;
+            return false;
         }
 
         /// <summary>

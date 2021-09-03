@@ -107,11 +107,27 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 get
                 {
+                    return SubactionDesc.Name;
+                }
+            }
+
+            public int CodeID
+            {
+                get
+                {
                     Bitreader r = new Bitreader(data);
 
-                    var sa = SubactionManager.GetSubaction((byte)r.Read(8), SubactionGroup);
+                    return (byte)r.Read(6);
+                }
+            }
 
-                    return sa.Name;
+            public Subaction SubactionDesc
+            {
+                get
+                {
+                    Bitreader r = new Bitreader(data);
+
+                    return SubactionManager.GetSubaction((byte)r.Read(8), SubactionGroup);
                 }
             }
 

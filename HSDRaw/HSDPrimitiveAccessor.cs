@@ -179,6 +179,7 @@ namespace HSDRaw
     public class HSDByteArray : HSDPrimitiveArray<byte>
     {
         public override int Stride => 1;
+
         protected override byte Get(int index)
         {
             return _s.GetByte(index * Stride);

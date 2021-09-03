@@ -27,6 +27,8 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool RenderSplines { get; set; } = false;
 
+        public bool EnableHiddenFlag { get; set; } = false;
+
         public float MaterialFrame { get; set; }
 
         private HSD_JOBJ RootJOBJ { get; set; }
@@ -360,6 +362,30 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        private bool BranchIsVisible(HSD_JOBJ jobj, JOBJCache cache)
+        {
+            var parent = cache;
+            var visible = !jobj.Flags.HasFlag(JOBJ_FLAG.HIDDEN);
+
+            while (parent != null)
+            {
+                if (Animation != null && 
+                    Animation.GetJointBranchState(Frame, parent.Index, out float branch))
+                    return branch != 0;
+
+                parent = parent.Parent;
+            }
+
+            if (EnableHiddenFlag)
+                return visible;
+            else
+                return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void RenderDOBJs(Camera camera)
         {
             if (_settings.RenderObjects)
@@ -378,7 +404,7 @@ namespace HSDRawViewer.Rendering.Models
                     MatAnimation.DOBJIndex = 0;
                     ShapeAnimation.DOBJIndex = 0;
 
-                    if (Animation != null && !Animation.IsJointVisible(Frame, b.Value.Index, b.Key))
+                    if (!BranchIsVisible(b.Key, b.Value))
                     {
                         MatAnimation.JOBJIndex++;
                         ShapeAnimation.JOBJIndex++;

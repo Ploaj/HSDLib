@@ -1,4 +1,5 @@
-﻿using HSDRaw.AirRide.Gr.Data;
+﻿using HSDRaw;
+using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using System.Linq;
 
@@ -65,7 +66,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         public AirRideGrDataPositionProxy(HSD_JOBJ joint)
         {
-            _joint = joint;
+            _joint = HSDAccessor.DeepClone<HSD_JOBJ>(joint);
+            _joint.Next = null;
+            _joint.Child = null;
         }
 
         public AirRideGrDataPositionProxy(KAR_grPositionData data)
@@ -107,8 +110,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 _positions = list.JointIndices.Array.Select(e => new AirRideGrDataPositionProxy(joints[e])).ToArray();
             }
             else
-            if (list.AreaPositionData != null)
-                _positions = list.AreaPositionData.Select(e => new AirRideGrDataPositionProxy(e)).ToArray();
+            if (list.AreaPositionArray != null)
+                _positions = list.AreaPositionArray.Select(e => new AirRideGrDataPositionProxy(e)).ToArray();
         }
 
         /// <summary>
@@ -127,8 +130,101 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 _positions = list.JointIndices.Array.Select(e => new AirRideGrDataPositionProxy(joints[e])).ToArray();
             }
             else
-            if (list.PositionData != null)
-                _positions = list.PositionData.Select(e => new AirRideGrDataPositionProxy(e)).ToArray();
+            if (list.PositionDataArray != null)
+                _positions = list.PositionDataArray.Select(e => new AirRideGrDataPositionProxy(e)).ToArray();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rootJoint"></param>
+        /// <returns></returns>
+
+        public KAR_grPositionList ToKarPositionList(HSD_JOBJ rootJoint)
+        {
+            if (_positions.Length == 0)
+                return null;
+
+            var list = new KAR_grPositionList()
+            {
+                Count = _positions.Length
+            };
+
+            foreach (var v in _positions)
+            {
+                // joint index
+                if (v._joint != null)
+                {
+                    rootJoint.AddChild(v._joint);
+                    if (list.JointIndices == null)
+                        list.JointIndices = new HSDIntArray() { _s = new HSDStruct() };
+                    list.JointIndices.Add(rootJoint.BreathFirstList.Count - 1);
+                }
+                else
+                // position data
+                if (v._data != null)
+                {
+                    if (list.PositionData == null)
+                        list.PositionData = new HSDArrayAccessor<KAR_grPositionData>();
+
+                    list.PositionData.Add(v._data);
+                }
+                else
+                //
+                if (v._areadata != null)
+                {
+
+                }
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rootJoint"></param>
+        /// <returns></returns>
+
+        public KAR_grAreaPositionList ToKarAreaPositionList(HSD_JOBJ rootJoint)
+        {
+            if (_positions.Length == 0)
+                return null;
+
+            var list = new KAR_grAreaPositionList()
+            {
+                Count = _positions.Length
+            };
+
+            foreach (var v in _positions)
+            {
+                // joint index
+                if (v._joint != null)
+                {
+                    rootJoint.AddChild(v._joint);
+                    if (list.JointIndices == null)
+                        list.JointIndices = new HSDIntArray() { _s = new HSDStruct() };
+                    list.JointIndices.Add(rootJoint.BreathFirstList.Count - 1);
+                }
+                else
+                // position data
+                if (v._data != null)
+                {
+                }
+                else
+                //
+                if (v._areadata != null)
+                {
+                    if (list.AreaPosition == null)
+                        list.AreaPosition = new HSDArrayAccessor<KAR_grAreaPositionData>();
+
+                    list.AreaPosition.Add(v._areadata);
+                }
+            }
+
+            return list;
         }
     }
 }

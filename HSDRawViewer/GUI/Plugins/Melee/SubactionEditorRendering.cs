@@ -11,6 +11,7 @@ using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
+using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
 using OpenTK;
 using OpenTK.Input;
@@ -576,6 +577,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private Vector3[] PreviousPositions = new Vector3[4];
         private Capsule capsule = new Capsule(Vector3.Zero, Vector3.Zero, 0);
 
+        private TranslationWidget _transWidget = new TranslationWidget();
+
         /// <summary>
         /// 
         /// </summary>
@@ -617,6 +620,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // hitbox collision
             int hitboxId = 0;
+            bool isHitboxSelected = false;
             foreach (var hb in SubactionProcess.Hitboxes)
             {
                 if (!hb.Active)
@@ -634,8 +638,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 if (hb.Element == 8)
                     hbColor = GrabboxColor;
 
-                if (hb.CommandIndex == subActionList.SelectedIndex)
+                if (subActionList.SelectedIndices.Count == 1 && hb.CommandIndex == subActionList.SelectedIndex)
+                {
                     hbColor = HitboxSelectedColor;
+                    isHitboxSelected = true;
+                    _transWidget.Transform = hb.GetWorldTransform(JointManager);
+                }
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
                 if (hb.Interpolate &&
@@ -757,6 +765,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     DrawShape.DrawSphere(ThrowDummyManager.GetWorldTransform(40), 1f, 16, 16, ThrowDummyColor, 0.5f);
                 }
             }
+
+            if (isHitboxSelected)
+                _transWidget.Render(cam);
 
             // sword trail
             //AfterImageRenderer.RenderAfterImage(JointManager, viewport.Frame, after_desc);
@@ -1128,6 +1139,40 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="kbState"></param>
         public void ViewportKeyPress(KeyboardState kbState)
         {
+            if (subActionList.SelectedItem is SubActionScript script &&
+                script.CodeID == 11)
+            {
+                var desc = script.SubactionDesc;
+                var parameters = desc.GetParameters(script.data);
+
+                if (kbState.IsKeyDown(Key.Plus))
+                {
+                    // size
+                    if (kbState.IsKeyDown(Key.ShiftLeft) || kbState.IsKeyDown(Key.ShiftRight))
+                        parameters[6] += 100;
+                    else
+                        parameters[6] += 10;
+
+                    if (parameters[6] > ushort.MaxValue)
+                        parameters[6] = ushort.MaxValue;
+                }
+                if (kbState.IsKeyDown(Key.Minus))
+                {
+                    // size
+                    if (kbState.IsKeyDown(Key.ShiftLeft) || kbState.IsKeyDown(Key.ShiftRight))
+                        parameters[6] -= 100;
+                    else
+                        parameters[6] -= 10;
+
+                    if (parameters[6] < 0)
+                        parameters[6] = 0;
+                }
+
+                script.data = desc.Compile(parameters);
+
+                subActionList.Invalidate(); 
+                SaveSelectedActionChanges();
+            }
         }
 
         /// <summary>
@@ -1154,14 +1199,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 if (hb.Active)
                 {
-                    Console.WriteLine("Hitbox Active " + hb.CommandIndex + " " + hb.GetWorldPosition(JointManager).ToString() + " " + hb.Size);
                     if (pick.CheckSphereHit(hb.GetWorldPosition(JointManager), hb.Size, out float distance))
                     {
                         if (distance < shortestDistance)
                         {
                             shortestDistance = distance;
+                            subActionList.ClearSelected();
                             subActionList.SelectedIndex = hb.CommandIndex;
-                            
                         }
                     }
                 }
@@ -1176,6 +1220,26 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="deltaY"></param>
         public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
         {
+            _transWidget.Drag(pick);
+
+            var keyState = Keyboard.GetState();
+
+            bool drag = keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+
+            if (drag && 
+                subActionList.SelectedItem is SubActionScript script && 
+                script.CodeID == 11)
+            {
+                var desc = script.SubactionDesc;
+                var parameters = desc.GetParameters(script.data);
+
+                // position
+                // 7 8 9 
+
+                script.data = desc.Compile(parameters);
+                subActionList.Invalidate();
+                SaveSelectedActionChanges();
+            }
         }
 
         /// <summary>

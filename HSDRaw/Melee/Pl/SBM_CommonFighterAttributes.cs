@@ -47,9 +47,9 @@ namespace HSDRaw.Melee.Pl
 
         public float MaximumShorthopVerticalVelocity { get => _s.GetFloat(0x04C); set => _s.SetFloat(0x4C, value); } // ?
 
-        public float HorizontalAirJumpMultiplier { get => _s.GetFloat(0x050); set => _s.SetFloat(0x50, value); }
+        public float VerticalAirJumpMultiplier { get => _s.GetFloat(0x050); set => _s.SetFloat(0x50, value); }
 
-        public float VerticalAirJumpMultiplier { get => _s.GetFloat(0x054); set => _s.SetFloat(0x54, value); }
+        public float HorizontalAirJumpMultiplier { get => _s.GetFloat(0x054); set => _s.SetFloat(0x54, value); }
 
         public int NumberOfJumps { get => _s.GetInt32(0x058); set => _s.SetInt32(0x58, value); }
 

@@ -494,6 +494,7 @@
     <Compile Include="Rendering\Viewport.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Rendering\Widgets\TranslationWidget.cs" />
     <Compile Include="Sound\HPS.cs" />
     <Compile Include="Sound\SEM.cs" />
     <Compile Include="Sound\SEMEntry.cs" />

@@ -396,8 +396,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public Vector3 GetWorldPosition(JOBJManager manager)
         {
+            return Vector3.TransformPosition(Vector3.Zero, GetWorldTransform(manager));
+        }
+
+        public Matrix4 GetWorldTransform(JOBJManager manager)
+        {
             if (manager == null)
-                return Point1;
+                return Matrix4.Identity;
 
             var boneID = BoneID;
             if (boneID == 0)
@@ -409,7 +414,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             var transform = Matrix4.CreateTranslation(Point1) * manager.GetWorldTransform(boneID);
             transform.ClearScale();
 
-            return Vector3.TransformPosition(Vector3.Zero, transform);
+            return transform;
         }
     }
 }

@@ -15,10 +15,10 @@ namespace HSDRaw.AirRide.Vc
         public HSD_MatAnimJoint Unk1MatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0xc); set => _s.SetReference(0xc, value); }
         public HSD_FigaTree Unk2Anim { get => _s.GetReference<HSD_FigaTree>(0x10); set => _s.SetReference(0x10, value); }
         public HSD_MatAnimJoint Unk2MatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0x14); set => _s.SetReference(0x14, value); }
-        public HSD_FigaTree Unk3Anim { get => _s.GetReference<HSD_FigaTree>(0x18); set => _s.SetReference(0x18, value); }
-        public HSD_MatAnimJoint Unk3MatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0x1c); set => _s.SetReference(0x1c, value); }
-        public HSD_FigaTree BoostAnim { get => _s.GetReference<HSD_FigaTree>(0x20); set => _s.SetReference(0x20, value); }
-        public HSD_MatAnimJoint BoostMatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0x24); set => _s.SetReference(0x24, value); }
+        public HSD_FigaTree BoostAnim { get => _s.GetReference<HSD_FigaTree>(0x18); set => _s.SetReference(0x18, value); }
+        public HSD_MatAnimJoint BoostMatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0x1c); set => _s.SetReference(0x1c, value); }
+        public HSD_FigaTree ChargeAnim { get => _s.GetReference<HSD_FigaTree>(0x20); set => _s.SetReference(0x20, value); }
+        public HSD_MatAnimJoint ChargeMatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0x24); set => _s.SetReference(0x24, value); }
         public HSD_FigaTree StopAnim { get => _s.GetReference<HSD_FigaTree>(0x28); set => _s.SetReference(0x28, value); }
         public HSD_MatAnimJoint StopMatAnim { get => _s.GetReference<HSD_MatAnimJoint>(0x2c); set => _s.SetReference(0x2c, value); }
         /*public int Unk1 { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }

@@ -15,7 +15,7 @@ namespace HSDRaw.AirRide.Gr.Data
         // 0C ??
 
         // 10 grCheck grDesert
-        public KAR_grConveyorPath x10 { get => _s.GetReference<KAR_grConveyorPath>(0x10); set => _s.SetReference(0x10, value); }
+        public KAR_grConveyorPath ConveyorSpline { get => _s.GetReference<KAR_grConveyorPath>(0x10); set => _s.SetReference(0x10, value); }
 
         // 14
         public KAR_grSplineList RailSpline1 { get => _s.GetReference<KAR_grSplineList>(0x14); set => _s.SetReference(0x14, value); }

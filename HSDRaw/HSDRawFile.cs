@@ -16,6 +16,7 @@ using HSDRaw.Melee;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Stages;
 using HSDRaw.MEX.Menus;
+using HSDRaw.AirRide.Em;
 
 namespace HSDRaw
 {
@@ -819,6 +820,7 @@ namespace HSDRaw
                 x => x.Equals("mexCostume") ?  new MEX_CostumeSymbol() : null,
                 x => x.StartsWith("mnName") ?  new HSDFixedLengthPointerArrayAccessor<HSD_ShiftJIS_String>() : null,
                 x => x.EndsWith("move_logic") ?  new HSDArrayAccessor<MEX_MoveLogic>() : null,
+                x => x.StartsWith("em") && x.EndsWith("DataGroup") ?  new KAR_emData() : null,
                 x => new HSDAccessor(),
         };
 

@@ -143,29 +143,34 @@ namespace HSDRawViewer.Rendering
         /// <param name="rad"></param>
         /// <param name="closest"></param>
         /// <returns></returns>
-        public bool CheckSphereHit(Vector3 sphere, float rad, out float distance)
+        public bool CheckSphereHit(Vector3 center, float radius, out float distance)
         {
-            Vector3 difference = sphere - Origin;
-            float differenceLengthSquared = difference.LengthSquared;
-            float sphereRadiusSquared = rad * rad;
-            float distanceAlongRay;
-            if (differenceLengthSquared < sphereRadiusSquared)
-            {
-                distance = 0;
-                return true;
-            }
-            Vector3 refDirection = Direction;
-            Vector3.Dot(ref refDirection, ref difference, out distanceAlongRay);
-            if (distanceAlongRay < 0)
-            {
-                distance = 0;
+            Vector3 m = Origin - center;
+            float b = Vector3.Dot(m, -Direction);
+            float c = Vector3.Dot(m, m) - radius * radius;
+
+            distance = float.MaxValue;
+
+            // Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
+            if (c > 0.0f && b > 0.0f) 
                 return false;
-            }
-            float dist = sphereRadiusSquared + distanceAlongRay * distanceAlongRay - differenceLengthSquared;
 
-            distance = dist;// distanceAlongRay - (float?)Math.Sqrt(dist);
+            float discr = b * b - c;
 
-            return (dist < 0) ? false : true;
+            // A negative discriminant corresponds to ray missing sphere 
+            if (discr < 0.0f) 
+                return false;
+
+            // Ray now found to intersect sphere, compute smallest t value of intersection
+            distance = -b - (float)Math.Sqrt(discr);
+
+            // If t is negative, ray started inside sphere so clamp t to zero 
+            if (distance < 0.0f)
+                distance = 0.0f;
+
+            // var q = Origin + distance * -Direction;
+
+            return true;
         }
 
 
@@ -204,7 +209,7 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public bool IntersectsLine(Vector3 start, Vector3 end)
         {
-            Vector3 da = Direction;  // Unnormalized direction of the ray
+            Vector3 da = End - Origin;  // Unnormalized direction of the ray
             Vector3 db = end - start;
             Vector3 dc = start - Origin;
 

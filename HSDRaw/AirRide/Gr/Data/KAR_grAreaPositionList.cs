@@ -6,7 +6,9 @@
 
         public HSDIntArray JointIndices { get => _s.GetReference<HSDIntArray>(0x00); set => _s.SetReference(0x00, value); }
 
-        public KAR_grAreaPositionData[] AreaPositionData
+        public HSDArrayAccessor<KAR_grAreaPositionData> AreaPosition { get => _s.GetReference<HSDArrayAccessor<KAR_grAreaPositionData>>(0x04); set => _s.SetReference(0x04, value);  }
+
+        public KAR_grAreaPositionData[] AreaPositionArray
         {
             get
             {

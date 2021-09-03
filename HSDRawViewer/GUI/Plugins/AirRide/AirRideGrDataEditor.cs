@@ -32,7 +32,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             RangeSpline,
             RailSpline1,
             RailSpline2,
-            UnknownSpline,
+            ConveyorSpline,
             Buckets,
             StartPosition,
             EnemyPosition,
@@ -75,7 +75,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         public HSD_Spline[] _splines { get; internal set; } = new HSD_Spline[0];
         public KAR_grRangeSpline[] _rangeSplines { get; internal set; } = new KAR_grRangeSpline[0];
-        public HSD_Spline[] _unkSplines { get; internal set; } = new HSD_Spline[0];
+        public HSD_Spline[] _conveyorSplines { get; internal set; } = new HSD_Spline[0];
         public HSD_Spline[] _railSplines1 { get; internal set; } = new HSD_Spline[0];
         public HSD_Spline[] _railSplines2 { get; internal set; } = new HSD_Spline[0];
 
@@ -95,13 +95,13 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private KAR_grPartitionBucket[] _buckets;
         private KAR_grPartitionBucket _selectedBucket;
-        private HashSet<int> _triangles = new HashSet<int>();
+        private HashSet<int> _selectedTriangles = new HashSet<int>();
 
         private KAR_CollisionJoint[] _joints;
         public KAR_CollisionTriangle[] _tris { get; internal set; }
         private GXVector3[] _vertices;
 
-        private KAR_ZoneCollisionJoint[] _zoneJoints;
+        private KAR_ZoneCollisionJoint[] _zoneJoints { get; set; }
         public KAR_ZoneCollisionTriangle[] _zoneTris { get; internal set; }
         private GXVector3[] _zoneVertices;
 
@@ -123,7 +123,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 { EditorMode.RangeSpline, () => RenderRangeSplines()},
                 { EditorMode.RailSpline1, () => RenderSplines(_railSplines1)},
                 { EditorMode.RailSpline2, () => RenderSplines(_railSplines2)},
-                { EditorMode.UnknownSpline, () => RenderSplines(_unkSplines)},
+                { EditorMode.ConveyorSpline, () => RenderSplines(_conveyorSplines)},
                 { EditorMode.StartPosition, () => RenderPosition(_startPos)},
                 { EditorMode.EnemyPosition, () => RenderPosition(_enemyPos)},
                 { EditorMode.GravityPosition, () => RenderPosition(_gravityPos)},
@@ -150,6 +150,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             modeComboBox.ComboBox.DataSource = Enum.GetValues(typeof(EditorMode));
             modeComboBox.SelectedIndex = 0;
 
+            // save on close
+            FormClosing += (sender, args) =>
+            {
+                Save();
+            };
+
             // dispose of viewport on close
             Disposed += (sender, args) =>
             {
@@ -162,7 +168,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// </summary>
         public void OnFileSave()
         {
-
+            Save();
         }
 
         /// <summary>
@@ -180,6 +186,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 case EditorMode.Collision:
                     break;
                 case EditorMode.Zones:
+                    if (_zoneJoints != null)
+                        arrayMemberEditor1.SetArrayFromProperty(this, "_zoneJoints");
                     break;
                 case EditorMode.CourseSpline:
                     if (_splines != null)
@@ -197,8 +205,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     if (_railSplines2 != null)
                         arrayMemberEditor1.SetArrayFromProperty(this, "_railSplines2");
                     break;
-                case EditorMode.UnknownSpline:
-                    if (_unkSplines != null)
+                case EditorMode.ConveyorSpline:
+                    if (_conveyorSplines != null)
                         arrayMemberEditor1.SetArrayFromProperty(this, "_unkSplines");
                     break;
                 case EditorMode.StartPosition: SelectPosition(_startPos); break;
@@ -266,8 +274,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 if (data.SplineNode.RangeSplineSetup != null)
                     _rangeSplines = data.SplineNode.RangeSplineSetup.Splines;
 
-                if (data.SplineNode.x10 != null)
-                    _unkSplines = data.SplineNode.x10.SplineList.Splines;
+                if (data.SplineNode.ConveyorSpline != null)
+                    _conveyorSplines = data.SplineNode.ConveyorSpline.SplineList.Splines;
 
                 if (data.SplineNode.RailSpline1 != null)
                     _railSplines1 = data.SplineNode.RailSpline1.Splines;
@@ -323,9 +331,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         {
             _selectedBucket = _buckets[bucketIndex];
 
-            _triangles.Clear();
+            _selectedTriangles.Clear();
             for (int i = _selectedBucket.CollTriangleStart; i < _selectedBucket.CollTriangleStart + _selectedBucket.CollTriangleCount; i++)
-                _triangles.Add(_data.PartitionNode.Partition.CollidableTriangles[i]);
+                _selectedTriangles.Add(_data.PartitionNode.Partition.CollidableTriangles[i]);
         }
 
 
@@ -346,7 +354,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             if (renderCollisionsToolStripMenuItem.Checked)
-                RenderCollisions(_editMode == EditorMode.Collision ? 1f : 0.25f, _triangles);
+                RenderCollisions(_editMode == EditorMode.Collision ? 1f : 0.25f, _selectedTriangles);
 
             GL.Disable(EnableCap.DepthTest);
 
@@ -594,11 +602,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     index++;
                 }
 
-                _triangles.Clear();
+                _selectedTriangles.Clear();
                 if (selected_index != -1)
                 {
                     Console.WriteLine(_tris[selected_index].Flags.ToString("X"));
-                    _triangles.Add(selected_index);
+                    _selectedTriangles.Add(selected_index);
                 }
             }
 
@@ -656,27 +664,96 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
+            Save();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Save()
+        {
+            // save collition data
             _data.CollisionNode = GenerateCollisionNode();
-
-            _data.SplineNode.SplineSetup.CourseSplineList.Splines = _splines;
-            if (_rangeSplines != null && _rangeSplines.Length > 0)
-                _data.SplineNode.RangeSplineSetup = new KAR_grRangeSplineSetup()
-                {
-                    Splines = _rangeSplines
-                };
-            else
-                _data.SplineNode.RangeSplineSetup = null;
-
             _data.PartitionNode = new KAR_grCollisionTreeNode()
             {
                 Partition = BucketGen.GenerateBucketPartition(_data.CollisionNode)
             };
 
+            // save splines
+            var splineNode = _data.SplineNode;
+
+            // course spline
+            splineNode.SplineSetup.CourseSplineList = new KAR_grSplineList()
+            {
+                Splines = _splines,
+                Count = _splines.Length
+            };
+
+            // range spline
+            splineNode.SplineSetup.CourseSplineList.Splines = _splines;
+            if (_rangeSplines != null && _rangeSplines.Length > 0)
+                splineNode.RangeSplineSetup = new KAR_grRangeSplineSetup()
+                {
+                    Splines = _rangeSplines
+                };
+            else
+                splineNode.RangeSplineSetup = null;
+
+            // conveyor spline
+            if (splineNode.ConveyorSpline != null && _conveyorSplines != null && _conveyorSplines.Length > 0)
+            {
+                splineNode.ConveyorSpline = new KAR_grConveyorPath();
+                splineNode.ConveyorSpline.SplineList = new KAR_grSplineList()
+                {
+                    Splines = _conveyorSplines,
+                    Count = _conveyorSplines.Length
+                };
+            }
+            else
+                splineNode.ConveyorSpline = null;
+
+            // rail1
+            if (_railSplines1 != null && _railSplines1.Length > 0)
+            {
+                splineNode.RailSpline1 = new KAR_grSplineList()
+                {
+                    Splines = _railSplines1,
+                    Count = _railSplines1.Length
+                };
+            }
+            else
+                splineNode.RailSpline1 = null;
+
+            // rail2
+            if (_railSplines2 != null && _railSplines2.Length > 0)
+            {
+                splineNode.RailSpline2 = new KAR_grSplineList()
+                {
+                    Splines = _railSplines2,
+                    Count = _railSplines2.Length
+                };
+            }
+            else
+                splineNode.RailSpline2 = null;
+
+
             // TODO: generate position list
+            var positionJoint = new HSD_JOBJ();
 
-            // generate jobj model and set indices
+            _data.PositionNode.Startpos = _startPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Enemypos = _enemyPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Gravitypos = _gravityPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Airflowpos = _airFlowPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Conveyorpos = _conveyorPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.ItemPos = _itemPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Eventpos = _eventPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Vehiclepos = _vehiclePos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.GlobalDeadPos = _globalDeadPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.Yakumonopos = _yakumonoPos?.ToKarPositionList(positionJoint);
+            _data.PositionNode.ItemAreaPos = _itemAreaPos?.ToKarAreaPositionList(positionJoint);
+            _data.PositionNode.VehicleAreapos = _vehicleAreaPos?.ToKarAreaPositionList(positionJoint);
 
-            // set position data
+            _data.PositionNode.PositionJoint = positionJoint;
         }
 
         /// <summary>
