@@ -2,9 +2,9 @@
 {
     public enum CameraProjection
     {
-        PERSPECTIVE,
-        FRUSTRUM,
-        ORTHO
+        PERSPECTIVE = 0x1,
+        FRUSTRUM = 0x2,
+        ORTHO = 0x3
     }
     /// <summary>
     /// 
