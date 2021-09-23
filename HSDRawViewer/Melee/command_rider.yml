@@ -1,0 +1,190 @@
+﻿- code: 10
+  name: Graphic Effect
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 11
+  name: Set flag 0x20 at 0x818 and set 0x81C if true
+  parameters:
+  - name: Value
+    bitCount: 26
+
+- code: 12
+  name: Set flag 0x80 at 0x818
+  parameters:
+  - name: None
+    bitCount: 26
+
+- code: 13
+  name: Create Hitsphere
+  parameters:
+  - name: ID
+    bitCount: 3
+  - name: Group
+    bitCount: 3
+  - name: Bone
+    bitCount: 8
+  - name: Damage
+    bitCount: 10
+  - name: Unk
+    bitCount: 2
+  - name: X
+    bitCount: 16
+  - name: Y
+    bitCount: 16
+  - name: Z
+    bitCount: 16
+  - name: Size
+    bitCount: 16
+  - name: Unk4
+    bitCount: 32
+    hex: true
+  - name: Unk5
+    bitCount: 32
+    hex: true
+    
+- code: 14
+  name: Clear Hitsphere
+  parameters:
+  - name: Value
+    bitCount: 26
+
+- code: 15
+  name: Clear All Hitsphere
+  parameters:
+  - name: None
+    bitCount: 26
+    
+- code: 16
+  name: Collision Something
+  parameters:
+  - name: Value
+    bitCount: 26
+
+- code: 17
+  name: Model Visibility
+  parameters:
+  - name: Value
+    bitCount: 13
+  - name: Value
+    bitCount: 13
+    
+- code: 18
+  name: Unknown Model 18
+  parameters:
+  - name: None
+    bitCount: 26
+    
+- code: 19
+  name: Unknown Model 19
+  parameters:
+  - name: None
+    bitCount: 26
+    
+- code: 20
+  name: Some particle function
+  parameters:
+  - name: Unk1
+    hex: true
+    bitCount: 26
+  - name: Unk2
+    hex: true
+    bitCount: 32
+  - name: Unk3
+    hex: true
+    bitCount: 32
+  - name: Unk4
+    hex: true
+    bitCount: 32
+  - name: Unk5
+    hex: true
+    bitCount: 32
+
+- code: 21
+  name: Color Animation
+  parameters:
+  - name: Unk Index1
+    bitCount: 8
+  - name: Unk Index2
+    bitCount: 17
+  - name: Flag
+    bitCount: 1
+
+- code: 22
+  name: Unknown22 Color related?
+  parameters:
+  - name: Unk
+    bitCount: 25
+  - name: Flag
+    bitCount: 1
+    
+- code: 23
+  name: Set Texture
+  parameters:
+  - name: Flag
+    bitCount: 1
+  - name: Some ID
+    bitCount: 7
+  - name: Unknown
+    bitCount: 2
+  - name: Value
+    bitCount: 16
+    
+- code: 24
+  name: Rumble
+  parameters:
+  - name: Flag
+    bitCount: 1
+  - name: Amt?
+    bitCount: 12
+  - name: Duration?
+    bitCount: 13
+    
+- code: 25
+  name: Unknown25
+  parameters:
+  - name: Value
+    bitCount: 26
+    
+- code: 26
+  name: PlaySound
+  parameters:
+  - name: Volume
+    bitCount: 16
+  - name: Flag
+    bitCount: 2
+  - name: Random Sound Flag
+    bitCount: 1
+  - name: Unknown
+    bitCount: 7
+  - name: SoundBank
+    bitCount: 16
+  - name: SoundIndex
+    bitCount: 16
+    
+- code: 27
+  name: Unknown27
+  parameters:
+  - name: Flag
+    bitCount: 2
+  - name: Value
+    bitCount: 24
+    
+- code: 28
+  name: Unknown28
+  parameters:
+  - name: Value1
+    bitCount: 8
+  - name: Flag
+    bitCount: 1
+  - name: Value2
+    bitCount: 17
+
+- code: 29
+  name: Unknown29
+  parameters:
+  - name: Flag
+    bitCount: 1
+  - name: Unknown
+    bitCount: 25

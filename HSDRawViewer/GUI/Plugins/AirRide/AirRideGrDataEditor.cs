@@ -803,7 +803,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             var scene = IOManager.LoadScene(filePath, new ImportSettings()
             {
-                SmoothNormals = true
+                SmoothNormals = true,
+                Triangulate = true,
+                FlipWindingOrder = true
             });
 
             ImportCollisionFromScene(scene);

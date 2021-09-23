@@ -86,6 +86,12 @@ namespace HSDRaw
 
         public string ReadString(int Offset, int Size)
         {
+            if (Offset < 0)
+                return null;
+
+            if (Offset > Length)
+                return null;
+
             var temp = Position;
             Position = (uint)Offset;
             StringBuilder str = new StringBuilder();

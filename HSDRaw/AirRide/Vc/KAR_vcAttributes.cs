@@ -4,18 +4,30 @@
     {
         public override int TrimmedSize => 0x1F0;
 
-        public int KirbySitHeight { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
-        public int Unknown { get => _s.GetInt32(0x4); set => _s.SetInt32(0x4, value); }
+        public int KirbySitBoneIndex { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
+
+        public int KirbyAdditionalBoneIndex { get => _s.GetInt32(0x4); set => _s.SetInt32(0x4, value); }
+
         public float ModelScaling { get => _s.GetFloat(0x8); set => _s.SetFloat(0x8, value); }
+
         public float BaseOffense { get => _s.GetFloat(0xc); set => _s.SetFloat(0xc, value); }
+
         public float StartCameraDistance { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+
         public float Unknown1 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+
         public float ShadowLengthFrontAndBehind { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+
         public float ShadowLengthSides { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
+
         public float ShadowWidthTurning { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
+
         public int Unknown2 { get => _s.GetInt32(0x24); set => _s.SetInt32(0x24, value); }
+
         public float Unknown3 { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
+
         public float AnglePointerDistance { get => _s.GetFloat(0x2c); set => _s.SetFloat(0x2c, value); }
+
         public float Unknown4 { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
         public float Unknown5 { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
         public float HitKnockback { get => _s.GetFloat(0x38); set => _s.SetFloat(0x38, value); }

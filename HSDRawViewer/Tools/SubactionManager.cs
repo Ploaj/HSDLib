@@ -142,9 +142,13 @@ namespace HSDRawViewer.Tools
 
     public enum SubactionGroup
     {
+        // Melee
         Fighter, 
         Item,
-        Color
+        Color,
+
+        // KAR
+        Rider
     }
 
     public class SubactionManager
@@ -196,6 +200,17 @@ namespace HSDRawViewer.Tools
         }
         private static List<Subaction> _customSubactions;
 
+        public static List<Subaction> RiderSubactions
+        {
+            get
+            {
+                if (_riderSubactions == null)
+                    LoadFromFile();
+                return _riderSubactions;
+            }
+        }
+        private static List<Subaction> _riderSubactions;
+
         /// <summary>
         /// 
         /// </summary>
@@ -210,12 +225,14 @@ namespace HSDRawViewer.Tools
             string isa = "";
             string clrsa = "";
             string csa = "";
+            string rsa = "";
 
             string controlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_controls.yml");
             string fighterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_fighter.yml");
             string itemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_item.yml");
             string colorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_color.yml");
             string customPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_custom.yml");
+            string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_rider.yml");
 
             if (File.Exists(controlPath))
                 sa = File.ReadAllText(controlPath);
@@ -232,11 +249,15 @@ namespace HSDRawViewer.Tools
             if (File.Exists(customPath))
                 csa = File.ReadAllText(customPath);
 
+            if (File.Exists(riderPath))
+                rsa = File.ReadAllText(riderPath);
+
             var subs = deserializer.Deserialize<Subaction[]>(sa);
             var fsubs = deserializer.Deserialize<Subaction[]>(fsa);
             var isubs = deserializer.Deserialize<Subaction[]>(isa);
             var csubs = deserializer.Deserialize<Subaction[]>(clrsa);
             var customsubs = deserializer.Deserialize<Subaction[]>(csa);
+            var ridersubs = deserializer.Deserialize<Subaction[]>(rsa);
 
             if (subs != null && subs.Length != 0)
             {
@@ -268,6 +289,15 @@ namespace HSDRawViewer.Tools
                         s.Code <<= 2;
                     _colorSubactions.AddRange(subs);
                     _colorSubactions.AddRange(csubs);
+                }
+
+                _riderSubactions = new List<Subaction>();
+                if (ridersubs != null && ridersubs.Length != 0)
+                {
+                    foreach (var s in ridersubs)
+                        s.Code <<= 2;
+                    _riderSubactions.AddRange(subs);
+                    _riderSubactions.AddRange(ridersubs);
                 }
             }
 
@@ -319,6 +349,8 @@ namespace HSDRawViewer.Tools
                     return ItemSubactions;
                 case SubactionGroup.Color:
                     return ColorSubactions;
+                case SubactionGroup.Rider:
+                    return RiderSubactions;
                 default:
                     return FighterSubactions;
             }

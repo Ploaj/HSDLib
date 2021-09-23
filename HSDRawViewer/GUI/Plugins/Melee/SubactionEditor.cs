@@ -11,10 +11,16 @@ using HSDRaw.Melee.Cmd;
 using System.IO;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.GUI.Controls;
+using HSDRaw.AirRide.Rd;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-    [SupportedTypes(new Type[] { typeof(SBM_FighterActionTable), typeof(SBM_FighterSubactionData), typeof(SBM_ItemSubactionData), typeof(SBM_ColorSubactionData) })]
+    [SupportedTypes(new Type[] { 
+        typeof(SBM_FighterActionTable), 
+        typeof(SBM_FighterSubactionData), 
+        typeof(SBM_ItemSubactionData), 
+        typeof(SBM_ColorSubactionData),
+        typeof(KAR_RdScript) })]
     public partial class SubactionEditor : DockContent, SaveableEditorBase
     {
         public DockState DefaultDockState => DockState.Document;
@@ -32,6 +38,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
                     if (value.Accessor is SBM_ColorSubactionData)
                         SubactionGroup = SubactionGroup.Color;
+
+                    if (value.Accessor is KAR_RdScript)
+                        SubactionGroup = SubactionGroup.Rider;
 
                     SBM_FighterAction[] su = new SBM_FighterAction[]
                     {

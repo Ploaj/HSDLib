@@ -519,6 +519,9 @@
     <Compile Include="Tools\RawTimer.cs" />
     <Compile Include="Tools\Simpoly.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Melee\command_rider.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\pb_no_loop.png" />
     <None Include="Resources\pb_play_reverse.png" />
     <None Include="Resources\pb_start.png" />

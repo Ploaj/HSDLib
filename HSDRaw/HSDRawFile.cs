@@ -17,6 +17,9 @@ using HSDRaw.MEX;
 using HSDRaw.MEX.Stages;
 using HSDRaw.MEX.Menus;
 using HSDRaw.AirRide.Em;
+using HSDRaw.AirRide.Rd;
+using HSDRaw.AirRide.Kx;
+using HSDRaw.AirRide;
 
 namespace HSDRaw
 {
@@ -564,7 +567,7 @@ namespace HSDRaw
         /// <param name="bufferAlign"></param>
         public void Save(Stream stream, bool bufferAlign = true, bool optimize = true, bool trim = false)
         {
-            if (Roots.Count > 0 && Roots[0].Data is MEX_Data)
+            if (Roots.Count > 0 && (Roots[0].Data is MEX_Data || Roots[0].Data is kexData))
                 bufferAlign = false;
 
             // trim data if desired
@@ -609,7 +612,8 @@ namespace HSDRaw
                 optimize && 
                 Roots.Count > 0 && 
                 !(Roots[0].Data is SBM_FighterData) && 
-                !(Roots[0].Data is MEX_Data))
+                !(Roots[0].Data is MEX_Data) &&
+                !(Roots[0].Data is kexData))
                 RemoveDuplicateBuffers();
 
             // guarentee order
@@ -821,6 +825,13 @@ namespace HSDRaw
                 x => x.StartsWith("mnName") ?  new HSDFixedLengthPointerArrayAccessor<HSD_ShiftJIS_String>() : null,
                 x => x.EndsWith("move_logic") ?  new HSDArrayAccessor<MEX_MoveLogic>() : null,
                 x => x.StartsWith("em") && x.EndsWith("DataGroup") ?  new KAR_emData() : null,
+                x => x.Equals("stData") ?  new KAR_stData() : null,
+                x => x.StartsWith("rdMotion") ?  new HSDArrayAccessor<KAR_RdMotion>() : null,
+                x => x.StartsWith("vcDataCommon") ?  new KAR_vcDataCommon() : null,
+                x => x.StartsWith("rdDataCommon") ?  new HSDAccessor() : null, // TODO:
+                x => x.StartsWith("rdData") ?  new KAR_RdData() : null,
+                x => x.StartsWith("rdExt") ?  new KEX_RdExt() : null,
+                x => x.StartsWith("kexData") ?  new kexData() : null,
                 x => new HSDAccessor(),
         };
 
