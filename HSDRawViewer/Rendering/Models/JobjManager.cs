@@ -79,14 +79,15 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         /// <param name="index"></param>
         /// <param name="transform"></param>
-        public void SetWorldTransform(int index, Matrix4 transform)
+        public void SetWorldTransform(int index, Matrix4 transform, bool update = true)
         {
             foreach (var v in jobjToCache)
                 if (v.Value.Index == index)
                 {
                     v.Value.SkipWorldUpdate = true;
                     v.Value.WorldTransform = transform;
-                    UpdateNoRender();
+                    if (update)
+                        UpdateNoRender();
                     v.Value.SkipWorldUpdate = false;
                     break;
                 }

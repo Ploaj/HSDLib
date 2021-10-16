@@ -29,18 +29,32 @@
     bitCount: 10
   - name: Unk
     bitCount: 2
-  - name: X
-    bitCount: 16
-  - name: Y
-    bitCount: 16
-  - name: Z
-    bitCount: 16
   - name: Size
     bitCount: 16
-  - name: Unk4
-    bitCount: 32
-    hex: true
-  - name: Unk5
+    signed: true
+  - name: X
+    bitCount: 16
+    signed: true
+  - name: Y
+    bitCount: 16
+    signed: true
+  - name: Z
+    bitCount: 16
+    signed: true
+  - name: Unknown1
+    bitCount: 8
+  - name: Unknown2
+    bitCount: 8
+  - name: Hitstun
+    bitCount: 16
+    signed: true
+  - name: Unknown3
+    bitCount: 16
+    signed: true
+  - name: Unknown4
+    bitCount: 16
+    signed: true
+  - name: Unknown5
     bitCount: 32
     hex: true
     

@@ -62,6 +62,59 @@
         public ushort CollidableTriangleCount { get => (ushort)_s.GetInt16(0x10); internal set => _s.SetInt16(0x10, (short)value); }
 
 
+        public byte ZoneIndexType { get => _s.GetByte(0x14); set => _s.SetByte(0x14, value); }
+
+        public ushort[] ZoneIndices
+        {
+            get
+            {
+                var s = _s.GetReference<HSDUShortArray>(0x18);
+                return s != null ? s.Array : null;
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    ZoneIndexCount = 0;
+                    _s.SetReference(0x18, null);
+                }
+                else
+                {
+                    ZoneIndexCount = (ushort)value.Length;
+                    _s.SetReference(0x18, new HSDUShortArray() { Array = value });
+                }
+            }
+        }
+
+        public ushort ZoneIndexCount { get => (ushort)_s.GetInt16(0x1C); internal set => _s.SetInt16(0x1C, (short)value); }
+
+
+        public byte RoughTriangleType { get => _s.GetByte(0x20); set => _s.SetByte(0x20, value); }
+
+        public ushort[] RoughIndices
+        {
+            get
+            {
+                var s = _s.GetReference<HSDUShortArray>(0x24);
+                return s != null ? s.Array : null;
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    RoughIndexCount = 0;
+                    _s.SetReference(0x24, null);
+                }
+                else
+                {
+                    RoughIndexCount = (ushort)value.Length;
+                    _s.SetReference(0x24, new HSDUShortArray() { Array = value });
+                }
+            }
+        }
+
+        public ushort RoughIndexCount { get => (ushort)_s.GetInt16(0x28); internal set => _s.SetInt16(0x28, (short)value); }
+
         public int BitTableDataType { get => _s.GetInt32(0x50); set => _s.SetInt32(0x50, value); }
 
         /*public bool[] BitTable
@@ -107,6 +160,22 @@
         public short CollTriangleStart { get => _s.GetInt16(0x1C); set => _s.SetInt16(0x1C, value); }
 
         public short CollTriangleCount { get => _s.GetInt16(0x1E); set => _s.SetInt16(0x1E, value); }
+
+
+
+
+
+        public short ZoneIndexStart { get => _s.GetInt16(0x24); set => _s.SetInt16(0x24, value); }
+
+        public short ZoneIndexCount { get => _s.GetInt16(0x26); set => _s.SetInt16(0x26, value); }
+
+
+
+
+
+        public short RoughStart { get => _s.GetInt16(0x2c); set => _s.SetInt16(0x2c, value); }
+
+        public short RoughCount { get => _s.GetInt16(0x2e); set => _s.SetInt16(0x2e, value); }
 
         public byte Depth { get => _s.GetByte(0x4C); set => _s.SetByte(0x4C, value); }
     }

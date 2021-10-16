@@ -7,6 +7,7 @@ using HSDRaw.Tools.KAR;
 using HSDRawViewer.Converters.AirRide;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.GX;
+using HSDRawViewer.Rendering.Models;
 using IONET;
 using IONET.Core;
 using IONET.Core.Model;
@@ -96,16 +97,22 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         private KAR_grPartitionBucket[] _buckets;
         private KAR_grPartitionBucket _selectedBucket;
         private HashSet<int> _selectedTriangles = new HashSet<int>();
+        private HashSet<int> _selectedZoneTriangles = new HashSet<int>();
 
-        private KAR_CollisionJoint[] _joints;
+        private ushort[] zoneIndices;
+        private ushort[] rough_tri_indices;
+
+        public KAR_CollisionJoint[] _joints { get; set; }
         public KAR_CollisionTriangle[] _tris { get; internal set; }
         private GXVector3[] _vertices;
 
-        private KAR_ZoneCollisionJoint[] _zoneJoints { get; set; }
+        public KAR_ZoneCollisionJoint[] _zoneJoints { get; set; }
         public KAR_ZoneCollisionTriangle[] _zoneTris { get; internal set; }
         private GXVector3[] _zoneVertices;
 
         private Dictionary<EditorMode, Action> editor_renders;
+
+        private JOBJManager JointManager = new JOBJManager();
 
         /// <summary>
         /// 
@@ -153,7 +160,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             // save on close
             FormClosing += (sender, args) =>
             {
-                Save();
+                // Save();
             };
 
             // dispose of viewport on close
@@ -184,6 +191,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             switch (_editMode)
             {
                 case EditorMode.Collision:
+                    if (_joints != null)
+                        arrayMemberEditor1.SetArrayFromProperty(this, "_joints");
                     break;
                 case EditorMode.Zones:
                     if (_zoneJoints != null)
@@ -244,6 +253,13 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         {
             _data = data;
             //collisionManager.LoadCollision(data.CollisionNode);
+
+            /*GrCollision c = new GrCollision();
+            c.LoadFromCollision(data.CollisionNode);
+            c.ExportCollisions(out KAR_grCollisionNode cn, out KAR_grCollisionTreeNode tree);
+            data.CollisionNode = cn;
+            data.PartitionNode = tree;*/
+
 
             LoadCollisionData(data.CollisionNode);
             LoadPartitionData(data.PartitionNode.Partition);
@@ -319,6 +335,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             _buckets = node.Buckets;
 
+            zoneIndices = node.ZoneIndices;
+            rough_tri_indices = node.RoughIndices;
+
             if (_editMode == EditorMode.Collision)
                 EditMode = _editMode;
         }
@@ -334,6 +353,25 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             _selectedTriangles.Clear();
             for (int i = _selectedBucket.CollTriangleStart; i < _selectedBucket.CollTriangleStart + _selectedBucket.CollTriangleCount; i++)
                 _selectedTriangles.Add(_data.PartitionNode.Partition.CollidableTriangles[i]);
+
+            /*_selectedTriangles.Clear();
+            int index = 0;
+            int tri_index = 0;
+            foreach (var t in _tris)
+            {
+                if ((t.Material & 3) != 0)
+                {
+                    for (int j = _selectedBucket.RoughStart; j < _selectedBucket.RoughStart + _selectedBucket.RoughCount; j++)
+                    {
+                        if (rough_tri_indices[j] == index)
+                        {
+                            _selectedTriangles.Add(tri_index);
+                        }
+                    }
+                    index++;
+                }
+                tri_index++;
+            }*/
         }
 
 
@@ -348,6 +386,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             if (_data == null)
                 return;
 
+            JointManager.Render(cam, true);
+
             GL.Enable(EnableCap.DepthTest);
 
             GL.Enable(EnableCap.Blend);
@@ -361,6 +401,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             if (editor_renders.ContainsKey(_editMode))
                 editor_renders[_editMode]();
 
+
+            // render bucket
+            if (_selectedBucket != null)
+                    DrawShape.DrawBox(Color.Red, _selectedBucket.MinX, _selectedBucket.MinY, _selectedBucket.MinZ, _selectedBucket.MaxX, _selectedBucket.MaxY, _selectedBucket.MaxZ);
+            
+
             DrawShape.DrawBox(Color.Blue, selectedPoint.X, selectedPoint.Y, selectedPoint.Z, 2);
         }
 
@@ -373,10 +419,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             GL.Enable(EnableCap.CullFace);
 
+            GL.MatrixMode(MatrixMode.Modelview);
+
             // render collisions
-            GL.Begin(PrimitiveType.Triangles);
             foreach (var j in _joints)
             {
+                if (arrayMemberEditor1.SelectedObject is KAR_CollisionJoint joint && joint != j)
+                    continue;
+
+                var mat = JointManager.GetWorldTransform(j.BoneID);
+                GL.LoadMatrix(ref mat);
+
+                GL.Begin(PrimitiveType.Triangles);
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
                     var t = _tris[i];
@@ -389,6 +443,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     if ((t.Flags & 0x04) != 0)
                         GL.Color4(0f, 0f, 1f, alpha);
 
+                    if ((t.Material & 3) != 0)
+                        GL.Color4(0f, 1f, 1f, alpha);
+
+                    if ((t.Material & 0x20) == 0x20)
+                        GL.Color4(1f, 1f, 1f, alpha);
+
                     if (visible != null && visible.Contains(i))
                         GL.Color3(Color.Yellow);
 
@@ -396,12 +456,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     GL.Vertex3(GXTranslator.toVector3(_vertices[t.V2]));
                     GL.Vertex3(GXTranslator.toVector3(_vertices[t.V1]));
                 }
+                GL.End();
             }
-            GL.End();
 
-            GL.Begin(PrimitiveType.Lines);
             foreach (var j in _joints)
             {
+                if (arrayMemberEditor1.SelectedObject is KAR_CollisionJoint joint && joint != j)
+                    continue;
+
+                var mat = JointManager.GetWorldTransform(j.BoneID);
+                GL.LoadMatrix(ref mat);
+
+                GL.Begin(PrimitiveType.Lines);
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
                     GL.Color3(Color.White);
@@ -416,8 +482,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     GL.Vertex3(GXTranslator.toVector3(_vertices[t.V3]));
                     GL.Vertex3(GXTranslator.toVector3(_vertices[t.V1]));
                 }
+                GL.End();
             }
-            GL.End();
+
+            GL.LoadIdentity();
 
             GL.PopAttrib();
         }
@@ -430,14 +498,36 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             if (_zoneJoints == null)
                 return;
 
+            var render_zones = new HashSet<KAR_ZoneCollisionJoint>();
+
+            if (_selectedBucket != null)
+            {
+                for (int i = _selectedBucket.ZoneIndexStart; i < _selectedBucket.ZoneIndexStart + _selectedBucket.ZoneIndexCount; i++)
+                {
+                    render_zones.Add(_zoneJoints[zoneIndices[i]]);
+                }
+            }
+
             // render collisions
             GL.Begin(PrimitiveType.Triangles);
             foreach (var j in _zoneJoints)
             {
+                //if (!render_zones.Contains(j))
+                //    continue;
+
+                if (arrayMemberEditor1.SelectedObject is KAR_ZoneCollisionJoint joint2 && joint2 != j)
+                    continue;
+
                 for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                 {
                     var t = _zoneTris[i];
-                    GL.Color3(1f, 1f, 1f);
+                    if (arrayMemberEditor1.SelectedObject is KAR_ZoneCollisionJoint joint && joint == j)
+                        GL.Color3(0f, 0f, 1f);
+                    else
+                        if (render_zones.Contains(j) || _selectedZoneTriangles.Contains(i))
+                        GL.Color3(1f, 1f, 0f);
+                    else
+                        GL.Color3(1f, 1f, 1f);
 
                     GL.Vertex3(GXTranslator.toVector3(_zoneVertices[t.V1]));
                     GL.Vertex3(GXTranslator.toVector3(_zoneVertices[t.V2]));
@@ -449,6 +539,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             GL.Begin(PrimitiveType.Lines);
             foreach (var j in _zoneJoints)
             {
+                //if (!render_zones.Contains(j))
+                //    continue;
+
+                if (arrayMemberEditor1.SelectedObject is KAR_ZoneCollisionJoint joint2 && joint2 != j)
+                    continue;
+
                 for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                 {
                     GL.Color3(Color.Black);
@@ -959,6 +1055,28 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             var coll = GenerateCollisionNode();
             coll.CalculateCollisionFlags();
             LoadCollisionData(coll);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void loadGrModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
+            if (f != null)
+            {
+                var file = new HSDRawFile(f);
+
+                foreach (var r in file.Roots)
+                {
+                    if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
+                    {
+                        JointManager.SetJOBJ(m.MainModel.RootNode);
+                    }
+                }
+            }
         }
     }
 

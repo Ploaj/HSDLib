@@ -583,7 +583,7 @@ namespace HSDRawViewer.GUI
 
             GL.PushAttrib(AttribMask.AllAttribBits);
 
-            GL.MatrixMode(MatrixMode.Modelview);
+            GL.MatrixMode(MatrixMode.Projection);
 
             var v = _camera.MvpMatrix;
             GL.LoadMatrix(ref v);

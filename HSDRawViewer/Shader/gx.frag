@@ -6,6 +6,7 @@
 #define PASS_DIFFUSE 2
 #define PASS_SPECULAR 3
 #define PASS_EXT 4
+#define PASS_TOON 5
 
 in vec3 vertPosition;
 in vec3 normal;
@@ -54,6 +55,7 @@ uniform struct Fog
 uniform vec3 cameraPos;
 
 // flags
+uniform int useToonShading;
 uniform int useVertexColor;
 uniform int renderOverride;
 uniform int selectedBone;
@@ -70,6 +72,7 @@ bool alpha_test(float alpha);
 vec4 GetBumpShading(vec3 V);
 vec4 GetTextureFragment(int index);
 vec4 TexturePass(vec4 color, int pass_type);
+vec4 GetToonTexture();
 
 // material
 vec4 GetDiffuseMaterial(vec3 V, vec3 N);
@@ -111,9 +114,20 @@ void main()
 	V = normalize(V);
 	vec3 N = normalize(normal);
 
+	// get light values
+	vec4 diffuseMaterial = GetDiffuseMaterial(N, V);
+	vec4 specularMaterial = GetSpecularMaterial(N, V, spec);
+
+	if (useToonShading == 1)
+	{
+		diffuseMaterial = GetToonTexture();
+		specularMaterial = vec4(0);
+	}
+
+	// calculate fragment color
 	fragColor.rgb =  ambientPass.rgb * diffusePass.rgb * light.ambient.rgb * vec3(light.ambientPower)
-					+ diffusePass.rgb * GetDiffuseMaterial(N, V).rgb * light.diffuse.rgb * vec3(light.diffusePower)
-					+ specularPass.rgb * GetSpecularMaterial(N, V, spec).rgb;
+					+ diffusePass.rgb * diffuseMaterial.rgb * light.diffuse.rgb * vec3(light.diffusePower)
+					+ specularPass.rgb * specularMaterial.rgb;
 
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));
 	
@@ -172,8 +186,8 @@ void main()
 	case 15: fragColor = diffusePass; break;
 	case 16: fragColor = specularPass; break;
 	case 17: fragColor = TexturePass(vec4(1), PASS_EXT); break;
-	case 18: fragColor = diffusePass * GetDiffuseMaterial(normalize(normal), V); break;
-	case 19: fragColor = specularPass * GetSpecularMaterial(normalize(normal), V, spec); break;
+	case 18: fragColor = diffusePass * diffuseMaterial; break;
+	case 19: fragColor = specularPass * specularMaterial; break;
 	case 20: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < 4 ; i++)

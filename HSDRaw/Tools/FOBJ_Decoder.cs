@@ -49,7 +49,7 @@ namespace HSDRaw.Tools
             if (FOBJ.JointTrackType == JointTrackType.HSD_A_J_PTCL)
                 return Keys;
 
-            float clock = startframe;
+            float clock = 0;// startframe;
             Reader.Seek(0);
             while (Reader.Position < Reader.BaseStream.Length)
             {
@@ -103,9 +103,30 @@ namespace HSDRaw.Tools
             }
 
             // hack for animations that don't start on frame 0
-            if (Keys.Count > 0 && Keys[0].Frame != 0)
+            if (startframe != 0)
             {
-                Keys.Insert(0, new FOBJKey() { Frame = 0, Value = Keys[0].Value, InterpolationType = GXInterpolationType.HSD_A_OP_CON});
+                // create a player in order to bake keys
+                FOBJ_Player player = new FOBJ_Player(0, Keys);
+
+                // move starting frame
+                foreach (var k in Keys)
+                    k.Frame -= startframe;
+
+                // remove all keys out of bounds
+                Keys.RemoveAll(e => e.Frame < 0);
+
+                // bake the keys from frame 0 to first key frame
+                if (Keys.Count > 0 && Keys[0].Frame != 0)
+                {
+                    var firstFrame = Keys[0].Frame;
+                    for (int i = 0; i < firstFrame; i++)
+                        Keys.Insert(i, new FOBJKey()
+                        {
+                            Frame = i,
+                            Value = player.GetValue(i - startframe),
+                            InterpolationType = GXInterpolationType.HSD_A_OP_LIN
+                        });
+                }
             }
 
             return Keys;

@@ -15,7 +15,7 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int Flags { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
-        public int Unknown { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int Material { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
     }
 
     public class KAR_CollisionJoint : HSDAccessor
@@ -32,16 +32,16 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int FaceSize { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
-        public int Unknown1 { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int Flags { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
-        public int Unknown2 { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        // public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
     }
 
     public class KAR_ZoneCollisionTriangle : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
 
-        public int UnknownZone { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
+        public int CollFlags { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
 
         public int V1 { get => _s.GetInt32(0x4); set => _s.SetInt32(0x4, value); }
 
@@ -49,9 +49,9 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int V3 { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
-        public int Color { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int TypeFlags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
-        public int Unknown { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int UnkFlags { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
     }
 
     public class KAR_ZoneCollisionJoint : HSDAccessor
@@ -72,29 +72,29 @@ namespace HSDRaw.AirRide.Gr.Data
 
         //public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
 
-        public float UnknownStart1 { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
+        public float Mtx00 { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
 
-        public float UnknownSize1 { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
+        public float Mtx10 { get => _s.GetFloat(0x20); set => _s.SetFloat(0x20, value); }
 
-        public float UnknownStart2 { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
+        public float Mtx20 { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
 
-        public float UnknownSize2 { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
+        public float Mtx30 { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
 
-        public float UnknownStart3 { get => _s.GetFloat(0x2c); set => _s.SetFloat(0x2c, value); }
+        public float Mtx01 { get => _s.GetFloat(0x2c); set => _s.SetFloat(0x2c, value); }
 
-        public float UnknownSize3 { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
+        public float Mtx11 { get => _s.GetFloat(0x30); set => _s.SetFloat(0x30, value); }
 
-        public float UnknownStart4 { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
+        public float Mtx21 { get => _s.GetFloat(0x34); set => _s.SetFloat(0x34, value); }
 
-        public float UnknownSize4 { get => _s.GetFloat(0x38); set => _s.SetFloat(0x38, value); }
+        public float Mtx31 { get => _s.GetFloat(0x38); set => _s.SetFloat(0x38, value); }
 
-        public float UnknownStart5 { get => _s.GetFloat(0x3c); set => _s.SetFloat(0x3c, value); }
+        public float Mtx02 { get => _s.GetFloat(0x3c); set => _s.SetFloat(0x3c, value); }
 
-        public float UnknownSize5 { get => _s.GetFloat(0x40); set => _s.SetFloat(0x40, value); }
+        public float Mtx12 { get => _s.GetFloat(0x40); set => _s.SetFloat(0x40, value); }
 
-        public float UnknownStart6 { get => _s.GetFloat(0x44); set => _s.SetFloat(0x44, value); }
+        public float Mtx22 { get => _s.GetFloat(0x44); set => _s.SetFloat(0x44, value); }
 
-        public float UnknownSize6 { get => _s.GetFloat(0x48); set => _s.SetFloat(0x48, value); }
+        public float Mtx32 { get => _s.GetFloat(0x48); set => _s.SetFloat(0x48, value); }
     }
 
     public class KAR_grCollisionNode : HSDAccessor

@@ -62,6 +62,16 @@
             Z = z;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is GXVector3 v && v.X == X && v.Y == Y && v.Z == Z ;
+        }
+
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
+        }
+
         public static bool operator ==(GXVector3 x, GXVector3 y)
         {
             return x.X == y.X && x.Y == y.Y && x.Z == y.Z;

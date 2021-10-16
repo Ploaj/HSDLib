@@ -138,9 +138,10 @@ namespace HSDRawViewer.Rendering.Models
             shader.SetBoolToInt("enableDiffuse", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
             shader.SetBoolToInt("useConstant", mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT));
             shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.VERTEX));
+            shader.SetBoolToInt("useToonShading", mobj.RenderFlags.HasFlag(RENDER_MODE.TOON));
 
             // Textures
-            for(int i = 0; i < MAX_TEX; i++)
+            for (int i = 0; i < MAX_TEX; i++)
                 shader.SetBoolToInt($"hasTEX[{i}]", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0 + (i << 4)) || enableAll);
 
             shader.SetInt("BumpTexture", -1);

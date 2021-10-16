@@ -74,7 +74,6 @@
 
 #define MAX_TEX 4
 
-in vec3 normal;
 in vec3 tan;
 in vec3 bitan;
 in vec2 texcoord[MAX_TEX];
@@ -126,14 +125,14 @@ uniform TevUnit Tev[MAX_TEX];
 uniform sampler2D textures[MAX_TEX];
 
 // 
-vec2 GetCoordType(int coordType, vec2 tex0, vec3 N);
+vec2 GetCoordType(int coordType, vec2 tex0);
 
 ///
 ///
 ///
 vec2 CalculateCoords(TexUnit tex, vec2 texCoord)
 {
-    vec2 coords = GetCoordType(tex.coord_type, texCoord, normal);
+    vec2 coords = GetCoordType(tex.coord_type, texCoord);
 
 	coords = (tex.transform * vec4(coords.x, coords.y, 0, 1)).xy;
 	
@@ -425,4 +424,23 @@ vec4 TexturePass(vec4 color, int pass_type)
 	}
 
 	return color;
+}
+
+///
+///
+///
+vec4 GetToonTexture()
+{
+	for(int i = 0; i < MAX_TEX ; i++)
+	{
+		if (hasTEX[i] == 1)
+		{
+			if(TEX[i].coord_type == 4)
+			{
+				return GetTextureFragment(i);
+			}
+		}
+	}
+
+	return vec4(0, 0, 0, 1);
 }

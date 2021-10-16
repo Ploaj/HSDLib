@@ -38,6 +38,8 @@
             this.exportOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.recalculateCollisionFlagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.generateRangeSplinesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.tsSaveButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.modeComboBox = new System.Windows.Forms.ToolStripComboBox();
@@ -50,8 +52,8 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.arrayMemberEditor1 = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.generateRangeSplinesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.loadGrModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -65,6 +67,7 @@
             this.toolStripDropDownButton2,
             this.toolStripDropDownButton3,
             this.tsSaveButton,
+            this.toolStripDropDownButton4,
             this.toolStripLabel1,
             this.modeComboBox,
             this.toolStripDropDownButton1,
@@ -143,6 +146,18 @@
             this.recalculateCollisionFlagsToolStripMenuItem.Text = "Recalculate Collision Flags";
             this.recalculateCollisionFlagsToolStripMenuItem.Click += new System.EventHandler(this.recalculateCollisionFlagsToolStripMenuItem_Click);
             // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(210, 6);
+            // 
+            // generateRangeSplinesToolStripMenuItem1
+            // 
+            this.generateRangeSplinesToolStripMenuItem1.Name = "generateRangeSplinesToolStripMenuItem1";
+            this.generateRangeSplinesToolStripMenuItem1.Size = new System.Drawing.Size(213, 22);
+            this.generateRangeSplinesToolStripMenuItem1.Text = "Generate Range Splines";
+            this.generateRangeSplinesToolStripMenuItem1.Click += new System.EventHandler(this.generateRangeSplinesToolStripMenuItem_Click);
+            // 
             // tsSaveButton
             // 
             this.tsSaveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -184,7 +199,7 @@
             this.renderCollisionsToolStripMenuItem.CheckOnClick = true;
             this.renderCollisionsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.renderCollisionsToolStripMenuItem.Name = "renderCollisionsToolStripMenuItem";
-            this.renderCollisionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.renderCollisionsToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.renderCollisionsToolStripMenuItem.Text = "Collisions";
             // 
             // zonesToolStripMenuItem
@@ -193,7 +208,7 @@
             this.zonesToolStripMenuItem.CheckOnClick = true;
             this.zonesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.zonesToolStripMenuItem.Name = "zonesToolStripMenuItem";
-            this.zonesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.zonesToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.zonesToolStripMenuItem.Text = "Zones";
             // 
             // toolStripTextBox1
@@ -218,7 +233,7 @@
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(761, 456);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Data Viewer";
@@ -238,7 +253,7 @@
             // arrayMemberEditor1
             // 
             this.arrayMemberEditor1.DisplayItemImages = false;
-            this.arrayMemberEditor1.DisplayItemIndices = false;
+            this.arrayMemberEditor1.DisplayItemIndices = true;
             this.arrayMemberEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.arrayMemberEditor1.EnablePropertyViewDescription = true;
             this.arrayMemberEditor1.ImageHeight = ((ushort)(24));
@@ -246,7 +261,7 @@
             this.arrayMemberEditor1.ItemHeight = 13;
             this.arrayMemberEditor1.ItemIndexOffset = 0;
             this.arrayMemberEditor1.Location = new System.Drawing.Point(3, 16);
-            this.arrayMemberEditor1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.arrayMemberEditor1.Margin = new System.Windows.Forms.Padding(4);
             this.arrayMemberEditor1.Name = "arrayMemberEditor1";
             this.arrayMemberEditor1.SelectionMode = System.Windows.Forms.SelectionMode.One;
             this.arrayMemberEditor1.Size = new System.Drawing.Size(222, 431);
@@ -256,23 +271,29 @@
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(761, 456);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // toolStripSeparator3
+            // toolStripDropDownButton4
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(210, 6);
+            this.toolStripDropDownButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadGrModelToolStripMenuItem});
+            this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
+            this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
+            this.toolStripDropDownButton4.Size = new System.Drawing.Size(54, 22);
+            this.toolStripDropDownButton4.Text = "Model";
             // 
-            // generateRangeSplinesToolStripMenuItem1
+            // loadGrModelToolStripMenuItem
             // 
-            this.generateRangeSplinesToolStripMenuItem1.Name = "generateRangeSplinesToolStripMenuItem1";
-            this.generateRangeSplinesToolStripMenuItem1.Size = new System.Drawing.Size(213, 22);
-            this.generateRangeSplinesToolStripMenuItem1.Text = "Generate Range Splines";
-            this.generateRangeSplinesToolStripMenuItem1.Click += new System.EventHandler(this.generateRangeSplinesToolStripMenuItem_Click);
+            this.loadGrModelToolStripMenuItem.Name = "loadGrModelToolStripMenuItem";
+            this.loadGrModelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadGrModelToolStripMenuItem.Text = "Load GrModel";
+            this.loadGrModelToolStripMenuItem.Click += new System.EventHandler(this.loadGrModelToolStripMenuItem_Click);
             // 
             // AirRideGrDataEditor
             // 
@@ -319,5 +340,7 @@
         private System.Windows.Forms.ToolStripMenuItem recalculateCollisionFlagsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem generateRangeSplinesToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton4;
+        private System.Windows.Forms.ToolStripMenuItem loadGrModelToolStripMenuItem;
     }
 }
