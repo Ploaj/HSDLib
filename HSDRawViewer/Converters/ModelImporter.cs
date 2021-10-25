@@ -598,7 +598,7 @@ namespace HSDRawViewer.Converters
                 // generate material
                 var material = scene.Materials.Find(e => e.Name == poly.MaterialName);
 
-                dobj.Mobj = GenerateMaterial(material);
+                dobj.Mobj = GenerateMaterial(mesh, material);
                 
 
                 Console.WriteLine(mesh.Name + " " + material?.Name);
@@ -865,7 +865,7 @@ namespace HSDRawViewer.Converters
         /// <param name="settings"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        private HSD_MOBJ GenerateMaterial(IOMaterial material)
+        private HSD_MOBJ GenerateMaterial(IOMesh mesh, IOMaterial material)
         {
             // create blank mobj
             var Mobj = new HSD_MOBJ();
@@ -882,7 +882,7 @@ namespace HSDRawViewer.Converters
             };
 
             // detect and set flags
-            if (Settings.ImportVertexColor)
+            if (Settings.ImportVertexColor && (mesh.HasColorSet(0) || mesh.HasColorSet(1)))
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
 
             if (Settings.EnableDiffuse)

@@ -54,9 +54,6 @@ namespace HSDRawViewer
 
             IsMdiContainer = true;
 
-            PluginManager.Init();
-            OpenTKResources.Init();
-
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
