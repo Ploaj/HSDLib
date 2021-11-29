@@ -225,6 +225,7 @@ namespace HSDRawViewer.Tools
             string isa = "";
             string clrsa = "";
             string csa = "";
+            string cisa = "";
             string rsa = "";
 
             string controlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_controls.yml");
@@ -232,6 +233,7 @@ namespace HSDRawViewer.Tools
             string itemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_item.yml");
             string colorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_color.yml");
             string customPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_custom.yml");
+            string customItemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_custom_item.yml");
             string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_rider.yml");
 
             if (File.Exists(controlPath))
@@ -249,6 +251,9 @@ namespace HSDRawViewer.Tools
             if (File.Exists(customPath))
                 csa = File.ReadAllText(customPath);
 
+            if (File.Exists(customItemPath))
+                cisa = File.ReadAllText(customPath);
+            
             if (File.Exists(riderPath))
                 rsa = File.ReadAllText(riderPath);
 
@@ -257,6 +262,7 @@ namespace HSDRawViewer.Tools
             var isubs = deserializer.Deserialize<Subaction[]>(isa);
             var csubs = deserializer.Deserialize<Subaction[]>(clrsa);
             var customsubs = deserializer.Deserialize<Subaction[]>(csa);
+            var customitemsubs = deserializer.Deserialize<Subaction[]>(cisa);
             var ridersubs = deserializer.Deserialize<Subaction[]>(rsa);
 
             if (subs != null && subs.Length != 0)
@@ -308,6 +314,13 @@ namespace HSDRawViewer.Tools
                     s.IsCustom = true;
                 _customSubactions.AddRange(customsubs);
                 _fighterSubactions.AddRange(customsubs);
+            }
+            if (customitemsubs != null && customitemsubs.Length != 0)
+            {
+                foreach (var s in customitemsubs)
+                    s.IsCustom = true;
+                _customSubactions.AddRange(customitemsubs);
+                _itemSubactions.AddRange(customitemsubs);
             }
         }
 

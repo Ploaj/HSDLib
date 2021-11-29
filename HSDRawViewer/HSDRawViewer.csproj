@@ -567,6 +567,9 @@
     <None Include="Resources\ico_hatchling.png" />
     <None Include="Resources\back_checker.png" />
     <None Include="Resources\ico_anim_shape.png" />
+    <None Include="Melee\command_custom_item.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Resources\ico_replace.png" />
     <None Include="Resources\ts_subtract.png" />
     <None Include="Resources\ts_add.png" />

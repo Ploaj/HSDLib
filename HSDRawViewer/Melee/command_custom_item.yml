@@ -1,0 +1,32 @@
+﻿- code: 0xF1
+  name: Hitbox Extension
+  parameters:
+    - name: Hitbox ID
+      bitCount: 3
+    - name: Apply To All Previous Hitboxes
+      bitCount: 1
+      enums:
+        - false
+        - true
+    - name: Hitlag Multiplier %
+      bitCount: 12
+    - name: SDI Multiplier %
+      bitCount: 12
+    - name: Shieldstun Multiplier %
+      bitCount: 12
+    - name: Hitstun Modifier
+      bitCount: 8
+      signed: true
+    - name: Set Weight
+      bitCount: 1
+      enums:
+        - false
+        - true
+    - name: Angle Flipper
+      bitCount: 2
+      enums:
+        - Regular
+        - Current Facing Direction
+        - Opposite Current Facing Direction
+    - name: Padding
+      bitCount: 5
