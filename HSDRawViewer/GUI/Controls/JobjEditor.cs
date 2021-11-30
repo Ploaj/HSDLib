@@ -50,6 +50,7 @@ namespace HSDRawViewer.GUI.Plugins
             showMeshToolStripMenuItem.Checked = JointManager._settings.RenderObjects;
             showBoneOrientationToolStripMenuItem.Checked = JointManager._settings.RenderOrientation;
             showSelectionOutlineToolStripMenuItem.Checked = JointManager._settings.OutlineSelected;
+            showSplinesToolStripMenuItem.Checked = JointManager._settings.RenderSplines;
 
             renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
             renderModeBox.SelectedIndex = 0;
@@ -403,6 +404,7 @@ namespace HSDRawViewer.GUI.Plugins
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             JointManager.Frame = viewport.Frame;
+            JointManager._settings.RenderSplines = showSplinesToolStripMenuItem.Checked;
             JointManager._settings.RenderBones = showBonesToolStripMenuItem.Checked;
             JointManager._settings.RenderOrientation = showBoneOrientationToolStripMenuItem.Checked;
             JointManager._settings.RenderObjects = showMeshToolStripMenuItem.Checked;

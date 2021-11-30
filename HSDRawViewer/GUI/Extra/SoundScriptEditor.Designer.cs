@@ -38,6 +38,7 @@
             this.buttonSaveScript = new System.Windows.Forms.Button();
             this.scriptArrayEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.splitter1 = new System.Windows.Forms.Splitter();
+            this.mushroomButton = new System.Windows.Forms.ToolStripButton();
             this.soundBox.SuspendLayout();
             this.scriptGroup.SuspendLayout();
             this.toolStrip4.SuspendLayout();
@@ -82,7 +83,8 @@
             // 
             this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.copyScriptButton,
-            this.pasteScriptButton});
+            this.pasteScriptButton,
+            this.mushroomButton});
             this.toolStrip4.Location = new System.Drawing.Point(211, 39);
             this.toolStrip4.Name = "toolStrip4";
             this.toolStrip4.Size = new System.Drawing.Size(523, 25);
@@ -122,10 +124,14 @@
             // 
             // scriptArrayEditor
             // 
+            this.scriptArrayEditor.DisplayItemImages = false;
             this.scriptArrayEditor.DisplayItemIndices = true;
             this.scriptArrayEditor.Dock = System.Windows.Forms.DockStyle.Left;
             this.scriptArrayEditor.EnablePropertyView = false;
             this.scriptArrayEditor.EnablePropertyViewDescription = false;
+            this.scriptArrayEditor.ImageHeight = ((ushort)(24));
+            this.scriptArrayEditor.ImageWidth = ((ushort)(24));
+            this.scriptArrayEditor.ItemHeight = 13;
             this.scriptArrayEditor.ItemIndexOffset = 0;
             this.scriptArrayEditor.Location = new System.Drawing.Point(3, 16);
             this.scriptArrayEditor.Name = "scriptArrayEditor";
@@ -143,6 +149,16 @@
             this.splitter1.Size = new System.Drawing.Size(743, 3);
             this.splitter1.TabIndex = 7;
             this.splitter1.TabStop = false;
+            // 
+            // mushroomButton
+            // 
+            this.mushroomButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.mushroomButton.Image = ((System.Drawing.Image)(resources.GetObject("mushroomButton.Image")));
+            this.mushroomButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mushroomButton.Name = "mushroomButton";
+            this.mushroomButton.Size = new System.Drawing.Size(158, 22);
+            this.mushroomButton.Text = "Generate Mushroom Noises";
+            this.mushroomButton.Click += new System.EventHandler(this.mushroomButton_Click);
             // 
             // SoundScriptEditor
             // 
@@ -172,5 +188,6 @@
         private System.Windows.Forms.Button buttonSaveScript;
         private ArrayMemberEditor scriptArrayEditor;
         private System.Windows.Forms.Splitter splitter1;
+        private System.Windows.Forms.ToolStripButton mushroomButton;
     }
 }

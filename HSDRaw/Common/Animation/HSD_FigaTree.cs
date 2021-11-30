@@ -1,5 +1,7 @@
-﻿using System;
+﻿using HSDRaw.Tools;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace HSDRaw.Common.Animation
@@ -121,6 +123,11 @@ namespace HSDRaw.Common.Animation
             return track;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private HSD_Track GetTrackAt(int index)
         {
             var tracks = _s.GetReference<HSDAccessor>(0x10);

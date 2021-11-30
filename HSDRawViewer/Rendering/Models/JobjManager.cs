@@ -356,6 +356,9 @@ namespace HSDRawViewer.Rendering.Models
             GL.PopAttrib();
             GL.UseProgram(0);
 
+            // render splines
+            DrawSplines(camera);
+
             // bone overlay
             RenderBoneOverlay();
         }
@@ -437,10 +440,6 @@ namespace HSDRawViewer.Rendering.Models
                         }
                     }
 
-                    // render splines if possible
-                    if (RenderSplines && b.Key.Spline != null)
-                        DrawShape.RenderSpline(b.Key.Spline, Color.Yellow, Color.Blue);
-
                     MatAnimation.JOBJIndex++;
                     ShapeAnimation.JOBJIndex++;
                 }
@@ -467,6 +466,19 @@ namespace HSDRawViewer.Rendering.Models
                 {
                     DOBJManager.RenderDOBJShader(GXShader._shader, DOBJManager.SelectedDOBJ, parent, this, null, true);
                 }
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DrawSplines(Camera camera)
+        {
+            foreach (var j in jobjToCache)
+            {
+                if (j.Key.Spline != null)
+                    DrawShape.RenderSpline(j.Key.Spline, Color.Yellow, Color.Blue);
             }
         }
 

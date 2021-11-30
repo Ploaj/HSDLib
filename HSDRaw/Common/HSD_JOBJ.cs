@@ -119,5 +119,122 @@ namespace HSDRaw.Common
             }
             return 0;
         }
+
+        /// <summary>
+        /// Autometically sets needed flags for self and all children
+        /// </summary>
+        public void UpdateFlags()
+        {
+            var list = BreathFirstList;
+            list.Reverse();
+
+            foreach (var j in list)
+            {
+                if (j.Dobj != null)
+                {
+                    bool xlu = false;
+                    bool opa = false;
+
+                    foreach (var dobj in j.Dobj.List)
+                    {
+                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+                        {
+                            j.Flags |= JOBJ_FLAG.XLU;
+                            j.Flags |= JOBJ_FLAG.TEXEDGE;
+                            xlu = true;
+                        }
+                        else
+                        {
+                            j.Flags &= ~JOBJ_FLAG.XLU;
+                            j.Flags &= ~JOBJ_FLAG.TEXEDGE;
+                            opa = true;
+                        }
+
+                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE))
+                            j.Flags |= JOBJ_FLAG.LIGHTING;
+                        else
+                            j.Flags &= ~JOBJ_FLAG.LIGHTING;
+
+                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR))
+                            j.Flags |= JOBJ_FLAG.SPECULAR;
+                        else
+                            j.Flags &= ~JOBJ_FLAG.SPECULAR;
+
+                        if (dobj.Pobj != null)
+                        {
+                            j.Flags &= ~JOBJ_FLAG.ENVELOPE_MODEL;
+                            foreach (var pobj in dobj.Pobj.List)
+                            {
+                                if (pobj.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+                                    j.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
+                            }
+                        }
+                    }
+
+                    if (opa)
+                        j.Flags |= JOBJ_FLAG.OPA;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.OPA;
+
+                    if (xlu)
+                        j.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.XLU;
+                }
+
+                if (j.InverseWorldTransform != null)
+                    j.Flags |= JOBJ_FLAG.SKELETON;
+                else
+                    j.Flags &= ~JOBJ_FLAG.SKELETON;
+
+                if (ChildHasFlag(j.Child, JOBJ_FLAG.XLU))
+                    j.Flags |= JOBJ_FLAG.ROOT_XLU;
+                else
+                    j.Flags &= ~JOBJ_FLAG.ROOT_XLU;
+
+                if (ChildHasFlag(j.Child, JOBJ_FLAG.OPA))
+                    j.Flags |= JOBJ_FLAG.ROOT_OPA;
+                else
+                    j.Flags &= ~JOBJ_FLAG.ROOT_OPA;
+
+                if (ChildHasFlag(j.Child, JOBJ_FLAG.TEXEDGE))
+                    j.Flags |= JOBJ_FLAG.ROOT_TEXEDGE;
+                else
+                    j.Flags &= ~JOBJ_FLAG.ROOT_TEXEDGE;
+            }
+
+            if (ChildHasFlag(Child, JOBJ_FLAG.SKELETON))
+                Flags |= JOBJ_FLAG.SKELETON_ROOT;
+            else
+                Flags &= ~JOBJ_FLAG.SKELETON_ROOT;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <param name="flag"></param>
+        /// <returns></returns>
+        private static bool ChildHasFlag(HSD_JOBJ jobj, JOBJ_FLAG flag)
+        {
+            if (jobj == null)
+                return false;
+
+            bool hasFlag = jobj.Flags.HasFlag(flag);
+
+            foreach (var c in jobj.Children)
+            {
+                if (ChildHasFlag(c, flag))
+                    hasFlag = true;
+            }
+
+            if (jobj.Next != null)
+            {
+                if (ChildHasFlag(jobj.Next, flag))
+                    hasFlag = true;
+            }
+
+            return hasFlag;
+        }
     }
 }

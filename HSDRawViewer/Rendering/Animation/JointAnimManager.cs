@@ -463,5 +463,24 @@ namespace HSDRawViewer.Rendering
         }
 
         #endregion
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Optimize(HSD_JOBJ jobj, float error = 0.001f)
+        {
+            if (jobj == null)
+                return;
+
+            var joints = jobj.BreathFirstList;
+
+            if (joints.Count != NodeCount)
+                return;
+
+            for (int i = 0; i < NodeCount; i++)
+                AnimationKeyCompressor.OptimizeJointTracks(joints[i], ref Nodes[i].Tracks, error);
+        }
     }
 }

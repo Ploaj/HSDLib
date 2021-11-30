@@ -21,6 +21,12 @@ namespace HSDRawViewer.GUI.Extra
             _soundBankEditor.Visible = false;
             Controls.Add(_soundBankEditor);
             _soundBankEditor.BringToFront();
+
+#if DEBUG
+
+#else
+            mushroomButton.Visible = false;
+#endif
         }
 
         /// <summary>
@@ -146,6 +152,54 @@ namespace HSDRawViewer.GUI.Extra
                     reverb = 0;
                 _soundBankEditor.PlaySound(pitch, reverb);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mushroomButton_Click(object sender, EventArgs e)
+        {
+            var entries = _entry.Scripts;
+
+            SEMScript[] newEntries = new SEMScript[((entries.Length - 1) * 3) + 1];
+            newEntries[0] = entries[0];
+
+            for (int i = 0; i < entries.Length - 1; i++)
+            {
+                var entry = entries[1 + i];
+
+                // normal entry
+                newEntries[1 + i * 3] = entry;
+
+                Console.WriteLine($"{1 + i} -> {1 + i * 3}");
+
+                // mushroom small -350
+                short small_pitch = -350;
+                byte[] small_pitch_command = new byte[] { 0x0C, 0x00, (byte)((small_pitch >> 8) & 0xFF), (byte)((small_pitch) & 0xFF)};
+                var small = new SEMScript();
+                small.Name = entry.Name + "_small";
+                small.CommandData = new byte[entry.CommandData.Length + 4];
+                Array.Copy(entry.CommandData, 0, small.CommandData, 0, 8);
+                Array.Copy(small_pitch_command, 0, small.CommandData, 8, 4);
+                Array.Copy(entry.CommandData, 8, small.CommandData, 12, entry.CommandData.Length - 8);
+                newEntries[1 + i * 3 + 1] = small;
+
+                // mushroom big 450
+                short big_pitch = 450;
+                byte[] big_pitch_command = new byte[] { 0x0C, 0x00, (byte)((big_pitch >> 8) & 0xFF), (byte)((big_pitch) & 0xFF) };
+                var big = new SEMScript();
+                big.Name = entry.Name + "_big";
+                big.CommandData = new byte[entry.CommandData.Length + 4];
+                Array.Copy(entry.CommandData, 0, big.CommandData, 0, 8);
+                Array.Copy(big_pitch_command, 0, big.CommandData, 8, 4);
+                Array.Copy(entry.CommandData, 8, big.CommandData, 12, entry.CommandData.Length - 8);
+                newEntries[1 + i * 3 + 2] = big;
+            }
+
+            _entry.Scripts = newEntries;
+            RefreshEntry();
         }
     }
 }

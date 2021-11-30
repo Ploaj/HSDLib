@@ -290,7 +290,7 @@ namespace HSDRaw.Tools
             new ParticleOpCode(0xB0, 1, ""),
             new ParticleOpCode(0xB1, 1, ""),
             new ParticleOpCode(0xB2, 1, ""),
-            new ParticleOpCode(0xB3, 1, "ebs"),
+            new ParticleOpCode(0xB3, 1, "ebbb"),
             new ParticleOpCode(0xB4, 1, ""),
             new ParticleOpCode(0xB5, 1, ""),
             new ParticleOpCode(0xB6, 1, "ef"),

@@ -88,6 +88,16 @@ namespace HSDRaw.Common.Animation
             }
         }
 
+        public HSD_Track()
+        {
+
+        }
+
+        public HSD_Track(HSD_FOBJ fobj)
+        {
+            FromFOBJ(fobj);
+        }
+
         public void FromFOBJ(HSD_FOBJ fobj)
         {
             TrackType = fobj.TrackType;

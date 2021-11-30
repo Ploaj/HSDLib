@@ -108,6 +108,9 @@ namespace HSDRawViewer.Converters.Melee
                     if (l.Flags.HasFlag(SSFLineFlag.LeftLedge) || l.Flags.HasFlag(SSFLineFlag.RightLedge))
                         line.Flag |= CollProperty.LedgeGrab;
 
+                    if (l.Flags.HasFlag(SSFLineFlag.DropThrough))
+                        line.Flag |= CollProperty.DropThrough;
+
                     line.Material = MaterialTranslate(l.Material);
                     line.GuessCollisionFlag();
                     lines.Add(line);

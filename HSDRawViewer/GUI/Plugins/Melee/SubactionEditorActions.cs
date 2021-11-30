@@ -416,7 +416,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 SubactionProcess.SetStruct(a._struct, SubactionGroup);
             }
 
-            UpdateFrameTips();
+            if (!IsSaving)
+                UpdateFrameTips();
         }
     }
 }

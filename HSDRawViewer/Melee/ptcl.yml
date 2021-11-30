@@ -212,11 +212,12 @@
   range: 1
   name: Ambient Color Remain?
   description: 
-  paramDesc: sbs
+  paramDesc: sbbb
   params:
   - unknown 1
   - unknown 2
   - unknown 3
+  - unknown 4
   
 - code: 0xB4
   range: 1

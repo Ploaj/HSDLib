@@ -18,5 +18,8 @@ namespace HSDRawViewer.Rendering.Models
 
         [Category("1. Display"), DisplayName("Outline Selected Object"), Description("")]
         public bool OutlineSelected { get; set; } = true;
+
+        [Category("1. Display"), DisplayName("Render Splines"), Description("")]
+        public bool RenderSplines { get; set; } = false;
     }
 }

@@ -391,6 +391,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             InitRendering();
         }
 
+        private bool IsSaving = false;
+
 
         /// <summary>
         /// 
@@ -424,7 +426,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             }
 
             // save action changes to dat file
+            IsSaving = true;
             SaveAllActionChanges();
+            IsSaving = false;
 
             // dump to file
             File.WriteAllBytes(AJFilePath, newAJFile);

@@ -21,19 +21,15 @@ namespace HSDRawViewer.Rendering
             GL.PushAttrib(AttribMask.AllAttribBits);
 
             GL.LineWidth(2);
-            GL.Begin(PrimitiveType.Lines);
+            GL.Begin(PrimitiveType.LineStrip);
 
             var points = spline.Points;
+            var pointMax = spline.PointCount;
 
-            var pointMax = points.Length;
-
-            for (int i = 0; i < points.Length - 1; i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 GL.Color3(Mix(c1, c2, i / (float)pointMax));
                 GL.Vertex3(points[i].X, points[i].Y, points[i].Z);
-
-                GL.Color3(Mix(c1, c2, (i + 1) / (float)pointMax));
-                GL.Vertex3(points[i + 1].X, points[i + 1].Y, points[i + 1].Z);
             }
 
             GL.End();
