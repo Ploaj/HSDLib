@@ -627,6 +627,9 @@ namespace HSDRawViewer.GUI
 
             if (CSPMode && !TakeScreenShot)
             {
+                GL.MatrixMode(MatrixMode.Projection);
+                GL.LoadIdentity();
+
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.LoadIdentity();
 

@@ -155,6 +155,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             SubactionProcess.UpdateVISMethod = SetModelVis;
             SubactionProcess.AnimateMaterialMethod = AnimateMaterial;
             SubactionProcess.AnimateModelMethod = AnimateModel;
+
+#if DEBUG
+            debugMenuItem2.Visible = true;
+#endif
         }
 
         /// <summary>

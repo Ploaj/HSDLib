@@ -79,6 +79,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private SBM_EnvironmentCollision ECB = null;
 
+
+        private Vector3 IrOffset = Vector3.Zero;
+        private static readonly Vector3 IrLeftOffset = new Vector3(-9, -10.1f, 0);
+        private static readonly Vector3 IrRightOffset = new Vector3(9, -10.1f, 0);
+        private SBM_gmIntroEasyTable easyTable = new SBM_gmIntroEasyTable();
+
+
         public DrawOrder DrawOrder => DrawOrder.Last;
 
         private float DisplayShieldSize = 0;
@@ -242,8 +249,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             ResultFilePath = Path.Combine(path, $"GmRstM{fighterKey}.dat");
             WaitFilePath = Path.Combine(path, $"Pl{fighterKey}DViWaitAJ.dat");
-            IntroFilePath = Path.Combine(path, $"ftDemoIntroMotionFile{fighterName}.dat");
-            EndingFilePath = Path.Combine(path, $"ftDemoEndingMotionFile{fighterName}.dat");
+            IntroFilePath = Path.Combine(path, $"ftDemoIntro{fighterName}.dat");
+            EndingFilePath = Path.Combine(path, $"ftDemoEnding{fighterName}.dat");
 
             if (!File.Exists(modelFile))
                 modelFile = FileIO.OpenFile("Fighter Model (Pl**Nr.dat)|*.dat", $"Pl{fighterKey}Nr.dat");
@@ -270,6 +277,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             WaitSymbol = AJManager.ScanAJFile(WaitFilePath);
             IntroSymbol = AJManager.ScanAJFile(IntroFilePath);
             EndingSymbol = AJManager.ScanAJFile(EndingFilePath);
+
+            // load easy table
+            if (File.Exists(IntroFilePath))
+            {
+                var f = new HSDRawFile(IntroFilePath);
+                if (f["gmIntroEasyTable"] != null)
+                    easyTable = f["gmIntroEasyTable"].Data as SBM_gmIntroEasyTable;
+            }
 
             MessageBox.Show($"Loaded:\nResultBank: {ResultFilePath}\nWaitBank: {WaitFilePath}\nIntroBank: {IntroFilePath}\nEndingBank: {EndingFilePath}");
 
@@ -332,17 +347,30 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // save action changes to dat file
             SaveAllActionChanges();
 
-            // save aj file
-            HSDRawFile file = new HSDRawFile();
+            // load or create file
+            HSDRawFile file = null;
             if (File.Exists(ajpath))
-            {
                 file = new HSDRawFile(ajpath);
-            }
+            else
+                file = new HSDRawFile();
+
+            // update or add aj data
             var dataAccessor = new HSDAccessor() { _s = new HSDStruct(data) };
             if (file[symbol] != null)
                 file[symbol].Data = dataAccessor;
             else
                 file.Roots.Add(new HSDRootNode() { Name = symbol, Data = dataAccessor });
+
+            // update or add easy table
+            if (symbol == IntroSymbol)
+            {
+                if (file["gmIntroEasyTable"] != null)
+                    file["gmIntroEasyTable"].Data = easyTable;
+                else
+                    file.Roots.Add(new HSDRootNode() { Name = "gmIntroEasyTable", Data = easyTable });
+            }
+
+            // save file
             file.Save(ajpath);
 
             return true;
@@ -529,7 +557,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             var plDat = FighterData;
 
-            if (plDat != null && plDat.ModelLookupTables != null && index < plDat.ModelLookupTables.CostumeMaterialLookups[0].Entries.Length)
+            if (plDat != null && plDat.ModelLookupTables != null && index < plDat.ModelLookupTables.MaterialLookupLength)
             {
                 if (matflag == 1)
                 {
@@ -613,6 +641,28 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // apply model animations
             JointManager.Frame = viewport.Frame;
             JointManager.UpdateNoRender();
+
+            // versus mode preview
+            if (introDropDownButton.Visible && enablePreviewToolStripMenuItem.Checked)
+            {
+                // 3.8, 1, 7
+                JointManager.SetWorldTransform(0,
+                    Matrix4.CreateScale(easyTable.XScale, easyTable.YScale, easyTable.ZScale) *
+                    Matrix4.CreateTranslation(IrOffset) *
+                    Matrix4.CreateTranslation(easyTable.XOffset, easyTable.YOffset, 0));
+                cam.FovDegrees = 20;
+                cam.Translation = new Vector3(0, 0, -62);
+                cam.RotationXDegrees = 0;
+                cam.RotationYDegrees = 0;
+                //JointManager._lightParam.UseCameraLight = false;
+                //JointManager._lightParam.LightX = 1;
+                //JointManager._lightParam.LightY = 1;
+                //JointManager._lightParam.LightZ = 6;
+            }
+            else
+            {
+                //JointManager._lightParam.UseCameraLight = true;
+            }
 
             // character invisibility
             if (!SubactionProcess.CharacterInvisibility && modelToolStripMenuItem.Checked)
@@ -724,7 +774,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     DrawShape.DrawECB(topN, minx, miny, maxx, maxy, groundECH.Checked);
                 }
 
-                // ledge grav
+                // ledge grab
                 if (ledgeGrabBoxToolStripMenuItem.Checked)
                 {
                     var correct = Math.Abs(minx - maxx) / 2;
@@ -775,6 +825,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // sword trail
             //AfterImageRenderer.RenderAfterImage(JointManager, viewport.Frame, after_desc);
+
+            // draw irvs preview border
+            if (introDropDownButton.Visible && enablePreviewToolStripMenuItem.Checked)
+            {
+                DrawShape.DrawRectangle(5.6f, 4.75f, -5.6f, 1.8f, 40, 0, Color.Black);
+                DrawShape.DrawRectangle(5.6f, -1.8f, -5.6f, -4.75f, 40, 0, Color.Black);
+            }
         }
 
         //private static AfterImageDesc after_desc = new AfterImageDesc()
@@ -804,6 +861,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // reset display sheild size
             DisplayShieldSize = 0;
 
+            // check to render irv
+            introDropDownButton.Visible = false;
+            viewport.EnableFloor = true;
+
             // check if animations are loaded
             if (AJManager == null)
                 return;
@@ -818,6 +879,19 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (anim.Roots[0].Data is HSD_FigaTree tree)
             {
                 LoadFigaTree(anim.Roots[0].Name, tree);
+            }
+
+            if (symbol.Contains("IntroL_figatree"))
+            {
+                introDropDownButton.Visible = true;
+                IrOffset = IrLeftOffset;
+                viewport.EnableFloor = false;
+            }
+            if (symbol.Contains("IntroR_figatree"))
+            {
+                introDropDownButton.Visible = true;
+                IrOffset = IrRightOffset;
+                viewport.EnableFloor = false;
             }
 
 
@@ -1253,6 +1327,19 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="end"></param>
         public void ScreenSelectArea(PickInformation start, PickInformation end)
         {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editPositionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (PropertyDialog d = new PropertyDialog("Intro Position Editor", easyTable))
+            {
+                d.ShowDialog();
+            }
         }
     }
 }

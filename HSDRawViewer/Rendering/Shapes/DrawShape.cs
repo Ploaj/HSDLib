@@ -173,16 +173,19 @@ namespace HSDRawViewer.Rendering
 
             GL.End();
 
-            GL.LineWidth(thickness);
-            GL.Color4(1f, 1f, 1f, 1f);
-            GL.Begin(PrimitiveType.LineLoop);
+            if (thickness != 0)
+            {
+                GL.LineWidth(thickness);
+                GL.Color4(1f, 1f, 1f, 1f);
+                GL.Begin(PrimitiveType.LineLoop);
 
-            GL.Vertex3(x, y2, z);
-            GL.Vertex3(x2, y2, z);
-            GL.Vertex3(x2, y, z);
-            GL.Vertex3(x, y, z);
+                GL.Vertex3(x, y2, z);
+                GL.Vertex3(x2, y2, z);
+                GL.Vertex3(x2, y, z);
+                GL.Vertex3(x, y, z);
 
-            GL.End();
+                GL.End();
+            }
             GL.PopAttrib();
         }
 
