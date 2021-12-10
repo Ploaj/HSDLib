@@ -200,7 +200,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        public bool TakeScreenShot = false;
+        public int TakeScreenShot = 0;
 
         public bool EnableCSPMode { get; set; } = false;
         private bool _cspMode = false;
@@ -625,7 +625,7 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
-            if (CSPMode && !TakeScreenShot)
+            if (CSPMode && TakeScreenShot == 0)
             {
                 GL.MatrixMode(MatrixMode.Projection);
                 GL.LoadIdentity();
@@ -688,7 +688,9 @@ namespace HSDRawViewer.GUI
 
             panel1.SwapBuffers();
 
-            if (TakeScreenShot)
+            if (TakeScreenShot == 1)
+                TakeScreenShot = 2;
+            else if (TakeScreenShot == 2)
             {
                 string fileName;
 
@@ -718,7 +720,7 @@ namespace HSDRawViewer.GUI
                     MessageBox.Show("Screenshot saved as " + fileName);
                 }
 
-                TakeScreenShot = false;
+                TakeScreenShot = 0;
             }
         }
 
@@ -1049,7 +1051,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void screenshotButton_Click(object sender, EventArgs e)
         {
-            TakeScreenShot = true;
+            TakeScreenShot = 1;
         }
 
         /// <summary>

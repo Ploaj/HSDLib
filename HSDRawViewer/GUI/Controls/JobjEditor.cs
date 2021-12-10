@@ -599,7 +599,7 @@ namespace HSDRawViewer.GUI.Plugins
         public void TakeScreenShot()
         {
             Show();
-            viewport.TakeScreenShot = true;
+            viewport.TakeScreenShot = 1;
             viewport.ForceDraw();
         }
 
