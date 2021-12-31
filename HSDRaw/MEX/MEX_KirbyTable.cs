@@ -32,7 +32,7 @@ namespace HSDRaw.MEX
 
     public class MEX_KirbyFunctionTable : HSDAccessor
     {
-        public override int TrimmedSize => 0x20;
+        public override int TrimmedSize => 0x24;
 
         public HSDUIntArray OnAbilityGain { get => _s.GetReference<HSDUIntArray>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -50,6 +50,8 @@ namespace HSDRaw.MEX
 
         public HSDUIntArray KirbyOnFrame { get => _s.GetReference<HSDUIntArray>(0x1C); set => _s.SetReference(0x1C, value); }
 
+        public HSDUIntArray KirbyOnDeath { get => _s.GetReference<HSDUIntArray>(0x20); set => _s.SetReference(0x20, value); }
+
         public override void New()
         {
             base.New();
@@ -62,6 +64,7 @@ namespace HSDRaw.MEX
             KirbyOnItemInit = new HSDUIntArray();
             MoveLogicRuntime = new HSDAccessor();
             KirbyOnFrame = new HSDUIntArray();
+            KirbyOnDeath = new HSDUIntArray();
         }
     }
 

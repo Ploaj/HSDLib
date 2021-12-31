@@ -621,7 +621,33 @@ namespace HSDRawViewer.Rendering.Models
             var world = local;
 
             if (parent != null)
-                world = local * parent.WorldTransform;
+            {
+                if (root.Flags.HasFlag(JOBJ_FLAG.MTX_SCALE_COMPENSATE))
+                {
+                    // get parent scale
+                    var parentTrackTransform = parent.LocalTransform.ExtractScale();
+
+                    // get animated vectors
+                    GetLocalTransformValues(root, out Vector3 trans, out Quaternion rot, out Vector3 scale, index);
+
+                    // scale the position only
+                    trans *= parentTrackTransform;
+
+                    // build the local matrix
+                    local = Matrix4.CreateScale(scale) *
+                    Matrix4.CreateFromQuaternion(rot) *
+                    Matrix4.CreateTranslation(trans);
+
+                    // calculate the compensate scale
+                    var scaleCompensation = Matrix4.CreateScale(1f / parentTrackTransform.X, 1f / parentTrackTransform.Y, 1f / parentTrackTransform.Z);
+
+                    // apply scale compensate
+                    world = local * scaleCompensation;
+
+                }
+                // multiply parent transform
+                world = world * parent.WorldTransform;
+            }
 
             if(cam != null && 
                 (root.Flags & (JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.PBILLBOARD)) != 0)
@@ -695,16 +721,31 @@ namespace HSDRawViewer.Rendering.Models
         /// <returns></returns>
         public Matrix4 GetLocalTransform(HSD_JOBJ jobj, int animatedBoneIndex = -1)
         {
-            Matrix4 Transform = Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
+            if (animatedBoneIndex != -1 && Animation != null)
+                return Animation.GetAnimatedMatrix(Frame, animatedBoneIndex, jobj);
+            else
+                return Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
                 Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
                 Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
+        }
 
+        /// <summary>
+        /// Creates a Matrix4 from a HSD_JOBJ
+        /// </summary>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
+        public void GetLocalTransformValues(HSD_JOBJ jobj, out Vector3 trans, out Quaternion rot, out Vector3 scale, int animatedBoneIndex = -1)
+        {
             if (animatedBoneIndex != -1 && Animation != null)
             {
-                Transform = Animation.GetAnimatedMatrix(Frame, animatedBoneIndex, jobj);
+                Animation.GetAnimatedValues(Frame, animatedBoneIndex, jobj, out trans, out rot, out scale);
             }
-            
-            return Transform;
+            else
+            {
+                trans = new Vector3(jobj.TX, jobj.TY, jobj.TZ);
+                rot = Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX);
+                scale = new Vector3(jobj.SX, jobj.SY, jobj.SZ);
+            }
         }
 
         /// <summary>

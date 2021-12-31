@@ -85,6 +85,7 @@
             this.editDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.loadPlayerFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.compressAllAnimationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.createNewSubroutineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createNewSubroutineToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -95,7 +96,6 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.importFromTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.compressAllAnimationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.previewBox.SuspendLayout();
@@ -679,6 +679,13 @@
             this.debugMenuItem2.Text = "Debug";
             this.debugMenuItem2.Visible = false;
             // 
+            // compressAllAnimationsToolStripMenuItem
+            // 
+            this.compressAllAnimationsToolStripMenuItem.Name = "compressAllAnimationsToolStripMenuItem";
+            this.compressAllAnimationsToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
+            this.compressAllAnimationsToolStripMenuItem.Text = "Compress All Animations";
+            this.compressAllAnimationsToolStripMenuItem.Click += new System.EventHandler(this.compressAllAnimationsToolStripMenuItem_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -747,13 +754,6 @@
             this.propertyGrid1.Size = new System.Drawing.Size(191, 251);
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
-            // 
-            // compressAllAnimationsToolStripMenuItem
-            // 
-            this.compressAllAnimationsToolStripMenuItem.Name = "compressAllAnimationsToolStripMenuItem";
-            this.compressAllAnimationsToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
-            this.compressAllAnimationsToolStripMenuItem.Text = "Compress All Animations";
-            this.compressAllAnimationsToolStripMenuItem.Click += new System.EventHandler(this.compressAllAnimationsToolStripMenuItem_Click);
             // 
             // SubactionEditor
             // 

@@ -39,7 +39,10 @@ namespace HSDRaw.Common
         MTX_INDEPEND_SRT = (1 << 25),
         ROOT_OPA = (1 << 28),
         ROOT_XLU = (1 << 29),
-        ROOT_TEXEDGE = (1 << 30)
+        ROOT_TEXEDGE = (1 << 30),
+
+        // custom
+        MTX_SCALE_COMPENSATE = (1 << 26),
     }
 
     public class HSD_JOBJ : HSDTreeAccessor<HSD_JOBJ>

@@ -9,20 +9,20 @@ namespace HSDRaw.Tools.Melee
     {
         END = 0x00,
         RESET = 0x01,
-        UNKNOWN_02 = 0x02,
+        CLEAR_TEXT = 0x02,
         LINE_BREAK = 0x03,
         UNKNOWN_04 = 0x04,
-        UNKNOWN_05 = 0x05,
-        UNKNOWN_06 = 0x06,
+        PAUSE = 0x05,
+        TYPE_SPEED = 0x06,
         OFFSET = 0x07,
         UNKNOWN_08 = 0x08,
         UNKNOWN_09 = 0x09,
-        SCALING = 0x0A,
-        RESET_SCALING = 0x0B,
+        SET_SPACING = 0x0A,
+        RESET_SPACING = 0x0B,
         COLOR = 0x0C,
         CLEAR_COLOR = 0x0D,
-        SET_TEXTBOX = 0x0E,
-        RESET_TEXTBOX = 0x0F,
+        SET_SCALING = 0x0E,
+        RESET_SCALING = 0x0F,
         CENTERED = 0x10,
         RESET_CENTERED = 0x11,
         LEFT_ALIGNED = 0x12,
@@ -56,7 +56,7 @@ namespace HSDRaw.Tools.Melee
         }
         private byte[] _data = new byte[] { 0 };
 
-        public List<Tuple<TEXT_OP_CODE, ushort[]>> OPCodes { get => DeserializeCodes(_data); }
+        public List<Tuple<TEXT_OP_CODE, short[]>> OPCodes { get => DeserializeCodes(_data); }
 
         public static Dictionary<TEXT_OP_CODE, Tuple<string, string>> CODES = new Dictionary<TEXT_OP_CODE, Tuple<string, string>>()
             {
@@ -75,15 +75,15 @@ namespace HSDRaw.Tools.Melee
                 { TEXT_OP_CODE.RESET, new Tuple<string, string>("RESET", "") },
                 { TEXT_OP_CODE.RESET_LEFT_ALIGN, new Tuple<string, string>("/LEFT", "") },
                 { TEXT_OP_CODE.RESET_RIGHT_ALIGN, new Tuple<string, string>("/RIGHT", "") },
-                { TEXT_OP_CODE.RESET_SCALING, new Tuple<string, string>("/SCALE", "") },
-                { TEXT_OP_CODE.RESET_TEXTBOX, new Tuple<string, string>("/TEXTBOX", "") },
+                { TEXT_OP_CODE.RESET_SPACING, new Tuple<string, string>("/SPACING", "") },
+                { TEXT_OP_CODE.RESET_SCALING, new Tuple<string, string>("/SCALING", "") },
                 { TEXT_OP_CODE.RIGHT_ALIGNED, new Tuple<string, string>("/RIGHT", "") },
-                { TEXT_OP_CODE.SCALING, new Tuple<string, string>("SCALE", "bbbb") },
-                { TEXT_OP_CODE.SET_TEXTBOX, new Tuple<string, string>("TEXTBOX", "ss") },
-                { TEXT_OP_CODE.UNKNOWN_02, new Tuple<string, string>("UNK02", "") },
+                { TEXT_OP_CODE.SET_SPACING, new Tuple<string, string>("SPACING", "bbbb") },
+                { TEXT_OP_CODE.SET_SCALING, new Tuple<string, string>("SCALING", "ss") },
+                { TEXT_OP_CODE.CLEAR_TEXT, new Tuple<string, string>("CLEAR_TEXT", "") },
                 { TEXT_OP_CODE.UNKNOWN_04, new Tuple<string, string>("UNK04", "") },
-                { TEXT_OP_CODE.UNKNOWN_05, new Tuple<string, string>("UNK05", "s") },
-                { TEXT_OP_CODE.UNKNOWN_06, new Tuple<string, string>("UNK06", "ss") },
+                { TEXT_OP_CODE.PAUSE, new Tuple<string, string>("PAUSE", "s") },
+                { TEXT_OP_CODE.TYPE_SPEED, new Tuple<string, string>("TYPE_SPEED", "ss") },
                 { TEXT_OP_CODE.UNKNOWN_08, new Tuple<string, string>("UNK08", "") },
                 { TEXT_OP_CODE.UNKNOWN_09, new Tuple<string, string>("UNK09", "") },
                 { TEXT_OP_CODE.SPACE, new Tuple<string, string>("S", "") },
@@ -94,22 +94,22 @@ namespace HSDRaw.Tools.Melee
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static List<Tuple<TEXT_OP_CODE, ushort[]>> DeserializeCodes(byte[] data)
+        public static List<Tuple<TEXT_OP_CODE, short[]>> DeserializeCodes(byte[] data)
         {
-            List<Tuple<TEXT_OP_CODE, ushort[]>> d = new List<Tuple<TEXT_OP_CODE, ushort[]>>();
+            List<Tuple<TEXT_OP_CODE, short[]>> d = new List<Tuple<TEXT_OP_CODE, short[]>>();
 
             for (int i = 0; i < data.Length;)
             {
                 var opcode = (TEXT_OP_CODE)data[i++];
-                ushort[] param = new ushort[0];
+                short[] param = new short[0];
 
                 int textCode = (byte)opcode;
 
                 if ((textCode >> 4) == 2)
-                    param = new ushort[] { (ushort)(((textCode << 8) | (data[i++] & 0xFF)) & 0xFFF) };
+                    param = new short[] { (short)(((textCode << 8) | (data[i++] & 0xFF)) & 0xFFF) };
                 else
                 if ((textCode >> 4) == 4)
-                    param = new ushort[] { (ushort)(((textCode << 8) | (data[i++] & 0xFF)) & 0xFFF) };
+                    param = new short[] { (short)(((textCode << 8) | (data[i++] & 0xFF)) & 0xFFF) };
                 else
                 if (!CODES.ContainsKey(opcode))
                     throw new Exception("Opcode Not Supported " + opcode.ToString("X"));
@@ -117,22 +117,22 @@ namespace HSDRaw.Tools.Melee
                 {
                     var code = CODES[opcode];
                     var p = code.Item2.ToCharArray();
-                    param = new ushort[p.Length];
+                    param = new short[p.Length];
                     for (int j = 0; j < param.Length; j++)
                     {
                         switch (p[j])
                         {
                             case 'b':
-                                param[j] = (ushort)(data[i++] & 0xFF);
+                                param[j] = (byte)(data[i++] & 0xFF);
                                 break;
                             case 's':
-                                param[j] = (ushort)(((data[i++] & 0xFF) << 8) | (data[i++] & 0xFF));
+                                param[j] = (short)(((data[i++] & 0xFF) << 8) | (data[i++] & 0xFF));
                                 break;
                         }
                     }
                 }
 
-                Tuple<TEXT_OP_CODE, ushort[]> c = new Tuple<TEXT_OP_CODE, ushort[]>(opcode, param);
+                Tuple<TEXT_OP_CODE, short[]> c = new Tuple<TEXT_OP_CODE, short[]>(opcode, param);
                 d.Add(c);
 
                 if (opcode == TEXT_OP_CODE.END)

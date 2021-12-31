@@ -564,5 +564,30 @@ namespace HSDRawViewer.Rendering
             GL.PopAttrib();
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transform"></param>
+        public static void DrawParasol(Matrix4 transform, Vector3 color)
+        {
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.MultMatrix(ref transform);
+
+            GL.LineWidth(2f);
+            GL.Color3(color);
+
+            GL.Begin(PrimitiveType.Lines);
+
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(-10, 0, 0);
+
+            GL.End();
+
+            GL.PopMatrix();
+        }
+
     }
 }

@@ -89,6 +89,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public DrawOrder DrawOrder => DrawOrder.Last;
 
         private float DisplayShieldSize = 0;
+        private enum ItemRender
+        {
+            None,
+            Parasol,
+            Swing
+        }
+        private ItemRender _itemRender = ItemRender.None;
 
         private ModelPartAnimations[] ModelPartsIndices;
 
@@ -728,6 +735,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (DisplayShieldSize > 0)
                 DrawShape.DrawSphere(JointManager.GetWorldTransform(JointManager.JointCount - 2), DisplayShieldSize, 16, 16, ShieldColor, 0.5f);
 
+            // draw item overlats
+            if (_itemRender == ItemRender.Parasol && FighterData != null)
+            {
+                var ftData = FighterData;
+                var hold_bone = ftData.ModelLookupTables.ItemHoldBone;
+
+                DrawShape.DrawParasol(JointManager.GetWorldTransform(hold_bone), Vector3.One);
+            }
+
             // gfx spawn indicator
             foreach (var gfx in SubactionProcess.GFXOnFrame)
             {
@@ -861,6 +877,19 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // reset display sheild size
             DisplayShieldSize = 0;
 
+            // reset item render
+            _itemRender = ItemRender.None;
+
+            // load attributes
+            if (!string.IsNullOrEmpty(symbol))
+            {
+                if (FighterData != null && symbol.Contains("Guard"))
+                    DisplayShieldSize = FighterData.Attributes.ShieldSize / 2;
+
+                if (FighterData != null && symbol.Contains("ItemParasol"))
+                    _itemRender = ItemRender.Parasol;
+            }
+
             // check to render irv
             introDropDownButton.Visible = false;
             viewport.EnableFloor = true;
@@ -881,6 +910,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 LoadFigaTree(anim.Roots[0].Name, tree);
             }
 
+            // enable intro view
             if (symbol.Contains("IntroL_figatree"))
             {
                 introDropDownButton.Visible = true;
@@ -893,8 +923,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 IrOffset = IrRightOffset;
                 viewport.EnableFloor = false;
             }
-
-
+            
+            // apply fsms
             if (FrameSpeedModifiers.Count > 0)
                 UpdateAnimationWithFSMs();
         }
@@ -921,12 +951,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // set frame
             viewport.MaxFrame = tree.FrameCount;
-
-
-            // enable shield display
-            if (FighterData != null && name.Equals("Guard"))
-                DisplayShieldSize = FighterData.Attributes.ShieldSize / 2;
-
 
             // load throw dummy for thrown animations
             if (name.Contains("Throw") && !name.Contains("Taro"))

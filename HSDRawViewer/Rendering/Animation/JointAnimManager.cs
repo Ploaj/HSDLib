@@ -100,6 +100,22 @@ namespace HSDRawViewer.Rendering
         /// <param name="boneIndex"></param>
         /// <param name="jobj"></param>
         /// <returns></returns>
+        public virtual void GetAnimatedValues(float frame, int boneIndex, HSD_JOBJ jobj, out Vector3 trans, out Quaternion rot, out Vector3 scale)
+        {
+            GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
+
+            trans = new Vector3(TX, TY, TZ);
+            rot = Math3D.FromEulerAngles(RZ, RY, RX);
+            scale = new Vector3(SX, SY, SZ);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="boneIndex"></param>
+        /// <param name="jobj"></param>
+        /// <returns></returns>
         public virtual Matrix4 GetAnimatedMatrix(float frame, int boneIndex, HSD_JOBJ jobj)
         {
             GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
