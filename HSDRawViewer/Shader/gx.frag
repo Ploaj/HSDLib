@@ -15,7 +15,7 @@ in vec3 bitan;
 in float spec;
 in vec2 texcoord[MAX_TEX];
 in vec4 vertexColor;
-in vec4 vbones;
+flat in vec4 vbones;
 in vec4 vweights;
 in float fogAmt;
 
@@ -191,9 +191,15 @@ void main()
 	case 20: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < 4 ; i++)
-			if(int(vbones[i]) == selectedBone)
-				fragColor.r += vweights[i];
-		fragColor.gb = fragColor.rr;
+			if(vweights[i] > 0)
+			{
+				if (int(vbones[i]) == selectedBone)
+					fragColor.r += vweights[i];
+				else
+					fragColor.b += vweights[i];
+			}
+		if (fragColor.r <= 0)
+			fragColor = vec4(0, 0, 0, 1);
 		break;
 	case 21: fragColor = vec4(vec3(fogAmt), 1); break;
 	}

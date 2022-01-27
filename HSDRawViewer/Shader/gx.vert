@@ -23,7 +23,7 @@ out vec3 bitan;
 out float spec;
 out vec2 texcoord[MAX_TEX];
 out vec4 vertexColor;
-out vec4 vbones;
+flat out vec4 vbones;
 out vec4 vweights;
 out float fogAmt;
 

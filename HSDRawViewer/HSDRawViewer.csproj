@@ -223,6 +223,12 @@
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\AirRide\AirRideGrDataPosition.cs" />
+    <Compile Include="GUI\Plugins\Melee\NewCollDataEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\NewCollDataEditor.Designer.cs">
+      <DependentUpon>NewCollDataEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionEditorActions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -612,6 +618,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\Melee\MEXStockIconEditor.resx">
       <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\Melee\NewCollDataEditor.resx">
+      <DependentUpon>NewCollDataEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\ParticleGenEditor.resx">
       <DependentUpon>ParticleGenEditor.cs</DependentUpon>

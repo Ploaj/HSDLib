@@ -37,6 +37,9 @@ namespace HSDRawViewer.GUI
         public delegate void OnItemRemoveHandler(RemovedItemEventArgs e);
         public event OnItemRemoveHandler OnItemRemove;
 
+        public delegate void OnItemAddedHandler(AddedItemEventArgs e);
+        public event OnItemAddedHandler OnItemAdded;
+
         [DefaultValue(true)]
         public bool EnableToolStrip
         {
@@ -281,6 +284,7 @@ namespace HSDRawViewer.GUI
             var ob = Activator.CreateInstance(Property.PropertyType.GetElementType());
             if(ob != null)
             {
+                OnItemAdded?.Invoke(new AddedItemEventArgs() { Item = ob });
                 Items.Add(ob);
                 MakeChanges();
             }
@@ -394,6 +398,7 @@ namespace HSDRawViewer.GUI
         {
             if (o == null)
                 return -1;
+            OnItemAdded?.Invoke(new AddedItemEventArgs() { Item = o });
             Items.Add(o);
             MakeChanges();
             return Items.Count - 1 + ItemIndexOffset;
@@ -548,6 +553,11 @@ namespace HSDRawViewer.GUI
     public class RemovedItemEventArgs : EventArgs
     {
         public int Index { get; set; }
+    }
+
+    public class AddedItemEventArgs : EventArgs
+    {
+        public object Item { get; set; }
     }
 
     public interface ImageArrayItem : IDisposable

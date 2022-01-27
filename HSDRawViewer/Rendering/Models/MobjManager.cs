@@ -79,7 +79,6 @@ namespace HSDRawViewer.Rendering.Models
             shader.SetInt("alphaComp0", 7); // always
             shader.SetInt("alphaComp1", 7);
 
-
             // Materials
             var color = mobj.Material;
             if (color != null)
@@ -148,9 +147,6 @@ namespace HSDRawViewer.Rendering.Models
 
             //LoadTextureConstants(shader);
 
-            // these are always uniform
-            GL.Uniform1(GL.GetUniformLocation(shader.programId, "textures"), 4, new int[] { 0, 1, 2, 3 });
-
             // Bind Textures
             if (mobj.Textures != null)
             {
@@ -216,6 +212,7 @@ namespace HSDRawViewer.Rendering.Models
                         colorOP = 4;
                     }
 
+                    shader.SetInt($"TEX[{i}].texture", i);
                     shader.SetBoolToInt($"TEX[{i}].is_ambient", flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_AMBIENT));
                     shader.SetBoolToInt($"TEX[{i}].is_diffuse", flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_DIFFUSE));
                     shader.SetBoolToInt($"TEX[{i}].is_specular", flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SPECULAR));

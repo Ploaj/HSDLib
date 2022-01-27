@@ -1,5 +1,4 @@
-﻿
-#version 330
+﻿#version 330
 
 #define PASS_AMBIENT 1
 #define PASS_DIFFUSE 2
@@ -92,6 +91,7 @@ struct TexUnit
 	vec2 uv_scale;
 	int mirror_fix;
 	mat4 transform;
+	sampler2D texture;
 };
 uniform int hasTEX[MAX_TEX];
 uniform TexUnit TEX[MAX_TEX];
@@ -121,8 +121,6 @@ struct TevUnit
 
 uniform int hasTev[MAX_TEX];
 uniform TevUnit Tev[MAX_TEX];
-
-uniform sampler2D textures[MAX_TEX];
 
 // 
 vec2 GetCoordType(int coordType, vec2 tex0);
@@ -158,8 +156,8 @@ vec4 GetBumpShading(vec3 V)
 				vec2 tex0 = CalculateCoords(TEX[i], texcoord[i]);
 				vec2 tex1 = tex0 + vec2(dot(V, bitan.xyz), dot(V, tan.xyz));
 
-				vec3 bump0 = texture(textures[i], tex0).rgb;
-				vec3 bump1 = texture(textures[i], tex1).rgb;
+				vec3 bump0 = texture(TEX[i].texture, tex0).rgb;
+				vec3 bump1 = texture(TEX[i].texture, tex1).rgb;
 
 				return vec4((bump0 - bump1) + 1.0, 1);
 			}
@@ -217,7 +215,7 @@ float TevUnit_GetBias(TevUnit unit)
 			return -0.5;
 		case GX_TB_ZERO:
 		default:
-			return 0;
+			return 0.0;
 	}
 }
 
@@ -226,14 +224,14 @@ float TevUnit_GetScale(TevUnit unit)
 	switch (unit.color_scale)
 	{
 		case GX_CS_SCALE_2:
-			return 2;
+			return 2.0;
 		case GX_CS_SCALE_4:
-			return 4;
+			return 4.0;
 		case GX_CS_DIVIDE_2:
 			return 0.5;
 		case GX_CS_SCALE_1:
 		default:
-			return 1;
+			return 1.0;
 	}
 }
 
@@ -242,7 +240,7 @@ float TevUnit_GetScale(TevUnit unit)
 ///
 vec4 ApplyTEV(int index)
 {
-	vec4 TEX = texture(textures[index], CalculateCoords(TEX[index], texcoord[index]));
+	vec4 TEX = texture(TEX[index].texture, CalculateCoords(TEX[index], texcoord[index]));
 
 	if (hasTev[index] == 1)
 	{
