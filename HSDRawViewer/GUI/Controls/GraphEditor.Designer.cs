@@ -98,7 +98,7 @@
             // 
             this.nudFrame.Location = new System.Drawing.Point(48, 9);
             this.nudFrame.Maximum = new decimal(new int[] {
-            10000,
+            100000,
             0,
             0,
             0});

@@ -671,28 +671,28 @@ namespace HSDRawViewer.Converters
                     Attributes.Add(GXAttribName.GX_VA_CLR1);
 
 
-                if (mesh.HasUVSet(0) && !hasReflection)
+                if (mesh.HasUVSet(0))
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
 
-                if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)) && !hasReflection)
+                if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)))
                     Attributes.Add(GXAttribName.GX_VA_TEX1);
 
-                if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)) && !hasReflection)
+                if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)))
                     Attributes.Add(GXAttribName.GX_VA_TEX2);
 
-                if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)) && !hasReflection)
+                if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)))
                     Attributes.Add(GXAttribName.GX_VA_TEX3);
 
-                if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)) && !hasReflection)
+                if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)))
                     Attributes.Add(GXAttribName.GX_VA_TEX4);
 
-                if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)) && !hasReflection)
+                if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)))
                     Attributes.Add(GXAttribName.GX_VA_TEX5);
 
-                if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)) && !hasReflection)
+                if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)))
                     Attributes.Add(GXAttribName.GX_VA_TEX6);
 
-                if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)) && !hasReflection)
+                if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
                     Attributes.Add(GXAttribName.GX_VA_TEX7);
 
 

@@ -290,6 +290,8 @@ namespace HSDRawViewer.GUI.Controls
                 }
             };
 
+            var gr = new GraphRenderer();
+
             _graph.Paint += (sender, args) =>
             {
                 var graphics = args.Graphics;
@@ -312,7 +314,6 @@ namespace HSDRawViewer.GUI.Controls
                 {
                     if (_selectedPlayer != null)
                     {
-                        var gr = new GraphRenderer();
                         gr.SetKeys(_selectedPlayer);
 
                         // horizontal lines
@@ -338,8 +339,8 @@ namespace HSDRawViewer.GUI.Controls
                         tickWidth = 1;
 
                     // don't crunch numbers too far together
-                    if (tickWidth * Zoom < 20)
-                        increment = (int)Math.Ceiling(20 / (tickWidth * Zoom));
+                    if (tickWidth * Zoom < 40)
+                        increment = (int)Math.Ceiling(40 / (tickWidth * Zoom));
 
                     // round increment to upper 5
                     if(increment != 1)
@@ -369,8 +370,6 @@ namespace HSDRawViewer.GUI.Controls
                 {
                     if (!_options.ShowAllTracks && p != _selectedPlayer)
                         continue;
-
-                    var gr = new GraphRenderer();
 
                     gr.RenderTangents = _options.ShowTangents;
 
