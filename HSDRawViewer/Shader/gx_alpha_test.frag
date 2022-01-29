@@ -1,4 +1,4 @@
-﻿#version 330
+#version 330
 
 #define ALPHA_OP_AND 0
 #define ALPHA_OP_OR 1

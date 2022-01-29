@@ -38,6 +38,9 @@ namespace HSDRawViewer.Rendering.Models
         // Rendering Cache
         private Dictionary<HSD_DOBJ, List<CachedPOBJ>> DOBJtoPOBJCache = new Dictionary<HSD_DOBJ, List<CachedPOBJ>>();
 
+        private static int MAX_WEIGHTS = 6;
+        private static int WEIGHT_STRIDE = 10;
+
         public class CachedPOBJ
         {
             public POBJ_FLAG Flag
@@ -48,8 +51,8 @@ namespace HSDRawViewer.Rendering.Models
             public HSD_POBJ POBJ;
 
             public int EnvelopeCount = 0;
-            public Vector4[] Envelopes = new Vector4[10];
-            public Vector4[] Weights = new Vector4[10];
+            public int[] Envelopes = new int[MAX_WEIGHTS * WEIGHT_STRIDE];
+            public float[] Weights = new float[MAX_WEIGHTS * WEIGHT_STRIDE];
 
             public bool HasWeighting = false;
 
@@ -135,12 +138,10 @@ namespace HSDRawViewer.Rendering.Models
                 foreach (var p in DOBJtoPOBJCache[dobj])
                 {
                     // load envelopes
-                    var en = p.Envelopes;
-                    GL.Uniform4(shader.GetVertexAttributeUniformLocation("envelopeIndex"), p.Envelopes.Length, ref p.Envelopes[0].X);
+                    GL.Uniform1(shader.GetVertexAttributeUniformLocation("envelopeIndex"), p.Envelopes.Length, ref p.Envelopes[0]);
 
                     // load weights
-                    var we = p.Weights;
-                    GL.Uniform4(shader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0].X);
+                    GL.Uniform1(shader.GetVertexAttributeUniformLocation("weights"), p.Weights.Length, ref p.Weights[0]);
 
                     // set uniform flag information
                     shader.SetBoolToInt("hasEnvelopes", p.HasWeighting);
@@ -285,26 +286,26 @@ namespace HSDRawViewer.Rendering.Models
                 int eni = 0;
                 foreach(var v in dl.Envelopes)
                 {
-                    Vector4 b = new Vector4();
-                    Vector4 w = new Vector4();
-                    for(int i = 0; i < v.EnvelopeCount; i++)
+                    if (eni >= WEIGHT_STRIDE)
+                        break;
+                        
+                    for (int i = 0; i < v.EnvelopeCount; i++)
                     {
-                        if (i >= 4)
+                        if (i >= MAX_WEIGHTS)
                             break;
 
                         var jobj = v.GetJOBJAt(i);
+                        var jobjIndex = jobjManager.IndexOf(jobj);
 
-                        w[i] = v.GetWeightAt(i);
-                        b[i] = jobjManager.IndexOf(jobj);
+                        pobjCache.Envelopes[eni * MAX_WEIGHTS + i] = jobjIndex;
+                        pobjCache.Weights[eni * MAX_WEIGHTS + i] = v.GetWeightAt(i);
 
-                        if (jobj != null && jobj.InverseWorldTransform == null || b[i] == -1)
+                        if (jobj != null && jobj.InverseWorldTransform == null || jobjIndex == -1)
                             Console.WriteLine("Warning: Inverse Matrix not set");
 
                         if (jobj != null && jobj.InverseWorldTransform != null && !jobj.Flags.HasFlag(JOBJ_FLAG.SKELETON))
                             Console.WriteLine("Skeleton flag not set");
                     }
-                    pobjCache.Weights[eni] = w;
-                    pobjCache.Envelopes[eni] = b;
                     eni++;
                     pobjCache.EnvelopeCount = v.EnvelopeCount;
                     pobjCache.HasWeighting = v.EnvelopeCount > 0;

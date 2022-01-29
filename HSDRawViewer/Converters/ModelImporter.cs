@@ -734,10 +734,8 @@ namespace HSDRawViewer.Converters
                             bones.Add(rootnode);
                         }
 
-                        if (v.Envelope.Weights.Count > 4)
-                        {
+                        if (v.Envelope.Weights.Count > 6)
                             throw new Exception($"Too many weights! {v.Envelope.Weights.Count} in {mesh.Name}");
-                        }
 
                         foreach(var bw in v.Envelope.Weights)
                         {
@@ -957,7 +955,7 @@ namespace HSDRawViewer.Converters
                         var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, Settings.TextureFormat, Settings.PaletteFormat);
                         tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
                         
-                        tobj.GXTexGenSrc = 4;
+                        tobj.GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0;
                         tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
 
                         tobj.WrapS = ToGXWrapMode(material.DiffuseMap.WrapS);

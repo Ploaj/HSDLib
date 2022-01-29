@@ -216,7 +216,7 @@ namespace HSDRawViewer.GUI.Extra
                     prev.TOBJ.Next = c.TOBJ;
                 }
                 
-                c.TOBJ.GXTexGenSrc = 4 + index;
+                // c.TOBJ.GXTexGenSrc = (HSDRaw.GX.GXTexGenSrc)(HSDRaw.GX.GXTexGenSrc.GX_TG_TEX0 + index);
                 c.TOBJ.TexMapID = HSDRaw.GX.GXTexMapID.GX_TEXMAP0 + index++;
 
                 prev = c;

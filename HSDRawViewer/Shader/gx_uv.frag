@@ -1,4 +1,4 @@
-﻿#version 330
+#version 330
 
 #define COORD_UV 0
 #define COORD_REFLECTION 1
@@ -7,8 +7,34 @@
 #define COORD_TOON 4
 #define COORD_GRADATION 5
 
+#define GX_TG_POS 0
+#define GX_TG_NRM 1
+#define GX_TG_BINRM 2
+#define GX_TG_TANGENT 3
+#define GX_TG_TEX0 4
+#define GX_TG_TEX1 5
+#define GX_TG_TEX2 6
+#define GX_TG_TEX3 7
+#define GX_TG_TEX4 8
+#define GX_TG_TEX5 9
+#define GX_TG_TEX6 10
+#define GX_TG_TEX7 11
+#define GX_TG_TEXCOORD0 12
+#define GX_TG_TEXCOORD1 13
+#define GX_TG_TEXCOORD2 14
+#define GX_TG_TEXCOORD3 15
+#define GX_TG_TEXCOORD4 16
+#define GX_TG_TEXCOORD5 17
+#define GX_TG_TEXCOORD6 18
+#define GX_TG_COLOR0 19
+#define GX_TG_COLOR1 20
+
+in vec3 posVA;
 in vec3 normal;
+in vec3 tan;
+in vec3 bitan;
 in vec3 vertPosition;
+in vec2 texcoord[4];
 
 uniform mat4 sphereMatrix;
 uniform vec3 cameraPos;
@@ -57,8 +83,43 @@ vec2 GetToonCoords()
 ///
 /// Returns Coords for specified coord type
 ///
-vec2 GetCoordType(int coordType, vec2 tex0)
+vec2 GetCoordType(int coordType, int gensrc)
 {
+	vec2 tex0 = vec2(0, 0);
+
+	// TODO: more texture uv channels
+	switch (gensrc)
+	{
+		case GX_TG_POS:		tex0 = vec2(posVA.x, posVA.y); break;
+		case GX_TG_NRM:		tex0 = vec2(normal.x, normal.y); break;
+		case GX_TG_BINRM:	tex0 = vec2(bitan.x, bitan.y); break;
+		case GX_TG_TANGENT:	tex0 = vec2(tan.x, tan.y);  break;
+
+		case GX_TG_TEX0: tex0 = texcoord[0]; break;
+		case GX_TG_TEX1: tex0 = texcoord[1]; break;
+		case GX_TG_TEX2: tex0 = texcoord[2]; break;
+		case GX_TG_TEX3: tex0 = texcoord[3]; break;
+		case GX_TG_TEX4: tex0 = texcoord[3]; break;
+		case GX_TG_TEX5: tex0 = texcoord[3]; break;
+		case GX_TG_TEX6: tex0 = texcoord[3]; break;
+		case GX_TG_TEX7: tex0 = texcoord[3]; break;
+		
+		case GX_TG_TEXCOORD0: tex0 = texcoord[0]; break;
+		case GX_TG_TEXCOORD1: tex0 = texcoord[1]; break;
+		case GX_TG_TEXCOORD2: tex0 = texcoord[2]; break;
+		case GX_TG_TEXCOORD3: tex0 = texcoord[3]; break;
+		case GX_TG_TEXCOORD4: tex0 = texcoord[3]; break;
+		case GX_TG_TEXCOORD5: tex0 = texcoord[3]; break;
+		case GX_TG_TEXCOORD6: tex0 = texcoord[3]; break;
+
+		case GX_TG_COLOR0:
+			// this is usually for toon shading
+			break;
+		case GX_TG_COLOR1:
+			// this seems to be some combination of spherical reflection and toon shading
+			break;
+	}
+
 	//COORD_HIGHLIGHT
     //COORD_SHADOW
     //COORD_GRADATION

@@ -107,8 +107,8 @@ namespace HSDRaw.Common
         [Category("0 - General"), Description("Texture ID used for binding texture.")]
         public GXTexMapID TexMapID { get => (GXTexMapID)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
 
-        [Category("0 - General"), Description("Used for generating mipmaps. (Use 4)")]
-        public int GXTexGenSrc { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        [Category("0 - General"), Description("")]
+        public GXTexGenSrc GXTexGenSrc { get => (GXTexGenSrc)_s.GetInt32(0x0C); set => _s.SetInt32(0x0C, (int)value); }
 
 
         [Category("0 - General"), Description("Amount to scale UVs (U) by when applied to a model")]

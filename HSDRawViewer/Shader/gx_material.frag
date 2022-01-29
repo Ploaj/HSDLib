@@ -1,4 +1,4 @@
-﻿#version 330
+#version 330
 
 // settings
 uniform int enableDiffuse;

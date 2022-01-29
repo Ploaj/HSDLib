@@ -1,6 +1,7 @@
-﻿#version 330
+#version 330
 
 #define MAX_TEX 4
+#define MAX_WEIGHTS 6
 
 #define PASS_AMBIENT 1
 #define PASS_DIFFUSE 2
@@ -15,8 +16,8 @@ in vec3 bitan;
 in float spec;
 in vec2 texcoord[MAX_TEX];
 in vec4 vertexColor;
-flat in vec4 vbones;
-in vec4 vweights;
+flat in int vbones[MAX_WEIGHTS];
+in float vweights[MAX_WEIGHTS];
 in float fogAmt;
 
 out vec4 fragColor;
@@ -190,10 +191,10 @@ void main()
 	case 19: fragColor = specularPass * specularMaterial; break;
 	case 20: 
 		fragColor = vec4(0, 0, 0, 1);
-		for(int i = 0; i < 4 ; i++)
+		for(int i = 0; i < MAX_WEIGHTS ; i++)
 			if(vweights[i] > 0)
 			{
-				if (int(vbones[i]) == selectedBone)
+				if (vbones[i] == selectedBone)
 					fragColor.r += vweights[i];
 				else
 					fragColor.b += vweights[i];

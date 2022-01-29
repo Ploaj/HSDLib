@@ -1,4 +1,4 @@
-﻿#version 330
+#version 330
 
 #define GX_CC_CPREV 0
 #define GX_CC_APREV 1

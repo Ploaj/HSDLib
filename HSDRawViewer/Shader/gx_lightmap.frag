@@ -1,4 +1,4 @@
-﻿#version 330
+#version 330
 
 #define PASS_AMBIENT 1
 #define PASS_DIFFUSE 2
@@ -75,10 +75,10 @@
 
 in vec3 tan;
 in vec3 bitan;
-in vec2 texcoord[MAX_TEX];
 
 struct TexUnit
 {
+	int gensrc;
 	int is_ambient;
 	int is_diffuse;
 	int is_specular;
@@ -123,14 +123,14 @@ uniform int hasTev[MAX_TEX];
 uniform TevUnit Tev[MAX_TEX];
 
 // 
-vec2 GetCoordType(int coordType, vec2 tex0);
+vec2 GetCoordType(int coordType, int gensrc);
 
 ///
 ///
 ///
-vec2 CalculateCoords(TexUnit tex, vec2 texCoord)
+vec2 CalculateCoords(TexUnit tex)
 {
-    vec2 coords = GetCoordType(tex.coord_type, texCoord);
+    vec2 coords = GetCoordType(tex.coord_type, tex.gensrc);
 
 	coords = (tex.transform * vec4(coords.x, coords.y, 0, 1)).xy;
 	
@@ -153,7 +153,7 @@ vec4 GetBumpShading(vec3 V)
 		{
 			if(TEX[i].is_bump == 1) 
 			{
-				vec2 tex0 = CalculateCoords(TEX[i], texcoord[i]);
+				vec2 tex0 = CalculateCoords(TEX[i]);
 				vec2 tex1 = tex0 + vec2(dot(V, bitan.xyz), dot(V, tan.xyz));
 
 				vec3 bump0 = texture(TEX[i].texture, tex0).rgb;
@@ -240,7 +240,7 @@ float TevUnit_GetScale(TevUnit unit)
 ///
 vec4 ApplyTEV(int index)
 {
-	vec4 TEX = texture(TEX[index].texture, CalculateCoords(TEX[index], texcoord[index]));
+	vec4 TEX = texture(TEX[index].texture, CalculateCoords(TEX[index]));
 
 	if (hasTev[index] == 1)
 	{

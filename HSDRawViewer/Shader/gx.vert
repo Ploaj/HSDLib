@@ -1,6 +1,8 @@
-﻿#version 330
+#version 330
 
 #define MAX_TEX 4
+#define MAX_WEIGHTS 6
+#define WEIGHT_STRIDE 10
 
 in float PNMTXIDX;
 in vec3 GX_VA_POS;
@@ -16,6 +18,7 @@ in vec4 GX_VA_CLR0;
 in vec3 GX_VA_POS_SHAPE;
 in vec3 GX_VA_NRM_SHAPE;
 
+out vec3 posVA;
 out vec3 vertPosition;
 out vec3 normal;
 out vec3 tan;
@@ -23,8 +26,8 @@ out vec3 bitan;
 out float spec;
 out vec2 texcoord[MAX_TEX];
 out vec4 vertexColor;
-flat out vec4 vbones;
-out vec4 vweights;
+flat out int vbones[MAX_WEIGHTS];
+out float vweights[MAX_WEIGHTS];
 out float fogAmt;
 
 uniform mat4 mvp;
@@ -38,12 +41,12 @@ uniform int hasEnvelopes;
 uniform BoneTransforms
 {
     mat4 transforms[200];
-} ;
+};
 
 uniform mat4 binds[200];
 
-uniform vec4 envelopeIndex[10];
-uniform vec4 weights[10];
+uniform int envelopeIndex[WEIGHT_STRIDE * MAX_WEIGHTS];
+uniform float weights[WEIGHT_STRIDE * MAX_WEIGHTS];
 
 uniform float shape_blend;
 
@@ -105,8 +108,12 @@ void main()
 	bitan = GX_VA_BTAN;
 	normal = mix(GX_VA_NRM, GX_VA_NRM_SHAPE, shape_blend);
 
-	vbones = vec4(0, 0, 0, 0);
-	vweights = vec4(0, 0, 0, 0);
+	
+	for (int i = 0; i < MAX_WEIGHTS; i += 1)
+	{
+		vbones[i] = 0;
+		vweights[i] = 0.0;
+	}
 
 	if(enableParentTransform == 1 && hasEnvelopes == 0) // todo maybe not accurate
 	{
@@ -117,24 +124,30 @@ void main()
 	if (hasEnvelopes == 1)
 	{
 		int matrixIndex = int(PNMTXIDX / 3);
-		vbones = envelopeIndex[matrixIndex];
-		vweights = weights[matrixIndex];
-		
-		if(isSkeleton == 1 && vweights.x == 1)
+
+		// set output attributes
+		for (int i = 0; i < MAX_WEIGHTS; i += 1)
 		{
-			pos = transforms[int(envelopeIndex[matrixIndex].x)] * vec4(pos.xyz, 1);
-			normal = (inverse(transpose(transforms[int(envelopeIndex[matrixIndex].x)])) * vec4(normal, 1)).xyz;
+			vbones[i] = envelopeIndex[matrixIndex * MAX_WEIGHTS + i];
+			vweights[i] = weights[matrixIndex * MAX_WEIGHTS + i];
+		}
+		
+		// single bind optimization
+		if(isSkeleton == 1 && vweights[0] == 1.0)
+		{
+			pos = transforms[vbones[0]] * vec4(pos.xyz, 1);
+			normal = (inverse(transpose(transforms[vbones[0]])) * vec4(normal, 1)).xyz;
 		}
 		else
 		{
+			// skin mesh
 			vec3 skinnedPos = vec3(0);
 			vec3 skinnedNrm = vec3(0);
-			int i = 0;
-			for(i = 0; i < 4 ; i+=1)
+			for(int i = 0; i < MAX_WEIGHTS; i += 1)
 			{
 				if(vweights[i] > 0)
 				{
-					mat4 transform = binds[int(vbones[i])];
+					mat4 transform = binds[vbones[i]];
 					skinnedPos += (transform * vec4(pos.xyz, 1) * vweights[i]).xyz;
 					skinnedNrm += (inverse(transpose(transform)) * vec4(normal, 1) * vweights[i]).xyz;
 				}
@@ -144,6 +157,8 @@ void main()
 		}
 	}
 	
+	// raw outputs
+	posVA = GX_VA_POS;
 	vertPosition = pos.xyz;
 	normal = normalize(normal);
 
@@ -154,17 +169,17 @@ void main()
 
 	vertexColor = GX_VA_CLR0;
 	
+	// view lighting calculations
 	vec3 V = vertPosition - cameraPos;
-
 	if(light.useCamera == 0)
 		V = light.position;
-
 	V = normalize(V);
-
     spec = clamp(dot(normal, V), 0, 1);
 
+	// final position
 	gl_Position = mvp * vec4(pos.xyz, 1);
 
+	// fog calcuation
 	if(fog.type == 1)
 		fogAmt = fogFactorLinear(length(gl_Position.xyz), fog.start, fog.end);
 	else

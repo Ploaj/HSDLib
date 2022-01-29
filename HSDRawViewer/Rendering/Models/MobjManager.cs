@@ -213,6 +213,7 @@ namespace HSDRawViewer.Rendering.Models
                     }
 
                     shader.SetInt($"TEX[{i}].texture", i);
+                    shader.SetInt($"TEX[{i}].gensrc", (int)tex.GXTexGenSrc);
                     shader.SetBoolToInt($"TEX[{i}].is_ambient", flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_AMBIENT));
                     shader.SetBoolToInt($"TEX[{i}].is_diffuse", flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_DIFFUSE));
                     shader.SetBoolToInt($"TEX[{i}].is_specular", flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SPECULAR));
