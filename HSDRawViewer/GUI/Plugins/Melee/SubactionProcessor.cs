@@ -35,7 +35,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private List<Command> Commands = new List<Command>();
 
-        public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[4];
+        public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[8];
 
         public bool HitboxesActive { get => Hitboxes.Any(e => e.Active); }
 
