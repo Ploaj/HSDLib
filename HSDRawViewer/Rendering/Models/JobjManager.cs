@@ -364,7 +364,7 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         private void RenderDOBJs(Camera camera)
         {
-            if (_settings.RenderObjects)
+            if (_settings.RenderObjects != ObjectRenderMode.None)
             {
                 List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>> XLU = new List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>>();
                 List<Tuple<HSD_DOBJ, HSD_JOBJ>> selected = new List<Tuple<HSD_DOBJ, HSD_JOBJ>>();
@@ -401,7 +401,8 @@ namespace HSDRawViewer.Rendering.Models
                                 selected.Add(new Tuple<HSD_DOBJ, HSD_JOBJ>(dobj, b.Key));
 
                             // check if hidden
-                            if (!HiddenDOBJIndices.Contains(dobjIndex))
+                            if (!HiddenDOBJIndices.Contains(dobjIndex) &&
+                                !(_settings.RenderObjects == ObjectRenderMode.Selected && !SelectedDOBJIndices.Contains(dobjIndex)))
                             {
                                 // get shape blend amt
                                 DOBJManager.ShapeBlend = ShapeAnimation.GetBlending();
@@ -440,10 +441,11 @@ namespace HSDRawViewer.Rendering.Models
                 //GL.Disable(EnableCap.DepthTest);
                 GL.DepthFunc(DepthFunction.Always);
 
-                foreach (var i in selected)
-                {
-                    DOBJManager.RenderDOBJShader(GXShader._shader, i.Item1, i.Item2, this, null, true);
-                }
+                if (_settings.OutlineSelected)
+                    foreach (var i in selected)
+                    {
+                        DOBJManager.RenderDOBJShader(GXShader._shader, i.Item1, i.Item2, this, null, true);
+                    }
             }
         }
 

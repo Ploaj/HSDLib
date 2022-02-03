@@ -37,7 +37,7 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options"), DisplayName("Smooth Normals"), Description("Applies normal smoothing")]
         public bool SmoothNormals { get; set; } = false;
-        
+
 
         [Category("Importing Options"), DisplayName("Import Bone Names"), Description("Stores bone names in JOBJs; not recommended")]
         public bool ImportBoneNames { get; set; } = false;
@@ -568,6 +568,17 @@ namespace HSDRawViewer.Converters
 
             bool singleBinded = mesh.Name.Contains("SINGLE");
 
+            if (mesh.Name.Contains("BUMP"))
+            {
+                mesh.CalculateTangentBitangent();
+
+                foreach (var v in mesh.Vertices)
+                {
+                    v.Tangent /= 100;
+                    v.Binormal /= 100;
+                }
+            }
+
             foreach (var poly in mesh.Polygons)
             {
                 // Skip Empty Polygon
@@ -694,7 +705,6 @@ namespace HSDRawViewer.Converters
 
                 if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
                     Attributes.Add(GXAttribName.GX_VA_TEX7);
-
 
                 var vertices = new List<GX_Vertex>();
                 var jobjList = new List<HSD_JOBJ[]>();
@@ -1003,6 +1013,5 @@ namespace HSDRawViewer.Converters
         {
             return (byte)(val > 1.0f ? 255 : val * 256);
         }
-
     }
 }

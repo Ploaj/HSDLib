@@ -158,6 +158,7 @@
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />
     <Compile Include="Converters\Animation\JointAnimationLoader.cs" />
+    <Compile Include="Converters\ModelTangentUtils.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\SBM\SSFModelGenerator.cs" />
     <Compile Include="Extensions\JOBJExtensions.cs" />

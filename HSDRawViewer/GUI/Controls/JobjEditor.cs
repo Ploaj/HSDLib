@@ -48,7 +48,6 @@ namespace HSDRawViewer.GUI.Plugins
             JointManager = new JOBJManager();
 
             showBonesToolStripMenuItem.Checked = JointManager._settings.RenderBones;
-            showMeshToolStripMenuItem.Checked = JointManager._settings.RenderObjects;
             showBoneOrientationToolStripMenuItem.Checked = JointManager._settings.RenderOrientation;
             showSelectionOutlineToolStripMenuItem.Checked = JointManager._settings.OutlineSelected;
             showSplinesToolStripMenuItem.Checked = JointManager._settings.RenderSplines;
@@ -415,7 +414,6 @@ namespace HSDRawViewer.GUI.Plugins
             JointManager._settings.RenderSplines = showSplinesToolStripMenuItem.Checked;
             JointManager._settings.RenderBones = showBonesToolStripMenuItem.Checked;
             JointManager._settings.RenderOrientation = showBoneOrientationToolStripMenuItem.Checked;
-            JointManager._settings.RenderObjects = showMeshToolStripMenuItem.Checked;
             JointManager._settings.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
             JointManager.Render(cam);
 
@@ -626,18 +624,15 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if(toolStripComboBox2.SelectedIndex == 0)
             {
-                JointManager._settings.RenderObjects = true;
-                JointManager.DOBJManager.OnlyRenderSelected = false;
+                JointManager._settings.RenderObjects = ObjectRenderMode.Visible;
             }
             if (toolStripComboBox2.SelectedIndex == 1)
             {
-                JointManager._settings.RenderObjects = true;
-                JointManager.DOBJManager.OnlyRenderSelected = true;
+                JointManager._settings.RenderObjects = ObjectRenderMode.Selected;
             }
             if (toolStripComboBox2.SelectedIndex == 2)
             {
-                JointManager._settings.RenderObjects = false;
-                JointManager.DOBJManager.OnlyRenderSelected = false;
+                JointManager._settings.RenderObjects = ObjectRenderMode.None;
             }
         }
 

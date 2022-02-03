@@ -36,13 +36,17 @@ namespace HSDRaw.Common
         public HSD_LightAnimPointer AnimPointer { get => _s.GetReference<HSD_LightAnimPointer>(0x04); set => _s.SetReference(0x04, value); }
     }
 
-    public class HSD_LightAnimPointer : HSDAccessor
+    public class HSD_LightAnimPointer : HSDListAccessor<HSD_LightAnimPointer>
     {
-        public override int TrimmedSize => 0x08;
+        public override int TrimmedSize => 0x10;
 
-        public HSD_AOBJ LightAnim { get => _s.GetReference<HSD_AOBJ>(0x00); set => _s.SetReference(0, value); }
+        public override HSD_LightAnimPointer Next { get => _s.GetReference<HSD_LightAnimPointer>(0x00); set => _s.SetReference(0x00, value); }
 
-        public int Unknown { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public HSD_AOBJ LightAnim { get => _s.GetReference<HSD_AOBJ>(0x04); set => _s.SetReference(0x04, value); }
+
+        public HSD_AOBJ PositionAnim { get => _s.GetReference<HSD_AOBJ>(0x08); set => _s.SetReference(0x08, value); }
+
+        public HSD_AOBJ InterestAnim { get => _s.GetReference<HSD_AOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 
     public class HSD_LOBJ : HSDListAccessor<HSD_LOBJ>

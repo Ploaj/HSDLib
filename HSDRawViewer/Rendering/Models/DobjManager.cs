@@ -20,8 +20,6 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool RenderVertexColor { get; set; } = true;
 
-        public bool OnlyRenderSelected { get; set; } = false;
-
         // Attributes
         public Vector3 OverlayColor = Vector3.One;
 
@@ -102,18 +100,10 @@ namespace HSDRawViewer.Rendering.Models
             if (dobj.Pobj == null)
                 return;
 
-            // check selection mode
-            //if (OnlyRenderSelected && SelectedDOBJ != null && SelectedDOBJ._s != dobj._s)
-            //    return;
-
             // process model if dobj is missing
             if (!DobjCacheLookup.ContainsKey(dobj))
                 if(!LoadModel(jobjManager))
                     return;
-
-            // check if dobj is hidden
-            if ((selected && OnlyRenderSelected))
-                return;
 
             // setup skeleton flag
             shader.SetBoolToInt("isSkeleton", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SKELETON));
