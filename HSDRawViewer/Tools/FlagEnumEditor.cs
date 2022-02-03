@@ -252,7 +252,7 @@ namespace HSDRawViewer.Tools
 
                 IWindowsFormsEditorService edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
 
-                if (edSvc != null)
+                if (edSvc != null && value != null)
                 {
 
                     Enum e = (Enum)Convert.ChangeType(value, context.PropertyDescriptor.PropertyType);

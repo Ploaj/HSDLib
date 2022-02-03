@@ -533,6 +533,16 @@ namespace HSDRawViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ts_hidden {
+            get {
+                object obj = ResourceManager.GetObject("ts_hidden", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ts_importfile {
             get {
                 object obj = ResourceManager.GetObject("ts_importfile", resourceCulture);
@@ -586,6 +596,16 @@ namespace HSDRawViewer.Properties {
         internal static System.Drawing.Bitmap ts_up {
             get {
                 object obj = ResourceManager.GetObject("ts_up", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_visible {
+            get {
+                object obj = ResourceManager.GetObject("ts_visible", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

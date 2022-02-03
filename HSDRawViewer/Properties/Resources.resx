@@ -259,6 +259,9 @@
   <data name="ts_exportfile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_exportfile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ts_hidden" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_hidden.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ts_importfile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_importfile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -276,6 +279,9 @@
   </data>
   <data name="ts_up" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_up.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ts_visible" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ts_visible.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ts_x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ts_x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

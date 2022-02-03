@@ -238,7 +238,7 @@ namespace HSDRawViewer.GUI
 
                       timer.Step();
 
-                      if (IsPlaying && timer.Total.Milliseconds > 1000 / (_fps * 2))
+                      if (IsPlaying && timer.Total.Milliseconds > 1000 / _fps)
                       {
                           if (_playbackMode == PlaybackMode.Forward && !(!LoopPlayback && Frame == MaxFrame))
                           {
@@ -255,6 +255,7 @@ namespace HSDRawViewer.GUI
                   }
               }
               );
+            drawLoop.IsBackground = true;
             drawLoop.Start();
 
 

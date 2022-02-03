@@ -449,8 +449,6 @@ namespace HSDRawViewer.Rendering
             GL.Vertex3(center);
 
             float twicePi = 2.0f * (float)Math.PI;
-            float x = 0;
-            float y = 0;
 
             for (int i = 0; i <= precision; i++)
             {

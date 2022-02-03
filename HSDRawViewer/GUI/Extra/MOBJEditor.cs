@@ -373,13 +373,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (listTexture.SelectedItems.Count > 0 && listTexture.SelectedItems[0] is TextureContainer con)
             {
-                var f = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
-                if (f != null)
-                {
-                    var bmp = TOBJConverter.ToBitmap(con.TOBJ);
-                    bmp.Save(f);
-                    bmp.Dispose();
-                }
+                con.TOBJ.ExportTOBJToFile();
             }
         }
 

@@ -183,6 +183,7 @@
     <Compile Include="GUI\Controls\ISOEditor.Designer.cs">
       <DependentUpon>ISOEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Controls\MeshList.cs" />
     <Compile Include="GUI\Controls\MEXStockIconControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -530,6 +531,8 @@
     <Compile Include="Tools\RawTimer.cs" />
     <Compile Include="Tools\Simpoly.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Resources\ts_visible.png" />
+    <None Include="Resources\ts_hidden.png" />
     <None Include="Melee\command_rider.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

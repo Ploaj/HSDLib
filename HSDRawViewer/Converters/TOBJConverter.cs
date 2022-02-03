@@ -9,7 +9,7 @@ using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.Converters
 {
-    public class TOBJConverter
+    public static class TOBJConverter
     {
         /// <summary>
         /// 
@@ -324,6 +324,17 @@ namespace HSDRawViewer.Converters
         public static void InjectBitmap(Bitmap bmp, HSD_TOBJ tobj, GXTexFmt imgFormat, GXTlutFmt palFormat)
         {
             tobj.EncodeImageData(bmp.GetBGRAData(), bmp.Width, bmp.Height, imgFormat, palFormat);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void ExportTOBJToFile(this HSD_TOBJ tobj)
+        {
+            var f = FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
+            if (f != null)
+                using (var bmp = ToBitmap(tobj))
+                    bmp.Save(f);
         }
     }
 }

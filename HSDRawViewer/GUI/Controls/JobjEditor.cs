@@ -21,6 +21,7 @@ using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Converters.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.GUI.Controls;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -66,21 +67,30 @@ namespace HSDRawViewer.GUI.Plugins
             };
 
             listDOBJ.SelectedIndexChanged += (sender, args) => {
-                propertyGrid1.SelectedObject = listDOBJ.SelectedItem;
-                JointManager.DOBJManager.SelectedDOBJ = ((listDOBJ.SelectedItem as DOBJContainer)?.DOBJ);
+                propertyGrid1.SelectedObjects = listDOBJ.SelectedItems.Cast<object>().ToArray();
+                JointManager.SetSelectedDOBJs(listDOBJ.SelectedIndices.Cast<int>());
 
-                materialDropDownButton1.Enabled = listDOBJ.SelectedItems.Count == 1;
-                buttonMoveDown.Enabled = materialDropDownButton1.Enabled;
-                buttonMoveUp.Enabled = materialDropDownButton1.Enabled;
+                //importToolStripMenuItem.Enabled = listDOBJ.SelectedItems.Count == 1;
+
+                // can only move one at a time
+                editToolStripMenuItem.Enabled = listDOBJ.SelectedItems.Count == 1;
+                exportToolStripMenuItem.Enabled = listDOBJ.SelectedItems.Count == 1;
+                buttonMoveDown.Enabled = listDOBJ.SelectedItems.Count == 1;
+                buttonMoveUp.Enabled = listDOBJ.SelectedItems.Count == 1;
+            };
+
+            listDOBJ.ItemVisiblilityChanged += (sender, args) =>
+            {
+                UpdateVisibility();
             };
 
             propertyGrid1.PropertyValueChanged += (sender, args) =>
             {
                 // refresh
-                listDOBJ.SelectedItem = listDOBJ.SelectedItem;
+                listDOBJ.Invalidate();
             };
 
-            //listDOBJ.SelectionMode = SelectionMode.MultiExtended;
+            listDOBJ.SelectionMode = SelectionMode.MultiExtended;
 
             viewport = new ViewportControl();
             viewport.Dock = DockStyle.Fill;
@@ -128,7 +138,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private Dictionary<HSD_JOBJ, int> jobjToIndex = new Dictionary<HSD_JOBJ, int>();
 
-        private class DOBJContainer
+        private class DOBJContainer : MeshListItem
         {
             public enum CullMode
             {
@@ -138,7 +148,6 @@ namespace HSDRawViewer.GUI.Plugins
                 FrontAndBack
             }
 
-            public int Index;
             public int JOBJIndex;
             public int DOBJIndex;
             public HSD_JOBJ ParentJOBJ;
@@ -229,7 +238,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             public override string ToString()
             {
-                return $"{Index}. Joint {JOBJIndex} : Object {DOBJIndex} : Polygons {PolygonCount} : Textures {TextureCount} {Name}";
+                return $"Joint {JOBJIndex} : Object {DOBJIndex} : Polygons {PolygonCount} : Textures {TextureCount} {Name}";
             }
         }
 
@@ -263,7 +272,6 @@ namespace HSDRawViewer.GUI.Plugins
 
             treeJOBJ.ExpandAll();
 
-            JointManager.DOBJManager.HiddenDOBJs.Clear();
             CheckAll();
         }
 
@@ -297,7 +305,7 @@ namespace HSDRawViewer.GUI.Plugins
                 int dobjIndex = 0;
                 foreach (var dobj in jobj.Dobj.List)
                 {
-                    dobjList.Add(new DOBJContainer() {Index = dobjList.Count, DOBJ = dobj, ParentJOBJ = jobj, DOBJIndex = dobjIndex++, JOBJIndex = jobjToIndex[jobj] } );
+                    dobjList.Add(new DOBJContainer() {DOBJ = dobj, ParentJOBJ = jobj, DOBJIndex = dobjIndex++, JOBJIndex = jobjToIndex[jobj] } );
                 }
             }
 
@@ -529,6 +537,12 @@ namespace HSDRawViewer.GUI.Plugins
                 }
             }
 
+            public void Export()
+            {
+                if (tobjs.Count > 0)
+                    tobjs[0].ExportTOBJToFile();
+            }
+
             public Image ToImage()
             {
                 if (tobjs.Count > 0)
@@ -710,10 +724,10 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private void CheckAll()
         {
-            for (int i = 0; i < listDOBJ.Items.Count; i++)
-            {
-                listDOBJ.SetItemChecked(i, true);
-            }
+            //for (int i = 0; i < listDOBJ.Items.Count; i++)
+            //{
+            //    listDOBJ.SetVisibleState(i, true);
+            //}
         }
 
         /// <summary>
@@ -721,29 +735,29 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ListDOBJ_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            List<DOBJContainer> checkedItems = new List<DOBJContainer>();
+        //private void ListDOBJ_ItemCheck(object sender, ItemCheckEventArgs e)
+        //{
+        //    List<DOBJContainer> checkedItems = new List<DOBJContainer>();
 
-            foreach (object item in listDOBJ.Items)
-            {
-                if (!listDOBJ.CheckedItems.Contains(item))
-                {
-                    checkedItems.Add(item as DOBJContainer);
-                }
-            }
+        //    foreach (object item in listDOBJ.Items)
+        //    {
+        //        if (!listDOBJ.CheckedItems.Contains(item))
+        //        {
+        //            checkedItems.Add(item as DOBJContainer);
+        //        }
+        //    }
 
-            if (e.NewValue != CheckState.Checked)
-                checkedItems.Add(listDOBJ.Items[e.Index] as DOBJContainer);
-            else
-                checkedItems.Remove(listDOBJ.Items[e.Index] as DOBJContainer);
+        //    if (e.NewValue != CheckState.Checked)
+        //        checkedItems.Add(listDOBJ.Items[e.Index] as DOBJContainer);
+        //    else
+        //        checkedItems.Remove(listDOBJ.Items[e.Index] as DOBJContainer);
             
-            JointManager.DOBJManager.HiddenDOBJs.Clear();
-            foreach(var i in checkedItems)
-            {
-                JointManager.DOBJManager.HiddenDOBJs.Add(i.DOBJ);
-            }
-        }
+        //    JointManager.DOBJManager.HiddenDOBJs.Clear();
+        //    foreach(var i in checkedItems)
+        //    {
+        //        JointManager.DOBJManager.HiddenDOBJs.Add(i.DOBJ);
+        //    }
+        //}
 
         /// <summary>
         /// 
@@ -817,7 +831,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonMoveDown_Click(object sender, EventArgs e)
         {
-            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            if (listDOBJ.SelectedIndices.Count == 1 && propertyGrid1.SelectedObject is DOBJContainer con)
             {
                 if (con.DOBJ.Next == null)
                     return;
@@ -837,13 +851,19 @@ namespace HSDRawViewer.GUI.Plugins
                         var newNext = con.DOBJ.Next.Next;
                         con.DOBJ.Next.Next = con.DOBJ;
                         con.DOBJ.Next = newNext;
+
+                        dobjList.Remove(con);
+                        dobjList.Insert(newIndex, con);
+
+                        listDOBJ.SelectedIndices.Clear();
+                        listDOBJ.SelectedIndex = -1;
+                        listDOBJ.SelectedIndex = newIndex;
+                        UpdateVisibility();
+
                         break;
                     }
                     prev = dobj;
                 }
-
-                RefreshGUI();
-                listDOBJ.SelectedIndex = newIndex;
             }
         }
 
@@ -854,7 +874,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonMoveUp_Click(object sender, EventArgs e)
         {
-            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            if (listDOBJ.SelectedIndices.Count == 1 && propertyGrid1.SelectedObject is DOBJContainer con)
             {
                 var newIndex = listDOBJ.SelectedIndex - 1;
 
@@ -874,14 +894,20 @@ namespace HSDRawViewer.GUI.Plugins
                             prevprev.Next = con.DOBJ;
                         prev.Next = con.DOBJ.Next;
                         con.DOBJ.Next = prev;
+
+                        dobjList.Remove(con);
+                        dobjList.Insert(newIndex, con);
+
+                        listDOBJ.SelectedIndices.Clear();
+                        listDOBJ.SelectedIndex = -1;
+                        listDOBJ.SelectedIndex = newIndex;
+                        UpdateVisibility();
+
                         break;
                     }
                     prevprev = prev;
                     prev = dobj;
                 }
-
-                RefreshGUI();
-                listDOBJ.SelectedIndex = newIndex;
             }
         }
 
@@ -898,8 +924,6 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 _jointMap.Load(f);
             }
-
-            RefreshGUI();
         }
 
 
@@ -958,6 +982,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (listDOBJ.SelectedItems.Count > 0 && MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete Object?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
+                List<DOBJContainer> toRem = new List<DOBJContainer>();
                 foreach (DOBJContainer dobj in listDOBJ.SelectedItems)
                 {
                     /*if (listDOBJ.CheckedItems.Contains(dobj))
@@ -978,10 +1003,15 @@ namespace HSDRawViewer.GUI.Plugins
                         }
                         prev = d;
                     }
+
+                    toRem.Add(dobj);
                 }
 
+                foreach (var rem in toRem)
+                    dobjList.Remove(rem);
+                
                 JointManager.RefreshRendering = true;
-                RefreshGUI();
+                UpdateVisibility();
             }
         }
 
@@ -1322,7 +1352,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (propertyGrid1.SelectedObject is DOBJContainer con)
+            if (listDOBJ.SelectedIndices.Count > 0)
             {
                 var f = Tools.FileIO.OpenFile("Material (*.mobj)|*.mobj");
 
@@ -1336,7 +1366,12 @@ namespace HSDRawViewer.GUI.Plugins
                         if(file.Roots[0].Data._s.Length >= mobj.TrimmedSize)
                         {
                             mobj._s = file.Roots[0].Data._s;
-                            con.DOBJ.Mobj = mobj;
+
+                            foreach (DOBJContainer con in listDOBJ.SelectedItems)
+                            {
+                                if (con != null)
+                                    con.DOBJ.Mobj = HSDAccessor.DeepClone<HSD_MOBJ>(mobj);
+                            }
                         }
                     }
 
@@ -1625,8 +1660,10 @@ namespace HSDRawViewer.GUI.Plugins
             }
 
             if (settings.HiddenNodes != null)
+            {
                 for (int i = 0; i < listDOBJ.Items.Count; i++)
-                    listDOBJ.SetItemChecked(i, !settings.HiddenNodes.Contains(i));
+                    listDOBJ.SetVisibleState(i, !settings.HiddenNodes.Contains(i));
+            }
         }
 
         /// <summary>
@@ -1703,7 +1740,20 @@ namespace HSDRawViewer.GUI.Plugins
                 textureArrayEditor.Update();
             }
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exporttoolStripButton_Click(object sender, EventArgs e)
+        {
+            if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
+            {
+                proxy.Export();
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1789,6 +1839,50 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     JointManager.SelectedJOBJ.ParticleJoint = new HSD_ParticleJoint();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonShowAll_Click(object sender, EventArgs e)
+        {
+            listDOBJ.SetAllVisibleState(true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonHidePoly_Click(object sender, EventArgs e)
+        {
+            listDOBJ.SetAllVisibleState(false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateVisibility()
+        {
+            int index = 0;
+            Dictionary<int, int> dobjindex = new Dictionary<int, int>();
+            foreach (var c in dobjList)
+            {
+                if (c.Visible)
+                    JointManager.ShowDOBJ(index);
+                else
+                    JointManager.HideDOBJ(index);
+
+                if (!dobjindex.ContainsKey(c.JOBJIndex))
+                    dobjindex.Add(c.JOBJIndex, 0);
+
+                c.DOBJIndex = dobjindex[c.JOBJIndex];
+                dobjindex[c.JOBJIndex] += 1;
+
+                index += 1;
             }
         }
     }

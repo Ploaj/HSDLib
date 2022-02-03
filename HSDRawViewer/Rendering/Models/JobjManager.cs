@@ -9,6 +9,7 @@ using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Tools;
 using System.Drawing;
+using System.Linq;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -280,35 +281,6 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
-        public void SetHiddenDOBJs(IEnumerable<int> indices)
-        {
-            var dobjs = GetDOBJs();
-
-            DOBJManager.HiddenDOBJs.Clear();
-
-            foreach (var i in indices)
-                DOBJManager.HiddenDOBJs.Add(dobjs[i]);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<int> GetHiddenDOBJIndices()
-        {
-            var dobjs = GetDOBJs();
-
-            foreach(var dobj in DOBJManager.HiddenDOBJs)
-            {
-                var index = dobjs.IndexOf(dobj);
-                if (index != -1)
-                    yield return index;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <returns></returns>
         public List<HSD_DOBJ> GetDOBJs()
         {
@@ -394,14 +366,16 @@ namespace HSDRawViewer.Rendering.Models
         {
             if (_settings.RenderObjects)
             {
-                HSD_JOBJ parent = null;
                 List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>> XLU = new List<Tuple<HSD_DOBJ, HSD_JOBJ, int, int>>();
+                List<Tuple<HSD_DOBJ, HSD_JOBJ>> selected = new List<Tuple<HSD_DOBJ, HSD_JOBJ>>();
 
                 if (!EnableMaterialFrame)
                     MatAnimation.SetAllFrames(Frame);
                 MatAnimation.JOBJIndex = 0;
                 ShapeAnimation.JOBJIndex = 0;
                 ShapeAnimation.SetAllFrames(Frame);
+
+                int dobjIndex = 0;
 
                 foreach (var b in jobjToCache)
                 {
@@ -423,20 +397,24 @@ namespace HSDRawViewer.Rendering.Models
                             if (dobj.Mobj == null)
                                 continue;
 
-                            // 
-                            if (dobj == DOBJManager.SelectedDOBJ)
-                                parent = b.Key;
+                            if (SelectedDOBJIndices.Contains(dobjIndex))
+                                selected.Add(new Tuple<HSD_DOBJ, HSD_JOBJ>(dobj, b.Key));
 
-                            // get shape blend amt
-                            DOBJManager.ShapeBlend = ShapeAnimation.GetBlending();
+                            // check if hidden
+                            if (!HiddenDOBJIndices.Contains(dobjIndex))
+                            {
+                                // get shape blend amt
+                                DOBJManager.ShapeBlend = ShapeAnimation.GetBlending();
 
-                            if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
-                                XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ, int, int>(dobj, b.Key, MatAnimation.JOBJIndex, MatAnimation.DOBJIndex));
-                            else
-                                DOBJManager.RenderDOBJShader(GXShader._shader, dobj, b.Key, this, MatAnimation);
+                                if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+                                    XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ, int, int>(dobj, b.Key, MatAnimation.JOBJIndex, MatAnimation.DOBJIndex));
+                                else
+                                    DOBJManager.RenderDOBJShader(GXShader._shader, dobj, b.Key, this, MatAnimation);
+                            }
 
                             MatAnimation.DOBJIndex++;
                             ShapeAnimation.DOBJIndex++;
+                            dobjIndex++;
                         }
                     }
 
@@ -462,9 +440,9 @@ namespace HSDRawViewer.Rendering.Models
                 //GL.Disable(EnableCap.DepthTest);
                 GL.DepthFunc(DepthFunction.Always);
 
-                if (DOBJManager.SelectedDOBJ != null && _settings.OutlineSelected && parent != null)
+                foreach (var i in selected)
                 {
-                    DOBJManager.RenderDOBJShader(GXShader._shader, DOBJManager.SelectedDOBJ, parent, this, null, true);
+                    DOBJManager.RenderDOBJShader(GXShader._shader, i.Item1, i.Item2, this, null, true);
                 }
             }
         }
@@ -858,15 +836,40 @@ namespace HSDRawViewer.Rendering.Models
             return null;
         }
 
+
+        private HashSet<int> HiddenDOBJIndices = new HashSet<int>();
+        private HashSet<int> SelectedDOBJIndices = new HashSet<int>();
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="index"></param>
-        public void HideDOBJ(int index)
+        /// <param name="selected"></param>
+        public void SetSelectedDOBJs(IEnumerable<int> selected)
         {
-            var dobj = GetDOBJAtIndex(index);
-            if(dobj != null && ! DOBJManager.HiddenDOBJs.Contains(dobj))
-                DOBJManager.HiddenDOBJs.Add(dobj);
+            SelectedDOBJIndices.Clear();
+            foreach (var i in selected)
+                SelectedDOBJIndices.Add(i);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetHiddenDOBJs(IEnumerable<int> indices)
+        {
+            HiddenDOBJIndices.Clear();
+            foreach (var i in indices)
+                HiddenDOBJIndices.Add(i);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<int> GetHiddenDOBJIndices()
+        {
+            foreach (var h in HiddenDOBJIndices)
+                yield return h;
         }
 
         /// <summary>
@@ -875,31 +878,24 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="index"></param>
         public void ShowDOBJ(int index)
         {
-            var dobj = GetDOBJAtIndex(index);
-            if (dobj != null)
-                DOBJManager.HiddenDOBJs.Remove(dobj);
+            HiddenDOBJIndices.Remove(index);
         }
 
         /// <summary>
-        /// Hides DOBJs with given indices
+        /// 
         /// </summary>
-        /// <param name="DOBJIndices"></param>
-        public void HideDOBJs(List<int> DOBJIndices)
+        public void ShowAllDOBJs()
         {
-            var i = 0;
-            DOBJManager.HiddenDOBJs.Clear();
-            foreach (var j in RootJOBJ.BreathFirstList)
-            {
-                if(j.Dobj != null)
-                {
-                    foreach(var dobj in j.Dobj.List)
-                    {
-                        if (DOBJIndices.Contains(i))
-                            DOBJManager.HiddenDOBJs.Add(dobj);
-                        i++;
-                    }
-                }
-            }
+            HiddenDOBJIndices.Clear();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        public void HideDOBJ(int index)
+        {
+            HiddenDOBJIndices.Add(index);
         }
 
         /// <summary>
@@ -908,9 +904,8 @@ namespace HSDRawViewer.Rendering.Models
         public void HideAllDOBJs()
         {
             for (int i = 0; i < DOBJManager.DOBJCount; i++)
-                HideDOBJ(i);
+                HiddenDOBJIndices.Add(i);
         }
-
 
         #endregion
     }

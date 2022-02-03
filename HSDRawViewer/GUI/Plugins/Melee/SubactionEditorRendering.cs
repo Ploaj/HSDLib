@@ -169,7 +169,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             JointManager.ModelScale = ModelScale;
 
             // clear hidden dobjs
-            JointManager.DOBJManager.HiddenDOBJs.Clear();
+            JointManager.ShowAllDOBJs();
 
             // don't render bones by default
             JointManager._settings.RenderBones = false;
@@ -496,7 +496,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // lookup table
             if (ftData != null && ftData.ModelLookupTables != null && JointManager.JointCount != 0)
             {
-                JointManager.DOBJManager.HiddenDOBJs.Clear();
+                JointManager.ShowAllDOBJs();
 
                 // only show struct 0 vis
                 for (int i = 0; i < ftData.ModelLookupTables.CostumeVisibilityLookups[0].HighPoly.Length; i++)

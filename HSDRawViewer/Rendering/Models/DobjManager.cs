@@ -14,7 +14,7 @@ namespace HSDRawViewer.Rendering.Models
     /// </summary>
     public class DOBJManager
     {
-        public int DOBJCount { get => DOBJtoPOBJCache.Count; }
+        public int DOBJCount { get => DobjCacheLookup.Count; }
 
         public bool RenderTextures { get; set; } = true;
 
@@ -22,24 +22,25 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool OnlyRenderSelected { get; set; } = false;
 
-        public HSD_DOBJ SelectedDOBJ;
-
         // Attributes
         public Vector3 OverlayColor = Vector3.One;
 
         public float ShapeBlend = 0;
-
-        public List<HSD_DOBJ> HiddenDOBJs { get; internal set; } = new List<HSD_DOBJ>();
 
         // Resource Managers
         private VertexBufferManager BufferManager = new VertexBufferManager();
         private MobjManager MOBJManager = new MobjManager();
 
         // Rendering Cache
-        private Dictionary<HSD_DOBJ, List<CachedPOBJ>> DOBJtoPOBJCache = new Dictionary<HSD_DOBJ, List<CachedPOBJ>>();
+        private Dictionary<HSD_DOBJ, CachedDOBJ> DobjCacheLookup = new Dictionary<HSD_DOBJ, CachedDOBJ>();
 
         private static int MAX_WEIGHTS = 6;
         private static int WEIGHT_STRIDE = 10;
+
+        public class CachedDOBJ
+        {
+            public List<CachedPOBJ> CachedPObjs = new List<CachedPOBJ>();
+        }
 
         public class CachedPOBJ
         {
@@ -81,7 +82,7 @@ namespace HSDRawViewer.Rendering.Models
             BufferManager.ClearRenderingCache();
             MOBJManager.ClearRenderingCache();
 
-            DOBJtoPOBJCache.Clear();
+            DobjCacheLookup.Clear();
         }
 
         /// <summary>
@@ -101,18 +102,18 @@ namespace HSDRawViewer.Rendering.Models
             if (dobj.Pobj == null)
                 return;
 
-            // check if dobj is hidden
-            if (HiddenDOBJs.Contains(dobj) || (selected && OnlyRenderSelected))
-                return;
-
             // check selection mode
-            if (OnlyRenderSelected && SelectedDOBJ != null && SelectedDOBJ._s != dobj._s)
-                return;
+            //if (OnlyRenderSelected && SelectedDOBJ != null && SelectedDOBJ._s != dobj._s)
+            //    return;
 
             // process model if dobj is missing
-            if (!DOBJtoPOBJCache.ContainsKey(dobj))
+            if (!DobjCacheLookup.ContainsKey(dobj))
                 if(!LoadModel(jobjManager))
                     return;
+
+            // check if dobj is hidden
+            if ((selected && OnlyRenderSelected))
+                return;
 
             // setup skeleton flag
             shader.SetBoolToInt("isSkeleton", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SKELETON));
@@ -135,7 +136,7 @@ namespace HSDRawViewer.Rendering.Models
             if(BufferManager.BindBuffer(shader, dobj, (int)ShapeBlend, (int)ShapeBlend + 1, ShapeBlend - (int)ShapeBlend))
             {
                 // render pobjs
-                foreach (var p in DOBJtoPOBJCache[dobj])
+                foreach (var p in DobjCacheLookup[dobj].CachedPObjs)
                 {
                     // load envelopes
                     GL.Uniform1(shader.GetVertexAttributeUniformLocation("envelopeIndex"), p.Envelopes.Length, ref p.Envelopes[0]);
@@ -329,7 +330,7 @@ namespace HSDRawViewer.Rendering.Models
             // convert list to array
             BufferManager.AddBuffer(dobj, vertices.ToArray());
             BufferManager.AddShapeSets(dobj, shapesets);
-            DOBJtoPOBJCache.Add(dobj, pobjs);
+            DobjCacheLookup.Add(dobj, new CachedDOBJ() { CachedPObjs = pobjs });
 
             return true;
         }
@@ -345,6 +346,20 @@ namespace HSDRawViewer.Rendering.Models
                     foreach (var t in no.TextureAnims)
                         foreach (var texture in t.Textures)
                             MOBJManager.PreLoadTexture(texture);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="function"></param>
+        public void RunOnDObjCache(Action<int, CachedDOBJ> function)
+        {
+            int index = 0;
+            foreach (var d in DobjCacheLookup)
+            {
+                function(index, d.Value);
+                index++;
+            }
         }
     }
 }

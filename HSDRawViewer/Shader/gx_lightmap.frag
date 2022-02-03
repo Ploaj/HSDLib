@@ -149,18 +149,15 @@ vec4 GetBumpShading(vec3 V)
 {
 	for(int i = 0; i < MAX_TEX ; i++)
 	{
-		if (hasTEX[i] == 1)
+		if (hasTEX[i] == 1 && TEX[i].is_bump == 1)
 		{
-			if(TEX[i].is_bump == 1) 
-			{
-				vec2 tex0 = CalculateCoords(TEX[i]);
-				vec2 tex1 = tex0 + vec2(dot(V, bitan.xyz), dot(V, tan.xyz));
+			vec2 tex0 = CalculateCoords(TEX[i]);
+			vec2 tex1 = tex0 + vec2(dot(V, bitan), dot(V, tan));
 
-				vec3 bump0 = texture(TEX[i].texture, tex0).rgb;
-				vec3 bump1 = texture(TEX[i].texture, tex1).rgb;
+			vec3 bump0 = texture(TEX[i].texture, tex0).rgb;
+			vec3 bump1 = texture(TEX[i].texture, tex1).rgb;
 
-				return vec4((bump0 - bump1) + 1.0, 1);
-			}
+			return vec4((bump0 - bump1) + 1.0, 1);
 		}
 	}
 	return vec4(1);
