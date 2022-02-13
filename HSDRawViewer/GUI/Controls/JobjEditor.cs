@@ -347,7 +347,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="camera"></param>
         public void SetCamera(HSD_Camera camera)
         {
-            // TODO: load camera
+            viewport.Camera.LoadFromHSD(camera);
         }
 
         /// <summary>

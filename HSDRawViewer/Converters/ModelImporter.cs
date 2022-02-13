@@ -727,8 +727,8 @@ namespace HSDRawViewer.Converters
                     {
                         tkvert = Vector3.TransformPosition(tkvert, parentTransform);
                         tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
-                        tktan = Vector3.TransformNormal(tktan, parentTransform).Normalized();
-                        tkbitan = Vector3.TransformNormal(tkbitan, parentTransform).Normalized();
+                        tktan = Vector3.TransformNormal(tktan, parentTransform);
+                        tkbitan = Vector3.TransformNormal(tkbitan, parentTransform);
                     }
 
 
@@ -775,8 +775,8 @@ namespace HSDRawViewer.Converters
                             var inv = _cache.jobjToWorldTransform[_cache.NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
                             tkvert = Vector3.TransformPosition(tkvert, inv);
                             tknrm = Vector3.TransformNormal(tknrm, inv).Normalized();
-                            tktan = Vector3.TransformNormal(tknrm, inv).Normalized();
-                            tkbitan = Vector3.TransformNormal(tknrm, inv).Normalized();
+                            tktan = Vector3.TransformNormal(tktan, inv).Normalized();
+                            tkbitan = Vector3.TransformNormal(tkbitan, inv).Normalized();
                         }
                     }
                     

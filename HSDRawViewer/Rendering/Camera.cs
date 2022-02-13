@@ -412,7 +412,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         protected virtual void UpdatePerspectiveMatrix()
         {
-            perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView(fovRadians, RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
+            perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView((float)(2 * Math.Atan(Math.Tan(fovRadians / 2) / Math.Max(AspectRatio, 1))), RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
         }
 
         /// <summary>
@@ -521,7 +521,22 @@ namespace HSDRawViewer.Rendering
         /// <param name="fog"></param>
         public void LoadFromHSD(HSDRaw.Common.HSD_Camera camera)
         {
-            // TODO load camera
+            // TODO load other camera types
+            if (camera.ProjectionType == HSDRaw.Common.CameraProjection.PERSPECTIVE)
+            {
+                translation = new Vector3(camera.eye.V1, camera.eye.V2, camera.eye.V3);
+                RotationXDegrees = 0;
+                RotationYDegrees = 0;
+
+                NearClipPlane = camera.NearClip;
+                FarClipPlane = camera.FarClip;
+
+                RenderWidth = camera.ViewportRight - camera.ViewportLeft;
+                renderHeight = camera.ViewportBottom - camera.ViewportTop;
+
+                FovDegrees = camera.FieldOfView;
+                // AspectRatio = camera.Aspect;
+            }
         }
     }
 }
