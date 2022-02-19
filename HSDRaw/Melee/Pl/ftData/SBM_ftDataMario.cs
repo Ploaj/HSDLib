@@ -1,4 +1,4 @@
-﻿namespace HSDRaw.Melee.Pl.UniqueAttributes
+﻿namespace HSDRaw.Melee.Pl.ftData
 {
     public class SBM_AttrMario : HSDAccessor
     {
@@ -53,5 +53,10 @@
         public int SpecialLwFreefallToggle { get => _s.GetInt32(0x5C); set => _s.SetInt32(0x5C, value); }
 
         //ReflectDesc reflect_data;                 //0x60
+    }
+
+    public class SBM_ftDataMario : SBM_FighterData
+    {
+        public SBM_AttrMario UniqueAttributes { get => _s.GetReference<SBM_AttrMario>(0x04); set => _s.SetReference(0x04, value); }
     }
 }

@@ -721,10 +721,9 @@ namespace HSDRawViewer.Converters
                     var tktan = new Vector3(v.Tangent.X, v.Tangent.Y, v.Tangent.Z);
                     var tkbitan = new Vector3(v.Binormal.X, v.Binormal.Y, v.Binormal.Z);
                     
-                    var parentTransform = _cache.jobjToWorldTransform[parent].Inverted();
-                    
                     if(_cache.jobjToWorldTransform[parent] != Matrix4.Identity)
                     {
+                        var parentTransform = _cache.jobjToWorldTransform[parent].Inverted();
                         tkvert = Vector3.TransformPosition(tkvert, parentTransform);
                         tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
                         tktan = Vector3.TransformNormal(tktan, parentTransform);

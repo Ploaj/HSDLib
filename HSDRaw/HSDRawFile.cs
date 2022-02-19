@@ -20,6 +20,7 @@ using HSDRaw.AirRide.Em;
 using HSDRaw.AirRide.Rd;
 using HSDRaw.AirRide.Kx;
 using HSDRaw.AirRide;
+using HSDRaw.Melee.Pl.ftData;
 
 namespace HSDRaw
 {
@@ -784,6 +785,7 @@ namespace HSDRaw
                     x.Equals("Stc_scemdls") ||
                     x.Equals("lupe") ||
                     x.Equals("tdsce") ?  new HSDNullPointerArrayAccessor<HSD_JOBJDesc>() : null,
+                x => x.Equals("ftDataMario") ?  new SBM_ftDataMario() : null,
                 x => x.StartsWith("ftData") && !x.Contains("Copy") ?  new SBM_FighterData() : null,
                 x => x.EndsWith("MnSelectChrDataTable") ?  new SBM_SelectChrDataTable() : null,
                 x => x.EndsWith("MnSelectStageDataTable") ?  new SBM_MnSelectStageDataTable() : null,
