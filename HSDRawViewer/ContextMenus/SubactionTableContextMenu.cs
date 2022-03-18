@@ -73,6 +73,90 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(rename);
+
+
+            MenuItem bonemap = new MenuItem("Remap Bone IDs");
+            bonemap.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
+                {
+                    var source = Tools.FileIO.OpenFile("Current Bone INI (*.ini)|*.ini");
+                    if (source == null)
+                        return;
+                    var target = Tools.FileIO.OpenFile("New Bone INI (*.ini)|*.ini");
+                    if (target == null)
+                        return;
+
+                    var sini = new Tools.JointMap(source);
+                    var tini = new Tools.JointMap(target);
+
+                    var tables = table.Commands;
+
+                    foreach (var c in tables)
+                    {
+                        var data = c.SubAction._s.GetData();
+                        Tools.SubactionManager.EditSubactionData(
+                            ref data,
+                            (Tools.Subaction sa, ref int[] p) =>
+                            {
+                                // create gfx
+                                if (sa.Code == 10 << 2)
+                                    p[0] = tini.IndexOf(sini[p[0]]);
+                                // create hitbox
+                                if (sa.Code == 11 << 2)
+                                    p[3] = tini.IndexOf(sini[p[3]]);
+                                // set bone collision state
+                                if (sa.Code == 28 << 2)
+                                    p[0] = tini.IndexOf(sini[p[0]]);
+                                // enable ragdoll
+                                if (sa.Code == 50 << 2)
+                                    p[0] = tini.IndexOf(sini[p[0]]);
+                            },
+                            Tools.SubactionGroup.Fighter);
+                        c.SubAction._s.SetData(data);
+                    }
+
+                    table.Commands = tables;
+                }
+            };
+            MenuItems.Add(bonemap);
+
+
+            MenuItem soundid = new MenuItem("MEX: Make Sound IDs Portable ");
+            soundid.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
+                {
+                    {
+                        {
+                            var tables = table.Commands;
+
+                            foreach (var c in tables)
+                            {
+                                var data = c.SubAction._s.GetData();
+                                Tools.SubactionManager.EditSubactionData(
+                                    ref data, 
+                                    (Tools.Subaction sa, ref int[] p) =>
+                                    {
+                                        if (sa.Code == 17 << 2)
+                                            p[2] = (p[2] % 1000) + 5000;
+
+                                        if (sa.Code == 54 << 2)
+                                            p[1] = (p[1] % 1000) + 5000;
+
+                                        if (sa.Code == 55 << 2)
+                                            p[1] = (p[1] % 1000) + 5000;
+                                    }, 
+                                    Tools.SubactionGroup.Fighter);
+                                c.SubAction._s.SetData(data);
+                            }
+
+                            table.Commands = tables;
+                        }
+                    }
+                }
+            };
+            MenuItems.Add(soundid);
 #endif
 
         }

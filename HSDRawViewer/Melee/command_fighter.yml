@@ -412,24 +412,18 @@
   - name: Unknown1
     bitCount: 26
     hex: true
-  - name: Unknown2
+  - name: SFX ID 1
     bitCount: 32
-    hex: true
-  - name: Unknown3
+  - name: SFX ID 2
     bitCount: 32
-    hex: true
-  - name: Unknown4
+  - name: SFX ID 3
     bitCount: 32
-    hex: true
-  - name: Unknown5
+  - name: SFX ID 4
     bitCount: 32
-    hex: true
-  - name: Unknown6
+  - name: SFX ID 5
     bitCount: 32
-    hex: true
-  - name: Unknown7
+  - name: SFX ID 6
     bitCount: 32
-    hex: true
 
 - code: 39
   name: Unknown0x27
@@ -570,12 +564,10 @@
 - code: 54
   name: Footstep Sound and Graphic Effect
   parameters:
-  - name: Unknown1
+  - name: Graphic ID
     bitCount: 26
-    hex: true
-  - name: Unknown2
+  - name: Sound ID
     bitCount: 32
-    hex: true
   - name: Unknown3
     bitCount: 32
     hex: true
@@ -585,10 +577,8 @@
   parameters:
   - name: Graphic ID
     bitCount: 26
-    hex: true
   - name: Sound ID
     bitCount: 32
-    hex: true
   - name: Unknown1
     bitCount: 32
     hex: true

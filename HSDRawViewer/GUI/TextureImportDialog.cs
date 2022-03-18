@@ -124,6 +124,7 @@ namespace HSDRawViewer.GUI
 
         public void ApplySettings(Bitmap bmp)
         {
+            Console.WriteLine("Applying settings");
             if (TextureFormat == GXTexFmt.IA4 || TextureFormat == GXTexFmt.IA8)
             {
                 for(int x = 0; x < bmp.Width; x++)
@@ -140,6 +141,7 @@ namespace HSDRawViewer.GUI
                     {
                         bmp.SetPixel(x, y, ApplyChannels(bmp.GetPixel(x, y), ISettings.AlphaChannel, ISettings.AlphaChannel));
                     }
+                bmp.Save("test.png");
             }
         }
 

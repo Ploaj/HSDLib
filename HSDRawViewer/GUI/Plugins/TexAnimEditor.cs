@@ -176,7 +176,10 @@ namespace HSDRawViewer.GUI.Plugins
 
                         foreach (var import in imports)
                             using (var bmp = new Bitmap(import))
+                            {
+                                d.ApplySettings(bmp);
                                 arrayMemberEditor1.AddItem(new TOBJProxy() { TOBJ = Converters.TOBJConverter.BitmapToTOBJ(bmp, texFmt, palFmt) });
+                            }
                     }
                 }
             }
@@ -205,7 +208,10 @@ namespace HSDRawViewer.GUI.Plugins
                         if (d.ShowDialog() == DialogResult.OK)
                         {
                             using (var bmp = new Bitmap(import))
+                            {
+                                d.ApplySettings(bmp);
                                 proxy.TOBJ.EncodeImageData(bmp.GetBGRAData(), bmp.Width, bmp.Height, d.TextureFormat, d.PaletteFormat);
+                            }
 
                             SaveTextures();
                             SelectNode();

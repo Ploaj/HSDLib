@@ -671,7 +671,7 @@ namespace HSDRawViewer.Rendering.Models
                     Index = jobjToCache.Count,
                     InvertedTransform = world.Inverted()
                 };
-                if (root.Flags.HasFlag(JOBJ_FLAG.SKELETON) || root.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) && root.InverseWorldTransform != null)
+                if ((root.Flags.HasFlag(JOBJ_FLAG.SKELETON) || root.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT)) && root.InverseWorldTransform != null)
                 {
                     jcache.InvertedTransform = root.InverseWorldTransform.ToTKMatrix();
                 }

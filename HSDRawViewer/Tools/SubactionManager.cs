@@ -63,10 +63,11 @@ namespace HSDRawViewer.Tools
             }
         }
 
-        public int[] GetParameters(byte[] data)
+        public int[] GetParameters(byte[] data, int offset = 0)
         {
             Bitreader r = new Bitreader(data);
 
+            r.Skip(offset * 8);
             r.Read(CodeSize);
 
             List<int> param = new List<int>();
@@ -366,6 +367,34 @@ namespace HSDRawViewer.Tools
                     return RiderSubactions;
                 default:
                     return FighterSubactions;
+            }
+        }
+
+
+        public delegate void EditSubaction(Subaction a, ref int[] p);
+
+        public static void EditSubactionData(ref byte[] data, EditSubaction edit, SubactionGroup group)
+        {
+            for (int i = 0; i < data.Length;)
+            {
+                var sa = SubactionManager.GetSubaction(data[i], group);
+
+                if (data[i] == 0)
+                    break;
+
+                // get parameters
+                var p = sa.GetParameters(data, i);
+
+                // make changes
+                edit(sa, ref p);
+
+                // recompile
+                var test = sa.Compile(p);
+                for (int j = 0; j < test.Length; j++)
+                    data[i + j] = test[j];
+
+                // advance to next action
+                i += sa.ByteSize;
             }
         }
     }

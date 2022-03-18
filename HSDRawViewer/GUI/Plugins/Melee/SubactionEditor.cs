@@ -674,6 +674,24 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (index == -1)
                 index = 0;
 
+            var text = Clipboard.GetText();
+            if (text != null)
+            {
+                // try to parse script code
+                List<SubActionScript> scripts = SubactionFromText.FromBrawlText(text);
+                if (scripts != null)
+                {
+                    // insert scripts
+                    scripts.Reverse();
+                    foreach (var v in scripts)
+                        // only paste subactions the belong to this group
+                        if (v.GetGroup() == SubactionGroup)
+                            subActionList.Items.Insert(index, v.Clone());
+
+                    SaveSelectedActionChanges();
+                }
+            }
+
             // Get data object from the clipboard
             IDataObject dataObject = Clipboard.GetDataObject();
             if (dataObject != null)

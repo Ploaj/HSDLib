@@ -657,10 +657,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     Matrix4.CreateScale(easyTable.XScale, easyTable.YScale, easyTable.ZScale) *
                     Matrix4.CreateTranslation(IrOffset) *
                     Matrix4.CreateTranslation(easyTable.XOffset, easyTable.YOffset, 0));
-                cam.FovDegrees = 20;
-                cam.Translation = new Vector3(0, 0, -62);
+                //cam.FovDegrees = 20;
+                //cam.Translation = new Vector3(0, 0, -62);
                 cam.RotationXDegrees = 0;
                 cam.RotationYDegrees = 0;
+                //cam.Mode = CameraMode.Orthogonal;
+                cam.Translation = new Vector3(0, 0, -1);
                 //JointManager._lightParam.UseCameraLight = false;
                 //JointManager._lightParam.LightX = 1;
                 //JointManager._lightParam.LightY = 1;
@@ -668,6 +670,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             }
             else
             {
+                //if (cam.Mode == CameraMode.Orthogonal)
+                //    cam.Mode = CameraMode.Persepective;
                 //JointManager._lightParam.UseCameraLight = true;
             }
 

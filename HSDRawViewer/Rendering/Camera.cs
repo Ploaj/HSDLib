@@ -5,11 +5,33 @@ using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Rendering
 {
+    public enum CameraMode
+    {
+        Persepective,
+        Orthogonal
+    }
     /// <summary>
     /// From: https://github.com/ScanMountGoat/SFGraphics/blob/master/Projects/SFGraphics/Cameras/Camera.cs
     /// </summary>
     public class Camera
     {
+        /// <summary>
+        /// The type of perspective matrix to use
+        /// </summary>
+        public CameraMode Mode
+        {
+            get
+            {
+                return _mode;
+            }
+            set
+            {
+                _mode = value;
+                UpdateTransformationMatrices();
+            }
+        }
+        private CameraMode _mode = CameraMode.Persepective;
+
         /// <summary>
         /// The position of the camera in scene units, taking into account translation and rotation.
         /// </summary>
@@ -412,7 +434,15 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         protected virtual void UpdatePerspectiveMatrix()
         {
-            perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView((float)(2 * Math.Atan(Math.Tan(fovRadians / 2) / Math.Max(AspectRatio, 1))), RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
+            switch(_mode)
+            {
+                case CameraMode.Orthogonal:
+                    perspectiveMatrix = Matrix4.CreateOrthographicOffCenter(-renderWidth/2, renderWidth / 2, -renderHeight /2, renderHeight / 2, nearClipPlane, farClipPlane);
+                    break;
+                case CameraMode.Persepective:
+                    perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView((float)(2 * Math.Atan(Math.Tan(fovRadians / 2) / Math.Max(AspectRatio, 1))), RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
+                    break;
+            }        
         }
 
         /// <summary>

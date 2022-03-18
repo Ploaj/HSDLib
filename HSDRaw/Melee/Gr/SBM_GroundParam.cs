@@ -63,40 +63,76 @@ namespace HSDRaw.Melee.Gr
 
         public short UnknownShort0 { get => _s.GetInt16(0x68); set => _s.SetInt16(0x68, value); }
 
-        public short UnknownShort1 { get => _s.GetInt16(0x6c); set => _s.SetInt16(0x6c, value); }
+        public short ItSpawn_Capsule { get => _s.GetInt16(0x6A); set => _s.SetInt16(0x6A, value); }
 
-        public short UnknownShort2 { get => _s.GetInt16(0x70); set => _s.SetInt16(0x70, value); }
+        public short ItSpawn_Box { get => _s.GetInt16(0x6C); set => _s.SetInt16(0x6C, value); }
 
-        public short UnknownShort3 { get => _s.GetInt16(0x74); set => _s.SetInt16(0x74, value); }
+        public short ItSpawn_Barrel { get => _s.GetInt16(0x6E); set => _s.SetInt16(0x6E, value); }
 
-        public short UnknownShort4 { get => _s.GetInt16(0x78); set => _s.SetInt16(0x78, value); }
+        public short ItSpawn_Egg { get => _s.GetInt16(0x70); set => _s.SetInt16(0x70, value); }
 
-        public short UnknownShort5 { get => _s.GetInt16(0x7c); set => _s.SetInt16(0x7c, value); }
+        public short ItSpawn_PartyBall { get => _s.GetInt16(0x72); set => _s.SetInt16(0x72, value); }
 
-        public short UnknownShort6 { get => _s.GetInt16(0x80); set => _s.SetInt16(0x80, value); }
+        public short ItSpawn_BarrelCannon { get => _s.GetInt16(0x74); set => _s.SetInt16(0x74, value); }
 
-        public short UnknownShort7 { get => _s.GetInt16(0x84); set => _s.SetInt16(0x84, value); }
+        public short ItSpawn_Bobomb { get => _s.GetInt16(0x76); set => _s.SetInt16(0x76, value); }
 
-        public short UnknownShort8 { get => _s.GetInt16(0x88); set => _s.SetInt16(0x88, value); }
+        public short ItSpawn_MrSaturn { get => _s.GetInt16(0x78); set => _s.SetInt16(0x78, value); }
 
-        public short UnknownShort9 { get => _s.GetInt16(0x8c); set => _s.SetInt16(0x8c, value); }
+        public short ItSpawn_HeartContainer { get => _s.GetInt16(0x7A); set => _s.SetInt16(0x7A, value); }
 
-        public short UnknownShort10 { get => _s.GetInt16(0x90); set => _s.SetInt16(0x90, value); }
+        public short ItSpawn_MaxTomato { get => _s.GetInt16(0x7C); set => _s.SetInt16(0x7C, value); }
 
-        public short UnknownShort11 { get => _s.GetInt16(0x94); set => _s.SetInt16(0x94, value); }
+        public short ItSpawn_SuperStar { get => _s.GetInt16(0x7E); set => _s.SetInt16(0x7E, value); }
 
-        public short UnknownShort12 { get => _s.GetInt16(0x98); set => _s.SetInt16(0x98, value); }
+        public short ItSpawn_HomeRunBat { get => _s.GetInt16(0x80); set => _s.SetInt16(0x80, value); }
 
-        public short UnknownShort13 { get => _s.GetInt16(0x9c); set => _s.SetInt16(0x9c, value); }
+        public short ItSpawn_BeamSword { get => _s.GetInt16(0x82); set => _s.SetInt16(0x82, value); }
 
-        public short UnknownShort14 { get => _s.GetInt16(0xa0); set => _s.SetInt16(0xa0, value); }
+        public short ItSpawn_Parasol { get => _s.GetInt16(0x84); set => _s.SetInt16(0x84, value); }
 
-        public short UnknownShort15 { get => _s.GetInt16(0xa4); set => _s.SetInt16(0xa4, value); }
+        public short ItSpawn_GreenShell { get => _s.GetInt16(0x86); set => _s.SetInt16(0x86, value); }
 
-        public short UnknownShort16 { get => _s.GetInt16(0xa8); set => _s.SetInt16(0xa8, value); }
+        public short ItSpawn_RedShell { get => _s.GetInt16(0x88); set => _s.SetInt16(0x88, value); }
 
-        public short UnknownShort17 { get => _s.GetInt16(0xac); set => _s.SetInt16(0xac, value); }
-        
+        public short ItSpawn_Raygun { get => _s.GetInt16(0x8A); set => _s.SetInt16(0x8A, value); }
+
+        public short ItSpawn_Freezie { get => _s.GetInt16(0x8C); set => _s.SetInt16(0x8C, value); }
+
+        public short ItSpawn_Food { get => _s.GetInt16(0x8E); set => _s.SetInt16(0x8E, value); }
+
+        public short ItSpawn_ProximetyMine { get => _s.GetInt16(0x90); set => _s.SetInt16(0x90, value); }
+
+        public short ItSpawn_Flipper { get => _s.GetInt16(0x92); set => _s.SetInt16(0x92, value); }
+
+        public short ItSpawn_SuperScope { get => _s.GetInt16(0x94); set => _s.SetInt16(0x94, value); }
+
+        public short ItSpawn_StarRod { get => _s.GetInt16(0x96); set => _s.SetInt16(0x96, value); }
+
+        public short ItSpawn_LipStick { get => _s.GetInt16(0x98); set => _s.SetInt16(0x98, value); }
+
+        public short ItSpawn_Fan { get => _s.GetInt16(0x9A); set => _s.SetInt16(0x9A, value); }
+
+        public short ItSpawn_FireFlower { get => _s.GetInt16(0x9C); set => _s.SetInt16(0x9C, value); }
+
+        public short ItSpawn_SuperMushroom { get => _s.GetInt16(0x9E); set => _s.SetInt16(0x9E, value); }
+
+        public short ItSpawn_Unk1 { get => _s.GetInt16(0xA0); set => _s.SetInt16(0xA0, value); }
+
+        public short ItSpawn_Unk2 { get => _s.GetInt16(0xA2); set => _s.SetInt16(0xA2, value); }
+
+        public short ItSpawn_WarpStar { get => _s.GetInt16(0xA4); set => _s.SetInt16(0xA4, value); }
+
+        public short ItSpawn_ScrewAttack { get => _s.GetInt16(0xA6); set => _s.SetInt16(0xA6, value); }
+
+        public short ItSpawn_BunnyHood { get => _s.GetInt16(0xA8); set => _s.SetInt16(0xA8, value); }
+
+        public short ItSpawn_MetalBox { get => _s.GetInt16(0xAA); set => _s.SetInt16(0xAA, value); }
+
+        public short ItSpawn_CloakingDevice { get => _s.GetInt16(0xAC); set => _s.SetInt16(0xAC, value); }
+
+        public short ItSpawn_Pokeball { get => _s.GetInt16(0xAE); set => _s.SetInt16(0xAE, value); }
+
         public SBM_GroundBGM[] BGMData
         {
             get

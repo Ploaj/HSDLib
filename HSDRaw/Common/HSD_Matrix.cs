@@ -16,5 +16,10 @@
         public float M32 { get => _s.GetFloat(0x24); set => _s.SetFloat(0x24, value); }
         public float M33 { get => _s.GetFloat(0x28); set => _s.SetFloat(0x28, value); }
         public float M34 { get => _s.GetFloat(0x2C); set => _s.SetFloat(0x2C, value); }
+
+        public override string ToString()
+        {
+            return $"[{M11}, {M21}, {M31}] [{M12}, {M22}, {M32}] [{M13}, {M23}, {M33}] [{M14}, {M24}, {M34}]";
+        }
     }
 }

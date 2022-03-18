@@ -86,6 +86,12 @@ namespace HSDRaw
             _references = str._references;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public byte[] GetSubData(int offset, int length)
         {
             if (offset + length >= _data.Length)
@@ -96,6 +102,26 @@ namespace HSDRaw
                 d[i] = _data[offset + i];
 
             return d;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="length"></param>
+        public void SetSubData(byte[] data, int offset, int length, byte fill_character)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                if (i + offset > _data.Length)
+                    break;
+
+                if (i >= data.Length)
+                    _data[i + offset] = fill_character;
+                else
+                    _data[i + offset] = data[i];
+            }
         }
 
         public byte[] GetData()

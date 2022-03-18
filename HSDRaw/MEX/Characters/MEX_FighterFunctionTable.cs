@@ -106,13 +106,13 @@
 
         public HSDUIntArray DemoMoveLogic { get => _s.GetReference<HSDUIntArray>(0xA0); set => _s.SetReference(0xA0, value); }
 
-        public HSDUIntArray onThrowFw { get => _s.GetReference<HSDUIntArray>(0xA4); set => _s.SetReference(0xA4, value); }
+        public HSDUIntArray onIntroL { get => _s.GetReference<HSDUIntArray>(0xA4); set => _s.SetReference(0xA4, value); }
 
-        public HSDUIntArray onThrowBk { get => _s.GetReference<HSDUIntArray>(0xA8); set => _s.SetReference(0xA8, value); }
+        public HSDUIntArray onIntroR { get => _s.GetReference<HSDUIntArray>(0xA8); set => _s.SetReference(0xA8, value); }
 
-        public HSDUIntArray onThrowHi { get => _s.GetReference<HSDUIntArray>(0xAC); set => _s.SetReference(0xAC, value); }
+        public HSDUIntArray onAppeal { get => _s.GetReference<HSDUIntArray>(0xAC); set => _s.SetReference(0xAC, value); }
 
-        public HSDUIntArray onThrowLw { get => _s.GetReference<HSDUIntArray>(0xB0); set => _s.SetReference(0xB0, value); }
+        public HSDUIntArray onCatch { get => _s.GetReference<HSDUIntArray>(0xB0); set => _s.SetReference(0xB0, value); }
         
         public HSDUIntArray getTrailData { get => _s.GetReference<HSDUIntArray>(0xB4); set => _s.SetReference(0xB4, value); }
 
@@ -161,10 +161,10 @@
             onExtRstAnim = new HSDUIntArray();
             onIndexExtResultAnim = new HSDUIntArray();
             DemoMoveLogic = new HSDUIntArray();
-            onThrowFw = new HSDUIntArray();
-            onThrowBk = new HSDUIntArray();
-            onThrowHi = new HSDUIntArray();
-            onThrowLw = new HSDUIntArray();
+            onIntroL = new HSDUIntArray();
+            onIntroR = new HSDUIntArray();
+            onAppeal = new HSDUIntArray();
+            onCatch = new HSDUIntArray();
             getTrailData = new HSDUIntArray();
         }
     }

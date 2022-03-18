@@ -21,6 +21,7 @@ using HSDRaw.AirRide.Rd;
 using HSDRaw.AirRide.Kx;
 using HSDRaw.AirRide;
 using HSDRaw.Melee.Pl.ftData;
+using HSDRaw.Melee.Ty;
 
 namespace HSDRaw
 {
@@ -836,6 +837,12 @@ namespace HSDRaw
                 x => x.StartsWith("rdExt") ?  new KEX_RdExt() : null,
                 x => x.StartsWith("kexData") ?  new kexData() : null,
                 x => x.Equals("gmIntroEasyTable") ?  new SBM_gmIntroEasyTable() : null,
+                x => x.StartsWith("tyDisplayModel") ?  new HSDArrayAccessor<SBM_tyDisplayModelEntry>() : null,
+                x => x.StartsWith("tyModelFile") ?  new HSDArrayAccessor<SBM_TyModelFileEntry>() : null,
+                x => x.StartsWith("tyInitModel") ?  new HSDArrayAccessor<SBM_tyInitModelEntry>() : null,
+                x => x.StartsWith("tyModelSort") ?  new HSDArrayAccessor<SBM_tyModelSortEntry>() : null,
+                x => x.StartsWith("tyExpDifferent") ?  new HSDShortArray() : null,
+                x => x.StartsWith("tyNoGetUsTbl") ?  new HSDShortArray() : null,
                 x => new HSDAccessor(),
         };
 
