@@ -136,6 +136,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     }
                 }
                 JointManager.CleanupRendering();
+                ItemJointManager.CleanupRendering();
+                ItCo = null;
                 viewport.Dispose();
                 _animEditor.CloseOnExit = true;
                 _animEditor.Dispose();

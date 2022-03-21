@@ -95,8 +95,6 @@ namespace HSDRaw.Melee
     /// </summary>
     public class SIS_Data : HSDAccessor
     {
-        public override int TrimmedSize => 0x04;
-
         public string TextCode
         {
             get

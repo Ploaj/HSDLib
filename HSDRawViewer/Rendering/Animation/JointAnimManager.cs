@@ -247,7 +247,7 @@ namespace HSDRawViewer.Rendering
             foreach (var j in joint.BreathFirstList)
             {
                 AnimNode n = new AnimNode();
-                if (j.AOBJ != null)
+                if (j.AOBJ != null && j.AOBJ.FObjDesc != null)
                 {
                     FrameCount = (int)Math.Max(FrameCount, j.AOBJ.EndFrame + 1);
 

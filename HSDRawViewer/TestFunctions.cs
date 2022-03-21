@@ -240,7 +240,7 @@ namespace HSDRawViewer
 
 
         public delegate void EditSubaction(SBM_FighterAction action);
-        public delegate void EditAnimation(HSD_FigaTree ft);
+        public delegate void EditAnimation(HSD_FigaTree ft, string name);
 
         /// <summary>
         /// 
@@ -254,12 +254,15 @@ namespace HSDRawViewer
 
             foreach (var symbol in manager.GetAnimationSymbols())
             {
+                if (symbol.Contains("Taro"))
+                    continue;
+
                 var ftFile = new HSDRawFile(manager.GetAnimationData(symbol));
 
                 if (ftFile[symbol] != null)
                 {
                     var ft = ftFile[symbol].Data as HSD_FigaTree;
-                    editAnim(ft);
+                    editAnim(ft, symbol);
                     ftFile[symbol].Data = ft;
 
                     using (MemoryStream stream = new MemoryStream())

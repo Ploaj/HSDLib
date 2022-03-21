@@ -61,7 +61,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     if (e == boneIndex && AnimIndex < Anims.Length)
                     {
                         var anim = Anims[AnimIndex];
-                        anim.GetAnimatedState(0, boneIndex - StartBone, jobj, out TX, out TY, out TZ, out RX, out RY, out RZ, out SX, out SY, out SZ);
+                        if (anim.Nodes[boneIndex - StartBone].Tracks.Count > 0)
+                            anim.GetAnimatedState(0, boneIndex - StartBone, jobj, out TX, out TY, out TZ, out RX, out RY, out RZ, out SX, out SY, out SZ);
                         return true;
                     }
 
@@ -75,6 +76,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private JOBJManager JointManager = new JOBJManager();
         private JOBJManager ThrowDummyManager = new JOBJManager();
+
+        private JOBJManager ItemJointManager = new JOBJManager();
+        private HSDRawFile ItCo;
+
         private Dictionary<int, int> ThrowDummyLookupTable = new Dictionary<int, int>();
 
         private SBM_EnvironmentCollision ECB = null;
@@ -89,13 +94,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public DrawOrder DrawOrder => DrawOrder.Last;
 
         private float DisplayShieldSize = 0;
-        private enum ItemRender
-        {
-            None,
-            Parasol,
-            Swing
-        }
-        private ItemRender _itemRender = ItemRender.None;
 
         private ModelPartAnimations[] ModelPartsIndices;
 
@@ -419,6 +417,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             AJFilePath = aFile;
             AJManager = new FighterAJManager(File.ReadAllBytes(aFile));
 
+            var itcoPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\ItCo.dat";
+            if (File.Exists(itcoPath))
+                ItCo = new HSDRawFile(itcoPath);
+
             // load model
             LoadModel(cFile);
 
@@ -675,9 +677,16 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 //JointManager._lightParam.UseCameraLight = true;
             }
 
-            // character invisibility
+            // render character model
             if (!SubactionProcess.CharacterInvisibility && modelToolStripMenuItem.Checked)
                 JointManager.Render(cam, false);
+
+            // render item model
+            if (ItemJointManager != null && FighterData != null)
+            {
+                ItemJointManager.SetWorldTransform(1, JointManager.GetWorldTransform(FighterData.ModelLookupTables.ItemHoldBone));
+                ItemJointManager.Render(cam, false);
+            }
 
             // hurtbox collision
             if (hurtboxesToolStripMenuItem.Checked)
@@ -739,14 +748,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (DisplayShieldSize > 0)
                 DrawShape.DrawSphere(JointManager.GetWorldTransform(JointManager.JointCount - 2), DisplayShieldSize, 16, 16, ShieldColor, 0.5f);
 
-            // draw item overlats
-            if (_itemRender == ItemRender.Parasol && FighterData != null)
-            {
-                var ftData = FighterData;
-                var hold_bone = ftData.ModelLookupTables.ItemHoldBone;
-
-                DrawShape.DrawParasol(JointManager.GetWorldTransform(hold_bone), Vector3.One);
-            }
 
             // gfx spawn indicator
             foreach (var gfx in SubactionProcess.GFXOnFrame)
@@ -871,6 +872,20 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         //    Color2 = new Vector3(0, 1, 1)
         //};
 
+        private void LoadItemModel(int id)
+        {
+            if (ItCo != null)
+            {
+                if (ItCo["itPublicData"]?.Data is itPublicData it)
+                {
+                    var item = it.Items.Articles[id];
+
+                    if (item.Model.RootModelJoint != null)
+                        ItemJointManager.SetJOBJ(item.Model.RootModelJoint);
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -881,8 +896,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // reset display sheild size
             DisplayShieldSize = 0;
 
-            // reset item render
-            _itemRender = ItemRender.None;
+            // clear item model
+            ItemJointManager.SetJOBJ(null);
 
             // load attributes
             if (!string.IsNullOrEmpty(symbol))
@@ -890,8 +905,18 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 if (FighterData != null && symbol.Contains("Guard"))
                     DisplayShieldSize = FighterData.Attributes.ShieldSize / 2;
 
-                if (FighterData != null && symbol.Contains("ItemParasol"))
-                    _itemRender = ItemRender.Parasol;
+                if (FighterData != null)
+                {
+                    // LoadItemModel(12);
+                    if (symbol.Contains("ItemParasol"))
+                        LoadItemModel(13);
+                    if (symbol.Contains("ItemShoot"))
+                        LoadItemModel(16);
+                    if (symbol.Contains("ItemScope"))
+                        LoadItemModel(21);
+                    if (symbol.Contains("ItemHammer"))
+                        LoadItemModel(28);
+                }
             }
 
             // check to render irv
