@@ -654,8 +654,17 @@ namespace HSDRawViewer.Converters
                     {
                         Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
 
-                        if (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)
+                        if (mesh.Name.Contains("REFLECTIVE2"))
                             Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+                        else
+                        if (dobj.Mobj.Textures != null)
+                        {
+                            if (dobj.Mobj.Textures.List.Count > 1)
+                                Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+
+                            if (dobj.Mobj.Textures.List.Count > 2)
+                                Attributes.Add(GXAttribName.GX_VA_TEX2MTXIDX);
+                        }
 
 #if DEBUG
                         if (Settings.MetalModel && !Attributes.Contains(GXAttribName.GX_VA_TEX1MTXIDX))
