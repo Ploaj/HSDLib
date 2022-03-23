@@ -288,7 +288,7 @@ namespace HSDRawViewer.GUI.Plugins
             TreeNode tree = new TreeNode();
 
             if (_jointMap[index] != null)
-                tree.Text = _jointMap[index];
+                tree.Text = index + ": " + _jointMap[index];
             else
             if (!string.IsNullOrEmpty(jobj.ClassName))
                 tree.Text = $"(Joint_{index})" + jobj.ClassName;
@@ -918,6 +918,7 @@ namespace HSDRawViewer.GUI.Plugins
             if(f != null)
             {
                 _jointMap.Load(f);
+                RefreshGUI();
             }
         }
 

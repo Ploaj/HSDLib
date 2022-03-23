@@ -690,6 +690,10 @@ namespace HSDRawViewer.Converters
                 if (mesh.HasColorSet(1) && Settings.ImportVertexColor)
                     Attributes.Add(GXAttribName.GX_VA_CLR1);
 
+#if DEBUG
+                if (!Settings.MetalModel)
+                {
+#endif
 
                 if (mesh.HasUVSet(0))
                     Attributes.Add(GXAttribName.GX_VA_TEX0);
@@ -714,6 +718,10 @@ namespace HSDRawViewer.Converters
 
                 if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
                     Attributes.Add(GXAttribName.GX_VA_TEX7);
+
+#if DEBUG
+                }
+#endif
 
                 var vertices = new List<GX_Vertex>();
                 var jobjList = new List<HSD_JOBJ[]>();

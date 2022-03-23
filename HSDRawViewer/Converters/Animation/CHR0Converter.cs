@@ -146,6 +146,20 @@ namespace HSDRawViewer.Converters
                         k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
 
+                    // make sure all tracks start at frame 0
+                    foreach (var track in node.Tracks)
+                    {
+                        if (track.Keys.Count > 0 && track.Keys[0].Frame != 0)
+                        {
+                            track.Keys.Insert(0, new FOBJKey()
+                            {
+                                Frame = 0,
+                                Value = track.Keys[0].Value,
+                                InterpolationType = GXInterpolationType.HSD_A_OP_CON,
+                            });
+                        }
+                    }
+
                     //Console.WriteLine(boneName + " Tracks:" + node.Tracks.Count + " " + flags.ToString("X"));
                     //Console.WriteLine($"{trackX.Keys.Count} {trackY.Keys.Count} {trackZ.Keys.Count}");
                     //Console.WriteLine($"{trackRX.Keys.Count} {trackRY.Keys.Count} {trackRZ.Keys.Count}");
