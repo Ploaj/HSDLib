@@ -31,7 +31,7 @@ namespace HSDRaw.MEX
 
     public class MEX_CostumeAccessory : HSDAccessor
     {
-        public override int TrimmedSize => 0x18;
+        public override int TrimmedSize => 0x2C;
 
         public HSD_JOBJ RootJoint { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
 
