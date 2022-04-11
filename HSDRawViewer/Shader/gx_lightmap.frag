@@ -73,7 +73,7 @@
 
 #define MAX_TEX 4
 
-in vec3 tan;
+in vec3 ntan;
 in vec3 bitan;
 
 struct TexUnit
@@ -82,19 +82,25 @@ struct TexUnit
 	int is_ambient;
 	int is_diffuse;
 	int is_specular;
+
 	int is_ext;
 	int is_bump;
 	int color_operation;
 	int alpha_operation;
+
 	int coord_type;
 	float blend;
 	vec2 uv_scale;
+
 	int mirror_fix;
 	mat4 transform;
-	sampler2D texture;
 };
 uniform int hasTEX[MAX_TEX];
 uniform TexUnit TEX[MAX_TEX];
+uniform sampler2D sampler0;
+uniform sampler2D sampler1;
+uniform sampler2D sampler2;
+uniform sampler2D sampler3;
 
 struct TevUnit
 {
@@ -142,6 +148,17 @@ vec2 CalculateCoords(TexUnit tex)
 	return coords;
 }
 
+vec4 getTextureSampler(int index, vec2 uv)
+{
+	switch(index)
+	{
+		case 1: return texture(sampler1, uv);
+		case 2: return texture(sampler2, uv);
+		case 3: return texture(sampler3, uv);
+		default: return texture(sampler0, uv);
+	}
+}
+
 ///
 ///
 ///
@@ -152,10 +169,10 @@ vec4 GetBumpShading(vec3 V)
 		if (hasTEX[i] == 1 && TEX[i].is_bump == 1)
 		{
 			vec2 tex0 = CalculateCoords(TEX[i]);
-			vec2 tex1 = tex0 + vec2(dot(V, bitan), dot(V, tan));
+			vec2 tex1 = tex0 + vec2(dot(V, bitan), dot(V, ntan));
 
-			vec3 bump0 = texture(TEX[i].texture, tex0).rgb;
-			vec3 bump1 = texture(TEX[i].texture, tex1).rgb;
+			vec3 bump0 = getTextureSampler(i, tex0).rgb;
+			vec3 bump1 = getTextureSampler(i, tex1).rgb;
 
 			return vec4((bump0 - bump1) + 1.0, 1);
 		}
@@ -237,7 +254,7 @@ float TevUnit_GetScale(TevUnit unit)
 ///
 vec4 ApplyTEV(int index)
 {
-	vec4 TEX = texture(TEX[index].texture, CalculateCoords(TEX[index]));
+	vec4 TEX = getTextureSampler(index, CalculateCoords(TEX[index]));
 
 	if (hasTev[index] == 1)
 	{

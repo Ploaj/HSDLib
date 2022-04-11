@@ -11,7 +11,7 @@
 
 in vec3 vertPosition;
 in vec3 normal;
-in vec3 tan;
+in vec3 ntan;
 in vec3 bitan;
 in float spec;
 in vec2 texcoord[MAX_TEX];
@@ -171,7 +171,7 @@ void main()
 	switch(renderOverride)
 	{
 	case 1: fragColor = vec4(vec3(0.5) + N / 2, 1); break;
-	case 2: fragColor = vec4(normalize(tan), 1); break;
+	case 2: fragColor = vec4(normalize(ntan), 1); break;
 	case 3: fragColor = vec4(normalize(bitan), 1); break;
 	case 4: fragColor = vertexColor; break;
 	case 5: fragColor = vec4(fragColor.aaa, 1); break;

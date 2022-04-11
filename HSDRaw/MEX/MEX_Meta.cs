@@ -13,7 +13,7 @@ namespace HSDRaw.MEX
 
     public class MEX_Meta : HSDAccessor
     {
-        public override int TrimmedSize => 0x34;
+        public override int TrimmedSize => 0x40;
 
         [DisplayName("Version Major")]
         public byte VersionMajor { get => _s.GetByte(0x00); internal set => _s.SetByte(0x00, value); }
@@ -59,6 +59,12 @@ namespace HSDRaw.MEX
 
         [DisplayName("Last Minor Scene ID")]
         public int LastMinor { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }
+
+        [DisplayName("Trophy Count")]
+        public int TrophyCount { get => _s.GetInt32(0x34); set => _s.SetInt32(0x34, value); }
+
+        [DisplayName("Trophy SD Offset")]
+        public int TrophySDOffset { get => _s.GetInt32(0x38); set => _s.SetInt32(0x38, value); }
     }
 
 }

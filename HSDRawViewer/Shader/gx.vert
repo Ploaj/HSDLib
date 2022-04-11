@@ -4,6 +4,8 @@
 #define MAX_WEIGHTS 6
 #define WEIGHT_STRIDE 10
 
+#define MAX_BONES 200
+
 in float PNMTXIDX;
 in vec3 GX_VA_POS;
 in vec3 GX_VA_NRM;
@@ -21,7 +23,7 @@ in vec3 GX_VA_NRM_SHAPE;
 out vec3 posVA;
 out vec3 vertPosition;
 out vec3 normal;
-out vec3 tan;
+out vec3 ntan;
 out vec3 bitan;
 out float spec;
 out vec2 texcoord[MAX_TEX];
@@ -40,10 +42,9 @@ uniform int hasEnvelopes;
 
 uniform BoneTransforms
 {
-    mat4 transforms[200];
+    mat4 transforms[MAX_BONES];
+    mat4 binds[MAX_BONES];
 };
-
-uniform mat4 binds[200];
 
 uniform int envelopeIndex[WEIGHT_STRIDE * MAX_WEIGHTS];
 uniform float weights[WEIGHT_STRIDE * MAX_WEIGHTS];
@@ -104,7 +105,7 @@ void main()
 {
 	vec4 pos = vec4(mix(GX_VA_POS, GX_VA_POS_SHAPE, shape_blend), 1);
 	
-	tan = GX_VA_TAN;
+	ntan = GX_VA_TAN;
 	bitan = GX_VA_BTAN;
 	normal = mix(GX_VA_NRM, GX_VA_NRM_SHAPE, shape_blend);
 

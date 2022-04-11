@@ -23,8 +23,8 @@ namespace HSDRawViewer.Rendering
         private bool hasCheckedProgramCreation = false;
         public bool HasCheckedCompilation { get { return hasCheckedProgramCreation; } }
 
+        public const int MAX_BONES = 200;
         private int BoneBufferID;
-        private int BindBufferID;
 
         //private ShaderLog errorLog = new ShaderLog();
 
@@ -40,14 +40,13 @@ namespace HSDRawViewer.Rendering
         {
             programId = GL.CreateProgram();
             GL.GenBuffers(1, out BoneBufferID);
-            GL.GenBuffers(1, out BindBufferID);
             //errorLog.AppendHardwareAndVersionInfo();
 
-            int dataSize = 200 * Vector4.SizeInBytes * 4;
+            int dataSize = MAX_BONES * Vector4.SizeInBytes * 4 * 2;
 
             GL.BindBuffer(BufferTarget.UniformBuffer, BoneBufferID);
             GL.BufferData(BufferTarget.UniformBuffer, (IntPtr)(dataSize), IntPtr.Zero, BufferUsageHint.DynamicDraw);
-            GL.BindBuffer(BufferTarget.UniformBuffer, 0);
+            GL.BindBuffer(BufferTarget.UniformBuffer, -1);
         }
 
         public void SetWorldTransformBones(Matrix4[] f)
@@ -59,20 +58,11 @@ namespace HSDRawViewer.Rendering
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, blockIndex, BoneBufferID);
         }
 
-        public void SetBindTransformBones(Matrix4[] f)
-        {
-            GL.BindBuffer(BufferTarget.UniformBuffer, BindBufferID);
-            GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, (IntPtr)(f.Length * Vector4.SizeInBytes * 4), f);
-
-            var blockIndex = GL.GetUniformBlockIndex(programId, "BindTransforms");
-            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, blockIndex, BindBufferID);
-        }
-
         public void Delete()
         {
             GL.DeleteProgram(programId);
             GL.DeleteBuffer(BoneBufferID);
-            GL.DeleteBuffer(BindBufferID);
+            //GL.DeleteBuffer(BindBufferID);
         }
 
         public int GetUniformBlockIndex(string name)

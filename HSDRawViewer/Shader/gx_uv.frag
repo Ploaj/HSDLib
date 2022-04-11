@@ -31,7 +31,7 @@
 
 in vec3 posVA;
 in vec3 normal;
-in vec3 tan;
+in vec3 ntan;
 in vec3 bitan;
 in vec3 vertPosition;
 in vec2 texcoord[4];
@@ -93,7 +93,7 @@ vec2 GetCoordType(int coordType, int gensrc)
 		case GX_TG_POS:		tex0 = vec2(posVA.x, posVA.y); break;
 		case GX_TG_NRM:		tex0 = vec2(normal.x, normal.y); break;
 		case GX_TG_BINRM:	tex0 = vec2(bitan.x, bitan.y); break;
-		case GX_TG_TANGENT:	tex0 = vec2(tan.x, tan.y);  break;
+		case GX_TG_TANGENT:	tex0 = vec2(ntan.x, ntan.y);  break;
 
 		case GX_TG_TEX0: tex0 = texcoord[0]; break;
 		case GX_TG_TEX1: tex0 = texcoord[1]; break;

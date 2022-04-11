@@ -1,6 +1,7 @@
 ﻿using HSDRaw.GX;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HSDRaw.Common
 {
@@ -119,6 +120,14 @@ namespace HSDRaw.Common
                 }
                 else
                     _s.SetReference(0x14, null);
+            }
+        }
+
+        public string AttributesTypes
+        {
+            get
+            {
+                return string.Join(", ", ToGXAttributes().Select(e=>e.AttributeName));
             }
         }
 

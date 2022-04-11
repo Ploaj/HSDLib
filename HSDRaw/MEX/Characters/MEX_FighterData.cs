@@ -65,7 +65,11 @@ namespace HSDRaw.MEX
 
         public HSDIntArray RuntimeIntroParamLookup { get => _s.GetReference<HSDIntArray>(0x70); set => _s.SetReference(0x70, value); }
 
-        //public HSDArrayAccessor<HSD_UShort> AdventureTrophyLookup { get => _s.GetReference<HSDArrayAccessor<HSD_UShort>>(0x5C); set => _s.SetReference(0x5C, value); }
+        public HSDShortArray ClassicTrophyLookup { get => _s.GetReference<HSDShortArray>(0x74); set => _s.SetReference(0x74, value); }
+
+        public HSDShortArray AdventureTrophyLookup { get => _s.GetReference<HSDShortArray>(0x78); set => _s.SetReference(0x78, value); }
+
+        public HSDShortArray AllStarTrophyLookup { get => _s.GetReference<HSDShortArray>(0x7C); set => _s.SetReference(0x7C, value); }
 
         public override void New()
         {
@@ -99,7 +103,9 @@ namespace HSDRaw.MEX
             EndMovieFiles = new HSDFixedLengthPointerArrayAccessor<HSD_String>();
             RaceToFinishTimeLimits = new HSDIntArray();
             RuntimeIntroParamLookup = new HSDIntArray();
-
+            ClassicTrophyLookup = new HSDShortArray();
+            AdventureTrophyLookup = new HSDShortArray();
+            AllStarTrophyLookup = new HSDShortArray();
         }
     }
 }

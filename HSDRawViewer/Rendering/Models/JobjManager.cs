@@ -508,8 +508,7 @@ namespace HSDRawViewer.Rendering.Models
         {
             // ui
             _gxShader.SelectedBone = IndexOf(SelectedJOBJ);
-            _gxShader.WorldTransforms = GetWorldTransforms();
-            _gxShader.BindTransforms = GetBindTransforms();
+            _gxShader.SetBoneTransforms(GetWorldTransforms(), GetBindTransforms());
         }
 
 
