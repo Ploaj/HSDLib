@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using System.Drawing;
 using System.Linq;
+using HSDRaw.Common;
 
 namespace HSDRawViewer.Rendering
 {
@@ -136,7 +137,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public int Get(int index)
+        public int GetGLID(int index)
         {
             return Textures[index].GLID;
         }
@@ -185,6 +186,27 @@ namespace HSDRawViewer.Rendering
         {
             Textures.Add(new GLTexture(mips.ToList(), width, height));
             return Textures.Count - 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobj"></param>
+        public int Add(HSD_TOBJ tobj)
+        {
+            List<byte[]> mips = new List<byte[]>();
+
+            if (tobj.LOD != null && tobj.ImageData.MaxLOD != 0)
+            {
+                for (int i = 0; i < tobj.ImageData.MaxLOD - 1; i++)
+                    mips.Add(tobj.GetDecodedImageData(i));
+            }
+            else
+            {
+                mips.Add(tobj.GetDecodedImageData());
+            }
+
+            return Add(mips, tobj.ImageData.Width, tobj.ImageData.Height);
         }
 
         /// <summary>
@@ -301,7 +323,7 @@ namespace HSDRawViewer.Rendering
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, Get(index));
+            GL.BindTexture(TextureTarget.Texture2D, GetGLID(index));
 
             float w = windowWidth;
             float h = windowHeight;

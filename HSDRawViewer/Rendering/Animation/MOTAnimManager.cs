@@ -27,7 +27,7 @@ namespace HSDRawViewer.Rendering
             float SY = jobj.SY;
             float SZ = jobj.SZ;
 
-            Quaternion rotationOverride = Math3D.FromEulerAngles(RZ, RY, RX);
+            Quaternion rotationOverride = Math3D.EulerToQuat(RX, RY, RZ);
 
             var joints = _motFile.Joints.FindAll(e => e.BoneID >= 0 && e.BoneID < _motJointTable.Length && _motJointTable[e.BoneID] == boneIndex);
 
@@ -53,7 +53,7 @@ namespace HSDRawViewer.Rendering
                 }
                 if (j.TrackFlag.HasFlag(MOT_FLAGS.ROTATE))
                 {
-                    rotationOverride = Math3D.FromEulerAngles(RZ, RY, RX);
+                    rotationOverride = Math3D.EulerToQuat(RX, RY, RZ);
 
                     var dir = new Vector3(key.X, key.Y, key.Z);
                     var angle = key.W;

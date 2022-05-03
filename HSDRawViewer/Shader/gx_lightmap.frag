@@ -39,9 +39,8 @@
 #define TEX1_RGB (0x01 << 7 | 7)
 #define TEX1_AAA (0x01 << 7 | 8)
 
-#define NONE 7
-#define GX_CC_TEXA 9
-#define GX_CC_ZERO 15
+#define GX_CC_TEXA_A 4
+#define GX_CC_ZERO_A 7
 #define KONST_R (0x01 << 6 | 0)
 #define KONST_G (0x01 << 6 | 1)
 #define KONST_B (0x01 << 6 | 2)
@@ -125,7 +124,8 @@ struct TevUnit
 	vec4 tev1;
 };
 
-uniform int hasTev[MAX_TEX];
+uniform int hasColorTev[MAX_TEX];
+uniform int hasAlphaTev[MAX_TEX];
 uniform TevUnit Tev[MAX_TEX];
 
 // 
@@ -183,7 +183,7 @@ vec4 GetBumpShading(vec3 V)
 ///
 ///
 ///
-vec3 TevUnit_GetInput(TevUnit unit, vec4 tex, int source)
+vec3 TevUnit_GetColorInput(TevUnit unit, vec4 tex, int source)
 {
 	switch (source)
 	{
@@ -217,6 +217,33 @@ vec3 TevUnit_GetInput(TevUnit unit, vec4 tex, int source)
 			return unit.tev1.aaa;
 	}
 	return tex.rgb;
+}
+
+///
+///
+///
+float TevUnit_GetAlphaInput(TevUnit unit, float tex, int source)
+{
+	switch (source)
+	{
+		case GX_CC_TEXA_A:
+			return tex;
+		case GX_CC_ZERO_A:
+			return 0;
+		case KONST_R:
+			return unit.konst.r;
+		case KONST_G:
+			return unit.konst.g;
+		case KONST_B:
+			return unit.konst.b;
+		case KONST_A:
+			return unit.konst.a;
+		case TEX0_A:
+			return unit.tev0.a;
+		case TEX1_A:
+			return unit.tev1.a;
+	}
+	return 0;
 }
 
 float TevUnit_GetBias(TevUnit unit)
@@ -255,45 +282,45 @@ float TevUnit_GetScale(TevUnit unit)
 vec4 ApplyTEV(int index)
 {
 	vec4 TEX = getTextureSampler(index, CalculateCoords(TEX[index]));
+	vec4 op = TEX;
 
-	if (hasTev[index] == 1)
+	if (hasColorTev[index] == 1)
 	{
 		// get tev unit
 		TevUnit tev = Tev[index];
 
 		// inputs
-		vec3 a = TevUnit_GetInput(tev, TEX, tev.color_a);
-		vec3 b = TevUnit_GetInput(tev, TEX, tev.color_b);
-		vec3 c = TevUnit_GetInput(tev, TEX, tev.color_c);
-		vec3 d = TevUnit_GetInput(tev, TEX, tev.color_d);
+		vec3 a = TevUnit_GetColorInput(tev, TEX, tev.color_a);
+		vec3 b = TevUnit_GetColorInput(tev, TEX, tev.color_b);
+		vec3 c = TevUnit_GetColorInput(tev, TEX, tev.color_c);
+		vec3 d = TevUnit_GetColorInput(tev, TEX, tev.color_d);
 		
 		// op
-		vec3 op = vec3(0);
 		switch (tev.color_op)
 		{
 			case GX_TEV_ADD:
-				op = d + (a * (1 - c) + b * c);
+				op.rgb = d + (a * (vec3(1) - c) + b * c);
 				break;
 			case GX_TEV_SUB:
-				op = d - (a * (1 - c) + b * c);
+				op.rgb = d - (a * (vec3(1) - c) + b * c);
 				break;
 			case GX_TEV_COMP_R8_GT:
-				op = d + ((a.r > b.r) ? c : vec3(0));
+				op.rgb = d + ((a.r > b.r) ? c : vec3(0));
 				break;
 			case GX_TEV_COMP_R8_EQ:
-				op = d + ((a.r == b.r) ? c : vec3(0));
+				op.rgb = d + ((a.r == b.r) ? c : vec3(0));
 				break;
 			case GX_TEV_COMP_GR16_GT:
-				op = d + (all(greaterThan(a.gr, b.gr)) ? c : vec3(0));
+				op.rgb = d + (all(greaterThan(a.gr, b.gr)) ? c : vec3(0));
 				break;
 			case GX_TEV_COMP_GR16_EQ:
-				op = d + ((a.gr == b.gr) ? c : vec3(0));
+				op.rgb = d + ((a.gr == b.gr) ? c : vec3(0));
 				break;
 			case GX_TEV_COMP_BGR24_GT:
-				op = d + (all(greaterThan(a.bgr, b.bgr)) ? c : vec3(0));
+				op.rgb = d + (all(greaterThan(a.bgr, b.bgr)) ? c : vec3(0));
 				break;
 			case GX_TEV_COMP_BGR24_EQ:
-				op = d + ((a.bgr == b.bgr) ? c : vec3(0));
+				op.rgb = d + ((a.bgr == b.bgr) ? c : vec3(0));
 				break;
 			case GX_TEV_COMP_RGB8_GT:
 				op.r = d.r + ((a.r > b.r) ? c.r : 0);
@@ -312,17 +339,50 @@ vec4 ApplyTEV(int index)
 			// bias and scale
 			float bias = TevUnit_GetBias(tev);
 			float scale = TevUnit_GetScale(tev);
-			op = (op + vec3(bias)) * scale;
+			op.rgb = (op.rgb + vec3(bias)) * scale;
 
 			// clamp
 			if (tev.color_clamp == 1)
-				op = clamp(op, vec3(0), vec3(1));
+				op.rgb = clamp(op.rgb, vec3(0), vec3(1));
 		}
-
-		return vec4(op, TEX.a);
 	}
 
-	return TEX;
+	if (hasAlphaTev[index] == 1)
+	{
+		// get tev unit
+		TevUnit tev = Tev[index];
+
+		// inputs
+		float a = TevUnit_GetAlphaInput(tev, TEX.a, tev.alpha_a);
+		float b = TevUnit_GetAlphaInput(tev, TEX.a, tev.alpha_b);
+		float c = TevUnit_GetAlphaInput(tev, TEX.a, tev.alpha_c);
+		float d = TevUnit_GetAlphaInput(tev, TEX.a, tev.alpha_d);
+		
+		// op
+		switch (tev.alpha_op)
+		{
+			case GX_TEV_ADD:
+				op.a = d + (a * (1 - c) + b * c);
+				break;
+			case GX_TEV_SUB:
+				op.a = d - (a * (1 - c) + b * c);
+				break;
+		}
+		
+		if (tev.alpha_op == GX_TEV_ADD || tev.alpha_op == GX_TEV_SUB)
+		{
+			// bias and scale
+			float bias = TevUnit_GetBias(tev);
+			float scale = TevUnit_GetScale(tev);
+			op.a = (op.a + bias) * scale;
+
+			// clamp
+			if (tev.color_clamp == 1)
+				op.a = clamp(op.a, 0, 1);
+		}
+	}
+
+	return op;
 }
 
 ///

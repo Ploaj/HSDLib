@@ -52,7 +52,7 @@ namespace HSDRawViewer.Converters.Animation
                     var matrix = n.GetLocal(f);
                     var tra = matrix.ExtractTranslation();
                     var sca = matrix.ExtractScale();
-                    var rot = Math3D.ToEulerAngles(matrix.ExtractRotation().Inverted());
+                    var rot = matrix.ExtractRotationEuler();
 
                     node.Tracks.Find(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAX).Keys.Add(new FOBJKey() { Frame = f, Value = tra.X, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
                     node.Tracks.Find(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAY).Keys.Add(new FOBJKey() { Frame = f, Value = tra.Y, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });

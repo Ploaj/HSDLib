@@ -52,7 +52,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 GenerateFontImage();
             }
 
-            GL.MatrixMode(MatrixMode.Modelview);
+            //GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
             var mat = Matrix4.CreateOrthographicOffCenter(0, cam.RenderWidth, cam.RenderHeight, 0, 0, 1);
             GL.LoadMatrix(ref mat);
@@ -65,7 +65,7 @@ namespace HSDRawViewer.Rendering.Renderers
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, TextureManager.Get(0));
+            GL.BindTexture(TextureTarget.Texture2D, TextureManager.GetGLID(0));
 
             GL.Begin(PrimitiveType.Quads);
 

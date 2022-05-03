@@ -186,7 +186,7 @@ namespace HSDRawViewer.Rendering
             }
 
             var transform = Matrix4.CreateScale(SX, SY, SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
+                Math3D.CreateMatrix4FromEuler(RX, RY, RZ) *
                 Matrix4.CreateTranslation(TX, TY, TZ);
 
             if(SX != 0 && SY != 0 && SZ != 0)

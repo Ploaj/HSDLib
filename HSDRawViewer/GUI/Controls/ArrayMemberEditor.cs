@@ -123,6 +123,8 @@ namespace HSDRawViewer.GUI
 
         public bool IsResetting { get; internal set; } = false;
 
+        public bool InsertCloneAfterSelected { get; set; } = false;
+
         /// <summary>
         /// 
         /// </summary>
@@ -285,7 +287,10 @@ namespace HSDRawViewer.GUI
             if(ob != null)
             {
                 OnItemAdded?.Invoke(new AddedItemEventArgs() { Item = ob });
-                Items.Add(ob);
+                if (InsertCloneAfterSelected && SelectedIndex != -1)
+                    Items.Insert(SelectedIndex + 1, ob);
+                else
+                    Items.Add(ob);
                 MakeChanges();
             }
         }
@@ -399,7 +404,10 @@ namespace HSDRawViewer.GUI
             if (o == null)
                 return -1;
             OnItemAdded?.Invoke(new AddedItemEventArgs() { Item = o });
-            Items.Add(o);
+            if (InsertCloneAfterSelected && SelectedIndex != -1)
+                Items.Insert(SelectedIndex + 1, o);
+            else
+                Items.Add(o);
             MakeChanges();
             return Items.Count - 1 + ItemIndexOffset;
         }
@@ -429,7 +437,10 @@ namespace HSDRawViewer.GUI
 
             var clone = ObjectExtensions.Copy(elementList.SelectedItem);
 
-            Items.Add(clone);
+            if (InsertCloneAfterSelected && SelectedIndex != -1)
+                Items.Insert(SelectedIndex + 1, clone);
+            else
+                Items.Add(clone);
             elementList.SelectedItems.Clear();
             elementList.SelectedItem = clone;
 

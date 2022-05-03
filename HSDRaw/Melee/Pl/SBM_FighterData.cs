@@ -17,11 +17,11 @@ namespace HSDRaw.Melee.Pl
 
         public SBM_FighterActionTable FighterActionTable { get => _s.GetReference<SBM_FighterActionTable>(0x0C); set => _s.SetReference(0x0C, value); }
 
-        public SBM_DynamicBehaviorIDs FighterActionDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x10); set => _s.SetReference(0x10, value); }
+        public HSDArrayAccessor<SBM_DynamicBehavior> FighterActionDynamicBehaviors { get => _s.GetReference<HSDArrayAccessor<SBM_DynamicBehavior>>(0x10); set => _s.SetReference(0x10, value); }
 
         public SBM_FighterActionTable DemoActionTable { get => _s.GetReference<SBM_FighterActionTable>(0x14); set => _s.SetReference(0x14, value); }
 
-        public SBM_DynamicBehaviorIDs DemoActionDynamicBehaviors { get => _s.GetReference<SBM_DynamicBehaviorIDs>(0x18); set => _s.SetReference(0x18, value); }
+        public HSDArrayAccessor<SBM_DynamicBehavior> DemoActionDynamicBehaviors { get => _s.GetReference<HSDArrayAccessor<SBM_DynamicBehavior>>(0x18); set => _s.SetReference(0x18, value); }
 
         public HSDFixedLengthPointerArrayAccessor<SBM_ModelPart> ModelPartAnimations { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_ModelPart>>(0x1C); set => _s.SetReference(0x1C, value); }
         
@@ -140,38 +140,13 @@ namespace HSDRaw.Melee.Pl
     /// <summary>
     /// 
     /// </summary>
-    public class SBM_DynamicBehaviorIDs : HSDAccessor
+    public class SBM_DynamicBehavior : HSDAccessor
     {
-        public short[] Values
-        {
-            get
-            {
-                var e = new short[_s.Length / 2];
+        public override int TrimmedSize => 2;
 
-                for (int i = 0; i < e.Length; i++)
-                    e[i] = _s.GetInt16(i * 2);
+        public byte Flags { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
-                return e;
-            }
-            set
-            {
-                if (value == null)
-                {
-                    _s.Resize(4);
-                    _s.SetInt32(0, 0);
-                }
-                else
-                {
-                    var size = value.Length * 2;
-                    if (size % 4 != 0)
-                        size += 4 - (size % 4);
-
-                    _s.Resize(size);
-                    for (int i = 0; i < value.Length; i++)
-                        _s.SetInt16(i * 2, value[i]);
-                }
-            }
-        }
+        public byte BoneTableIndex { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
     }
 
     /// <summary>

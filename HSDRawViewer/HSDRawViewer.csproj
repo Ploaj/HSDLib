@@ -241,23 +241,17 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\SubactionFromText.cs" />
-    <Compile Include="GUI\Plugins\ParticleGenEditorPanel.cs">
+    <Compile Include="GUI\Plugins\ParticleEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Plugins\ParticleGenEditorPanel.Designer.cs">
-      <DependentUpon>ParticleGenEditorPanel.cs</DependentUpon>
+    <Compile Include="GUI\Plugins\ParticleEditor.Designer.cs">
+      <DependentUpon>ParticleEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\MEXStockIconEditor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\Plugins\Melee\MEXStockIconEditor.Designer.cs">
       <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\ParticleGenEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\ParticleGenEditor.Designer.cs">
-      <DependentUpon>ParticleGenEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Plugins\TexAnimEditor.cs">
       <SubType>Form</SubType>
@@ -477,6 +471,7 @@
     <Compile Include="Rendering\Animation\AnimManager.cs" />
     <Compile Include="Rendering\Animation\AnimNode.cs" />
     <Compile Include="Rendering\Animation\MotAnimManager.cs" />
+    <Compile Include="Rendering\Animation\PhysicsSimulator.cs" />
     <Compile Include="Rendering\Animation\ShapeAnimManager.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\GX\GXFogParam.cs" />
@@ -491,6 +486,10 @@
     <Compile Include="Rendering\Renderers\AfterImageRenderer.cs" />
     <Compile Include="Rendering\Renderers\GraphRenderer.cs" />
     <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
+    <Compile Include="Rendering\Renderers\Particle.cs" />
+    <Compile Include="Rendering\Renderers\ParticleGenerator.cs" />
+    <Compile Include="Rendering\Renderers\ParticleShader.cs" />
+    <Compile Include="Rendering\Renderers\ParticleSystem.cs" />
     <Compile Include="Rendering\Renderers\TextRenderer.cs" />
     <Compile Include="Rendering\Shapes\DrawShape.cs" />
     <Compile Include="Rendering\GX\GXTranslator.cs" />
@@ -516,6 +515,7 @@
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
     <Compile Include="Tools\AnimationRetarget.cs" />
+    <Compile Include="Tools\CustomClass.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <Compile Include="Tools\FlagEnumEditor.cs">
       <SubType>Component</SubType>
@@ -523,16 +523,23 @@
     <Compile Include="Tools\GUITools.cs" />
     <Compile Include="Tools\ImageTools.cs" />
     <Compile Include="Tools\JointMap.cs" />
-    <Compile Include="Tools\MatrixExtensions.cs" />
+    <Compile Include="Tools\OpenTKExtensions.cs" />
     <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Sound\SSM.cs" />
+    <Compile Include="Tools\ParticleEvent.cs" />
     <Compile Include="Tools\ParticleManager.cs" />
     <Compile Include="Tools\RawTimer.cs" />
     <Compile Include="Tools\Simpoly.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="Shader\ps.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shader\ps.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\ts_visible.png" />
     <None Include="Resources\ts_hidden.png" />
     <None Include="Melee\command_rider.yml">
@@ -627,11 +634,8 @@
     <EmbeddedResource Include="GUI\Plugins\Melee\NewCollDataEditor.resx">
       <DependentUpon>NewCollDataEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\ParticleGenEditor.resx">
-      <DependentUpon>ParticleGenEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\ParticleGenEditorPanel.resx">
-      <DependentUpon>ParticleGenEditorPanel.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\Plugins\ParticleEditor.resx">
+      <DependentUpon>ParticleEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Plugins\TexAnimEditor.resx">
       <DependentUpon>TexAnimEditor.cs</DependentUpon>
@@ -659,6 +663,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\MOBJEditor.resx">
       <DependentUpon>MOBJEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\PopoutGraphEditor.resx">
       <DependentUpon>PopoutGraphEditor.cs</DependentUpon>

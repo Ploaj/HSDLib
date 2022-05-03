@@ -474,7 +474,7 @@ namespace HSDRawViewer.Converters
             if (TransformUVS)
             {
                 var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
-                    Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
+                    Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RZ) *
                     Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
 
                 transform.Invert();

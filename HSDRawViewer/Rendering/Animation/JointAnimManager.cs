@@ -105,7 +105,7 @@ namespace HSDRawViewer.Rendering
             GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
 
             trans = new Vector3(TX, TY, TZ);
-            rot = Math3D.FromEulerAngles(RZ, RY, RX);
+            rot = Math3D.EulerToQuat(RX, RY, RZ);
             scale = new Vector3(SX, SY, SZ);
         }
 
@@ -121,7 +121,7 @@ namespace HSDRawViewer.Rendering
             GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
 
             return Matrix4.CreateScale(SX, SY, SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(RZ, RY, RX)) *
+                Math3D.CreateMatrix4FromEuler(RX, RY, RZ) *
                 Matrix4.CreateTranslation(TX, TY, TZ);
         }
 

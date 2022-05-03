@@ -165,7 +165,7 @@ namespace HSDRawViewer.Rendering.Models
                     var blending = tex.Blending;
 
                     var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
-                        Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(tex.RZ, tex.RY, tex.RX)) *
+                        Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RY) *
                         Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
 
                     if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
@@ -186,7 +186,7 @@ namespace HSDRawViewer.Rendering.Models
                     PreLoadTexture(displayTex);
 
                     // grab texture id
-                    var texid = TextureManager.Get(imageBufferTextureIndex[displayTex.ImageData.ImageData]);
+                    var texid = TextureManager.GetGLID(imageBufferTextureIndex[displayTex.ImageData.ImageData]);
 
                     // set texture
                     GL.ActiveTexture(TextureUnit.Texture0 + i);
@@ -228,9 +228,11 @@ namespace HSDRawViewer.Rendering.Models
                     shader.SetMatrix4x4($"TEX[{i}].transform", ref transform);
 
                     var tev = tex.TEV;
-                    bool useTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.COLOR_TEV);
-                    shader.SetBoolToInt($"hasTev[{i}]", useTev);
-                    if (useTev)
+                    bool colorTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.COLOR_TEV);
+                    bool alphaTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.ALPHA_TEV);
+                    shader.SetBoolToInt($"hasColorTev[{i}]", colorTev);
+                    shader.SetBoolToInt($"hasAlphaTev[{i}]", alphaTev);
+                    if (colorTev)
                     {
                         shader.SetInt($"Tev[{i}].color_op", (int)tev.color_op);
                         shader.SetInt($"Tev[{i}].color_bias", (int)tev.color_bias);
@@ -240,7 +242,9 @@ namespace HSDRawViewer.Rendering.Models
                         shader.SetInt($"Tev[{i}].color_b", (int)tev.color_b_in);
                         shader.SetInt($"Tev[{i}].color_c", (int)tev.color_c_in);
                         shader.SetInt($"Tev[{i}].color_d", (int)tev.color_d_in);
-
+                    }
+                    if (alphaTev)
+                    {
                         shader.SetInt($"Tev[{i}].alpha_op", (int)tev.alpha_op);
                         shader.SetInt($"Tev[{i}].alpha_bias", (int)tev.alpha_bias);
                         shader.SetInt($"Tev[{i}].alpha_scale", (int)tev.alpha_scale);
@@ -249,10 +253,17 @@ namespace HSDRawViewer.Rendering.Models
                         shader.SetInt($"Tev[{i}].alpha_b", (int)tev.alpha_b_in);
                         shader.SetInt($"Tev[{i}].alpha_c", (int)tev.alpha_c_in);
                         shader.SetInt($"Tev[{i}].alpha_d", (int)tev.alpha_d_in);
+                    }
+                    if (tev != null)
+                    {
+                        if (tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV0))
+                            shader.SetColor($"Tev[{i}].tev0", tev.tev0, tev.tev0Alpha);
 
-                        shader.SetColor($"Tev[{i}].konst", tev.constant, tev.constantAlpha);
-                        shader.SetColor($"Tev[{i}].tev0", tev.tev0, tev.tev0Alpha);
-                        shader.SetColor($"Tev[{i}].tev1", tev.tev1, tev.tev1Alpha);
+                        if (tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV1))
+                            shader.SetColor($"Tev[{i}].tev1", tev.tev1, tev.tev1Alpha);
+
+                        if (tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST))
+                            shader.SetColor($"Tev[{i}].konst", tev.constant, tev.constantAlpha);
                     }
                 }
             }

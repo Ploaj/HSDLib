@@ -28,13 +28,13 @@ namespace HSDRaw.Common
 
         public int EffectIDStart { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
-        public int ParticleCount { get => _s.GetInt32(0x08); internal set => _s.SetInt32(0x08, value); }
+        public int GeneratorCount { get => _s.GetInt32(0x08); internal set => _s.SetInt32(0x08, value); }
 
-        public HSD_ParticleGenerator[] Particles
+        public HSD_ParticleGenerator[] Generators
         {
             get
             {
-                HSD_ParticleGenerator[] p = new HSD_ParticleGenerator[ParticleCount];
+                HSD_ParticleGenerator[] p = new HSD_ParticleGenerator[GeneratorCount];
 
                 int prevSize = 0;
                 for(int i = 0; i < p.Length; i++)
@@ -103,7 +103,7 @@ namespace HSDRaw.Common
                     }
                 }
 
-                ParticleCount = value.Length;
+                GeneratorCount = value.Length;
             }
         }
     }
@@ -118,37 +118,62 @@ namespace HSDRaw.Common
         Rect,
         Cone,
         Cylinder,
-        Sphere
+        Sphere,
+    }
+
+    public enum GeneratorFlags
+    {
+        HasChild = 0x80,
+
+        x100 = 0x100,
+        BillboardA = 0x800,
+
+        Bit26 = 0x02000000,
+        Bit27 = 0x04000000,
+        Bit28 = 0x08000000,
     }
 
     [Flags]
     public enum ParticleKind : uint
     {
         None        = 0x00000000,
+
         Gravity     = 0x00000001,
         Friction    = 0x00000002,
         Tornado     = 0x00000004,
         Bit4        = 0x00000008,
+
         ComTLUT     = 0x00000010,
         MirrorS     = 0x00000020,
         MirrorT     = 0x00000040,
         PrimEnv     = 0x00000080,
+
         IMMRND      = 0x00000100,
-        // interpolation type
+        NearestTex   = 0x00000200,
+        HasTexture  = 0x00000400,
         ExecPause   = 0x00000800,
-        //
+
+        //          = 0x00001000, pnt jobj index for these 3 bits
+        //          = 0x00002000,
+        //          = 0x00004000,
         PNTJOBJ     = 0x00008000,
+
         BillboardG  = 0x00010000,
         BillboardA  = 0x00020000,
         FlipS       = 0x00040000,
         FlipT       = 0x00080000,
+
         Trail       = 0x00100000,
         DirVec      = 0x00200000,
-        // blend
+        BlendOne    = 0x00400000,
+        //          = 0x00800000,
+
         Fog         = 0x01000000,
-        Bit26       = 0x02000000,
+        Bit26       = 0x02000000, // Bit 26 - 27 set by particle event 0xEF
         Bit27       = 0x04000000,
         Bit28       = 0x08000000,
+        BitGroup = Bit26 | Bit27 | Bit28,
+
         Bit29       = 0x10000000,
         Bit30       = 0x20000000,
         Point       = 0x40000000,
@@ -157,7 +182,9 @@ namespace HSDRaw.Common
 
     public class HSD_ParticleGenerator : HSDAccessor
     {
-        public ParticleType Type { get => (ParticleType)_s.GetInt16(0x00); set => _s.SetInt16(0x00, (short)value); }
+        public ParticleType TypeShape { get => (ParticleType)(_s.GetInt16(0x00) & 0xF); set => _s.SetInt16(0x00, (short)((_s.GetInt16(0x00) & ~0xF) | (int)value)); }
+
+        public GeneratorFlags Flags { get => (GeneratorFlags)(_s.GetInt16(0x00) & ~0xF); set => _s.SetInt16(0x00, (short)((_s.GetInt16(0x00) & 0xF) | (int)value)); }
 
         public short TexGroup { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
 
@@ -220,7 +247,7 @@ namespace HSDRaw.Common
 
         public override string ToString()
         {
-            return $"Particle: {Type} TexG: {TexGroup} ";
+            return $"Particle: {TypeShape} TexG: {TexGroup} ";
         }
     }
 }

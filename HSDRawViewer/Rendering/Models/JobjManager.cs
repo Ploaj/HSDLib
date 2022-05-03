@@ -63,6 +63,8 @@ namespace HSDRawViewer.Rendering.Models
         {
             public JOBJCache Parent;
 
+            public bool CustomLocal = false;
+
             public Matrix4 LocalTransform;
             public Matrix4 WorldTransform;
             public Matrix4 InvertedTransform;
@@ -74,6 +76,34 @@ namespace HSDRawViewer.Rendering.Models
         }
 
         private Dictionary<HSD_JOBJ, JOBJCache> jobjToCache = new Dictionary<HSD_JOBJ, JOBJCache>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="transform"></param>
+        public void SetOverrideLocalTransform(HSD_JOBJ joint, Matrix4 transform)
+        {
+            if (!jobjToCache.ContainsKey(joint))
+                return;
+
+            var v = jobjToCache[joint];
+            v.CustomLocal = true;
+            v.LocalTransform = transform;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public void ClearOverrideLocalTransform(HSD_JOBJ joint)
+        {
+            if (!jobjToCache.ContainsKey(joint))
+                return;
+
+            var v = jobjToCache[joint];
+            v.CustomLocal = false;
+        }
 
         /// <summary>
         /// 
@@ -597,6 +627,14 @@ namespace HSDRawViewer.Rendering.Models
                 index = jobjToCache[root].Index;
 
             var local = GetLocalTransform(root, index);
+
+            if (jobjToCache.ContainsKey(root))
+            {
+                index = jobjToCache[root].Index;
+                if (jobjToCache[root].CustomLocal)
+                    local = jobjToCache[root].LocalTransform;
+            }
+
             var world = local;
 
             if (parent != null)
@@ -704,7 +742,7 @@ namespace HSDRawViewer.Rendering.Models
                 return Animation.GetAnimatedMatrix(Frame, animatedBoneIndex, jobj);
             else
                 return Matrix4.CreateScale(jobj.SX, jobj.SY, jobj.SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX)) *
+                Math3D.CreateMatrix4FromEuler(jobj.RX, jobj.RY, jobj.RZ) *
                 Matrix4.CreateTranslation(jobj.TX, jobj.TY, jobj.TZ);
         }
 
@@ -722,7 +760,7 @@ namespace HSDRawViewer.Rendering.Models
             else
             {
                 trans = new Vector3(jobj.TX, jobj.TY, jobj.TZ);
-                rot = Math3D.FromEulerAngles(jobj.RZ, jobj.RY, jobj.RX);
+                rot = Math3D.EulerToQuat(jobj.RX, jobj.RY, jobj.RZ);
                 scale = new Vector3(jobj.SX, jobj.SY, jobj.SZ);
             }
         }

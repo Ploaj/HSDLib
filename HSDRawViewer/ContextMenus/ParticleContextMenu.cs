@@ -19,13 +19,13 @@ namespace HSDRawViewer.ContextMenus
                     if (f != null)
                     {
                         var file = new HSDRaw.HSDRawFile(f);
-                        var mod = root.Particles;
+                        var mod = root.Generators;
                         Array.Resize(ref mod, mod.Length + 1);
                         mod[mod.Length - 1] = new HSD_ParticleGenerator()
                         {
                             _s = file.Roots[0].Data._s
                         };
-                        root.Particles = mod;
+                        root.Generators = mod;
                     }
                 }
             };

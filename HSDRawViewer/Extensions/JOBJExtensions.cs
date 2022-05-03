@@ -25,7 +25,7 @@ namespace HSDRawViewer
 
                 if(i == 0)
                 {
-                    rot = Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(j.RZ, j.RY, j.RX));
+                    rot = Math3D.CreateMatrix4FromEuler(j.RX, j.RY, j.RZ);
                     j.RX = 0;
                     j.RY = 0;
                     j.RZ = 0;
@@ -208,7 +208,7 @@ namespace HSDRawViewer
         {
             var oldTransform =
                 Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(root.RZ, root.RY, root.RX)) *
+                Math3D.CreateMatrix4FromEuler(root.RX, root.RY, root.RZ) *
                 Matrix4.CreateTranslation(root.TX, root.TY, root.TZ) * oldParent;
 
             var targetPoint = Vector3.TransformPosition(Vector3.Zero, oldTransform);
@@ -236,7 +236,7 @@ namespace HSDRawViewer
 
             Matrix4 currentTransform =
                 Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(root.RZ, root.RY, root.RX)) *
+                Math3D.CreateMatrix4FromEuler(root.RX, root.RY, root.RZ) *
                 parentTransform;
 
             var relPoint = Vector3.TransformPosition(targetPoint, parentTransform.Inverted());
@@ -254,7 +254,7 @@ namespace HSDRawViewer
 
             var newTransform =
                 Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
-                Matrix4.CreateFromQuaternion(Math3D.FromEulerAngles(root.RZ, root.RY, root.RX)) *
+                Math3D.CreateMatrix4FromEuler(root.RX, root.RY, root.RZ) *
                 Matrix4.CreateTranslation(root.TX, root.TY, root.TZ) * parentTransform;
 
             newTransforms.Add(root, newTransform);

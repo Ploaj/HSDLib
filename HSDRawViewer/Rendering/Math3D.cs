@@ -41,6 +41,14 @@ namespace HSDRawViewer.Rendering
         {
             return Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2) + Math.Pow(p1.Z - p2.Z, 2) < distance * distance;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
         public static bool FastDistance(Vector2 p1, Vector2 p2, float distance)
         {
             return Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2) < distance * distance;
@@ -64,47 +72,51 @@ namespace HSDRawViewer.Rendering
         /// <param name="y"></param>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static Quaternion FromEulerAngles(float z, float y, float x)
+        public static Quaternion EulerToQuat(float x, float y, float z)
         {
-            {
-                Quaternion xRotation = Quaternion.FromAxisAngle(Vector3.UnitX, x);
-                Quaternion yRotation = Quaternion.FromAxisAngle(Vector3.UnitY, y);
-                Quaternion zRotation = Quaternion.FromAxisAngle(Vector3.UnitZ, z);
-
-                Quaternion q = (zRotation * yRotation * xRotation);
-
-                //if (q.W < 0)
-                //    q *= -1;
-
-                //return xRotation * yRotation * zRotation;
-                return q;
-            }
+            return new Quaternion().FromEuler(x, y, z);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eul"></param>
+        /// <returns></returns>
+        public static Matrix4 CreateMatrix4FromEuler(Vector3 eul)
+        {
+            return CreateMatrix4FromEuler(eul.X, eul.Y, eul.Z);
+        }
 
         /// <summary>
-        /// Converts quaternion into euler angles in ZYX order
+        /// 
         /// </summary>
-        /// <param name="q"></param>
+        /// <param name="eulerAngles"></param>
         /// <returns></returns>
-        public static Vector3 ToEulerAngles(Quaternion q)
+        public static Matrix4 CreateMatrix4FromEuler(float X, float Y, float Z)
         {
-            Matrix4 mat = Matrix4.CreateFromQuaternion(q);
-            float x, y, z;
+            var sx = (float)Math.Sin(X);
+            var cx = (float)Math.Cos(X);
+            var sy = (float)Math.Sin(Y);
+            var cy = (float)Math.Cos(Y);
+            var sz = (float)Math.Sin(Z);
+            var cz = (float)Math.Cos(Z);
 
-            y = (float)Math.Asin(-Clamp(mat.M31, -1, 1));
+            var M11 = cy * cz;
+            var M12 = cy * sz;
+            var M13 = -sy;
+            var M21 = cz * sx * sy - cx * sz;
+            var M22 = sz * sx * sy + cx * cz;
+            var M23 = sx * cy;
+            var M31 = cz * cx * sy + sx * sz;
+            var M32 = sz * cx * sy - sx * cz;
+            var M33 = cx * cy;
 
-            if (Math.Abs(mat.M31) < 0.99999)
-            {
-                x = (float)Math.Atan2(mat.M32, mat.M33);
-                z = (float)Math.Atan2(mat.M21, mat.M11);
-            }
-            else
-            {
-                x = 0;
-                z = (float)Math.Atan2(-mat.M12, mat.M22);
-            }
-            return new Vector3(x, y, z);
+            return new Matrix4(
+                M11, M12, M13, 0,
+                M21, M22, M23, 0,
+                M31, M32, M33, 0,
+                0, 0, 0, 1
+                );
         }
 
 

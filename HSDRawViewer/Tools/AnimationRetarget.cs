@@ -183,7 +183,7 @@ namespace HSDRawViewer.Tools
                     if(targetParentIndex != -1)
                         rel *= targetManager.GetWorldTransform(targetParentIndex).Inverted();
 
-                    var rot = Math3D.ToEulerAngles(rel.ExtractRotation().Inverted());
+                    var rot = rel.ExtractRotationEuler();
 
                     var targetJOBJ = targetManager.GetJOBJ(targetIndex);
                     var sourceJOBJ = sourceManager.GetJOBJ(sourceIndex);
