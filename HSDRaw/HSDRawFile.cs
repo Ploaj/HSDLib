@@ -786,6 +786,7 @@ namespace HSDRaw
                     x.Equals("Stc_scemdls") ||
                     x.Equals("lupe") ||
                     x.Equals("tdsce") ?  new HSDNullPointerArrayAccessor<HSD_JOBJDesc>() : null,
+                x => x.EndsWith("_model_set") ?  new HSD_JOBJDesc() : null,
                 x => x.Equals("ftDataMario") ?  new SBM_ftDataMario() : null,
                 x => x.StartsWith("ftData") && !x.Contains("Copy") ?  new SBM_FighterData() : null,
                 x => x.EndsWith("MnSelectChrDataTable") ?  new SBM_SelectChrDataTable() : null,
