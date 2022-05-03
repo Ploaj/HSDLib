@@ -256,13 +256,13 @@ namespace HSDRawViewer.Rendering.Models
                     }
                     if (tev != null)
                     {
-                        if (tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV0))
+                        if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV0) != 0)
                             shader.SetColor($"Tev[{i}].tev0", tev.tev0, tev.tev0Alpha);
 
-                        if (tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV1))
+                        if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
                             shader.SetColor($"Tev[{i}].tev1", tev.tev1, tev.tev1Alpha);
 
-                        if (tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST))
+                        if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
                             shader.SetColor($"Tev[{i}].konst", tev.constant, tev.constantAlpha);
                     }
                 }

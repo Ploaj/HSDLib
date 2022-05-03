@@ -14,5 +14,15 @@ namespace HSDRaw.Common.Animation
         //public uint ROBJPointer { get; set; }
 
         public uint Flags { get => (uint)_s.GetInt32(0x10); set => _s.SetInt32(0x10, (int)value); }
+
+        protected override int Trim()
+        {
+            // hack to guarentee sibling sequence
+            // this is needed for smash stages sometimes...
+            if (Next != null)
+                _s._nextStruct = Next._s;
+
+            return base.Trim();
+        }
     }
 }

@@ -15,9 +15,6 @@ namespace HSDRawViewer.Rendering.Renderers
             public HSD_JOBJ Jobj = null;
         }
 
-        private List<Particle> _particles = new List<Particle>();
-        public int ParticleCount { get => _particles.Count; }
-
         public ParticleKind Kind { get; set; }
         public float Random { get; set; }
         public float NumToSpawn { get; set; }
@@ -66,9 +63,8 @@ namespace HSDRawViewer.Rendering.Renderers
 
         public int RectFlags;
 
-        public bool Destroyed { get; internal set; } = false;
 
-        private bool Dead = false;
+        public bool Dead { get; internal set; } = false;
 
         public Random RandomGen { get; set; } = new Random();
 
@@ -542,7 +538,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         spawn_vel = Vector3.TransformPosition(spawn_vel, matrix);
 
                         // spawn particle
-                        _particles.Add(Particle.SpawnParticle(spawn_pos, spawn_vel,
+                        Parent.AttachParticle(Particle.SpawnParticle(spawn_pos, spawn_vel,
                             Size, Gravity, LinkNo, Bank, Kind,
                             TexG, cmdList, Life, 0, this, Friction));
                         //psGenerateParticle((double)spawn_pos.X, (double)spawn_pos.Y, (double)spawn_pos.Z,
@@ -557,7 +553,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         spawn_vel = Vector3.TransformPosition(Velocity, matrix);
 
                         // spawn particle
-                        _particles.Add(Particle.SpawnParticle(spawn_pos, spawn_vel,
+                        Parent.AttachParticle(Particle.SpawnParticle(spawn_pos, spawn_vel,
                             Size, Gravity, LinkNo, Bank, Kind,
                             TexG, cmdList, Life, 0, this, Friction));
 
@@ -586,7 +582,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         spawn_pos = new Vector3(0);
                         spawn_vel = new Vector3(in_f25, y_vel, 0);
 
-                        _particles.Add(Particle.SpawnParticle(spawn_pos, spawn_vel,
+                        Parent.AttachParticle(Particle.SpawnParticle(spawn_pos, spawn_vel,
                             Size, Gravity, LinkNo, Bank, Kind | ParticleKind.Tornado,
                             TexG, cmdList, Life, 0, this, Friction));
 
@@ -669,7 +665,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         spawn_vel = Vector3.TransformPosition(spawn_vel, matrix);
 
                         // spawn particle
-                        _particles.Add(Particle.SpawnParticle(spawn_pos, spawn_vel,
+                        Parent.AttachParticle(Particle.SpawnParticle(spawn_pos, spawn_vel,
                             Size, Gravity, LinkNo, Bank, Kind,
                             TexG, cmdList, Life, 0, this, Friction));
                         //psGenerateParticle((double)spawn_pos.X, (double)spawn_pos.Y, (double)spawn_pos.Z,
@@ -720,7 +716,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         spawn_pos = dVar15 * spawn_dir + JointPosition;
 
                         // spawn particle
-                        _particles.Add(Particle.SpawnParticle(spawn_pos, spawn_vel,
+                        Parent.AttachParticle(Particle.SpawnParticle(spawn_pos, spawn_vel,
                             Size, Gravity, LinkNo, Bank, Kind,
                             TexG, cmdList, Life, 0, this, Friction));
 
@@ -748,19 +744,6 @@ namespace HSDRawViewer.Rendering.Renderers
         /// </summary>
         public void Update()
         {
-            // update particles
-            List<Particle> dead = new List<Particle>();
-            foreach (var p in _particles)
-            {
-                p.Process();
-                if (p.Life <= 0)
-                    dead.Add(p);
-            }
-            foreach (var d in dead)
-                _particles.Remove(d);
-
-            if (Dead && _particles.Count == 0)
-                Destroyed = true;
 
             // check if still active
             if (Dead || Kind.HasFlag(ParticleKind.ExecPause))
@@ -782,33 +765,6 @@ namespace HSDRawViewer.Rendering.Renderers
                 if (GenLife <= 1)
                     Dead = true;
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cam"></param>
-        public void Render(Camera cam, List<int> indices)
-        {
-            var pos = cam.ModelViewMatrix.ExtractTranslation();
-            foreach (var p in _particles.OrderBy(e => (e.Pos - pos).LengthSquared))
-            {
-                if (p.TexG >= 0)
-                    p.Render(cam, indices);
-                else
-                    p.Render(cam, null);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void ToggleTrail()
-        {
-            foreach (var p in _particles)
-                p.Kind ^= ParticleKind.Trail;
-
-            Kind ^= ParticleKind.Trail;
         }
     }
 

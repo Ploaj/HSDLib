@@ -9,7 +9,7 @@ namespace HSDRawViewer.Rendering.Renderers
     {
         public int GeneratorCount { get => _generators.Count; }
 
-        public int ParticleCount { get => Generators.Sum(e => e.ParticleCount) + Particles.Count; }
+        public int ParticleCount { get => Particles.Count; }
 
         public int LiveGeneratorCount { get => Generators.Count; }
 
@@ -143,6 +143,10 @@ namespace HSDRawViewer.Rendering.Renderers
             for (int i = Generators.Count - 1; i >= 0; i--) 
             {
                 Generators[i].Update();
+
+                // remove dead particles
+                if (Generators[i].Dead)
+                    Generators.Remove(Generators[i]);
             }
 
             // process loose particles
@@ -155,9 +159,6 @@ namespace HSDRawViewer.Rendering.Renderers
                 if (Particles[i].Life <= 0)
                     Particles.Remove(Particles[i]);
             }
-
-            // remove destroyed particles from list
-            Generators.RemoveAll(e => e.Destroyed);
         }
 
         /// <summary>
@@ -166,14 +167,15 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="c"></param>
         public void Render(Camera c)
         {
-            // render the generators
-            foreach (var g in Generators)
-                if (g.TexG < TexGs.Count)
-                    g.Render(c, TexGs[g.TexG].GetGLIndices(_manager));
-
-            // render loose particles
-            foreach (var p in Particles)
-                p.Render(c, TexGs[p.TexG].GetGLIndices(_manager));
+            // render particles
+            var pos = c.ModelViewMatrix.ExtractTranslation();
+            foreach (var p in Particles.OrderBy(e => (e.Pos - pos).LengthSquared))
+            {
+                if (p.TexG >= 0)
+                    p.Render(c, TexGs[p.TexG].GetGLIndices(_manager));
+                else
+                    p.Render(c, null);
+            }
         }
 
         /// <summary>

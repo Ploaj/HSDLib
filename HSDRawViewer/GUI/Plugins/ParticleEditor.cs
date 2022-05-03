@@ -29,6 +29,8 @@ namespace HSDRawViewer.GUI.Plugins
                     generateArrayEditor.SetArrayFromProperty(this, "_generators");
 
                     SetupRendering();
+
+                    generateArrayEditor.ItemIndexOffset = g.EffectIDStart;
                 }
                 else
                 {
