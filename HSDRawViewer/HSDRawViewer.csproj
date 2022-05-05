@@ -231,16 +231,6 @@
     <Compile Include="GUI\Plugins\Melee\NewCollDataEditor.Designer.cs">
       <DependentUpon>NewCollDataEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditorActions.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditorDebug.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditorRendering.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionFromText.cs" />
     <Compile Include="GUI\Plugins\ParticleEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -421,7 +411,6 @@
     <Compile Include="GUI\Plugins\Melee\SISMenuDataEditor.Designer.cs">
       <DependentUpon>SISMenuDataEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
     <Compile Include="GUI\ProgressBarDisplay.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -445,12 +434,6 @@
     </Compile>
     <Compile Include="GUI\PropertyView.Designer.cs">
       <DependentUpon>PropertyView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditor.Designer.cs">
-      <DependentUpon>SubactionEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\TextureImportDialog.cs">
       <SubType>Form</SubType>
@@ -732,9 +715,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\PropertyView.resx">
       <DependentUpon>PropertyView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\SubactionEditor.resx">
-      <DependentUpon>SubactionEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\TextureImportDialog.resx">
       <DependentUpon>TextureImportDialog.cs</DependentUpon>
