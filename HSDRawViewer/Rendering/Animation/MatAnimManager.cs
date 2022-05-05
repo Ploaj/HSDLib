@@ -1,12 +1,10 @@
-﻿using HSDRaw;
-using HSDRaw.Common;
+﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.GX;
 using HSDRaw.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {

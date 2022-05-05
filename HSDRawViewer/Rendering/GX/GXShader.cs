@@ -18,18 +18,7 @@ namespace HSDRawViewer.Rendering.GX
         [YamlIgnore, Browsable(false)]
         public int SelectedBone { get; set; }
 
-        private Matrix4[] WorldTransforms = new Matrix4[400];
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="bind"></param>
-        public void SetBoneTransforms(Matrix4[] world, Matrix4[] bind)
-        {
-            Array.Copy(world, WorldTransforms, world.Length);
-            Array.Copy(bind, 0, WorldTransforms, Shader.MAX_BONES, bind.Length);
-        }
+        public Matrix4[] WorldTransforms = new Matrix4[400];
 
         /// <summary>
         /// 

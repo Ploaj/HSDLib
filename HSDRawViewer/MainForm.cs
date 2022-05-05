@@ -503,12 +503,16 @@ namespace HSDRawViewer
                 || SelectedDataNode.Accessor is HSD_ShapeAnimJoint
                 || SelectedDataNode.Accessor is HSD_FogDesc
                 || SelectedDataNode.Accessor is HSD_Camera
-                || SelectedDataNode.Accessor is SBM_ModelPart)
+                || SelectedDataNode.Accessor is SBM_ModelPart
+                || SelectedDataNode.Accessor is SBM_PhysicsGroup)
             {
                 //foreach (var v in dockPanel.Contents)
                 {
                     if (LastActiveContent is JobjEditorDock jedit && jedit.Visible)
                     {
+                        if (SelectedDataNode.Accessor is SBM_PhysicsGroup group)
+                            jedit.LoadPhysics(group);
+
                         if (SelectedDataNode.Accessor is HSD_MatAnimJoint matjoint)
                             jedit.LoadAnimation(matjoint);
 

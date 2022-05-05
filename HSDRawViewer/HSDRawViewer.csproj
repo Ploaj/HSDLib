@@ -471,6 +471,8 @@
     <Compile Include="Rendering\Animation\AnimManager.cs" />
     <Compile Include="Rendering\Animation\AnimNode.cs" />
     <Compile Include="Rendering\Animation\MotAnimManager.cs" />
+    <Compile Include="Rendering\Animation\PhysicsDynamics.cs" />
+    <Compile Include="Rendering\Animation\PhysicsPlayer.cs" />
     <Compile Include="Rendering\Animation\PhysicsSimulator.cs" />
     <Compile Include="Rendering\Animation\ShapeAnimManager.cs" />
     <Compile Include="Rendering\Camera.cs" />
@@ -480,6 +482,7 @@
     <Compile Include="Rendering\Models\DobjManager.cs" />
     <Compile Include="Rendering\Animation\MatAnimManager.cs" />
     <Compile Include="Rendering\Models\JobjDisplaySettings.cs" />
+    <Compile Include="Rendering\Models\LiveJObj.cs" />
     <Compile Include="Rendering\Models\MobjManager.cs" />
     <Compile Include="Rendering\Models\VertexBufferManager.cs" />
     <Compile Include="Rendering\GX\RenderMode.cs" />
@@ -514,7 +517,6 @@
     <Compile Include="TestFunctions.cs" />
     <Compile Include="Sound\DSP.cs" />
     <Compile Include="Sound\DSPPlayer.cs" />
-    <Compile Include="Tools\AnimationRetarget.cs" />
     <Compile Include="Tools\CustomClass.cs" />
     <Compile Include="Tools\FileIO.cs" />
     <Compile Include="Tools\FlagEnumEditor.cs">

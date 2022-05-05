@@ -149,7 +149,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void recalBoundingButton_Click(object sender, EventArgs e)
         {
-            ModelExporter exp = new ModelExporter(_jointEditor.JointManager.GetJOBJ(0), new ModelExportSettings(), new Tools.JointMap());
+            ModelExporter exp = new ModelExporter(_jointEditor.JointManager.GetJOBJ(0).Desc, new ModelExportSettings(), new Tools.JointMap());
 
             List<KAR_grStaticBoundingBox> staticBoxes = new List<KAR_grStaticBoundingBox>();
             List<KAR_grDynamicBoundingBoxes> dynamicBoxes = new List<KAR_grDynamicBoundingBoxes>();
@@ -238,7 +238,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            ModelExporter exp = new ModelExporter(_jointEditor.JointManager.GetJOBJ(0), new ModelExportSettings(), new Tools.JointMap());
+            ModelExporter exp = new ModelExporter(_jointEditor.JointManager.GetJOBJ(0).Desc, new ModelExportSettings(), new Tools.JointMap());
 
             List<GXVector3> points = new List<GXVector3>();
 

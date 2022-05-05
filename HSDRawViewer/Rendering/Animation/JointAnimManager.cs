@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using OpenTK;
 using System;
@@ -14,7 +15,7 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public interface IJointFrameModifier
     {
-        bool OverrideAnim(float frame, int boneIndex, HSD_JOBJ jobj, ref float TX, ref float TY, ref float TZ, ref float RX, ref float RY, ref float RZ, ref float SX, ref float SY, ref float SZ);
+        bool OverrideAnim(LiveJObj jobj, float frame);
     }
 
     /// <summary>
@@ -28,11 +29,11 @@ namespace HSDRawViewer.Rendering
 
         private int index = 0;
 
-        public List<IJointFrameModifier> FrameModifier = new List<IJointFrameModifier>();
+        public List<IJointFrameModifier> FrameModifier { get; set; } = new List<IJointFrameModifier>();
 
-        public bool EnableBoneLookup = false;
+        public bool EnableBoneLookup { get; set; } = false;
 
-        public Dictionary<int, int> BoneLookup = new Dictionary<int, int>();
+        public Dictionary<int, int> BoneLookup { get; internal set; } = new Dictionary<int, int>();
 
         /// <summary>
         /// 
@@ -96,87 +97,49 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="frame"></param>
-        /// <param name="boneIndex"></param>
         /// <param name="jobj"></param>
-        /// <returns></returns>
-        public virtual void GetAnimatedValues(float frame, int boneIndex, HSD_JOBJ jobj, out Vector3 trans, out Quaternion rot, out Vector3 scale)
+        public void ApplyAnimation(LiveJObj jobj, float frame)
         {
-            GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
+            if (jobj == null)
+                return;
 
-            trans = new Vector3(TX, TY, TZ);
-            rot = Math3D.EulerToQuat(RX, RY, RZ);
-            scale = new Vector3(SX, SY, SZ);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="frame"></param>
-        /// <param name="boneIndex"></param>
-        /// <param name="jobj"></param>
-        /// <returns></returns>
-        public virtual Matrix4 GetAnimatedMatrix(float frame, int boneIndex, HSD_JOBJ jobj)
-        {
-            GetAnimatedState(frame, boneIndex, jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ);
-
-            return Matrix4.CreateScale(SX, SY, SZ) *
-                Math3D.CreateMatrix4FromEuler(RX, RY, RZ) *
-                Matrix4.CreateTranslation(TX, TY, TZ);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="frame"></param>
-        /// <param name="boneIndex"></param>
-        /// <param name="jobj"></param>
-        /// <returns></returns>
-        public virtual void GetAnimatedState(float frame, int boneIndex, HSD_JOBJ jobj, out float TX, out float TY, out float TZ, out float RX, out float RY, out float RZ, out float SX, out float SY, out float SZ)
-        {
-            TX = jobj.TX;
-            TY = jobj.TY;
-            TZ = jobj.TZ;
-            RX = jobj.RX;
-            RY = jobj.RY;
-            RZ = jobj.RZ;
-            SX = jobj.SX;
-            SY = jobj.SY;
-            SZ = jobj.SZ;
-
-            // use bone lookup if enabled
-            if (EnableBoneLookup)
+            foreach (var j in jobj.Enumerate)
             {
-                if (BoneLookup.ContainsKey(boneIndex))
-                    boneIndex = BoneLookup[boneIndex];
-                else
-                    return;
-            }
-
-            // set keys to animated values
-            if (boneIndex < Nodes.Count)
-            {
-                AnimNode node = Nodes[boneIndex];
-                foreach (FOBJ_Player t in node.Tracks)
+                // use bone lookup if enabled
+                int boneIndex = j.Index;
+                if (EnableBoneLookup)
                 {
-                    switch (t.JointTrackType)
+                    if (BoneLookup.ContainsKey(boneIndex))
+                        boneIndex = BoneLookup[boneIndex];
+                    else
+                        return;
+                }
+
+                // set keys to animated values
+                if (boneIndex < Nodes.Count)
+                {
+                    AnimNode node = Nodes[boneIndex];
+                    foreach (FOBJ_Player t in node.Tracks)
                     {
-                        case JointTrackType.HSD_A_J_ROTX: RX = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_ROTY: RY = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_ROTZ: RZ = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_TRAX: TX = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_TRAY: TY = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_TRAZ: TZ = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_SCAX: SX = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_SCAY: SY = t.GetValue(frame); break;
-                        case JointTrackType.HSD_A_J_SCAZ: SZ = t.GetValue(frame); break;
+                        switch (t.JointTrackType)
+                        {
+                            case JointTrackType.HSD_A_J_ROTX: j.Rotation.X = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_ROTY: j.Rotation.Y = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_ROTZ: j.Rotation.Z = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_TRAX: j.Translation.X = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_TRAY: j.Translation.Y = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_TRAZ: j.Translation.Z = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_SCAX: j.Scale.X = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_SCAY: j.Scale.Y = t.GetValue(frame); break;
+                            case JointTrackType.HSD_A_J_SCAZ: j.Scale.Z = t.GetValue(frame); break;
+                        }
                     }
                 }
-            }
 
-            // apply frame modifiers
-            foreach (var fm in FrameModifier)
-                fm.OverrideAnim(frame, boneIndex, jobj, ref TX, ref TY, ref TZ, ref RX, ref RY, ref RZ, ref SX, ref SY, ref SZ);
+                // TODO: apply frame modifiers
+                foreach (var fm in FrameModifier)
+                    fm.OverrideAnim(j, frame);
+            }
         }
 
         #region AnimationTypeLoading

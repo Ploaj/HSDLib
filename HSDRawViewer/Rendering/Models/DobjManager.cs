@@ -14,33 +14,35 @@ namespace HSDRawViewer.Rendering.Models
     /// </summary>
     public class DOBJManager
     {
+        // Constants
+        private static int MAX_WEIGHTS = 6;
+        private static int WEIGHT_STRIDE = 10;
+
+        // Rendering Cache
         public int DOBJCount { get => DobjCacheLookup.Count; }
 
+        private Dictionary<HSD_DOBJ, CachedDOBJ> DobjCacheLookup = new Dictionary<HSD_DOBJ, CachedDOBJ>();
+
+        // Render Parameters
         public bool RenderTextures { get; set; } = true;
 
         public bool RenderVertexColor { get; set; } = true;
 
-        // Attributes
         public Vector3 OverlayColor = Vector3.One;
 
+        // Attributes
         public float ShapeBlend = 0;
 
         // Resource Managers
         private VertexBufferManager BufferManager = new VertexBufferManager();
         private MobjManager MOBJManager = new MobjManager();
 
-        // Rendering Cache
-        private Dictionary<HSD_DOBJ, CachedDOBJ> DobjCacheLookup = new Dictionary<HSD_DOBJ, CachedDOBJ>();
-
-        private static int MAX_WEIGHTS = 6;
-        private static int WEIGHT_STRIDE = 10;
-
-        public class CachedDOBJ
+        private class CachedDOBJ
         {
             public List<CachedPOBJ> CachedPObjs = new List<CachedPOBJ>();
         }
 
-        public class CachedPOBJ
+        private class CachedPOBJ
         {
             public POBJ_FLAG Flag
             {
@@ -58,7 +60,7 @@ namespace HSDRawViewer.Rendering.Models
             public List<CachedDL> DisplayLists = new List<CachedDL>();
         }
 
-        public class CachedDL
+        private class CachedDL
         {
             public PrimitiveType PrimType;
 
@@ -123,7 +125,7 @@ namespace HSDRawViewer.Rendering.Models
                 MOBJManager.BindMOBJ(shader, dobj.Mobj, parentJOBJ, matAnim);
 
             // bind buffer
-            if(BufferManager.BindBuffer(shader, dobj, (int)ShapeBlend, (int)ShapeBlend + 1, ShapeBlend - (int)ShapeBlend))
+            if(BufferManager.EnableBuffers(shader, dobj, (int)ShapeBlend, (int)ShapeBlend + 1, ShapeBlend - (int)ShapeBlend))
             {
                 // render pobjs
                 foreach (var p in DobjCacheLookup[dobj].CachedPObjs)
@@ -167,7 +169,7 @@ namespace HSDRawViewer.Rendering.Models
                 }
 
                 // unbind buffer
-                BufferManager.Unbind(shader);
+                BufferManager.Disable();
             }
         }
 
@@ -190,9 +192,9 @@ namespace HSDRawViewer.Rendering.Models
             // get all dobjs
             List<HSD_DOBJ> dobj = new List<HSD_DOBJ>(0);
 
-            foreach (var j in root.BreathFirstList)
-                if (j.Dobj != null)
-                    dobj.AddRange(j.Dobj.List);
+            foreach (var j in root.Enumerate)
+                if (j.Desc.Dobj != null)
+                    dobj.AddRange(j.Desc.Dobj.List);
 
             // 
             Dictionary<HSDStruct, GX_Attribute[]> structToAttrs = new Dictionary<HSDStruct, GX_Attribute[]>();
@@ -336,20 +338,6 @@ namespace HSDRawViewer.Rendering.Models
                     foreach (var t in no.TextureAnims)
                         foreach (var texture in t.Textures)
                             MOBJManager.PreLoadTexture(texture);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="function"></param>
-        public void RunOnDObjCache(Action<int, CachedDOBJ> function)
-        {
-            int index = 0;
-            foreach (var d in DobjCacheLookup)
-            {
-                function(index, d.Value);
-                index++;
-            }
         }
     }
 }

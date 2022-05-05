@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
 using System;
 using System.Windows.Forms;
@@ -37,6 +38,15 @@ namespace HSDRawViewer.GUI.Plugins
             Editor = new JobjEditor();
             Editor.Dock = DockStyle.Fill;
             Controls.Add(Editor);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public void LoadPhysics(SBM_PhysicsGroup group)
+        {
+            Editor.LoadPhysics(group);
         }
 
         /// <summary>

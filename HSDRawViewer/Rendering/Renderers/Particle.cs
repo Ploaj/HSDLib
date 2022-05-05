@@ -351,12 +351,19 @@ namespace HSDRawViewer.Rendering.Renderers
             var vec = m.ExtractTranslation() - Pos;
 
             if (range * range < vec.LengthSquared)
-                return false;
-            else
             {
-                Velocity += vec.Normalized();
-                return true;
+                if (vec.LengthSquared == 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    Velocity += vec * speed / vec.Length;
+                    return false;
+                }
             }
+            else
+                return false;
         }
 
         /// <summary>
@@ -626,7 +633,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xB8: // Move to JOBJ
                             {
-                                byte ji = cmdList[cmdPtr++];
+                                byte jointindex = cmdList[cmdPtr++];
                                 float range = ReadFloat();
                                 float speed = ReadFloat();
                                 if (MoveToMatrix(Matrix4.Identity, range, speed))

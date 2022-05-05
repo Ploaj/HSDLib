@@ -269,48 +269,5 @@ namespace HSDRawViewer.Rendering.Models
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="shader"></param>
-        private static void LoadTextureConstants(Shader shader)
-        {
-            var transform = Matrix4.Identity;
-            for (int i = 0; i < 4; i++)
-            {
-                shader.SetInt($"TEX{i}.texIndex", 0);
-                shader.SetInt($"TEX{i}.light_type", 0);
-                shader.SetInt($"TEX{i}.color_operation", 0);
-                shader.SetInt($"TEX{i}.alpha_operation", 0);
-                shader.SetInt($"TEX{i}.coord_type", 0);
-                shader.SetFloat($"TEX{i}.blend", 0);
-                shader.SetBoolToInt($"TEX{i}.mirror_fix", false);
-                shader.SetVector2($"TEX{i}.uv_scale", 1, 1);
-                shader.SetMatrix4x4($"TEX{i}.transform", ref transform);
-
-                shader.SetBoolToInt($"hasTEX{i}Tev", false);
-                shader.SetInt($"TEX{i}Tev.color_op", 0);
-                shader.SetInt($"TEX{i}Tev.color_bias", 0);
-                shader.SetInt($"TEX{i}Tev.color_scale", 0);
-                shader.SetBoolToInt($"TEX{i}Tev.color_clamp", false);
-                shader.SetInt($"TEX{i}Tev.color_a", 0);
-                shader.SetInt($"TEX{i}Tev.color_b", 0);
-                shader.SetInt($"TEX{i}Tev.color_c", 0);
-                shader.SetInt($"TEX{i}Tev.color_d", 0);
-
-                shader.SetInt($"TEX{i}Tev.alpha_op", 0);
-                shader.SetInt($"TEX{i}Tev.alpha_bias", 0);
-                shader.SetInt($"TEX{i}Tev.alpha_scale", 0);
-                shader.SetBoolToInt($"TEX{i}Tev.alpha_clamp", false);
-                shader.SetInt($"TEX{i}Tev.alpha_a", 0);
-                shader.SetInt($"TEX{i}Tev.alpha_b", 0);
-                shader.SetInt($"TEX{i}Tev.alpha_c", 0);
-                shader.SetInt($"TEX{i}Tev.alpha_d", 0);
-
-                shader.SetColor($"TEX{i}Tev.konst", System.Drawing.Color.White, 255);
-                shader.SetColor($"TEX{i}Tev.tev0", System.Drawing.Color.White, 255);
-                shader.SetColor($"TEX{i}Tev.tev1", System.Drawing.Color.White, 255);
-            }
-        }
     }
 }

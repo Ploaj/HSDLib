@@ -50,8 +50,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 Anims = part.Anims.Array.Select(e => new JointAnimManager(e)).ToArray();
             }
 
-            public bool OverrideAnim(float frame, int boneIndex, HSD_JOBJ jobj, ref float TX, ref float TY, ref float TZ, ref float RX, ref float RY, ref float RZ, ref float SX, ref float SY, ref float SZ)
+            public bool OverrideAnim(LiveJObj jobj, float frame)
             {
+                int boneIndex = jobj.Index;
+
                 // check if bone index is in entries
                 if (AnimIndex == -1 || boneIndex < StartBone || boneIndex >= StartBone + Anims[0].NodeCount)
                     return false;
@@ -62,7 +64,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     {
                         var anim = Anims[AnimIndex];
                         if (anim.Nodes[boneIndex - StartBone].Tracks.Count > 0)
-                            anim.GetAnimatedState(0, boneIndex - StartBone, jobj, out TX, out TY, out TZ, out RX, out RY, out RZ, out SX, out SY, out SZ);
+                            anim.ApplyAnimation(jobj, 0);
+                            // anim.GetAnimatedState(0, boneIndex - StartBone, jobj, out TX, out TY, out TZ, out RX, out RY, out RZ, out SX, out SY, out SZ);
                         return true;
                     }
 
@@ -109,6 +112,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private static Vector3 HitboxSelectedColor = new Vector3(1, 1, 1);
         private float ModelScale = 1f;
+        private float ItemScale = 1f;
 
         private FighterAJManager AJManager;
 
@@ -163,9 +167,6 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// </summary>
         private void InitRendering()
         {
-            // set model scale
-            JointManager.ModelScale = ModelScale;
-
             // clear hidden dobjs
             JointManager.ShowAllDOBJs();
 
@@ -677,6 +678,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 //JointManager._lightParam.UseCameraLight = true;
             }
 
+            // scale model
+            JointManager.SetWorldTransform(0, Matrix4.CreateScale(ModelScale));
+
             // render character model
             if (!SubactionProcess.CharacterInvisibility && modelToolStripMenuItem.Checked)
                 JointManager.Render(cam, false);
@@ -684,7 +688,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // render item model
             if (ItemJointManager != null && FighterData != null)
             {
-                ItemJointManager.SetWorldTransform(1, JointManager.GetWorldTransform(FighterData.ModelLookupTables.ItemHoldBone));
+                ItemJointManager.SetWorldTransform(1, Matrix4.CreateScale(ItemScale) * JointManager.GetWorldTransform(FighterData.ModelLookupTables.ItemHoldBone));
                 ItemJointManager.Render(cam, false);
             }
 
@@ -880,8 +884,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 {
                     var item = it.Items.Articles[id];
 
-                    if (item.Model.RootModelJoint != null)
+                    if (item.Model.RootModelJoint != null && 
+                        ItemJointManager.GetJOBJ(0)?.Desc != item.Model.RootModelJoint)
+                    {
                         ItemJointManager.SetJOBJ(item.Model.RootModelJoint);
+                        ItemScale = item.Parameters.ModelScale;
+                    }
                 }
             }
         }
@@ -972,7 +980,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // load figatree to manager and anim editor
             JointManager.SetFigaTree(tree);
-            _animEditor.SetJoint(JointManager.GetJOBJ(0), JointManager.Animation);
+            _animEditor.SetJoint(JointManager.GetJOBJ(0).Desc, JointManager.Animation);
 
             // set backup anim
             BackupAnim = new JointAnimManager();

@@ -86,101 +86,106 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         /// <param name="dobj"></param>
         /// <returns></returns>
-        public bool BindBuffer(Shader GXShader, HSD_DOBJ dobj, int shapeset1, int shapeset2, float blend)
+        public bool EnableBuffers(Shader GXShader, HSD_DOBJ dobj, int shapeset1, int shapeset2, float blend)
         {
             if (!attributeToBuffer.ContainsKey(dobj))
                 return false;
 
+            // set blend shape
             GXShader.SetFloat("shape_blend", blend);
 
             // normal attributes
             GL.BindBuffer(BufferTarget.ArrayBuffer, attributeToBuffer[dobj]);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"), 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
+            GL.EnableVertexAttribArray(3);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
+            GL.EnableVertexAttribArray(4);
+            GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"), 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
+            GL.EnableVertexAttribArray(5);
+            GL.VertexAttribPointer(5, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
+            GL.EnableVertexAttribArray(6);
+            GL.VertexAttribPointer(6, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
+            GL.EnableVertexAttribArray(7);
+            GL.VertexAttribPointer(7, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 104);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX2"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX2"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 104);
+            GL.EnableVertexAttribArray(8);
+            GL.VertexAttribPointer(8, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 112);
 
-            GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX3"));
-            GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX3"), 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 112);
+            GL.EnableVertexAttribArray(9);
+            GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
 
 
             // shape sets (if exists)
-            if(dobjToShapes.ContainsKey(dobj))
+            if (dobjToShapes.ContainsKey(dobj))
             {
                 if (shapeset1 < dobjToShapes[dobj].Length)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, dobjToShapes[dobj][shapeset1]);
 
-                    GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
-                    GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"), 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 0);
+                    GL.EnableVertexAttribArray(1);
+                    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 0);
 
-                    GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
-                    GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"), 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 12);
+                    GL.EnableVertexAttribArray(2);
+                    GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 12);
                 }
 
                 if (shapeset2 < dobjToShapes[dobj].Length)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, dobjToShapes[dobj][shapeset2]);
 
-                    GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS_SHAPE"));
-                    GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS_SHAPE"), 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 0);
+                    GL.EnableVertexAttribArray(10);
+                    GL.VertexAttribPointer(10, 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 0);
 
-                    GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM_SHAPE"));
-                    GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM_SHAPE"), 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 12);
+                    GL.EnableVertexAttribArray(11);
+                    GL.VertexAttribPointer(11, 3, VertexAttribPointerType.Float, false, GX_Shape.Stride, 12);
                 }
             }
             else
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, attributeToBuffer[dobj]);
 
-                GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS_SHAPE"));
-                GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS_SHAPE"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
+                GL.EnableVertexAttribArray(10);
+                GL.VertexAttribPointer(10, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
 
-                GL.EnableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM_SHAPE"));
-                GL.VertexAttribPointer(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM_SHAPE"), 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
+                GL.EnableVertexAttribArray(11);
+                GL.VertexAttribPointer(11, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
             }
             return true;
         }
 
-        public void Unbind(Shader GXShader)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="GXShader"></param>
+        public void Disable()
         {
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("PNMTXIDX"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TAN"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_BTAN"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_CLR0"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX0"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX1"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX2"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_TEX3"));
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
+            GL.DisableVertexAttribArray(3);
+            GL.DisableVertexAttribArray(4);
+            GL.DisableVertexAttribArray(5);
+            GL.DisableVertexAttribArray(6);
+            GL.DisableVertexAttribArray(7);
+            GL.DisableVertexAttribArray(8);
+            GL.DisableVertexAttribArray(9);
 
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_POS_SHAPE"));
-            GL.DisableVertexAttribArray(GXShader.GetVertexAttributeUniformLocation("GX_VA_NRM_SHAPE"));
+            GL.DisableVertexAttribArray(10);
+            GL.DisableVertexAttribArray(11);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }

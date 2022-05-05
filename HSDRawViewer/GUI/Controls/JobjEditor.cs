@@ -22,6 +22,7 @@ using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Converters.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.GUI.Controls;
+using HSDRaw.Melee.Pl;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -87,6 +88,11 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 // refresh
                 listDOBJ.Invalidate();
+
+                if (propertyGrid1.SelectedObject is HSD_JOBJ j)
+                {
+                    JointManager.GetLiveJOBJ(j).ResetTransforms();
+                }
             };
 
             listDOBJ.SelectionMode = SelectionMode.MultiExtended;
@@ -322,19 +328,6 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ob"></param>
-        /// <returns></returns>
-        private bool IsSelected(object ob)
-        {
-            foreach (var v in propertyGrid1.SelectedObjects)
-                if (v == ob)
-                    return true;
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="fog"></param>
         public void SetFog(HSD_FogDesc fog)
         {
@@ -348,6 +341,17 @@ namespace HSDRawViewer.GUI.Plugins
         public void SetCamera(HSD_Camera camera)
         {
             viewport.Camera.LoadFromHSD(camera);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="group"></param>
+        public void LoadPhysics(SBM_PhysicsGroup group)
+        {
+            var vp = viewport;
+            vp.AnimationTrackEnabled = true;
+            JointManager.LoadPhysics(group.DynamicDesc.Array, group.Hitbubbles.Array);
         }
 
         /// <summary>
@@ -400,6 +404,32 @@ namespace HSDRawViewer.GUI.Plugins
             vp.Frame = 0;
             vp.MaxFrame = motFile.EndTime * 60;
             JointManager.SetMOT(jointTable, motFile);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadPhysicsDesc(IEnumerable<SBM_DynamicDesc> phys, IEnumerable<SBM_DynamicHitBubble> bubbles)
+        {
+            //dynamics = PhysicsSimulator.Init(phys, bubbles, JointManager);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetPhysic()
+        {
+            //if (dynamics != null)
+            //    dynamics.ResetPhysics(JointManager);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearPhysics()
+        {
+            //dynamics = null;
+            //JointManager.ClearOverrideLocalTransform();
         }
 
         /// <summary>
@@ -1154,7 +1184,7 @@ namespace HSDRawViewer.GUI.Plugins
                     HSDRawFile animFile = new HSDRawFile();
                     animFile.Roots.Add(new HSDRootNode()
                     {
-                        Data = JointManager.Animation.ToAnimJoint(JointManager.GetJOBJ(0), setting.Flags),
+                        Data = JointManager.Animation.ToAnimJoint(JointManager.GetJOBJ(0).Desc, setting.Flags),
                         Name = setting.Symbol
                     });
                     animFile.Save(f);
@@ -1301,8 +1331,8 @@ namespace HSDRawViewer.GUI.Plugins
                     {
                         for(int i = 0; i < temp.JointCount; i++)
                         {
-                            var old = JointManager.GetJOBJ(i);
-                            var n = temp.GetJOBJ(i);
+                            var old = JointManager.GetJOBJ(i).Desc;
+                            var n = temp.GetJOBJ(i).Desc;
                             old.TX = n.TX; old.TY = n.TY; old.TZ = n.TZ;
                             old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
                             old.SX = n.SX; old.SY = n.SY; old.SZ = n.SZ;

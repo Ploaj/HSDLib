@@ -6,19 +6,19 @@
 
 #define MAX_BONES 200
 
-in float PNMTXIDX;
-in vec3 GX_VA_POS;
-in vec3 GX_VA_NRM;
-in vec3 GX_VA_TAN;
-in vec3 GX_VA_BTAN;
-in vec2 GX_VA_TEX0;
-in vec2 GX_VA_TEX1;
-in vec2 GX_VA_TEX2;
-in vec2 GX_VA_TEX3;
-in vec4 GX_VA_CLR0;
+layout (location = 0) in float PNMTXIDX;
+layout (location = 1) in vec3 GX_VA_POS;
+layout (location = 2) in vec3 GX_VA_NRM;
+layout (location = 3) in vec3 GX_VA_TAN;
+layout (location = 4) in vec3 GX_VA_BTAN;
+layout (location = 5) in vec2 GX_VA_TEX0;
+layout (location = 6) in vec2 GX_VA_TEX1;
+layout (location = 7) in vec2 GX_VA_TEX2;
+layout (location = 8) in vec2 GX_VA_TEX3;
+layout (location = 9) in vec4 GX_VA_CLR0;
 
-in vec3 GX_VA_POS_SHAPE;
-in vec3 GX_VA_NRM_SHAPE;
+layout (location = 10) in vec3 GX_VA_POS_SHAPE;
+layout (location = 11) in vec3 GX_VA_NRM_SHAPE;
 
 out vec3 posVA;
 out vec3 vertPosition;

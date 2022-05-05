@@ -156,7 +156,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 Particles[i].Process();
 
                 // remove dead particles
-                if (Particles[i].Life <= 0)
+                if (Particles[i].Life < 0)
                     Particles.Remove(Particles[i]);
             }
         }
