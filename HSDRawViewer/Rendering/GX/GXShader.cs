@@ -68,11 +68,6 @@ namespace HSDRawViewer.Rendering.GX
 
             // setup bone binds
             _shader.SetWorldTransformBones(WorldTransforms);
-            // _shader.SetBindTransformBones(BindTransforms);
-
-            //var tb = BindTransforms;
-            //if (tb.Length > 0)
-            //    _shader.SetMatrix4x4("binds", tb);
 
             // lighting
             light.Bind(_shader);
@@ -86,6 +81,8 @@ namespace HSDRawViewer.Rendering.GX
         /// </summary>
         public void Unbind()
         {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindVertexArray(0);
             GL.UseProgram(0);
         }
 

@@ -238,8 +238,10 @@ namespace HSDRawViewer.Rendering.Models
             // Render DOBJS
             RenderDOBJs(camera);
 
+            // no longer use shader
+            _gxShader.Unbind();
+
             GL.PopAttrib();
-            GL.UseProgram(0);
 
             // render splines
             DrawSplines(camera);

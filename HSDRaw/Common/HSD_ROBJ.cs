@@ -35,7 +35,7 @@
 
         public override HSD_ROBJ Next { get => _s.GetReference<HSD_ROBJ>(0x00); set => _s.SetReference(0x00, value); }
 
-        private int Flags { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public int Flags { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
         public REFTYPE RefType { get => (REFTYPE)(Flags & 0x70000000); set => Flags = (Flags & ~0x70000000) | ((int)value & 0x70000000); }
 

@@ -98,7 +98,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="jobj"></param>
-        public void ApplyAnimation(LiveJObj jobj, float frame)
+        public virtual void ApplyAnimation(LiveJObj jobj, float frame)
         {
             if (jobj == null)
                 return;

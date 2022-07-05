@@ -167,9 +167,6 @@ namespace HSDRawViewer.Rendering.Models
                     foreach (var dl in p.DisplayLists)
                         GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
                 }
-
-                // unbind buffer
-                BufferManager.Disable();
             }
         }
 

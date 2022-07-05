@@ -130,6 +130,13 @@ namespace HSDRaw
 
                     var objectOff = r.ReadInt32() + 0x20;
 
+                    //if (objectOff % 4 != 0)
+                    //{
+
+                    //    Console.WriteLine(objectOff.ToString("X") + " " + offset.ToString("X"));
+                    //    continue;
+                    //}
+
                     // if we need to read past end of file then we need to include filesize as an offset
                     // this fixes files that had previously been manually relocated to end of file
                     if(objectOff > relocOffset && !OffsetContain.Contains(fsize))

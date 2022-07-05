@@ -57,13 +57,13 @@
     <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="netstandard" />
+    <Reference Include="OpenTK, Version=3.3.2.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTK.3.3.2\lib\net20\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.GLControl, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.GLControl.3.1.0\lib\net20\OpenTK.GLControl.dll</HintPath>
     </Reference>
-    <Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -87,8 +87,8 @@
     <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.1.6643.41644, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WeifenLuo.WinFormsUI.Docking.2.1.0\lib\net20\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
-    <Reference Include="YamlDotNet, Version=9.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.9.1.0\lib\net45\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +231,21 @@
     <Compile Include="GUI\Plugins\Melee\NewCollDataEditor.Designer.cs">
       <DependentUpon>NewCollDataEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionEditor.Designer.cs" />
+    <Compile Include="GUI\Plugins\Melee\SubactionEditorActions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionEditorDebug.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionEditorRendering.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Plugins\Melee\SubactionFromText.cs" />
+    <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
     <Compile Include="GUI\Plugins\ParticleEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -519,6 +534,7 @@
     <Compile Include="Tools\RawTimer.cs" />
     <Compile Include="Tools\Simpoly.cs" />
     <Compile Include="Tools\SubactionManager.cs" />
+    <None Include="OpenTK.dll.config" />
     <None Include="Shader\ps.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -555,7 +571,6 @@
     <None Include="Melee\command_item.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="OpenTK.dll.config" />
     <None Include="Resources\ts_importfile.png" />
     <None Include="Resources\ts_exportfile.png" />
     <None Include="Resources\ts_clone.png" />
@@ -619,6 +634,7 @@
     <EmbeddedResource Include="GUI\Plugins\Melee\NewCollDataEditor.resx">
       <DependentUpon>NewCollDataEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Plugins\Melee\SubactionEditor.resx" />
     <EmbeddedResource Include="GUI\Plugins\ParticleEditor.resx">
       <DependentUpon>ParticleEditor.cs</DependentUpon>
     </EmbeddedResource>

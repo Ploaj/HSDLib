@@ -4,6 +4,7 @@ using HSDRaw.Common;
 using OpenTK;
 using System.Diagnostics;
 using System.Collections.Generic;
+using HSDRawViewer.Rendering.Models;
 
 namespace HSDRawViewer.Rendering
 {
@@ -15,64 +16,70 @@ namespace HSDRawViewer.Rendering
         private MOT_FILE _motFile;
         private short[] _motJointTable;
 
-        //public override Matrix4 GetAnimatedMatrix(float frame, int boneIndex, HSD_JOBJ jobj)
-        //{
-        //    float TX = jobj.TX;
-        //    float TY = jobj.TY;
-        //    float TZ = jobj.TZ;
-        //    float RX = jobj.RX;
-        //    float RY = jobj.RY;
-        //    float RZ = jobj.RZ;
-        //    float SX = jobj.SX;
-        //    float SY = jobj.SY;
-        //    float SZ = jobj.SZ;
+        public override void ApplyAnimation(LiveJObj jobj, float frame)
+        {
+            foreach (var v in jobj.Enumerate)
+                ApplyAnimation0(v, frame);
+        }
 
-        //    Quaternion rotationOverride = Math3D.EulerToQuat(RX, RY, RZ);
+        private void ApplyAnimation0(LiveJObj jobj, float frame)
+        {
+            var joints = _motFile.Joints.FindAll(
+                e => e.BoneID >= 0 && 
+                e.BoneID < _motJointTable.Length && 
+                _motJointTable[e.BoneID] == jobj.Index);
 
-        //    var joints = _motFile.Joints.FindAll(e => e.BoneID >= 0 && e.BoneID < _motJointTable.Length && _motJointTable[e.BoneID] == boneIndex);
+            foreach (var j in joints)
+            {
+                var key = j.GetKey(frame / 60f);
+                if (key == null)
+                {
+                    continue;
+                }
 
-        //    foreach (var j in joints)
-        //    {
-        //        var key = j.GetKey(frame / 60f);
-        //        if (key == null)
-        //        {
-        //            continue;
-        //        }
+                if (j.TrackFlag.HasFlag(MOT_FLAGS.TRANSLATE))
+                {
+                    jobj.Translation = new Vector3(jobj.Desc.TX, jobj.Desc.TY, jobj.Desc.TZ) + new Vector3(key.X, key.Y, key.Z);
+                }
+                if (j.TrackFlag.HasFlag(MOT_FLAGS.SCALE))
+                {
+                    jobj.Scale = new Vector3(jobj.Desc.SX, jobj.Desc.SY, jobj.Desc.SZ) + new Vector3(key.X, key.Y, key.Z);
+                }
+                if (j.TrackFlag.HasFlag(MOT_FLAGS.ROTATE))
+                {
+                    var dir = new Vector3(key.X, key.Y, key.Z);
+                    var angle = key.W;
 
-        //        if (j.TrackFlag.HasFlag(MOT_FLAGS.TRANSLATE))
-        //        {
-        //            TX += key.X;
-        //            TY += key.Y;
-        //            TZ += key.Z;
-        //        }
-        //        if (j.TrackFlag.HasFlag(MOT_FLAGS.SCALE))
-        //        {
-        //            SX += key.X;
-        //            SY += key.Y;
-        //            SZ += key.Z;
-        //        }
-        //        if (j.TrackFlag.HasFlag(MOT_FLAGS.ROTATE))
-        //        {
-        //            rotationOverride = Math3D.EulerToQuat(RX, RY, RZ);
+                    ///
+                    //var local_2a4 = new Vector3(org_axis_vector.X, org_axis_vector.Y, org_axis_vector.Z);
+                    //if (dynamic_params.MaxAngleChange < Vector3.CalculateAngle(axis_vector, local_2a4))
+                    //{
+                    //    var VStack688 = Vector3.Cross(local_2a4, axis_vector).Normalized();
+                    //    local_2a4.RotateAboutUnitAxis(dynamic_params.MaxAngleChange, VStack688); // lbvector_RotateAboutUnitAxis(dynamic_params.MaxAngleChange, ref local_2a4, VStack688);
+                    //    axis_vector = local_2a4;
+                    //}
 
-        //            var dir = new Vector3(key.X, key.Y, key.Z);
-        //            var angle = key.W;
+                    //var rot = new Vector3(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ);
+                    //// var ang = Vector3.CalculateAngle(rot, dir);
 
-        //            float rot_angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitX, dir));
-        //            if (Math.Abs(rot_angle) > 0.000001f)
-        //            {
-        //                Vector3 rot_axis = Vector3.Cross(Vector3.UnitX, dir).Normalized();
-        //                rotationOverride *= Quaternion.FromAxisAngle(rot_axis, rot_angle);
-        //            }
+                    //rot.RotateAboutUnitAxis(angle * (float)Math.PI / 180, Vector3.Cross(Vector3.UnitX, dir));
+                    //jobj.Rotation.Xyz = rot;
 
-        //            rotationOverride *= Quaternion.FromEulerAngles(angle * (float)Math.PI / 180, 0, 0);
-        //        }
-        //    }
 
-        //    return Matrix4.CreateScale(SX, SY, SZ) *
-        //        Matrix4.CreateFromQuaternion(rotationOverride) *
-        //        Matrix4.CreateTranslation(TX, TY, TZ);
-        //}
+                    var rotationOverride = Math3D.EulerToQuat(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ);
+
+                    float rot_angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitX, dir));
+                    if (Math.Abs(rot_angle) > 0.000001f)
+                    {
+                        Vector3 rot_axis = Vector3.Cross(Vector3.UnitX, dir).Normalized();
+                        rotationOverride *= Quaternion.FromAxisAngle(rot_axis, rot_angle);
+                    }
+
+                    rotationOverride *= Quaternion.FromEulerAngles(angle * (float)Math.PI / 180, 0, 0);
+                    jobj.Rotation.Xyz = Matrix4.CreateFromQuaternion(rotationOverride).ExtractRotationEuler();
+                }
+            }
+        }
 
         /// <summary>
         /// 
