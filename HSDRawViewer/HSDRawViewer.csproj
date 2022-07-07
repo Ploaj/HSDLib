@@ -523,7 +523,7 @@
     <Compile Include="Tools\GUITools.cs" />
     <Compile Include="Tools\ImageTools.cs" />
     <Compile Include="Tools\JointMap.cs" />
-    <Compile Include="Tools\OpenTKExtensions.cs" />
+    <Compile Include="Extensions\OpenTKExtensions.cs" />
     <Compile Include="Tools\ObjectExtension.cs" />
     <Compile Include="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>

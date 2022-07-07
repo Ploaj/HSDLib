@@ -107,7 +107,7 @@ namespace HSDRawViewer
         /// <param name="angle"></param>
         /// <param name="v"></param>
         /// <param name="axis"></param>
-        public static void RotateAboutUnitAxis(ref this Vector3 v, float angle, Vector3 axis)
+        public static void RotateAboutUnitAxis(this Vector3 v, float angle, Vector3 axis)
         {
             // The implementation is unnecessarily complex. the idea is to reduce the problem to the
             // case where the rotation axis is pointing along the z-axis by using two initial rotations,
