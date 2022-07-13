@@ -260,6 +260,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // update alt group links
             foreach (var v in newLines)
             {
+                if (v == null)
+                    continue;
+
                 if (lineToAltNext.ContainsKey(v))
                     v.NextLineAltGroup = (short)collLineToIndex[lineToCollLine[lineToAltNext[v]]];
 

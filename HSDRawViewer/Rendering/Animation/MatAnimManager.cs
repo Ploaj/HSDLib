@@ -56,11 +56,14 @@ namespace HSDRawViewer.Rendering
 
         public Matrix4 Transform { get; }
 
-        public MatAnimTextureState(HSD_TOBJ tOBJ, float blending, Matrix4 transform)
+        public Vector4 Konst { get; }
+
+        public MatAnimTextureState(HSD_TOBJ tOBJ, float blending, Matrix4 transform, Vector4 konst)
         {
             TOBJ = tOBJ;
             Blending = blending;
             Transform = transform;
+            Konst = konst;
         }
     }
 
@@ -151,6 +154,14 @@ namespace HSDRawViewer.Rendering
             var SX = tobj.SX;
             var SY = tobj.SY;
             var SZ = tobj.SZ;
+            Vector4 konst = Vector4.One;
+            if (tobj.TEV != null)
+            {
+                konst.X = tobj.TEV.constant.R / 255f;
+                konst.Y = tobj.TEV.constant.B / 255f;
+                konst.Z = tobj.TEV.constant.G / 255f;
+                konst.W = tobj.TEV.constantAlpha / 255f;
+            }
 
             if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
             {
@@ -161,23 +172,29 @@ namespace HSDRawViewer.Rendering
                 {
                     foreach(var t in texAnim.Tracks)
                     {
+                        var value = t.GetValue(texAnim.Frame);
+
                         //TODO: TEV as usual
                         switch ((TexTrackType)t.TrackType)
                         {
                             case TexTrackType.HSD_A_T_TIMG:
-                                tex = texAnim.Textures[(int)t.GetValue(texAnim.Frame)];
+                                tex = texAnim.Textures[(int)value];
                                 break;
                             case TexTrackType.HSD_A_T_BLEND:
                             case TexTrackType.HSD_A_T_TS_BLEND:
-                                blending = t.GetValue(texAnim.Frame);
+                                blending = value;
                                 break;
-                            case TexTrackType.HSD_A_T_TRAU: TX = t.GetValue(texAnim.Frame); break;
-                            case TexTrackType.HSD_A_T_TRAV: TY = t.GetValue(texAnim.Frame); break;
-                            case TexTrackType.HSD_A_T_SCAU: SX = t.GetValue(texAnim.Frame); break;
-                            case TexTrackType.HSD_A_T_SCAV: SY = t.GetValue(texAnim.Frame); break;
-                            case TexTrackType.HSD_A_T_ROTX: RX = t.GetValue(texAnim.Frame); break;
-                            case TexTrackType.HSD_A_T_ROTY: RY = t.GetValue(texAnim.Frame); break;
-                            case TexTrackType.HSD_A_T_ROTZ: RZ = t.GetValue(texAnim.Frame); break;
+                            case TexTrackType.HSD_A_T_TRAU: TX = value; break;
+                            case TexTrackType.HSD_A_T_TRAV: TY = value; break;
+                            case TexTrackType.HSD_A_T_SCAU: SX = value; break;
+                            case TexTrackType.HSD_A_T_SCAV: SY = value; break;
+                            case TexTrackType.HSD_A_T_ROTX: RX = value; break;
+                            case TexTrackType.HSD_A_T_ROTY: RY = value; break;
+                            case TexTrackType.HSD_A_T_ROTZ: RZ = value; break;
+                            case TexTrackType.HSD_A_T_KONST_R: konst.X = value; break;
+                            case TexTrackType.HSD_A_T_KONST_G: konst.Y = value; break;
+                            case TexTrackType.HSD_A_T_KONST_B: konst.Z = value; break;
+                            case TexTrackType.HSD_A_T_KONST_A: konst.W = value; break;
                         }
                     }
                 }
@@ -190,7 +207,7 @@ namespace HSDRawViewer.Rendering
             if(SX != 0 && SY != 0 && SZ != 0)
                 transform.Invert();
 
-            return new MatAnimTextureState(tex, blending, transform);
+            return new MatAnimTextureState(tex, blending, transform, konst);
         }
 
         /// <summary>

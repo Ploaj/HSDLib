@@ -355,7 +355,14 @@ namespace HSDRawViewer.Converters
                                 for (int w = 0; w < en.EnvelopeCount; w++)
                                 {
                                     var vertexWeight = new IOBoneWeight();
-                                    vertexWeight.BoneName = jobjToBone[en.JOBJs[w]].Name;
+                                    if (jobjToBone.ContainsKey(en.JOBJs[w]))
+                                    {
+                                        vertexWeight.BoneName = jobjToBone[en.JOBJs[w]].Name;
+                                    }
+                                    else
+                                    {
+                                        vertexWeight.BoneName = "JOBJ_0";
+                                    }
                                     vertexWeight.Weight = en.Weights[w];
                                     vertex.Envelope.Weights.Add(vertexWeight);
                                 }

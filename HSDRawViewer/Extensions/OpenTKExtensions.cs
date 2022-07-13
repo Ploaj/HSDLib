@@ -47,11 +47,6 @@ namespace HSDRawViewer
             };
         }
 
-        private static float ClampPI(float value)
-        {
-            return value;
-        }
-
 
         /// <summary>
         /// 

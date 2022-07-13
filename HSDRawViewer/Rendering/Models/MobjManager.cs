@@ -171,14 +171,15 @@ namespace HSDRawViewer.Rendering.Models
                     if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
                         transform.Invert();
 
+                    MatAnimTextureState texState = null;
                     if (animation != null)
                     {
-                        var state = animation.GetTextureAnimState(tex);
-                        if (state != null)
+                        texState = animation.GetTextureAnimState(tex);
+                        if (texState != null)
                         {
-                            displayTex = state.TOBJ;
-                            blending = state.Blending;
-                            transform = state.Transform;
+                            displayTex = texState.TOBJ;
+                            blending = texState.Blending;
+                            transform = texState.Transform;
                         }
                     }
 
@@ -263,7 +264,16 @@ namespace HSDRawViewer.Rendering.Models
                             shader.SetColor($"Tev[{i}].tev1", tev.tev1, tev.tev1Alpha);
 
                         if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
-                            shader.SetColor($"Tev[{i}].konst", tev.constant, tev.constantAlpha);
+                        {
+                            if (texState != null)
+                            {
+                                shader.SetVector4($"Tev[{i}].konst", texState.Konst);
+                            }
+                            else
+                            {
+                                shader.SetColor($"Tev[{i}].konst", tev.constant, tev.constantAlpha);
+                            }
+                        }
                     }
                 }
             }

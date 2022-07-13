@@ -360,11 +360,12 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="animation"></param>
         public void LoadAnimation(JointAnimManager animation)
         {
+            JointManager.ClearAnimation();
+            JointManager.Animation = animation;
             var vp = viewport;
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = animation.FrameCount;
-            JointManager.Animation = animation;
         }
 
         /// <summary>
@@ -403,6 +404,7 @@ namespace HSDRawViewer.GUI.Plugins
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = motFile.EndTime * 60;
+            JointManager.ClearAnimation();
             JointManager.SetMOT(jointTable, motFile);
         }
 
@@ -702,7 +704,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void importModelFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ModelImporter.ReplaceModelFromFile(root);
-            JointManager.RefreshRendering = true;
+            JointManager.SetJOBJ(root);
             _jointMap.Clear();
             RefreshGUI();
         }
@@ -1049,7 +1051,9 @@ namespace HSDRawViewer.GUI.Plugins
         private void clearAnimButton_Click(object sender, EventArgs e)
         {
             viewport.AnimationTrackEnabled = false;
-            JointManager.Animation = null;
+            JointManager.ClearAnimation();
+            JointManager.SetMatAnimJoint(null);
+            JointManager.SetShapeAnimJoint(null);
         }
 
         /// <summary>

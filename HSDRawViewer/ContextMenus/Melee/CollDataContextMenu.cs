@@ -1,5 +1,6 @@
 ﻿using HSDRaw.Melee.Gr;
 using HSDRawViewer.Converters.Melee;
+using HSDRawViewer.Converters.SBM;
 using System;
 using System.Windows.Forms;
 
@@ -46,6 +47,25 @@ namespace HSDRawViewer.ContextMenus
                 SSFConverter.ExportCollDataToSSF(MainForm.SelectedDataNode.Accessor as SBM_Coll_Data);
             };
             MenuItems.Add(ExportSSF);
+
+
+
+
+            MenuItem ImportCOLL = new MenuItem("Import COLL");
+            ImportCOLL.Click += (sender, args) =>
+            {
+                using (OpenFileDialog sd = new OpenFileDialog())
+                {
+                    sd.Filter = "Brawl collision format (.coll)|*.coll";
+
+                    if (sd.ShowDialog() == DialogResult.OK)
+                    {
+                        var c = MainForm.SelectedDataNode.Accessor as SBM_Coll_Data;
+                        CollImporter.ImportColl(sd.FileName, c);
+                    }
+                }
+            };
+            MenuItems.Add(ImportCOLL);
         }
     }
 }

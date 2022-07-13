@@ -93,7 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationSettings.cs" />
-    <Compile Include="ContextMenus\CollDataContextMenu.cs">
+    <Compile Include="ContextMenus\Melee\CollDataContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ContextMenus\CommonContextMenu.cs">
@@ -159,6 +159,7 @@
     <Compile Include="Converters\Animation\HSDK.cs" />
     <Compile Include="Converters\Animation\JointAnimationLoader.cs" />
     <Compile Include="Converters\ModelTangentUtils.cs" />
+    <Compile Include="Converters\SBM\CollImporter.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\SBM\SSFModelGenerator.cs" />
     <Compile Include="Extensions\JOBJExtensions.cs" />

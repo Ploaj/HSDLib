@@ -53,6 +53,15 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
+        public void ClearAnimation()
+        {
+            RootJObj?.ResetTransforms();
+            Animation = null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="index"></param>
         /// <param name="transform"></param>
         public void SetWorldTransform(int index, Matrix4 transform)
