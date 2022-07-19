@@ -29,7 +29,7 @@ namespace HSDRawViewer.GUI.Plugins
     /// <summary>
     /// 
     /// </summary>
-    public partial class JobjEditor : UserControl, IDrawable
+    public partial class JObjEditor : UserControl, IDrawable
     {
         public DrawOrder DrawOrder => DrawOrder.First;
 
@@ -42,7 +42,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
-        public JobjEditor()
+        public JObjEditor()
         {
             InitializeComponent();
 
@@ -101,7 +101,7 @@ namespace HSDRawViewer.GUI.Plugins
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
-            viewport.EnableFloor = true;
+            viewport.DisplayGrid = true;
             viewport.EnableCSPMode = true;
             previewBox.Controls.Add(viewport);
             viewport.RefreshSize();
@@ -447,6 +447,7 @@ namespace HSDRawViewer.GUI.Plugins
             JointManager._settings.RenderBones = showBonesToolStripMenuItem.Checked;
             JointManager._settings.RenderOrientation = showBoneOrientationToolStripMenuItem.Checked;
             JointManager._settings.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
+
             JointManager.Render(cam);
 
             foreach (var d in _drawables)
@@ -1622,7 +1623,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     Frame = viewport.Frame,
                     CSPMode = viewport.CSPMode,
-                    ShowGrid = viewport.EnableFloor,
+                    ShowGrid = viewport.DisplayGrid,
                     ShowBackdrop = viewport.EnableBack,
                     Camera = viewport.Camera,
                     Lighting = JointManager._lightParam,
@@ -1661,7 +1662,7 @@ namespace HSDRawViewer.GUI.Plugins
                 showSelectionOutlineToolStripMenuItem.PerformClick();
 
             viewport.EnableBack = settings.ShowBackdrop;
-            viewport.EnableFloor = settings.ShowGrid;
+            viewport.DisplayGrid = settings.ShowGrid;
 
             if (settings.Camera != null)
                 viewport.Camera = settings.Camera;

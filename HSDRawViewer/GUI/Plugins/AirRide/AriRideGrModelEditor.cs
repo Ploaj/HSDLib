@@ -21,12 +21,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
     [SupportedTypes(new Type[] { typeof(KAR_grMainModel) })]
     public partial class AriRideGrModelEditor : DockContent, EditorBase, IDrawableInterface
     {
-        private JobjEditor _jointEditor;
+        private JObjEditor _jointEditor;
 
         public AriRideGrModelEditor()
         {
             InitializeComponent();
-            _jointEditor = new JobjEditor();
+            _jointEditor = new JObjEditor();
             _jointEditor.Dock = DockStyle.Fill;
             _jointEditor.AddDrawable(this);
             tabControl1.TabPages[0].Controls.Add(_jointEditor);

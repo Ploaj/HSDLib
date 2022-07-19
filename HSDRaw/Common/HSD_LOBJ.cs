@@ -1,4 +1,5 @@
 ﻿using HSDRaw.Common.Animation;
+using HSDRaw.GX;
 using System;
 using System.Drawing;
 
@@ -11,6 +12,14 @@ namespace HSDRaw.Common
         LOBJ_LIGHT_ATTN = 1
     }
 
+    public enum LObjType
+    {
+        AMBIENT,
+        INFINITE,
+        POINT,
+        SPOT,
+    }
+
     [Flags]
     public enum LOBJ_Flags
     {
@@ -18,9 +27,11 @@ namespace HSDRaw.Common
         LOBJ_INFINITE = (1 << 0),
         LOBJ_POINT = (2 << 0),
         LOBJ_SPOT = (3 << 0),
+
         LOBJ_DIFFUSE = (1 << 2),
         LOBJ_SPECULAR = (1 << 3),
         LOBJ_ALPHA = (1 << 4),
+
         LOBJ_HIDDEN = (1 << 5),
         LOBJ_RAW_PARAM = (1 << 6),
         LOBJ_DIFF_DIRTY = (1 << 7),
@@ -71,51 +82,91 @@ namespace HSDRaw.Common
             set => _s.SetColorRGBA(0x0C, value);
         }
 
-        public HSD_LOBJPoint Position { get => _s.GetReference<HSD_LOBJPoint>(0x10); set => _s.SetReference(0x10, value); }
+        public HSD_WOBJ Position { get => _s.GetReference<HSD_WOBJ>(0x10); set => _s.SetReference(0x10, value); }
 
-        //public int Unknown { get; set; } // TODO: this is pointer
+        public HSD_WOBJ Interest { get => _s.GetReference<HSD_WOBJ>(0x14); set => _s.SetReference(0x14, value); }
 
         public float InfiniteData
         {
-            get => Flags.HasFlag(LOBJ_Flags.LOBJ_INFINITE) ? _s.GetReference<HSDAccessor>(0x18)._s.GetFloat(0) : 0;
+            get => (LOBJ_Flags)((int)Flags & 0x3) == (LOBJ_Flags.LOBJ_INFINITE) ? _s.GetReference<HSDAccessor>(0x18)._s.GetFloat(0) : 0;
             set
             {
                 var str = new HSDAccessor();
                 str._s.SetFloat(0, value);
-                _s.SetReference(0x18, str); 
+                _s.SetReference(0x18, str);
                 Flags &= ~LOBJ_Flags.LOBJ_POINT;
+                Flags &= ~LOBJ_Flags.LOBJ_SPOT;
+                Flags &= ~LOBJ_Flags.LOBJ_AMBIENT;
                 Flags |= LOBJ_Flags.LOBJ_INFINITE;
             }
         }
-        public HSD_PointSpotData PointSpotData
+        public HSD_LightPoint PointData
         {
-            get => Flags.HasFlag(LOBJ_Flags.LOBJ_POINT) ? _s.GetReference<HSD_PointSpotData>(0x18) : null;
+            get => (LOBJ_Flags)((int)Flags & 0x3) == (LOBJ_Flags.LOBJ_POINT) ? _s.GetReference<HSD_LightPoint>(0x18) : null;
             set
             {
                 _s.SetReference(0x18, value);
                 Flags &= ~LOBJ_Flags.LOBJ_INFINITE;
+                Flags &= ~LOBJ_Flags.LOBJ_SPOT;
+                Flags &= ~LOBJ_Flags.LOBJ_AMBIENT;
                 Flags |= LOBJ_Flags.LOBJ_POINT;
             }
         }
+
+        public HSD_LightSpot SpotData
+        {
+            get => (LOBJ_Flags)((int)Flags & 0x3) == (LOBJ_Flags.LOBJ_SPOT) ? _s.GetReference<HSD_LightSpot>(0x18) : null;
+            set
+            {
+                _s.SetReference(0x18, value);
+                Flags &= ~(LOBJ_Flags)0x3;
+                Flags |= LOBJ_Flags.LOBJ_SPOT;
+            }
+        }
+
     }
 
-    public class HSD_PointSpotData : HSDAccessor
+    public class HSD_LightPoint : HSDAccessor
     {
         public override int TrimmedSize => 0x0C;
         
-        public float RangeMin { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
-        public float RangeMax { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
-        public int Flag { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+        public float RefBrightness { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+
+        public float RefDistance { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+
+        public GXBrightnessDistance Flag { get => (GXBrightnessDistance)_s.GetInt32(0x08); set => _s.SetInt32(0x08, (int)value); }
     }
 
-    public class HSD_LOBJPoint : HSDAccessor
+    public class HSD_LightSpot : HSDAccessor
     {
         public override int TrimmedSize => 0x14;
 
-        public int ClassName { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
-        public float X { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
-        public float Y { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
-        public float Z { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
-        public int Unknown { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public float Cutoff { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+        
+        public GXSpotFunc SpotFunc { get => (GXSpotFunc)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (byte)value); }
+        
+        public float RefBrightness { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+        
+        public float RefDistance { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
+
+        public GXBrightnessDistance DistFunc { get => (GXBrightnessDistance)_s.GetInt32(0x10); set => _s.SetInt32(0x10, (byte)value); }
     }
+
+    public class HSD_LightAttn : HSDAccessor
+    {
+        public override int TrimmedSize => 0x18;
+
+        public float A0 { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
+
+        public float A1 { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+
+        public float A2 { get => _s.GetFloat(0x08); set => _s.SetFloat(0x08, value); }
+
+        public float K0 { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
+
+        public float K1 { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+
+        public float K2 { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+    }
+
 }

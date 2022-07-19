@@ -2,7 +2,7 @@
 
 namespace HSDRawViewer.GUI.Plugins
 {
-    partial class JobjEditor
+    partial class JObjEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JobjEditor));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JObjEditor));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.treeJOBJ = new System.Windows.Forms.TreeView();

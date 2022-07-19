@@ -183,7 +183,7 @@ namespace HSDRawViewer.GUI
         [Browsable(false)]
         public bool IsPlaying { get => _playbackMode != PlaybackMode.None; }
 
-        public bool EnableFloor { get; set; } = false;
+        public bool DisplayGrid { get; set; } = false;
 
         private bool _enableBack = true;
         public bool EnableBack
@@ -598,7 +598,7 @@ namespace HSDRawViewer.GUI
                 GL.End();
             }
 
-            if (EnableFloor)
+            if (DisplayGrid)
                 DrawShape.Floor(GridColor, 50, 5);
 
             foreach (var r in Drawables)
@@ -1032,7 +1032,7 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void toggleGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            EnableFloor = !EnableFloor;
+            DisplayGrid = !DisplayGrid;
         }
 
         /// <summary>

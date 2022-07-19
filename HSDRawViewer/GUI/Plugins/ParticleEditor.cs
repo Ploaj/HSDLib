@@ -62,7 +62,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             _viewport = new ViewportControl();
             _viewport.Dock = DockStyle.Fill;
-            _viewport.EnableFloor = true;
+            _viewport.DisplayGrid = true;
             _viewport.AddRenderer(this);
             _viewport.Play(PlaybackMode.Forward);
             groupBoxPreview.Controls.Add(_viewport);

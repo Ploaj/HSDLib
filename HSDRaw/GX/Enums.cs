@@ -329,4 +329,23 @@
         GX_CC_KONST,
         GX_CC_ZERO
     }
+
+    public enum GXBrightnessDistance
+    {
+        GX_DA_OFF = 0,
+        GX_DA_GENTLE = 1,
+        GX_DA_MEDIUM = 2,
+        GX_DA_STEEP = 3,
+    }
+
+    public enum GXSpotFunc
+    {
+        GX_SP_OFF = 0,
+        GX_SP_COS = 2,
+        GX_SP_FLAT = 1,
+        GX_SP_COS2 = 3,
+        GX_SP_SHARP = 4,
+        GX_SP_RING1 = 5,
+        GX_SP_RING2 = 6,
+    }
 }

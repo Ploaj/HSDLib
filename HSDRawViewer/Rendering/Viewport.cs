@@ -27,7 +27,7 @@ namespace HSDRawViewer.Rendering
             //_glViewport = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
             glViewport = new ViewportControl();
             glViewport.Dock = DockStyle.Fill;
-            glViewport.EnableFloor = true;
+            glViewport.DisplayGrid = true;
 
             glViewport.AddRenderer(this);
 

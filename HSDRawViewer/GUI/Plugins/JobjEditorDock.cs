@@ -26,7 +26,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
         private DataNode _node;
 
-        public JobjEditor Editor { get; internal set; }
+        public JObjEditor Editor { get; internal set; }
 
         /// <summary>
         /// 
@@ -35,7 +35,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             InitializeComponent();
 
-            Editor = new JobjEditor();
+            Editor = new JObjEditor();
             Editor.Dock = DockStyle.Fill;
             Controls.Add(Editor);
         }

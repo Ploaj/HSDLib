@@ -929,7 +929,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // check to render irv
             introDropDownButton.Visible = false;
-            viewport.EnableFloor = true;
+            viewport.DisplayGrid = true;
 
             // check if animations are loaded
             if (AJManager == null)
@@ -952,13 +952,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 introDropDownButton.Visible = true;
                 IrOffset = IrLeftOffset;
-                viewport.EnableFloor = false;
+                viewport.DisplayGrid = false;
             }
             if (symbol.Contains("IntroR_figatree"))
             {
                 introDropDownButton.Visible = true;
                 IrOffset = IrRightOffset;
-                viewport.EnableFloor = false;
+                viewport.DisplayGrid = false;
             }
             
             // apply fsms

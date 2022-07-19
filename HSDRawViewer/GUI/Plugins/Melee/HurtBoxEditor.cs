@@ -62,7 +62,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = false;
             viewport.AddRenderer(this);
-            viewport.EnableFloor = true;
+            viewport.DisplayGrid = true;
             previewPanel.Controls.Add(viewport);
             viewport.RefreshSize();
             viewport.BringToFront();
