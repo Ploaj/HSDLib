@@ -158,8 +158,8 @@ namespace HSDRawViewer.Rendering
             if (tobj.TEV != null)
             {
                 konst.X = tobj.TEV.constant.R / 255f;
-                konst.Y = tobj.TEV.constant.B / 255f;
-                konst.Z = tobj.TEV.constant.G / 255f;
+                konst.Y = tobj.TEV.constant.G / 255f;
+                konst.Z = tobj.TEV.constant.B / 255f;
                 konst.W = tobj.TEV.constantAlpha / 255f;
             }
 
