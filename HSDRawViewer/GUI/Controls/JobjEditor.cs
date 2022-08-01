@@ -544,7 +544,8 @@ namespace HSDRawViewer.GUI.Plugins
                     {
                         if (t.ImageData == null)
                             t.ImageData = new HSD_Image();
-                        t.ImageData.ImageData = newTOBJ.ImageData.ImageData;
+                        t.ImageData._s.SetReference(0x00, newTOBJ.ImageData._s.GetReference<HSDAccessor>(0x00));
+                        //t.ImageData.ImageData = newTOBJ.ImageData.ImageData;
                         t.ImageData.Format = newTOBJ.ImageData.Format;
                         t.ImageData.Width = newTOBJ.ImageData.Width;
                         t.ImageData.Height = newTOBJ.ImageData.Height;
@@ -556,7 +557,8 @@ namespace HSDRawViewer.GUI.Plugins
                     {
                         if (t.TlutData == null)
                             t.TlutData = new HSD_Tlut();
-                        t.TlutData.TlutData = newTOBJ.TlutData.TlutData;
+                        t.TlutData._s.SetReference(0x00, newTOBJ.TlutData._s.GetReference<HSDAccessor>(0x00));
+                        //t.TlutData.TlutData = newTOBJ.TlutData.TlutData;
                         t.TlutData.Format = newTOBJ.TlutData.Format;
                     }
                     else

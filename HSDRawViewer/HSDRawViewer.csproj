@@ -162,6 +162,7 @@
     <Compile Include="Converters\SBM\CollImporter.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\SBM\SSFModelGenerator.cs" />
+    <Compile Include="Extensions\AOBJExtentions.cs" />
     <Compile Include="Extensions\JOBJExtensions.cs" />
     <Compile Include="Converters\Animation\MayaAnim.cs" />
     <Compile Include="Converters\ModelExporter.cs" />

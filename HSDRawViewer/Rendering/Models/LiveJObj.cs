@@ -221,28 +221,30 @@ namespace HSDRawViewer.Rendering.Models
                 if (Desc.Flags.HasFlag(JOBJ_FLAG.MTX_SCALE_COMPENSATE))
                 {
                     // get parent scale
-                    var parentTrackTransform = Parent.LocalTransform.ExtractScale();
+                    var parentScale = Parent.LocalTransform.ExtractScale();
 
                     // get animated vectors
                     // GetLocalTransformValues(root, out Vector3 trans, out Quaternion rot, out Vector3 scale, index);
 
                     // scale the position only
-                    var trans = Translation * parentTrackTransform;
+                    var trans = Translation * parentScale;
 
                     // build the local matrix
                     LocalTransform = Matrix4.CreateScale(Scale) *
-                    Math3D.CreateMatrix4FromEuler(Rotation.Xyz) *
-                    Matrix4.CreateTranslation(trans);
+                                    Math3D.CreateMatrix4FromEuler(Rotation.Xyz) *
+                                    Matrix4.CreateTranslation(trans);
 
                     // calculate the compensate scale
-                    var scaleCompensation = Matrix4.CreateScale(1f / parentTrackTransform.X, 1f / parentTrackTransform.Y, 1f / parentTrackTransform.Z);
+                    var scaleCompensation = Matrix4.CreateScale(1f / parentScale.X, 1f / parentScale.Y, 1f / parentScale.Z);
 
                     // apply scale compensate
-                    WorldTransform = LocalTransform * scaleCompensation;
+                    WorldTransform = LocalTransform * scaleCompensation * Parent.WorldTransform;
                 }
-
-                // multiply parent transform
-                WorldTransform = LocalTransform * Parent.WorldTransform;
+                else
+                {
+                    // multiply parent transform
+                    WorldTransform = LocalTransform * Parent.WorldTransform;
+                }
             }
             else
             {

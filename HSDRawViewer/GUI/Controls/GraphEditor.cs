@@ -993,6 +993,16 @@ NONE - None (do not use)";
                 }
             }
         }
+
+        private void reverseButton_Click(object sender, EventArgs e)
+        {
+            if (_selectedPlayer != null)
+            {
+                _selectedPlayer.Reverse();
+                _graph.Invalidate();
+                OnTrackEdited(EventArgs.Empty);
+            }
+        }
     }
 
     /// <summary>

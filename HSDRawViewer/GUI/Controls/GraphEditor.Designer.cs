@@ -59,6 +59,7 @@
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
             this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
+            this.reverseButton = new System.Windows.Forms.ToolStripButton();
             this.graphBox.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
@@ -183,7 +184,8 @@
             this.exportKeyButton,
             this.helpButton,
             this.buttonBakeTrack,
-            this.buttonCompressTrack});
+            this.buttonCompressTrack,
+            this.reverseButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 152);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(727, 25);
@@ -386,6 +388,16 @@
             this.trackTypeBox.Size = new System.Drawing.Size(121, 25);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
+            // reverseButton
+            // 
+            this.reverseButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.reverseButton.Image = ((System.Drawing.Image)(resources.GetObject("reverseButton.Image")));
+            this.reverseButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.reverseButton.Name = "reverseButton";
+            this.reverseButton.Size = new System.Drawing.Size(51, 22);
+            this.reverseButton.Text = "Reverse";
+            this.reverseButton.Click += new System.EventHandler(this.reverseButton_Click);
+            // 
             // GraphEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -445,5 +457,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripButton buttonBakeTrack;
         private System.Windows.Forms.ToolStripButton buttonCompressTrack;
+        private System.Windows.Forms.ToolStripButton reverseButton;
     }
 }

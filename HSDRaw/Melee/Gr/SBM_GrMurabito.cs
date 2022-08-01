@@ -12,6 +12,8 @@ namespace HSDRaw.Melee.Gr
         BLANCA = (1 << 2),
         NOEMOTE = (1 << 3),
         ELDER = (1 << 4),
+        JINGLE = (1 << 5),
+        JACK = (1 << 6),
     }
 
     public class SBM_GrMurabito : HSDAccessor

@@ -373,6 +373,27 @@ namespace HSDRaw.Tools
             // compress track
             AnimationKeyCompressor.CompressTrack(this);
         }
+
+        public void Reverse()
+        {
+            List<FOBJKey> newkeys = new List<FOBJKey>();
+
+            float last_frame = Keys[Keys.Count - 1].Frame;
+
+            for (int i = Keys.Count - 1; i >= 0; i--)
+            {
+                Keys[i].Frame = last_frame - Keys[i].Frame;
+                Keys[i].Tan = Keys[i].Tan * -1;
+
+                if (i > 0)
+                {
+                    Keys[i].InterpolationType = Keys[i - 1].InterpolationType;
+                }
+                newkeys.Add(Keys[i]);
+            }
+
+            Keys = newkeys;
+        }
     }
     
     /// <summary>
