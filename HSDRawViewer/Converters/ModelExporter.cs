@@ -256,7 +256,7 @@ namespace HSDRawViewer.Converters
                                 if (pobj.HasAttribute(GXAttribName.GX_VA_PNMTXIDX))
                                     single = false;
                                 
-                                var poly = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ, dobj.Mobj, mesh);
+                                var poly = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ, dobj.Mobj, mesh, _root);
                                 poly.MaterialName = m.Name;
                                 mesh.Polygons.Add(poly);
                             }
@@ -277,7 +277,7 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="pobj"></param>
-        private IOPolygon ProcessPOBJ(HSD_POBJ pobj, HSD_JOBJ parent, HSD_JOBJ singleBind, HSD_MOBJ mobj, IOMesh mesh)
+        private IOPolygon ProcessPOBJ(HSD_POBJ pobj, HSD_JOBJ parent, HSD_JOBJ singleBind, HSD_MOBJ mobj, IOMesh mesh, HSD_JOBJ _root)
         {
             IOPolygon poly = new IOPolygon();
 
@@ -351,36 +351,58 @@ namespace HSDRawViewer.Converters
                         {
                             case GXAttribName.GX_VA_PNMTXIDX:
 
-                                var en = envelopes[v.PNMTXIDX / 3];
-                                for (int w = 0; w < en.EnvelopeCount; w++)
+                                if (pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN2))
                                 {
-                                    var vertexWeight = new IOBoneWeight();
-                                    if (jobjToBone.ContainsKey(en.JOBJs[w]))
-                                    {
-                                        vertexWeight.BoneName = jobjToBone[en.JOBJs[w]].Name;
-                                    }
-                                    else
-                                    {
-                                        vertexWeight.BoneName = "JOBJ_0";
-                                    }
-                                    vertexWeight.Weight = en.Weights[w];
-                                    vertex.Envelope.Weights.Add(vertexWeight);
-                                }
+                                    var en = v.PNMTXIDX / 3;
 
-                                if (en.EnvelopeCount > 0 && en.GetWeightAt(0) == 1 && jobjToBone.ContainsKey(en.JOBJs[0]))
-                                    singleMatrix = jobjToBone[en.JOBJs[0]].WorldTransform;
+                                    IOBone bone = jobjToBone[parent];
+                                    if (en == 1)
+                                        bone = jobjToBone[_root.BreathFirstList.Find(e => e.Children.Contains(parent))];
+
+                                    var vertexWeight = new IOBoneWeight()
+                                    {
+                                        BoneName = bone.Name,
+                                        Weight = 1
+                                    };
+                                    vertex.Envelope.Weights.Clear();
+                                    vertex.Envelope.Weights.Add(vertexWeight);
+                                    singleMatrix = bone.WorldTransform;
+                                }
                                 else
-                                    singleMatrix = parentTransform;
+                                {
+                                    var en = envelopes[v.PNMTXIDX / 3];
+                                    for (int w = 0; w < en.EnvelopeCount; w++)
+                                    {
+                                        var vertexWeight = new IOBoneWeight();
+                                        if (jobjToBone.ContainsKey(en.JOBJs[w]))
+                                        {
+                                            vertexWeight.BoneName = jobjToBone[en.JOBJs[w]].Name;
+                                        }
+                                        else
+                                        {
+                                            vertexWeight.BoneName = "JOBJ_0";
+                                        }
+                                        vertexWeight.Weight = en.Weights[w];
+                                        vertex.Envelope.Weights.Add(vertexWeight);
+                                    }
+
+                                    if (en.EnvelopeCount > 0 && en.GetWeightAt(0) == 1 && jobjToBone.ContainsKey(en.JOBJs[0]))
+                                        singleMatrix = jobjToBone[en.JOBJs[0]].WorldTransform;
+                                    else
+                                        singleMatrix = parentTransform;
+                                }
 
                                 break;
                             case GXAttribName.GX_VA_POS:
                                 {
                                     var vec = new System.Numerics.Vector3(v.POS.X, v.POS.Y, v.POS.Z);
 
-                                    if (!pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN0) && !hasEnvelopes)
+                                    if (!pobj.Flags.HasFlag(POBJ_FLAG.SHAPESET_AVERAGE) && !hasEnvelopes)
                                         vec = System.Numerics.Vector3.Transform(vec, parentTransform);
 
-                                    if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                                    if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || 
+                                        parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || 
+                                        pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN2))
                                         vec = System.Numerics.Vector3.Transform(vec, singleMatrix);
 
                                     vec = System.Numerics.Vector3.Transform(vec, singleBindTransform);
@@ -392,7 +414,7 @@ namespace HSDRawViewer.Converters
                                 {
                                     var vec = new System.Numerics.Vector3(v.NRM.X, v.NRM.Y, v.NRM.Z);
 
-                                    if (!pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN0) && !hasEnvelopes)
+                                    if (!pobj.Flags.HasFlag(POBJ_FLAG.SHAPESET_AVERAGE) && !hasEnvelopes)
                                         vec = System.Numerics.Vector3.TransformNormal(vec, parentTransform);
 
                                     if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))

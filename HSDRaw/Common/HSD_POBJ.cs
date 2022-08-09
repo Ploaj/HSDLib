@@ -8,8 +8,9 @@ namespace HSDRaw.Common
     [Flags]
     public enum POBJ_FLAG
     {
-        UNKNOWN0 = (1 << 0),
-        UNKNOWN1 = (1 << 1),
+        SHAPESET_AVERAGE = (1 << 0),
+        SHAPESET_ADDITIVE = (1 << 1),
+        UNKNOWN2 = (1 << 2),
         ANIM = (1 << 3),
         SHAPEANIM = (1 << 12),
         ENVELOPE = (1 << 13),
@@ -79,7 +80,7 @@ namespace HSDRaw.Common
         {
             get
             {
-                if (!Flags.HasFlag(POBJ_FLAG.ENVELOPE) && !Flags.HasFlag(POBJ_FLAG.SHAPEANIM))
+                if (!Flags.HasFlag(POBJ_FLAG.ENVELOPE) && !Flags.HasFlag(POBJ_FLAG.SHAPEANIM) &&  !Flags.HasFlag(POBJ_FLAG.UNKNOWN2))
                 {
                     return _s.GetReference<HSD_JOBJ>(0x14);
                 }

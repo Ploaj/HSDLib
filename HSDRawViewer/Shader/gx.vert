@@ -116,12 +116,6 @@ void main()
 		vweights[i] = 0.0;
 	}
 
-	if(enableParentTransform == 1 && hasEnvelopes == 0) // todo maybe not accurate
-	{
-		pos = singleBind * pos;
-		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
-	}
-
 	if (hasEnvelopes == 1)
 	{
 		int matrixIndex = int(PNMTXIDX / 3);
@@ -156,6 +150,28 @@ void main()
 			pos = vec4(skinnedPos, 1);
 			normal = skinnedNrm;
 		}
+	}
+	else
+	if (enableParentTransform == 1)
+	{
+		pos = singleBind * pos;
+		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
+	}
+	else
+	if (enableParentTransform == 2)
+	{
+		int matrixIndex = int(PNMTXIDX / 3);
+
+		// set output attributes
+		for (int i = 0; i < MAX_WEIGHTS; i += 1)
+		{
+			vbones[i] = envelopeIndex[matrixIndex * MAX_WEIGHTS + i];
+			vweights[i] = weights[matrixIndex * MAX_WEIGHTS + i];
+		}
+
+		// 
+		pos = transforms[vbones[0]] * vec4(pos.xyz, 1);
+		normal = (inverse(transpose(transforms[vbones[0]])) * vec4(normal, 1)).xyz;
 	}
 	
 	// raw outputs

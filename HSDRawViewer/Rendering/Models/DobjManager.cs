@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using HSDRawViewer.Rendering.GX;
 using HSDRaw;
+using System.Linq;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -138,7 +139,10 @@ namespace HSDRawViewer.Rendering.Models
 
                     // set uniform flag information
                     shader.SetBoolToInt("hasEnvelopes", p.HasWeighting);
-                    shader.SetBoolToInt("enableParentTransform", !p.Flag.HasFlag(POBJ_FLAG.UNKNOWN0));
+                    shader.SetBoolToInt("enableParentTransform", !p.Flag.HasFlag(POBJ_FLAG.SHAPESET_AVERAGE));
+
+                    if (p.Flag.HasFlag(POBJ_FLAG.UNKNOWN2))
+                        shader.SetInt("enableParentTransform", 2);
 
                     // set culling
                     GL.Enable(EnableCap.CullFace);
@@ -187,19 +191,19 @@ namespace HSDRawViewer.Rendering.Models
             ClearRenderingCache();
 
             // get all dobjs
-            List<HSD_DOBJ> dobj = new List<HSD_DOBJ>(0);
+            List<Tuple<HSD_DOBJ, HSD_JOBJ>> dobj = new List<Tuple<HSD_DOBJ, HSD_JOBJ>>(0);
 
             foreach (var j in root.Enumerate)
                 if (j.Desc.Dobj != null)
-                    dobj.AddRange(j.Desc.Dobj.List);
+                    dobj.AddRange(j.Desc.Dobj.List.Select(e => new Tuple<HSD_DOBJ, HSD_JOBJ>(e, j.Desc)));
 
             // 
             Dictionary<HSDStruct, GX_Attribute[]> structToAttrs = new Dictionary<HSDStruct, GX_Attribute[]>();
             foreach(var v in dobj)
             {
-                if(v.Pobj != null)
+                if(v.Item1.Pobj != null)
                 {
-                    foreach(var pobj in v.Pobj.List)
+                    foreach(var pobj in v.Item1.Pobj.List)
                     {
                         var attrs = pobj.ToGXAttributes();
                         var attr = pobj._s.GetReference<HSDAccessor>(0x08)._s;
@@ -216,7 +220,7 @@ namespace HSDRawViewer.Rendering.Models
             // prepare dobjs for rendering
 
             foreach (var v in dobj)
-                if (!LoadDOBJ(v, manager, structToAttrs))
+                if (!LoadDOBJ(v.Item1, v.Item2, manager, structToAttrs))
                 {
                     ClearRenderingCache();
                     return false;
@@ -229,7 +233,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// Prepares DOBJ for rendering by loading relevant information into a cache
         /// </summary>
-        private bool LoadDOBJ(HSD_DOBJ dobj, JOBJManager jobjManager, Dictionary<HSDStruct, GX_Attribute[]> structToAttrs)
+        private bool LoadDOBJ(HSD_DOBJ dobj, HSD_JOBJ parent, JOBJManager jobjManager, Dictionary<HSDStruct, GX_Attribute[]> structToAttrs)
         {
             if (dobj.Pobj == null)
                 return true;
@@ -273,32 +277,44 @@ namespace HSDRawViewer.Rendering.Models
                 };
 
                 // build envelopes
-                int eni = 0;
-                foreach(var v in dl.Envelopes)
+                if (pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN2))
                 {
-                    if (eni >= WEIGHT_STRIDE)
-                        break;
-                        
-                    for (int i = 0; i < v.EnvelopeCount; i++)
+                    pobjCache.Envelopes[0 * MAX_WEIGHTS + 0] = jobjManager.IndexOf(parent);
+                    pobjCache.Envelopes[1 * MAX_WEIGHTS + 0] = jobjManager.GetLiveJOBJ(parent).Parent.Index;
+
+                    pobjCache.EnvelopeCount = 2;
+                    pobjCache.HasWeighting = false;
+                }
+                else
+                {
+                    int eni = 0;
+                    foreach (var v in dl.Envelopes)
                     {
-                        if (i >= MAX_WEIGHTS)
+                        if (eni >= WEIGHT_STRIDE)
                             break;
 
-                        var jobj = v.GetJOBJAt(i);
-                        var jobjIndex = jobjManager.IndexOf(jobj);
+                        for (int i = 0; i < v.EnvelopeCount; i++)
+                        {
+                            if (i >= MAX_WEIGHTS)
+                                break;
 
-                        pobjCache.Envelopes[eni * MAX_WEIGHTS + i] = jobjIndex;
-                        pobjCache.Weights[eni * MAX_WEIGHTS + i] = v.GetWeightAt(i);
+                            var jobj = v.GetJOBJAt(i);
+                            var jobjIndex = jobjManager.IndexOf(jobj);
 
-                        if (jobj != null && jobj.InverseWorldTransform == null || jobjIndex == -1)
-                            Console.WriteLine("Warning: Inverse Matrix not set");
+                            pobjCache.Envelopes[eni * MAX_WEIGHTS + i] = jobjIndex;
+                            pobjCache.Weights[eni * MAX_WEIGHTS + i] = v.GetWeightAt(i);
 
-                        if (jobj != null && jobj.InverseWorldTransform != null && !jobj.Flags.HasFlag(JOBJ_FLAG.SKELETON))
-                            Console.WriteLine("Skeleton flag not set");
+                            if (jobj != null && jobj.InverseWorldTransform == null || jobjIndex == -1)
+                                Console.WriteLine("Warning: Inverse Matrix not set");
+
+                            if (jobj != null && jobj.InverseWorldTransform != null && !jobj.Flags.HasFlag(JOBJ_FLAG.SKELETON))
+                                Console.WriteLine("Skeleton flag not set");
+                        }
+                        eni++;
+                        pobjCache.EnvelopeCount = v.EnvelopeCount;
+                        pobjCache.HasWeighting = v.EnvelopeCount > 0;
                     }
-                    eni++;
-                    pobjCache.EnvelopeCount = v.EnvelopeCount;
-                    pobjCache.HasWeighting = v.EnvelopeCount > 0;
+
                 }
 
                 // load display list
