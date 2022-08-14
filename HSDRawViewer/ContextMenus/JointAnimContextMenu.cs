@@ -3,12 +3,20 @@ using System;
 using System.Windows.Forms;
 using System.Linq;
 using HSDRaw.Tools;
+using HSDRawViewer.GUI;
 
 namespace HSDRawViewer.ContextMenus
 {
     public class AnimJointContextMenu : CommonContextMenu
     {
         public override Type[] SupportedTypes { get; } = new Type[] { typeof(HSD_AnimJoint) };
+
+        public class AObjClass
+        {
+            public float EndFrame { get; set; }
+
+            public AOBJ_Flags Flags { get; set; }
+        }
 
         public AnimJointContextMenu() : base()
         {
@@ -89,6 +97,31 @@ namespace HSDRawViewer.ContextMenus
             };
             MenuItems.Add(reverse);
 #endif
+            MenuItem editAOBJ = new MenuItem("Edit All AObj Flags");
+            editAOBJ.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
+                {
+                    AObjClass setting = new AObjClass();
+
+                    using (PropertyDialog d = new PropertyDialog("AObj Settings", setting))
+                    {
+                        if (d.ShowDialog() == DialogResult.OK)
+                        {
+                            foreach (var n in anim.BreathFirstList)
+                            {
+                                if (n.AOBJ != null)
+                                {
+                                    n.AOBJ.EndFrame = setting.EndFrame;
+                                    n.AOBJ.Flags = setting.Flags;
+                                }
+                            }
+                        }
+                    }
+
+                }
+            };
+            MenuItems.Add(editAOBJ);
         }
     }
 }

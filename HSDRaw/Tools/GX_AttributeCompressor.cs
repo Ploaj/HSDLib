@@ -179,6 +179,22 @@ namespace HSDRaw.Tools
                     attr.CompType = GXCompType.UInt16;
                     attr.Scale = ushortScale;
                 }
+
+                //// make sure error is acceptable
+                //error = 0;
+                //foreach (float[] v in values)
+                //    foreach (var val in v)
+                //        if (signed)
+                //            error = (short)(val * Math.Pow(2, shortScale)) / Math.Pow(2, shortScale);
+                //        else
+                //            error = (ushort)(val * Math.Pow(2, ushortScale)) / Math.Pow(2, ushortScale);
+
+                //// if error is still too large then use float type
+                //if (Math.Abs(max - error) >= Epsilon)
+                //{
+                //    attr.CompType = GXCompType.Float;
+                //    attr.Scale = 1;
+                //}
             }
 
             // set index type

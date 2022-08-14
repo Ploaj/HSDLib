@@ -5,7 +5,7 @@ namespace HSDRaw.MEX
 {
     public class MEX_FighterData : HSDAccessor
     {
-        public override int TrimmedSize => 0x80;
+        public override int TrimmedSize => 0x90;
 
         public HSDFixedLengthPointerArrayAccessor<HSD_String> NameText { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_String>>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -71,6 +71,8 @@ namespace HSDRaw.MEX
 
         public HSDShortArray AllStarTrophyLookup { get => _s.GetReference<HSDShortArray>(0x7C); set => _s.SetReference(0x7C, value); }
 
+        public HSDFloatArray EndingFallScale { get => _s.GetReference<HSDFloatArray>(0x80); set => _s.SetReference(0x80, value); }
+
         public override void New()
         {
             base.New();
@@ -106,6 +108,7 @@ namespace HSDRaw.MEX
             ClassicTrophyLookup = new HSDShortArray();
             AdventureTrophyLookup = new HSDShortArray();
             AllStarTrophyLookup = new HSDShortArray();
+            EndingFallScale = new HSDFloatArray();
         }
     }
 }

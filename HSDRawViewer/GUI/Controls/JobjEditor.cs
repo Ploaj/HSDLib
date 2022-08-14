@@ -560,6 +560,8 @@ namespace HSDRawViewer.GUI.Plugins
                         t.TlutData._s.SetReference(0x00, newTOBJ.TlutData._s.GetReference<HSDAccessor>(0x00));
                         //t.TlutData.TlutData = newTOBJ.TlutData.TlutData;
                         t.TlutData.Format = newTOBJ.TlutData.Format;
+                        t.TlutData.ColorCount = newTOBJ.TlutData.ColorCount;
+                        t.TlutData.GXTlut = newTOBJ.TlutData.GXTlut;
                     }
                     else
                         t.TlutData = null;

@@ -164,9 +164,15 @@ namespace HSDRaw.Tools.Melee
                 {
                     if (d.Item1 == TEXT_OP_CODE.SPECIAL_CHARACTER)
                         sb.Append("<" + "CHR" + ", " + d.Item2[0] + ">");
-
+                    else
                     if (d.Item1 == TEXT_OP_CODE.COMMON_CHARACTER)
                         sb.Append(CharMAP[d.Item2[0]]);
+                    else
+                    if (((int)d.Item1 & 0xF0) == 0x20)
+                    {
+                        int head = ((int)d.Item1 & 0x0F) << 8;
+                        sb.Append(CharMAP[head | (int)d.Item2[0]]);
+                    }
                 }
             }
 
