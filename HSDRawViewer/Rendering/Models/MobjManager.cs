@@ -195,6 +195,12 @@ namespace HSDRawViewer.Rendering.Models
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GXTranslator.toWrapMode(tex.WrapS));
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GXTranslator.toWrapMode(tex.WrapT));
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GXTranslator.toMagFilter(tex.MagFilter));
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, 0); //640×548
+
+                    if (tex.LOD != null)
+                    {
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, tex.LOD.Bias); //640×548
+                    }
 
                     var wscale = tex.WScale;
                     var hscale = tex.HScale;

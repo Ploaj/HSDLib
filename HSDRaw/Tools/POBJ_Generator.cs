@@ -68,7 +68,7 @@ namespace HSDRaw.Tools
                     {
                         AttributeName = names[i],
                         AttributeType = GXAttribType.GX_DIRECT,
-                        CompType = GXCompType.RGB8,
+                        CompType = GXCompType.RGB565,
                         Stride = 4,
                         CompCount = GXCompCnt.ClrRGB
                     };

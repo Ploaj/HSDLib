@@ -23,6 +23,16 @@
 
         public static int Stride = (1 + 1 + 3 + 3 + 3 + 3 + 4 + 4 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2) * 4;
 
+        public override int GetHashCode()
+        {
+            return (POS, NRM, PNMTXIDX, TEX0MTXIDX).GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GX_Vertex vert && this == vert;
+        }
+
         public static bool operator ==(GX_Vertex x, GX_Vertex y)
         {
             return x.POS == y.POS && x.NRM == y.NRM && x.PNMTXIDX == y.PNMTXIDX && x.TEX0MTXIDX == y.TEX0MTXIDX;

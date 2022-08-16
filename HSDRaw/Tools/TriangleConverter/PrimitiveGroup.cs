@@ -9,7 +9,7 @@ namespace HSDRaw.Tools.TriangleConverter
 {
     public class PrimitiveGroup
     {
-        public List<ushort> _nodes = new List<ushort>();
+        public HashSet<ushort> _nodes = new HashSet<ushort>();
 
         public List<PointTriangle> _triangles = new List<PointTriangle>();
         public List<PointTriangleStrip> _tristrips = new List<PointTriangleStrip>();
@@ -40,7 +40,7 @@ namespace HSDRaw.Tools.TriangleConverter
 
         private bool TryAdd(PointTriangleStrip t)
         {
-            List<ushort> newIds = new List<ushort>();
+            HashSet<ushort> newIds = new HashSet<ushort>();
             foreach (GX_Vertex p in t._points)
             {
                 ushort id = p.PNMTXIDX;
@@ -58,7 +58,7 @@ namespace HSDRaw.Tools.TriangleConverter
 
         private bool TryAdd(PointTriangle t)
         {
-            List<ushort> newIds = new List<ushort>();
+            HashSet<ushort> newIds = new HashSet<ushort>();
 
             ushort x = t._x.PNMTXIDX;
             ushort y = t._y.PNMTXIDX;

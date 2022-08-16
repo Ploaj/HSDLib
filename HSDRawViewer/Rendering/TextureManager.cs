@@ -103,7 +103,7 @@ namespace HSDRawViewer.Rendering
                 GL.BindTexture(TextureTarget.Texture2D, 0);
 
 #if DEBUG
-                Console.WriteLine($"Loaded Texture {Width}x{Height} {_glid}");
+                Console.WriteLine($"Loaded Texture {Width}x{Height} {_glid} {RGBAData.Count}");
 #endif
 
                 RGBAData = null;
