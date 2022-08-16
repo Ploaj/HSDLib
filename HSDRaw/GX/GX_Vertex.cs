@@ -25,7 +25,7 @@
 
         public override int GetHashCode()
         {
-            return (POS, NRM, PNMTXIDX, TEX0MTXIDX).GetHashCode();
+            return (POS, NRM, CLR0, TEX0, TEX1, TEX2, TEX3, PNMTXIDX, TEX0MTXIDX).GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -35,7 +35,7 @@
 
         public static bool operator ==(GX_Vertex x, GX_Vertex y)
         {
-            return x.POS == y.POS && x.NRM == y.NRM && x.PNMTXIDX == y.PNMTXIDX && x.TEX0MTXIDX == y.TEX0MTXIDX;
+            return x.POS == y.POS && x.NRM == y.NRM && x.TEX0 == y.TEX0 && x.TEX1 == y.TEX1 && x.TEX2 == y.TEX2 && x.TEX3 == y.TEX3 && x.PNMTXIDX == y.PNMTXIDX && x.TEX0MTXIDX == y.TEX0MTXIDX;
         }
         public static bool operator !=(GX_Vertex x, GX_Vertex y)
         {
