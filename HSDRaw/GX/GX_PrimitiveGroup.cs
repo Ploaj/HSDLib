@@ -192,8 +192,8 @@ namespace HSDRaw.GX
         private static ushort ClrTo565(byte[] color)
         {
             byte red = color[0];
-            byte green = color[0];
-            byte blue = color[0];
+            byte green = color[1];
+            byte blue = color[2];
 
             int b = (blue >> 3) & 0x1f;
             int g = ((green >> 2) & 0x3f) << 5;
