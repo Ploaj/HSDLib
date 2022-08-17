@@ -14,6 +14,7 @@ using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
 using HSDRawViewer.Tools;
+using HSDRaw.Tools;
 
 namespace HSDRawViewer.Converters
 {
@@ -202,6 +203,21 @@ namespace HSDRawViewer.Converters
                         // process and export material
                         IOMaterial m = new IOMaterial();
                         m.Name = $"Joint_{jIndex}_Object_{dIndex}_Material_{dIndex}";
+                        m.AmbientColor = new System.Numerics.Vector4(
+                            dobj.Mobj.Material.AMB_R / 255f,
+                            dobj.Mobj.Material.AMB_G / 255f,
+                            dobj.Mobj.Material.AMB_B / 255f,
+                            dobj.Mobj.Material.AMB_A / 255f);
+                        m.DiffuseColor = new System.Numerics.Vector4(
+                            dobj.Mobj.Material.DIF_R / 255f,
+                            dobj.Mobj.Material.DIF_G / 255f,
+                            dobj.Mobj.Material.DIF_B / 255f,
+                            dobj.Mobj.Material.DIF_A / 255f);
+                        m.SpecularColor = new System.Numerics.Vector4(
+                            dobj.Mobj.Material.SPC_R / 255f,
+                            dobj.Mobj.Material.SPC_G / 255f,
+                            dobj.Mobj.Material.SPC_B / 255f,
+                            dobj.Mobj.Material.SPC_A / 255f);
                         m.Shininess = dobj.Mobj.Material.Shininess;
                         m.Alpha = dobj.Mobj.Material.Alpha;
 
@@ -212,9 +228,14 @@ namespace HSDRawViewer.Converters
                             {
                                 if (t.ImageData != null && t.ImageData.ImageData != null && !imageToName.ContainsKey(t.ImageData.ImageData))
                                 {
-                                    var name = $"Texture_{imageToName.Count}";
+                                    var name = $"Texture_{imageToName.Count}_{t.ImageData.Format}";
+
+                                    if (GXImageConverter.IsPalettedFormat(t.ImageData.Format))
+                                        name += $"_{t.TlutData.Format}";
+
                                     using (Bitmap img = TOBJConverter.ToBitmap(t))
                                         img.Save(_settings.Directory + name + ".png");
+
                                     imageToName.Add(t.ImageData.ImageData, name);
 
                                     if (_settings.ExportMOBJs)

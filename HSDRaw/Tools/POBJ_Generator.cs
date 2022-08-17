@@ -12,7 +12,7 @@ namespace HSDRaw.Tools
     /// </summary>
     public class POBJ_Generator
     {
-        public bool UseVertexAlpha { get; set; } = false;
+        public GXCompType VertexColorFormat { get; set; } = GXCompType.RGB565;
 
         public bool UseTriangleStrips { get; set; } = true;
 
@@ -72,10 +72,24 @@ namespace HSDRaw.Tools
                         Stride = 4,
                         CompCount = GXCompCnt.ClrRGB
                     };
-                    if (UseVertexAlpha &&
-                        (names[i].Equals(GXAttribName.GX_VA_CLR0) || names[i].Equals(GXAttribName.GX_VA_CLR1)))
-                            attr.CompType = GXCompType.RGBA8;
-                    Console.WriteLine(names[i] + " " + attr.CompType);
+
+                    if (names[i].Equals(GXAttribName.GX_VA_CLR0) || names[i].Equals(GXAttribName.GX_VA_CLR1))
+                    {
+                        attr.CompType = VertexColorFormat;
+
+                        switch (attr.CompType)
+                        {
+                            case GXCompType.RGBA6:
+                            case GXCompType.RGBA8:
+                            case GXCompType.RGBA4:
+                            case GXCompType.RGBX8:
+                                attr.CompCount = GXCompCnt.ClrRGBA;
+                                break;
+                        }
+                    }
+
+                    System.Diagnostics.Debug.WriteLine(names[i] + " " + attr.CompType);
+
                     nameToAttr.Add(names[i], attr);
                 }
                 attrs[i] = nameToAttr[names[i]];
@@ -109,7 +123,7 @@ namespace HSDRaw.Tools
 
             var index = 0;
 
-            var hash = string.Join("", o).GetHashCode();// ((IStructuralEquatable)o).GetHashCode(EqualityComparer<float>.Default);
+            var hash = string.Join("", o).GetHashCode();
             
             if (hashToIndex.ContainsKey(hash))
             {

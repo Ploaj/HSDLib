@@ -158,7 +158,9 @@
     <Compile Include="Converters\Animation\ConvFOBJ.cs" />
     <Compile Include="Converters\Animation\HSDK.cs" />
     <Compile Include="Converters\Animation\JointAnimationLoader.cs" />
+    <Compile Include="Converters\ImporterExtensions.cs" />
     <Compile Include="Converters\ModelTangentUtils.cs" />
+    <Compile Include="Converters\ModelImporter.cs" />
     <Compile Include="Converters\SBM\CollImporter.cs" />
     <Compile Include="Converters\SBM\ConvSVG.cs" />
     <Compile Include="Converters\SBM\SSFModelGenerator.cs" />
@@ -166,7 +168,7 @@
     <Compile Include="Extensions\JOBJExtensions.cs" />
     <Compile Include="Converters\Animation\MayaAnim.cs" />
     <Compile Include="Converters\ModelExporter.cs" />
-    <Compile Include="Converters\ModelImporter.cs" />
+    <Compile Include="Converters\ModelImportSettings.cs" />
     <Compile Include="Converters\SBM\CSPMaker.cs" />
     <Compile Include="Converters\SBM\ModeltoCollData.cs" />
     <Compile Include="Converters\Animation\MOTLoader.cs" />
@@ -225,6 +227,12 @@
     </Compile>
     <Compile Include="GUI\Extra\ISOFileTool.Designer.cs">
       <DependentUpon>ISOFileTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Extra\ModelImportDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Extra\ModelImportDialog.Designer.cs">
+      <DependentUpon>ModelImportDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Extra\PopoutJointAnimationEditor.cs">
       <SubType>Form</SubType>
@@ -641,6 +649,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\ISOFileTool.resx">
       <DependentUpon>ISOFileTool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Extra\ModelImportDialog.resx">
+      <DependentUpon>ModelImportDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Extra\PopoutJointAnimationEditor.resx">
       <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>

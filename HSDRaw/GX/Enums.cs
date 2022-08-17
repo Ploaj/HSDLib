@@ -110,6 +110,16 @@
         Float = 4,
     }
 
+    public enum GXCompTypeClr
+    {
+        RGB565 = 0,
+        RGB8 = 1,
+        RGBX8 = 2,
+        RGBA4 = 3,
+        RGBA6 = 4,
+        RGBA8 = 5,
+    }
+
     public enum GXAnisotropy
     {
         GX_ANISO_1, GX_ANISO_2, GX_ANISO_4, GX_MAX_ANISOTROPY

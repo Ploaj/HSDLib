@@ -1,178 +1,86 @@
-﻿using System;
-using System.Collections.Generic;
-using HSDRaw.Common;
-using OpenTK;
-using HSDRawViewer.Rendering;
-using System.IO;
-using HSDRaw.Tools;
+﻿using HSDRaw.Common;
 using HSDRaw.GX;
-using System.ComponentModel;
+using HSDRaw.Tools;
 using HSDRawViewer.GUI;
+using HSDRawViewer.GUI.Extra;
+using HSDRawViewer.Rendering.GX;
 using IONET;
-using IONET.Core.Skeleton;
 using IONET.Core;
 using IONET.Core.Model;
-using System.Linq;
+using IONET.Core.Skeleton;
+using OpenTK;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Windows.Forms;
-using HSDRawViewer.Rendering.GX;
+using static HSDRawViewer.Converters.ImporterExtensions;
 
 namespace HSDRawViewer.Converters
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ModelImportSettings
-    {
-        [Category("Importing Options"), DisplayName("Classical Scaling"), Description("Leave this true if you don't know what it is.")]
-        public bool ClassicalScaling { get; set; } = true;
-
-        [Category("Importing Options"), DisplayName("Flip Faces"), Description("Flips direction of faces, useful if model imports inside out")]
-        public bool FlipFaces { get; set; } = false;
-
-        [Category("Importing Options"), DisplayName("Flip UVs"), Description("Flips UVs on the Y axis, useful if textures are upside down")]
-        public bool FlipUVs { get; set; } = false;
-
-        [Category("Importing Options"), DisplayName("Flip Normals"), Description("Flips direction of normals, useful if model is all black with textures")]
-        public bool InvertNormals { get; set; } = false;
-
-        [Category("Importing Options"), DisplayName("Smooth Normals"), Description("Applies normal smoothing")]
-        public bool SmoothNormals { get; set; } = false;
-
-
-        [Category("Importing Options"), DisplayName("Import Bone Names"), Description("Stores bone names in JOBJs; not recommended")]
-        public bool ImportBoneNames { get; set; } = false;
-
-        [Category("Importing Options"), DisplayName("Import Mesh Names"), Description("Stores mesh names in DOBJs; not recommended")]
-        public bool ImportMeshNames { get; set; } = false;
-
-
-        [Category("Importing Options"), DisplayName("Use Triangle Strips"), Description("Slower to import, but significantly better optimized for game")]
-        public bool UseStrips { get; set; } = true;
-        
-        [Category("Importing Options"), DisplayName("Import Rigging"), Description("Import rigging from model file")]
-        public bool ImportRigging { get; set; } = true;
-
-#if DEBUG
-        [Category("Debug Options"), DisplayName("Merge"), Description("")]
-        public bool Merge { get; set; } = false;
-
-        [Category("Debug Options"), DisplayName("Metal Model"), Description("")]
-        public bool MetalModel { get; set; } = false;
-
-        [Category("Debug Options"), DisplayName("Clean Root Node"), Description("")]
-        public bool CleanRoot { get; set; } = false;
-
-        [Category("Debug Options"), DisplayName("Melee-ify"), Description("")]
-        public bool Meleeify { get; set; } = false;
-#endif
-
-
-        [Category("Material Options"), DisplayName("Import MOBJs"), Description("Imports .mobj files from file if found")]
-        public bool ImportMOBJ { get; set; } = false;
-
-        [Category("Material Options"), DisplayName("Import Material Info"), Description("Imports the material info from model file. NOT recommended if you don't know what this is")]
-        public bool ImportMaterialInfo { get; set; } = false;
-
-        [Category("Material Options"), DisplayName("Import Normals"), Description("Imports normals from model file")]
-        public bool ImportNormals { get; set; } = true;
-
-        [Category("Material Options"), DisplayName("Enable Diffuse"), Description("Enables DIFFUSE flag on materials")]
-        public bool EnableDiffuse { get; set; } = true;
-
-        [Category("Material Options"), DisplayName("Enable Constant"), Description("Enables CONSTANT flag on materials. Material will have constant color.")]
-        public bool EnableConstant { get; set; } = false;
-
-
-
-        [Category("Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("Enables importing of vertex colors")]
-        public bool ImportVertexColor { get; set; } = false;
-
-        [Category("Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha channel from vertex colors")]
-        public bool ImportVertexAlpha { get; set; } = false;
-
-        [Category("Vertex Color Options"), DisplayName("Multiply by 2"), Description("Multiplies vertex colors by 2")]
-        public bool MultiplyVertexColorBy2 { get; set; } = false;
-
-
-
-        [Category("Texture Options"), DisplayName("Import Textures"), Description("Imports textures from model file if they exist")]
-        public bool ImportTexture { get; set; } = true;
-
-        [Category("Texture Options"), DisplayName("Texture Format"), Description("The format to store the texture data in")]
-        public GXTexFmt TextureFormat { get; set; } = GXTexFmt.CI8;
-
-        [Category("Texture Options"), DisplayName("Palette Format"), Description("Palette format used with CI8 and CI4")]
-        public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB565;
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ModelProcessCache
-    {
-        // Folder path to search for external files like textures
-        public string FolderPath;
-
-        // this tool automatically splits triangle lists into stripped pobjs
-        public POBJ_Generator POBJGen = new POBJ_Generator();
-
-        // cache the jobj names to their respective jobj
-        public Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
-        
-        // Indicates jobjs that need the SKELETON flag set along with inverted transform
-        public List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
-
-        // for cleaning root
-        public Matrix4 CleanRotMatrix = Matrix4.Identity;
-
-        // 
-        public Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
-
-        // keeps matches texture path to dobj for better grouping options
-        public Dictionary<string, HSD_DOBJ> TextureToDOBJ = new Dictionary<string, HSD_DOBJ>();
-
-        public bool HasXLU = false;
-    }
-
-
-
-    /// <summary>
-    /// Static class for importing 3d model information
-    /// </summary>
     public class ModelImporter : ProgressClass
     {
-        private string FilePath;
+        // location to look for external files like textures
+        public string FolderPath;
+
+        // main model settings
         private ModelImportSettings Settings;
-        private ImportSettings IOSettings;
-        public HSD_JOBJ NewModel;
-        ModelProcessCache _cache = new ModelProcessCache();
+
+        // lookup mesh settings from iomesh
+        private Dictionary<IOMesh, MeshImportSettings> meshSettings = new Dictionary<IOMesh, MeshImportSettings>();
+
+        // lookup material settings from iomaterial
+        private Dictionary<IOMaterial, MaterialImportSettings> materialSettings = new Dictionary<IOMaterial, MaterialImportSettings>();
+
+        // cache the jobj names to their respective jobj
+        private Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
+
+        // Indicates jobjs that need the SKELETON flag set along with inverted transform
+        private List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
+
+        // for cleaning root
+        private Matrix4 CleanRotMatrix = Matrix4.Identity;
+
+        // 
+        private Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
+
+        // cache textures
+        private Dictionary<string, HSD_TOBJ> pathToTObj = new Dictionary<string, HSD_TOBJ>();
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="toReplace"></param>
-        public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
-        {
-            var f = Tools.FileIO.OpenFile(IOManager.GetModelImportFileFilter());
+        private HSD_JOBJ NewModel;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private IOScene scene;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private IOModel model;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public static HSD_JOBJ ImportModelFromFile(string f)
+        {
             if (f != null)
             {
-                var settings = new ModelImportSettings();
-                using (PropertyDialog d = new PropertyDialog("Model Import Options", settings))
+                var scene = IONET.IOManager.LoadScene(f, new IONET.ImportSettings()
                 {
-                    if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        ImportSettings ioSettings = new ImportSettings()
-                        {
-                            FlipUVs = settings.FlipUVs,
-                            FlipWindingOrder = !settings.FlipFaces,
-                            SmoothNormals = settings.SmoothNormals,
-                            Triangulate = true,
-                            //WeightLimit = true,
-                        };
+                    Triangulate = true,
+                });
 
-                        ModelImporter imp = new ModelImporter(f, settings, ioSettings);
+                using (ModelImportDialog d = new ModelImportDialog(scene, scene.Models[0]))
+                {
+                    if (d.ShowDialog() == DialogResult.OK)
+                    {
+                        ModelImporter imp = new ModelImporter(Path.GetDirectoryName(f), scene, scene.Models[0], d.settings, d.GetMeshSettings(), d.GetMaterialSettings());
 
                         using (ProgressBarDisplay pb = new ProgressBarDisplay(imp))
                         {
@@ -180,25 +88,57 @@ namespace HSDRawViewer.Converters
                             pb.ShowDialog();
                         }
 
-                        var newroot = imp.NewModel;
-
-                        toReplace._s.SetFromStruct(newroot._s);
+                        return imp.NewModel;
                     }
                 }
             }
+
+            return null;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="settings"></param>
-        /// <param name="iosettings"></param>
-        public ModelImporter(string filePath, ModelImportSettings settings, ImportSettings iosettings)
+        /// <param name="toReplace"></param>
+        public static HSD_JOBJ ImportModelFromFile()
         {
-            FilePath = filePath;
-            Settings = settings;
-            IOSettings = iosettings;
+            return ImportModelFromFile(Tools.FileIO.OpenFile(IOManager.GetModelImportFileFilter()));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="toReplace"></param>
+        public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
+        {
+            var model = ImportModelFromFile();
+
+            if (model != null)
+                toReplace._s.SetFromStruct(model._s);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="scene"></param>
+        /// <param name="settings"></param>
+        /// <param name="meshSettings"></param>
+        /// <param name="materialSettings"></param>
+        public ModelImporter(string folderPath, IOScene scene, IOModel model, ModelImportSettings settings, IEnumerable<MeshImportSettings> meshSettings, IEnumerable<MaterialImportSettings> materialSettings)
+        {
+            this.scene = scene;
+            this.model = model;
+            this.FolderPath = folderPath;
+            this.Settings = settings;
+
+            // generate mesh lookup
+            foreach (var m in meshSettings)
+                this.meshSettings.Add(m._poly, m);
+
+            // generate material lookup
+            foreach (var m in materialSettings)
+                this.materialSettings.Add(m._material, m);
         }
 
         /// <summary>
@@ -221,26 +161,23 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="w"></param>
         private void Import(BackgroundWorker w)
         {
             // settings
             if (Settings == null)
                 Settings = new ModelImportSettings();
 
-            if (IOSettings == null)
-                IOSettings = new ImportSettings();
+            // create pobj generate
+            POBJ_Generator POBJGen = new POBJ_Generator()
+            {
+                UseTriangleStrips = Settings.UseStrips,
+                VertexColorFormat = (GXCompType)Settings.VertexColorFormat,
+            };
 
-            _cache.POBJGen.UseTriangleStrips = Settings.UseStrips;
-            _cache.POBJGen.UseVertexAlpha = Settings.ImportVertexAlpha;
-            _cache.FolderPath = Path.GetDirectoryName(FilePath);
-
-
-            // import model
-            ProgressStatus = "Importing Model Data...";
-            w.ReportProgress(0);
-            var scene = IOManager.LoadScene(FilePath, IOSettings);
-
-            var model = scene.Models[0];
+            // apply settings to model
+            if (Settings.SmoothNormals)
+                model.SmoothNormals();
 
             // process nodes
             ProgressStatus = "Processing Joints...";
@@ -266,14 +203,11 @@ namespace HSDRawViewer.Converters
             }
 
 
-            // get root of skeleton
-            root.Flags = JOBJ_FLAG.SKELETON_ROOT;
-
             // process mesh
             ProgressStatus = "Processing Mesh...";
             foreach (var mesh in model.Meshes)
             {
-                ProcessMesh(scene, mesh, root);
+                ProcessMesh(scene, mesh, root, ref POBJGen);
 
                 if (root.Dobj != null)
                 {
@@ -282,38 +216,35 @@ namespace HSDRawViewer.Converters
                 }
             }
 
-
-            // set flags
-            if (_cache.EnvelopedJOBJs.Count > 0)
-                root.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
-
-            // enable xlu if anything needs it
-            if (_cache.HasXLU)
-                root.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
-
-            // just always enable opaque
-            root.Flags |= JOBJ_FLAG.OPA;
-
             // calculate inverse binds
-            foreach (var jobj in _cache.EnvelopedJOBJs)
+            if (Settings.EnvelopeAll)
             {
-                ProgressStatus = "Generating Inverse Transforms...";
-                if (_cache.jobjToWorldTransform.ContainsKey(jobj))
-                    jobj.InverseWorldTransform = Matrix4ToHSDMatrix(_cache.jobjToWorldTransform[jobj].Inverted());
+                foreach (var v in jobjToWorldTransform)
+                    v.Key.InverseWorldTransform = v.Value.Inverted().ToHsdMatrix();
+            }
+            else
+            {
+                foreach (var jobj in EnvelopedJOBJs)
+                {
+                    ProgressStatus = "Generating Inverse Transforms...";
+                    if (jobjToWorldTransform.ContainsKey(jobj))
+                        jobj.InverseWorldTransform = jobjToWorldTransform[jobj].Inverted().ToHsdMatrix();
+                }
             }
 
 
             // SAVE POBJ buffers
             ProgressStatus = "Generating and compressing vertex buffers...";
             w.ReportProgress(90);
-            _cache.POBJGen.SaveChanges();
+            POBJGen.SaveChanges();
 
             // done
             NewModel = root;
 
-            // update flags
+            // auto update flags
             JOBJExtensions.UpdateJOBJFlags(NewModel);
 
+            // apply classical scale flag
             if (Settings.ClassicalScaling)
                 NewModel.Flags |= JOBJ_FLAG.CLASSICAL_SCALING;
 
@@ -327,87 +258,6 @@ namespace HSDRawViewer.Converters
             w.ReportProgress(100);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="root"></param>
-        private static void Meleeify(IOBone root)
-        {
-            Dictionary<IOBone, System.Numerics.Matrix4x4> worldTransform = new Dictionary<IOBone, System.Numerics.Matrix4x4>();
-            Queue<IOBone> queue = new Queue<IOBone>();
-
-            // gather final positions
-            queue.Enqueue(root);
-            while (queue.Count > 0)
-            {
-                var bone = queue.Dequeue();
-
-                worldTransform.Add(bone, bone.WorldTransform);
-
-                foreach (var child in bone.Children)
-                    queue.Enqueue(child);
-            }
-
-            // reset skeleton
-            queue.Enqueue(root);
-            while (queue.Count > 0)
-            {
-                var bone = queue.Dequeue();
-
-                // reset rotation and scale
-                List<string> specialBones = new List<string>() { "LShoulderJA", "RShoulderJA",
-    "RHaveN", "LHaveN",
-    "LLegJA", "LFootJA",
-    "RLegJA", "RFootJA"};
-
-                List<string> commonBones = new List<string>()
-                {
-                    "TopN", "TransN", "XRotN", "YRotN", "HipN", "WaistN", "LLegJA", "LLegJ", "LKneeJ", "LFootJA", "LFootJ", "RLegJA", "RLegJ", "RKneeJ", "RFootJA", "RFootJ", "BustN", "LShoulderN", "LShoulderJA", "LShoulderJ", "LArmJ", "LHandN", "L1stNa", "L1stNb", "L2ndNa", "L2ndNb", "L3rdNa", "L3rdNb", "L4thNa", "L4thNb", "LThumbNa", "LThumbNb", "LHandNb", "NeckN", "HeadN", "RShoulderN", "RShoulderJA", "RShoulderJ", "RArmJ", "RHandN", "R1stNa", "R1stNb", "R2ndNa", "R2ndNb", "R3rdNa", "R3rdNb", "R4thNa", "R4thNb", "RThumbNa", "RThumbNb", "RHandNb", "ThrowN", "TransN2"
-                };
-
-                Vector3[] specialBoneRotations = new Vector3[]
-                {
-                    new Vector3(-90, 0, 0), new Vector3(-90, 0,-180),
-                    new Vector3(0, -90, -180), new Vector3(-90, -90, 270),
-                    new Vector3(-90, 0, -90), new Vector3(0, 0, -90),
-                    new Vector3(-90, 0, -90), new Vector3(0, 0, -90)
-                };
-
-                var boneIndex = specialBones.IndexOf(bone.Name);
-
-                if (boneIndex != -1)
-                {
-                    var r = specialBoneRotations[boneIndex];
-                    bone.RotationEuler = new System.Numerics.Vector3((float)(r.X * Math.PI / 180), (float)(r.Y * Math.PI / 180), (float)(r.Z * Math.PI / 180));
-                }
-                else
-                if (commonBones.Contains(bone.Name))
-                {
-                    bone.Rotation = new System.Numerics.Quaternion(0, 0, 0, 1);
-                }
-                bone.Scale = new System.Numerics.Vector3(1, 1, 1);
-
-                bone.Translation = new System.Numerics.Vector3(0, 0, 0);
-
-                // calcuate new translation
-                if (bone.Parent != null)
-                {
-                    var currentPoint = System.Numerics.Vector3.Transform(System.Numerics.Vector3.Zero, bone.WorldTransform);
-                    var targetPoint = System.Numerics.Vector3.Transform(System.Numerics.Vector3.Zero, worldTransform[bone]);
-                    var dis = System.Numerics.Vector3.Subtract(targetPoint, currentPoint);
-
-                    if (System.Numerics.Matrix4x4.Invert(bone.Parent.WorldTransform, out System.Numerics.Matrix4x4 inverse))
-                    {
-                        bone.Translation = System.Numerics.Matrix4x4.Multiply(worldTransform[bone], inverse).Translation;
-
-                        Console.WriteLine(bone.Name + " " + bone.Translation.ToString());
-                    }
-                }
-
-                foreach (var child in bone.Children)
-                    queue.Enqueue(child);
-            }
-        }
 
         /// <summary>
         /// 
@@ -420,15 +270,15 @@ namespace HSDRawViewer.Converters
             //
             if (Settings.CleanRoot)
             {
+                // if this is root bone calculate the clean matrix
                 if (bone.Parent == null)
                 {
-                    _cache.CleanRotMatrix = Matrix4.CreateFromQuaternion(new Quaternion(bone.Rotation.X, bone.Rotation.Y, bone.Rotation.Z, bone.Rotation.W));
+                    CleanRotMatrix = Matrix4.CreateFromQuaternion(new Quaternion(bone.Rotation.X, bone.Rotation.Y, bone.Rotation.Z, bone.Rotation.W));
                     bone.Rotation = System.Numerics.Quaternion.Identity;
                 }
-                else
+                else // otherwise apply the cleaning to current bone
                 {
-                    // fix position
-                    var pos = Vector3.TransformNormal(new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ), _cache.CleanRotMatrix);
+                    var pos = Vector3.TransformNormal(new Vector3(bone.TranslationX, bone.TranslationY, bone.TranslationZ), CleanRotMatrix);
                     bone.Translation = new System.Numerics.Vector3(pos.X, pos.Y, pos.Z);
                 }
 
@@ -436,13 +286,13 @@ namespace HSDRawViewer.Converters
                 bone.Scale = new System.Numerics.Vector3(1, 1, 1);
             }
 
-            //
+            // melee-ify model if flag is set
             if (bone.Parent == null && Settings.Meleeify)
             {
-                Meleeify(bone);
+                bone.Meleeify();
             }
 #endif
-
+            // create jobj
             HSD_JOBJ jobj = new HSD_JOBJ()
             {
                 TX = bone.TranslationX,
@@ -456,117 +306,52 @@ namespace HSDRawViewer.Converters
                 SZ = bone.ScaleZ,
             };
 
+            // optional import bone name
             if (Settings.ImportBoneNames)
                 jobj.ClassName = bone.Name;
 
-            Console.WriteLine(bone.Name + " " + jobj.Children.Length);
+            // add to lookup
+            NameToJOBJ.Add(bone.Name, jobj);
 
-            _cache.NameToJOBJ.Add(bone.Name, jobj);
-            _cache.jobjToWorldTransform.Add(jobj, MatrixNumericsToTKMatrix(bone.WorldTransform));
+            // add world transform lookup
+            jobjToWorldTransform.Add(jobj, bone.WorldTransform.ToTKMatrix());
 
-            foreach(var child in bone.Children)
+            // recursivly add children
+            foreach (var child in bone.Children)
             {
                 jobj.AddChild(IOBoneToJOBJ(child));
             }
 
             return jobj;
         }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        private static int ComputeHash(params byte[] data)
-        {
-            unchecked
-            {
-                const int p = 16777619;
-                int hash = (int)2166136261;
 
-                for (int i = 0; i < data.Length; i++)
-                    hash = (hash ^ data[i]) * p;
-
-                hash += hash << 13;
-                hash ^= hash >> 7;
-                hash += hash << 3;
-                hash ^= hash >> 17;
-                hash += hash << 5;
-                return hash;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        private static Matrix4 MatrixNumericsToTKMatrix(System.Numerics.Matrix4x4 t)
-        {
-            return new Matrix4(
-                t.M11, t.M12, t.M13, t.M14,
-                t.M21, t.M22, t.M23, t.M24,
-                t.M31, t.M32, t.M33, t.M34,
-                t.M41, t.M42, t.M43, t.M44);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        private static HSD_Matrix4x3 Matrix4ToHSDMatrix(Matrix4 t)
-        {
-            var o = new HSD_Matrix4x3();
-            o.M11 = t.M11;
-            o.M12 = t.M21;
-            o.M13 = t.M31;
-            o.M14 = t.M41;
-            o.M21 = t.M12;
-            o.M22 = t.M22;
-            o.M23 = t.M32;
-            o.M24 = t.M42;
-            o.M31 = t.M13;
-            o.M32 = t.M23;
-            o.M33 = t.M33;
-            o.M34 = t.M43;
-            return o;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="f"></param>
-        /// <returns></returns>
-        private static float RoundFloat(float f)
-        {
-            return (float)Math.Round(f, 4);
-        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        private void ProcessMesh(IOScene scene, IOMesh mesh, HSD_JOBJ rootnode)
+        private void ProcessMesh(IOScene scene, IOMesh mesh, HSD_JOBJ rootnode, ref POBJ_Generator POBJGen)
         {
+            // get settings if they exist
+            MeshImportSettings settings;
+            if (meshSettings.ContainsKey(mesh))
+                settings = meshSettings[mesh];
+            else
+                settings = new MeshImportSettings(mesh);
+
+            // apply settings
+            if (settings.FlipUVs)
+                mesh.FlipUVs();
+
+            if (settings.FlipFaces)
+                mesh.FlipWindingOrder();
+
+            // determine parent
             HSD_JOBJ parent = rootnode;
+            if (mesh.ParentBone != null && NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
+                parent = NameToJOBJ[mesh.ParentBone.Name];
 
-            HashSet<HSD_JOBJ> nodes = new HashSet<HSD_JOBJ>();
-            foreach(var j in rootnode.BreathFirstList)
-                nodes.Add(j);
-            
-
-            if (mesh.ParentBone != null && _cache.NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
-                parent = _cache.NameToJOBJ[mesh.ParentBone.Name];
-
-
-            HSD_DOBJ root = null;
-            HSD_DOBJ prev = null;
-
-            //var skeleton = rootnode.BreathFirstList;
             Console.WriteLine("Processing " + mesh.Name);
-
-            bool singleBinded = mesh.Name.Contains("SINGLE");
 
             if (mesh.Name.Contains("BUMP"))
             {
@@ -579,24 +364,24 @@ namespace HSDRawViewer.Converters
                 }
             }
 
+            // begin processing polygons
+            HSD_DOBJ root = null;
+            HSD_DOBJ prev = null;
             foreach (var poly in mesh.Polygons)
             {
                 // Skip Empty Polygon
                 if (poly.Indicies.Count == 0)
                     continue;
 
-
                 // convert to triangles
                 poly.ToTriangles(mesh);
-
                 if (poly.PrimitiveType != IOPrimitive.TRIANGLE)
                     continue;
-
 
                 // Generate DOBJ
                 HSD_DOBJ dobj = new HSD_DOBJ();
 
-                if(Settings.ImportMeshNames)
+                if (Settings.ImportMeshNames)
                     dobj.ClassName = mesh.Name;
 
                 if (root == null)
@@ -608,30 +393,19 @@ namespace HSDRawViewer.Converters
 
                 // generate material
                 var material = scene.Materials.Find(e => e.Name == poly.MaterialName);
+                dobj.Mobj = GenerateMaterial(settings, material);
 
-                dobj.Mobj = GenerateMaterial(mesh, material);
-                
 
                 Console.WriteLine(mesh.Name + " " + material?.Name);
 
-                
+
                 // reflective mobjs do not use uvs
-                var hasReflection = false;
+                var hasReflection = settings.IsReflective || Settings.MetalModel;
 
                 // bump maps need tangents and bitangents
-                var hasBump = false;
+                var hasBump = settings.GenerateTB;
 
-                // Assess needed attributes based on the material MOBJ
-                if (mesh.Name.Contains("REFLECTIVE") )
-                    hasReflection = true;
-#if DEBUG
-                if(Settings.MetalModel)
-                    hasReflection = true;
-#endif
-
-                if (mesh.Name.Contains("BUMP"))
-                    hasBump = true;
-
+                // Assess additional attributes based on the material MOBJ
                 if (dobj.Mobj.Textures != null)
                 {
                     foreach (var t in dobj.Mobj.Textures.List)
@@ -646,7 +420,8 @@ namespace HSDRawViewer.Converters
                 // assess attributes
                 List<GXAttribName> Attributes = new List<GXAttribName>();
 
-                if (mesh.HasEnvelopes() && Settings.ImportRigging && !singleBinded)
+                // determine if position normal matrix is needed
+                if (mesh.HasEnvelopes() && Settings.ImportSkinning && !settings.SingleBind)
                 {
                     Attributes.Add(GXAttribName.GX_VA_PNMTXIDX);
 
@@ -665,7 +440,6 @@ namespace HSDRawViewer.Converters
                             if (dobj.Mobj.Textures.List.Count > 2)
                                 Attributes.Add(GXAttribName.GX_VA_TEX2MTXIDX);
                         }
-
 #if DEBUG
                         if (Settings.MetalModel && !Attributes.Contains(GXAttribName.GX_VA_TEX1MTXIDX))
                             Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
@@ -673,60 +447,63 @@ namespace HSDRawViewer.Converters
                     }
                 }
 
-                
+                // always add position attribute
                 Attributes.Add(GXAttribName.GX_VA_POS);
 
-
+                // add normal attribute if needed
                 if (hasBump)
                     Attributes.Add(GXAttribName.GX_VA_NBT);
                 else
-                if (mesh.HasNormals && Settings.ImportNormals)
+                if (mesh.HasNormals && settings.ImportNormals)
                     Attributes.Add(GXAttribName.GX_VA_NRM);
 
-
-                if (mesh.HasColorSet(0) && Settings.ImportVertexColor)
+                // add vertex color attribute if needed
+                if (mesh.HasColorSet(0) && settings.ImportVertexColor)
                     Attributes.Add(GXAttribName.GX_VA_CLR0);
 
-                if (mesh.HasColorSet(1) && Settings.ImportVertexColor)
+                if (mesh.HasColorSet(1) && settings.ImportVertexColor)
                     Attributes.Add(GXAttribName.GX_VA_CLR1);
 
+                // add texture coordinate uvs
 #if DEBUG
                 if (!Settings.MetalModel)
                 {
 #endif
 
-                if (mesh.HasUVSet(0))
-                    Attributes.Add(GXAttribName.GX_VA_TEX0);
+                    if (mesh.HasUVSet(0))
+                        Attributes.Add(GXAttribName.GX_VA_TEX0);
 
-                if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX1);
+                    if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX1);
 
-                if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX2);
+                    if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX2);
 
-                if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX3);
+                    if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX3);
 
-                if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX4);
+                    if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX4);
 
-                if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX5);
+                    if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX5);
 
-                if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX6);
+                    if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX6);
 
-                if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
-                    Attributes.Add(GXAttribName.GX_VA_TEX7);
+                    if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
+                        Attributes.Add(GXAttribName.GX_VA_TEX7);
 
 #if DEBUG
                 }
 #endif
 
+                // being processing mesh
                 var vertices = new List<GX_Vertex>();
                 var jobjList = new List<HSD_JOBJ[]>();
                 var weightList = new List<float[]>();
 
+                // generarte vertex list
                 foreach (var face in poly.Indicies)
                 {
                     var v = mesh.Vertices[face];
@@ -737,44 +514,48 @@ namespace HSDRawViewer.Converters
                     var tknrm = new Vector3(v.Normal.X, v.Normal.Y, v.Normal.Z);
                     var tktan = new Vector3(v.Tangent.X, v.Tangent.Y, v.Tangent.Z);
                     var tkbitan = new Vector3(v.Binormal.X, v.Binormal.Y, v.Binormal.Z);
-                    
-                    if(_cache.jobjToWorldTransform[parent] != Matrix4.Identity)
+
+                    // transform by inverse of parent
+                    if (jobjToWorldTransform[parent] != Matrix4.Identity)
                     {
-                        var parentTransform = _cache.jobjToWorldTransform[parent].Inverted();
+                        var parentTransform = jobjToWorldTransform[parent].Inverted();
                         tkvert = Vector3.TransformPosition(tkvert, parentTransform);
                         tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
                         tktan = Vector3.TransformNormal(tktan, parentTransform);
                         tkbitan = Vector3.TransformNormal(tkbitan, parentTransform);
                     }
 
-
-                    if (mesh.HasEnvelopes() && Settings.ImportRigging)
+                    // additional processing for skin
+                    if (mesh.HasEnvelopes() && Settings.ImportSkinning)
                     {
                         // create weighting lists
                         List<float> weight = new List<float>();
                         List<HSD_JOBJ> bones = new List<HSD_JOBJ>();
 
-                        if(v.Envelope.Weights.Count == 0)
+                        // single bind if there are no weights
+                        if (v.Envelope.Weights.Count == 0)
                         {
                             weight.Add(1);
                             bones.Add(rootnode);
                         }
 
+                        // check for too many weights
                         if (v.Envelope.Weights.Count > 6)
                             throw new Exception($"Too many weights! {v.Envelope.Weights.Count} in {mesh.Name}");
 
-                        foreach(var bw in v.Envelope.Weights)
+                        // process weights
+                        foreach (var bw in v.Envelope.Weights)
                         {
                             // check if skeleton actually contains bone
-                            if(_cache.NameToJOBJ.ContainsKey(bw.BoneName) && nodes.Contains(_cache.NameToJOBJ[bw.BoneName]))
+                            if (NameToJOBJ.ContainsKey(bw.BoneName))
                             {
                                 // add envelope
-                                bones.Add(_cache.NameToJOBJ[bw.BoneName]);
+                                bones.Add(NameToJOBJ[bw.BoneName]);
                                 weight.Add(bw.Weight);
 
                                 // indicate enveloped jobjs
-                                if (!_cache.EnvelopedJOBJs.Contains(_cache.NameToJOBJ[bw.BoneName]))
-                                    _cache.EnvelopedJOBJs.Add(_cache.NameToJOBJ[bw.BoneName]);
+                                if (!EnvelopedJOBJs.Contains(NameToJOBJ[bw.BoneName]))
+                                    EnvelopedJOBJs.Add(NameToJOBJ[bw.BoneName]);
                             }
                             else
                             {
@@ -782,26 +563,28 @@ namespace HSDRawViewer.Converters
                             }
                         }
 
+                        // add to jobj and weight list
                         jobjList.Add(bones.ToArray());
                         weightList.Add(weight.ToArray());
 
                         // invert single binds
                         if (v.Envelope.Weights.Count == 1)
                         {
-                            var inv = _cache.jobjToWorldTransform[_cache.NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
+                            var inv = jobjToWorldTransform[NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
                             tkvert = Vector3.TransformPosition(tkvert, inv);
                             tknrm = Vector3.TransformNormal(tknrm, inv).Normalized();
-                            tktan = Vector3.TransformNormal(tktan, inv).Normalized();
-                            tkbitan = Vector3.TransformNormal(tkbitan, inv).Normalized();
+                            tktan = Vector3.TransformNormal(tktan, inv);
+                            tkbitan = Vector3.TransformNormal(tkbitan, inv);
                         }
                     }
-                    
+
+                    // set final vertex data
                     vertex.POS = GXTranslator.fromVector3(tkvert);
                     vertex.NRM = GXTranslator.fromVector3(tknrm.Normalized());
                     vertex.TAN = GXTranslator.fromVector3(tktan);
                     vertex.BITAN = GXTranslator.fromVector3(tkbitan);
 
-                    if (Settings.InvertNormals)
+                    if (settings.InvertNormals)
                     {
                         vertex.NRM.X *= -1;
                         vertex.NRM.Y *= -1;
@@ -840,34 +623,34 @@ namespace HSDRawViewer.Converters
 
                     if (mesh.HasColorSet(0))
                         vertex.CLR0 = new GXColor4(
-                            v.Colors[0].X * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
-                            v.Colors[0].Y * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
-                            v.Colors[0].Z * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
-                            Settings.ImportVertexAlpha ? v.Colors[0].W : 1);
+                        v.Colors[0].X,
+                        v.Colors[0].Y,
+                        v.Colors[0].Z,
+                        settings.ImportVertexAlpha ? v.Colors[0].W : 1);
 
                     if (mesh.HasColorSet(1))
                         vertex.CLR1 = new GXColor4(
-                            v.Colors[1].X * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
-                            v.Colors[1].Y * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
-                            v.Colors[1].Z * (Settings.MultiplyVertexColorBy2 ? 2 : 1),
-                            Settings.ImportVertexAlpha ? v.Colors[1].W : 1);
+                        v.Colors[1].X,
+                        v.Colors[1].Y,
+                        v.Colors[1].Z,
+                        settings.ImportVertexAlpha ? v.Colors[1].W : 1);
 
                     vertices.Add(vertex);
                 }
 
-                
+
                 // generate pobjs
                 HSD_POBJ pobj = null;
 
-                if (mesh.HasEnvelopes() && Settings.ImportRigging && !singleBinded)
-                    pobj = _cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, weightList);
+                if (mesh.HasEnvelopes() && Settings.ImportSkinning && !settings.SingleBind)
+                    pobj = POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), jobjList, weightList);
                 else
-                    pobj = _cache.POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
+                    pobj = POBJGen.CreatePOBJsFromTriangleList(vertices, Attributes.ToArray(), null);
 
-                if (singleBinded && jobjList.Count > 0 && jobjList[0].Length > 0)
+                if (settings.SingleBind && jobjList.Count > 0 && jobjList[0].Length > 0)
                     parent = jobjList[0][0];
 
-                if(pobj != null)
+                if (pobj != null)
                 {
                     if (dobj.Pobj == null)
                         dobj.Pobj = pobj;
@@ -886,10 +669,34 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private string GetFullTexturePath(string path)
+        {
+            var texturePath = path;
+
+            if (texturePath.Contains("file://"))
+                texturePath = texturePath.Replace("file://", "");
+
+            if (File.Exists(Path.Combine(FolderPath, texturePath)))
+                texturePath = Path.Combine(FolderPath, texturePath);
+
+            if (File.Exists(path))
+                texturePath = path;
+
+            if (File.Exists(texturePath + ".png"))
+                texturePath = texturePath + ".png";
+
+            return texturePath;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="settings"></param>
         /// <param name="material"></param>
         /// <returns></returns>
-        private HSD_MOBJ GenerateMaterial(IOMesh mesh, IOMaterial material)
+        private HSD_MOBJ GenerateMaterial(MeshImportSettings mesh, IOMaterial material)
         {
             // create blank mobj
             var Mobj = new HSD_MOBJ();
@@ -905,129 +712,94 @@ namespace HSDRawViewer.Converters
                 Alpha = 1
             };
 
+            // no material data
+            if (material == null)
+                return Mobj;
+
+            // get settings if they exist
+            MaterialImportSettings settings;
+            if (materialSettings.ContainsKey(material))
+                settings = materialSettings[material];
+            else
+                settings = new MaterialImportSettings(material);
+
+            // optional mobj loading
+            if (settings.ImportMOBJ && 
+                settings.ImportTexture &&
+                material.DiffuseMap != null && 
+                !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
+            {
+                var textPath = GetFullTexturePath(material.DiffuseMap.FilePath);
+                var mobjPath = Path.Combine(Path.GetDirectoryName(textPath), Path.GetFileNameWithoutExtension(textPath) + ".mobj");
+
+                if (File.Exists(mobjPath))
+                {
+                    Mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
+                    return Mobj;
+                }
+            }
+
             // detect and set flags
-            if (Settings.ImportVertexColor && (mesh.HasColorSet(0) || mesh.HasColorSet(1)))
+            if (mesh.ImportVertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
 
-            if (Settings.EnableDiffuse)
+            if (settings.EnableDiffuse)
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
 
-            if (Settings.EnableConstant)
+            if (settings.EnableConstant)
                 Mobj.RenderFlags |= RENDER_MODE.CONSTANT;
 
             // Properties
-            if (material != null && Settings.ImportMaterialInfo)
+            if (settings.ImportMaterialInfo)
             {
-                Mobj.Material.Shininess = material.Shininess;
-                Mobj.Material.Alpha = material.Alpha;
-
-                Mobj.Material.AMB_R = (byte)(material.AmbientColor.X * 255);
-                Mobj.Material.AMB_G = (byte)(material.AmbientColor.Y * 255);
-                Mobj.Material.AMB_B = (byte)(material.AmbientColor.Z * 255);
-                Mobj.Material.AMB_A = (byte)(material.AmbientColor.W * 255);
-
-                Mobj.Material.DIF_R = (byte)(material.DiffuseColor.X * 255);
-                Mobj.Material.DIF_G = (byte)(material.DiffuseColor.Y * 255);
-                Mobj.Material.DIF_B = (byte)(material.DiffuseColor.Z * 255);
-                Mobj.Material.DIF_A = (byte)(material.DiffuseColor.W * 255);
-
-                Mobj.Material.SPC_R = (byte)(material.SpecularColor.X * 255);
-                Mobj.Material.SPC_G = (byte)(material.SpecularColor.Y * 255);
-                Mobj.Material.SPC_B = (byte)(material.SpecularColor.Z * 255);
-                Mobj.Material.SPC_A = (byte)(material.SpecularColor.W * 255);
+                Mobj.Material.Shininess = settings.Shininess;
+                Mobj.Material.Alpha = settings.Alpha;
+                Mobj.Material.AmbientColor = settings.AmbientColor;
+                Mobj.Material.DiffuseColor = settings.DiffuseColor;
+                Mobj.Material.SpecularColor = settings.SpecularColor;
             }
 
             // Textures
-            if(material != null && Settings.ImportTexture)
+            if (settings.ImportTexture)
             {
                 if (material.DiffuseMap != null && !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
                 {
-                    var texturePath = material.DiffuseMap.FilePath;
+                    var texturePath = GetFullTexturePath(material.DiffuseMap.FilePath);
 
-                    if (texturePath.Contains("file://"))
-                        texturePath = texturePath.Replace("file://", "");
-                    
-                    if (File.Exists(Path.Combine(_cache.FolderPath, texturePath)))
-                        texturePath = Path.Combine(_cache.FolderPath, texturePath);
-                    
-                    if (File.Exists(material.DiffuseMap.FilePath))
-                        texturePath = material.DiffuseMap.FilePath;
-
-                    if (File.Exists(texturePath + ".png"))
-                        texturePath = texturePath + ".png";
-
-
-                    var mobjPath = Path.Combine(Path.GetDirectoryName(texturePath), Path.GetFileNameWithoutExtension(texturePath)) + ".mobj";
-                    
-                    if(Settings.ImportMOBJ && File.Exists(mobjPath))
-                    {
-                        var dat = new HSDRaw.HSDRawFile(mobjPath);
-                        Mobj._s = dat.Roots[0].Data._s;
-                        return Mobj;
-                    }
-                    else
-                    /// special mobj loading
-                    if (Path.GetExtension(texturePath).ToLower() == ".mobj")
-                    {
-                        var dat = new HSDRaw.HSDRawFile(texturePath);
-                        Mobj._s = dat.Roots[0].Data._s;
-                        return Mobj;
-                    }
-                    else
                     if (File.Exists(texturePath) && (texturePath.ToLower().EndsWith(".png") || texturePath.ToLower().EndsWith(".bmp")))
                     {
                         Mobj.RenderFlags |= RENDER_MODE.TEX0;
 
-                        var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, Settings.TextureFormat, Settings.PaletteFormat);
-                        tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
-                        
-                        tobj.GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0;
-                        tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
-
-                        tobj.WrapS = ToGXWrapMode(material.DiffuseMap.WrapS);
-                        tobj.WrapT = ToGXWrapMode(material.DiffuseMap.WrapT);
-
-                        if (TOBJConverter.IsTransparent(tobj))
+                        if (pathToTObj.ContainsKey(texturePath))
                         {
-                            _cache.HasXLU = true;
-                            Mobj.RenderFlags |= RENDER_MODE.XLU;
-                            tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;
+                            Mobj.Textures = HSDRaw.HSDAccessor.DeepClone<HSD_TOBJ>(pathToTObj[texturePath]);
                         }
+                        else
+                        {
+                            var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, settings.TextureFormat, settings.PaletteFormat);
+                            tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
 
-                        Mobj.Textures = tobj;
+                            tobj.GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0;
+                            tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
+
+                            tobj.WrapS = material.DiffuseMap.WrapS.ToGXWrapMode();
+                            tobj.WrapT = material.DiffuseMap.WrapT.ToGXWrapMode();
+
+                            if (TOBJConverter.IsTransparent(tobj))
+                            {
+                                Mobj.RenderFlags |= RENDER_MODE.XLU;
+                                tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;
+                            }
+
+                            Mobj.Textures = tobj;
+
+                            pathToTObj.Add(texturePath, tobj);
+                        }
                     }
                 }
             }
 
             return Mobj;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        private static GXWrapMode ToGXWrapMode(WrapMode mode)
-        {
-            switch (mode)
-            {
-                case WrapMode.CLAMP:
-                    return GXWrapMode.CLAMP;
-                case WrapMode.MIRROR:
-                    return GXWrapMode.MIRROR;
-                default:
-                    return GXWrapMode.REPEAT;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        private static byte ColorFloatToByte(float val)
-        {
-            return (byte)(val > 1.0f ? 255 : val * 256);
         }
     }
 }
