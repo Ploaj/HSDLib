@@ -400,7 +400,11 @@ namespace HSDRawViewer.Converters
 
 
                 // reflective mobjs do not use uvs
-                var hasReflection = settings.IsReflective || Settings.MetalModel;
+                var hasReflection = settings.IsReflective;
+#if DEBUG
+                if (Settings.MetalModel)
+                    hasReflection = true;
+#endif
 
                 // bump maps need tangents and bitangents
                 var hasBump = settings.GenerateTB;

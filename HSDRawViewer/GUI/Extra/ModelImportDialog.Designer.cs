@@ -133,7 +133,7 @@
             this.tabPage4.Controls.Add(this.materialProperty);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(816, 512);
+            this.tabPage4.Size = new System.Drawing.Size(816, 488);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Materials";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -143,7 +143,7 @@
             this.splitter3.Dock = System.Windows.Forms.DockStyle.Right;
             this.splitter3.Location = new System.Drawing.Point(368, 23);
             this.splitter3.Name = "splitter3";
-            this.splitter3.Size = new System.Drawing.Size(3, 489);
+            this.splitter3.Size = new System.Drawing.Size(3, 465);
             this.splitter3.TabIndex = 6;
             this.splitter3.TabStop = false;
             // 
@@ -153,7 +153,7 @@
             this.materialList.HideSelection = false;
             this.materialList.Location = new System.Drawing.Point(0, 23);
             this.materialList.Name = "materialList";
-            this.materialList.Size = new System.Drawing.Size(371, 489);
+            this.materialList.Size = new System.Drawing.Size(371, 465);
             this.materialList.TabIndex = 4;
             this.materialList.UseCompatibleStateImageBehavior = false;
             this.materialList.View = System.Windows.Forms.View.List;
@@ -175,7 +175,7 @@
             this.materialProperty.Location = new System.Drawing.Point(371, 0);
             this.materialProperty.Name = "materialProperty";
             this.materialProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.materialProperty.Size = new System.Drawing.Size(445, 512);
+            this.materialProperty.Size = new System.Drawing.Size(445, 488);
             this.materialProperty.TabIndex = 5;
             // 
             // tabPage2
@@ -186,7 +186,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(816, 512);
+            this.tabPage2.Size = new System.Drawing.Size(816, 488);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Bone List";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -196,7 +196,7 @@
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
             this.splitter2.Location = new System.Drawing.Point(368, 3);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(3, 506);
+            this.splitter2.Size = new System.Drawing.Size(3, 482);
             this.splitter2.TabIndex = 2;
             this.splitter2.TabStop = false;
             // 
@@ -205,7 +205,7 @@
             this.boneTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.boneTree.Location = new System.Drawing.Point(3, 3);
             this.boneTree.Name = "boneTree";
-            this.boneTree.Size = new System.Drawing.Size(368, 506);
+            this.boneTree.Size = new System.Drawing.Size(368, 482);
             this.boneTree.TabIndex = 0;
             // 
             // boneProperty
@@ -214,7 +214,7 @@
             this.boneProperty.Location = new System.Drawing.Point(371, 3);
             this.boneProperty.Name = "boneProperty";
             this.boneProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.boneProperty.Size = new System.Drawing.Size(442, 506);
+            this.boneProperty.Size = new System.Drawing.Size(442, 482);
             this.boneProperty.TabIndex = 1;
             // 
             // tabPage3
@@ -222,7 +222,7 @@
             this.tabPage3.Controls.Add(this.mainProperty);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(816, 512);
+            this.tabPage3.Size = new System.Drawing.Size(816, 488);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Misc";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -233,7 +233,7 @@
             this.mainProperty.Location = new System.Drawing.Point(0, 0);
             this.mainProperty.Name = "mainProperty";
             this.mainProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.mainProperty.Size = new System.Drawing.Size(816, 512);
+            this.mainProperty.Size = new System.Drawing.Size(816, 488);
             this.mainProperty.TabIndex = 1;
             // 
             // button1
@@ -260,8 +260,8 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportSettingsToolStripMenuItem,
-            this.importSettingsToolStripMenuItem});
+            this.importSettingsToolStripMenuItem,
+            this.exportSettingsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
