@@ -9,6 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.ComponentModel;
 using HSDRawViewer.GUI.Plugins.Melee;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -27,6 +28,8 @@ namespace HSDRawViewer.GUI.Plugins
                 LoadCollData();
             }
         }
+
+        public override DockState DefaultDockState => DockState.DockLeft;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 

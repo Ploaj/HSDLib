@@ -151,9 +151,13 @@ namespace HSDRawViewer.GUI.Extra
             boneTree.ExpandAll();
 
             // fill mesh list
+            bool hasVertexAlpha = false;
             foreach (var m in _model.Meshes)
             {
                 meshList.Items.Add(new MeshItem(m));
+
+                if (!hasVertexAlpha && m.Vertices.Any(e => (m.HasColorSet(0) && e.Colors[0].W != 1) || (m.HasColorSet(1) && e.Colors[1].W != 1)))
+                    hasVertexAlpha = true;
                 
             }
             // selectAllMesh_Click(null, null);
@@ -163,6 +167,10 @@ namespace HSDRawViewer.GUI.Extra
             {
                 materialList.Items.Add(new MaterialItem(m));
             }
+
+            // auto detect vertex alpha
+            if (hasVertexAlpha)
+                settings.VertexColorFormat = HSDRaw.GX.GXCompTypeClr.RGBA8;
         }
 
         /// <summary>

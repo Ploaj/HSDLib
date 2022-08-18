@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <TargetFramework>net6.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -204,9 +205,5 @@
     <PackageReference Include="VGAudio" Version="2.2.1" />
     <PackageReference Include="YamlDotNet" Version="12.0.0" />
   </ItemGroup>
-  <ItemDefinitionGroup>
-    <ReferenceCopyLocalPaths>
-      <DestinationSubDirectory>lib\</DestinationSubDirectory>
-    </ReferenceCopyLocalPaths>
-  </ItemDefinitionGroup>
+
 </Project>
