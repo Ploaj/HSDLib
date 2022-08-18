@@ -10,7 +10,6 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-    // This plugin is so extra lol
     /// <summary>
     /// Special Plugin for Rendering Hurtboxes for fighters
     /// </summary>
@@ -111,14 +110,29 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="e"></param>
         private void buttonLoadModel_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            var path = System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath);
+            var filename = System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Nr.dat");
 
-            if(f != null)
+            path = System.IO.Path.Combine(path, filename);
+
+            if (System.IO.File.Exists(path))
             {
-                var hsd = new HSDRawFile(f);
+                var hsd = new HSDRawFile(path);
                 if (hsd.Roots[0].Data is HSD_JOBJ jobj)
                     LoadModel(jobj);
             }
+            else
+            {
+                var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+
+                if (f != null)
+                {
+                    var hsd = new HSDRawFile(f);
+                    if (hsd.Roots[0].Data is HSD_JOBJ jobj)
+                        LoadModel(jobj);
+                }
+            }
+            
         }
     }
 }

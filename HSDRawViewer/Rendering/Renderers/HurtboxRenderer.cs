@@ -15,7 +15,16 @@ namespace HSDRawViewer.Rendering.Renderers
         private Vector3 HurtboxColor = new Vector3(1, 1, 0);
         private Vector3 IntanColor = new Vector3(0, 0, 1);
         private Vector3 InvulColor = new Vector3(0, 1, 0);
+        private Vector3 GrabbableColor = new Vector3(1, 0, 1);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobjManager"></param>
+        /// <param name="hurtboxes"></param>
+        /// <param name="selected"></param>
+        /// <param name="states"></param>
+        /// <param name="bodyState"></param>
         public void Render(JOBJManager jobjManager, List<SBM_Hurtbox> hurtboxes, HSDAccessor selected, Dictionary<int, int> states = null, int bodyState = -1)
         {
             foreach (SBM_Hurtbox v in hurtboxes)
@@ -44,10 +53,19 @@ namespace HSDRawViewer.Rendering.Renderers
                     }
                 }
 
-                if(bodyState == 1)
-                    clr = InvulColor;
-                if (bodyState == 2)
-                    clr = IntanColor;
+                switch (bodyState)
+                {
+                    case -1:
+                        if (v.Grabbable == 0)
+                            clr = GrabbableColor;
+                        break;
+                    case 1:
+                        clr = InvulColor;
+                        break;
+                    case 2:
+                        clr = IntanColor;
+                        break;
+                }
 
                 var transform = jobjManager.GetWorldTransform(v.BoneIndex);
 
