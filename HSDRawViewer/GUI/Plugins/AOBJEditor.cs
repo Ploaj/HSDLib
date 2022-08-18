@@ -6,7 +6,7 @@ using System.Windows.Forms;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_AOBJ) })]
-    public partial class AOBJEditor : EditorBase
+    public partial class AOBJEditor : PluginBase
     {
         public override DataNode Node { get => _node;
             set

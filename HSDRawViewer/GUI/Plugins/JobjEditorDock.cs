@@ -9,7 +9,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_JOBJ) })]
-    public partial class JobjEditorDock : EditorBase
+    public partial class JobjEditorDock : PluginBase
     {
         public override DataNode Node
         {

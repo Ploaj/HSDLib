@@ -9,7 +9,7 @@ using HSDRawViewer.GUI.Dialog;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_TexAnim) })]
-    public partial class TexAnimEditor : EditorBase
+    public partial class TexAnimEditor : PluginBase
     {
         private HSD_TexAnim _texAnim => _node.Accessor as HSD_TexAnim;
 

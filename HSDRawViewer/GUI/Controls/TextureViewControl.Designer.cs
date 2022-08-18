@@ -1,7 +1,7 @@
 ﻿
 namespace HSDRawViewer.GUI.Controls
 {
-    partial class TexturePanel
+    partial class TextureViewControl
     {
         /// <summary> 
         /// Required designer variable.

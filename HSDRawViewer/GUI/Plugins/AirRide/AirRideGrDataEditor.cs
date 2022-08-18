@@ -22,7 +22,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
     [SupportedTypes(new Type[] { typeof(KAR_grData) })]
-    public partial class AirRideGrDataEditor : EditorBase, IDrawableInterface
+    public partial class AirRideGrDataEditor : PluginBase, IDrawableInterface
     {
         public enum EditorMode
         {

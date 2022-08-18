@@ -9,7 +9,7 @@ using HSDRawViewer.GUI.Dialog;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_TexGraphic) })]
-    public partial class TEXGEditor : EditorBase
+    public partial class TEXGEditor : PluginBase
     {
         private HSD_TexGraphic _texGraphic => _node.Accessor as HSD_TexGraphic;
 

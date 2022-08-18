@@ -8,7 +8,7 @@ using System.Windows.Forms;
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
     //[SupportedTypes(new Type[] { typeof(SBM_Coll_Data) })]
-    public partial class NewCollDataEditor : EditorBase, IDrawableInterface
+    public partial class NewCollDataEditor : PluginBase, IDrawableInterface
     {
         public DrawOrder DrawOrder => DrawOrder.Last;
 

@@ -7,7 +7,7 @@ using HSDRawViewer.GUI.Dialog;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_TOBJ) })]
-    public partial class TOBJEditor : EditorBase
+    public partial class TOBJEditor : PluginBase
     {
         private HSD_TOBJ _tobj => _node.Accessor as HSD_TOBJ;
 

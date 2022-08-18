@@ -19,7 +19,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
     [SupportedTypes(new Type[] { typeof(KAR_grMainModel) })]
-    public partial class AriRideGrModelEditor : EditorBase, IDrawableInterface
+    public partial class AriRideGrModelEditor : PluginBase, IDrawableInterface
     {
         private JObjEditor _jointEditor;
 

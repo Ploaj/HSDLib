@@ -4,7 +4,7 @@ using System;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_LOBJ) })]
-    public partial class LObjEditorDock : EditorBase
+    public partial class LObjEditorDock : PluginBase
     {
         public override DataNode Node
         {

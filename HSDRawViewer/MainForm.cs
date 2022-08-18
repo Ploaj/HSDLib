@@ -9,7 +9,6 @@ using HSDRawViewer.GUI.Plugins;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Extra;
 using System.ComponentModel;
-using GCILib;
 using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Dialog;
@@ -420,7 +419,7 @@ namespace HSDRawViewer
             List<Form> editors = new List<Form>();
             foreach (var c in dockPanel.Contents)
             {
-                if (c is EditorBase b && b.Node.Accessor._s == n.Accessor._s && c is Form form)
+                if (c is PluginBase b && b.Node.Accessor._s == n.Accessor._s && c is Form form)
                 {
                     editors.Add(form);
                 }
@@ -437,7 +436,7 @@ namespace HSDRawViewer
         {
             foreach (var c in dockPanel.Contents)
             {
-                if (c is EditorBase b && b.Node.Accessor._s == n.Accessor._s)
+                if (c is PluginBase b && b.Node.Accessor._s == n.Accessor._s)
                 {
                     return true;
                 }
@@ -455,7 +454,7 @@ namespace HSDRawViewer
             var structs = s.GetSubStructs();
             foreach (var c in dockPanel.Contents)
             {
-                if (c is EditorBase b && structs.Contains(b.Node.Accessor._s))
+                if (c is PluginBase b && structs.Contains(b.Node.Accessor._s))
                 {
                     return true;
                 }
@@ -570,8 +569,8 @@ namespace HSDRawViewer
 
                 dc.Text = SelectedDataNode.Text;
                 dc.TabText = SelectedDataNode.Text;
-                //if (dc is EditorBase b)
-                //    dc.DockState = b.DefaultDockState;
+                if (dc is PluginBase b)
+                    dc.DockState = b.DefaultDockState;
             }
         }
 
@@ -879,226 +878,5 @@ namespace HSDRawViewer
 
             return null;
         }
-
-        #region ISO Tools
-
-        private GCISO _iso;
-        private string _isoFilePath;
-        private bool _savingISO = false;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void loadISOToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _isoFilePath = Tools.FileIO.OpenFile("Gamecube ISO (.iso)|*.iso", "game.iso");
-            if(_isoFilePath != null)
-            {
-                if (_iso != null)
-                {
-                    _iso.Dispose();
-                    _iso = null;
-                }
-
-                _iso = new GCISO(_isoFilePath);
-
-                viewFilesToolStripMenuItem.Enabled = true;
-                saveISOAsToolStripMenuItem.Enabled = true;
-                saveISOToolStripMenuItem.Enabled = true;
-                closeISOToolStripMenuItem.Enabled = true;
-
-                OpenFileTree();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void closeISOToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            CloseISO();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveISOToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveISO();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void CloseISO()
-        {
-            if (_iso != null)
-            {
-                _iso.Dispose();
-                _iso = null;
-                _isoFilePath = null;
-            }
-
-            viewFilesToolStripMenuItem.Enabled = false;
-            saveISOAsToolStripMenuItem.Enabled = false;
-            saveISOToolStripMenuItem.Enabled = false;
-            closeISOToolStripMenuItem.Enabled = false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void SaveISO()
-        {
-            if (_savingISO)
-                return;
-
-            if (_iso != null)
-            {
-                if (_iso.NeedsRebuild)
-                {
-                    MessageBox.Show("ISO needs to be rebuilt", "Rebuild ISO", MessageBoxButtons.OK);
-
-                    SaveISOAs();
-                }
-                else
-                {
-                    BackgroundWorker worker = new BackgroundWorker();
-                    worker.WorkerReportsProgress = true;
-                    worker.DoWork += (send, arg) =>
-                    {
-                        _iso.Save(ISOBuildProgress);
-                    };
-                    worker.RunWorkerAsync();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void SaveISOAs()
-        {
-            if (_savingISO)
-                return;
-
-            var file = Tools.FileIO.OpenFile("Gamecube ISO (.iso)|*.iso", "game.iso");
-            
-            if (file != null)
-            {
-                if (file == _isoFilePath)
-                {
-                    MessageBox.Show("Cannot overwrite currently opened file");
-                    return;
-                }
-
-                if (_iso != null)
-                {
-                    BackgroundWorker worker = new BackgroundWorker();
-                    worker.WorkerReportsProgress = true;
-                    worker.DoWork += (sender, arg) =>
-                    {
-                        _iso.Rebuild(file, ISOBuildProgress);
-                    };
-                    worker.RunWorkerAsync();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void ISOBuildProgress(object sender, ProgressChangedEventArgs args)
-        {
-            Invoke(new MethodInvoker(delegate ()
-            {
-                UpdateBuildProgress(args.ProgressPercentage);
-            }));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="progress"></param>
-        private void UpdateBuildProgress(int progress)
-        {
-            if (progress == 100)
-            {
-                isoSaveProgessPanel.Visible = false;
-                isoSaveProgressBar.Visible = false;
-                _savingISO = false;
-            }
-            else
-            {
-                isoSaveProgessPanel.Visible = true;
-                isoSaveProgressBar.Value = progress;
-                _savingISO = true;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void viewFilesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenFileTree();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void OpenFileTree()
-        {
-            using (ISOFileTool isoTool = new ISOFileTool(_iso))
-            {
-                isoTool.ShowDialog();
-
-                // todo: open file
-                if(isoTool.FileData != null)
-                {
-                    var tempDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp/");
-                    var datPath = System.IO.Path.Combine(tempDir, isoTool.FilePath);
-                    var dir = System.IO.Path.GetDirectoryName(datPath);
-
-                    if (!System.IO.Directory.Exists(dir))
-                        System.IO.Directory.CreateDirectory(dir);
-
-                    System.IO.File.WriteAllBytes(datPath, isoTool.FileData);
-
-                    OpenFile(datPath);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void saveISOAsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveISOAs();
-        }
-
-        #endregion
-
-        private void testToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (var fsm = new FSMTool())
-            {
-                fsm.ShowDialog();
-            }
-        }
     }
-    
 }

@@ -35,7 +35,7 @@ namespace HSDRawViewer.GUI.Plugins
             this.buttonExportAll = new System.Windows.Forms.ToolStripButton();
             this.buttonImport = new System.Windows.Forms.ToolStripButton();
             this.buttonReplace = new System.Windows.Forms.ToolStripButton();
-            this.texturePanel1 = new HSDRawViewer.GUI.Controls.TexturePanel();
+            this.texturePanel1 = new HSDRawViewer.GUI.Controls.TextureViewControl();
             this.arrayMemberEditor1 = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -144,7 +144,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private ArrayMemberEditor arrayMemberEditor1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private Controls.TexturePanel texturePanel1;
+        private Controls.TextureViewControl texturePanel1;
         private System.Windows.Forms.ToolStripButton buttonReplace;
         private System.Windows.Forms.ToolStripButton buttonExportAll;
         private System.Windows.Forms.ToolStripButton buttonExport;

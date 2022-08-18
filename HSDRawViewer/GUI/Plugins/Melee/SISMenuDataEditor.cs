@@ -17,7 +17,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// big TODO: op codes and editing
     /// </summary>
     [SupportedTypes(new Type[] { typeof(SBM_SISData) })]
-    public partial class SISMenuDataEditor : EditorBase
+    public partial class SISMenuDataEditor : PluginBase
     {
         public MeleeMenuText[] MenuTexts { get; set; }
 

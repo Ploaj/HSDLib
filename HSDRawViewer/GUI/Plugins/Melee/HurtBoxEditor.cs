@@ -15,7 +15,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// Special Plugin for Rendering Hurtboxes for fighters
     /// </summary>
     [SupportedTypes(new Type[] { typeof(SBM_HurtboxBank<SBM_Hurtbox>) })]
-    public partial class HurtBoxEditor : EditorBase, IDrawable
+    public partial class HurtBoxEditor : PluginBase, IDrawable
     {
         public override DataNode Node
         {

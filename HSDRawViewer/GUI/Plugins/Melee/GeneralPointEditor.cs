@@ -1,5 +1,4 @@
 ﻿using System;
-using WeifenLuo.WinFormsUI.Docking;
 using HSDRaw.Melee.Gr;
 using HSDRaw.Common;
 using HSDRawViewer.Rendering;
@@ -9,49 +8,27 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using HSDRawViewer.Converters.Melee;
 using HSDRawViewer.Rendering.Models;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
-    [SupportedTypes(new Type[] { typeof(HSDRaw.Melee.Gr.SBM_GeneralPoints) })]
-    public partial class GeneralPointEditor : EditorBase, IDrawableInterface
+    [SupportedTypes(new Type[] { typeof(SBM_GeneralPoints) })]
+    public partial class GeneralPointEditor : PluginBase, IDrawableInterface
     {
-        public GeneralPointEditor()
-        {
-            InitializeComponent();
-
-            PointList.DataSource = PointLinks;
-
-            PluginManager.GetCommonViewport()?.AddRenderer(this);
-
-            propertyGrid1.PropertyValueChanged += (sender, args) =>
-            {
-                // refresh
-                PointLinks[PointList.SelectedIndex] = PointLinks[PointList.SelectedIndex];
-                SavePointChanges();
-            };
-
-            FormClosing += (sender, args) =>
-            {
-                Renderer.CleanupRendering();
-                PluginManager.GetCommonViewport()?.RemoveRenderer(this);
-                SavePointChanges();
-            };
-        }
-
         private class PointLink
         {
             public PointType Type { get; set; } = PointType.Player1Respawn;
 
-            public float X { get => JOBJ.TX; set => JOBJ.TX = value; }
+            public float X { get => JObj.Translation.X; set { JObj.Translation.X = value; JObj.Desc.TX = value; } }
 
-            public float Y { get => JOBJ.TY; set => JOBJ.TY = value; }
+            public float Y { get => JObj.Translation.Y; set { JObj.Translation.Y = value; JObj.Desc.TY = value; } }
 
-            public HSD_JOBJ JOBJ;
+            public LiveJObj JObj;
 
             public void Move(float delX, float delY)
             {
-                X -= delX / 2;
-                Y += delY / 2;
+                X += delX;
+                Y += delY;
             }
 
             public override string ToString()
@@ -59,6 +36,12 @@ namespace HSDRawViewer.GUI.Plugins
                 return Type.ToString();
             }
         }
+
+        public override DockState DefaultDockState => DockState.DockLeft;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public override DataNode Node
         {
             get => _node;
@@ -77,8 +60,40 @@ namespace HSDRawViewer.GUI.Plugins
 
         private BindingList<PointLink> PointLinks = new BindingList<PointLink>();
 
-        private JOBJManager Renderer = new JOBJManager();
+        private JOBJManager JointManager = new JOBJManager();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public GeneralPointEditor()
+        {
+            InitializeComponent();
+
+            PointList.DataSource = PointLinks;
+
+            PluginManager.GetCommonViewport()?.AddRenderer(this);
+
+            propertyGrid1.PropertyValueChanged += (sender, args) =>
+            {
+                // refresh
+                PointLinks[PointList.SelectedIndex] = PointLinks[PointList.SelectedIndex];
+                SavePointChanges();
+            };
+
+            FormClosing += (sender, args) =>
+            {
+                JointManager.CleanupRendering();
+                PluginManager.GetCommonViewport()?.RemoveRenderer(this);
+                SavePointChanges();
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="camera"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public void Draw(Camera camera, int windowWidth, int windowHeight)
         {
             // draw overtop
@@ -87,7 +102,7 @@ namespace HSDRawViewer.GUI.Plugins
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
 
-            Renderer.UpdateNoRender();
+            JointManager.UpdateNoRender();
 
             Vector3 MinCam = Vector3.Zero, MaxCam = Vector3.Zero;
             Vector3 MinDeath = Vector3.Zero, MaxDeath = Vector3.Zero;
@@ -97,8 +112,7 @@ namespace HSDRawViewer.GUI.Plugins
             {
                 var selected = (propertyGrid1.SelectedObject == v);
 
-                var t = Renderer.GetWorldTransform(v.JOBJ);
-                var point = Vector3.TransformPosition(Vector3.Zero, t);
+                var point = v.JObj.WorldTransform.ExtractTranslation();
 
                 switch (v.Type)
                 {
@@ -169,27 +183,22 @@ namespace HSDRawViewer.GUI.Plugins
                 RenderBounds(MinDeath, MaxDeath, new Vector3(1f, 1f, 0.75f), DeathSelected);
         }
 
-        private float SelectionDistance = 5f;
+        private bool dragging = false;
+        private Vector2 previousPoint = Vector2.Zero;
+        private Vector2 previousPickPosition = Vector2.Zero;
+        private float _selectionDistance = 5f;
 
-        public void ScreenClick(MouseButtons button, PickInformation pick)
-        {
-            if (button == MouseButtons.Right &&
-                dragging &&
-                propertyGrid1.SelectedObject is PointLink point)
-            {
-                point.X = previousPoint.X;
-                point.Y = previousPoint.Y;
-            }
-        }
-
-        public void ScreenDoubleClick(PickInformation pick)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pick"></param>
+        private void SelectPoint(PickInformation pick)
         {
             var selected = false;
             var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
             foreach (var v in PointLinks)
             {
-                var t = Renderer.GetWorldTransform(v.JOBJ);
-                var point = Vector3.TransformPosition(Vector3.Zero, t);
+                var point = v.JObj.WorldTransform.ExtractTranslation();
 
                 var close = Vector3.Zero;
 
@@ -204,17 +213,50 @@ namespace HSDRawViewer.GUI.Plugins
                 propertyGrid1.SelectedObject = null;
         }
 
-        private bool dragging = false;
-        private Vector2 previousPoint = Vector2.Zero;
-        private Vector2 previousPickPosition = Vector2.Zero;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="pick"></param>
+        public void ScreenClick(MouseButtons button, PickInformation pick)
+        {
+            if (button == MouseButtons.Right &&
+                dragging &&
+                propertyGrid1.SelectedObject is PointLink point)
+            {
+                point.X = previousPoint.X;
+                point.Y = previousPoint.Y;
+            }
+            else
+            if (button == MouseButtons.Left)
+            {
+                SelectPoint(pick);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pick"></param>
+        public void ScreenDoubleClick(PickInformation pick)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="pick"></param>
+        /// <param name="deltaX"></param>
+        /// <param name="deltaY"></param>
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
             var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
 
-            if (PluginManager.GetCommonViewport().IsAltAction &&
+            if (PluginManager.GetCommonViewport().IsAltKey &&
                 args.Button.HasFlag(MouseButtons.Left) &&
                 propertyGrid1.SelectedObject is PointLink point &&
-                Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), SelectionDistance))
+                Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), _selectionDistance))
             {
                 point.X = Picked.X;
                 point.Y = Picked.Y;
@@ -227,74 +269,100 @@ namespace HSDRawViewer.GUI.Plugins
             previousPickPosition = Picked.Xy;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
         public void ScreenSelectArea(PickInformation start, PickInformation end)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void LoadData()
         {
+            // get jobjs
             var jobj = GeneralPoints.JOBJReference.BreathFirstList;
 
+            // set joints for rendering
+            JointManager.SetJOBJ(GeneralPoints.JOBJReference);
+
+            // load points
             foreach (var v in GeneralPoints.Points)
             {
                 PointLinks.Add(new PointLink()
                 {
                     Type = v.Type,
-                    JOBJ = jobj[v.JOBJIndex]
+                    JObj = JointManager.GetJOBJ(v.JOBJIndex),
                 });
             }
-
-            Renderer.SetJOBJ(GeneralPoints.JOBJReference);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void SavePointChanges()
         {
-            var list = PointLinks;// new List<PointLink>(PointLinks.ToList().OrderBy(e => e.Type));
-
+            var list = PointLinks;
             SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[list.Count];
-            var jobjs = GeneralPoints.JOBJReference.BreathFirstList;
-
             for (int i = 0; i < p.Length; i++)
             {
                 p[i] = new SBM_GeneralPointInfo()
                 {
                     Type = list[i].Type,
-                    JOBJIndex = (short)jobjs.IndexOf(list[i].JOBJ)
+                    JOBJIndex = (short)JointManager.IndexOf(list[i].JObj.Desc)
                 };
             }
             GeneralPoints.Points = p;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PointList_SelectedIndexChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = PointList.SelectedItem;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonRemove_Click(object sender, EventArgs e)
         {
             // remove jobj and remove from list
-            Renderer.RemoveJOBJ((PointList.SelectedItem as PointLink).JOBJ);
-            PointLinks.Remove(PointList.SelectedItem as PointLink);
+            if (PointList.SelectedItem is PointLink link)
+            {
+                JointManager.RemoveJOBJ(link.JObj.Desc);
+                PointLinks.Remove(link);
+            }
 
+            // save changes
             SavePointChanges();
         }
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            // create new jobj
-            var jobj = new HSD_JOBJ();
-
-            GeneralPoints.JOBJReference.AddChild(jobj);
-
+            // create new point link
             PointLinks.Add(new PointLink()
             {
-                JOBJ = jobj
+                JObj = JointManager.GetJOBJ(0).AddChild(new HSD_JOBJ())
             });
 
+            // save changes
             SavePointChanges();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonUp_Click(object sender, EventArgs e)
         {
             var index = PointList.SelectedIndex;
@@ -313,6 +381,11 @@ namespace HSDRawViewer.GUI.Plugins
             SavePointChanges();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buttonDown_Click(object sender, EventArgs e)
         {
             var index = PointList.SelectedIndex;
@@ -481,11 +554,14 @@ namespace HSDRawViewer.GUI.Plugins
 
                 PointLinks = new BindingList<PointLink>();
 
+                GeneralPoints.JOBJReference = new HSD_JOBJ();
+                JointManager.SetJOBJ(GeneralPoints.JOBJReference);
+
                 foreach (var p in ssf.Points)
                 {
                     var pl = new PointLink()
                     {
-                        JOBJ = new HSD_JOBJ(),
+                        JObj = JointManager.GetJOBJ(0).AddChild(new HSD_JOBJ()),
                         X = p.X,
                         Y = p.Y
                     };
@@ -510,12 +586,6 @@ namespace HSDRawViewer.GUI.Plugins
                     if (pl != null)
                         PointLinks.Add(pl);
                 }
-
-                GeneralPoints.JOBJReference.Child = null;
-                GeneralPoints.JOBJReference.Next = null;
-
-                foreach (var p in PointLinks)
-                    GeneralPoints.JOBJReference.AddChild(p.JOBJ);
 
                 SavePointChanges();
 

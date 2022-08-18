@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_ParticleGroup) })]
-    public partial class ParticleEditor : EditorBase, IDrawable
+    public partial class ParticleEditor : PluginBase, IDrawable
     {
         public override DataNode Node
         {

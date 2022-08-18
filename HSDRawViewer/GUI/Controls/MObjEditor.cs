@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
 {
-    public partial class MOBJEditor : Form
+    public partial class MOBJEditor : UserControl
     {
         public class TextureContainer : ListViewItem
         {
@@ -27,15 +27,13 @@ namespace HSDRawViewer.GUI.Extra
         {
             InitializeComponent();
 
-            CenterToScreen();
-
             listTexture.SmallImageList = TextureList;
             listTexture.LargeImageList = TextureList;
 
             TextureList.ImageSize = new Size(64, 64);
             TextureList.ColorDepth = ColorDepth.Depth32Bit;
 
-            FormClosed += (sender, args) =>
+            Disposed += (sender, args) =>
             {
                 foreach(Image v in TextureList.Images)
                 {

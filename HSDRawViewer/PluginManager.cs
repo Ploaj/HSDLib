@@ -52,11 +52,11 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static EditorBase GetEditorFromType(Type t)
+        public static PluginBase GetEditorFromType(Type t)
         {
             if (typeToEditor.ContainsKey(t))
             {
-                return (EditorBase)Activator.CreateInstance(typeToEditor[t]);
+                return (PluginBase)Activator.CreateInstance(typeToEditor[t]);
             }
             return null;
         }
@@ -114,12 +114,12 @@ namespace HSDRawViewer
         {
             var types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                          from assemblyType in domainAssembly.GetTypes()
-                         where typeof(EditorBase).IsAssignableFrom(assemblyType)
+                         where typeof(PluginBase).IsAssignableFrom(assemblyType)
                          select assemblyType).ToArray();
 
             foreach (var t in types)
             {
-                if (t != typeof(EditorBase))
+                if (t != typeof(PluginBase))
                 {
                     SupportedTypes suppTypes = (SupportedTypes)Attribute.GetCustomAttribute(t, typeof(SupportedTypes));
 

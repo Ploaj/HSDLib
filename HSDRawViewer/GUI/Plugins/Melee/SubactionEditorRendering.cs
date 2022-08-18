@@ -152,7 +152,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <summary>
         /// 
         /// </summary>
-        public void OnDatFileSave()
+        public override void OnDatFileSave()
         {
             if (!string.IsNullOrEmpty(AJFilePath))
                 SaveFighterAnimationFile();

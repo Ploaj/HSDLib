@@ -85,9 +85,6 @@
     <Compile Update="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="GUI\Controls\ISOEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Update="GUI\Controls\LObjEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -97,7 +94,7 @@
     <Compile Update="GUI\Controls\AnimationPlaybackControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="GUI\Controls\TexturePanel.cs">
+    <Compile Update="GUI\Controls\TextureViewControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="GUI\Controls\ArrayMemberEditor.cs">

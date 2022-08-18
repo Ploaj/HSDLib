@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Controls
 {
-    public partial class TexturePanel : UserControl
+    public partial class TextureViewControl : UserControl
     {
         /// <summary>
         /// 
@@ -19,7 +19,7 @@ namespace HSDRawViewer.GUI.Controls
         /// <summary>
         /// 
         /// </summary>
-        public TexturePanel()
+        public TextureViewControl()
         {
             InitializeComponent();
 

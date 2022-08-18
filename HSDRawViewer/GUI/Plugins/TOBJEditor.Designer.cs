@@ -37,7 +37,7 @@ namespace HSDRawViewer.GUI.Plugins
             this.panel2 = new System.Windows.Forms.Splitter();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
-            this.texturePanel = new HSDRawViewer.GUI.Controls.TexturePanel();
+            this.texturePanel = new HSDRawViewer.GUI.Controls.TextureViewControl();
             this.customPaintTrackBar1 = new System.Windows.Forms.CustomPaintTrackBar();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -160,7 +160,7 @@ namespace HSDRawViewer.GUI.Plugins
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.Splitter panel2;
-        private HSDRawViewer.GUI.Controls.TexturePanel texturePanel;
+        private HSDRawViewer.GUI.Controls.TextureViewControl texturePanel;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.CustomPaintTrackBar customPaintTrackBar1;
         private System.Windows.Forms.Label label1;

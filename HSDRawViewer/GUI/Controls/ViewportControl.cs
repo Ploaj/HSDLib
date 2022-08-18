@@ -136,26 +136,15 @@ namespace HSDRawViewer.GUI
         public bool Lock2D { get; set; } = false;
 
         [Browsable(false)]
-        public bool IsAltAction
+        public bool IsAltKey
         {
-            get
-            {
-                //var keyState = Keyboard.GetState();
-                //return keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
-                return false;
-            }
+            get; internal set;
         }
 
         [Browsable(false)]
-        public bool Frozen
+        public bool IsControlKey
         {
-            get
-            {
-                //var keyState = Keyboard.GetState();
-                //return keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight) ||
-                //       IsAltAction;
-                return false;
-            }
+            get; internal set;
         }
 
         public static int CSPWidth { get; internal set; } = 136 * 2;
@@ -169,8 +158,6 @@ namespace HSDRawViewer.GUI
 
         private Vector2 PrevCursorPos;
         private Vector2 DeltaCursorPos;
-
-        private Vector3 CrossHair = new Vector3();
 
         [Browsable(false)]
         public bool IsPlaying { get => _playbackMode != PlaybackMode.None; }
@@ -219,8 +206,22 @@ namespace HSDRawViewer.GUI
 
             nudPlaybackSpeed.Value = 60;
 
+            glControl.KeyUp += (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Menu)
+                    IsAltKey = false;
+
+                if (args.KeyCode == Keys.ControlKey)
+                    IsControlKey = false;
+            };
+
             glControl.KeyDown += (sender, args) =>
             {
+                if (args.KeyCode == Keys.Menu)
+                    IsAltKey = true;
+
+                if (args.KeyCode == Keys.ControlKey)
+                    IsControlKey = true;
                 /*if (args.Alt)
                 {
                     if (args.KeyCode == Keys.B)
@@ -268,9 +269,8 @@ namespace HSDRawViewer.GUI
 
             glControl.MouseDown += (sender, args) =>
             {
-                //var keyState = Keyboard.GetState();
-                //if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
-                //    Selecting = true;
+                if (IsControlKey && args.Button == MouseButtons.Left)
+                    Selecting = true;
 
                 mouseStart = new Vector2(args.X, args.Y);
             };
@@ -380,7 +380,7 @@ namespace HSDRawViewer.GUI
             Vector3 p1 = va.Xyz;
             Vector3 p2 = p1 - ((va - (va + vb)).Xyz) * 100;
 
-            CrossHair = p1;
+            // CrossHair = p1;
 
             PickInformation info = new PickInformation(new Vector2(point.X, point.Y), p1, p2);
 
@@ -486,111 +486,126 @@ namespace HSDRawViewer.GUI
         {
             glControl.MakeCurrent();
 
+            // setup viewport
             GL.Viewport(0, 0, glControl.Width, glControl.Height);
-
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.PushAttrib(AttribMask.AllAttribBits);
-
+            // setup immediate mode matricies
+            var v = _camera.PerspectiveMatrix;
+            var m = _camera.ModelViewMatrix;
             GL.MatrixMode(MatrixMode.Projection);
-
-            var v = _camera.MvpMatrix;
             GL.LoadMatrix(ref v);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref m);
 
-            // if (DisplayGrid)
+            // draw grid if enabled
+            if (DisplayGrid)
                 DrawShape.Floor(GridColor, 50, 5);
 
+            // draw drawbles
+            GL.PushAttrib(AttribMask.AllAttribBits);
             foreach (var r in Drawables)
                 r.Draw(_camera, glControl.Width, glControl.Height);
-
             GL.PopAttrib();
 
-            //if (Selecting)
-            //{
-            //    GL.MatrixMode(MatrixMode.Modelview);
-            //    GL.LoadIdentity();
+            // draw selection
+            if (Selecting)
+                RenderSelectionOutline();
 
-            //    var x1 = (mouseStart.X / glControl.Width) * 2 - 1f;
-            //    var y1 = 1f - (mouseStart.Y / glControl.Height) * 2;
-            //    var x2 = (mouseEnd.X / glControl.Width) * 2 - 1f;
-            //    var y2 = 1f - (mouseEnd.Y / glControl.Height) * 2;
+            // render screenshot outline
+            RenderScreenshotSelection();
 
-            //    GL.LineWidth(1f);
-            //    GL.Color3(1f, 1f, 1f);
-            //    GL.Begin(PrimitiveType.LineLoop);
-            //    GL.Vertex2(x1, y1);
-            //    GL.Vertex2(x2, y1);
-            //    GL.Vertex2(x2, y2);
-            //    GL.Vertex2(x1, y2);
-            //    GL.End();
-            //}
-
-            //if (CSPMode && TakeScreenShot == 0)
-            //{
-            //    GL.MatrixMode(MatrixMode.Projection);
-            //    GL.LoadIdentity();
-
-            //    GL.MatrixMode(MatrixMode.Modelview);
-            //    GL.LoadIdentity();
-
-            //    GL.Disable(EnableCap.DepthTest);
-
-            //    GL.Enable(EnableCap.Blend);
-            //    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-            //    // 136 x 188
-
-            //    float width = CSPWidth / (float)glControl.Width;
-            //    float height = CSPHeight / (float)glControl.Height;
-
-            //    GL.Color4(0.5f, 0.5f, 0.5f, 0.5f);
-
-            //    GL.Begin(PrimitiveType.Quads);
-
-            //    GL.Vertex2(-1, -height);
-            //    GL.Vertex2(1, -height);
-            //    GL.Vertex2(1, -1);
-            //    GL.Vertex2(-1, -1);
-
-            //    GL.Vertex2(-1, 1);
-            //    GL.Vertex2(1, 1);
-            //    GL.Vertex2(1, height);
-            //    GL.Vertex2(-1, height);
-
-            //    GL.Vertex2(1, -height);
-            //    GL.Vertex2(width, -height);
-            //    GL.Vertex2(width, height);
-            //    GL.Vertex2(1, height);
-
-            //    GL.Vertex2(-width, -height);
-            //    GL.Vertex2(-1, -height);
-            //    GL.Vertex2(-1, height);
-            //    GL.Vertex2(-width, height);
-
-            //    GL.End();
-            //}
-
-            /*if (EnableHelpDisplay && !TakeScreenShot)
-            {
-                if (IsAltAction)
-                {
-                    GLTextRenderer.RenderText(_camera, "R - Reset Camera", 0, 0);
-                    GLTextRenderer.RenderText(_camera, "C - Open Camera Settings", 0, 16);
-                    GLTextRenderer.RenderText(_camera, "G - Toggle Grid", 0, 32);
-                    GLTextRenderer.RenderText(_camera, "B - Toggle Backdrop", 0, 48);
-                    GLTextRenderer.RenderText(_camera, "P - Save Screenshot to File", 0, 64);
-                }
-                else
-                {
-                    GLTextRenderer.RenderText(_camera, "Alt+", 0, 0);
-                }
-            }*/
-
+            // swap buffer to display render
             glControl.SwapBuffers();
 
-            // TakeGLScreenShot();
+            // check to take screenshot
+            TakeGLScreenShot();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RenderSelectionOutline()
+        {
+            GL.PushMatrix();
+
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+
+            var x1 = (mouseStart.X / glControl.Width) * 2 - 1f;
+            var y1 = 1f - (mouseStart.Y / glControl.Height) * 2;
+            var x2 = (mouseEnd.X / glControl.Width) * 2 - 1f;
+            var y2 = 1f - (mouseEnd.Y / glControl.Height) * 2;
+
+            GL.LineWidth(1f);
+            GL.Color3(1f, 1f, 1f);
+            GL.Begin(PrimitiveType.LineLoop);
+            GL.Vertex2(x1, y1);
+            GL.Vertex2(x2, y1);
+            GL.Vertex2(x2, y2);
+            GL.Vertex2(x1, y2);
+            GL.End();
+
+            GL.PopMatrix();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RenderScreenshotSelection()
+        {
+            if (CSPMode && TakeScreenShot == 0)
+            {
+                GL.MatrixMode(MatrixMode.Projection);
+                GL.LoadIdentity();
+
+                GL.MatrixMode(MatrixMode.Modelview);
+                GL.LoadIdentity();
+
+                GL.Disable(EnableCap.DepthTest);
+
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+                // 136 x 188
+
+                float width = CSPWidth / (float)glControl.Width;
+                float height = CSPHeight / (float)glControl.Height;
+
+                GL.Color4(0.5f, 0.5f, 0.5f, 0.5f);
+
+                GL.Begin(PrimitiveType.Quads);
+
+                GL.Vertex2(-1, -height);
+                GL.Vertex2(1, -height);
+                GL.Vertex2(1, -1);
+                GL.Vertex2(-1, -1);
+
+                GL.Vertex2(-1, 1);
+                GL.Vertex2(1, 1);
+                GL.Vertex2(1, height);
+                GL.Vertex2(-1, height);
+
+                GL.Vertex2(1, -height);
+                GL.Vertex2(width, -height);
+                GL.Vertex2(width, height);
+                GL.Vertex2(1, height);
+
+                GL.Vertex2(-width, -height);
+                GL.Vertex2(-1, -height);
+                GL.Vertex2(-1, height);
+                GL.Vertex2(-width, height);
+
+                GL.End();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void TakeGLScreenShot()
         {
             if (TakeScreenShot == 1)
@@ -600,9 +615,11 @@ namespace HSDRawViewer.GUI
             else
             if (TakeScreenShot == 2)
             {
+                TakeScreenShot = 0;
+
                 string fileName;
 
-                if (CSPMode)
+                if (CSPMode && MainForm.Instance.FilePath != null)
                     fileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath), "csp_" + System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + ".png");
                 else
                     fileName = "render_" + System.DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss") + ".png";
@@ -623,12 +640,12 @@ namespace HSDRawViewer.GUI
                         }
                     }
                     else
+                    {
                         bitmap.Save(fileName);
+                    }
 
                     MessageBox.Show("Screenshot saved as " + fileName);
                 }
-
-                TakeScreenShot = 0;
             }
         }
 
@@ -793,7 +810,7 @@ namespace HSDRawViewer.GUI
 
             PrevCursorPos = pos;
 
-            if (!Frozen)
+            if (!Selecting && !IsAltKey)
             {
                 var speed = 0.10f;
                 var speedpane = 0.75f;

@@ -117,6 +117,42 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="jobj"></param>
+        public LiveJObj AddChild(HSD_JOBJ desc)
+        {
+            if (Child == null)
+            {
+                Child = new LiveJObj(desc);
+                this.Desc.Child = desc;
+                return Child;
+            }
+            else
+            {
+                return Child.AddSibling(desc);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        public LiveJObj AddSibling(HSD_JOBJ desc)
+        {
+            if (Sibling == null)
+            {
+                Sibling = new LiveJObj(desc);
+                this.Desc.Next = desc;
+                return Sibling;
+            }
+            else
+            {
+                return Sibling.AddSibling(desc);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
         public LiveJObj GetJObjFromDesc(HSD_JOBJ jobj)

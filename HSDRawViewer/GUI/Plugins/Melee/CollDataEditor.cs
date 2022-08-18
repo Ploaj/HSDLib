@@ -13,7 +13,7 @@ using HSDRawViewer.GUI.Plugins.Melee;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(SBM_Coll_Data) })]
-    public partial class CollDataEditor : EditorBase, IDrawableInterface
+    public partial class CollDataEditor : PluginBase, IDrawableInterface
     {
         public override DataNode Node
         {

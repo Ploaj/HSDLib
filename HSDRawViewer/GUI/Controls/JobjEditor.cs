@@ -679,15 +679,16 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            using (MOBJEditor m = new MOBJEditor())
-            {
-                m.SetMOBJ((listDOBJ.SelectedItem as DOBJContainer).DOBJ.Mobj);
+            // TODO: MObj Editor
+            //using (MOBJEditor m = new MOBJEditor())
+            //{
+            //    m.SetMOBJ((listDOBJ.SelectedItem as DOBJContainer).DOBJ.Mobj);
 
-                if (m.ShowDialog() != DialogResult.OK)
-                {
-                    dobjList[listDOBJ.SelectedIndex] = dobjList[listDOBJ.SelectedIndex];
-                }
-            }
+            //    if (m.ShowDialog() != DialogResult.OK)
+            //    {
+            //        dobjList[listDOBJ.SelectedIndex] = dobjList[listDOBJ.SelectedIndex];
+            //    }
+            //}
         }
 
         /// <summary>
