@@ -6,6 +6,7 @@ using HSDRawViewer.GUI;
 using System.IO;
 using System;
 using HSDRawViewer.Tools;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.Converters
 {

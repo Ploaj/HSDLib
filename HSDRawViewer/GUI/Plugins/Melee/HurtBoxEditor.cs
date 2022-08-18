@@ -4,12 +4,9 @@ using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
-using HSDRawViewer.Rendering.Shapes;
-using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -18,11 +15,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// Special Plugin for Rendering Hurtboxes for fighters
     /// </summary>
     [SupportedTypes(new Type[] { typeof(SBM_HurtboxBank<SBM_Hurtbox>) })]
-    public partial class HurtBoxEditor : DockContent, EditorBase, IDrawable
+    public partial class HurtBoxEditor : EditorBase, IDrawable
     {
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node; set { _node = value;  HBBank = value.Accessor as SBM_HurtboxBank<SBM_Hurtbox>; }
         }

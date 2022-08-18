@@ -3,13 +3,11 @@ using System.Windows.Forms;
 using HSDRaw;
 using System.Collections.Generic;
 using HSDRaw.Melee.Pl;
-using WeifenLuo.WinFormsUI.Docking;
 using System.Drawing;
 using HSDRawViewer.Tools;
 using System.Linq;
 using HSDRaw.Melee.Cmd;
 using System.IO;
-using HSDRawViewer.Rendering;
 using HSDRawViewer.GUI.Controls;
 using HSDRaw.AirRide.Rd;
 
@@ -21,11 +19,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         typeof(SBM_ItemSubactionData), 
         typeof(SBM_ColorSubactionData),
         typeof(KAR_RdScript) })]
-    public partial class SubactionEditor : DockContent, SaveableEditorBase
+    public partial class SubactionEditor : SaveableEditorBase
     {
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

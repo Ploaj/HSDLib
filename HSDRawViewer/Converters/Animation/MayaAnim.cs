@@ -1,17 +1,15 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
-using HSDRawViewer.GUI;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
-using OpenTK;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.Converters
 {

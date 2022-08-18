@@ -1,15 +1,12 @@
 ﻿using HSDRaw.Common;
 using System;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_LOBJ) })]
-    public partial class LObjEditorDock : DockContent, EditorBase
+    public partial class LObjEditorDock : EditorBase
     {
-        public DockState DefaultDockState => DockState.DockLeft;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

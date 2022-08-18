@@ -9,12 +9,11 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using HSDRawViewer.Converters.Melee;
 using HSDRawViewer.Rendering.Models;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSDRaw.Melee.Gr.SBM_GeneralPoints) })]
-    public partial class GeneralPointEditor : DockContent, EditorBase, IDrawableInterface
+    public partial class GeneralPointEditor : EditorBase, IDrawableInterface
     {
         public GeneralPointEditor()
         {
@@ -60,10 +59,7 @@ namespace HSDRawViewer.GUI.Plugins
                 return Type.ToString();
             }
         }
-
-        public DockState DefaultDockState => DockState.DockLeft;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set
@@ -211,26 +207,24 @@ namespace HSDRawViewer.GUI.Plugins
         private bool dragging = false;
         private Vector2 previousPoint = Vector2.Zero;
         private Vector2 previousPickPosition = Vector2.Zero;
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
-            //var mouseState = Mouse.GetState();
+            var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
 
-            //var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
-
-            //if (PluginManager.GetCommonViewport().IsAltAction &&
-            //    mouseState.IsButtonDown(MouseButton.Left) &&
-            //    propertyGrid1.SelectedObject is PointLink point &&
-            //    Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), SelectionDistance))
-            //{
-            //    point.X = Picked.X;
-            //    point.Y = Picked.Y;
-            //    if (!dragging)
-            //        previousPoint = Picked.Xy;
-            //    dragging = true;
-            //}
-            //else
-            //    dragging = false;
-            //previousPickPosition = Picked.Xy;
+            if (PluginManager.GetCommonViewport().IsAltAction &&
+                args.Button.HasFlag(MouseButtons.Left) &&
+                propertyGrid1.SelectedObject is PointLink point &&
+                Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), SelectionDistance))
+            {
+                point.X = Picked.X;
+                point.Y = Picked.Y;
+                if (!dragging)
+                    previousPoint = Picked.Xy;
+                dragging = true;
+            }
+            else
+                dragging = false;
+            previousPickPosition = Picked.Xy;
         }
 
         public void ScreenSelectArea(PickInformation start, PickInformation end)
@@ -534,7 +528,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// 
         /// </summary>
         /// <param name="kbState"></param>
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
         }
     }

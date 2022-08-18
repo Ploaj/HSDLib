@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using HSDRaw.Common;
-using HSDRawViewer.GUI;
 using OpenTK;
 using HSDRawViewer.Rendering;
 using HSDRaw.GX;
@@ -16,6 +14,7 @@ using IONET.Core.Skeleton;
 using HSDRawViewer.Tools;
 using HSDRaw.Tools;
 using OpenTK.Mathematics;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.Converters
 {

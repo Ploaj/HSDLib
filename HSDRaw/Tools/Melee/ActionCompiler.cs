@@ -82,14 +82,11 @@ namespace HSDRaw.Tools.Melee
                     main = s;
 
                 List<byte> output = new List<byte>();
-                bool returned = false;
+
                 foreach (var c in code)
                 {
                     var cname = Regex.Match(c, @".+?(?=\()").Value;
                     var cparameters = Regex.Match(c, @"(?<=\().+?(?=\))").Value.Split(',');
-
-                    if (cname == "Return")
-                        returned = true;
 
                     byte flag = ActionCommon.GetMeleeCMDAction(cname).Command;
 

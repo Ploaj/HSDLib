@@ -1,4 +1,5 @@
 ﻿using System;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -12,15 +13,18 @@ namespace HSDRawViewer.GUI.Plugins
         }
     }
 
-    public interface EditorBase
+    public class EditorBase : DockContent
     {
-        WeifenLuo.WinFormsUI.Docking.DockState DefaultDockState { get; }
+        public virtual DockState DefaultDockState { get; } = DockState.Document;
 
-        DataNode Node { get; set; }
+        public virtual DataNode Node { get; set; }
     }
 
-    public interface SaveableEditorBase : EditorBase
+    public class SaveableEditorBase : EditorBase
     {
-        void OnDatFileSave();
+        public virtual void OnDatFileSave()
+        {
+
+        }
     }
 }

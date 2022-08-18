@@ -5,16 +5,13 @@ using HSDRawViewer.Tools;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_ParticleGroup) })]
-    public partial class ParticleEditor : DockContent, EditorBase, IDrawable
+    public partial class ParticleEditor : EditorBase, IDrawable
     {
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

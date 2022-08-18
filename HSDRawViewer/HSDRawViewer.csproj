@@ -189,6 +189,8 @@
     <ProjectReference Include="..\HSDRaw\HSDRaw.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DockPanelSuite" Version="3.1.0" />
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
@@ -203,7 +205,6 @@
     <PackageReference Include="OpenTK" Version="4.7.4" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="VGAudio" Version="2.2.1" />
-    <PackageReference Include="WeifenLuo.WinFormsUI.Docking" Version="2.1.0" />
     <PackageReference Include="YamlDotNet" Version="12.0.0" />
   </ItemGroup>
   <ItemDefinitionGroup>

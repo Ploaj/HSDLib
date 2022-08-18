@@ -1,8 +1,8 @@
 ﻿using HSDRaw;
 using HSDRaw.Melee.Pl;
-using HSDRawViewer.GUI;
 using System;
 using System.Windows.Forms;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus
 {

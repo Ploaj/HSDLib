@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace HSDRawViewer.GUI
+namespace HSDRawViewer.GUI.Dialog
 {
     public partial class HelpBox : Form
     {

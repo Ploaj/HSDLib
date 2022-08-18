@@ -9,11 +9,9 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_JOBJ) })]
-    public partial class JobjEditorDock : DockContent, EditorBase
+    public partial class JobjEditorDock : EditorBase
     {
-        public DockState DefaultDockState => DockState.DockLeft;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

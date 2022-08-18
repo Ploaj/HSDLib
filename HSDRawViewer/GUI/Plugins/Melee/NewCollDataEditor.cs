@@ -1,28 +1,18 @@
 ﻿using HSDRaw.Melee.Gr;
 using HSDRawViewer.Rendering;
-using OpenTK.Input;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
     //[SupportedTypes(new Type[] { typeof(SBM_Coll_Data) })]
-    public partial class NewCollDataEditor : DockContent, EditorBase, IDrawableInterface
+    public partial class NewCollDataEditor : EditorBase, IDrawableInterface
     {
-        public DockState DefaultDockState => DockState.Document;
-
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set
@@ -101,7 +91,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
         }
 
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
         }
 
@@ -109,7 +99,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
         }
 
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
         }
 

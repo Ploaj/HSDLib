@@ -10,9 +10,9 @@ using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Extra;
 using System.ComponentModel;
 using GCILib;
-using HSDRawViewer.GUI.Plugins.Melee;
 using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer
 {
@@ -54,23 +54,22 @@ namespace HSDRawViewer
 
             IsMdiContainer = true;
 
+            dockPanel.Theme = new VS2015LightTheme();
+
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
-            
+
+            Viewport = new CommonViewport();
+            Viewport.Dock = DockStyle.Fill;
+            Viewport.Show(dockPanel);
+
             //dockPanel.ShowDocumentIcon = true;
             dockPanel.ActiveContentChanged += (sender, args) =>
             {
                 if (dockPanel.ActiveContent != null)
                     LastActiveContent = dockPanel.ActiveContent;
             };
-
-            Viewport = new CommonViewport();
-            Viewport.Dock = DockStyle.Fill;
-            Viewport.Show(dockPanel);
-
-            //_ScriptEditor = new SubactionEditor();
-            //_ScriptEditor.Dock = DockStyle.Fill;
 
             ImageList myImageList = new ImageList();
             myImageList.ImageSize = new System.Drawing.Size(24, 24);

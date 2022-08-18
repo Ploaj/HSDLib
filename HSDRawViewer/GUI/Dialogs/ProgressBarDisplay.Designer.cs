@@ -1,4 +1,4 @@
-﻿namespace HSDRawViewer.GUI
+﻿namespace HSDRawViewer.GUI.Dialog
 {
     partial class ProgressBarDisplay
     {

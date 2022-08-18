@@ -1,14 +1,13 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRaw.Tools;
-using HSDRawViewer.GUI;
 using HSDRawViewer.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.Converters
 {

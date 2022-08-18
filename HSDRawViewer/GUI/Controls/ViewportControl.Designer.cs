@@ -33,7 +33,7 @@ namespace HSDRawViewer.GUI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewportControl));
-            this.panel1 = new GLControl();
+            this.glControl = new GLControl(new GLControlSettings() { NumberOfSamples = 8 });
             this.animationGroup = new System.Windows.Forms.GroupBox();
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonRewind = new System.Windows.Forms.Button();
@@ -70,19 +70,24 @@ namespace HSDRawViewer.GUI
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Black;
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 27);
-            this.panel1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(539, 215);
-            this.panel1.TabIndex = 0;
-            this.panel1.Load += new System.EventHandler(this.panel1_Load);
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
-            this.panel1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.panel1_KeyDown);
-            this.panel1.MouseEnter += new System.EventHandler(this.panel1_MouseEnter);
-            this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
-            this.panel1.Resize += new System.EventHandler(this.panel1_Resize);
+            this.glControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.glControl.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
+            this.glControl.APIVersion = new System.Version(3, 3, 0, 0);
+            this.glControl.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
+            this.glControl.IsEventDriven = true;
+            this.glControl.Location = new System.Drawing.Point(0, 27);
+            this.glControl.Name = "glControl";
+            this.glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
+            this.glControl.Size = new System.Drawing.Size(539, 215);
+            this.glControl.TabIndex = 2; // 0
+            this.glControl.Text = "glControl1";
+            this.glControl.Load += new System.EventHandler(this.panel1_Load);
+            this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.panel1_KeyDown);
+            this.glControl.MouseEnter += new System.EventHandler(this.panel1_MouseEnter);
+            this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
+            this.glControl.Resize += new System.EventHandler(this.panel1_Resize);
+            this.glControl.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             // 
             // animationGroup
             // 
@@ -436,7 +441,7 @@ namespace HSDRawViewer.GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.glControl);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.animationGroup);
@@ -457,7 +462,7 @@ namespace HSDRawViewer.GUI
 
         #endregion
 
-        private OpenTK.WinForms.GLControl panel1;
+        private OpenTK.WinForms.GLControl glControl;
         private System.Windows.Forms.GroupBox animationGroup;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.NumericUpDown nudFrame;

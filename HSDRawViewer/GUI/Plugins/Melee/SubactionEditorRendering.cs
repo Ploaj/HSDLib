@@ -5,7 +5,6 @@ using HSDRaw.Melee;
 using HSDRaw.Melee.Pl;
 using HSDRaw.Tools;
 using HSDRaw.Tools.Melee;
-using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
@@ -14,14 +13,13 @@ using HSDRawViewer.Rendering.Shapes;
 using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -1277,7 +1275,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <param name="kbState"></param>
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
             if (subActionList.SelectedItem is SubActionScript script &&
                 script.CodeID == 11)
@@ -1285,28 +1283,28 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 var desc = script.SubactionDesc;
                 var parameters = desc.GetParameters(script.data);
 
-                //if (kbState.IsKeyDown(Keys.KeyPadAdd))
-                //{
-                //    // size
-                //    if (kbState.IsKeyDown(Keys.ShiftLeft) || kbState.IsKeyDown(Keys.ShiftRight))
-                //        parameters[6] += 100;
-                //    else
-                //        parameters[6] += 10;
+                if (kbState.KeyCode == Keys.Add)
+                {
+                    // size
+                    if (kbState.Shift)
+                        parameters[6] += 100;
+                    else
+                        parameters[6] += 10;
 
-                //    if (parameters[6] > ushort.MaxValue)
-                //        parameters[6] = ushort.MaxValue;
-                //}
-                //if (kbState.IsKeyDown(Keys.Minus))
-                //{
-                //    // size
-                //    if (kbState.IsKeyDown(Keys.ShiftLeft) || kbState.IsKeyDown(Keys.ShiftRight))
-                //        parameters[6] -= 100;
-                //    else
-                //        parameters[6] -= 10;
+                    if (parameters[6] > ushort.MaxValue)
+                        parameters[6] = ushort.MaxValue;
+                }
+                if (kbState.KeyCode == Keys.Subtract)
+                {
+                    // size
+                    if (kbState.Shift)
+                        parameters[6] -= 100;
+                    else
+                        parameters[6] -= 10;
 
-                //    if (parameters[6] < 0)
-                //        parameters[6] = 0;
-                //}
+                    if (parameters[6] < 0)
+                        parameters[6] = 0;
+                }
 
                 script.data = desc.Compile(parameters);
 
@@ -1358,7 +1356,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="pick"></param>
         /// <param name="deltaX"></param>
         /// <param name="deltaY"></param>
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
             //_transWidget.Drag(pick);
             //OpenTK.Windowing.GraphicsLibraryFramework.

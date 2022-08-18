@@ -2,8 +2,7 @@
 using System;
 using System.Windows.Forms;
 using System.Linq;
-using HSDRaw.Tools;
-using HSDRawViewer.GUI;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus
 {

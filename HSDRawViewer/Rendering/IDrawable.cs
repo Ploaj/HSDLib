@@ -20,13 +20,13 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public interface IDrawableInterface : IDrawable
     {
-        void ViewportKeyPress(KeyboardState kbState);
+        void ViewportKeyPress(KeyEventArgs kbState);
 
         void ScreenClick(MouseButtons button, PickInformation pick);
 
         void ScreenDoubleClick(PickInformation pick);
 
-        void ScreenDrag(PickInformation pick, float deltaX, float deltaY);
+        void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY);
 
         void ScreenSelectArea(PickInformation start, PickInformation end);
     }

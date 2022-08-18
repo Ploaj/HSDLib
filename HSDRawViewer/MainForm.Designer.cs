@@ -82,9 +82,9 @@
             this.treeView1.Indent = 16;
             this.treeView1.ItemHeight = 24;
             this.treeView1.LabelEdit = true;
-            this.treeView1.Location = new System.Drawing.Point(3, 16);
+            this.treeView1.Location = new System.Drawing.Point(3, 19);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(208, 342);
+            this.treeView1.Size = new System.Drawing.Size(208, 339);
             this.treeView1.TabIndex = 0;
             this.treeView1.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_BeforeLabelEdit);
             this.treeView1.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_AfterLabelEdit);
@@ -354,7 +354,7 @@
             // LocationLabel
             // 
             this.LocationLabel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.LocationLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LocationLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.LocationLabel.Location = new System.Drawing.Point(0, 57);
             this.LocationLabel.Name = "LocationLabel";
             this.LocationLabel.Size = new System.Drawing.Size(751, 16);
@@ -363,9 +363,9 @@
             // 
             // dockPanel
             // 
-            this.dockPanel.ActiveAutoHideContent = null;
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dockPanel.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingMdi;
+            this.dockPanel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.dockPanel.Location = new System.Drawing.Point(231, 73);
             this.dockPanel.Name = "dockPanel";
             this.dockPanel.Size = new System.Drawing.Size(520, 361);
@@ -376,7 +376,7 @@
             this.showHideButton.BackColor = System.Drawing.SystemColors.Control;
             this.showHideButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.showHideButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.showHideButton.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.showHideButton.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.showHideButton.Location = new System.Drawing.Point(217, 73);
             this.showHideButton.Name = "showHideButton";
             this.showHideButton.Size = new System.Drawing.Size(14, 361);
@@ -418,7 +418,7 @@
             this.isoSaveLabel.AutoSize = true;
             this.isoSaveLabel.Location = new System.Drawing.Point(6, 8);
             this.isoSaveLabel.Name = "isoSaveLabel";
-            this.isoSaveLabel.Size = new System.Drawing.Size(64, 13);
+            this.isoSaveLabel.Size = new System.Drawing.Size(66, 15);
             this.isoSaveLabel.TabIndex = 14;
             this.isoSaveLabel.Text = "Saving ISO:";
             // 

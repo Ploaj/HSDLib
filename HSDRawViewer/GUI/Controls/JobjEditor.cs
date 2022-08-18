@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Converters;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Linq;
 using System.Drawing;
 using HSDRaw;
@@ -16,13 +15,13 @@ using HSDRawViewer.Tools;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using HSDRaw.GX;
-using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Converters.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.GUI.Controls;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -649,7 +648,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             Show();
             viewport.TakeScreenShot = 1;
-            viewport.ForceDraw();
+            viewport.Render();
         }
 
         /// <summary>

@@ -5,7 +5,6 @@ using HSDRaw.GX;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using OpenTK.Input;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +19,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
     [SupportedTypes(new Type[] { typeof(KAR_grMainModel) })]
-    public partial class AriRideGrModelEditor : DockContent, EditorBase, IDrawableInterface
+    public partial class AriRideGrModelEditor : EditorBase, IDrawableInterface
     {
         private JObjEditor _jointEditor;
 
@@ -38,9 +37,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             };
         }
 
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node { get => _node; set
+        public override DataNode Node { get => _node; set
             {
                 _node = value;
 
@@ -317,7 +314,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         }
 
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
         }
 
@@ -329,7 +326,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         {
         }
 
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
         }
 

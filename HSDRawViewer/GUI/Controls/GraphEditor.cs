@@ -8,9 +8,8 @@ using System.Windows.Forms;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering.Renderers;
-using OpenTK.Input;
 using HSDRawViewer.Converters.Animation;
-using HSDRawViewer.Tools;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Controls
 {

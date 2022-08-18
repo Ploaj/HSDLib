@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using HSDRaw.Tools;
 using HSDRaw.Common.Animation;
 using System.Reflection;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI
 {

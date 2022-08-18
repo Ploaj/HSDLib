@@ -1,11 +1,7 @@
-﻿using HSDRaw;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System;
 using System.Windows.Forms;
 
-namespace HSDRawViewer.GUI
+namespace HSDRawViewer.GUI.Dialog
 {
     public partial class HSDTypeDialog : Form
     {
@@ -14,8 +10,8 @@ namespace HSDRawViewer.GUI
         public HSDTypeDialog()
         {
             InitializeComponent();
-            
-            foreach(var v in ApplicationSettings.HSDTypes)
+
+            foreach (var v in ApplicationSettings.HSDTypes)
             {
                 comboBoxType.Items.Add(v);
             }

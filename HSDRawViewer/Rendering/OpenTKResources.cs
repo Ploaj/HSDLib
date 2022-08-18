@@ -1,6 +1,7 @@
 ﻿using System;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Graphics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace HSDRawViewer.Rendering
 {
@@ -28,10 +29,12 @@ namespace HSDRawViewer.Rendering
             // GraphicsContext.ShareContexts = true;
             //control = new OpenTK.GLControl();
             //control.MakeCurrent();
-            
-            Renderer = GL.GetString(StringName.Renderer);
-            OpenGLVersion = GL.GetString(StringName.Version);
-            GLSLVersion = GL.GetString(StringName.ShadingLanguageVersion);
+            GLFW.Init();
+            GL.LoadBindings(new GLFWBindingsContext());
+
+            //Renderer = GL.GetString(StringName.Renderer);
+            //OpenGLVersion = GL.GetString(StringName.Version);
+            //GLSLVersion = GL.GetString(StringName.ShadingLanguageVersion);
         }
     }
 }

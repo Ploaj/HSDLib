@@ -1,9 +1,9 @@
 ﻿using System.Windows.Forms;
 using HSDRaw;
 using WeifenLuo.WinFormsUI.Docking;
-using HSDRawViewer.GUI;
+using HSDRawViewer.Rendering;
 
-namespace HSDRawViewer.Rendering
+namespace HSDRawViewer.GUI
 {
     public class CommonViewport : DockContent, IDrawable
     {

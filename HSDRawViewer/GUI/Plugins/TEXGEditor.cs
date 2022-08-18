@@ -4,20 +4,18 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_TexGraphic) })]
-    public partial class TEXGEditor : DockContent, EditorBase
+    public partial class TEXGEditor : EditorBase
     {
         private HSD_TexGraphic _texGraphic => _node.Accessor as HSD_TexGraphic;
 
         public TOBJProxy[] Images { get; set; }
 
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

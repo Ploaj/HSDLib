@@ -1,6 +1,6 @@
 ﻿using CSCore.CoreAudioAPI;
 using HSDRaw;
-using HSDRawViewer.GUI;
+using HSDRawViewer.GUI.Dialog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

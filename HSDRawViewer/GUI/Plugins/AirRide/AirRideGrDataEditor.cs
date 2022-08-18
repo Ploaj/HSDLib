@@ -22,7 +22,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
     [SupportedTypes(new Type[] { typeof(KAR_grData) })]
-    public partial class AirRideGrDataEditor : DockContent, EditorBase, IDrawableInterface
+    public partial class AirRideGrDataEditor : EditorBase, IDrawableInterface
     {
         public enum EditorMode
         {
@@ -49,8 +49,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             VehicleAreaPosition,
         }
 
-        public DockState DefaultDockState => DockState.Document;
-
         public EditorMode EditMode
         {
             get => _editMode;
@@ -58,7 +56,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         }
         private EditorMode _editMode = EditorMode.Collision;
 
-        public DataNode Node { get => _node;
+        public override DataNode Node { get => _node;
             set
             {
                 _node = value;
@@ -659,7 +657,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
 
 
-        public void ViewportKeyPress(OpenTK.Windowing.GraphicsLibraryFramework.KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
         }
 
@@ -722,7 +720,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         }
 
 
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
         }
 

@@ -69,7 +69,11 @@
 
         public override int GetHashCode()
         {
-            return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
+            int hashCode = -307843816;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            hashCode = hashCode * -1521134295 + Z.GetHashCode();
+            return hashCode;
         }
 
         public static bool operator ==(GXVector3 x, GXVector3 y)
@@ -100,6 +104,21 @@
         public static bool operator !=(GXVector2 x, GXVector2 y)
         {
             return !(x.X == y.X && x.Y == y.Y);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GXVector2 vector &&
+                   X == vector.X &&
+                   Y == vector.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1861411795;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            return hashCode;
         }
     }
 }

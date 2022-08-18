@@ -1,7 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRaw.Tools;
-using HSDRawViewer.GUI;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering.GX;
 using IONET;

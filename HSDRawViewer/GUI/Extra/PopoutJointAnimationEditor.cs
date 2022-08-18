@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using static HSDRawViewer.GUI.Controls.GraphEditor;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Extra
 {
