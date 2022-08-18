@@ -1,6 +1,6 @@
 ﻿using System;
 using HSDRaw.GX;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 
 namespace HSDRawViewer.Rendering.Renderers

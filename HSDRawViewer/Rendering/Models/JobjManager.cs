@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using HSDRaw.Common;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.Converters;

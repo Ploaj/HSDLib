@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using HSDRaw.Tools;
 using HSDRaw.Common.Animation;
-using HSDRawViewer.Rendering;
 using System.Reflection;
 
 namespace HSDRawViewer.GUI
@@ -20,7 +19,7 @@ namespace HSDRawViewer.GUI
         }
 
         private BindingList<Key> KeyFrames = new BindingList<Key>();
-        private ContextMenu KeyContextMenu = new ContextMenu();
+        private ContextMenuStrip KeyContextMenu = new ContextMenuStrip();
 
         public KeyEditor()
         {
@@ -28,19 +27,19 @@ namespace HSDRawViewer.GUI
 
             DoubleBuffered = true;
 
-            var insert = new MenuItem("Insert");
+            var insert = new ToolStripMenuItem("Insert");
             insert.Click += (sender, args) =>
             {
                 InsertKey();
             };
-            KeyContextMenu.MenuItems.Add(insert);
+            KeyContextMenu.Items.Add(insert);
 
-            var delete = new MenuItem("Delete");
+            var delete = new ToolStripMenuItem("Delete");
             delete.Click += (sender, args) =>
             {
                 DeleteKeys();
             };
-            KeyContextMenu.MenuItems.Add(delete);
+            KeyContextMenu.Items.Add(delete);
 
             dataGridView1.MouseDown += (sender, args) =>
             {

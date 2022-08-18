@@ -13,14 +13,15 @@ using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Shapes;
 using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
-using OpenTK;
-using OpenTK.Input;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -1284,28 +1285,28 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 var desc = script.SubactionDesc;
                 var parameters = desc.GetParameters(script.data);
 
-                if (kbState.IsKeyDown(Key.Plus))
-                {
-                    // size
-                    if (kbState.IsKeyDown(Key.ShiftLeft) || kbState.IsKeyDown(Key.ShiftRight))
-                        parameters[6] += 100;
-                    else
-                        parameters[6] += 10;
+                //if (kbState.IsKeyDown(Keys.KeyPadAdd))
+                //{
+                //    // size
+                //    if (kbState.IsKeyDown(Keys.ShiftLeft) || kbState.IsKeyDown(Keys.ShiftRight))
+                //        parameters[6] += 100;
+                //    else
+                //        parameters[6] += 10;
 
-                    if (parameters[6] > ushort.MaxValue)
-                        parameters[6] = ushort.MaxValue;
-                }
-                if (kbState.IsKeyDown(Key.Minus))
-                {
-                    // size
-                    if (kbState.IsKeyDown(Key.ShiftLeft) || kbState.IsKeyDown(Key.ShiftRight))
-                        parameters[6] -= 100;
-                    else
-                        parameters[6] -= 10;
+                //    if (parameters[6] > ushort.MaxValue)
+                //        parameters[6] = ushort.MaxValue;
+                //}
+                //if (kbState.IsKeyDown(Keys.Minus))
+                //{
+                //    // size
+                //    if (kbState.IsKeyDown(Keys.ShiftLeft) || kbState.IsKeyDown(Keys.ShiftRight))
+                //        parameters[6] -= 100;
+                //    else
+                //        parameters[6] -= 10;
 
-                    if (parameters[6] < 0)
-                        parameters[6] = 0;
-                }
+                //    if (parameters[6] < 0)
+                //        parameters[6] = 0;
+                //}
 
                 script.data = desc.Compile(parameters);
 
@@ -1359,26 +1360,26 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="deltaY"></param>
         public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
         {
-            _transWidget.Drag(pick);
+            //_transWidget.Drag(pick);
+            //OpenTK.Windowing.GraphicsLibraryFramework.
+            //var keyState = Keyboard.GetState();
 
-            var keyState = Keyboard.GetState();
+            //bool drag = keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
 
-            bool drag = keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+            //if (drag && 
+            //    subActionList.SelectedItem is SubActionScript script && 
+            //    script.CodeID == 11)
+            //{
+            //    var desc = script.SubactionDesc;
+            //    var parameters = desc.GetParameters(script.data);
 
-            if (drag && 
-                subActionList.SelectedItem is SubActionScript script && 
-                script.CodeID == 11)
-            {
-                var desc = script.SubactionDesc;
-                var parameters = desc.GetParameters(script.data);
+            //    // position
+            //    // 7 8 9 
 
-                // position
-                // 7 8 9 
-
-                script.data = desc.Compile(parameters);
-                subActionList.Invalidate();
-                SaveSelectedActionChanges();
-            }
+            //    script.data = desc.Compile(parameters);
+            //    subActionList.Invalidate();
+            //    SaveSelectedActionChanges();
+            //}
         }
 
         /// <summary>

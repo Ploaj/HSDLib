@@ -1,5 +1,5 @@
 ﻿using HSDRaw.Melee.Pl;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 
 namespace HSDRawViewer.Rendering.Renderers

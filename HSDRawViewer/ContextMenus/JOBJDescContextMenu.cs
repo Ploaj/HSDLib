@@ -10,29 +10,29 @@ namespace HSDRawViewer.ContextMenus
 
         public JOBJDescContextMenu() : base()
         {
-            MenuItem add = new MenuItem("Add");
+            ToolStripMenuItem add = new ToolStripMenuItem("Add");
             
             {
-                MenuItem nn = new MenuItem("Add Joint Anim Folder");
+                ToolStripMenuItem nn = new ToolStripMenuItem("Add Joint Anim Folder");
                 nn.Click += (sender, args) =>
                 {
                     if (MainForm.SelectedDataNode.Accessor is HSD_JOBJDesc desc && desc.JointAnimations == null)
                         desc.JointAnimations = new HSDRaw.HSDNullPointerArrayAccessor<HSDRaw.Common.Animation.HSD_AnimJoint>();
                 };
-                add.MenuItems.Add(nn);
+                add.DropDownItems.Add(nn);
             }
 
             {
-                MenuItem nn = new MenuItem("Add Material Anim Folder");
+                ToolStripMenuItem nn = new ToolStripMenuItem("Add Material Anim Folder");
                 nn.Click += (sender, args) =>
                 {
                     if (MainForm.SelectedDataNode.Accessor is HSD_JOBJDesc desc && desc.MaterialAnimations == null)
                         desc.MaterialAnimations = new HSDRaw.HSDNullPointerArrayAccessor<HSDRaw.Common.Animation.HSD_MatAnimJoint>();
                 };
-                add.MenuItems.Add(nn);
+                add.DropDownItems.Add(nn);
             }
 
-            MenuItems.Add(add);
+            Items.Add(add);
         }
 
     }

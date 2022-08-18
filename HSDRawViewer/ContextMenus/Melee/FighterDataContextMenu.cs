@@ -23,7 +23,7 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public FighterDataContextMenu() : base()
         {
-            MenuItem addFromFile = new MenuItem("Add Article Folder");
+            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add Article Folder");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_FighterData root)
@@ -32,10 +32,10 @@ namespace HSDRawViewer.ContextMenus.Melee
                         root.Articles = new SBM_ArticlePointer();
                 }
             };
-            MenuItems.Add(addFromFile);
+            Items.Add(addFromFile);
 
 #if DEBUG
-            MenuItem renameAnimSymbol = new MenuItem("Rename Anim Symbol");
+            ToolStripMenuItem renameAnimSymbol = new ToolStripMenuItem("Rename Anim Symbol");
             renameAnimSymbol.Click += (sender, args) =>
             {
                 var rn = new RenameProperty();
@@ -65,7 +65,7 @@ namespace HSDRawViewer.ContextMenus.Melee
                     }
                 }
             };
-            MenuItems.Add(renameAnimSymbol);
+            Items.Add(renameAnimSymbol);
 #endif
         }
     }

@@ -4,7 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using HSDRawViewer.Rendering;
 using System.Collections.Generic;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Linq;
 using OpenTK.Input;
 using System.Timers;
@@ -147,8 +147,9 @@ namespace HSDRawViewer.GUI
         {
             get
             {
-                var keyState = Keyboard.GetState();
-                return keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+                //var keyState = Keyboard.GetState();
+                //return keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+                return false;
             }
         }
 
@@ -157,9 +158,10 @@ namespace HSDRawViewer.GUI
         {
             get
             {
-                var keyState = Keyboard.GetState();
-                return keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight) ||
-                       IsAltAction;
+                //var keyState = Keyboard.GetState();
+                //return keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight) ||
+                //       IsAltAction;
+                return false;
             }
         }
 
@@ -312,10 +314,10 @@ namespace HSDRawViewer.GUI
                             d.ShowDialog();
                 }*/
 
-                var keyState = OpenTK.Input.Keyboard.GetState();
+                // var keyState = OpenTK.Input.Keyboard.GetState();
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                        inter.ViewportKeyPress(keyState);
+                        inter.ViewportKeyPress(null); //keyState
             };
 
             panel1.MouseClick += (sender, args) =>
@@ -338,10 +340,9 @@ namespace HSDRawViewer.GUI
 
             panel1.MouseDown += (sender, args) =>
             {
-                var keyState = Keyboard.GetState();
-
-                if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
-                    Selecting = true;
+                //var keyState = Keyboard.GetState();
+                //if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
+                //    Selecting = true;
 
                 mouseStart = new Vector2(args.X, args.Y);
             };
@@ -375,10 +376,9 @@ namespace HSDRawViewer.GUI
                 var zoomMultiplier = 1;
                 try
                 {
-                    var ks = Keyboard.GetState();
-
-                    if (ks.IsKeyDown(Key.ShiftLeft) || ks.IsKeyDown(Key.ShiftRight))
-                        zoomMultiplier = 4;
+                    //var ks = Keyboard.GetState();
+                    //if (ks.IsKeyDown(Key.ShiftLeft) || ks.IsKeyDown(Key.ShiftRight))
+                    //    zoomMultiplier = 4;
                 }
                 catch (Exception)
                 {
@@ -386,8 +386,6 @@ namespace HSDRawViewer.GUI
                 }
                 _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
             };
-
-            panel1.VSync = false;
 
             Disposed += (sender, args) =>
             {
@@ -451,8 +449,8 @@ namespace HSDRawViewer.GUI
 
             var inv = _camera.MvpMatrix.Inverted();
 
-            Vector4 va = Vector4.Transform(new Vector4(x, y, -1.0f, 1.0f), inv);
-            Vector4 vb = Vector4.Transform(new Vector4(x, y, 1.0f, 1.0f), inv);
+            Vector4 va = new Vector4(x, y, -1.0f, 1.0f) * inv;
+            Vector4 vb = new Vector4(x, y, 1.0f, 1.0f) * inv;
 
             va.Xyz /= va.W;
             vb.Xyz /= vb.W;

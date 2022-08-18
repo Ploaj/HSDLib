@@ -147,8 +147,9 @@ namespace HSDRawViewer.GUI.Controls
         {
             get
             {
-                var state = Keyboard.GetState();
-                return state.IsKeyDown(Key.ControlLeft) || state.IsKeyDown(Key.ControlRight);
+                //var state = Keyboard.GetState();
+                //return state.IsKeyDown(Key.ControlLeft) || state.IsKeyDown(Key.ControlRight);
+                return false;
             }
         }
 

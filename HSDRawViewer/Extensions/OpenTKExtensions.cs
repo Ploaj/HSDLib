@@ -1,5 +1,5 @@
 ﻿using HSDRaw.Common;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 
 namespace HSDRawViewer

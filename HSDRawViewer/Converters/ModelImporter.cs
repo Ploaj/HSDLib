@@ -9,12 +9,12 @@ using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
 using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
-using static HSDRawViewer.Converters.ImporterExtensions;
 
 namespace HSDRawViewer.Converters
 {

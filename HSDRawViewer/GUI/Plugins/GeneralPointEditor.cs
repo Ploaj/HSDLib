@@ -6,10 +6,10 @@ using HSDRawViewer.Rendering;
 using System.Windows.Forms;
 using System.ComponentModel;
 using OpenTK.Graphics.OpenGL;
-using OpenTK;
-using OpenTK.Input;
+using OpenTK.Mathematics;
 using HSDRawViewer.Converters.Melee;
 using HSDRawViewer.Rendering.Models;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -213,24 +213,24 @@ namespace HSDRawViewer.GUI.Plugins
         private Vector2 previousPickPosition = Vector2.Zero;
         public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
         {
-            var mouseState = Mouse.GetState();
+            //var mouseState = Mouse.GetState();
 
-            var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+            //var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
 
-            if (PluginManager.GetCommonViewport().IsAltAction &&
-                mouseState.IsButtonDown(MouseButton.Left) &&
-                propertyGrid1.SelectedObject is PointLink point &&
-                Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), SelectionDistance))
-            {
-                point.X = Picked.X;
-                point.Y = Picked.Y;
-                if (!dragging)
-                    previousPoint = Picked.Xy;
-                dragging = true;
-            }
-            else
-                dragging = false;
-            previousPickPosition = Picked.Xy;
+            //if (PluginManager.GetCommonViewport().IsAltAction &&
+            //    mouseState.IsButtonDown(MouseButton.Left) &&
+            //    propertyGrid1.SelectedObject is PointLink point &&
+            //    Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), SelectionDistance))
+            //{
+            //    point.X = Picked.X;
+            //    point.Y = Picked.Y;
+            //    if (!dragging)
+            //        previousPoint = Picked.Xy;
+            //    dragging = true;
+            //}
+            //else
+            //    dragging = false;
+            //previousPickPosition = Picked.Xy;
         }
 
         public void ScreenSelectArea(PickInformation start, PickInformation end)

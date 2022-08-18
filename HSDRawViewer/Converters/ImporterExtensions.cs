@@ -2,7 +2,7 @@
 using HSDRaw.GX;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 

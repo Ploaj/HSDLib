@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Melee.Gr;
 using HSDRawViewer.Rendering;
 using OpenTK.Input;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

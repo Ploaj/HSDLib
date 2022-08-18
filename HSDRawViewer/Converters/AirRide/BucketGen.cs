@@ -1,7 +1,7 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.GX;
 using HSDRawViewer.Rendering;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -2,7 +2,7 @@
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Shapes;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Collections.Generic;
 
 namespace HSDRawViewer.Rendering.Renderers

@@ -2,7 +2,7 @@
 using HSDRaw.GX;
 using System;
 using System.Collections.Generic;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using HSDRawViewer.Rendering.GX;
 using HSDRaw;

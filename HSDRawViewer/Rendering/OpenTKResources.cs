@@ -10,14 +10,14 @@ namespace HSDRawViewer.Rendering
         public static string OpenGLVersion { get; internal set; }
         public static string GLSLVersion { get; internal set; }
 
-        private static OpenTK.GLControl control { get; set; }
+        //private static OpenTK.GLControl control { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         public static void MakeCurrentDummy()
         {
-            control.MakeCurrent();
+            //control.MakeCurrent();
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public static void Init()
         {
-            GraphicsContext.ShareContexts = true;
-            control = new OpenTK.GLControl();
-            control.MakeCurrent();
+            // GraphicsContext.ShareContexts = true;
+            //control = new OpenTK.GLControl();
+            //control.MakeCurrent();
             
             Renderer = GL.GetString(StringName.Renderer);
             OpenGLVersion = GL.GetString(StringName.Version);

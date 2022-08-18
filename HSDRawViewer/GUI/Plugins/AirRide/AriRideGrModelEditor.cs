@@ -5,6 +5,7 @@ using HSDRaw.GX;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using OpenTK.Input;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

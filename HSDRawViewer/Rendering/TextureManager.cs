@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Drawing;
 using System.Linq;
 using HSDRaw.Common;

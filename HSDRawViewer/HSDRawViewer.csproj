@@ -1,51 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{755580A7-D09D-4EEC-9129-2DD7A6951A31}</ProjectGuid>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>HSDRawViewer</RootNamespace>
-    <AssemblyName>HSDRawViewer</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>dogg.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Be.Windows.Forms.HexBox, Version=1.6.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Be.Windows.Forms.HexBox.1.6.1\lib\net40\Be.Windows.Forms.HexBox.dll</HintPath>
-    </Reference>
-    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
-      <HintPath>..\packages\CSCore.1.2.1.2\lib\net35-client\CSCore.dll</HintPath>
-    </Reference>
     <Reference Include="GCILib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\GCILib.dll</HintPath>
@@ -54,819 +18,197 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\IONET.dll</HintPath>
     </Reference>
-    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
-    </Reference>
     <Reference Include="netstandard" />
-    <Reference Include="OpenTK, Version=3.3.2.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.3.3.2\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK.WinForms">
+      <HintPath>lib\OpenTK.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK.GLControl, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTK.GLControl.3.1.0\lib\net20\OpenTK.GLControl.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Design" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="VGAudio, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\VGAudio.2.2.1\lib\net45\VGAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.1.6643.41644, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WeifenLuo.WinFormsUI.Docking.2.1.0\lib\net20\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
-    </Reference>
-    <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationSettings.cs" />
-    <Compile Include="ContextMenus\Melee\CollDataContextMenu.cs">
+    <Compile Update="ContextMenus\Melee\CollDataContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\CommonContextMenu.cs">
+    <Compile Update="ContextMenus\CommonContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\DOBJContextMenu.cs">
+    <Compile Update="ContextMenus\DOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\FigatreeContextMenu.cs">
+    <Compile Update="ContextMenus\FigatreeContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\Melee\FighterArticleContextMenu.cs">
+    <Compile Update="ContextMenus\Melee\FighterArticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\FOBJContextMenu.cs">
+    <Compile Update="ContextMenus\FOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\JOBJContextMenu.cs">
+    <Compile Update="ContextMenus\JOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\JOBJDescContextMenu.cs">
+    <Compile Update="ContextMenus\JOBJDescContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\Melee\MapHeadContextMenu.cs">
+    <Compile Update="ContextMenus\Melee\MapHeadContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\MatAnimContextMenu.cs">
+    <Compile Update="ContextMenus\MatAnimContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\JointAnimContextMenu.cs">
+    <Compile Update="ContextMenus\JointAnimContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\MatAnimJointContextMenu.cs">
+    <Compile Update="ContextMenus\MatAnimJointContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\Melee\FighterDataContextMenu.cs">
+    <Compile Update="ContextMenus\Melee\FighterDataContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\Melee\MeleeEffectTable.cs">
+    <Compile Update="ContextMenus\Melee\MeleeEffectTable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\Melee\MapGOBJContextMenu.cs">
+    <Compile Update="ContextMenus\Melee\MapGOBJContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\ParticleContextMenu.cs">
+    <Compile Update="ContextMenus\ParticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\Melee\SelectCharContextMenu.cs">
+    <Compile Update="ContextMenus\Melee\SelectCharContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\SplineContextMenu.cs">
+    <Compile Update="ContextMenus\SplineContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ContextMenus\SubactionTableContextMenu.cs" />
-    <Compile Include="ContextMenus\UnidentifiedContextMenu.cs">
+    <Compile Update="ContextMenus\UnidentifiedContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Converters\AirRide\BucketGen.cs" />
-    <Compile Include="Converters\AirRide\KCLConv.cs" />
-    <Compile Include="Converters\Animation\BKEConv.cs" />
-    <Compile Include="Converters\Animation\CHR0Converter.cs" />
-    <Compile Include="Converters\Animation\ConvFOBJ.cs" />
-    <Compile Include="Converters\Animation\HSDK.cs" />
-    <Compile Include="Converters\Animation\JointAnimationLoader.cs" />
-    <Compile Include="Converters\ImporterExtensions.cs" />
-    <Compile Include="Converters\ModelTangentUtils.cs" />
-    <Compile Include="Converters\ModelImporter.cs" />
-    <Compile Include="Converters\SBM\CollImporter.cs" />
-    <Compile Include="Converters\SBM\ConvSVG.cs" />
-    <Compile Include="Converters\SBM\SSFModelGenerator.cs" />
-    <Compile Include="Extensions\AOBJExtentions.cs" />
-    <Compile Include="Extensions\JOBJExtensions.cs" />
-    <Compile Include="Converters\Animation\MayaAnim.cs" />
-    <Compile Include="Converters\ModelExporter.cs" />
-    <Compile Include="Converters\ModelImportSettings.cs" />
-    <Compile Include="Converters\SBM\CSPMaker.cs" />
-    <Compile Include="Converters\SBM\ModeltoCollData.cs" />
-    <Compile Include="Converters\Animation\MOTLoader.cs" />
-    <Compile Include="Converters\OutlineGenerator.cs" />
-    <Compile Include="Converters\PlayStruct.cs" />
-    <Compile Include="Converters\SBM\SSF.cs" />
-    <Compile Include="Converters\SBM\SSFConverter.cs" />
-    <Compile Include="Converters\TOBJConverter.cs" />
-    <Compile Include="DataNode.cs" />
-    <Compile Include="Extensions\KarCollisionExtensions.cs" />
-    <Compile Include="GUI\Controls\DoubleBufferedListBox.cs">
+    <Compile Update="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\ISOEditor.cs">
+    <Compile Update="GUI\Controls\ISOEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\ISOEditor.Designer.cs">
-      <DependentUpon>ISOEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\LObjEditor.cs">
+    <Compile Update="GUI\Controls\LObjEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\LObjEditor.Designer.cs">
-      <DependentUpon>LObjEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\MeshList.cs" />
-    <Compile Include="GUI\Controls\MEXStockIconControl.cs">
+    <Compile Update="GUI\Controls\MEXStockIconControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\MEXStockIconControl.Designer.cs" />
-    <Compile Include="GUI\Controls\AnimationPlaybackControl.cs">
+    <Compile Update="GUI\Controls\AnimationPlaybackControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\AnimationPlaybackControl.Designer.cs">
-      <DependentUpon>AnimationPlaybackControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\PlaybackBar.cs" />
-    <Compile Include="GUI\Controls\PlaybackBar.Designer.cs">
-      <DependentUpon>PlaybackBar.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\PopoutCollectionEditor.cs" />
-    <Compile Include="GUI\Controls\TexturePanel.cs">
+    <Compile Update="GUI\Controls\TexturePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\TexturePanel.Designer.cs">
-      <DependentUpon>TexturePanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\FSMTool.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\FSMTool.Designer.cs">
-      <DependentUpon>FSMTool.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\ISOFileTool.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\ISOFileTool.Designer.cs">
-      <DependentUpon>ISOFileTool.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\ModelImportDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\ModelImportDialog.Designer.cs">
-      <DependentUpon>ModelImportDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\PopoutJointAnimationEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\PopoutJointAnimationEditor.Designer.cs">
-      <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\AirRide\AirRideGrDataPosition.cs" />
-    <Compile Include="GUI\Plugins\LObjEditorDock.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\LObjEditorDock.Designer.cs">
-      <DependentUpon>LObjEditorDock.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\NewCollDataEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\NewCollDataEditor.Designer.cs">
-      <DependentUpon>NewCollDataEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditor.Designer.cs" />
-    <Compile Include="GUI\Plugins\Melee\SubactionEditorActions.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditorDebug.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionEditorRendering.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubactionFromText.cs" />
-    <Compile Include="GUI\Plugins\Melee\SubactionProcessor.cs" />
-    <Compile Include="GUI\Plugins\ParticleEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\ParticleEditor.Designer.cs">
-      <DependentUpon>ParticleEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\MEXStockIconEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\MEXStockIconEditor.Designer.cs">
-      <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\TexAnimEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\TexAnimEditor.Designer.cs">
-      <DependentUpon>TexAnimEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\TEXGEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\TEXGEditor.Designer.cs">
-      <DependentUpon>TEXGEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\TOBJEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\TOBJEditor.Designer.cs">
-      <DependentUpon>TOBJEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\ArrayMemberEditor.cs">
+    <Compile Update="GUI\Controls\ArrayMemberEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\ArrayMemberEditor.Designer.cs">
-      <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\CustomTrackBar.cs">
+    <Compile Update="GUI\Controls\CustomTrackBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\GraphEditor.cs">
+    <Compile Update="GUI\Controls\GraphEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\GraphEditor.Designer.cs">
-      <DependentUpon>GraphEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\AJSplitDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\AJSplitDialog.Designer.cs">
-      <DependentUpon>AJSplitDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\DSPViewer.cs">
+    <Compile Update="GUI\Extra\DSPViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Extra\DSPViewer.Designer.cs">
-      <DependentUpon>DSPViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\MOBJEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\MOBJEditor.Designer.cs">
-      <DependentUpon>MOBJEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\PopoutGraphEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\PopoutGraphEditor.Designer.cs">
-      <DependentUpon>PopoutGraphEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\SEMEditor.cs">
+    <Compile Update="GUI\Extra\SEMEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Extra\SEMEditor.Designer.cs">
-      <DependentUpon>SEMEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\SEMEditorTool.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\SEMEditorTool.Designer.cs">
-      <DependentUpon>SEMEditorTool.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\SoundBankEditor.cs">
+    <Compile Update="GUI\Extra\SoundBankEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Extra\SoundBankEditor.Designer.cs">
-      <DependentUpon>SoundBankEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\SoundScriptEditor.cs">
+    <Compile Update="GUI\Extra\SoundScriptEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Extra\SoundScriptEditor.Designer.cs">
-      <DependentUpon>SoundScriptEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Extra\SSMTool.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Extra\SSMTool.Designer.cs">
-      <DependentUpon>SSMTool.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\HelpBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\HelpBox.Designer.cs">
-      <DependentUpon>HelpBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\HSDTypeDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\HSDTypeDialog.Designer.cs">
-      <DependentUpon>HSDTypeDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\KeyEditor.cs">
+    <Compile Update="GUI\Controls\KeyEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\KeyEditor.Designer.cs">
-      <DependentUpon>KeyEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\AirRide\AirRideGrDataEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\AirRide\AirRideGrDataEditor.Designer.cs">
-      <DependentUpon>AirRideGrDataEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\AirRide\AriRideGrModelEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\AirRide\AriRideGrModelEditor.Designer.cs">
-      <DependentUpon>AriRideGrModelEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\AOBJEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\AOBJEditor.Designer.cs">
-      <DependentUpon>AOBJEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\JobjEditorDock.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\JobjEditorDock.Designer.cs">
-      <DependentUpon>JobjEditorDock.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\CollDataEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\CollDataEditor.Designer.cs">
-      <DependentUpon>CollDataEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\EditorBase.cs" />
-    <Compile Include="GUI\Plugins\GeneralPointEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\GeneralPointEditor.Designer.cs">
-      <DependentUpon>GeneralPointEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\JObjEditor.cs">
+    <Compile Update="GUI\Controls\JObjEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\JObjEditor.Designer.cs">
-      <DependentUpon>JObjEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\CollDataItems.cs" />
-    <Compile Include="GUI\Plugins\Melee\DummyThrowModel.cs" />
-    <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\HurtBoxEditor.Designer.cs">
-      <DependentUpon>HurtBoxEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SISMenuDataEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SISMenuDataEditor.Designer.cs">
-      <DependentUpon>SISMenuDataEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\ProgressBarDisplay.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ProgressBarDisplay.Designer.cs">
-      <DependentUpon>ProgressBarDisplay.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubActionPanel.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Plugins\Melee\SubActionPanel.Designer.cs">
-      <DependentUpon>SubActionPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\PropertyDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\PropertyDialog.Designer.cs">
-      <DependentUpon>PropertyDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\PropertyView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\PropertyView.Designer.cs">
-      <DependentUpon>PropertyView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\TextureImportDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\TextureImportDialog.Designer.cs">
-      <DependentUpon>TextureImportDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Controls\ViewportControl.cs">
+    <Compile Update="GUI\Controls\ViewportControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\Controls\ViewportControl.Designer.cs">
-      <DependentUpon>ViewportControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PluginManager.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RawCommand.cs" />
-    <Compile Include="Rendering\Animation\AnimManager.cs" />
-    <Compile Include="Rendering\Animation\AnimNode.cs" />
-    <Compile Include="Rendering\Animation\MotAnimManager.cs" />
-    <Compile Include="Rendering\Animation\PhysicsDynamics.cs" />
-    <Compile Include="Rendering\Animation\PhysicsPlayer.cs" />
-    <Compile Include="Rendering\Animation\PhysicsSimulator.cs" />
-    <Compile Include="Rendering\Animation\ShapeAnimManager.cs" />
-    <Compile Include="Rendering\Camera.cs" />
-    <Compile Include="Rendering\GX\GXFogParam.cs" />
-    <Compile Include="Rendering\GX\GXLightParam.cs" />
-    <Compile Include="Rendering\GX\GXShader.cs" />
-    <Compile Include="Rendering\Models\DobjManager.cs" />
-    <Compile Include="Rendering\Animation\MatAnimManager.cs" />
-    <Compile Include="Rendering\Models\JobjDisplaySettings.cs" />
-    <Compile Include="Rendering\Models\LiveJObj.cs" />
-    <Compile Include="Rendering\Models\MobjManager.cs" />
-    <Compile Include="Rendering\Models\VertexBufferManager.cs" />
-    <Compile Include="Rendering\GX\RenderMode.cs" />
-    <Compile Include="Rendering\Renderers\AfterImageRenderer.cs" />
-    <Compile Include="Rendering\Renderers\GraphRenderer.cs" />
-    <Compile Include="Rendering\Renderers\HurtboxRenderer.cs" />
-    <Compile Include="Rendering\Renderers\Particle.cs" />
-    <Compile Include="Rendering\Renderers\ParticleGenerator.cs" />
-    <Compile Include="Rendering\Renderers\ParticleShader.cs" />
-    <Compile Include="Rendering\Renderers\ParticleSystem.cs" />
-    <Compile Include="Rendering\Renderers\TextRenderer.cs" />
-    <Compile Include="Rendering\Shapes\DrawShape.cs" />
-    <Compile Include="Rendering\GX\GXTranslator.cs" />
-    <Compile Include="Rendering\IDrawable.cs" />
-    <Compile Include="Rendering\Models\JobjManager.cs" />
-    <Compile Include="Rendering\Math3D.cs" />
-    <Compile Include="Rendering\OpenTKResources.cs" />
-    <Compile Include="Rendering\Picking.cs" />
-    <Compile Include="Rendering\Renderers\RendererGrCollision.cs" />
-    <Compile Include="Rendering\Animation\JointAnimManager.cs" />
-    <Compile Include="Rendering\Shader.cs" />
-    <Compile Include="Rendering\Shapes\Capsule.cs" />
-    <Compile Include="Rendering\TextureManager.cs" />
-    <Compile Include="Rendering\TriangleConverter.cs" />
-    <Compile Include="Rendering\Viewport.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Rendering\Widgets\TranslationWidget.cs" />
-    <Compile Include="Sound\HPS.cs" />
-    <Compile Include="Sound\SEM.cs" />
-    <Compile Include="Sound\SEMEntry.cs" />
-    <Compile Include="TestFunctions.cs" />
-    <Compile Include="Sound\DSP.cs" />
-    <Compile Include="Sound\DSPPlayer.cs" />
-    <Compile Include="Tools\CustomClass.cs" />
-    <Compile Include="Tools\FileIO.cs" />
-    <Compile Include="Tools\FlagEnumEditor.cs">
+    <Compile Update="Tools\FlagEnumEditor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Tools\GUITools.cs" />
-    <Compile Include="Tools\ImageTools.cs" />
-    <Compile Include="Tools\JointMap.cs" />
-    <Compile Include="Extensions\OpenTKExtensions.cs" />
-    <Compile Include="Tools\ObjectExtension.cs" />
-    <Compile Include="Tools\OpenFolderDialog.cs">
+    <Compile Update="Tools\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Sound\SSM.cs" />
-    <Compile Include="Tools\ParticleEvent.cs" />
-    <Compile Include="Tools\ParticleManager.cs" />
-    <Compile Include="Tools\RawTimer.cs" />
-    <Compile Include="Tools\Simpoly.cs" />
-    <Compile Include="Tools\SubactionManager.cs" />
-    <None Include="OpenTK.dll.config" />
-    <None Include="Shader\ps.frag">
+    <None Update="Shader\ps.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\ps.vert">
+    <None Update="Shader\ps.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\ts_visible.png" />
-    <None Include="Resources\ts_hidden.png" />
-    <None Include="Melee\command_rider.yml">
+    <None Update="Melee\command_rider.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\pb_no_loop.png" />
-    <None Include="Resources\pb_play_reverse.png" />
-    <None Include="Resources\pb_start.png" />
-    <None Include="Resources\pb_rewind.png" />
-    <None Include="Resources\pb_pause.png" />
-    <None Include="Resources\pb_loop.png" />
-    <None Include="Resources\pb_fastforward.png" />
-    <None Include="Resources\pb_end.png" />
-    <None Include="Resources\pb_play.png" />
-    <None Include="Resources\iso_disc.png" />
-    <None Include="Resources\ts_x.png" />
-    <None Include="Resources\ts_check.png" />
-    <None Include="Melee\command_color.yml">
+    <None Update="Melee\command_color.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Melee\ptcl.yml">
+    <None Update="Melee\ptcl.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\melee_font.png" />
-    <None Include="Melee\command_fighter.yml">
+    <None Update="Melee\command_fighter.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Melee\command_item.yml">
+    <None Update="Melee\command_item.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\ts_importfile.png" />
-    <None Include="Resources\ts_exportfile.png" />
-    <None Include="Resources\ts_clone.png" />
-    <None Include="Resources\ts_pause.png" />
-    <None Include="Resources\ico_right.png" />
-    <None Include="Resources\ico_left.png" />
-    <None Include="Resources\ico_kabii.png" />
-    <None Include="Resources\ico_fuma.png" />
-    <None Include="Resources\doc_kabii.png" />
-    <Content Include="lib\GCILib.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lib\IONET.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="Resources\ico_file.png" />
-    <None Include="Resources\ico_hatchling.png" />
-    <None Include="Resources\back_checker.png" />
-    <None Include="Resources\ico_anim_shape.png" />
-    <None Include="Melee\command_custom_item.yml">
+    <None Update="Melee\command_custom_item.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="Resources\ico_replace.png" />
-    <None Include="Resources\ts_subtract.png" />
-    <None Include="Resources\ts_add.png" />
-    <None Include="Resources\ts_up.png" />
-    <None Include="Resources\ts_down.png" />
-    <None Include="Melee\command_controls.yml">
+    <None Update="Melee\command_controls.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Melee\command_custom.yml">
+    <None Update="Melee\command_custom.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\ts_stop.png" />
-    <None Include="Resources\ts_play.png" />
-    <EmbeddedResource Include="GUI\Controls\ISOEditor.resx">
-      <DependentUpon>ISOEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\LObjEditor.resx">
-      <DependentUpon>LObjEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\MEXStockIconControl.resx" />
-    <EmbeddedResource Include="GUI\Controls\AnimationPlaybackControl.resx">
-      <DependentUpon>AnimationPlaybackControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\PlaybackBar.resx">
-      <DependentUpon>PlaybackBar.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\TexturePanel.resx">
-      <DependentUpon>TexturePanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\FSMTool.resx">
-      <DependentUpon>FSMTool.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\ISOFileTool.resx">
-      <DependentUpon>ISOFileTool.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\ModelImportDialog.resx">
-      <DependentUpon>ModelImportDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\PopoutJointAnimationEditor.resx">
-      <DependentUpon>PopoutJointAnimationEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\LObjEditorDock.resx">
-      <DependentUpon>LObjEditorDock.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\MEXStockIconEditor.resx">
-      <DependentUpon>MEXStockIconEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\NewCollDataEditor.resx">
-      <DependentUpon>NewCollDataEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\SubactionEditor.resx" />
-    <EmbeddedResource Include="GUI\Plugins\ParticleEditor.resx">
-      <DependentUpon>ParticleEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\TexAnimEditor.resx">
-      <DependentUpon>TexAnimEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\TEXGEditor.resx">
-      <DependentUpon>TEXGEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\TOBJEditor.resx">
-      <DependentUpon>TOBJEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\ArrayMemberEditor.resx">
-      <DependentUpon>ArrayMemberEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\GraphEditor.resx">
-      <DependentUpon>GraphEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\AJSplitDialog.resx">
-      <DependentUpon>AJSplitDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\DSPViewer.resx">
-      <DependentUpon>DSPViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\MOBJEditor.resx">
-      <DependentUpon>MOBJEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\PopoutGraphEditor.resx">
-      <DependentUpon>PopoutGraphEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\SEMEditor.resx">
-      <DependentUpon>SEMEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\SEMEditorTool.resx">
-      <DependentUpon>SEMEditorTool.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\SoundBankEditor.resx">
-      <DependentUpon>SoundBankEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\SoundScriptEditor.resx">
-      <DependentUpon>SoundScriptEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Extra\SSMTool.resx">
-      <DependentUpon>SSMTool.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\HelpBox.resx">
-      <DependentUpon>HelpBox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\HSDTypeDialog.resx">
-      <DependentUpon>HSDTypeDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\KeyEditor.resx">
-      <DependentUpon>KeyEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\AirRide\AirRideGrDataEditor.resx">
-      <DependentUpon>AirRideGrDataEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\AirRide\AriRideGrModelEditor.resx">
-      <DependentUpon>AriRideGrModelEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\AOBJEditor.resx">
-      <DependentUpon>AOBJEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\JobjEditorDock.resx">
-      <DependentUpon>JobjEditorDock.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\CollDataEditor.resx">
-      <DependentUpon>CollDataEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\GeneralPointEditor.resx">
-      <DependentUpon>GeneralPointEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\JObjEditor.resx">
-      <DependentUpon>JObjEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\HurtBoxEditor.resx">
-      <DependentUpon>HurtBoxEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\SISMenuDataEditor.resx">
-      <DependentUpon>SISMenuDataEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ProgressBarDisplay.resx">
-      <DependentUpon>ProgressBarDisplay.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Plugins\Melee\SubActionPanel.resx">
-      <DependentUpon>SubActionPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\PropertyDialog.resx">
-      <DependentUpon>PropertyDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\PropertyView.resx">
-      <DependentUpon>PropertyView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\TextureImportDialog.resx">
-      <DependentUpon>TextureImportDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Controls\ViewportControl.resx">
-      <DependentUpon>ViewportControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <None Include="Shader\gx.frag">
+    <None Update="Shader\gx.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\gx.vert">
+    <None Update="Shader\gx.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\gx_alpha_test.frag">
+    <None Update="Shader\gx_alpha_test.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\gx_lightmap.frag">
+    <None Update="Shader\gx_lightmap.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\gx_material.frag">
+    <None Update="Shader\gx_material.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Shader\gx_tev_old.frag" />
-    <None Include="Shader\gx_uv.frag">
+    <None Update="Shader\gx_uv.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ico_dobj.png" />
-    <None Include="Resources\ico_jobj.png" />
-    <None Include="Resources\ico_unknown.png" />
-    <None Include="Resources\ico_mobj.png" />
-    <None Include="Resources\ico_pobj.png" />
-    <None Include="Resources\ico_tobj.png" />
-    <None Include="Resources\ico_aobj.png" />
-    <None Include="Resources\ico_cobj.png" />
-    <None Include="Resources\ico_fobj.png" />
-    <None Include="Resources\ico_iobj.png" />
-    <None Include="Resources\ico_lobj.png" />
-    <None Include="Resources\ico_sobj.png" />
-    <None Include="Resources\ico_known.png" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ico_anim_joint.png" />
+    <PackageReference Include="Be.Windows.Forms.HexBox" Version="1.6.1" />
+    <PackageReference Include="CSCore" Version="1.2.1.2" />
+    <PackageReference Include="DotNetZip.Reduced" Version="1.9.1.8" />
+    <PackageReference Include="OpenTK" Version="4.7.4" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="VGAudio" Version="2.2.1" />
+    <PackageReference Include="WeifenLuo.WinFormsUI.Docking" Version="2.1.0" />
+    <PackageReference Include="YamlDotNet" Version="12.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_anim_texture.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_coll.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_folder.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_anim_material.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_group.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_table.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_save.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="dogg.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj">
-      <Project>{ed9126af-8a1e-465d-840a-8754a945414d}</Project>
-      <Name>HSDRaw</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
   <ItemDefinitionGroup>
     <ReferenceCopyLocalPaths>
       <DestinationSubDirectory>lib\</DestinationSubDirectory>
     </ReferenceCopyLocalPaths>
   </ItemDefinitionGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

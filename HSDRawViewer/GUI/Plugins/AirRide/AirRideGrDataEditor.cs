@@ -11,9 +11,8 @@ using HSDRawViewer.Rendering.Models;
 using IONET;
 using IONET.Core;
 using IONET.Core.Model;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -660,7 +659,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
 
 
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(OpenTK.Windowing.GraphicsLibraryFramework.KeyboardState kbState)
         {
         }
 
@@ -668,7 +667,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         {
         }
 
-        private OpenTK.Vector3 selectedPoint = OpenTK.Vector3.Zero;
+        private Vector3 selectedPoint = Vector3.Zero;
 
         public void ScreenDoubleClick(PickInformation pick)
         {
@@ -680,7 +679,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 int index = 0;
                 foreach (var t in _tris)
                 {
-                    OpenTK.Vector3 hit = OpenTK.Vector3.Zero;
+                    Vector3 hit = Vector3.Zero;
                     if (pick.CheckTriangleHit2(
                         GXTranslator.toVector3(_vertices[t.V1]), 
                         GXTranslator.toVector3(_vertices[t.V2]), 
@@ -713,7 +712,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 {
                     foreach (var p in s.Points)
                     {
-                        if (pick.CheckAABBHit(new OpenTK.Vector3(p.X, p.Y, p.Z), 2, ref o))
+                        if (pick.CheckAABBHit(new Vector3(p.X, p.Y, p.Z), 2, ref o))
                         {
                             Console.WriteLine(p.X + " " + p.Y + " " + p.Z);
                         }

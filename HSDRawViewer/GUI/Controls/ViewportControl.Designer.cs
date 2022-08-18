@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.WinForms;
 
 namespace HSDRawViewer.GUI
 {
@@ -32,7 +33,7 @@ namespace HSDRawViewer.GUI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewportControl));
-            this.panel1 = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
+            this.panel1 = new GLControl();
             this.animationGroup = new System.Windows.Forms.GroupBox();
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonRewind = new System.Windows.Forms.Button();
@@ -76,7 +77,6 @@ namespace HSDRawViewer.GUI
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(539, 215);
             this.panel1.TabIndex = 0;
-            this.panel1.VSync = false;
             this.panel1.Load += new System.EventHandler(this.panel1_Load);
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.panel1_KeyDown);
@@ -457,7 +457,7 @@ namespace HSDRawViewer.GUI
 
         #endregion
 
-        private OpenTK.GLControl panel1;
+        private OpenTK.WinForms.GLControl panel1;
         private System.Windows.Forms.GroupBox animationGroup;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.NumericUpDown nudFrame;

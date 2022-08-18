@@ -89,7 +89,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 Parent = this
             };
 
-            gen.JointPosition = new OpenTK.Vector3(x, y, z);
+            gen.JointPosition = new OpenTK.Mathematics.Vector3(x, y, z);
 
             Generators.Add(gen);
             return gen;

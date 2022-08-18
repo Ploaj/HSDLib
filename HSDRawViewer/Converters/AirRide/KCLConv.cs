@@ -2,13 +2,10 @@
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using HSDRaw.GX;
-using OpenTK;
-using System;
+using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters.AirRide
 {

@@ -250,11 +250,11 @@ namespace HSDRawViewer.GUI.Controls
             public override void Draw()
             {
                 Rendering.DrawShape.DrawSphere(
-                    OpenTK.Matrix4.CreateTranslation(SourceX, SourceY, SourceZ), 
+                    OpenTK.Mathematics.Matrix4.CreateTranslation(SourceX, SourceY, SourceZ), 
                     ReferenceDistance, 
                     16, 
                     16, 
-                    new OpenTK.Vector3(Color.R / 255f, Color.G / 255f, Color.B / 255f),
+                    new OpenTK.Mathematics.Vector3(Color.R / 255f, Color.G / 255f, Color.B / 255f),
                     0.7f);
             }
         }

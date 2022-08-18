@@ -4,13 +4,14 @@ using WeifenLuo.WinFormsUI.Docking;
 using HSDRaw.Melee.Gr;
 using HSDRawViewer.Rendering;
 using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
-using OpenTK.Input;
 using System.ComponentModel;
 using HSDRawViewer.GUI.Plugins.Melee;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -200,6 +201,15 @@ namespace HSDRawViewer.GUI.Plugins
 
         #region Interaction
 
+        public KeyboardState KeyboardGetState()
+        {
+            return null;
+        }
+        public MouseState MouseGetState()
+        {
+            return null;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -207,7 +217,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="ray"></param>
         public void ScreenClick(MouseButtons button, PickInformation ray)
         {
-            var mouseState = Mouse.GetState();
+            var mouseState = MouseGetState();
             
             if (WasDragging && mouseState.IsButtonDown(MouseButton.Right))
             {
@@ -224,8 +234,8 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="ray"></param>
         public void ScreenDoubleClick(PickInformation ray)
         {
-            var keyState = Keyboard.GetState();
-            bool multiSelect = keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight);
+            var keyState = KeyboardGetState();
+            bool multiSelect = keyState.IsKeyDown(Keys.LeftControl) || keyState.IsKeyDown(Keys.RightControl);
 
             float closest = float.MaxValue;
             var pick2D = ray.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
@@ -294,9 +304,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="kbState"></param>
         public void ViewportKeyPress(KeyboardState kbState)
         {
-            if(kbState.IsKeyDown(Key.ControlLeft) || kbState.IsKeyDown(Key.ControlRight))
+            if(kbState.IsKeyDown(Keys.LeftControl) || kbState.IsKeyDown(Keys.RightControl))
             {
-                if (kbState.IsKeyDown(Key.Z))
+                if (kbState.IsKeyDown(Keys.Z))
                 {
                     Undo();
                 }
@@ -311,11 +321,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="Ydelta"></param>
         public void ScreenDrag(PickInformation pick, float Xdelta, float Ydelta)
         {
-            var mouseState = Mouse.GetState();
+            var mouseState = MouseGetState();
 
-            var keyState = Keyboard.GetState();
+            var keyState = KeyboardGetState();
 
-            bool drag = keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+            bool drag = keyState.IsKeyDown(Keys.LeftAlt) || keyState.IsKeyDown(Keys.RightAlt);
 
             // keep track of vertices we've already processed by hashes
             // this is a hacky way to make sure we don't process a shared vertex more than once
@@ -428,9 +438,9 @@ namespace HSDRawViewer.GUI.Plugins
 
             List<object> selected = new List<object>();
 
-            var keyState = Keyboard.GetState();
+            var keyState = KeyboardGetState();
 
-            if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
+            if (keyState.IsKeyDown(Keys.LeftControl) || keyState.IsKeyDown(Keys.RightControl))
                 selected.AddRange(propertyGrid1.SelectedObjects);
 
             if (cbSelectType.SelectedIndex == 1)

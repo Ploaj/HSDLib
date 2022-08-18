@@ -11,7 +11,7 @@ namespace HSDRawViewer.ContextMenus
 
         public FigatreeContextMenu() : base()
         {
-            MenuItem OpenAsAJ = new MenuItem("Export As .figatree");
+            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Export As .figatree");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_FigaTree figa)
@@ -47,7 +47,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(OpenAsAJ);
+            Items.Add(OpenAsAJ);
         }
     }
 }

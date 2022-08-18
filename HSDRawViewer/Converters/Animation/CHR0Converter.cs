@@ -4,6 +4,7 @@ using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
 using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.IO;
 

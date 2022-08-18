@@ -1,9 +1,6 @@
 ﻿using HSDRawViewer.ContextMenus;
 using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.Plugins;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Platform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +13,7 @@ namespace HSDRawViewer
     /// </summary>
     public class PluginManager
     {
-        private static Dictionary<Type, ContextMenu> typeToContextMenu;
+        private static Dictionary<Type, ContextMenuStrip> typeToContextMenu;
         private static CommonContextMenu commonContextMenu;
 
         private static Dictionary<Type, Type> typeToEditor;
@@ -41,7 +38,7 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static ContextMenu GetContextMenuFromType(Type t)
+        public static ContextMenuStrip GetContextMenuFromType(Type t)
         {
             if (typeToContextMenu.ContainsKey(t))
             {
@@ -85,7 +82,7 @@ namespace HSDRawViewer
             typeToEditor = new Dictionary<Type, Type>();
             InitEditors();
 
-            typeToContextMenu = new Dictionary<Type, ContextMenu>();
+            typeToContextMenu = new Dictionary<Type, ContextMenuStrip>();
             InitContextMenus();
             commonContextMenu = new CommonContextMenu();
 

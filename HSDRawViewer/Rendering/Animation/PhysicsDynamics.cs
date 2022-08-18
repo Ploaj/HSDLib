@@ -1,7 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering.Models;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 

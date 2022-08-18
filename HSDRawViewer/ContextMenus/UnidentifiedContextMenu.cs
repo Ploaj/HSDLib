@@ -13,7 +13,7 @@ namespace HSDRawViewer.ContextMenus
 
         public UnidentifiedContextMenu() : base()
         {
-            MenuItem OpenAs = new MenuItem("Open As");
+            ToolStripMenuItem OpenAs = new ToolStripMenuItem("Open As");
             OpenAs.Click += (sender, args) =>
             {
                 using (HSDTypeDialog d = new HSDTypeDialog())
@@ -25,19 +25,19 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(OpenAs);
+            Items.Add(OpenAs);
 
-            MenuItem OpenAsJOBJ = new MenuItem("Open As JOBJ");
+            ToolStripMenuItem OpenAsJOBJ = new ToolStripMenuItem("Open As JOBJ");
             OpenAsJOBJ.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_JOBJ());
-            MenuItems.Add(OpenAsJOBJ);
+            Items.Add(OpenAsJOBJ);
 
-            MenuItem OpenAsAJ = new MenuItem("Open As AnimJoint");
+            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Open As AnimJoint");
             OpenAsAJ.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_AnimJoint());
-            MenuItems.Add(OpenAsAJ);
+            Items.Add(OpenAsAJ);
 
-            MenuItem OpenAsmah = new MenuItem("Open As MatAnimJoint");
+            ToolStripMenuItem OpenAsmah = new ToolStripMenuItem("Open As MatAnimJoint");
             OpenAsmah.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_MatAnimJoint());
-            MenuItems.Add(OpenAsmah);
+            Items.Add(OpenAsmah);
         }
 
     }

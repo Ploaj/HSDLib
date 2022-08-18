@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using System.ComponentModel;
 using YamlDotNet.Serialization;
-using OpenTK;
+using OpenTK.Mathematics;
 
 namespace HSDRawViewer.Rendering.GX
 {

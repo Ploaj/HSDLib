@@ -153,13 +153,14 @@ namespace HSDRawViewer
                 }
                 try
                 {
-                    var kb = OpenTK.Input.Keyboard.GetState();
-                    if (kb.IsKeyDown(OpenTK.Input.Key.ShiftLeft) || kb.IsKeyDown(OpenTK.Input.Key.ShiftRight))
-                    {
-                        treeView1.BeginUpdate();
-                        treeView1.SelectedNode.ExpandAll();
-                        treeView1.EndUpdate();
-                    }
+                    // TODO: expand all
+                    //var kb = OpenTK.Input.Keyboard.GetState();
+                    //if (kb.IsKeyDown(OpenTK.Input.Key.ShiftLeft) || kb.IsKeyDown(OpenTK.Input.Key.ShiftRight))
+                    //{
+                    //    treeView1.BeginUpdate();
+                    //    treeView1.SelectedNode.ExpandAll();
+                    //    treeView1.EndUpdate();
+                    //}
                 }
                 catch (Exception)
                 {
