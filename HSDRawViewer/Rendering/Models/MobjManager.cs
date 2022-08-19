@@ -15,6 +15,8 @@ namespace HSDRawViewer.Rendering.Models
 
         private TextureManager TextureManager = new TextureManager();
 
+        private static MatAnimMaterialState MaterialState = new MatAnimMaterialState();
+
         /// <summary>
         /// 
         /// </summary>
@@ -52,8 +54,6 @@ namespace HSDRawViewer.Rendering.Models
                 imageBufferTextureIndex.Add(rawImageData, index);
             }
         }
-
-        private static MatAnimMaterialState MaterialState = new MatAnimMaterialState();
 
         /// <summary>
         /// 

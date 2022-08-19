@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace HSDRawViewer.GUI.Controls
+namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public class MeshListItem
     {
@@ -18,14 +18,14 @@ namespace HSDRawViewer.GUI.Controls
         public MeshList() : base()
         {
             //Activate double buffering
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
 
             //Enable the OnNotifyMessage event so we get a chance to filter out 
             // Windows messages before they get to the form's WndProc
-            this.SetStyle(ControlStyles.EnableNotifyMessage, true);
+            SetStyle(ControlStyles.EnableNotifyMessage, true);
 
-            this.DrawMode = DrawMode.OwnerDrawFixed;
-            this.DrawItem += Ditem;
+            DrawMode = DrawMode.OwnerDrawFixed;
+            DrawItem += Ditem;
 
 
             HashSet<int> _selIndex = new HashSet<int>();

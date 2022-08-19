@@ -107,6 +107,14 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
+        public void InitializeDrawing()
+        {
+            _system.Initialize(_viewport.GetControl());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void SetupRendering()
         {
             if (_texg != null)

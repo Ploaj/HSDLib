@@ -83,6 +83,9 @@
     <Compile Update="ContextMenus\UnidentifiedContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="GUI\Controls\DockablePropertyGrid.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="GUI\Controls\DoubleBufferedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -122,7 +125,7 @@
     <Compile Update="GUI\Controls\KeyEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="GUI\Controls\JObjEditor.cs">
+    <Compile Update="GUI\Controls\JObjEditor\JObjEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="GUI\Controls\ViewportControl.cs">

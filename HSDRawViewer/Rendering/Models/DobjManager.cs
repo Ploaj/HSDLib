@@ -19,10 +19,9 @@ namespace HSDRawViewer.Rendering.Models
         private static int MAX_WEIGHTS = 6;
         private static int WEIGHT_STRIDE = 10;
 
-        // Rendering Cache
-        public int DOBJCount { get => DobjCacheLookup.Count; }
+        // cache dobjs
 
-        private Dictionary<HSD_DOBJ, CachedDOBJ> DobjCacheLookup = new Dictionary<HSD_DOBJ, CachedDOBJ>();
+        private Dictionary<HSD_DOBJ, LiveDObj> DobjCacheLookup = new Dictionary<HSD_DOBJ, LiveDObj>();
 
         // Render Parameters
         public bool RenderTextures { get; set; } = true;
@@ -38,12 +37,12 @@ namespace HSDRawViewer.Rendering.Models
         private VertexBufferManager BufferManager = new VertexBufferManager();
         private MobjManager MOBJManager = new MobjManager();
 
-        private class CachedDOBJ
+        private class LiveDObj
         {
-            public List<CachedPOBJ> CachedPObjs = new List<CachedPOBJ>();
+            public List<LivePObj> CachedPObjs = new List<LivePObj>();
         }
 
-        private class CachedPOBJ
+        private class LivePObj
         {
             public POBJ_FLAG Flag
             {
@@ -141,6 +140,7 @@ namespace HSDRawViewer.Rendering.Models
                     shader.SetBoolToInt("hasEnvelopes", p.HasWeighting);
                     shader.SetBoolToInt("enableParentTransform", !p.Flag.HasFlag(POBJ_FLAG.SHAPESET_AVERAGE));
 
+                    // enable parent transform
                     if (p.Flag.HasFlag(POBJ_FLAG.UNKNOWN2))
                         shader.SetInt("enableParentTransform", 2);
 
@@ -238,7 +238,7 @@ namespace HSDRawViewer.Rendering.Models
             if (dobj.Pobj == null)
                 return true;
 
-            List<CachedPOBJ> pobjs = new List<CachedPOBJ>();
+            List<LivePObj> pobjs = new List<LivePObj>();
             List<GX_Vertex> vertices = new List<GX_Vertex>();
             List<List<GX_Shape>> shapesets = new List<List<GX_Shape>>();
 
@@ -271,7 +271,7 @@ namespace HSDRawViewer.Rendering.Models
                 
 
                 // create pobj cache
-                var pobjCache = new CachedPOBJ()
+                var pobjCache = new LivePObj()
                 {
                     POBJ = pobj
                 };
@@ -335,7 +335,7 @@ namespace HSDRawViewer.Rendering.Models
             // convert list to array
             BufferManager.AddBuffer(dobj, vertices.ToArray());
             BufferManager.AddShapeSets(dobj, shapesets);
-            DobjCacheLookup.Add(dobj, new CachedDOBJ() { CachedPObjs = pobjs });
+            DobjCacheLookup.Add(dobj, new LiveDObj() { CachedPObjs = pobjs });
 
             return true;
         }

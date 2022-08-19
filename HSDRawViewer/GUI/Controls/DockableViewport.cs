@@ -1,22 +1,17 @@
 ﻿using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using HSDRawViewer.Rendering;
 
-namespace HSDRawViewer.GUI
+namespace HSDRawViewer.GUI.Controls
 {
-    public class CommonViewport : DockContent, IDrawable
+    public partial class DockableViewport : DockContent
     {
         public ViewportControl glViewport;
 
-        public int ViewportWidth => glViewport.Width;
-        public int ViewportHeight => glViewport.Height;
-
-        public Camera Camera;
-
-        public DrawOrder DrawOrder => DrawOrder.First;
-
-        public CommonViewport()
+        public DockableViewport()
         {
+            InitializeComponent();
+
+            // name
             Text = "Viewport";
 
             //_glViewport = new GLControl(new GraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 8, 16));
@@ -24,22 +19,20 @@ namespace HSDRawViewer.GUI
             glViewport.Dock = DockStyle.Fill;
             glViewport.DisplayGrid = true;
 
-            glViewport.AddRenderer(this);
-
+            // add viewport
             Controls.Add(glViewport);
 
+            // disable ability to close
+            CloseButtonVisible = false;
+
+            // prevent user closing
             FormClosing += (sender, args) =>
             {
                 if (args.CloseReason == CloseReason.UserClosing)
                 {
                     args.Cancel = true;
-                    //MainForm.Instance.TryClose(this);
                 }
             };
-        }
-
-        public void Draw(Camera cam, int windowWidth, int windowHeight)
-        {
         }
     }
 }

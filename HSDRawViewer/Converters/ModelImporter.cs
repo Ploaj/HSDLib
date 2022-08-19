@@ -630,14 +630,14 @@ namespace HSDRawViewer.Converters
                         v.Colors[0].X,
                         v.Colors[0].Y,
                         v.Colors[0].Z,
-                        settings.ImportVertexAlpha ? v.Colors[0].W : 1);
+                        v.Colors[0].W);
 
                     if (mesh.HasColorSet(1))
                         vertex.CLR1 = new GXColor4(
                         v.Colors[1].X,
                         v.Colors[1].Y,
                         v.Colors[1].Z,
-                        settings.ImportVertexAlpha ? v.Colors[1].W : 1);
+                        v.Colors[1].W);
 
                     vertices.Add(vertex);
                 }

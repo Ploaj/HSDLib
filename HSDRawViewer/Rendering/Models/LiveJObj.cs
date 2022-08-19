@@ -11,11 +11,38 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool PhysicsEnabled { get; set; } = false;
 
+        public bool Visible { get; set; } = true;
+
+        public bool BranchVisible
+        {
+            get
+            {
+                if (Visible)
+                    return true;
+
+                if (Parent != null)
+                    return Parent.BranchVisible;
+
+                return Visible;
+            }
+        }
+
         public HSD_JOBJ Desc { get; internal set; }
 
         public LiveJObj Parent;
         public LiveJObj Child;
         public LiveJObj Sibling;
+
+        public LiveJObj Root
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.Root;
+
+                return this;
+            }
+        }
 
         public Vector3 Translation;
         public Vector4 Rotation;
@@ -89,6 +116,7 @@ namespace HSDRawViewer.Rendering.Models
 
             Desc = desc;
             SetDefaultSRT();
+            Visible = !desc.Flags.HasFlag(JOBJ_FLAG.HIDDEN);
 
             // recalcuate transforms
             RecalculateTransforms(null, false);
@@ -202,6 +230,23 @@ namespace HSDRawViewer.Rendering.Models
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        public int GetIndexOfDesc(HSD_JOBJ desc)
+        {
+            int i = 0;
+            foreach (var v in Enumerate)
+            {
+                if (v.Desc == desc)
+                    return i;
+                i++;
+            }
+            return -1;
         }
 
         /// <summary>

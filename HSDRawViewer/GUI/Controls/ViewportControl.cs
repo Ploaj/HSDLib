@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Dialog;
+using OpenTK.WinForms;
 
 namespace HSDRawViewer.GUI
 {
@@ -200,6 +201,7 @@ namespace HSDRawViewer.GUI
                 }
             }
         }
+
         public ViewportControl()
         {
             InitializeComponent();
@@ -1060,6 +1062,11 @@ namespace HSDRawViewer.GUI
         private void animationTrack_KeyDown(object sender, KeyEventArgs e)
         {
             Console.WriteLine(e.KeyCode);
+        }
+
+        public GLControl GetControl()
+        {
+            return glControl;
         }
     }
 }

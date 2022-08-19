@@ -38,6 +38,12 @@ namespace HSDRawViewer.Rendering
     {
         DrawOrder DrawOrder { get; }
 
+        /// <summary>
+        /// draw
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         void Draw(Camera cam, int windowWidth, int windowHeight);
     }
 
@@ -81,6 +87,10 @@ namespace HSDRawViewer.Rendering
             }
 
             GL.End();
+        }
+
+        public void InitializeDrawing()
+        {
         }
     }
 }

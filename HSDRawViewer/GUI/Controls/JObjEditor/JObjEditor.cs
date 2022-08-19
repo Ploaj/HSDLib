@@ -19,9 +19,9 @@ using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Converters.Animation;
 using HSDRaw.Tools;
-using HSDRawViewer.GUI.Controls;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.GUI.Controls.JObjEditor;
 
 namespace HSDRawViewer.GUI.Plugins
 {

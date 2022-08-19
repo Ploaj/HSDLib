@@ -3,16 +3,13 @@ using HSDRaw.GX;
 using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 
-namespace HSDRawViewer.Rendering.Renderers
+namespace HSDRawViewer.Rendering.Shaders
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ParticleShader
+    public class ParticleShader : Shader
     {
-        // Shader
-        private static Shader _shader;
-
         private static int _vb_pos;
 
         public GXAlphaOp AlphaOp = GXAlphaOp.And;
@@ -35,53 +32,51 @@ namespace HSDRawViewer.Rendering.Renderers
 
         public float TexScaleY = 1;
 
+        public ParticleShader()
+        {
+            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\ps.vert"));
+            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_alpha_test.frag"));
+            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\ps.frag"));
+            Link();
+
+            if (!ProgramCreatedSuccessfully())
+                System.Windows.Forms.MessageBox.Show("Particle Shader failed to link or compile");
+
+            GL.GenBuffers(1, out _vb_pos);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         private void Bind()
         {
-            // load shader if it's not ready yet
-            if (_shader == null)
-            {
-                _shader = new Shader();
-                _shader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\ps.vert"));
-                _shader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_alpha_test.frag"));
-                _shader.LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\ps.frag"));
-                _shader.Link();
-
-                if (!_shader.ProgramCreatedSuccessfully())
-                    System.Windows.Forms.MessageBox.Show("Particle Shader failed to link or compile");
-
-                GL.GenBuffers(1, out _vb_pos);
-            }
-
-            if (!_shader.ProgramCreatedSuccessfully())
+            if (!ProgramCreatedSuccessfully())
                 return;
 
             // bind shader
-            GL.UseProgram(_shader.programId);
+            GL.UseProgram(programId);
 
             // load model view matrix
-            GL.UniformMatrix4(_shader.GetVertexAttributeUniformLocation("mvp"), false, ref MVP);
+            GL.UniformMatrix4(GetVertexAttributeUniformLocation("mvp"), false, ref MVP);
 
             // bind sampler
-            _shader.SetInt("sampler0", 0);
-            _shader.SetBoolToInt("use_texture", HasTexture);
+            SetInt("sampler0", 0);
+            SetBoolToInt("use_texture", HasTexture);
 
             // bind alpha
-            _shader.SetInt("alphaOp", (int)AlphaOp);
-            _shader.SetInt("alphaComp0", (int)AlphaComp0);
-            _shader.SetInt("alphaComp1", (int)AlphaComp1);
-            _shader.SetFloat("alphaRef0", AlphaRef0);
-            _shader.SetFloat("alphaRef1", AlphaRef1);
+            SetInt("alphaOp", (int)AlphaOp);
+            SetInt("alphaComp0", (int)AlphaComp0);
+            SetInt("alphaComp1", (int)AlphaComp1);
+            SetFloat("alphaRef0", AlphaRef0);
+            SetFloat("alphaRef1", AlphaRef1);
 
             // set colors
-            _shader.SetVector4("primColor", PrimitiveColor);
-            _shader.SetVector4("envColor", EnvironmentColor);
-            _shader.SetBoolToInt("enablePrimEnv", EnablePrimEnv);
+            SetVector4("primColor", PrimitiveColor);
+            SetVector4("envColor", EnvironmentColor);
+            SetBoolToInt("enablePrimEnv", EnablePrimEnv);
 
             // for mirror
-            _shader.SetVector2("texscale", TexScaleX, TexScaleY);
+            SetVector2("texscale", TexScaleX, TexScaleY);
         }
 
         /// <summary>

@@ -47,9 +47,6 @@ namespace HSDRawViewer.Converters
         [Category("3. Vertex Color Options"), DisplayName("Import Vertex Colors"), Description("Enables importing of vertex colors")]
         public bool ImportVertexColor { get; set; } = false;
 
-        [Category("3. Vertex Color Options"), DisplayName("Import Vertex Alpha"), Description("Import the alpha channel from vertex colors")]
-        public bool ImportVertexAlpha { get; set; } = false;
-
 
         [Category("4. Additional Options"), DisplayName("Flip UVs"), Description("Flips UVs on the Y axis, useful if textures are upside down")]
         public bool FlipUVs { get; set; } = false;

@@ -1,4 +1,6 @@
 ﻿using HSDRaw.Common;
+using HSDRawViewer.Rendering.Shaders;
+using OpenTK.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
         private List<TexGroup> TexGs { get; } = new List<TexGroup>();
 
+        private ParticleShader _shader;
 
         private class TexGroup
         {
@@ -161,20 +164,29 @@ namespace HSDRawViewer.Rendering.Renderers
             }
         }
 
+        public void Initialize(GLControl c)
+        {
+            c.MakeCurrent();
+            _shader = new ParticleShader();
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="c"></param>
         public void Render(Camera c)
         {
+            if (_shader == null)
+                return;
+
             // render particles
             var pos = c.ModelViewMatrix.ExtractTranslation();
             foreach (var p in Particles.OrderBy(e => (e.Pos - pos).LengthSquared))
             {
                 if (p.TexG >= 0)
-                    p.Render(c, TexGs[p.TexG].GetGLIndices(_manager));
+                    p.Render(c, _shader, TexGs[p.TexG].GetGLIndices(_manager));
                 else
-                    p.Render(c, null);
+                    p.Render(c, _shader, null);
             }
         }
 
@@ -183,6 +195,8 @@ namespace HSDRawViewer.Rendering.Renderers
         /// </summary>
         public void Dispose()
         {
+            if (_shader != null)
+                _shader.Dispose();
             _manager.ClearTextures();
         }
     }

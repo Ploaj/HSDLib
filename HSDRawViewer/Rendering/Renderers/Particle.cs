@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HSDRawViewer.Rendering.Shaders;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -17,8 +18,6 @@ namespace HSDRawViewer.Rendering.Renderers
         {
             public byte R, G, B, A;
         }
-
-        private static ParticleShader _shader = new ParticleShader();
 
         public Particle Next;
 
@@ -1317,7 +1316,7 @@ namespace HSDRawViewer.Rendering.Renderers
         /// 
         /// </summary>
         /// <param name="cam"></param>
-        public void Render(Camera cam, List<int> texg, int piVar34 = 0)
+        public void Render(Camera cam, ParticleShader _shader, List<int> texg, int piVar34 = 0)
         {
             _shader.MVP = cam.MvpMatrix;
 
