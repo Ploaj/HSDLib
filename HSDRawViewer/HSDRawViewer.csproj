@@ -122,9 +122,6 @@
     <Compile Update="GUI\Extra\SoundScriptEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="GUI\Controls\KeyEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Update="GUI\Controls\JObjEditor\JObjEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>

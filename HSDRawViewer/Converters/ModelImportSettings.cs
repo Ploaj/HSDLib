@@ -49,7 +49,7 @@ namespace HSDRawViewer.Converters
 
 
         [Category("4. Additional Options"), DisplayName("Flip UVs"), Description("Flips UVs on the Y axis, useful if textures are upside down")]
-        public bool FlipUVs { get; set; } = false;
+        public bool FlipUVs { get; set; } = true;
 
         [Category("4. Additional Options"), DisplayName("Flip Faces"), Description("Flips direction of faces, useful if model imports inside out")]
         public bool FlipFaces { get; set; } = false;

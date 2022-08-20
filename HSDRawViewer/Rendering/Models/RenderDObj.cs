@@ -20,7 +20,7 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool Selected { get; set; }
 
-        public bool Visibile { get; set; } = true;
+        public bool Visible { get; set; } = true;
 
         /// <summary>
         /// 

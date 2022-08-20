@@ -137,39 +137,29 @@ namespace HSDRaw.Common
                 {
                     bool xlu = false;
                     bool opa = false;
+                    bool lighting = false;
+                    bool specular = false;
+                    bool envelope = false;
 
                     foreach (var dobj in j.Dobj.List)
                     {
                         if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
-                        {
-                            j.Flags |= JOBJ_FLAG.XLU;
-                            j.Flags |= JOBJ_FLAG.TEXEDGE;
                             xlu = true;
-                        }
                         else
-                        {
-                            j.Flags &= ~JOBJ_FLAG.XLU;
-                            j.Flags &= ~JOBJ_FLAG.TEXEDGE;
                             opa = true;
-                        }
 
                         if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE))
-                            j.Flags |= JOBJ_FLAG.LIGHTING;
-                        else
-                            j.Flags &= ~JOBJ_FLAG.LIGHTING;
+                            lighting = true;
 
                         if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR))
-                            j.Flags |= JOBJ_FLAG.SPECULAR;
-                        else
-                            j.Flags &= ~JOBJ_FLAG.SPECULAR;
+                            specular = true;
 
                         if (dobj.Pobj != null)
                         {
-                            j.Flags &= ~JOBJ_FLAG.ENVELOPE_MODEL;
                             foreach (var pobj in dobj.Pobj.List)
                             {
                                 if (pobj.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
-                                    j.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
+                                    envelope = true;
                             }
                         }
                     }
@@ -183,6 +173,21 @@ namespace HSDRaw.Common
                         j.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
                     else
                         j.Flags &= ~JOBJ_FLAG.XLU;
+
+                    if (specular)
+                        j.Flags |= JOBJ_FLAG.SPECULAR;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.SPECULAR;
+
+                    if (lighting)
+                        j.Flags |= JOBJ_FLAG.LIGHTING;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.LIGHTING;
+
+                    if (envelope)
+                        j.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
+                    else
+                        j.Flags &= ~JOBJ_FLAG.ENVELOPE_MODEL;
                 }
 
                 if (j.InverseWorldTransform != null)

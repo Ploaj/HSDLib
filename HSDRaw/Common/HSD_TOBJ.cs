@@ -211,11 +211,11 @@ namespace HSDRaw.Common
         public HSD_Tlut TlutData { get => _s.GetReference<HSD_Tlut>(0x50); set => _s.SetReference(0x50, value); }
 
 
-        [Category("3 - Ext"), Description("Defines level-of-detail texture information.")]
+        [Category("3 - Ext"), Description("Defines level-of-detail texture information."), Browsable(false)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_TOBJ_LOD LOD { get => _s.GetReference<HSD_TOBJ_LOD>(0x54); set => _s.SetReference(0x54, value); }
 
-        [Category("3 - Ext"), Description("Texture Environment Unit (TEV) operations for this texture.")]
+        [Category("3 - Ext"), Description("Texture Environment Unit (TEV) operations for this texture."), Browsable(false)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_TOBJ_TEV TEV { get => _s.GetReference<HSD_TOBJ_TEV>(0x58); set => _s.SetReference(0x58, value); }
 

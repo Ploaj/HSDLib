@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
@@ -56,7 +57,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         public bool NoZupdate { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.NO_ZUPDATE, value); }
 
         [DisplayName("Has Transparency"), Category("Material Flags"), Description("Indicates this material has transparent elements")]
-        public bool XLU { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.NO_ZUPDATE, value); }
+        public bool XLU { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.XLU, value); }
 
         //TOON = (1 << 12),
         //ALPHA_COMPAT = (0 << 13),
@@ -67,19 +68,19 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         //EFFECT = (1 << 25),
         //DF_ALL = (1 << 28),
 
-        [DisplayName("Ambient Color"), Category("Material"), Description("Color of the ambient light on this material")]
+        [DisplayName("Ambient Color"), Category("Material Color"), Description("Color of the ambient light on this material")]
         public Color Ambient { get => DOBJ.Mobj.Material.AmbientColor; set => DOBJ.Mobj.Material.AmbientColor = value; }
 
-        [DisplayName("Diffuse Color"), Category("Material"), Description("Color of the diffuse light on this material")]
+        [DisplayName("Diffuse Color"), Category("Material Color"), Description("Color of the diffuse light on this material")]
         public Color Diffuse { get => DOBJ.Mobj.Material.DiffuseColor; set => DOBJ.Mobj.Material.DiffuseColor = value; }
 
-        [DisplayName("Specular Color"), Category("Material"), Description("Color of the specular light on this material")]
+        [DisplayName("Specular Color"), Category("Material Color"), Description("Color of the specular light on this material")]
         public Color Specular { get => DOBJ.Mobj.Material.SpecularColor; set => DOBJ.Mobj.Material.SpecularColor = value; }
 
-        [DisplayName("Shinniness"), Category("Material"), Description("Power of the specular highlight")]
+        [DisplayName("Shinniness"), Category("Material Color"), Description("Power of the specular highlight")]
         public float Shinniness { get => DOBJ.Mobj.Material.Shininess; set => DOBJ.Mobj.Material.Shininess = value; }
 
-        [DisplayName("Alpha"), Category("Material"), Description("Alpha transparency of material")]
+        [DisplayName("Alpha"), Category("Material Color"), Description("Alpha transparency of material")]
         public float Alpha { get => DOBJ.Mobj.Material.Alpha; set => DOBJ.Mobj.Material.Alpha = value; }
 
 
@@ -126,6 +127,30 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             }
         }
 
+        [DisplayName("Enabled"), Category("Pixel Processing"), Description(""), RefreshProperties(RefreshProperties.All)]
+        public bool EnablePP
+        {
+            get => DOBJ.Mobj.PEDesc != null;
+            set
+            {
+                if (value)
+                {
+                    DOBJ.Mobj.PEDesc = _pixelProcess;
+                }
+                else
+                {
+                    DOBJ.Mobj.PEDesc = null;
+                }
+            }
+        }
+
+        [DisplayName("Pixel Processing Parameters"), 
+            Category("Pixel Processing"),
+            TypeConverter(typeof(ExpandableObjectConverter))]
+        public HSD_PEDesc PixelProcess { get => EnablePP ? _pixelProcess : null; set => _pixelProcess = value; }
+        private HSD_PEDesc _pixelProcess;
+
+
         [Browsable(false)]
         public int PolygonCount { get => DOBJ.Pobj != null ? DOBJ.Pobj.List.Count : 0; }
 
@@ -165,6 +190,25 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             DOBJIndex = dOBJIndex;
             ParentJOBJ = parentJOBJ;
             DOBJ = dOBJ;
+
+            if (DOBJ != null && DOBJ.Mobj != null && DOBJ.Mobj.PEDesc != null)
+            {
+                PixelProcess = DOBJ.Mobj.PEDesc;
+            }
+            else
+            {
+                PixelProcess = new HSD_PEDesc()
+                {
+                    AlphaComp0 = HSDRaw.GX.GXCompareType.Always,
+                    AlphaComp1 = HSDRaw.GX.GXCompareType.Always,
+                    BlendMode = HSDRaw.GX.GXBlendMode.GX_BLEND,
+                    BlendOp = HSDRaw.GX.GXLogicOp.GX_LO_SET,
+                    DepthFunction = HSDRaw.GX.GXCompareType.LEqual,
+                    SrcFactor = HSDRaw.GX.GXBlendFactor.GX_BL_SRCALPHA,
+                    DstFactor = HSDRaw.GX.GXBlendFactor.GX_BL_INVSRCALPHA,
+                    Flags = (PIXEL_PROCESS_ENABLE)25
+                };
+            }
         }
 
         /// <summary>

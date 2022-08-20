@@ -19,7 +19,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private HSD_JOBJ _root;
 
-        public delegate void JObjSelected(HSD_JOBJ jobj);
+        public delegate void JObjSelected(int index, HSD_JOBJ jobj);
         public JObjSelected SelectJObj;
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void treeJOBJ_AfterSelect(object sender, TreeViewEventArgs e)
         {
             if (e.Node.Tag is HSD_JOBJ jobj)
-                SelectJObj?.Invoke(jobj);
+                SelectJObj?.Invoke(_root.BreathFirstList.IndexOf(jobj), jobj);
         }
 
         /// <summary>

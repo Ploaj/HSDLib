@@ -7,8 +7,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
     {
         None,
         Both,
-        Verical,
         Horizontal,
+        Vertical,
         View,
     }
 

@@ -1449,7 +1449,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void autoUpdateFlagsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JOBJExtensions.UpdateJOBJFlags(root);
+            root.UpdateFlags();
         }
 
         /// <summary>

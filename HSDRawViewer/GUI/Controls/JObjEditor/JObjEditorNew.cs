@@ -24,11 +24,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private DockableMeshList _meshList;
 
+        private DockableTextureEditor _textureEditor;
+
+        private DockableTrackEditor _trackEditor;
+
         private DockableViewport _viewport;
 
         private RenderJObj RenderJObj;
 
         private HSD_JOBJ _root;
+
+        private JointAnimManager JointAnimation;
 
         /// <summary>
         /// 
@@ -40,12 +46,28 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // initial theme
             dockPanel1.Theme = new VS2015LightTheme();
 
+            // initialize viewport
+            _viewport = new DockableViewport();
+            _viewport.Show(dockPanel1, DockState.Document);
+
+            // refresh render when viewport reloads
+            _viewport.glViewport.Load += (r, a) =>
+            {
+                RenderJObj.Invalidate();
+            };
+
+            // initialize texture editor
+            _trackEditor = new DockableTrackEditor();
+            _trackEditor.MinimumSize = new System.Drawing.Size(400, 800);
+            _trackEditor.Show(dockPanel1);
+            _trackEditor.DockState = DockState.DockBottom;
+            _trackEditor.Hide();
+
             // initialize joint tree
             _jointTree = new DockableJointTree();
-            _jointTree.Show(dockPanel1);
-            _jointTree.DockState = DockState.DockLeft;
+            _jointTree.Show(dockPanel1, DockState.DockLeft);
 
-            _jointTree.SelectJObj += (jobj) =>
+            _jointTree.SelectJObj += (i, jobj) =>
             {
                 if (jobj.Flags.HasFlag(JOBJ_FLAG.PTCL))
                     _propertyGrid.SetObject(new JObjParticleProxy(jobj));
@@ -56,12 +78,20 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     _propertyGrid.SetObject(new JObjProxy(jobj));
 
                 RenderJObj.SelectedJObj = jobj;
+
+                // set animation track
+                if (JointAnimation != null)
+                {
+                    if (i < JointAnimation.NodeCount && i >= 0)
+                        _trackEditor.SetKeys(GraphEditor.AnimType.Joint, JointAnimation.Nodes[i].Tracks);
+                    else
+                        _trackEditor.SetKeys(GraphEditor.AnimType.Joint, null);
+                }
             };
 
             // initialize meshlist
             _meshList = new DockableMeshList();
-            _meshList.Show(dockPanel1);
-            _meshList.DockState = DockState.DockLeft;
+            _meshList.Show(dockPanel1, DockState.DockLeft);
 
             _meshList.SelectDObj += (dobj, indices) =>
             {
@@ -70,6 +100,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 RenderJObj.ClearDObjSelection();
                 foreach (var i in indices)
                     RenderJObj.SetDObjSelected(i, true);
+
+                // set textures in editor
+                if (dobj.Length == 1)
+                    _textureEditor.SetTextures(dobj[0]);
+                else
+                    _textureEditor.SetTextures(null);
             };
 
             _meshList.VisibilityUpdated += () =>
@@ -81,6 +117,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             {
                 RenderJObj.Invalidate();
                 UpdateVisibility();
+
+                // set materials in editor
+                _textureEditor.SetTextures(null);
             };
 
             // initialize properties
@@ -104,13 +143,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 }
             };
 
-            // initialize viewport
-            _viewport = new DockableViewport();
-            _viewport.Show(dockPanel1);
-            _viewport.DockState = DockState.Document;
+            // initialize texture editor
+            _textureEditor = new DockableTextureEditor();
+            _textureEditor.Show(dockPanel1);
+            _textureEditor.DockState = DockState.DockLeft;
 
-            // refresh render when viewport reloads
-            _viewport.glViewport.Load += (r, a) =>
+            _textureEditor.SelectTObj += (tobj) =>
+            {
+                _propertyGrid.SetObject(tobj);
+            };
+
+            _textureEditor.InvalidateTexture += () =>
             {
                 RenderJObj.Invalidate();
             };
@@ -118,13 +161,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // add to renderer
             _viewport.glViewport.AddRenderer(this);
 
+            _viewport.glViewport.FrameChange += (f) =>
+            {
+                if (JointAnimation != null)
+                    JointAnimation.ApplyAnimation(RenderJObj.RootJObj, f);
+            };
+
             // initialize joint manager
             RenderJObj = new RenderJObj();
-
-            // dispose of resources
-            Disposed += (sender, args) =>
-            {
-            };
 
             // setup params
             renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
@@ -145,8 +189,22 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (_root != null)
             {
-                JOBJExtensions.UpdateJOBJFlags(_root);
+                _root.UpdateFlags();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jointAnim"></param>
+        public void LoadAnimation(JointAnimManager animation)
+        {
+            JointAnimation = animation;
+            var vp = _viewport.glViewport;
+            vp.AnimationTrackEnabled = true;
+            vp.Frame = 0;
+            vp.MaxFrame = animation.FrameCount;
+            _trackEditor.Show();
         }
 
         /// <summary>

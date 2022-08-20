@@ -132,8 +132,8 @@ namespace HSDRawViewer.GUI.Controls
             float numberOfFrames = EndFrame - StartFrame + 1;
             var tickWidth = (rect.Width / numberOfFrames);
             var increment = 1;
-            float tickStartY = rect.Height * 0.3f;
-            float tickTipHeight = (rect.Height - tickStartY) / 3;
+            float tickStartY = rect.Height * 0.4f;
+            float tickTipHeight = (rect.Height - tickStartY) / 2;
 
             float tipUpperYStart = tickStartY;
             float tipMiddleYStart = tickStartY + tickTipHeight;

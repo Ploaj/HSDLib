@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRawViewer.Converters;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
@@ -422,6 +423,20 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     file.Roots.Add(new HSDRootNode() { Name = "mobj", Data = con.DOBJ.Mobj });
                     file.Save(f);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void massTextureEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (JObjTextureEditorDialog d = new JObjTextureEditorDialog(_root))
+            {
+                d.ShowDialog();
+                ListUpdated?.Invoke();
             }
         }
     }

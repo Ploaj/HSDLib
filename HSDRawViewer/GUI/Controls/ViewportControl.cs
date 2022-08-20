@@ -13,6 +13,7 @@ using System.Drawing.Drawing2D;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Dialog;
 using OpenTK.WinForms;
+using System.Diagnostics;
 
 namespace HSDRawViewer.GUI
 {
@@ -208,6 +209,12 @@ namespace HSDRawViewer.GUI
 
             nudPlaybackSpeed.Value = 60;
 
+            glControl.LostFocus += (s, a) =>
+            {
+                IsAltKey = false;
+                IsControlKey = false;
+            };
+
             glControl.KeyUp += (sender, args) =>
             {
                 if (args.KeyCode == Keys.Menu)
@@ -317,7 +324,10 @@ namespace HSDRawViewer.GUI
                 _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
             };
         }
-        
+
+        public delegate void FrameChanged(float value);
+        public FrameChanged FrameChange;
+
         /// <summary>
         /// 
         /// </summary>
@@ -359,6 +369,8 @@ namespace HSDRawViewer.GUI
 
                 nudFrame.Value = frame;
                 animationTrack.Frame = (int)frame;
+
+                FrameChange(_frame);
             }
         }
 
@@ -724,8 +736,17 @@ namespace HSDRawViewer.GUI
             _camera.Translation = new Vector3(0, 10, -80);
 
             // Redraw the screen every 1/20 of a second.
-            System.Windows.Forms.Timer _timer = new System.Windows.Forms.Timer();
+            Timer _timer = new Timer();
             _timer.Tick += (sender, e) =>
+            {
+                Render();
+            };
+            _timer.Interval = 12;   // 1000 ms per sec / 50 ms per frame = 20 FPS
+            _timer.Start();
+
+            // advance frame value
+            System.Timers.Timer _timer2 = new System.Timers.Timer();
+            _timer2.Elapsed += (sender, e) =>
             {
                 if (IsPlaying)
                 {
@@ -738,16 +759,15 @@ namespace HSDRawViewer.GUI
                         Frame--;
                     }
                 }
-
-                Render();
             };
-            _timer.Interval = 16;   // 1000 ms per sec / 50 ms per frame = 20 FPS
-            _timer.Start();
+            _timer2.Interval = 16; // 1000 ms per sec / 50 ms per frame = 20 FPS
+            _timer2.Start();
 
             // stop timer on dispose
             Disposed += (sender, args) =>
             {
                 _timer.Stop();
+                _timer2.Stop();
             };
         }
 

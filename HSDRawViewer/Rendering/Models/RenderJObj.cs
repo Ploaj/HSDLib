@@ -105,6 +105,7 @@ namespace HSDRawViewer.Rendering.Models
             BufferManager.ClearRenderingCache();
             TextureManager.ClearTextures();
             imageBufferTextureIndex.Clear();
+            RenderDobjs.Clear();
 
             // initial dobj cache
             foreach (var j in RootJObj?.Enumerate)
@@ -195,26 +196,24 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="visible"></param>
+        /// <param name="selected"></param>
         /// <returns></returns>
-        private bool BranchIsVisible(HSD_JOBJ jobj, LiveJObj cache)
+        private bool DisplayObject(bool visible, bool selected)
         {
-            // TODO:
-            //var parent = cache;
-            //var visible = !jobj.Flags.HasFlag(JOBJ_FLAG.HIDDEN);
+            switch (_settings.RenderObjects)
+            {
+                case ObjectRenderMode.All:
+                    return true;
+                case ObjectRenderMode.None:
+                    return false;
+                case ObjectRenderMode.Selected:
+                    return selected;
+                case ObjectRenderMode.Visible:
+                    return visible;
+            }
 
-            //while (parent != null)
-            //{
-            //    if (Animation != null &&
-            //        Animation.GetJointBranchState(Frame, parent.Index, out float branch))
-            //        return branch != 0;
-
-            //    parent = parent.Parent;
-            //}
-
-            //if (EnableHiddenFlag)
-            //    return visible;
-            //else
-                return true;
+            return true;
         }
 
         /// <summary>
@@ -225,14 +224,14 @@ namespace HSDRawViewer.Rendering.Models
             // render opaque dobjs first
             foreach (var opa in RenderDobjs.Where(e => !e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) && e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.OPA)))
             {
-                if (opa.Visibile && opa.Parent.BranchVisible)
+                if (DisplayObject(opa.Visible, opa.Selected) && opa.Parent.BranchVisible)
                     RenderDOBJShader(opa);
             }
 
             // render sorted xlu objects last
             foreach (var xlu in RenderDobjs.Where(e => e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) && e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.XLU)))
             {
-                if (xlu.Visibile && xlu.Parent.BranchVisible)
+                if (DisplayObject(xlu.Visible, xlu.Selected) && xlu.Parent.BranchVisible)
                     RenderDOBJShader(xlu);
             }
 
@@ -751,7 +750,7 @@ namespace HSDRawViewer.Rendering.Models
         public void SetDObjVisible(int index, bool visible)
         {
             if (index >= 0 && index < RenderDobjs.Count)
-                RenderDobjs[index].Visibile = visible;
+                RenderDobjs[index].Visible = visible;
         }
     }
 }

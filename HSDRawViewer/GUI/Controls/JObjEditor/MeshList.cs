@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -7,6 +8,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public class MeshListItem
     {
+        [Browsable(false)]
         public bool Visible { get; set; } = true;
     }
 

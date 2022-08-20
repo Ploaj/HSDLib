@@ -242,7 +242,7 @@ namespace HSDRawViewer.Converters
             NewModel = root;
 
             // auto update flags
-            JOBJExtensions.UpdateJOBJFlags(NewModel);
+            NewModel.UpdateFlags();
 
             // apply classical scale flag
             if (Settings.ClassicalScaling)

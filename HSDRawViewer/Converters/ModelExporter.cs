@@ -27,7 +27,7 @@ namespace HSDRawViewer.Converters
         
         public bool Optimize { get; set; } = true;
         
-        public bool FlipUVs { get; set; } = false;
+        public bool FlipUVs { get; set; } = true;
         
         public bool ExportBindPose { get; set; } = true;
         

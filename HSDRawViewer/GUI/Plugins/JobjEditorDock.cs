@@ -63,7 +63,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="anim"></param>
         public void LoadAnimation(JointAnimManager anim)
         {
-            //Editor.LoadAnimation(anim);
+            Editor.LoadAnimation(anim);
         }
 
         /// <summary>
