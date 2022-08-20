@@ -1,4 +1,8 @@
 ﻿using HSDRaw.Common;
+using HSDRaw.Tools;
+using HSDRawViewer.Rendering;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -6,6 +10,24 @@ using System.Reflection;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
+    public class TextureAnimDesc
+    {
+        public MatAnimTextureState State { get; internal set; } = new MatAnimTextureState();
+
+        public List<HSD_TOBJ> Textures { get; internal set; } = new List<HSD_TOBJ>();
+
+        public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        public void ApplyFrame(float frame)
+        {
+            State.ApplyAnim(Textures, Tracks, frame);
+        }
+    }
+
     public class DObjProxy : MeshListItem
     {
         public enum CullMode
@@ -27,6 +49,18 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         [DisplayName("Class Name"), Category("General")]
         public string Name { get => DOBJ.ClassName; set => DOBJ.ClassName = value; }
+
+        /// <summary>
+        /// Animation Tracks
+        /// </summary>
+        [Browsable(false)]
+        public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
+
+        public MatAnimMaterialState MaterialState { get; internal set; } = new MatAnimMaterialState();
+
+        // 
+        public TextureAnimDesc[] TextureStates { get; internal set; } = new TextureAnimDesc[8];
+
 
         //[Editor(typeof(FlagEnumUIEditor), typeof(System.Drawing.Design.UITypeEditor))]
         //public RENDER_MODE MOBJFlags { get => DOBJ.Mobj.RenderFlags; set => DOBJ.Mobj.RenderFlags = value; }
@@ -191,6 +225,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             ParentJOBJ = parentJOBJ;
             DOBJ = dOBJ;
 
+            // initialize texture state
+            for (int i = 0; i < TextureStates.Length; i++)
+                TextureStates[i] = new TextureAnimDesc();
+
+            // set initial animation values
+            ResetAnimation();
+
+            // initialize pixel processing data
             if (DOBJ != null && DOBJ.Mobj != null && DOBJ.Mobj.PEDesc != null)
             {
                 PixelProcess = DOBJ.Mobj.PEDesc;
@@ -209,6 +251,54 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     Flags = (PIXEL_PROCESS_ENABLE)25
                 };
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetAnimation()
+        {
+            // initialize material state
+            MaterialState.Reset(DOBJ.Mobj);
+
+            // initialize texture data
+            if (DOBJ.Mobj.Textures != null)
+            {
+                var textures = DOBJ.Mobj.Textures.List;
+                for (int i = 0; i < textures.Count; i++)
+                    if (i < TextureStates.Length)
+                        TextureStates[i].State.Reset(textures[i]);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearAnimation()
+        {
+            // clear tracks
+            Tracks.Clear();
+
+            // clear texture anims
+            foreach (var t in TextureStates)
+            {
+                t.Textures.Clear();
+                t.Tracks.Clear();
+            }
+
+            // reset animation data
+            ResetAnimation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ApplyFrame(float frame)
+        {
+            MaterialState.ApplyAnim(Tracks, frame);
+
+            foreach (var t in TextureStates)
+                t.ApplyFrame(frame);
         }
 
         /// <summary>

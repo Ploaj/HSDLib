@@ -101,11 +101,18 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 foreach (var i in indices)
                     RenderJObj.SetDObjSelected(i, true);
 
-                // set textures in editor
+                // set textures in editor and material tracks
                 if (dobj.Length == 1)
+                {
+                    _trackEditor.SetKeys(dobj[0].ToString(), GraphEditor.AnimType.Material, dobj[0].Tracks);
                     _textureEditor.SetTextures(dobj[0]);
+                }
                 else
+                {
+                    _trackEditor.SetKeys("", GraphEditor.AnimType.Material, null);
                     _textureEditor.SetTextures(null);
+                }
+
             };
 
             _meshList.VisibilityUpdated += () =>
@@ -116,9 +123,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _meshList.ListUpdated += () =>
             {
                 RenderJObj.Invalidate();
-                UpdateVisibility();
 
                 // set materials in editor
+                _trackEditor.SetKeys("", GraphEditor.AnimType.Material, null);
                 _textureEditor.SetTextures(null);
             };
 
@@ -141,9 +148,19 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     RenderJObj.RootJObj?.GetJObjFromDesc(j.jobj).ResetTransforms();
                 }
 
-                // update jobj if changed
+                // update dobj if changed
                 if (_propertyGrid.SelectedObject is DObjProxy d)
                 {
+                    d.ResetAnimation();
+                    RenderJObj.ResetDefaultStateMaterial();
+                }
+
+                // update tobj if changed
+                if (_propertyGrid.SelectedObject is TObjProxy t)
+                {
+                    foreach (var v in _meshList.EnumerateDObjs)
+                        v.ResetAnimation();
+
                     RenderJObj.ResetDefaultStateMaterial();
                 }
             };
@@ -173,6 +190,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // initialize joint manager
             RenderJObj = new RenderJObj();
+            RenderJObj.Initialize += () =>
+            {
+                RenderJObj.ClearDObjSelection();
+                foreach (var i in _meshList.SelectedIndices)
+                    RenderJObj.SetDObjSelected(i, true);
+
+                UpdateVisibility();
+            };
 
             // setup params
             renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
@@ -207,6 +232,15 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             foreach (var p in _jointTree.EnumerateJoints())
             {
                 RenderJObj.RootJObj.GetJObjFromDesc(p.jobj).ApplyAnimation(p.Tracks, frame);
+            }
+
+            // dobjs
+            int di = 0;
+            foreach (var d in _meshList.EnumerateDObjs)
+            {
+                d.ApplyFrame(frame);
+                RenderJObj.SetMaterialAnimation(di, d.MaterialState, d.TextureStates.Select(e => e.State));
+                di++;
             }
         }
 
@@ -254,7 +288,32 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         public void LoadAnimation(MatAnimManager matanim)
         {
             // set animation
-            // TODO: MaterialAnimation = matanim;
+            int ji = 0;
+            foreach (var j in matanim.Nodes)
+            {
+                var mi = 0;
+                foreach (var mat in j.Nodes)
+                {
+                    var d = _meshList.EnumerateDObjs.FirstOrDefault(e => e.DOBJIndex == mi && e.JOBJIndex == ji);
+
+                    if (d != null)
+                    {
+                        d.Tracks.Clear();
+                        d.Tracks.AddRange(mat.Tracks);
+
+                        foreach (var t in mat.TextureAnims)
+                        {
+                            var tstate = d.TextureStates[t.TextureID - HSDRaw.GX.GXTexMapID.GX_TEXMAP0];
+                            tstate.Tracks.Clear();
+                            tstate.Tracks.AddRange(t.Tracks);
+                            tstate.Textures.Clear();
+                            tstate.Textures.AddRange(t.Textures);
+                        }
+                    }
+                    mi++;
+                }
+                ji++;
+            }
 
             // enable animation view
             EnableAnimation();
@@ -283,6 +342,10 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // reset joint animation
             RenderJObj?.RootJObj?.ResetTransforms();
+
+            // reset material animation
+            foreach (var d in _meshList.EnumerateDObjs)
+                d.ClearAnimation();
 
             // disable viewport
             var vp = _viewport.glViewport;
@@ -320,10 +383,10 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             vp.MaxFrame = Math.Max(vp.MaxFrame, _jointTree.EnumerateJoints().Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
 
-            // TODO: find end frame
-            //if (MaterialAnimation != null)
-            //    vp.MaxFrame = Math.Max(vp.MaxFrame, MaterialAnimation.FrameCount);
+            // todo: max frame of texture animation as well
+            vp.MaxFrame = Math.Max(vp.MaxFrame, _meshList.EnumerateDObjs.Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
 
+            // TODO: find end frame
             //if (ShapeAnimation != null)
             //    vp.MaxFrame = Math.Max(vp.MaxFrame, ShapeAnimation.FrameCount);
         }
@@ -378,6 +441,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
                 index += 1;
             }
+
+            _meshList.Invalidate();
         }
 
         /// <summary>
@@ -698,6 +763,39 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     // set the new max frame
                     var vp = _viewport.glViewport;
                     vp.MaxFrame = settings.FrameCount;
+                }
+            }
+        }
+
+        /// <summary>
+        /// settings class for animation key compression
+        /// </summary>
+        private class OptimizeSettings
+        {
+            //public bool BakeAnimation = true;
+            public float ErrorMargin { get; set; } = 0.001f;
+        }
+
+        private static OptimizeSettings _settings = new OptimizeSettings();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void compressAllTracksToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (PropertyDialog d = new PropertyDialog("Animation Optimize Settings", _settings))
+            {
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (var joint in _jointTree.EnumerateJoints())
+                    {
+                        var tracks = joint.Tracks;
+                        AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
+                    }
+
+                    _trackEditor.SetKeys("", GraphEditor.AnimType.Joint, null);
                 }
             }
         }

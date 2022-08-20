@@ -42,6 +42,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             }
         }
 
+        public IEnumerable<int> SelectedIndices
+        {
+            get
+            {
+                return listDOBJ.SelectedIndices.Cast<int>();
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -218,7 +226,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     prev = dobj;
                 }
 
-                VisibilityUpdated?.Invoke();
+                ListUpdated?.Invoke();
             }
         }
 
@@ -261,8 +269,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     }
                     prev = dobj;
                 }
-                
-                VisibilityUpdated?.Invoke();
+
+                ListUpdated?.Invoke();
             }
         }
 

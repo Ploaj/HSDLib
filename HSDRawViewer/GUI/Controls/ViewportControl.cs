@@ -88,6 +88,7 @@ namespace HSDRawViewer.GUI
             set
             {
                 _frame = value;
+                FrameChange?.Invoke(_frame);
                 UpdateFrame((decimal)_frame);
             }
         }
@@ -370,8 +371,6 @@ namespace HSDRawViewer.GUI
 
                 nudFrame.Value = frame;
                 animationTrack.Frame = (int)frame;
-
-                FrameChange(_frame);
             }
         }
 
@@ -514,6 +513,7 @@ namespace HSDRawViewer.GUI
             GL.LoadMatrix(ref m);
 
             // draw grid if enabled
+            GL.Enable(EnableCap.DepthTest);
             if (DisplayGrid)
                 DrawShape.Floor(GridColor, 50, 5);
 
@@ -769,6 +769,9 @@ namespace HSDRawViewer.GUI
             {
                 _timer.Stop();
                 _timer2.Stop();
+
+                _timer.Dispose();
+                _timer2.Dispose();
             };
         }
 

@@ -71,49 +71,49 @@
             // graphBox
             // 
             this.graphBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.graphBox.Location = new System.Drawing.Point(191, 49);
+            this.graphBox.Location = new System.Drawing.Point(366, 49);
             this.graphBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.graphBox.Name = "graphBox";
             this.graphBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.graphBox.Size = new System.Drawing.Size(657, 365);
+            this.graphBox.Size = new System.Drawing.Size(482, 365);
             this.graphBox.TabIndex = 0;
             this.graphBox.TabStop = false;
             this.graphBox.Text = "Graph";
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.trackTree);
             this.groupBox2.Controls.Add(this.splitter2);
             this.groupBox2.Controls.Add(this.keyProperty);
-            this.groupBox2.Controls.Add(this.trackTree);
             this.groupBox2.Controls.Add(this.toolStrip2);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox2.Size = new System.Drawing.Size(191, 414);
+            this.groupBox2.Size = new System.Drawing.Size(366, 414);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tracks";
             // 
             // splitter2
             // 
-            this.splitter2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter2.Location = new System.Drawing.Point(4, 261);
+            this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
+            this.splitter2.Location = new System.Drawing.Point(174, 44);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(183, 3);
+            this.splitter2.Size = new System.Drawing.Size(3, 367);
             this.splitter2.TabIndex = 11;
             this.splitter2.TabStop = false;
             // 
             // keyProperty
             // 
-            this.keyProperty.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.keyProperty.Dock = System.Windows.Forms.DockStyle.Right;
             this.keyProperty.HelpVisible = false;
-            this.keyProperty.Location = new System.Drawing.Point(4, 264);
+            this.keyProperty.Location = new System.Drawing.Point(177, 44);
             this.keyProperty.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.keyProperty.Name = "keyProperty";
             this.keyProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.keyProperty.Size = new System.Drawing.Size(183, 147);
+            this.keyProperty.Size = new System.Drawing.Size(185, 367);
             this.keyProperty.TabIndex = 10;
             this.keyProperty.ToolbarVisible = false;
             this.keyProperty.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.keyProperty_PropertyValueChanged);
@@ -122,10 +122,10 @@
             // 
             this.trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trackTree.HideSelection = false;
-            this.trackTree.Location = new System.Drawing.Point(4, 46);
+            this.trackTree.Location = new System.Drawing.Point(4, 44);
             this.trackTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.trackTree.Name = "trackTree";
-            this.trackTree.Size = new System.Drawing.Size(183, 365);
+            this.trackTree.Size = new System.Drawing.Size(170, 367);
             this.trackTree.TabIndex = 8;
             this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
             // 
@@ -137,7 +137,7 @@
             this.trackTypeBox});
             this.toolStrip2.Location = new System.Drawing.Point(4, 19);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(183, 27);
+            this.toolStrip2.Size = new System.Drawing.Size(358, 25);
             this.toolStrip2.TabIndex = 7;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -147,7 +147,7 @@
             this.addTrackButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
             this.addTrackButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.addTrackButton.Name = "addTrackButton";
-            this.addTrackButton.Size = new System.Drawing.Size(23, 24);
+            this.addTrackButton.Size = new System.Drawing.Size(23, 22);
             this.addTrackButton.Text = "Add Track";
             this.addTrackButton.Click += new System.EventHandler(this.addTrackButton_Click);
             // 
@@ -157,7 +157,7 @@
             this.removeTrackButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
             this.removeTrackButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.removeTrackButton.Name = "removeTrackButton";
-            this.removeTrackButton.Size = new System.Drawing.Size(23, 24);
+            this.removeTrackButton.Size = new System.Drawing.Size(23, 22);
             this.removeTrackButton.Text = "Remove Track";
             this.removeTrackButton.Click += new System.EventHandler(this.removeTrackButton_Click);
             // 
@@ -165,7 +165,7 @@
             // 
             this.trackTypeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.trackTypeBox.Name = "trackTypeBox";
-            this.trackTypeBox.Size = new System.Drawing.Size(140, 23);
+            this.trackTypeBox.Size = new System.Drawing.Size(140, 25);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
             // panel1
@@ -177,10 +177,10 @@
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(191, 25);
+            this.panel1.Location = new System.Drawing.Point(366, 25);
             this.panel1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(657, 24);
+            this.panel1.Size = new System.Drawing.Size(482, 24);
             this.panel1.TabIndex = 10;
             // 
             // nudFrame
@@ -265,9 +265,9 @@
             this.toolStripDropDownButton3,
             this.toolStripDropDownButton1,
             this.helpButton});
-            this.toolStrip1.Location = new System.Drawing.Point(191, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(366, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(657, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(482, 25);
             this.toolStrip1.TabIndex = 11;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -367,7 +367,7 @@
             // 
             this.showAllTracksToolStripMenuItem.CheckOnClick = true;
             this.showAllTracksToolStripMenuItem.Name = "showAllTracksToolStripMenuItem";
-            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showAllTracksToolStripMenuItem.Text = "Show All Tracks";
             this.showAllTracksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -377,7 +377,7 @@
             this.showFrameTicksToolStripMenuItem.CheckOnClick = true;
             this.showFrameTicksToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showFrameTicksToolStripMenuItem.Name = "showFrameTicksToolStripMenuItem";
-            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showFrameTicksToolStripMenuItem.Text = "Show Frame Ticks";
             this.showFrameTicksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -387,7 +387,7 @@
             this.showTangentsToolStripMenuItem.CheckOnClick = true;
             this.showTangentsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showTangentsToolStripMenuItem.Name = "showTangentsToolStripMenuItem";
-            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showTangentsToolStripMenuItem.Text = "Show Tangents";
             this.showTangentsToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 

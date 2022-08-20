@@ -71,6 +71,9 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         private JointAnimManager JointAnim;
 
+        public delegate void OnIntialize();
+        public OnIntialize Initialize;
+
 
         /// <summary>
         /// 
@@ -87,6 +90,29 @@ namespace HSDRawViewer.Rendering.Models
         public RenderJObj(HSD_JOBJ desc)
         {
             LoadJObj(desc);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="state"></param>
+        public void SetMaterialAnimation(int dobj_index, MatAnimMaterialState state, IEnumerable<MatAnimTextureState> textureStates)
+        {
+            if (dobj_index >= 0 && dobj_index < RenderDobjs.Count)
+            {
+                RenderDobjs[dobj_index].MaterialState = state;
+
+                int ti = 0;
+                foreach (var t in textureStates)
+                {
+                    if (ti >= RenderDobjs[dobj_index].TextureStates.Length)
+                        break;
+
+                    RenderDobjs[dobj_index].TextureStates[ti] = t;
+                    ti++;
+                }
+            }
         }
 
         /// <summary>
@@ -244,6 +270,9 @@ namespace HSDRawViewer.Rendering.Models
             // print diagnostic info
             System.Diagnostics.Debug.WriteLine($"Buffer Count: {BufferManager.BufferCount}");
             System.Diagnostics.Debug.WriteLine($"Texture Count: {TextureManager.TextureCount}");
+
+            // callback done initializing
+            Initialize?.Invoke();
         }
 
         /// <summary>
@@ -471,15 +500,11 @@ namespace HSDRawViewer.Rendering.Models
             _shader.SetInt("alphaComp1", 7);
 
             // Materials
-            var color = mobj.Material;
-            if (color != null)
-            {
-                _shader.SetVector4("ambientColor", MaterialState.Ambient);
-                _shader.SetVector4("diffuseColor", MaterialState.Diffuse);
-                _shader.SetVector4("specularColor", MaterialState.Specular);
-                _shader.SetFloat("shinniness", MaterialState.Shininess);
-                _shader.SetFloat("alpha", MaterialState.Alpha);
-            }
+            _shader.SetVector4("ambientColor", MaterialState.Ambient);
+            _shader.SetVector4("diffuseColor", MaterialState.Diffuse);
+            _shader.SetVector4("specularColor", MaterialState.Specular);
+            _shader.SetFloat("shinniness", MaterialState.Shininess);
+            _shader.SetFloat("alpha", MaterialState.Alpha);
 
             // pixel processing
             var pp = mobj.PEDesc;
@@ -531,6 +556,8 @@ namespace HSDRawViewer.Rendering.Models
                     float blending;
                     Matrix4 transform;
                     Vector4 konst = Vector4.Zero;
+                    Vector4 tev0 = Vector4.Zero;
+                    Vector4 tev1 = Vector4.Zero;
 
                     // get texture state data if it exists
                     if (textureStates != null && i < textureStates.Length && textureStates[i] != null)
@@ -539,7 +566,17 @@ namespace HSDRawViewer.Rendering.Models
                         displayTex = texState.TOBJ;
                         blending = texState.Blending;
                         transform = texState.Transform;
-                        konst = texState.Konst;
+                        if (tev != null)
+                        {
+                            if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
+                                konst = texState.Konst;
+
+                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV0) != 0)
+                                tev0 = texState.Tev0;
+
+                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
+                                tev1 = texState.Tev1;
+                        }
                     }
                     else
                     {
@@ -548,14 +585,21 @@ namespace HSDRawViewer.Rendering.Models
                         transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
                             Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RY) *
                             Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+                        // invert transform matrix
+                        if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
+                            transform.Invert();
                         if (tev != null)
+                        {
                             if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
                                 konst = new Vector4(tev.constant.A / 255f, tev.constant.B / 255f, tev.constant.G / 255f, tev.constantAlpha / 255f);
-                    }
 
-                    // invert transform matrix
-                    if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
-                        transform.Invert();
+                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV0) != 0)
+                                tev0 = new Vector4(tev.tev0.A / 255f, tev.tev0.B / 255f, tev.tev0.G / 255f, tev.tev0Alpha / 255f);
+
+                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
+                                tev1 = new Vector4(tev.tev1.A / 255f, tev.tev1.B / 255f, tev.tev1.G / 255f, tev.tev1Alpha / 255f);
+                        }
+                    }
 
                     // if texture image data is null skip setup?
                     if (tex.ImageData == null)
@@ -639,15 +683,10 @@ namespace HSDRawViewer.Rendering.Models
                         _shader.SetInt($"Tev[{i}].alpha_c", (int)tev.alpha_c_in);
                         _shader.SetInt($"Tev[{i}].alpha_d", (int)tev.alpha_d_in);
                     }
-                    if (tev != null)
-                    {
-                        if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV0) != 0)
-                            _shader.SetColor($"Tev[{i}].tev0", tev.tev0, tev.tev0Alpha);
 
-                        if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
-                            _shader.SetColor($"Tev[{i}].tev1", tev.tev1, tev.tev1Alpha);
-                    }
                     _shader.SetVector4($"Tev[{i}].konst", konst);
+                    _shader.SetVector4($"Tev[{i}].tev0", tev0);
+                    _shader.SetVector4($"Tev[{i}].tev1", tev1);
                 }
             }
         }
