@@ -1,8 +1,10 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
 using HSDRawViewer.Converters;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
@@ -34,7 +36,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private HSD_JOBJ _root;
 
-        private JointAnimManager JointAnimation;
+        public float Frame { get => _viewport.glViewport.Frame; }
 
         /// <summary>
         /// 
@@ -65,35 +67,26 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _trackEditor.TracksUpdated += () =>
             {
                 RenderJObj.RootJObj.ResetTransforms();
-
-                if (JointAnimation != null)
-                    JointAnimation.ApplyAnimation(RenderJObj.RootJObj, _viewport.glViewport.Frame);
+                ApplyEditorAnimation(Frame);
             };
 
             // initialize joint tree
             _jointTree = new DockableJointTree();
             _jointTree.Show(dockPanel1, DockState.DockLeft);
 
-            _jointTree.SelectJObj += (i, jobj) =>
+            _jointTree.SelectJObj += (name, jobj) =>
             {
-                if (jobj.Flags.HasFlag(JOBJ_FLAG.PTCL))
-                    _propertyGrid.SetObject(new JObjParticleProxy(jobj));
+                if (jobj.jobj.Flags.HasFlag(JOBJ_FLAG.PTCL))
+                    _propertyGrid.SetObject(new JObjParticlePropertyAccessor(jobj.jobj));
                 else
-                if (jobj.Flags.HasFlag(JOBJ_FLAG.SPLINE))
-                    _propertyGrid.SetObject(new JObjSplineProxy(jobj));
+                if (jobj.jobj.Flags.HasFlag(JOBJ_FLAG.SPLINE))
+                    _propertyGrid.SetObject(new JObjSplinePropertyAccessor(jobj.jobj));
                 else
-                    _propertyGrid.SetObject(new JObjProxy(jobj));
+                    _propertyGrid.SetObject(new JObjPropertyAccessor(jobj.jobj));
 
-                RenderJObj.SelectedJObj = jobj;
+                RenderJObj.SelectedJObj = jobj.jobj;
 
-                // set animation track
-                if (JointAnimation != null)
-                {
-                    if (i < JointAnimation.NodeCount && i >= 0)
-                        _trackEditor.SetKeys(GraphEditor.AnimType.Joint, JointAnimation.Nodes[i]);
-                    else
-                        _trackEditor.SetKeys(GraphEditor.AnimType.Joint, null);
-                }
+                _trackEditor.SetKeys(name, GraphEditor.AnimType.Joint, jobj.Tracks);
             };
 
             // initialize meshlist
@@ -146,7 +139,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 if (_propertyGrid.SelectedObject is JObjProxy j)
                 {
                     RenderJObj.RootJObj?.GetJObjFromDesc(j.jobj).ResetTransforms();
-                    // RenderJObj.GetLiveJOBJ(j.jobj).ResetTransforms();
+                }
+
+                // update jobj if changed
+                if (_propertyGrid.SelectedObject is DObjProxy d)
+                {
+                    RenderJObj.ResetDefaultStateMaterial();
                 }
             };
 
@@ -170,8 +168,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             _viewport.glViewport.FrameChange += (f) =>
             {
-                if (JointAnimation != null)
-                    JointAnimation.ApplyAnimation(RenderJObj.RootJObj, f);
+                ApplyEditorAnimation(f);
             };
 
             // initialize joint manager
@@ -203,30 +200,132 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="frame"></param>
+        private void ApplyEditorAnimation(float frame)
+        {
+            // joints
+            foreach (var p in _jointTree.EnumerateJoints())
+            {
+                RenderJObj.RootJObj.GetJObjFromDesc(p.jobj).ApplyAnimation(p.Tracks, frame);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="jointAnim"></param>
         public void LoadAnimation(JointAnimManager animation)
         {
+            // reset skeleton
+            RenderJObj.RootJObj?.ResetTransforms();
+
             // add any missing nodes
             while (animation.Nodes.Count < RenderJObj.RootJObj.JointCount)
                 animation.Nodes.Add(new AnimNode());
 
             // set animation
-            JointAnimation = animation;
+            for (int i = 0; i < animation.NodeCount; i++)
+            {
+                var pro = _jointTree.GetProxyAtIndex(i);
 
-            // enable viewport
-            var vp = _viewport.glViewport;
-            vp.AnimationTrackEnabled = true;
-            vp.Frame = 0;
-            vp.MaxFrame = animation.FrameCount;
+                if (pro != null)
+                {
+                    pro.Tracks.Clear();
+                    pro.Tracks.AddRange(animation.Nodes[i].Tracks);
+                }
+            }
 
-            // show track editor
-            _trackEditor.Show();
-
-            // hide texture panel
-            _textureEditor.DockState = DockState.DockLeftAutoHide;
+            // apply animation
+            ApplyEditorAnimation(Frame);
 
             // bring joint tree to front
             _jointTree.Show();
+
+            // enable animation view
+            EnableAnimation();
+
+            // clear track editor
+            _trackEditor.SetKeys("", GraphEditor.AnimType.Joint, null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadAnimation(MatAnimManager matanim)
+        {
+            // set animation
+            // TODO: MaterialAnimation = matanim;
+
+            // enable animation view
+            EnableAnimation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadAnimation(ShapeAnimManager shapeanim)
+        {
+            // set animation
+            // TODO: ShapeAnimation = shapeanim;
+
+            // enable animation view
+            EnableAnimation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ClearAnimation()
+        {
+            // clear animations
+            foreach (var j in _jointTree.EnumerateJoints())
+                j.Tracks.Clear();
+
+            // reset joint animation
+            RenderJObj?.RootJObj?.ResetTransforms();
+
+            // disable viewport
+            var vp = _viewport.glViewport;
+            vp.AnimationTrackEnabled = false;
+
+            // hide track editor
+            _trackEditor.SetKeys("", GraphEditor.AnimType.Texture, null);
+            _trackEditor.Hide();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void EnableAnimation()
+        {
+            // enable viewport
+            var vp = _viewport.glViewport;
+
+            // enable view if not already
+            if (!vp.AnimationTrackEnabled)
+            {
+                vp.AnimationTrackEnabled = true;
+                vp.Frame = 0;
+                vp.MaxFrame = 0;
+
+                // show track editor
+                _trackEditor.Show();
+
+                // hide texture panel
+                _textureEditor.DockState = DockState.DockLeftAutoHide;
+            }
+
+            // calculate max frame count
+            vp.MaxFrame = 0;
+
+            vp.MaxFrame = Math.Max(vp.MaxFrame, _jointTree.EnumerateJoints().Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
+
+            // TODO: find end frame
+            //if (MaterialAnimation != null)
+            //    vp.MaxFrame = Math.Max(vp.MaxFrame, MaterialAnimation.FrameCount);
+
+            //if (ShapeAnimation != null)
+            //    vp.MaxFrame = Math.Max(vp.MaxFrame, ShapeAnimation.FrameCount);
         }
 
         /// <summary>
@@ -380,7 +479,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     Camera = _viewport.glViewport.Camera,
                     Lighting = RenderJObj._lightParam,
                     Settings = RenderJObj._settings,
-                    // TODO: Animation = RenderJObj.Animation,
+                    // TODO: Animation = JointAnimation,
                     HiddenNodes = _meshList.EnumerateDObjs.Where(e => !e.Visible).Select((i, e) => e).ToArray(),
                 };
                 settings.Serialize(f);
@@ -414,18 +513,21 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             if (settings.Animation != null)
             {
-                // TODO: animation
-                //// load animations
-                //LoadAnimation(settings.Animation);
+                // load animations
+                LoadAnimation(settings.Animation);
 
-                //// load material animation if exists
-                //var symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
-                //var matAnim = MainForm.Instance.GetSymbol(symbol);
-                //if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
-                //    LoadAnimation(maj);
+                // load material animation if exists
+                var symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
+                var matAnim = MainForm.Instance.GetSymbol(symbol);
+                if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
+                {
+                    var a = new MatAnimManager();
+                    a.FromMatAnim(maj);
+                    LoadAnimation(a);
+                }
 
-                //// set frames
-                //_viewport.glViewport.Frame = settings.Frame;
+                // set frames
+                _viewport.glViewport.Frame = settings.Frame;
             }
 
             if (settings.HiddenNodes != null)
@@ -461,6 +563,143 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             using (PropertyDialog d = new PropertyDialog("Fog Settings", RenderJObj._fogParam))
                 d.ShowDialog();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var anim = JointAnimManager.LoadFromFile(_jointTree._jointMap);
+
+            if (anim != null)
+            {
+                LoadAnimation(anim);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearAnimation();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private JointAnimManager ToJointAnim()
+        {
+            JointAnimManager m = new JointAnimManager();
+
+            foreach (var n in _jointTree.EnumerateJoints())
+                m.Nodes.Add(new AnimNode() { Tracks = n.Tracks });
+
+            return m;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            ToJointAnim().ExportAsMayaAnim(_jointTree._jointMap);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            ToJointAnim().ExportAsFigatree();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            if (_root != null)
+                ToJointAnim().ExportAsAnimJoint(_root);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class FrameSpeedModifierSettings
+        {
+            public List<FrameSpeedMultiplier> Modifiers { get; set; } = new List<FrameSpeedMultiplier>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void fSMApplyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_trackEditor.IsHidden)
+                return;
+
+            var mult = new FrameSpeedModifierSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Frame Speed Multipler Settings", mult))
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (var j in _jointTree.EnumerateJoints())
+                        foreach (var i in j.Tracks)
+                            i.ApplyFSMs(mult.Modifiers);
+
+                    // recalculat frame count
+                    EnableAnimation();
+
+                    // re apply animation
+                    ApplyEditorAnimation(Frame);
+                }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class AnimationCreationSettings
+        {
+            public int FrameCount { get; set; } = 60;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void createToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var settings = new AnimationCreationSettings();
+            using (PropertyDialog d = new PropertyDialog("Create Animation", settings))
+            {
+                if (d.ShowDialog() == DialogResult.OK && settings.FrameCount > 0)
+                {
+                    // enable animation editing
+                    EnableAnimation();
+
+                    // set the new max frame
+                    var vp = _viewport.glViewport;
+                    vp.MaxFrame = settings.FrameCount;
+                }
+            }
         }
     }
 }

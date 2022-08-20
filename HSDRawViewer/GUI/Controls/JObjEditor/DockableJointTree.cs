@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -19,8 +20,29 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private HSD_JOBJ _root;
 
-        public delegate void JObjSelected(int index, HSD_JOBJ jobj);
+        public delegate void JObjSelected(string name, JObjProxy jobj);
         public JObjSelected SelectJObj;
+
+        public IEnumerable<JObjProxy> EnumerateJoints()
+        {
+            foreach (TreeNode n in treeJOBJ.Nodes)
+            {
+                foreach (var e in EnumerateJoints0(n))
+                    yield return e;
+            }
+        }
+
+        private IEnumerable<JObjProxy> EnumerateJoints0(TreeNode n)
+        {
+            if (n.Tag is JObjProxy p)
+                yield return p;
+
+            foreach (TreeNode node in n.Nodes)
+            {
+                foreach (var e in EnumerateJoints0(node))
+                    yield return e;
+            }
+        }
 
         /// <summary>
         /// 
@@ -53,6 +75,54 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _root = jobj;
             _jointMap.Clear();
             RefreshTree();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public JObjProxy GetProxyAtIndex(int index)
+        {
+            int i = 0;
+
+            foreach (TreeNode n in treeJOBJ.Nodes)
+            {
+                var p = GetProxyAtIndex0(n, index, ref i);
+
+                if (p != null)
+                    return p;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private JObjProxy GetProxyAtIndex0(TreeNode node, int index, ref int i)
+        {
+            // check if this node is what we are looking for
+            if (i == index)
+                if (node.Tag is JObjProxy proxy)
+                    return proxy;
+
+            // advance node index
+            i++;
+
+            // check children
+            foreach (TreeNode c in node.Nodes)
+            {
+                var p = GetProxyAtIndex0(c, index, ref i);
+
+                if (p != null)
+                    return p;
+            }
+
+            // nothing was found so return null
+            return null;
         }
 
         /// <summary>
@@ -96,7 +166,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             joint_count++;
 
             // add jobj as a tag
-            node.Tag = jobj;
+            node.Tag = new JObjProxy(jobj);
 
             // add to list
             if (parent == null)
@@ -124,8 +194,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void treeJOBJ_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node.Tag is HSD_JOBJ jobj)
-                SelectJObj?.Invoke(_root.BreathFirstList.IndexOf(jobj), jobj);
+            if (e.Node.Tag is JObjProxy jobj)
+                SelectJObj?.Invoke(e.Node.Text, jobj);
         }
 
         /// <summary>
@@ -166,7 +236,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void makeParticleJointToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (treeJOBJ.SelectedNode != null && treeJOBJ.SelectedNode.Tag is HSD_JOBJ jobj)
+            if (treeJOBJ.SelectedNode != null && treeJOBJ.SelectedNode.Tag is JObjProxy jobj)
             {
                 if (MessageBox.Show(
                     "Are you sure you want to make this joint a particle joint?\n" +
@@ -175,7 +245,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     MessageBoxButtons.YesNoCancel,
                     MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
-                    jobj.ParticleJoint = new HSD_ParticleJoint();
+                    jobj.jobj.ParticleJoint = new HSD_ParticleJoint();
                 }
             }
         }

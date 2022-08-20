@@ -1,4 +1,6 @@
 ﻿using HSDRaw.Common;
+using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
 
@@ -377,6 +379,30 @@ namespace HSDRawViewer.Rendering.Models
             // process siblings
             if (Sibling != null && updateChildren)
                 Sibling.RecalculateTransforms(c, updateChildren);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tracks"></param>
+        /// <param name="frame"></param>
+        public void ApplyAnimation(List<FOBJ_Player> tracks, float frame)
+        {
+            foreach (FOBJ_Player t in tracks)
+            {
+                switch (t.JointTrackType)
+                {
+                    case JointTrackType.HSD_A_J_ROTX: Rotation.X = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_ROTY: Rotation.Y = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_ROTZ: Rotation.Z = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_TRAX: Translation.X = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_TRAY: Translation.Y = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_TRAZ: Translation.Z = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_SCAX: Scale.X = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_SCAY: Scale.Y = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_SCAZ: Scale.Z = t.GetValue(frame); break;
+                }
+            }
         }
     }
 }

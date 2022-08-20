@@ -2,6 +2,7 @@
 using HSDRaw.GX;
 using HSDRawViewer.Rendering.GX;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,12 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool Visible { get; set; } = true;
 
+        public float ShapeBlend { get; set; } = 1;
+
+        public MatAnimMaterialState MaterialState = new MatAnimMaterialState();
+
+        public MatAnimTextureState[] TextureStates { get; internal set; } = new MatAnimTextureState[8];
+
         /// <summary>
         /// 
         /// </summary>
@@ -31,6 +38,85 @@ namespace HSDRawViewer.Rendering.Models
         {
             Parent = parent;
             _dobj = dobj;
+
+            // initialize texture states
+            for (int i = 0; i < TextureStates.Length; i++)
+                TextureStates[i] = new MatAnimTextureState();
+
+            // initialize material state
+            ResetMaterialState();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetMaterialState()
+        {
+            if (_dobj == null || _dobj.Mobj == null)
+                return;
+
+            // initial material color
+            var color = _dobj.Mobj.Material;
+            if (color != null)
+            {
+                MaterialState.Ambient.X = color.AMB_R / 255f;
+                MaterialState.Ambient.Y = color.AMB_G / 255f;
+                MaterialState.Ambient.Z = color.AMB_B / 255f;
+                MaterialState.Ambient.W = color.AMB_A / 255f;
+
+                MaterialState.Diffuse.X = color.DIF_R / 255f;
+                MaterialState.Diffuse.Y = color.DIF_G / 255f;
+                MaterialState.Diffuse.Z = color.DIF_B / 255f;
+                MaterialState.Diffuse.W = color.DIF_A / 255f;
+
+                MaterialState.Specular.X = color.SPC_R / 255f;
+                MaterialState.Specular.Y = color.SPC_G / 255f;
+                MaterialState.Specular.Z = color.SPC_B / 255f;
+                MaterialState.Specular.W = color.SPC_A / 255f;
+
+                MaterialState.Shininess = color.Shininess;
+                MaterialState.Alpha = color.Alpha;
+            }
+
+            // initialize pixel processing
+            var pp = _dobj.Mobj.PEDesc;
+            if (pp != null)
+            {
+                MaterialState.Ref0 = pp.AlphaRef0 / 255f;
+                MaterialState.Ref1 = pp.AlphaRef1 / 255f;
+            }
+
+            // initialize texture data
+            if (_dobj.Mobj.Textures != null)
+            {
+                int ti = 0;
+                foreach (var t in _dobj.Mobj.Textures.List)
+                {
+                    // too many textures
+                    if (ti >= TextureStates.Length)
+                        break;
+
+                    // get next texture state
+                    var ts = TextureStates[ti];
+
+                    // initialize tobj data
+                    ts.TOBJ = t;
+                    ts.Blending = t.Blending;
+                    ts.Transform = 
+                        Matrix4.CreateScale(t.SX, t.SY, t.SZ) *
+                        Math3D.CreateMatrix4FromEuler(t.RX, t.RY, t.RZ) *
+                        Matrix4.CreateTranslation(t.TX, t.TY, t.TZ);
+
+                    // initialize tev data
+                    if (t.TEV != null)
+                    {
+                        var k = t.TEV.constant;
+                        ts.Konst = new Vector4(k.R / 255f, k.B / 255f, k.G / 255f, t.TEV.constantAlpha / 255f);
+                    }
+
+                    ti++;
+                }
+            }
         }
 
         /// <summary>

@@ -3,9 +3,9 @@ using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Controls.JObjEditor;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Animation;
 using System;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -54,7 +54,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="joint"></param>
         public void LoadAnimation(HSD_MatAnimJoint joint)
         {
-           // Editor.LoadAnimation(joint);
+            MatAnimManager m = new MatAnimManager();
+            m.FromMatAnim(joint);
+            Editor.LoadAnimation(m);
         }
 
         /// <summary>
@@ -72,7 +74,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="anim"></param>
         public void LoadAnimation(HSD_ShapeAnimJoint anim)
         {
-            //Editor.LoadAnimation(anim);
+            ShapeAnimManager m = new ShapeAnimManager();
+            m.FromShapeAnim(anim);
+            Editor.LoadAnimation(m);
         }
     }
 }

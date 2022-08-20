@@ -125,6 +125,7 @@ namespace HSDRawViewer.GUI
                     PlaybackMode = PlaybackMode.None;
                 }
             }
+            get => animationGroup.Visible;
         }
 
         /// <summary>

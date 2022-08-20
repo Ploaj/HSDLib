@@ -128,7 +128,7 @@ namespace HSDRaw.Tools
         /// <summary>
         /// 
         /// </summary>
-        private static float CalculateTangent(FOBJ_Player player, int i)
+        public static float CalculateTangent(FOBJ_Player player, float i)
         {
             //for (int i = 0; i < player.Keys.Count; i++)
             {
@@ -138,9 +138,14 @@ namespace HSDRaw.Tools
                 float Tan = 0;
                 var weight = 0;
 
+                var prevKey = player.Keys.LastOrDefault(e => e.Frame < i);
+                var nextKey = player.Keys.FirstOrDefault(e => e.Frame > i);
+
                 if (i != 0)
                 {
-                    var dis = 1;
+                    float dis = 1;
+                    if (prevKey != null)
+                        dis = i - prevKey.Frame;
                     var prev = player.GetValue(i - dis);
                     Tan += (current - prev) / dis;
                     weight++;
@@ -148,7 +153,9 @@ namespace HSDRaw.Tools
 
                 if (i != player.Keys.Count - 1)
                 {
-                    var dis = 1;
+                    float dis = 1;
+                    if (nextKey != null)
+                        dis = nextKey.Frame - i;
                     var next = player.GetValue(i + dis);
                     Tan += (next - current) / dis;
                     weight++;

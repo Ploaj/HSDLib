@@ -254,44 +254,6 @@ namespace HSDRaw.Tools
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="index"></param>
-        public void AutoTangent(int index)
-        {
-            if (index < 0 || index > Keys.Count - 1)
-                return;
-
-            if (Keys[index].InterpolationType != GXInterpolationType.HSD_A_OP_SPL)
-                return;
-
-            if (index == 0 || index == Keys.Count - 1)
-            {
-                Keys[index].Tan = 0;
-                return;
-            }
-
-            var prev = Keys[index - 1];
-            var current = Keys[index];
-            var next = Keys[index + 1];
-            float weightCount = 0;
-            float tangent = 0;
-            {
-                tangent += (current.Value - prev.Value) / (current.Frame - prev.Frame);
-                weightCount++;
-            }
-            {
-                tangent += (next.Value - current.Value) / (next.Frame - current.Frame);
-                weightCount++;
-            }
-
-            if (weightCount > 0)
-                tangent /= weightCount;
-
-            current.Tan = tangent;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <returns></returns>
         public HSD_FOBJ ToFobj(float error = 0.0001f)
         {
@@ -374,6 +336,9 @@ namespace HSDRaw.Tools
             AnimationKeyCompressor.CompressTrack(this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Reverse()
         {
             List<FOBJKey> newkeys = new List<FOBJKey>();

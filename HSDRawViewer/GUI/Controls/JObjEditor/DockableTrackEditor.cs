@@ -1,12 +1,13 @@
-﻿using HSDRawViewer.Rendering;
-using System.Linq;
+﻿using HSDRaw.Tools;
+using System.Collections.Generic;
+using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public partial class DockableTrackEditor : DockContent
     {
-        private AnimNode _node;
+        private List<FOBJ_Player> list;
 
         public delegate void TrackUpdate();
         public TrackUpdate TracksUpdated;
@@ -22,8 +23,22 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             graphEditor1.TrackListUpdated += (s, a) =>
             {
-                _node.Tracks = graphEditor1.TrackPlayers.ToList();
+                if (list != null)
+                {
+                    list.Clear();
+                    list.AddRange(graphEditor1.TrackPlayers);
+                }
                 TracksUpdated?.Invoke();
+            };
+
+            // prevent user closing
+            CloseButtonVisible = false;
+            FormClosing += (sender, args) =>
+            {
+                if (args.CloseReason == CloseReason.UserClosing)
+                {
+                    args.Cancel = true;
+                }
             };
         }
 
@@ -31,15 +46,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// 
         /// </summary>
         /// <param name="aobj"></param>
-        public void SetKeys(GraphEditor.AnimType type, AnimNode node)
+        public void SetKeys(string objectName, GraphEditor.AnimType type, List<FOBJ_Player> tracks)
         {
-            _node = node;
-            graphEditor1.ClearTracks();
+            Text = $"Animation Editor: {objectName}";
 
-            if (node != null)
-            {
-                graphEditor1.LoadTracks(type, node.Tracks);
-            }
+            list = null;
+
+            graphEditor1.ClearTracks();
+            if (tracks != null)
+                graphEditor1.LoadTracks(type, tracks);
+
+            list = tracks;
         }
     }
 }

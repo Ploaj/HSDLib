@@ -711,18 +711,31 @@ namespace HSDRawViewer.GUI.Controls
         {
             if(_selectedPlayer != null)
             {
-                if(!_selectedPlayer.Keys.Exists(k=>k.Frame == _frame))
+                if(!_selectedPlayer.Keys.Exists(k => k.Frame == _frame))
                 {
-                    var key = new FOBJKey() { Frame = _frame, Value = _selectedPlayer.GetValue(_frame), InterpolationType = GXInterpolationType.HSD_A_OP_LIN };
+                    var currKey = _selectedPlayer.Keys.Last(e => e.Frame < _frame);
+
+                    var key = new FOBJKey() 
+                    { 
+                        Frame = _frame, 
+                        Value = _selectedPlayer.GetValue(_frame), 
+                        InterpolationType = currKey != null ? currKey.InterpolationType : GXInterpolationType.HSD_A_OP_LIN
+                    };
 
                     var insertIndex = _selectedPlayer.Keys.FindIndex(k => k.Frame >= _frame);
 
                     if(insertIndex == -1 || insertIndex >= _selectedPlayer.Keys.Count)
+                    {
                         _selectedPlayer.Keys.Add(key);
+                    }
                     else
+                    {
                         _selectedPlayer.Keys.Insert(insertIndex, key);
+                        key.Tan = AnimationKeyCompressor.CalculateTangent(_selectedPlayer, _frame);
+                    }
 
                     SelectKeyAtFrame();
+
                 }
 
                 _graph.Invalidate();
@@ -989,6 +1002,7 @@ NONE - None (do not use)";
                 {
                     if(d.ShowDialog() == DialogResult.OK)
                     {
+                        AnimationKeyCompressor.BakeTrack(_selectedPlayer);
                         AnimationKeyCompressor.CompressTrack(_selectedPlayer, _compSettings.CompressionLevel);
                         _graph.Invalidate();
                         OnTrackEdited(EventArgs.Empty);

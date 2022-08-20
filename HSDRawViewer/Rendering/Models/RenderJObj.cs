@@ -10,9 +10,19 @@ using HSDRawViewer.Rendering.GX;
 using OpenTK.Mathematics;
 using System.Drawing;
 using HSDRaw.GX;
+using HSDRaw.Common.Animation;
 
 namespace HSDRawViewer.Rendering.Models
 {
+    [Flags]
+    public enum FrameFlags
+    {
+        None = 0,
+        Joint = 1,
+        Material = 2,
+        Shape = 4,
+        All = Joint | Material | Shape,
+    }
     public class RenderJObj
     {
         private static int MAX_TEX { get; } = 4;
@@ -30,8 +40,6 @@ namespace HSDRawViewer.Rendering.Models
         public GXFogParam _fogParam { get; internal set; } = new GXFogParam();
 
         public JobjDisplaySettings _settings { get; internal set; } = new JobjDisplaySettings();
-
-        public float ShapeBlend { get; set; } = 1;
 
         public Vector3 OverlayColor { get; set; } = Vector3.One;
 
@@ -58,7 +66,11 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public HSD_JOBJ SelectedJObj;
 
-        private static MatAnimMaterialState MaterialState = new MatAnimMaterialState();
+        /// <summary>
+        /// 
+        /// </summary>
+        private JointAnimManager JointAnim;
+
 
         /// <summary>
         /// 
@@ -75,6 +87,101 @@ namespace HSDRawViewer.Rendering.Models
         public RenderJObj(HSD_JOBJ desc)
         {
             LoadJObj(desc);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void RequestAnimationUpdate(FrameFlags flags, float frame)
+        {
+            if (flags.HasFlag(FrameFlags.Joint) && RootJObj != null && JointAnim != null)
+            {
+                JointAnim.ApplyAnimation(RootJObj, frame);
+            }
+
+            // TODO: material animation
+
+            // TODO: shape animation
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name=""></param>
+        public void ClearAnimation(FrameFlags flags)
+        {
+            if (flags.HasFlag(FrameFlags.Joint))
+            {
+                JointAnim = null;
+
+                // TODO: material animation
+
+                // TODO: shape animation
+                RootJObj?.ResetTransforms();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadAnimation(JointAnimManager joint, HSD_MatAnimJoint material, HSD_ShapeAnimJoint shape)
+        {
+            FrameFlags flags = FrameFlags.None;
+
+            JointAnim = joint;
+
+            // TODO: material animation
+
+            // TODO: shape animation
+
+            if (joint != null)
+                flags |= FrameFlags.Joint;
+
+            if (material != null)
+                flags |= FrameFlags.Material;
+
+            if (shape != null)
+                flags |= FrameFlags.Shape;
+
+            // request anim update
+            RequestAnimationUpdate(flags, 0);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetDefaultStateAll()
+        {
+            ResetDefaultStateJoints();
+            ResetDefaultStateMaterial();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetDefaultStateJoints()
+        {
+            // reset skeleton
+            RootJObj?.ResetTransforms();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetDefaultStateMaterial()
+        {
+            // reset materials
+            foreach (var d in RenderDobjs)
+                d.ResetMaterialState();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadMatAnim(HSD_MatAnimJoint matanim)
+        {
+
         }
 
         /// <summary>
@@ -130,6 +237,9 @@ namespace HSDRawViewer.Rendering.Models
                     }
                 }
             }
+
+            // re apply animation after invalidating
+            RequestAnimationUpdate(FrameFlags.All, 0);
 
             // print diagnostic info
             System.Diagnostics.Debug.WriteLine($"Buffer Count: {BufferManager.BufferCount}");
@@ -273,8 +383,11 @@ namespace HSDRawViewer.Rendering.Models
             if (!selected)
                 SetupMObj(dobj);
 
+            // get shape blending
+            float shapeBlend = dobj.ShapeBlend;
+
             // bind buffer
-            if (BufferManager.EnableBuffers(_shader, dobj._dobj, (int)ShapeBlend, (int)ShapeBlend + 1, ShapeBlend - (int)ShapeBlend))
+            if (BufferManager.EnableBuffers(_shader, dobj._dobj, (int)shapeBlend, (int)shapeBlend + 1, shapeBlend - (int)shapeBlend))
             {
                 // render pobjs
                 foreach (var p in dobj.PObjs)
@@ -333,12 +446,15 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="mobj"></param>
         private void SetupMObj(RenderDObj dobj)
         {
-            if (dobj._dobj.Mobj == null)
+            if (dobj == null && dobj._dobj != null && dobj._dobj.Mobj != null)
                 return;
 
             var mobj = dobj._dobj.Mobj;
-            MatAnimManager animation = null;
+            var MaterialState = dobj.MaterialState;
+            var textureStates = dobj.TextureStates;
+            var parentJOBJ = dobj.Parent.Desc;
 
+            // init GL state
             GL.Enable(EnableCap.Texture2D);
 
             GL.Enable(EnableCap.Blend);
@@ -358,27 +474,6 @@ namespace HSDRawViewer.Rendering.Models
             var color = mobj.Material;
             if (color != null)
             {
-                MaterialState.Ambient.X = color.AMB_R / 255f;
-                MaterialState.Ambient.Y = color.AMB_G / 255f;
-                MaterialState.Ambient.Z = color.AMB_B / 255f;
-                MaterialState.Ambient.W = color.AMB_A / 255f;
-
-                MaterialState.Diffuse.X = color.DIF_R / 255f;
-                MaterialState.Diffuse.Y = color.DIF_G / 255f;
-                MaterialState.Diffuse.Z = color.DIF_B / 255f;
-                MaterialState.Diffuse.W = color.DIF_A / 255f;
-
-                MaterialState.Specular.X = color.SPC_R / 255f;
-                MaterialState.Specular.Y = color.SPC_G / 255f;
-                MaterialState.Specular.Z = color.SPC_B / 255f;
-                MaterialState.Specular.W = color.SPC_A / 255f;
-
-                MaterialState.Shininess = color.Shininess;
-                MaterialState.Alpha = color.Alpha;
-
-                if (animation != null)
-                    animation.GetMaterialState(mobj, ref MaterialState);
-
                 _shader.SetVector4("ambientColor", MaterialState.Ambient);
                 _shader.SetVector4("diffuseColor", MaterialState.Diffuse);
                 _shader.SetVector4("specularColor", MaterialState.Specular);
@@ -386,15 +481,10 @@ namespace HSDRawViewer.Rendering.Models
                 _shader.SetFloat("alpha", MaterialState.Alpha);
             }
 
+            // pixel processing
             var pp = mobj.PEDesc;
             if (pp != null)
             {
-                MaterialState.Ref0 = pp.AlphaRef0 / 255f;
-                MaterialState.Ref1 = pp.AlphaRef1 / 255f;
-
-                if (animation != null)
-                    animation.GetMaterialState(mobj, ref MaterialState);
-
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
                 GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
 
@@ -405,11 +495,12 @@ namespace HSDRawViewer.Rendering.Models
                 _shader.SetFloat("alphaRef1", MaterialState.Ref1);
             }
 
+            // all flag
             var enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);
 
             _shader.SetBoolToInt("no_zupdate", mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE));
-            _shader.SetBoolToInt("enableSpecular", dobj.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.SPECULAR) && mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
-            _shader.SetBoolToInt("enableDiffuse", dobj.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
+            _shader.SetBoolToInt("enableSpecular", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SPECULAR) && mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
+            _shader.SetBoolToInt("enableDiffuse", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.LIGHTING) && mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
             _shader.SetBoolToInt("useConstant", mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT));
             _shader.SetBoolToInt("useVertexColor", mobj.RenderFlags.HasFlag(RENDER_MODE.VERTEX));
             _shader.SetBoolToInt("useToonShading", mobj.RenderFlags.HasFlag(RENDER_MODE.TOON));
@@ -418,9 +509,8 @@ namespace HSDRawViewer.Rendering.Models
             for (int i = 0; i < MAX_TEX; i++)
                 _shader.SetBoolToInt($"hasTEX[{i}]", mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0 + (i << 4)) || enableAll);
 
+            // initialize bump texture to unused
             _shader.SetInt("BumpTexture", -1);
-
-            //LoadTextureConstants(shader);
 
             // Bind Textures
             if (mobj.Textures != null)
@@ -428,35 +518,48 @@ namespace HSDRawViewer.Rendering.Models
                 var textures = mobj.Textures.List;
                 for (int i = 0; i < textures.Count; i++)
                 {
+                    // make sure texture is not out of supported range
                     if (i > MAX_TEX)
                         break;
 
+                    // get texture
                     var tex = textures[i];
-                    var displayTex = tex;
+                    var tev = tex.TEV;
 
-                    if (tex.ImageData == null)
-                        continue;
+                    // texture state info
+                    HSD_TOBJ displayTex;
+                    float blending;
+                    Matrix4 transform;
+                    Vector4 konst = Vector4.Zero;
 
-                    var blending = tex.Blending;
+                    // get texture state data if it exists
+                    if (textureStates != null && i < textureStates.Length && textureStates[i] != null)
+                    {
+                        MatAnimTextureState texState = textureStates[i];
+                        displayTex = texState.TOBJ;
+                        blending = texState.Blending;
+                        transform = texState.Transform;
+                        konst = texState.Konst;
+                    }
+                    else
+                    {
+                        displayTex = tex;
+                        blending = tex.Blending;
+                        transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
+                            Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RY) *
+                            Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+                        if (tev != null)
+                            if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
+                                konst = new Vector4(tev.constant.A / 255f, tev.constant.B / 255f, tev.constant.G / 255f, tev.constantAlpha / 255f);
+                    }
 
-                    var transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
-                        Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RY) *
-                        Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
-
+                    // invert transform matrix
                     if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
                         transform.Invert();
 
-                    MatAnimTextureState texState = null;
-                    if (animation != null)
-                    {
-                        texState = animation.GetTextureAnimState(tex);
-                        if (texState != null)
-                        {
-                            displayTex = texState.TOBJ;
-                            blending = texState.Blending;
-                            transform = texState.Transform;
-                        }
-                    }
+                    // if texture image data is null skip setup?
+                    if (tex.ImageData == null)
+                        continue;
 
                     // make sure texture is loaded
                     PreLoadTexture(displayTex);
@@ -472,6 +575,7 @@ namespace HSDRawViewer.Rendering.Models
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GXTranslator.toMagFilter(tex.MagFilter));
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, 0); //640×548
 
+                    // optional texture mipmap coords
                     if (tex.LOD != null)
                     {
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, tex.LOD.Bias); //640×548
@@ -509,7 +613,6 @@ namespace HSDRawViewer.Rendering.Models
                     _shader.SetVector2($"TEX[{i}].uv_scale", wscale, hscale);
                     _shader.SetMatrix4x4($"TEX[{i}].transform", ref transform);
 
-                    var tev = tex.TEV;
                     bool colorTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.COLOR_TEV);
                     bool alphaTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.ALPHA_TEV);
                     _shader.SetBoolToInt($"hasColorTev[{i}]", colorTev);
@@ -543,19 +646,8 @@ namespace HSDRawViewer.Rendering.Models
 
                         if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
                             _shader.SetColor($"Tev[{i}].tev1", tev.tev1, tev.tev1Alpha);
-
-                        if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
-                        {
-                            if (texState != null)
-                            {
-                                _shader.SetVector4($"Tev[{i}].konst", texState.Konst);
-                            }
-                            else
-                            {
-                                _shader.SetColor($"Tev[{i}].konst", tev.constant, tev.constantAlpha);
-                            }
-                        }
                     }
+                    _shader.SetVector4($"Tev[{i}].konst", konst);
                 }
             }
         }

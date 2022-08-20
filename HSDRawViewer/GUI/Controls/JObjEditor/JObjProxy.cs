@@ -1,4 +1,6 @@
 ﻿using HSDRaw.Common;
+using HSDRaw.Tools;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
@@ -12,15 +14,15 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         View,
     }
 
-    public class JObjSplineProxy : JObjProxy
+    public class JObjSplinePropertyAccessor : JObjPropertyAccessor
     {
-        public JObjSplineProxy(HSD_JOBJ jobj) : base(jobj)
+        public JObjSplinePropertyAccessor(HSD_JOBJ jobj) : base(jobj)
         {
         }
 
     }
 
-    public class JObjParticleProxy : JObjProxy
+    public class JObjParticlePropertyAccessor : JObjPropertyAccessor
     {
         [DisplayName("Particle Bank"), Category("General")]
         public byte ParticleBank { get => jobj.ParticleJoint.ParticleBank; set => jobj.ParticleJoint.ParticleBank = value; }
@@ -29,13 +31,13 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         [DisplayName("Particle ID"), Category("General")]
         public int ParticleID { get => jobj.ParticleJoint.ParticleID; set => jobj.ParticleJoint.ParticleID = value; }
 
-        public JObjParticleProxy(HSD_JOBJ jobj) : base(jobj)
+        public JObjParticlePropertyAccessor(HSD_JOBJ jobj) : base(jobj)
         {
         }
 
     }
 
-    public class JObjProxy
+    public class JObjPropertyAccessor
     {
         public HSD_JOBJ jobj;
 
@@ -111,6 +113,23 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         [DisplayName("Scale Z"), Category("Transforms")]
         public float SZ { get => jobj.SZ; set => jobj.SZ = value; }
 
+        public JObjPropertyAccessor(HSD_JOBJ jobj)
+        {
+            this.jobj = jobj;
+        }
+    }
+
+    public class JObjProxy
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public HSD_JOBJ jobj;
+
+        /// <summary>
+        /// Animation Tracks
+        /// </summary>
+        public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
 
         public JObjProxy(HSD_JOBJ jobj)
         {

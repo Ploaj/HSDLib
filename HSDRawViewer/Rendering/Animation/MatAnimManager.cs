@@ -50,13 +50,18 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public class MatAnimTextureState
     {
-        public HSD_TOBJ TOBJ { get; }
+        public HSD_TOBJ TOBJ { get; set; }
 
-        public float Blending { get; }
+        public float Blending { get; set; }
 
-        public Matrix4 Transform { get; }
+        public Matrix4 Transform { get; set; }
 
-        public Vector4 Konst { get; }
+        public Vector4 Konst { get; set; }
+
+        public MatAnimTextureState()
+        {
+
+        }
 
         public MatAnimTextureState(HSD_TOBJ tOBJ, float blending, Matrix4 transform, Vector4 konst)
         {

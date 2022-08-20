@@ -1,12 +1,19 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.Converters;
+using HSDRawViewer.Converters.Animation;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering
 {
@@ -119,21 +126,7 @@ namespace HSDRawViewer.Rendering
                 if (boneIndex < Nodes.Count)
                 {
                     AnimNode node = Nodes[boneIndex];
-                    foreach (FOBJ_Player t in node.Tracks)
-                    {
-                        switch (t.JointTrackType)
-                        {
-                            case JointTrackType.HSD_A_J_ROTX: j.Rotation.X = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_ROTY: j.Rotation.Y = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_ROTZ: j.Rotation.Z = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_TRAX: j.Translation.X = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_TRAY: j.Translation.Y = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_TRAZ: j.Translation.Z = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_SCAX: j.Scale.X = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_SCAY: j.Scale.Y = t.GetValue(frame); break;
-                            case JointTrackType.HSD_A_J_SCAZ: j.Scale.Z = t.GetValue(frame); break;
-                        }
-                    }
+                    j.ApplyAnimation(node.Tracks, frame);
                 }
 
                 // TODO: apply frame modifiers
@@ -460,6 +453,110 @@ namespace HSDRawViewer.Rendering
 
             for (int i = 0; i < NodeCount; i++)
                 AnimationKeyCompressor.OptimizeJointTracks(joints[i], ref Nodes[i].Tracks, error);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_jointMap"></param>
+        /// <returns></returns>
+        public static JointAnimManager LoadFromFile(JointMap _jointMap)
+        {
+            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim (*.dat*.anim*.chr0)|*.dat;*.anim;*.chr0;");
+            //var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta*.xml)|*.dat;*.anim;*.mota;*.gnta;*.chr0;*.xml");
+
+            if (f != null)
+            {
+                return JointAnimationLoader.LoadJointAnimFromFile(_jointMap, f);
+                //if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta") ||
+                //    (Path.GetExtension(f).ToLower().Equals(".xml") && MOT_FILE.IsMotXML(f)))
+                //{
+                //    var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");
+
+                //    if (jointTable != null)
+                //        LoadAnimation(MOTLoader.GetJointTable(jointTable), new MOT_FILE(f));
+                //}
+                //else
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ExportAsMayaAnim(JointMap _jointMap)
+        {
+            var f = Tools.FileIO.SaveFile("Supported Formats (*.anim)|*.anim");
+
+            if (f != null)
+                ConvMayaAnim.ExportToMayaAnim(f, this, _jointMap);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class AnimJointSettings
+        {
+            [DisplayName("Symbol Name"), Description("Should end in _animjoint")]
+            public string Symbol { get; set; } = "_animjoint";
+
+            [DisplayName("Flags"), Description("")]
+            public AOBJ_Flags Flags { get; set; } = AOBJ_Flags.ANIM_LOOP;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ExportAsAnimJoint(HSD_JOBJ root)
+        {
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+
+            var setting = new AnimJointSettings();
+
+            using (PropertyDialog d = new PropertyDialog("AnimJoint Settings", setting))
+                if (f != null && d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile animFile = new HSDRawFile();
+                    animFile.Roots.Add(new HSDRootNode()
+                    {
+                        Data = ToAnimJoint(root, setting.Flags),
+                        Name = setting.Symbol
+                    });
+                    animFile.Save(f);
+                }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class FigaTreeSettings
+        {
+            [DisplayName("Symbol Name"), Description("Name of animation used by the game")]
+            public string Symbol { get; set; } = "_figatree";
+
+            [DisplayName("Compression Error"), Description("A larger value will make a smaller file but with loss of accuracy")]
+            public float CompressionError { get; set; } = 0.0001f;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ExportAsFigatree()
+        {
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+            var setting = new FigaTreeSettings();
+
+            using (PropertyDialog d = new PropertyDialog("Figatree Settings", setting))
+                if (f != null && d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRawFile animFile = new HSDRawFile();
+                    animFile.Roots.Add(new HSDRootNode()
+                    {
+                        Data = ToFigaTree(setting.CompressionError),
+                        Name = setting.Symbol
+                    });
+                    animFile.Save(f);
+                }
         }
     }
 }
