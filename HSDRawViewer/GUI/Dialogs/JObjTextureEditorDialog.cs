@@ -136,6 +136,8 @@ namespace HSDRawViewer.GUI.Extra
             InitializeComponent();
 
             LoadTextureList(root);
+
+            CenterToScreen();
         }
 
         public TextureListProxy[] TextureLists { get; set; }

@@ -58,10 +58,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // initialize texture editor
             _trackEditor = new DockableTrackEditor();
-            _trackEditor.MinimumSize = new System.Drawing.Size(400, 800);
             _trackEditor.Show(dockPanel1);
             _trackEditor.DockState = DockState.DockBottom;
             _trackEditor.Hide();
+
+            _trackEditor.TracksUpdated += () =>
+            {
+                RenderJObj.RootJObj.ResetTransforms();
+
+                if (JointAnimation != null)
+                    JointAnimation.ApplyAnimation(RenderJObj.RootJObj, _viewport.glViewport.Frame);
+            };
 
             // initialize joint tree
             _jointTree = new DockableJointTree();
@@ -83,7 +90,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 if (JointAnimation != null)
                 {
                     if (i < JointAnimation.NodeCount && i >= 0)
-                        _trackEditor.SetKeys(GraphEditor.AnimType.Joint, JointAnimation.Nodes[i].Tracks);
+                        _trackEditor.SetKeys(GraphEditor.AnimType.Joint, JointAnimation.Nodes[i]);
                     else
                         _trackEditor.SetKeys(GraphEditor.AnimType.Joint, null);
                 }
@@ -199,12 +206,27 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="jointAnim"></param>
         public void LoadAnimation(JointAnimManager animation)
         {
+            // add any missing nodes
+            while (animation.Nodes.Count < RenderJObj.RootJObj.JointCount)
+                animation.Nodes.Add(new AnimNode());
+
+            // set animation
             JointAnimation = animation;
+
+            // enable viewport
             var vp = _viewport.glViewport;
             vp.AnimationTrackEnabled = true;
             vp.Frame = 0;
             vp.MaxFrame = animation.FrameCount;
+
+            // show track editor
             _trackEditor.Show();
+
+            // hide texture panel
+            _textureEditor.DockState = DockState.DockLeftAutoHide;
+
+            // bring joint tree to front
+            _jointTree.Show();
         }
 
         /// <summary>

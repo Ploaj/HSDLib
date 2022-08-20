@@ -507,8 +507,11 @@ namespace HSDRawViewer.GUI.Controls
         {
             SetTrackType(type);
 
-            foreach (var p in players)
-                AddPlayer(p);
+            if (players != null)
+            {
+                foreach (var p in players)
+                    AddPlayer(p);
+            }
 
             if (trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];

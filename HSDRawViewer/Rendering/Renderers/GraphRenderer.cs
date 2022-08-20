@@ -87,8 +87,8 @@ namespace HSDRawViewer.Rendering.Renderers
             _xScale = bounds.Width / (float)_frameCount;
             _yScale = (bounds.Height - _zoom * 2) / _range;
 
-            if (_yScale < 1)
-                _yScale = 1;
+            if (_yScale == 0)
+                _yScale = 0.00001f;
             
             if (_range == 0)
                 _yScale = bounds.Height / 1f;

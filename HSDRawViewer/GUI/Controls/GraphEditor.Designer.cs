@@ -32,12 +32,12 @@
             this.graphBox = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.splitter2 = new System.Windows.Forms.Splitter();
+            this.keyProperty = new System.Windows.Forms.PropertyGrid();
             this.trackTree = new System.Windows.Forms.TreeView();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
             this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.keyProperty = new System.Windows.Forms.PropertyGrid();
             this.panel1 = new System.Windows.Forms.Panel();
             this.nudFrame = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -71,11 +71,11 @@
             // graphBox
             // 
             this.graphBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.graphBox.Location = new System.Drawing.Point(181, 49);
+            this.graphBox.Location = new System.Drawing.Point(191, 49);
             this.graphBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.graphBox.Name = "graphBox";
             this.graphBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.graphBox.Size = new System.Drawing.Size(667, 365);
+            this.graphBox.Size = new System.Drawing.Size(657, 365);
             this.graphBox.TabIndex = 0;
             this.graphBox.TabStop = false;
             this.graphBox.Text = "Graph";
@@ -91,7 +91,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox2.Size = new System.Drawing.Size(181, 414);
+            this.groupBox2.Size = new System.Drawing.Size(191, 414);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tracks";
@@ -99,11 +99,24 @@
             // splitter2
             // 
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter2.Location = new System.Drawing.Point(4, 255);
+            this.splitter2.Location = new System.Drawing.Point(4, 261);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(173, 3);
+            this.splitter2.Size = new System.Drawing.Size(183, 3);
             this.splitter2.TabIndex = 11;
             this.splitter2.TabStop = false;
+            // 
+            // keyProperty
+            // 
+            this.keyProperty.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.keyProperty.HelpVisible = false;
+            this.keyProperty.Location = new System.Drawing.Point(4, 264);
+            this.keyProperty.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.keyProperty.Name = "keyProperty";
+            this.keyProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            this.keyProperty.Size = new System.Drawing.Size(183, 147);
+            this.keyProperty.TabIndex = 10;
+            this.keyProperty.ToolbarVisible = false;
+            this.keyProperty.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.keyProperty_PropertyValueChanged);
             // 
             // trackTree
             // 
@@ -112,7 +125,7 @@
             this.trackTree.Location = new System.Drawing.Point(4, 46);
             this.trackTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.trackTree.Name = "trackTree";
-            this.trackTree.Size = new System.Drawing.Size(173, 365);
+            this.trackTree.Size = new System.Drawing.Size(183, 365);
             this.trackTree.TabIndex = 8;
             this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
             // 
@@ -124,7 +137,7 @@
             this.trackTypeBox});
             this.toolStrip2.Location = new System.Drawing.Point(4, 19);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(173, 27);
+            this.toolStrip2.Size = new System.Drawing.Size(183, 27);
             this.toolStrip2.TabIndex = 7;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -155,19 +168,6 @@
             this.trackTypeBox.Size = new System.Drawing.Size(140, 23);
             this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
             // 
-            // keyProperty
-            // 
-            this.keyProperty.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.keyProperty.HelpVisible = false;
-            this.keyProperty.Location = new System.Drawing.Point(4, 258);
-            this.keyProperty.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.keyProperty.Name = "keyProperty";
-            this.keyProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.keyProperty.Size = new System.Drawing.Size(173, 153);
-            this.keyProperty.TabIndex = 10;
-            this.keyProperty.ToolbarVisible = false;
-            this.keyProperty.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.keyProperty_PropertyValueChanged);
-            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.nudFrame);
@@ -177,10 +177,10 @@
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(181, 25);
+            this.panel1.Location = new System.Drawing.Point(191, 25);
             this.panel1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(667, 24);
+            this.panel1.Size = new System.Drawing.Size(657, 24);
             this.panel1.TabIndex = 10;
             // 
             // nudFrame
@@ -265,9 +265,9 @@
             this.toolStripDropDownButton3,
             this.toolStripDropDownButton1,
             this.helpButton});
-            this.toolStrip1.Location = new System.Drawing.Point(181, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(191, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(667, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(657, 25);
             this.toolStrip1.TabIndex = 11;
             this.toolStrip1.Text = "toolStrip1";
             // 

@@ -1,20 +1,16 @@
-﻿using HSDRaw.Common.Animation;
-using HSDRaw.Tools;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using HSDRawViewer.Rendering;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public partial class DockableTrackEditor : DockContent
     {
+        private AnimNode _node;
+
+        public delegate void TrackUpdate();
+        public TrackUpdate TracksUpdated;
+
         /// <summary>
         /// 
         /// </summary>
@@ -23,16 +19,27 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             InitializeComponent();
 
             Text = "Animation Editor";
+
+            graphEditor1.TrackListUpdated += (s, a) =>
+            {
+                _node.Tracks = graphEditor1.TrackPlayers.ToList();
+                TracksUpdated?.Invoke();
+            };
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="aobj"></param>
-        public void SetKeys(GraphEditor.AnimType type, IEnumerable<FOBJ_Player> players)
+        public void SetKeys(GraphEditor.AnimType type, AnimNode node)
         {
+            _node = node;
             graphEditor1.ClearTracks();
-            graphEditor1.LoadTracks(type, players);
+
+            if (node != null)
+            {
+                graphEditor1.LoadTracks(type, node.Tracks);
+            }
         }
     }
 }
