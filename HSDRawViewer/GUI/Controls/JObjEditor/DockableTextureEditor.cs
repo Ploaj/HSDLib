@@ -9,11 +9,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public partial class DockableTextureEditor : DockContent
     {
-        private HSD_MOBJ _mobj = new HSD_MOBJ();
+        private HSD_MOBJ _mobj { get => _proxy?.DOBJ?.Mobj; }
+        private DObjProxy _proxy;
 
         public TObjProxy[] TextureLists { get; set; }
 
-        public delegate void TObjSelected(TObjProxy tobj);
+        public delegate void TObjSelected(DObjProxy dobj, TObjProxy tobj, int index);
         public TObjSelected SelectTObj;
 
         public delegate void InvalidateTextures();
@@ -47,12 +48,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="mobj"></param>
         public void SetTextures(DObjProxy dobj)
         {
-            _mobj = null;
+            _proxy = null;
 
             ClearTextureList();
 
-            if (dobj != null)
-                _mobj = dobj.DOBJ.Mobj;
+            _proxy = dobj;
 
             PopulateTextureList();
         }
@@ -138,7 +138,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // 
             if (textureArrayEditor.SelectedObject is TObjProxy p)
-                SelectTObj?.Invoke(p);
+                SelectTObj?.Invoke(_proxy, p, textureArrayEditor.SelectedIndex);
         }
 
         /// <summary>

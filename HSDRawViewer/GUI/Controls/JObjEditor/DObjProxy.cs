@@ -12,20 +12,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public class TextureAnimDesc
     {
-        public MatAnimTextureState State { get; internal set; } = new MatAnimTextureState();
-
         public List<HSD_TOBJ> Textures { get; internal set; } = new List<HSD_TOBJ>();
 
         public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="frame"></param>
-        public void ApplyFrame(float frame)
-        {
-            State.ApplyAnim(Textures, Tracks, frame);
-        }
     }
 
     public class DObjProxy : MeshListItem
@@ -49,17 +38,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         [DisplayName("Class Name"), Category("General")]
         public string Name { get => DOBJ.ClassName; set => DOBJ.ClassName = value; }
-
-        /// <summary>
-        /// Animation Tracks
-        /// </summary>
-        [Browsable(false)]
-        public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
-
-        public MatAnimMaterialState MaterialState { get; internal set; } = new MatAnimMaterialState();
-
-        // 
-        public TextureAnimDesc[] TextureStates { get; internal set; } = new TextureAnimDesc[8];
 
 
         //[Editor(typeof(FlagEnumUIEditor), typeof(System.Drawing.Design.UITypeEditor))]
@@ -211,6 +189,34 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         [Browsable(false)]
         public bool HasMaterialColor { get => DOBJ.Mobj?.Material != null; }
 
+
+        /// <summary>
+        /// Animation Tracks
+        /// </summary>
+        [Browsable(false)]
+        public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
+
+        // 
+        public TextureAnimDesc[] TextureStates { get; internal set; } = new TextureAnimDesc[8];
+
+        public float FrameCount
+        {
+            get
+            {
+                float fc = 0;
+                if (Tracks.Count > 0)
+                {
+                    fc = Math.Max(fc, Tracks.Max(e => e.FrameCount));
+                }
+                foreach (var v in TextureStates)
+                {
+                    if (v.Tracks.Count > 0)
+                        fc = Math.Max(fc, v.Tracks.Max(e => e.FrameCount));
+                }
+                return fc;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -228,9 +234,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // initialize texture state
             for (int i = 0; i < TextureStates.Length; i++)
                 TextureStates[i] = new TextureAnimDesc();
-
-            // set initial animation values
-            ResetAnimation();
 
             // initialize pixel processing data
             if (DOBJ != null && DOBJ.Mobj != null && DOBJ.Mobj.PEDesc != null)
@@ -256,24 +259,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <summary>
         /// 
         /// </summary>
-        public void ResetAnimation()
-        {
-            // initialize material state
-            MaterialState.Reset(DOBJ.Mobj);
-
-            // initialize texture data
-            if (DOBJ.Mobj.Textures != null)
-            {
-                var textures = DOBJ.Mobj.Textures.List;
-                for (int i = 0; i < textures.Count; i++)
-                    if (i < TextureStates.Length)
-                        TextureStates[i].State.Reset(textures[i]);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public void ClearAnimation()
         {
             // clear tracks
@@ -285,20 +270,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 t.Textures.Clear();
                 t.Tracks.Clear();
             }
-
-            // reset animation data
-            ResetAnimation();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void ApplyFrame(float frame)
-        {
-            MaterialState.ApplyAnim(Tracks, frame);
-
-            foreach (var t in TextureStates)
-                t.ApplyFrame(frame);
         }
 
         /// <summary>

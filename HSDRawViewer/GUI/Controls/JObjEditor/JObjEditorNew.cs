@@ -145,22 +145,18 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 // update jobj if changed
                 if (_propertyGrid.SelectedObject is JObjProxy j)
                 {
-                    RenderJObj.RootJObj?.GetJObjFromDesc(j.jobj).ResetTransforms();
+                    RenderJObj.ResetDefaultStateJoints();
                 }
 
                 // update dobj if changed
                 if (_propertyGrid.SelectedObject is DObjProxy d)
                 {
-                    d.ResetAnimation();
                     RenderJObj.ResetDefaultStateMaterial();
                 }
 
                 // update tobj if changed
                 if (_propertyGrid.SelectedObject is TObjProxy t)
                 {
-                    foreach (var v in _meshList.EnumerateDObjs)
-                        v.ResetAnimation();
-
                     RenderJObj.ResetDefaultStateMaterial();
                 }
             };
@@ -170,9 +166,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _textureEditor.Show(dockPanel1);
             _textureEditor.DockState = DockState.DockLeft;
 
-            _textureEditor.SelectTObj += (tobj) =>
+            _textureEditor.SelectTObj += (dobj, tobj, index) =>
             {
                 _propertyGrid.SetObject(tobj);
+
+                // update tracks
+                _trackEditor.SetKeys($"{dobj.ToString()}_Texture_{index}", GraphEditor.AnimType.Texture, dobj.TextureStates[index].Tracks);
             };
 
             _textureEditor.InvalidateTexture += () =>
@@ -238,8 +237,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             int di = 0;
             foreach (var d in _meshList.EnumerateDObjs)
             {
-                d.ApplyFrame(frame);
-                RenderJObj.SetMaterialAnimation(di, d.MaterialState, d.TextureStates.Select(e => e.State));
+                RenderJObj.SetMaterialAnimation(di, frame, d.Tracks, d.TextureStates.Select(e => e.Tracks), d.TextureStates.Select(e => e.Textures).ToList());
                 di++;
             }
         }
@@ -384,7 +382,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             vp.MaxFrame = Math.Max(vp.MaxFrame, _jointTree.EnumerateJoints().Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
 
             // todo: max frame of texture animation as well
-            vp.MaxFrame = Math.Max(vp.MaxFrame, _meshList.EnumerateDObjs.Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
+            vp.MaxFrame = Math.Max(vp.MaxFrame, _meshList.EnumerateDObjs.Max(e => e.FrameCount));
 
             // TODO: find end frame
             //if (ShapeAnimation != null)

@@ -11,6 +11,7 @@ using OpenTK.Mathematics;
 using System.Drawing;
 using HSDRaw.GX;
 using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -97,11 +98,11 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         /// <param name="index"></param>
         /// <param name="state"></param>
-        public void SetMaterialAnimation(int dobj_index, MatAnimMaterialState state, IEnumerable<MatAnimTextureState> textureStates)
+        public void SetMaterialAnimation(int dobj_index, float frame, List<FOBJ_Player> tracks, IEnumerable<List<FOBJ_Player>> textureStates, List<List<HSD_TOBJ>> textures)
         {
             if (dobj_index >= 0 && dobj_index < RenderDobjs.Count)
             {
-                RenderDobjs[dobj_index].MaterialState = state;
+                RenderDobjs[dobj_index].MaterialState.ApplyAnim(tracks, frame);
 
                 int ti = 0;
                 foreach (var t in textureStates)
@@ -109,7 +110,7 @@ namespace HSDRawViewer.Rendering.Models
                     if (ti >= RenderDobjs[dobj_index].TextureStates.Length)
                         break;
 
-                    RenderDobjs[dobj_index].TextureStates[ti] = t;
+                    RenderDobjs[dobj_index].TextureStates[ti].ApplyAnim(textures[ti], t, frame);
                     ti++;
                 }
             }
