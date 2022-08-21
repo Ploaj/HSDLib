@@ -335,37 +335,44 @@ namespace HSDRawViewer.Rendering.Models
             }
 
             // calculate billboarding
-            if (c != null &&
-                (Desc.Flags & (JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.PBILLBOARD)) != 0)
+            if (c != null)
             {
-                var pos = Vector3.TransformPosition(Vector3.Zero, WorldTransform);
-                var campos = (c.RotationMatrix * new Vector4(c.Translation, 1)).Xyz;
+                var pos = WorldTransform.ExtractTranslation();
+                var campos = c.TransformedPosition;
 
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.BILLBOARD))
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                int billboard_type = (((int)Desc.Flags >> 9) & 0x7);
 
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.VBILLBOARD))
+                switch (billboard_type)
                 {
-                    var temp = pos.Y;
-                    pos.Y = 0;
-                    campos.Y = 0;
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, temp, 0);
-                }
-
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.HBILLBOARD))
-                {
-                    var temp = pos.X;
-                    pos.X = 0;
-                    campos.X = 0;
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(temp, 0, 0);
-                }
-
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.RBILLBOARD))
-                {
-                    var temp = pos.Z;
-                    pos.Z = 0;
-                    campos.Z = 0;
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, 0, temp);
+                    case 1:
+                        {
+                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                        }
+                        break;
+                    case 2:
+                        {
+                            var temp = pos.Y;
+                            pos.Y = 0;
+                            campos.Y = 0;
+                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, temp, 0);
+                        }
+                        break;
+                    case 3:
+                        {
+                            var temp = pos.X;
+                            pos.X = 0;
+                            campos.X = 0;
+                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(temp, 0, 0);
+                        }
+                        break;
+                    case 4:
+                        {
+                            var temp = pos.Z;
+                            pos.Z = 0;
+                            campos.Z = 0;
+                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, 0, temp);
+                        }
+                        break;
                 }
             }
 

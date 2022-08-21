@@ -30,10 +30,11 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GraphEditor));
             this.graphBox = new System.Windows.Forms.GroupBox();
+            this.glviewport = new OpenTK.WinForms.GLControl(new OpenTK.WinForms.GLControlSettings() { NumberOfSamples = 8 });
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.trackTree = new System.Windows.Forms.TreeView();
             this.splitter2 = new System.Windows.Forms.Splitter();
             this.keyProperty = new System.Windows.Forms.PropertyGrid();
-            this.trackTree = new System.Windows.Forms.TreeView();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.addTrackButton = new System.Windows.Forms.ToolStripButton();
             this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
@@ -60,6 +61,7 @@
             this.showFrameTicksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showTangentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpButton = new System.Windows.Forms.ToolStripButton();
+            this.graphBox.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -70,6 +72,7 @@
             // 
             // graphBox
             // 
+            this.graphBox.Controls.Add(this.glviewport);
             this.graphBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.graphBox.Location = new System.Drawing.Point(366, 49);
             this.graphBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -79,6 +82,21 @@
             this.graphBox.TabIndex = 0;
             this.graphBox.TabStop = false;
             this.graphBox.Text = "Graph";
+            // 
+            // glviewport
+            // 
+            this.glviewport.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
+            this.glviewport.APIVersion = new System.Version(3, 3, 0, 0);
+            this.glviewport.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.glviewport.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
+            this.glviewport.IsEventDriven = true;
+            this.glviewport.Location = new System.Drawing.Point(4, 19);
+            this.glviewport.Name = "glviewport";
+            this.glviewport.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
+            this.glviewport.Size = new System.Drawing.Size(474, 343);
+            this.glviewport.TabIndex = 0;
+            this.glviewport.Load += new System.EventHandler(this.glviewport_Load);
+            this.glviewport.Resize += new System.EventHandler(this.glviewport_Resize);
             // 
             // groupBox2
             // 
@@ -95,6 +113,17 @@
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tracks";
+            // 
+            // trackTree
+            // 
+            this.trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trackTree.HideSelection = false;
+            this.trackTree.Location = new System.Drawing.Point(4, 44);
+            this.trackTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.trackTree.Name = "trackTree";
+            this.trackTree.Size = new System.Drawing.Size(170, 367);
+            this.trackTree.TabIndex = 8;
+            this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
             // 
             // splitter2
             // 
@@ -117,17 +146,6 @@
             this.keyProperty.TabIndex = 10;
             this.keyProperty.ToolbarVisible = false;
             this.keyProperty.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.keyProperty_PropertyValueChanged);
-            // 
-            // trackTree
-            // 
-            this.trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackTree.HideSelection = false;
-            this.trackTree.Location = new System.Drawing.Point(4, 44);
-            this.trackTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.trackTree.Name = "trackTree";
-            this.trackTree.Size = new System.Drawing.Size(170, 367);
-            this.trackTree.TabIndex = 8;
-            this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
             // 
             // toolStrip2
             // 
@@ -367,7 +385,7 @@
             // 
             this.showAllTracksToolStripMenuItem.CheckOnClick = true;
             this.showAllTracksToolStripMenuItem.Name = "showAllTracksToolStripMenuItem";
-            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.showAllTracksToolStripMenuItem.Text = "Show All Tracks";
             this.showAllTracksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -377,7 +395,7 @@
             this.showFrameTicksToolStripMenuItem.CheckOnClick = true;
             this.showFrameTicksToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showFrameTicksToolStripMenuItem.Name = "showFrameTicksToolStripMenuItem";
-            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.showFrameTicksToolStripMenuItem.Text = "Show Frame Ticks";
             this.showFrameTicksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -387,7 +405,7 @@
             this.showTangentsToolStripMenuItem.CheckOnClick = true;
             this.showTangentsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showTangentsToolStripMenuItem.Name = "showTangentsToolStripMenuItem";
-            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.showTangentsToolStripMenuItem.Text = "Show Tangents";
             this.showTangentsToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -411,6 +429,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "GraphEditor";
             this.Size = new System.Drawing.Size(848, 414);
+            this.graphBox.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.toolStrip2.ResumeLayout(false);
@@ -459,5 +478,6 @@
         private System.Windows.Forms.ToolStripMenuItem bakeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem compressToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reverseToolStripMenuItem;
+        private OpenTK.WinForms.GLControl glviewport;
     }
 }

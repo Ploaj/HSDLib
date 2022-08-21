@@ -33,7 +33,7 @@ namespace HSDRawViewer.GUI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewportControl));
-            this.glControl = new OpenTK.WinForms.GLControl();
+            this.glControl = new OpenTK.WinForms.GLControl(new GLControlSettings() { NumberOfSamples = 8 });
             this.animationGroup = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.buttonStart = new System.Windows.Forms.Button();

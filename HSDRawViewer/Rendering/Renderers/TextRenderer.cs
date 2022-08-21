@@ -131,10 +131,19 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="text"></param>
         public void RenderText(Camera cam, string text, float x, float y, StringAlignment align = StringAlignment.Near, bool dropShadow = false)
         {
+            RenderText(text, cam.RenderWidth, cam.RenderHeight, x, y, align, dropShadow);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        public void RenderText(string text, int screenwidth, int screenheight, float x, float y, StringAlignment align = StringAlignment.Near, bool dropShadow = false)
+        {
             if (!Initialized)
                 return;
 
-            var mat = Matrix4.CreateOrthographicOffCenter(0, cam.RenderWidth, cam.RenderHeight, 0, 0, 1);
+            var mat = Matrix4.CreateOrthographicOffCenter(0, screenwidth, screenheight, 0, 0, 1);
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.PushMatrix();

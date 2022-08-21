@@ -1412,7 +1412,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
             // 803a0dd0 - 803a0e00
             // z mode setup
-            // GL.Enable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             // GL.DepthMask(true);// Kind.HasFlag(ParticleKind.Bit4));
 
