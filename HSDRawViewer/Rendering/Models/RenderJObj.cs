@@ -494,6 +494,7 @@ namespace HSDRawViewer.Rendering.Models
             GL.AlphaFunc(AlphaFunction.Greater, 0f);
 
             GL.DepthMask(!mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE));
+            GL.DepthFunc(DepthFunction.Lequal);
 
             // Pixel Processing
             _shader.SetInt("alphaOp", -1); // none

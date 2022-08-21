@@ -1095,14 +1095,30 @@ NONE - None (do not use)";
 
             if (!float.IsNaN(linex) && !float.IsInfinity(linex))
             {
-                //if (IsControl)
-                //{
-                //    var start = _startSelectionFrame * (rect.Width / (float)_frameCount);
+                if (IsControl)
+                {
+                    var start = _startSelectionFrame * (rect.Width / (float)_frameCount);
 
-                //    graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), glviewport.Height);
+                    //graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), glviewport.Height);
 
-                //    graphics.DrawLine(FrameIndicatorPen, start, 0, start, glviewport.Height);
-                //}
+                    //graphics.DrawLine(FrameIndicatorPen, start, 0, start, glviewport.Height);
+
+                    var s1 = Math.Min(start, linex);
+                    var s2 = Math.Abs(start - linex);
+                    GL.Color4(SelectionColor);
+                    GL.Begin(PrimitiveType.Quads);
+                    GL.Vertex2(s1, 0);
+                    GL.Vertex2(s2, 0);
+                    GL.Vertex2(s2, glviewport.Height);
+                    GL.Vertex2(s1, glviewport.Height);
+                    GL.End();
+
+                    GL.Color4(FrameIndicatorPen);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex2(start, 0);
+                    GL.Vertex2(start, glviewport.Height);
+                    GL.End();
+                }
 
                 GL.Color4(FrameIndicatorPen);
                 GL.Begin(PrimitiveType.Lines);

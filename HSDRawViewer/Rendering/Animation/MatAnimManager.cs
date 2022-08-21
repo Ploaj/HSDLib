@@ -278,7 +278,7 @@ namespace HSDRawViewer.Rendering
                 {
                     case MatTrackType.HSD_A_M_PE_REF0: Ref0 = t.GetValue(frame); break;
                     case MatTrackType.HSD_A_M_PE_REF1: Ref1 = t.GetValue(frame); break;
-                    case MatTrackType.HSD_A_M_ALPHA: Alpha = t.GetValue(frame); break;
+                    case MatTrackType.HSD_A_M_ALPHA: Alpha = 1 - t.GetValue(frame); break;
                     case MatTrackType.HSD_A_M_AMBIENT_R: Ambient.X = t.GetValue(frame); break;
                     case MatTrackType.HSD_A_M_AMBIENT_G: Ambient.Y = t.GetValue(frame); break;
                     case MatTrackType.HSD_A_M_AMBIENT_B: Ambient.Z = t.GetValue(frame); break;

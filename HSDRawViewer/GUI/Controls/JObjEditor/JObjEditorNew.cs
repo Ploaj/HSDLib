@@ -66,7 +66,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             _trackEditor.TracksUpdated += () =>
             {
-                RenderJObj.RootJObj.ResetTransforms();
+                RenderJObj.ResetDefaultStateAll();
                 ApplyEditorAnimation(Frame);
             };
 
