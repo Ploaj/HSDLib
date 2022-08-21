@@ -107,8 +107,6 @@ namespace HSDRawViewer.GUI
             set
             {
                 animationTrack.EndFrame = (int)value;
-                nudFrame.Maximum = (decimal)value;
-                nudMaxFrame.Maximum = (decimal)value;
                 nudMaxFrame.Value = (decimal)value;
                 animationTrack.Invalidate();
             }
@@ -175,11 +173,6 @@ namespace HSDRawViewer.GUI
             set
             {
                 _enableBack = value;
-
-                if (EnableBack)
-                    GL.ClearColor(ViewportBackColor);
-                else
-                    GL.ClearColor(0, 0, 0, 0);
             }
         }
 
@@ -344,14 +337,14 @@ namespace HSDRawViewer.GUI
                 {
                     nudFrame.Invoke(d, new object[] { frame });
                 }
-                catch (ObjectDisposedException)
+                catch (Exception)
                 {
 
                 }
             }
             else
             {
-                if (frame > nudFrame.Maximum)
+                if (frame > (decimal)MaxFrame)
                 {
                     if (_playbackMode == PlaybackMode.Forward && !LoopPlayback)
                         Stop();
@@ -365,8 +358,8 @@ namespace HSDRawViewer.GUI
                     if (_playbackMode == PlaybackMode.Reverse && !LoopPlayback)
                         Stop();
 
-                    frame = nudFrame.Maximum;
-                    _frame = (float)nudFrame.Maximum;
+                    frame = (decimal)MaxFrame;
+                    _frame = MaxFrame;
                 }
 
                 nudFrame.Value = frame;
@@ -499,6 +492,12 @@ namespace HSDRawViewer.GUI
         public void Render()
         {
             glControl.MakeCurrent();
+
+            // set clear color
+            if (EnableBack)
+                GL.ClearColor(ViewportBackColor);
+            else
+                GL.ClearColor(0, 0, 0, 0);
 
             // setup viewport
             GL.Viewport(0, 0, glControl.Width, glControl.Height);
@@ -1053,12 +1052,7 @@ namespace HSDRawViewer.GUI
                 d.Color = ViewportBackColor;
 
                 if (d.ShowDialog() == DialogResult.OK)
-                {
                     ViewportBackColor = d.Color;
-
-                    if (EnableBack)
-                        GL.ClearColor(ViewportBackColor);
-                }
             }
         }
 
@@ -1091,6 +1085,17 @@ namespace HSDRawViewer.GUI
         public GLControl GetControl()
         {
             return glControl;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudMaxFrame_ValueChanged(object sender, EventArgs e)
+        {
+            animationTrack.EndFrame = (float)nudMaxFrame.Value;
+            animationTrack.Invalidate();
         }
     }
 }

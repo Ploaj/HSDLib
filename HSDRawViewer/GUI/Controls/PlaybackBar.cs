@@ -76,8 +76,8 @@ namespace HSDRawViewer.GUI.Controls
             {
                 _frame = value;
 
-                if (ValueChanged != null)
-                ValueChanged.Invoke(this, EventArgs.Empty);
+                ValueChanged?.Invoke(this, EventArgs.Empty);
+
                 Invalidate();
             }
         }
@@ -266,11 +266,11 @@ namespace HSDRawViewer.GUI.Controls
 
             Frame = (float)Math.Floor(x / tickWidth);
 
-            if (_frame < StartFrame)
-                _frame = StartFrame;
+            if (x < 0 || Frame < StartFrame)
+                Frame = StartFrame;
 
-            if (_frame > EndFrame)
-                _frame = EndFrame;
+            if (Frame > EndFrame)
+                Frame = EndFrame;
 
             Invalidate();
         }

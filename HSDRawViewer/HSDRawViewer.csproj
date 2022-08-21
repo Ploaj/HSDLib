@@ -95,9 +95,6 @@
     <Compile Update="GUI\Controls\MEXStockIconControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="GUI\Controls\AnimationPlaybackControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Update="GUI\Controls\TextureViewControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

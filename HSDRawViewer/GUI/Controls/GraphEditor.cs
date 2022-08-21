@@ -488,6 +488,8 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="aobj"></param>
         public void LoadTracks(AnimType type, HSD_AOBJ aobj)
         {
+            ClearTracks();
+
             SetTrackType(type);
             
             if (aobj.FObjDesc != null)
@@ -496,6 +498,8 @@ namespace HSDRawViewer.GUI.Controls
 
             if(trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
+
+            _graph.Invalidate();
         }
 
         /// <summary>
@@ -505,6 +509,8 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="aobj"></param>
         public void LoadTracks(AnimType type, IEnumerable<FOBJ_Player> players)
         {
+            ClearTracks();
+
             SetTrackType(type);
 
             if (players != null)
@@ -515,6 +521,8 @@ namespace HSDRawViewer.GUI.Controls
 
             if (trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
+
+            _graph.Invalidate();
         }
 
         /// <summary>

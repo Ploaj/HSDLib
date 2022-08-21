@@ -313,6 +313,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 ji++;
             }
 
+            // apply animation
+            ApplyEditorAnimation(Frame);
+
             // enable animation view
             EnableAnimation();
         }
@@ -324,6 +327,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             // set animation
             // TODO: ShapeAnimation = shapeanim;
+
+            // apply animation
+            ApplyEditorAnimation(Frame);
 
             // enable animation view
             EnableAnimation();
@@ -338,12 +344,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             foreach (var j in _jointTree.EnumerateJoints())
                 j.Tracks.Clear();
 
-            // reset joint animation
-            RenderJObj?.RootJObj?.ResetTransforms();
-
             // reset material animation
             foreach (var d in _meshList.EnumerateDObjs)
                 d.ClearAnimation();
+
+            // reset joint animation
+            RenderJObj.ResetDefaultStateAll();
 
             // disable viewport
             var vp = _viewport.glViewport;

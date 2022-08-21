@@ -31,6 +31,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 TracksUpdated?.Invoke();
             };
 
+
+            graphEditor1.TrackEdited += (s, a) =>
+            {
+                TracksUpdated?.Invoke();
+            };
+
             // prevent user closing
             CloseButtonVisible = false;
             FormClosing += (sender, args) =>
@@ -52,9 +58,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             list = null;
 
-            graphEditor1.ClearTracks();
-            if (tracks != null)
-                graphEditor1.LoadTracks(type, tracks);
+            graphEditor1.LoadTracks(type, tracks);
 
             list = tracks;
         }

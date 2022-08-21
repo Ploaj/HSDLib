@@ -33,7 +33,7 @@ namespace HSDRawViewer.GUI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewportControl));
-            this.glControl = new OpenTK.WinForms.GLControl(new GLControlSettings() { NumberOfSamples = 8 });
+            this.glControl = new OpenTK.WinForms.GLControl();
             this.animationGroup = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.buttonStart = new System.Windows.Forms.Button();
@@ -286,7 +286,6 @@ namespace HSDRawViewer.GUI
             // nudMaxFrame
             // 
             this.nudMaxFrame.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.nudMaxFrame.Enabled = false;
             this.nudMaxFrame.Location = new System.Drawing.Point(394, 41);
             this.nudMaxFrame.Margin = new System.Windows.Forms.Padding(4);
             this.nudMaxFrame.Maximum = new decimal(new int[] {
@@ -297,6 +296,7 @@ namespace HSDRawViewer.GUI
             this.nudMaxFrame.Name = "nudMaxFrame";
             this.nudMaxFrame.Size = new System.Drawing.Size(71, 23);
             this.nudMaxFrame.TabIndex = 7;
+            this.nudMaxFrame.ValueChanged += new System.EventHandler(this.nudMaxFrame_ValueChanged);
             // 
             // nudFrame
             // 
@@ -304,7 +304,7 @@ namespace HSDRawViewer.GUI
             this.nudFrame.Location = new System.Drawing.Point(296, 41);
             this.nudFrame.Margin = new System.Windows.Forms.Padding(4);
             this.nudFrame.Maximum = new decimal(new int[] {
-            1,
+            99999,
             0,
             0,
             0});

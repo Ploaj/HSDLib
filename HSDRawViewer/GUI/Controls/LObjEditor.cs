@@ -298,8 +298,6 @@ namespace HSDRawViewer.GUI.Controls
 
         private HSD_LOBJ _lobj;
 
-        private ViewportControl _vp;
-
         public DrawOrder DrawOrder => DrawOrder.Last;
 
         /// <summary>

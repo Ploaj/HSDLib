@@ -282,7 +282,6 @@ namespace HSDRawViewer.GUI.Plugins
         }
 
         private bool ControlHeld = false;
-        private bool ShiftHeld = false;
         private bool AltHeld = false;
 
         private bool WasDragging = false;
