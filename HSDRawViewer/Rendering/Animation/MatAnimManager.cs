@@ -111,21 +111,43 @@ namespace HSDRawViewer.Rendering
             if (SX != 0 && SY != 0 && SZ != 0)
                 Transform.Invert();
 
+            Konst = Vector4.Zero;
+            Tev0 = Vector4.Zero;
+            Tev1 = Vector4.Zero;
+
             // initialize tev data
             if (t.TEV != null)
             {
                 var k = t.TEV.constant;
                 var t0 = t.TEV.tev0;
                 var t1 = t.TEV.tev1;
-                Konst = new Vector4(k.R / 255f, k.B / 255f, k.G / 255f, t.TEV.constantAlpha / 255f);
-                Tev0 = new Vector4(t0.R / 255f, t0.B / 255f, t0.G / 255f, t.TEV.tev0Alpha / 255f);
-                Tev1 = new Vector4(t1.R / 255f, t1.B / 255f, t1.G / 255f, t.TEV.tev1Alpha / 255f);
-            }
-            else
-            {
-                Konst = Vector4.Zero;
-                Tev0 = Vector4.Zero;
-                Tev1 = Vector4.Zero;
+
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST_R))
+                    Konst.X = k.R / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST_G))
+                    Konst.Y = k.G / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST_B))
+                    Konst.Z = k.B / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST_A))
+                    Konst.W = t.TEV.constantAlpha / 255f;
+
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV0_R))
+                    Tev0.X = t0.R / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV0_G))
+                    Tev0.Y = t0.G / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV0_B))
+                    Tev0.Z = t0.B / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV0_A))
+                    Tev0.W = t.TEV.tev0Alpha / 255f;
+
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV1_R))
+                    Tev1.X = t1.R / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV1_G))
+                    Tev1.Y = t1.G / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV1_B))
+                    Tev1.Z = t1.B / 255f;
+                if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.TEV1_A))
+                    Tev1.W = t.TEV.tev1Alpha / 255f;
             }
 
         }

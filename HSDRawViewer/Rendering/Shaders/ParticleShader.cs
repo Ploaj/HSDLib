@@ -10,7 +10,8 @@ namespace HSDRawViewer.Rendering.Shaders
     /// </summary>
     public class ParticleShader : Shader
     {
-        private static int _vb_pos;
+        private int _vb_pos;
+        private int _vao;
 
         public GXAlphaOp AlphaOp = GXAlphaOp.And;
         public GXCompareType AlphaComp0 = GXCompareType.Always;
@@ -43,6 +44,7 @@ namespace HSDRawViewer.Rendering.Shaders
                 System.Windows.Forms.MessageBox.Show("Particle Shader failed to link or compile");
 
             GL.GenBuffers(1, out _vb_pos);
+            GL.GenBuffers(1, out _vao);
         }
 
         /// <summary>
@@ -91,6 +93,7 @@ namespace HSDRawViewer.Rendering.Shaders
 
             int stride = sizeof(float) * 5;
 
+            GL.BindVertexArray(_vao);
             GL.EnableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
             GL.DisableVertexAttribArray(2);
@@ -120,6 +123,7 @@ namespace HSDRawViewer.Rendering.Shaders
 
             int stride = sizeof(float) * 5;
 
+            GL.BindVertexArray(_vao);
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.DisableVertexAttribArray(2);
@@ -150,6 +154,7 @@ namespace HSDRawViewer.Rendering.Shaders
 
             int stride = sizeof(float) * 9;
 
+            GL.BindVertexArray(_vao);
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);

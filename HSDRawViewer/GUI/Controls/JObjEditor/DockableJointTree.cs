@@ -55,6 +55,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             _jointMap = new JointMap();
 
+            treeJOBJ.NodeMouseClick += delegate (object sender, TreeNodeMouseClickEventArgs e) {
+                TreeNode selected = e.Node;
+
+                // If node already selected - unselect, then reselect
+                if (selected == treeJOBJ.SelectedNode)
+                {
+                    treeJOBJ.SelectedNode = null;
+                    treeJOBJ.SelectedNode = selected;
+                }
+            };
+
             // prevent user closing
             CloseButtonVisible = false;
             FormClosing += (sender, args) =>

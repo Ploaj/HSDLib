@@ -410,7 +410,7 @@ namespace HSDRawViewer.Rendering
             UpdateMvpMatrix();
 
             // Ensure the vector used for shading gets updated.
-            TransformedPosition = (rotationMatrix * new Vector4(translation, 1)).Xyz;
+            // TransformedPosition = (rotationMatrix * new Vector4(translation, 1)).Xyz;
         }
 
         /// <summary>
@@ -451,6 +451,7 @@ namespace HSDRawViewer.Rendering
         protected virtual void UpdateModelViewMatrix()
         {
             modelViewMatrix = Matrix4.CreateScale(scale) * rotationMatrix * translationMatrix;
+            TransformedPosition = Vector3.TransformPosition(Vector3.Zero, ModelViewMatrix.Inverted());
         }
 
         /// <summary>

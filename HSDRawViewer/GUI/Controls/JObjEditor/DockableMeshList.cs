@@ -83,6 +83,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             _root = jobj;
 
+            listDOBJ.DataSource = null;
             dobjList.Clear();
             int ji = 0;
             foreach (var j in jobj.BreathFirstList)
@@ -98,6 +99,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 }
                 ji++;
             }
+            listDOBJ.DataSource = dobjList;
         }
 
         /// <summary>
@@ -111,7 +113,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             SelectDObj?.Invoke(listDOBJ.SelectedItems.Cast<DObjProxy>().ToArray(), listDOBJ.SelectedIndices.Cast<int>());
 
             // can only move one at a time
-            editToolStripMenuItem.Enabled = listDOBJ.SelectedItems.Count == 1;
             exportToolStripMenuItem.Enabled = listDOBJ.SelectedItems.Count == 1;
             buttonMoveDown.Enabled = listDOBJ.SelectedItems.Count == 1;
             buttonMoveUp.Enabled = listDOBJ.SelectedItems.Count == 1;

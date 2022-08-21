@@ -164,9 +164,12 @@ namespace HSDRawViewer.Rendering.Renderers
             }
         }
 
-        public void Initialize(GLControl c)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
+        public void Initialize()
         {
-            c.MakeCurrent();
             _shader = new ParticleShader();
         }
 
@@ -180,8 +183,8 @@ namespace HSDRawViewer.Rendering.Renderers
                 return;
 
             // render particles
-            var pos = c.ModelViewMatrix.ExtractTranslation();
-            foreach (var p in Particles.OrderBy(e => (e.Pos - pos).LengthSquared))
+            var pos = c.TransformedPosition;
+            foreach (var p in Particles.OrderBy(e => -(e.Pos - pos).LengthSquared))
             {
                 if (p.TexG >= 0)
                     p.Render(c, _shader, TexGs[p.TexG].GetGLIndices(_manager));

@@ -569,14 +569,9 @@ namespace HSDRawViewer.Rendering.Models
                         transform = texState.Transform;
                         if (tev != null)
                         {
-                            if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
-                                konst = texState.Konst;
-
-                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV0) != 0)
-                                tev0 = texState.Tev0;
-
-                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
-                                tev1 = texState.Tev1;
+                            konst = texState.Konst;
+                            tev0 = texState.Tev0;
+                            tev1 = texState.Tev1;
                         }
                     }
                     else
@@ -586,19 +581,15 @@ namespace HSDRawViewer.Rendering.Models
                         transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
                             Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RY) *
                             Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+
                         // invert transform matrix
                         if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
                             transform.Invert();
                         if (tev != null)
                         {
-                            if ((tev.active & TOBJ_TEVREG_ACTIVE.KONST) != 0)
-                                konst = new Vector4(tev.constant.A / 255f, tev.constant.B / 255f, tev.constant.G / 255f, tev.constantAlpha / 255f);
-
-                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV0) != 0)
-                                tev0 = new Vector4(tev.tev0.A / 255f, tev.tev0.B / 255f, tev.tev0.G / 255f, tev.tev0Alpha / 255f);
-
-                            if ((tev.active & TOBJ_TEVREG_ACTIVE.TEV1) != 0)
-                                tev1 = new Vector4(tev.tev1.A / 255f, tev.tev1.B / 255f, tev.tev1.G / 255f, tev.tev1Alpha / 255f);
+                            konst = new Vector4(tev.constant.R / 255f, tev.constant.B / 255f, tev.constant.G / 255f, tev.constantAlpha / 255f);
+                            tev0 = new Vector4(tev.tev0.R / 255f, tev.tev0.B / 255f, tev.tev0.G / 255f, tev.tev0Alpha / 255f);
+                            tev1 = new Vector4(tev.tev1.R / 255f, tev.tev1.B / 255f, tev.tev1.G / 255f, tev.tev1Alpha / 255f);
                         }
                     }
 

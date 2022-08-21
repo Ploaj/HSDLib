@@ -7,6 +7,9 @@ namespace HSDRawViewer.GUI.Controls
     {
         public ViewportControl glViewport;
 
+        public delegate void GLLoaded();
+        public GLLoaded GLLoad;
+
         public DockableViewport()
         {
             InitializeComponent();
@@ -24,6 +27,11 @@ namespace HSDRawViewer.GUI.Controls
 
             // disable ability to close
             CloseButtonVisible = false;
+
+            glViewport.Load += (s, a) =>
+            {
+                GLLoad?.Invoke();
+            };
 
             // prevent user closing
             FormClosing += (sender, args) =>

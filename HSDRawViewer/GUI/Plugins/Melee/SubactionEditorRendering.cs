@@ -742,7 +742,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     else
                         DrawShape.DrawSakuraiAngle(cam, worldTransform, hb.Size);
 
-                    GLTextRenderer.RenderText(cam, hitboxId.ToString(), worldTransform, StringAlignment.Center, true);
+                    // TODO: GLTextRenderer.RenderText(cam, hitboxId.ToString(), worldTransform, StringAlignment.Center, true);
                 }
                 hitboxId++;
             }

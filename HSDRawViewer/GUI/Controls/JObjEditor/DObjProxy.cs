@@ -197,6 +197,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
 
         // 
+        [Browsable(false)]
         public TextureAnimDesc[] TextureStates { get; internal set; } = new TextureAnimDesc[8];
 
         public float FrameCount

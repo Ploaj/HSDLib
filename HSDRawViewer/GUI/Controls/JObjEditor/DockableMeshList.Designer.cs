@@ -32,7 +32,6 @@
             this.listDOBJ = new HSDRawViewer.GUI.Controls.JObjEditor.MeshList();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.materialDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonMoveUp = new System.Windows.Forms.ToolStripButton();
@@ -41,9 +40,9 @@
             this.buttonShowAll = new System.Windows.Forms.ToolStripButton();
             this.buttonHidePoly = new System.Windows.Forms.ToolStripButton();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.massTextureEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDummyDOBJToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearSelectedPOBJsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.massTextureEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,7 +79,6 @@
             // materialDropDownButton1
             // 
             this.materialDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editToolStripMenuItem,
             this.importToolStripMenuItem,
             this.exportToolStripMenuItem});
             this.materialDropDownButton1.Image = global::HSDRawViewer.Properties.Resources.ico_mobj;
@@ -89,17 +87,11 @@
             this.materialDropDownButton1.Size = new System.Drawing.Size(83, 24);
             this.materialDropDownButton1.Text = "Material";
             // 
-            // editToolStripMenuItem
-            // 
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
-            this.editToolStripMenuItem.Text = "Edit";
-            // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.importToolStripMenuItem.Text = "Import";
             this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
             // 
@@ -107,7 +99,7 @@
             // 
             this.exportToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(184, 26);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
@@ -176,6 +168,13 @@
             this.toolStripDropDownButton3.Size = new System.Drawing.Size(47, 24);
             this.toolStripDropDownButton3.Text = "Tools";
             // 
+            // massTextureEditorToolStripMenuItem
+            // 
+            this.massTextureEditorToolStripMenuItem.Name = "massTextureEditorToolStripMenuItem";
+            this.massTextureEditorToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.massTextureEditorToolStripMenuItem.Text = "Mass Texture Editor";
+            this.massTextureEditorToolStripMenuItem.Click += new System.EventHandler(this.massTextureEditorToolStripMenuItem_Click);
+            // 
             // addDummyDOBJToolStripMenuItem
             // 
             this.addDummyDOBJToolStripMenuItem.Name = "addDummyDOBJToolStripMenuItem";
@@ -189,13 +188,6 @@
             this.clearSelectedPOBJsToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.clearSelectedPOBJsToolStripMenuItem.Text = "Delete Selected Polygons";
             this.clearSelectedPOBJsToolStripMenuItem.Click += new System.EventHandler(this.clearSelectedPOBJsToolStripMenuItem_Click);
-            // 
-            // massTextureEditorToolStripMenuItem
-            // 
-            this.massTextureEditorToolStripMenuItem.Name = "massTextureEditorToolStripMenuItem";
-            this.massTextureEditorToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.massTextureEditorToolStripMenuItem.Text = "Mass Texture Editor";
-            this.massTextureEditorToolStripMenuItem.Click += new System.EventHandler(this.massTextureEditorToolStripMenuItem_Click);
             // 
             // DockableMeshList
             // 
@@ -220,7 +212,6 @@
         private System.Windows.Forms.ToolStripMenuItem addDummyDOBJToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearSelectedPOBJsToolStripMenuItem;
         private System.Windows.Forms.ToolStripDropDownButton materialDropDownButton1;
-        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonMoveUp;

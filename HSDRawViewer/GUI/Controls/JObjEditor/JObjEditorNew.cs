@@ -53,7 +53,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _viewport.Show(dockPanel1, DockState.Document);
 
             // refresh render when viewport reloads
-            _viewport.glViewport.Load += (r, a) =>
+            _viewport.GLLoad += () =>
             {
                 RenderJObj.Invalidate();
             };
@@ -494,6 +494,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importModelFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            ClearAnimation();
             ModelImporter.ReplaceModelFromFile(_root);
             SetJOBJ(_root);
         }

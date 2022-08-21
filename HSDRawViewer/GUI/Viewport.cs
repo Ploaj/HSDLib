@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Renderers;
 
 namespace HSDRawViewer.GUI
 {

@@ -50,6 +50,8 @@ namespace HSDRawViewer.GUI.Plugins
         private HSD_ParticleGroup _group;
         private HSD_TEXGraphicBank _texg;
 
+        private GLTextRenderer TextRenderer = new GLTextRenderer();
+
         /// <summary>
         /// 
         /// </summary>
@@ -97,19 +99,18 @@ namespace HSDRawViewer.GUI.Plugins
                 CompileCode();
             };
 
+            _viewport.Load += (s, a) =>
+            {
+                _system.Initialize();
+                TextRenderer.InitializeRender(@"lib\Consolas.bff");
+            };
+
             Disposed += (sender, args) =>
             {
+                TextRenderer.Dispose();
                 _system.Dispose();
                 _viewport.Dispose();
             };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void InitializeDrawing()
-        {
-            _system.Initialize(_viewport.GetControl());
         }
 
         /// <summary>
@@ -156,10 +157,12 @@ namespace HSDRawViewer.GUI.Plugins
             if (!buttonPause.Checked)
                 _system.Update();
 
+            OpenTK.Graphics.OpenGL.GL.Enable(OpenTK.Graphics.OpenGL.EnableCap.DepthTest);
+
             _system.Render(cam);
 
-            GLTextRenderer.RenderText(cam, $"Generators: {_system.LiveGeneratorCount}", 16, 16);
-            GLTextRenderer.RenderText(cam, $"Particles: {_system.ParticleCount}", 16, 32);
+            TextRenderer.RenderText(cam, $"Generators: {_system.LiveGeneratorCount}", 16, 16);
+            TextRenderer.RenderText(cam, $"Particles: {_system.ParticleCount}", 16, 32);
         }
 
         /// <summary>
