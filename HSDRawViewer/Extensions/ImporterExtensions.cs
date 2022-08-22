@@ -6,7 +6,7 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
-namespace HSDRawViewer.Converters
+namespace HSDRawViewer.Extensions
 {
     public static class ImporterExtensions
     {

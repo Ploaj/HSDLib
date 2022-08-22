@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using HSDRaw.GX;
 
-namespace HSDRawViewer.Rendering
+namespace HSDRawViewer.Tools
 {
     public class TriangleConverter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static List<GX_Vertex> QuadToList(List<GX_Vertex> input)
         {
             var output = new List<GX_Vertex>();
@@ -24,13 +29,18 @@ namespace HSDRawViewer.Rendering
             return output;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static List<GX_Vertex> StripToList(List<GX_Vertex> input)
         {
             var output = new List<GX_Vertex>();
 
             for (int index = 2; index < input.Count; index++)
             {
-                bool isEven = (index % 2 != 1);
+                bool isEven = index % 2 != 1;
 
                 var vert1 = input[index - 2];
                 var vert2 = isEven ? input[index] : input[index - 1];
@@ -46,6 +56,7 @@ namespace HSDRawViewer.Rendering
 
             return output;
         }
+
         /// <summary>
         /// Converts a list of quads into triangles
         /// </summary>
@@ -77,7 +88,7 @@ namespace HSDRawViewer.Rendering
 
             for (int index = 2; index < vertices.Count; index++)
             {
-                bool isEven = (index % 2 != 1);
+                bool isEven = index % 2 != 1;
 
                 var vert1 = vertices[index - 2];
                 var vert2 = isEven ? vertices[index] : vertices[index - 1];

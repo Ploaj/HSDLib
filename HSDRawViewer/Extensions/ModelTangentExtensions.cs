@@ -3,12 +3,10 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HSDRawViewer.Converters
+namespace HSDRawViewer.Extensions
 {
-    public static class ModelTangentUtils
+    public static class ModelTangentExtensions
     {
         public static Vector3 defaultTangent = new Vector3(1, 0, 0);
 
@@ -41,10 +39,10 @@ namespace HSDRawViewer.Converters
         public static void CalculateTangentsBitangents(IList<Vector3> positions, IList<Vector3> normals, IList<Vector2> uvs, IList<int> indices, out Vector3[] tangents, out Vector3[] bitangents)
         {
             if (normals.Count != positions.Count)
-                throw new System.ArgumentOutOfRangeException(nameof(normals), "Vector source lengths do not match.");
+                throw new ArgumentOutOfRangeException(nameof(normals), "Vector source lengths do not match.");
 
             if (uvs.Count != positions.Count)
-                throw new System.ArgumentOutOfRangeException(nameof(uvs), "Vector source lengths do not match.");
+                throw new ArgumentOutOfRangeException(nameof(uvs), "Vector source lengths do not match.");
 
             tangents = new Vector3[positions.Count];
             bitangents = new Vector3[positions.Count];
@@ -104,7 +102,7 @@ namespace HSDRawViewer.Converters
             Vector2 uvA = uv2 - uv1;
             Vector2 uvB = uv3 - uv1;
 
-            float div = (uvA.X * uvB.Y - uvB.X * uvA.Y);
+            float div = uvA.X * uvB.Y - uvB.X * uvA.Y;
 
             // Fix +/- infinity from division by zero.
             float r = 1.0f;

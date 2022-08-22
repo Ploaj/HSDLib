@@ -125,7 +125,7 @@
     <Compile Update="Tools\FlagEnumEditor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="Tools\OpenFolderDialog.cs">
+    <Compile Update="GUI\OpenFolderDialog.cs">
       <SubType>Component</SubType>
     </Compile>
     <None Update="lib\Consolas.bff">

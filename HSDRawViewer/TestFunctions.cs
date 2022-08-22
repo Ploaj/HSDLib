@@ -3,7 +3,6 @@ using HSDRaw;
 using HSDRaw.GX;
 using HSDRaw.Tools;
 using System.Collections.Generic;
-using HSDRawViewer.Rendering;
 using HSDRaw.Common.Animation;
 using System;
 using System.IO;
