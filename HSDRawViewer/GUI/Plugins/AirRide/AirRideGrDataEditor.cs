@@ -109,7 +109,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private Dictionary<EditorMode, Action> editor_renders;
 
-        private JOBJManager JointManager = new JOBJManager();
+        private RenderJObj RenderJObj = new RenderJObj();
 
         /// <summary>
         /// 
@@ -375,6 +375,22 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <summary>
         /// 
         /// </summary>
+        public void GLInit()
+        {
+            RenderJObj.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+            RenderJObj.FreeResources();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="cam"></param>
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
@@ -383,7 +399,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             if (_data == null)
                 return;
 
-            JointManager.Render(cam, true);
+            RenderJObj.Render(cam, true);
 
             GL.Enable(EnableCap.DepthTest);
 
@@ -424,7 +440,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 if (arrayMemberEditor1.SelectedObject is KAR_CollisionJoint joint && joint != j)
                     continue;
 
-                var mat = JointManager.GetWorldTransform(j.BoneID);
+                var mat = RenderJObj.RootJObj.GetJObjAtIndex(j.BoneID).WorldTransform;
                 GL.LoadMatrix(ref mat);
 
                 GL.Begin(PrimitiveType.Triangles);
@@ -461,7 +477,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 if (arrayMemberEditor1.SelectedObject is KAR_CollisionJoint joint && joint != j)
                     continue;
 
-                var mat = JointManager.GetWorldTransform(j.BoneID);
+                var mat = RenderJObj.RootJObj.GetJObjAtIndex(j.BoneID).WorldTransform;
                 GL.LoadMatrix(ref mat);
 
                 GL.Begin(PrimitiveType.Lines);
@@ -1070,7 +1086,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 {
                     if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
                     {
-                        JointManager.SetJOBJ(m.MainModel.RootNode);
+                        RenderJObj.LoadJObj(m.MainModel.RootNode);
                     }
                 }
             }

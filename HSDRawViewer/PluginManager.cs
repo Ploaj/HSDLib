@@ -24,11 +24,11 @@ namespace HSDRawViewer
         /// Gets the shared viewport control
         /// </summary>
         /// <returns></returns>
-        public static ViewportControl GetCommonViewport()
+        public static CommonViewport GetCommonViewport()
         {
-            if(MainForm.Instance != null)
+            if (MainForm.Instance != null)
             {
-                return MainForm.Instance.Viewport.glViewport;
+                return MainForm.Instance.Viewport;
             }
             return null;
         }

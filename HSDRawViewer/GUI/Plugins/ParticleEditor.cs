@@ -99,12 +99,6 @@ namespace HSDRawViewer.GUI.Plugins
                 CompileCode();
             };
 
-            _viewport.Load += (s, a) =>
-            {
-                _system.Initialize();
-                TextRenderer.InitializeRender(@"lib\Consolas.bff");
-            };
-
             Disposed += (sender, args) =>
             {
                 TextRenderer.Dispose();
@@ -144,6 +138,24 @@ namespace HSDRawViewer.GUI.Plugins
 
 
             return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+            _system.Initialize();
+            TextRenderer.InitializeRender(@"lib\Consolas.bff");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+            TextRenderer.Dispose();
+            _system.Dispose();
         }
 
         /// <summary>

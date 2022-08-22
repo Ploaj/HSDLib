@@ -1,7 +1,6 @@
 ﻿using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.Renderers;
 
 namespace HSDRawViewer.GUI
 {
@@ -16,6 +15,9 @@ namespace HSDRawViewer.GUI
 
         public DrawOrder DrawOrder => DrawOrder.First;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public CommonViewport()
         {
             Text = "Viewport";
@@ -26,7 +28,6 @@ namespace HSDRawViewer.GUI
             glViewport.DisplayGrid = true;
 
             glViewport.AddRenderer(this);
-
             Controls.Add(glViewport);
 
             FormClosing += (sender, args) =>
@@ -38,8 +39,22 @@ namespace HSDRawViewer.GUI
                 }
             };
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
+        {
+        }
+
+        public void GLInit()
+        {
+        }
+
+        public void GLFree()
         {
         }
     }

@@ -29,11 +29,11 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+        private DataNode _node;
+
         public override DockState DefaultDockState => DockState.DockLeft;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
-
-        private DataNode _node;
 
         private SBM_Coll_Data CollData;
 
@@ -143,7 +143,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             listLines.DataSource = Lines;
 
-            PluginManager.GetCommonViewport()?.AddRenderer(this);
+            PluginManager.GetCommonViewport().glViewport.AddRenderer(this);
 
             listBox1.SelectedIndexChanged += (sender, args) =>
             {
@@ -185,7 +185,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             FormClosing += (sender, args) =>
             {
-                PluginManager.GetCommonViewport()?.RemoveRenderer(this);
+                PluginManager.GetCommonViewport().glViewport.RemoveRenderer(this);
             };
         }
 
@@ -1220,6 +1220,20 @@ namespace HSDRawViewer.GUI.Plugins
             foreach (var l in lines)
                 if (l.InRange(range))
                     yield return l;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
         }
     }
 }

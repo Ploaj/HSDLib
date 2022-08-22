@@ -393,24 +393,24 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public Vector3 Point2;
         public int CommandIndex;
 
-        public Vector3 GetWorldPosition(JOBJManager manager)
+        public Vector3 GetWorldPosition(LiveJObj manager)
         {
             return Vector3.TransformPosition(Vector3.Zero, GetWorldTransform(manager));
         }
 
-        public Matrix4 GetWorldTransform(JOBJManager manager)
+        public Matrix4 GetWorldTransform(LiveJObj manager)
         {
             if (manager == null)
                 return Matrix4.Identity;
 
             var boneID = BoneID;
             if (boneID == 0)
-                if (manager.GetJOBJ(1) != null && manager.GetJOBJ(1).Child == null) // special case for character like mewtwo with a leading bone
+                if (manager.GetJObjAtIndex(1) != null && manager.GetJObjAtIndex(1).Child == null) // special case for character like mewtwo with a leading bone
                     boneID = 2;
                 else
                     boneID = 1;
 
-            var transform = Matrix4.CreateTranslation(Point1) * manager.GetWorldTransform(boneID);
+            var transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
             transform.ClearScale();
 
             return transform;

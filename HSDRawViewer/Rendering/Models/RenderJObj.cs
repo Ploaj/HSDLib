@@ -221,25 +221,36 @@ namespace HSDRawViewer.Rendering.Models
         }
 
         /// <summary>
-        /// 
+        /// This will free all opengl resources used for rendering
         /// </summary>
-        private void InitializeRendering()
+        public void FreeResources()
         {
-            Initialized = true;
-
             // initialize shader
             if (_shader != null)
             {
                 _shader.Dispose();
                 _shader = null;
             }
-            _shader = new GXShader();
 
             // clear previous caches
             BufferManager.ClearRenderingCache();
             TextureManager.ClearTextures();
             imageBufferTextureIndex.Clear();
             RenderDobjs.Clear();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void InitializeRendering()
+        {
+            Initialized = true;
+
+            // free old resources
+            FreeResources();
+
+            // initialize shader
+            _shader = new GXShader();
 
             // initial dobj cache
             foreach (var j in RootJObj?.Enumerate)

@@ -402,6 +402,10 @@ namespace HSDRawViewer.GUI
             Drawables.Clear();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="drawable"></param>
         public void AddRenderer(IDrawable drawable)
         {
             Drawables.Add(drawable);
@@ -409,9 +413,21 @@ namespace HSDRawViewer.GUI
             Drawables = Drawables.OrderBy(x => (int)(x.DrawOrder)).ToList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="drawable"></param>
         public void RemoveRenderer(IDrawable drawable)
         {
-            Drawables.Remove(drawable);
+            if (Drawables.Contains(drawable))
+            {
+                // free resources
+                glControl.MakeCurrent();
+                drawable.GLFree();
+
+                // remove drawable
+                Drawables.Remove(drawable);
+            }
         }
 
         private void nudFrame_ValueChanged(object sender, EventArgs e)
@@ -772,6 +788,10 @@ namespace HSDRawViewer.GUI
                 _timer.Dispose();
                 _timer2.Dispose();
             };
+
+            // init gl resources
+            foreach (var r in Drawables)
+                r.GLInit();
         }
 
         /// <summary>

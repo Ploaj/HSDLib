@@ -609,7 +609,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             foreach (var hb in SubactionProcess.Hitboxes)
             {
                 if (hb.Active)
-                    PreviousPositions[hitboxId] = hb.GetWorldPosition(JointManager);
+                    PreviousPositions[hitboxId] = hb.GetWorldPosition(JointManager.GetJOBJ(0));
 
                 hitboxId++;
             }
@@ -619,6 +619,20 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private Capsule capsule = new Capsule(Vector3.Zero, Vector3.Zero, 0);
 
         private TranslationWidget _transWidget = new TranslationWidget();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+        }
 
         /// <summary>
         /// 
@@ -693,7 +707,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // hurtbox collision
             if (hurtboxesToolStripMenuItem.Checked)
-                HurtboxRenderer.Render(JointManager, Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
+                HurtboxRenderer.Render(JointManager.GetJOBJ(0), Hurtboxes, null, SubactionProcess.BoneCollisionStates, SubactionProcess.BodyCollisionState);
 
             // hitbox collision
             int hitboxId = 0;
@@ -709,7 +723,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 float alpha = 0.4f;
                 Vector3 hbColor = HitboxColor;
 
-                var worldPosition = hb.GetWorldPosition(JointManager);
+                var worldPosition = hb.GetWorldPosition(JointManager.GetJOBJ(0));
                 var worldTransform = Matrix4.CreateTranslation(worldPosition);
 
                 if (hb.Element == 8)
@@ -719,7 +733,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 {
                     hbColor = HitboxSelectedColor;
                     isHitboxSelected = true;
-                    _transWidget.Transform = hb.GetWorldTransform(JointManager);
+                    _transWidget.Transform = hb.GetWorldTransform(JointManager.GetJOBJ(0));
                 }
 
                 // drawing a capsule takes more processing power, so only draw it if necessary
@@ -1337,7 +1351,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             {
                 if (hb.Active)
                 {
-                    if (pick.CheckSphereHit(hb.GetWorldPosition(JointManager), hb.Size, out float distance))
+                    if (pick.CheckSphereHit(hb.GetWorldPosition(JointManager.GetJOBJ(0)), hb.Size, out float distance))
                     {
                         if (distance < shortestDistance)
                         {

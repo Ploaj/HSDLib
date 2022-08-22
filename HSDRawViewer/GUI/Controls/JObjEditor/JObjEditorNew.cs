@@ -34,6 +34,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private RenderJObj RenderJObj;
 
+        private bool RenderInViewport = false;
+
         private HSD_JOBJ _root;
 
         public float Frame { get => _viewport.glViewport.Frame; }
@@ -52,10 +54,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _viewport = new DockableViewport();
             _viewport.Show(dockPanel1, DockState.Document);
 
-            // refresh render when viewport reloads
-            _viewport.GLLoad += () =>
+            // add to renderer
+            _viewport.glViewport.AddRenderer(this);
+            _viewport.glViewport.FrameChange += (f) =>
             {
-                RenderJObj.Invalidate();
+                ApplyEditorAnimation(f);
             };
 
             // initialize texture editor
@@ -131,8 +134,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // initialize properties
             _propertyGrid = new DockablePropertyGrid();
-            _propertyGrid.Show(dockPanel1);
-            _propertyGrid.DockState = DockState.DockRight;
+            _propertyGrid.Show(dockPanel1, DockState.DockRight);
 
             _propertyGrid.PropertyValueUpdated += (sender, args) =>
             {
@@ -177,14 +179,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _textureEditor.InvalidateTexture += () =>
             {
                 RenderJObj.Invalidate();
-            };
-
-            // add to renderer
-            _viewport.glViewport.AddRenderer(this);
-
-            _viewport.glViewport.FrameChange += (f) =>
-            {
-                ApplyEditorAnimation(f);
             };
 
             // initialize joint manager
@@ -398,11 +392,29 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <summary>
         /// 
         /// </summary>
+        public void GLInit()
+        {
+            RenderJObj.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="cam"></param>
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
+            if (RenderInViewport)
+                return;
+
             //RenderJObj.Frame = _viewport.glViewport.Frame;
             RenderJObj._settings.RenderSplines = showSplinesToolStripMenuItem.Checked;
             RenderJObj._settings.RenderBones = showBonesToolStripMenuItem.Checked;

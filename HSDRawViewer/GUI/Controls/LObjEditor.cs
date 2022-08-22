@@ -417,5 +417,19 @@ namespace HSDRawViewer.GUI.Controls
             if (ob is LightPropBase prop)
                 prop.Draw();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+        }
     }
 }

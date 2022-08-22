@@ -10,7 +10,7 @@ namespace HSDRawViewer.Rendering.Animation
 
         public List<SBM_DynamicHitBubble> Hitbubbles { get; } = new List<SBM_DynamicHitBubble>();
 
-        public void ResetPhyics(JOBJManager manager)
+        public void ResetPhyics(LiveJObj manager)
         {
             foreach (var s in Sets)
                 foreach (var d in s.PhysicsBones)
@@ -19,7 +19,7 @@ namespace HSDRawViewer.Rendering.Animation
                 }
         }
 
-        public void ProcessAndApplyDynamics(JOBJManager manager, bool apply_hit)
+        public void ProcessAndApplyDynamics(LiveJObj manager, bool apply_hit)
         {
             foreach (var v in Sets)
                 v.Think(manager, apply_hit ? Hitbubbles : null, false, 8, 0);

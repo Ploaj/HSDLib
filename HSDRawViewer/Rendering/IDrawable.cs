@@ -45,6 +45,16 @@ namespace HSDRawViewer.Rendering
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
         void Draw(Camera cam, int windowWidth, int windowHeight);
+
+        /// <summary>
+        /// Init any gl resources you wish to use
+        /// </summary>
+        void GLInit();
+
+        /// <summary>
+        /// Free any gl resources
+        /// </summary>
+        void GLFree();
     }
 
     /// <summary>
@@ -90,6 +100,14 @@ namespace HSDRawViewer.Rendering
         }
 
         public void InitializeDrawing()
+        {
+        }
+
+        public void GLInit()
+        {
+        }
+
+        public void GLFree()
         {
         }
     }

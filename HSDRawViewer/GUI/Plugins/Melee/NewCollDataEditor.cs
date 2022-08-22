@@ -76,7 +76,27 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             SelectedLines = Lines.Where(e => e.Group == group).ToArray();
             lineArrayEditor.SetArrayFromProperty(this, "SelectedLines");
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
         }

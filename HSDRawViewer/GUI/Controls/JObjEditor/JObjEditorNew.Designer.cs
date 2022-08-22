@@ -47,6 +47,7 @@
             this.createToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.compressAllTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fSMApplyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.displaySettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,7 +61,6 @@
             this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.viewModeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.compressAllTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -217,6 +217,13 @@
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(226, 6);
             // 
+            // compressAllTracksToolStripMenuItem
+            // 
+            this.compressAllTracksToolStripMenuItem.Name = "compressAllTracksToolStripMenuItem";
+            this.compressAllTracksToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.compressAllTracksToolStripMenuItem.Text = "Compress All Tracks";
+            this.compressAllTracksToolStripMenuItem.Click += new System.EventHandler(this.compressAllTracksToolStripMenuItem_Click);
+            // 
             // fSMApplyToolStripMenuItem
             // 
             this.fSMApplyToolStripMenuItem.Name = "fSMApplyToolStripMenuItem";
@@ -319,13 +326,6 @@
             this.viewModeBox.Name = "viewModeBox";
             this.viewModeBox.Size = new System.Drawing.Size(140, 25);
             this.viewModeBox.SelectedIndexChanged += new System.EventHandler(this.viewModeBox_SelectedIndexChanged);
-            // 
-            // compressAllTracksToolStripMenuItem
-            // 
-            this.compressAllTracksToolStripMenuItem.Name = "compressAllTracksToolStripMenuItem";
-            this.compressAllTracksToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.compressAllTracksToolStripMenuItem.Text = "Compress All Tracks";
-            this.compressAllTracksToolStripMenuItem.Click += new System.EventHandler(this.compressAllTracksToolStripMenuItem_Click);
             // 
             // JObjEditorNew
             // 

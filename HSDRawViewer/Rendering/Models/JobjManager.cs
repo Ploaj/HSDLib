@@ -9,7 +9,6 @@ using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.GX;
 using System.Drawing;
 using HSDRaw.Melee.Pl;
-using static HSDRawViewer.Rendering.Animation.PhysicsSimulator;
 using HSDRawViewer.Rendering.Shaders;
 
 namespace HSDRawViewer.Rendering.Models
@@ -552,7 +551,7 @@ namespace HSDRawViewer.Rendering.Models
             //if (parent == null)
             //    world *= Matrix4.CreateScale(ModelScale);
             if (PhysicsAnimation != null)
-                PhysicsAnimation.ProcessAndApplyDynamics(this, true);
+                PhysicsAnimation.ProcessAndApplyDynamics(RootJObj, true);
 
             RootJObj.RecalculateTransforms(cam, true);//, Matrix4.CreateScale(ModelScale));
         }
@@ -624,7 +623,7 @@ namespace HSDRawViewer.Rendering.Models
         public void LoadPhysics(IEnumerable<SBM_DynamicDesc> desc, IEnumerable<SBM_DynamicHitBubble> bubbles)
         {
             RootJObj?.RecalculateTransforms(null, true);
-            PhysicsAnimation = PhysicsSimulator.Init(desc, bubbles, this);
+            PhysicsAnimation = PhysicsSimulator.Init(desc, bubbles, RootJObj);
         }
 
         /// <summary>

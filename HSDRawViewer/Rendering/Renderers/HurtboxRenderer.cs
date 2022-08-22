@@ -20,13 +20,16 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="jobjManager"></param>
+        /// <param name="liveJObj"></param>
         /// <param name="hurtboxes"></param>
         /// <param name="selected"></param>
         /// <param name="states"></param>
         /// <param name="bodyState"></param>
-        public void Render(JOBJManager jobjManager, List<SBM_Hurtbox> hurtboxes, HSDAccessor selected, Dictionary<int, int> states = null, int bodyState = -1)
+        public void Render(LiveJObj liveJObj, List<SBM_Hurtbox> hurtboxes, HSDAccessor selected, Dictionary<int, int> states = null, int bodyState = -1)
         {
+            if (liveJObj == null)
+                return;
+
             foreach (SBM_Hurtbox v in hurtboxes)
             {
                 var clr = HurtboxColor;
@@ -67,7 +70,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         break;
                 }
 
-                var transform = jobjManager.GetWorldTransform(v.BoneIndex);
+                var transform = liveJObj.GetJObjAtIndex(v.BoneIndex).WorldTransform;
 
                 if (!HurtboxToCapsule.ContainsKey(v))
                     HurtboxToCapsule.Add(v, new Capsule(new Vector3(v.X1, v.Y1, v.Z1), new Vector3(v.X2, v.Y2, v.Z2), v.Size));
