@@ -143,7 +143,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 _meshList.Invalidate();
 
                 // update jobj if changed
-                if (_propertyGrid.SelectedObject is JObjProxy j)
+                if (_propertyGrid.SelectedObject is JObjPropertyAccessor j)
                 {
                     RenderJObj.ResetDefaultStateJoints();
                 }

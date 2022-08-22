@@ -2,6 +2,7 @@
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 
 namespace HSDRawViewer.Rendering.Models
@@ -337,7 +338,7 @@ namespace HSDRawViewer.Rendering.Models
             // calculate billboarding
             if (c != null)
             {
-                var pos = WorldTransform.ExtractTranslation();
+                var pos = Vector3.TransformPosition(Vector3.Zero, WorldTransform);
                 var campos = c.TransformedPosition;
 
                 int billboard_type = (((int)Desc.Flags >> 9) & 0x7);
@@ -346,31 +347,22 @@ namespace HSDRawViewer.Rendering.Models
                 {
                     case 1:
                         {
-                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                            mkBillBoardMtx(c.ModelViewMatrix);
                         }
                         break;
                     case 2:
                         {
-                            var temp = pos.Y;
-                            pos.Y = 0;
-                            campos.Y = 0;
-                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, temp, 0);
+                            mkVBillBoardMtx(c.ModelViewMatrix);
                         }
                         break;
                     case 3:
                         {
-                            var temp = pos.X;
-                            pos.X = 0;
-                            campos.X = 0;
-                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(temp, 0, 0);
+                            mkHBillBoardMtx(c.ModelViewMatrix);
                         }
                         break;
                     case 4:
                         {
-                            var temp = pos.Z;
-                            pos.Z = 0;
-                            campos.Z = 0;
-                            WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, 0, temp);
+                            mkRBillBoardMtx(c.ModelViewMatrix);
                         }
                         break;
                 }
@@ -386,6 +378,201 @@ namespace HSDRawViewer.Rendering.Models
             // process siblings
             if (Sibling != null && updateChildren)
                 Sibling.RecalculateTransforms(c, updateChildren);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            Vector3 ax;
+            Vector3 ay = new Vector3(mtx.M21, mtx.M22, mtx.M23);
+            Vector3 az;
+
+            float sx = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
+            float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+            float sy = ay.LengthFast;
+
+            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+
+            if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
+            {
+                az = pos;
+                ax = Vector3.Cross(az, ay);
+                ay = Vector3.Cross(ax, az);
+                sz /= az.LengthFast;
+            }
+            else
+            {
+                az = Vector3.UnitZ;
+                ax = Vector3.Cross(ay, az);
+                ay = Vector3.Cross(az, ax);
+                sz /= az.LengthFast;
+            }
+
+            sx = sx / ax.LengthFast;
+            sy = sy / ay.LengthFast;
+
+            WorldTransform = new Matrix4()
+            {
+                M11 = sx * ax.X,
+                M12 = sx * ax.Y,
+                M13 = sx * ax.Z,
+
+                M21 = sy * ay.X,
+                M22 = sy * ay.Y,
+                M23 = sy * ay.Z,
+
+                M31 = sz * az.X,
+                M32 = sz * az.Y,
+                M33 = sz * az.Z,
+
+                M41 = pos.X,
+                M42 = pos.Y,
+                M43 = pos.Z,
+                M44 = 1,
+            } * mv.Inverted();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkHBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+
+            Vector3 ax = new Vector3(mtx.M11, mtx.M12, mtx.M13);
+            Vector3 ay;
+            Vector3 az;
+
+            float sy = new Vector3(mtx.M21, mtx.M22, mtx.M23).LengthFast;
+            float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+
+            if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
+            {
+                float pos_mag = pos.LengthFast;
+                Vector3 l = new Vector3(
+                    pos.X * (-pos.Y / pos_mag),
+                    pos_mag,
+                    pos.Z * (-pos.Y / pos_mag));
+                az = Vector3.Cross(ax, l);
+            }
+            else
+            {
+                az = Vector3.Cross(ax, Vector3.UnitY);
+            }
+
+            ay = Vector3.Cross(az, ax);
+            sy = sy / ay.LengthFast;
+            sz = sz / az.LengthFast;
+
+            WorldTransform = new Matrix4()
+            {
+                M11 = ax.X,
+                M12 = ax.Y,
+                M13 = ax.Z,
+
+                M21 = sy * ay.X,
+                M22 = sy * ay.Y,
+                M23 = sy * ay.Z,
+
+                M31 = sz * az.X,
+                M32 = sz * az.Y,
+                M33 = sz * az.Z,
+
+                M41 = pos.X,
+                M42 = pos.Y,
+                M43 = pos.Z,
+                M44 = 1,
+            } * mv.Inverted();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkVBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+
+            Vector3 ax;
+            Vector3 ay = new Vector3(mtx.M21, mtx.M22, mtx.M23);
+            Vector3 az;
+
+            float sx = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
+            float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+
+            if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
+            {
+                ax = Vector3.Cross(pos, ay);
+            }
+            else
+            {
+                ax = Vector3.Cross(ay, Vector3.UnitZ);
+            }
+
+            az = Vector3.Cross(ax, ay);
+
+            sx = sx / ax.LengthFast;
+            sz = sz / az.LengthFast;
+
+
+            WorldTransform = new Matrix4()
+            {
+                M11 = sx * ax.X,
+                M12 = sx * ax.Y,
+                M13 = sx * ax.Z,
+
+                M21 = ay.X,
+                M22 = ay.Y,
+                M23 = ay.Z,
+
+                M31 = sz * az.X,
+                M32 = sz * az.Y,
+                M33 = sz * az.Z,
+
+                M41 = pos.X,
+                M42 = pos.Y,
+                M43 = pos.Z,
+                M44 = 1,
+            } * mv.Inverted();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkRBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            float x = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
+            float y = new Vector3(mtx.M21, mtx.M22, mtx.M23).LengthFast;
+            float z = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+
+            var scamtx = Matrix4.CreateScale(x, y, z);
+
+            var rotmtx = Matrix4.CreateRotationZ(Rotation.Z);
+            rotmtx.M41 = mtx.M41;
+            rotmtx.M42 = mtx.M42;
+            rotmtx.M43 = mtx.M43;
+
+            WorldTransform = rotmtx * scamtx * mv.Inverted();
         }
 
         /// <summary>
