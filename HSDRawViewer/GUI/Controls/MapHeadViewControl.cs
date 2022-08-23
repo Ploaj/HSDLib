@@ -8,6 +8,23 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Controls.MapHeadViewer
 {
+    class NoDoubleClickTreeView : TreeView
+    {
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == 0x203) // identified double click
+            {
+                var localPos = PointToClient(Cursor.Position);
+                var hitTestInfo = HitTest(localPos);
+                if (hitTestInfo.Location == TreeViewHitTestLocations.StateImage)
+                    m.Result = IntPtr.Zero;
+                else
+                    base.WndProc(ref m);
+            }
+            else base.WndProc(ref m);
+        }
+    }
+
     /// <summary>
     /// A control that allows you to preview all map head gobj models
     /// </summary>
@@ -137,9 +154,12 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
             int index = 0;
             foreach (var group in head.ModelGroups.Array)
             {
-                var g = new MapHeadGroup($"Group_{index}", group);
-                max = Math.Max(max, g.MaxFrame);
-                treeView1.Nodes.Add(g);
+                if (group.RootNode != null)
+                {
+                    var g = new MapHeadGroup($"Group_{index}", group);
+                    max = Math.Max(max, g.MaxFrame);
+                    treeView1.Nodes.Add(g);
+                }
                 index++;
             }
             glViewport.MaxFrame = max;
@@ -208,8 +228,6 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
         /// <param name="e"></param>
         private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (UpdatingCheckState)
-                return;
 
             if (e.Node is MapHeadAnimation anim)
             {
@@ -220,7 +238,6 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
                     if (n != anim)
                         n.Checked = false;
                 }
-                UpdatingCheckState = false;
 
                 // load animation
                 if (e.Node.Checked && e.Node.Parent is MapHeadGroup g)
@@ -228,8 +245,20 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
                     g.renderJObj.LoadAnimation(new JointAnimManager(anim.joint), anim.matanim, null);
                     g.renderJObj.RequestAnimationUpdate(FrameFlags.All, glViewport.Frame);
                 }
+                UpdatingCheckState = false;
             }
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeView1_BeforeCheck(object sender, TreeViewCancelEventArgs e)
+        {
+            if (UpdatingCheckState)
+                e.Cancel = true;
         }
     }
 }

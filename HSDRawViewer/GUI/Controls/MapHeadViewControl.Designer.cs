@@ -30,7 +30,7 @@
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeView1 = new NoDoubleClickTreeView();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -63,6 +63,7 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(249, 500);
             this.treeView1.TabIndex = 0;
+            this.treeView1.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeCheck);
             this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCheck);
             // 
             // MapHeadViewControl
@@ -82,6 +83,6 @@
 
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.TreeView treeView1;
+        private NoDoubleClickTreeView treeView1;
     }
 }

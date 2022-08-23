@@ -9,6 +9,7 @@ using OpenTK.Mathematics;
 using HSDRawViewer.Converters.Melee;
 using HSDRawViewer.Rendering.Models;
 using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Controls.MapHeadViewer;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -37,8 +38,6 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
-        public override DockState DefaultDockState => DockState.DockLeft;
-
         /// <summary>
         /// 
         /// </summary>
@@ -50,6 +49,9 @@ namespace HSDRawViewer.GUI.Plugins
                 _node = value;
                 GeneralPoints = _node.Accessor as SBM_GeneralPoints;
                 LoadData();
+
+                var map_head = MainForm.Instance.GetSymbol("map_head") as SBM_Map_Head;
+                mapheadviewer.LoadMapHead(map_head);
             }
         }
         private DataNode _node;
@@ -62,6 +64,8 @@ namespace HSDRawViewer.GUI.Plugins
 
         private LiveJObj LiveJObj;
 
+        private MapHeadViewControl mapheadviewer;
+
         /// <summary>
         /// 
         /// </summary>
@@ -69,9 +73,14 @@ namespace HSDRawViewer.GUI.Plugins
         {
             InitializeComponent();
 
+            mapheadviewer = new MapHeadViewControl();
+            mapheadviewer.Dock = DockStyle.Fill;
+            mapheadviewer.glViewport.AddRenderer(this);
+            groupBox3.Controls.Add(mapheadviewer);
+
             PointList.DataSource = PointLinks;
 
-            PluginManager.GetCommonViewport()?.glViewport?.AddRenderer(this);
+            mapheadviewer.glViewport.AddRenderer(this);
 
             propertyGrid1.PropertyValueChanged += (sender, args) =>
             {
@@ -82,7 +91,8 @@ namespace HSDRawViewer.GUI.Plugins
 
             FormClosing += (sender, args) =>
             {
-                PluginManager.GetCommonViewport().glViewport.RemoveRenderer(this);
+                mapheadviewer.glViewport.RemoveRenderer(this);
+                mapheadviewer.Dispose();
                 SavePointChanges();
             };
         }
@@ -253,7 +263,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
 
-            if (PluginManager.GetCommonViewport().glViewport.IsAltKey &&
+            if (mapheadviewer.glViewport.IsAltKey &&
                 args.Button.HasFlag(MouseButtons.Left) &&
                 propertyGrid1.SelectedObject is PointLink point &&
                 Math3D.FastDistance(previousPickPosition, new Vector2(point.X, point.Y), _selectionDistance))

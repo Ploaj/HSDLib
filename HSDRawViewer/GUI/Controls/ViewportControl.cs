@@ -260,6 +260,8 @@ namespace HSDRawViewer.GUI
                 foreach (var v in Drawables)
                     if(v is IDrawableInterface inter)
                         inter.ScreenClick(args.Button, GetScreenPosition(point));
+
+                glControl.Focus();
             };
 
             glControl.DoubleClick += (sender, args) =>
@@ -289,6 +291,7 @@ namespace HSDRawViewer.GUI
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
                          inter.ScreenDrag(args, GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
+
             };
 
             glControl.MouseUp += (sender, args) =>

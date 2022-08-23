@@ -10,6 +10,7 @@ using System.Drawing;
 using System.ComponentModel;
 using HSDRawViewer.GUI.Plugins.Melee;
 using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Controls.MapHeadViewer;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -22,16 +23,17 @@ namespace HSDRawViewer.GUI.Plugins
             set
             {
                 _node = value;
-
+                
                 CollData = _node.Accessor as SBM_Coll_Data;
 
                 LoadCollData();
+
+                var map_head = MainForm.Instance.GetSymbol("map_head") as SBM_Map_Head;
+                mapheadviewer.LoadMapHead(map_head);
             }
         }
 
         private DataNode _node;
-
-        public override DockState DefaultDockState => DockState.DockLeft;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
@@ -134,16 +136,21 @@ namespace HSDRawViewer.GUI.Plugins
         private float PlatformWidth = 20;
         private float PickRange = 100;
 
+        private MapHeadViewControl mapheadviewer;
+
         public CollDataEditor()
         {
             InitializeComponent();
+
+            mapheadviewer = new MapHeadViewControl();
+            mapheadviewer.Dock = DockStyle.Fill;
+            mapheadviewer.glViewport.AddRenderer(this);
+            groupBox2.Controls.Add(mapheadviewer);
 
             cbSelectType.SelectedIndex = 0;
             cbRenderModes.SelectedIndex = 0;
 
             listLines.DataSource = Lines;
-
-            PluginManager.GetCommonViewport().glViewport.AddRenderer(this);
 
             listBox1.SelectedIndexChanged += (sender, args) =>
             {
@@ -182,10 +189,9 @@ namespace HSDRawViewer.GUI.Plugins
 
                 editLineMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is CollLine);
             };
-
-            FormClosing += (sender, args) =>
+            Disposed += (s, a) =>
             {
-                PluginManager.GetCommonViewport().glViewport.RemoveRenderer(this);
+                mapheadviewer.Dispose();
             };
         }
 
