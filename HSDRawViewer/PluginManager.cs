@@ -21,19 +21,6 @@ namespace HSDRawViewer
         private static bool Initialized = false;
 
         /// <summary>
-        /// Gets the shared viewport control
-        /// </summary>
-        /// <returns></returns>
-        public static CommonViewport GetCommonViewport()
-        {
-            if (MainForm.Instance != null)
-            {
-                return MainForm.Instance.Viewport;
-            }
-            return null;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="t"></param>

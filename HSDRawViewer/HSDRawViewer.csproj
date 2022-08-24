@@ -140,28 +140,22 @@
     <None Update="Shader\ps.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Melee\command_rider.yml">
+    <None Update="Scripts\command_rider.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Melee\command_color.yml">
+    <None Update="Scripts\command_color.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Melee\ptcl.yml">
+    <None Update="Scripts\ptcl.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Melee\command_fighter.yml">
+    <None Update="Scripts\command_fighter.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Melee\command_item.yml">
+    <None Update="Scripts\command_item.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Melee\command_custom_item.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Melee\command_controls.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Melee\command_custom.yml">
+    <None Update="Scripts\command_controls.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Shader\gx.frag">

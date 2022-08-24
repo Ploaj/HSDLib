@@ -107,9 +107,10 @@
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(197, 0);
+            this.splitter1.Location = new System.Drawing.Point(230, 0);
+            this.splitter1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 439);
+            this.splitter1.Size = new System.Drawing.Size(4, 507);
             this.splitter1.TabIndex = 3;
             this.splitter1.TabStop = false;
             // 
@@ -122,9 +123,11 @@
             this.groupBox1.Controls.Add(this.previewBox);
             this.groupBox1.Controls.Add(this.renderPanel);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(200, 0);
+            this.groupBox1.Location = new System.Drawing.Point(234, 0);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(546, 439);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.groupBox1.Size = new System.Drawing.Size(636, 507);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Subaction";
@@ -132,9 +135,10 @@
             // splitter2
             // 
             this.splitter2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter2.Location = new System.Drawing.Point(3, 127);
+            this.splitter2.Location = new System.Drawing.Point(4, 148);
+            this.splitter2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(540, 3);
+            this.splitter2.Size = new System.Drawing.Size(628, 3);
             this.splitter2.TabIndex = 8;
             this.splitter2.TabStop = false;
             // 
@@ -143,15 +147,16 @@
             this.subActionList.AllowDrop = true;
             this.subActionList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.subActionList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.subActionList.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.subActionList.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.subActionList.FormattingEnabled = true;
             this.subActionList.HorizontalExtent = 2000;
             this.subActionList.HorizontalScrollbar = true;
             this.subActionList.ItemHeight = 16;
-            this.subActionList.Location = new System.Drawing.Point(3, 72);
+            this.subActionList.Location = new System.Drawing.Point(4, 79);
+            this.subActionList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.subActionList.Name = "subActionList";
             this.subActionList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.subActionList.Size = new System.Drawing.Size(540, 58);
+            this.subActionList.Size = new System.Drawing.Size(628, 72);
             this.subActionList.TabIndex = 0;
             this.subActionList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.subActionList_DrawItem);
             this.subActionList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.subActionList_MeasureItem);
@@ -178,9 +183,9 @@
             this.buttonReplace,
             this.toolStripLabel1,
             this.toolStripComboBox1});
-            this.toolStrip2.Location = new System.Drawing.Point(3, 45);
+            this.toolStrip2.Location = new System.Drawing.Point(4, 52);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(540, 27);
+            this.toolStrip2.Size = new System.Drawing.Size(628, 27);
             this.toolStrip2.TabIndex = 1;
             this.toolStrip2.Text = "toolStrip2";
             // 
@@ -287,16 +292,17 @@
             "Simple",
             "Simple (Descriptive)"});
             this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(92, 27);
+            this.toolStripComboBox1.Size = new System.Drawing.Size(107, 27);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Location = new System.Drawing.Point(3, 45);
+            this.label1.Location = new System.Drawing.Point(4, 52);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.Size = new System.Drawing.Size(38, 15);
             this.label1.TabIndex = 2;
             this.label1.Text = "label1";
             // 
@@ -304,9 +310,11 @@
             // 
             this.previewBox.Controls.Add(this.liveToolStrip);
             this.previewBox.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.previewBox.Location = new System.Drawing.Point(3, 130);
+            this.previewBox.Location = new System.Drawing.Point(4, 151);
+            this.previewBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.previewBox.Name = "previewBox";
-            this.previewBox.Size = new System.Drawing.Size(540, 306);
+            this.previewBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.previewBox.Size = new System.Drawing.Size(628, 353);
             this.previewBox.TabIndex = 7;
             this.previewBox.TabStop = false;
             this.previewBox.Text = "Live Editor";
@@ -322,9 +330,9 @@
             this.fsmMode,
             this.editFsms,
             this.applyFSM});
-            this.liveToolStrip.Location = new System.Drawing.Point(3, 16);
+            this.liveToolStrip.Location = new System.Drawing.Point(4, 19);
             this.liveToolStrip.Name = "liveToolStrip";
-            this.liveToolStrip.Size = new System.Drawing.Size(534, 25);
+            this.liveToolStrip.Size = new System.Drawing.Size(620, 25);
             this.liveToolStrip.TabIndex = 0;
             this.liveToolStrip.Text = "toolStrip3";
             // 
@@ -560,17 +568,19 @@
             this.renderPanel.Controls.Add(this.referenceLabel);
             this.renderPanel.Controls.Add(this.cbReference);
             this.renderPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.renderPanel.Location = new System.Drawing.Point(3, 16);
+            this.renderPanel.Location = new System.Drawing.Point(4, 19);
+            this.renderPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.renderPanel.Name = "renderPanel";
-            this.renderPanel.Size = new System.Drawing.Size(540, 29);
+            this.renderPanel.Size = new System.Drawing.Size(628, 33);
             this.renderPanel.TabIndex = 6;
             // 
             // buttonGoto
             // 
             this.buttonGoto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonGoto.Location = new System.Drawing.Point(462, 3);
+            this.buttonGoto.Location = new System.Drawing.Point(537, 3);
+            this.buttonGoto.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.buttonGoto.Name = "buttonGoto";
-            this.buttonGoto.Size = new System.Drawing.Size(75, 23);
+            this.buttonGoto.Size = new System.Drawing.Size(88, 27);
             this.buttonGoto.TabIndex = 5;
             this.buttonGoto.Text = "Goto";
             this.buttonGoto.UseVisualStyleBackColor = true;
@@ -579,9 +589,10 @@
             // referenceLabel
             // 
             this.referenceLabel.AutoSize = true;
-            this.referenceLabel.Location = new System.Drawing.Point(3, 8);
+            this.referenceLabel.Location = new System.Drawing.Point(4, 9);
+            this.referenceLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.referenceLabel.Name = "referenceLabel";
-            this.referenceLabel.Size = new System.Drawing.Size(81, 13);
+            this.referenceLabel.Size = new System.Drawing.Size(85, 15);
             this.referenceLabel.TabIndex = 3;
             this.referenceLabel.Text = "Referenced By:";
             // 
@@ -591,9 +602,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbReference.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbReference.FormattingEnabled = true;
-            this.cbReference.Location = new System.Drawing.Point(90, 4);
+            this.cbReference.Location = new System.Drawing.Point(105, 5);
+            this.cbReference.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.cbReference.Name = "cbReference";
-            this.cbReference.Size = new System.Drawing.Size(366, 21);
+            this.cbReference.Size = new System.Drawing.Size(424, 23);
             this.cbReference.TabIndex = 4;
             // 
             // actionList
@@ -601,9 +613,10 @@
             this.actionList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.actionList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.actionList.FormattingEnabled = true;
-            this.actionList.Location = new System.Drawing.Point(3, 41);
+            this.actionList.Location = new System.Drawing.Point(4, 44);
+            this.actionList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.actionList.Name = "actionList";
-            this.actionList.Size = new System.Drawing.Size(191, 144);
+            this.actionList.Size = new System.Drawing.Size(222, 170);
             this.actionList.TabIndex = 5;
             this.actionList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.actionList_DrawItem);
             this.actionList.SelectedIndexChanged += new System.EventHandler(this.actionList_SelectedIndexChanged);
@@ -616,8 +629,10 @@
             this.groupBox2.Controls.Add(this.propertyGrid1);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox2.Location = new System.Drawing.Point(0, 0);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(197, 439);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.groupBox2.Size = new System.Drawing.Size(230, 507);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Action List";
@@ -625,9 +640,10 @@
             // splitter3
             // 
             this.splitter3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.splitter3.Location = new System.Drawing.Point(3, 182);
+            this.splitter3.Location = new System.Drawing.Point(4, 211);
+            this.splitter3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.splitter3.Name = "splitter3";
-            this.splitter3.Size = new System.Drawing.Size(191, 3);
+            this.splitter3.Size = new System.Drawing.Size(222, 3);
             this.splitter3.TabIndex = 11;
             this.splitter3.TabStop = false;
             // 
@@ -636,9 +652,9 @@
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.editDropDown});
-            this.toolStrip1.Location = new System.Drawing.Point(3, 16);
+            this.toolStrip1.Location = new System.Drawing.Point(4, 19);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(191, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(222, 25);
             this.toolStrip1.TabIndex = 6;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -748,21 +764,23 @@
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.propertyGrid1.HelpVisible = false;
-            this.propertyGrid1.Location = new System.Drawing.Point(3, 185);
+            this.propertyGrid1.Location = new System.Drawing.Point(4, 214);
+            this.propertyGrid1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid1.Size = new System.Drawing.Size(191, 251);
+            this.propertyGrid1.Size = new System.Drawing.Size(222, 290);
             this.propertyGrid1.TabIndex = 10;
             this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
             // SubactionEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(746, 439);
+            this.ClientSize = new System.Drawing.Size(870, 507);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.groupBox2);
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "SubactionEditor";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

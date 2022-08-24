@@ -46,6 +46,18 @@ namespace HSDRawViewer.Rendering
         public Vector3 DefaultTranslation = new Vector3(0, 10, -80);
 
         /// <summary>
+        /// 
+        /// </summary>
+        [YamlIgnore]
+        public float DefaultRotationX = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [YamlIgnore]
+        public float DefaultRotationY = 0;
+
+        /// <summary>
         /// The translation component of the camera's transforms in scene units.
         /// </summary>
         [Browsable(false)]
@@ -478,8 +490,8 @@ namespace HSDRawViewer.Rendering
         public void RestoreDefault()
         {
             Translation = DefaultTranslation;
-            RotationXRadians = 0;
-            RotationYRadians = 0;
+            RotationXRadians = DefaultRotationX;
+            RotationYRadians = DefaultRotationY;
         }
 
         /// <summary>

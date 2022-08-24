@@ -118,6 +118,14 @@ namespace HSDRawViewer.Tools
             return w.Bytes.ToArray();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return Name; // $"{(IsCustom ? Code.ToString("X2") : (Code >> 2).ToString("X2"))}: {Name}";
+        }
     }
 
     public class SubactionParameter
@@ -143,6 +151,7 @@ namespace HSDRawViewer.Tools
 
     public enum SubactionGroup
     {
+        None,
         // Melee
         Fighter, 
         Item,
@@ -229,13 +238,13 @@ namespace HSDRawViewer.Tools
             string cisa = "";
             string rsa = "";
 
-            string controlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_controls.yml");
-            string fighterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_fighter.yml");
-            string itemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_item.yml");
-            string colorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_color.yml");
-            string customPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_custom.yml");
-            string customItemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_custom_item.yml");
-            string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Melee\command_rider.yml");
+            string controlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_controls.yml");
+            string fighterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_fighter.yml");
+            string itemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_item.yml");
+            string colorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_color.yml");
+            string customPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_custom.yml");
+            string customItemPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_custom_item.yml");
+            string riderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\command_rider.yml");
 
             if (File.Exists(controlPath))
                 sa = File.ReadAllText(controlPath);

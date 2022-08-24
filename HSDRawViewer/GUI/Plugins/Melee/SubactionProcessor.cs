@@ -8,6 +8,48 @@ using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Hitbox
+    {
+        public bool Active { get => _active; set { _active = value; } }
+        private bool _active;
+        public float CreatedOnFrame;
+        public bool Interpolate;
+        public int BoneID;
+        public float Size;
+        public int Angle;
+        public int Element;
+        public Vector3 Point1;
+        public Vector3 Point2;
+        public int CommandIndex;
+
+        public Vector3 GetWorldPosition(LiveJObj manager)
+        {
+            return Vector3.TransformPosition(Vector3.Zero, GetWorldTransform(manager));
+        }
+
+        public Matrix4 GetWorldTransform(LiveJObj manager)
+        {
+            if (manager == null)
+                return Matrix4.Identity;
+
+            var boneID = BoneID;
+            if (boneID == 0)
+                if (manager.GetJObjAtIndex(1) != null && manager.GetJObjAtIndex(1).Child == null) // special case for character like mewtwo with a leading bone
+                    boneID = 2;
+                else
+                    boneID = 1;
+
+            var transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
+            transform.ClearScale();
+
+            return transform;
+        }
+    }
+
     /// <summary>
     /// Handles and processes subaction data for rendering
     /// </summary>
@@ -374,46 +416,5 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 FighterFlagWasSetThisFrame[i] = false;
         }
 
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class Hitbox
-    {
-        public bool Active { get => _active; set { _active = value; } }
-        private bool _active;
-        public float CreatedOnFrame;
-        public bool Interpolate;
-        public int BoneID;
-        public float Size;
-        public int Angle;
-        public int Element;
-        public Vector3 Point1;
-        public Vector3 Point2;
-        public int CommandIndex;
-
-        public Vector3 GetWorldPosition(LiveJObj manager)
-        {
-            return Vector3.TransformPosition(Vector3.Zero, GetWorldTransform(manager));
-        }
-
-        public Matrix4 GetWorldTransform(LiveJObj manager)
-        {
-            if (manager == null)
-                return Matrix4.Identity;
-
-            var boneID = BoneID;
-            if (boneID == 0)
-                if (manager.GetJObjAtIndex(1) != null && manager.GetJObjAtIndex(1).Child == null) // special case for character like mewtwo with a leading bone
-                    boneID = 2;
-                else
-                    boneID = 1;
-
-            var transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
-            transform.ClearScale();
-
-            return transform;
-        }
     }
 }

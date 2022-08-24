@@ -202,6 +202,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             showBoneOrientationToolStripMenuItem.Checked = RenderJObj._settings.RenderOrientation;
             showSelectionOutlineToolStripMenuItem.Checked = RenderJObj._settings.OutlineSelected;
             showSplinesToolStripMenuItem.Checked = RenderJObj._settings.RenderSplines;
+
+            // dipose of resources
+            Disposed += (s, a) =>
+            {
+                _propertyGrid.Dispose();
+                _jointTree.Dispose();
+                _meshList.Dispose();
+                _textureEditor.Dispose();
+                _trackEditor.Dispose();
+                _viewport.Dispose();
+            };
         }
 
         /// <summary>

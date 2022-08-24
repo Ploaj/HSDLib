@@ -23,8 +23,6 @@ namespace HSDRawViewer
         public static MainForm Instance { get; internal set; }
 
         private PropertyView _nodePropertyViewer;
-        public CommonViewport Viewport { get; internal set; }
-        //private SubactionEditor _ScriptEditor;
 
         public string FilePath { get; internal set; }
 
@@ -58,10 +56,6 @@ namespace HSDRawViewer
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;
             _nodePropertyViewer.Show(dockPanel);
-
-            Viewport = new CommonViewport();
-            Viewport.Dock = DockStyle.Fill;
-            Viewport.Show(dockPanel);
 
             //dockPanel.ShowDocumentIcon = true;
             dockPanel.ActiveContentChanged += (sender, args) =>
@@ -472,7 +466,7 @@ namespace HSDRawViewer
             List<DockContent> ToRemove = new List<DockContent>();
             foreach (var c in dockPanel.Contents)
             {
-                if (c is DockContent dc && c != Viewport && c != _nodePropertyViewer)
+                if (c is DockContent dc && c != _nodePropertyViewer)
                 {
                     ToRemove.Add(dc);
                 }
@@ -584,10 +578,6 @@ namespace HSDRawViewer
             {
                 propertyViewToolStripMenuItem.Checked = false;
             }
-            if (c == Viewport)
-            {
-                viewportToolStripMenuItem.Checked = false;
-            }
         }
 
 
@@ -611,15 +601,6 @@ namespace HSDRawViewer
 
         private void viewportToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            if (viewportToolStripMenuItem.Checked)
-            {
-                if (Viewport.IsHidden)
-                    Viewport.Show();
-            }
-            else
-            {
-                Viewport.Hide();
-            }
         }
 
         private void showHideButton_Click(object sender, EventArgs e)

@@ -13,12 +13,12 @@ using HSDRaw.AirRide.Rd;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-    [SupportedTypes(new Type[] { 
-        typeof(SBM_FighterActionTable), 
-        typeof(SBM_FighterSubactionData), 
-        typeof(SBM_ItemSubactionData), 
-        typeof(SBM_ColorSubactionData),
-        typeof(KAR_RdScript) })]
+    //[SupportedTypes(new Type[] { 
+    //    typeof(SBM_FighterActionTable), 
+    //    typeof(SBM_FighterSubactionData), 
+    //    typeof(SBM_ItemSubactionData), 
+    //    typeof(SBM_ColorSubactionData),
+    //    typeof(KAR_RdScript) })]
     public partial class SubactionEditor : SaveableEditorBase
     {
         public override DataNode Node

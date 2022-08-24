@@ -45,7 +45,6 @@
             this.trimExcessDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertyViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aJToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sSMEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -196,8 +195,7 @@
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.propertyViewToolStripMenuItem,
-            this.viewportToolStripMenuItem});
+            this.propertyViewToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
@@ -208,19 +206,9 @@
             this.propertyViewToolStripMenuItem.CheckOnClick = true;
             this.propertyViewToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.propertyViewToolStripMenuItem.Name = "propertyViewToolStripMenuItem";
-            this.propertyViewToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.propertyViewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.propertyViewToolStripMenuItem.Text = "Property View";
             this.propertyViewToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.propertyViewToolStripMenuItem_CheckStateChanged);
-            // 
-            // viewportToolStripMenuItem
-            // 
-            this.viewportToolStripMenuItem.Checked = true;
-            this.viewportToolStripMenuItem.CheckOnClick = true;
-            this.viewportToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.viewportToolStripMenuItem.Name = "viewportToolStripMenuItem";
-            this.viewportToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            this.viewportToolStripMenuItem.Text = "Viewport";
-            this.viewportToolStripMenuItem.CheckedChanged += new System.EventHandler(this.viewportToolStripMenuItem_CheckedChanged);
             // 
             // toolsToolStripMenuItem
             // 
@@ -363,7 +351,6 @@
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem propertyViewToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem viewportToolStripMenuItem;
         private System.Windows.Forms.Button showHideButton;
         private System.Windows.Forms.GroupBox nodeBox;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;

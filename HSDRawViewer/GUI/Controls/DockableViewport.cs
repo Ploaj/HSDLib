@@ -40,6 +40,10 @@ namespace HSDRawViewer.GUI.Controls
                 {
                     args.Cancel = true;
                 }
+                else
+                {
+                    glViewport.Dispose();
+                }
             };
         }
     }

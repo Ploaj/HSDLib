@@ -516,6 +516,11 @@ namespace HSDRawViewer.GUI
         /// <param name="o"></param>
         public void SelectObject(object o, bool multi = false)
         {
+            if (o == null)
+            {
+                elementList.SelectedItems.Clear();
+            }
+            else
             if (elementList.Items.Contains(o))
             {
                 if(!multi)
