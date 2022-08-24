@@ -307,7 +307,7 @@ namespace HSDRawViewer.Rendering.Models
 
                 if (!EnableMaterialFrame)
                     MatAnimation.SetAllFrames(Frame);
-                MatAnimation.JOBJIndex = 0;
+                //MatAnimation.JOBJIndex = 0;
                 ShapeAnimation.JOBJIndex = 0;
                 ShapeAnimation.SetAllFrames(Frame);
 
@@ -315,12 +315,12 @@ namespace HSDRawViewer.Rendering.Models
 
                 foreach (var b in RootJObj.Enumerate)
                 {
-                    MatAnimation.DOBJIndex = 0;
+                    //MatAnimation.DOBJIndex = 0;
                     ShapeAnimation.DOBJIndex = 0;
 
                     if (!BranchIsVisible(b.Desc, b))
                     {
-                        MatAnimation.JOBJIndex++;
+                        //MatAnimation.JOBJIndex++;
                         ShapeAnimation.JOBJIndex++;
                         continue;
                     }
@@ -344,19 +344,19 @@ namespace HSDRawViewer.Rendering.Models
                                 // get shape blend amt
                                 DOBJManager.ShapeBlend = ShapeAnimation.GetBlending();
 
-                                if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
-                                    XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ, int, int>(dobj, b.Desc, MatAnimation.JOBJIndex, MatAnimation.DOBJIndex));
-                                else
-                                    DOBJManager.RenderDOBJShader(_gxShader, dobj, b.Desc, this, MatAnimation);
+                                //if (dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+                                //    XLU.Add(new Tuple<HSD_DOBJ, HSD_JOBJ, int, int>(dobj, b.Desc, MatAnimation.JOBJIndex, MatAnimation.DOBJIndex));
+                                //else
+                                //    DOBJManager.RenderDOBJShader(_gxShader, dobj, b.Desc, this, MatAnimation);
                             }
 
-                            MatAnimation.DOBJIndex++;
+                            //MatAnimation.DOBJIndex++;
                             ShapeAnimation.DOBJIndex++;
                             dobjIndex++;
                         }
                     }
 
-                    MatAnimation.JOBJIndex++;
+                    //MatAnimation.JOBJIndex++;
                     ShapeAnimation.JOBJIndex++;
                 }
 
@@ -365,8 +365,8 @@ namespace HSDRawViewer.Rendering.Models
                 // render xlu lookups last
                 foreach (var xlu in XLU)
                 {
-                    MatAnimation.JOBJIndex = xlu.Item3;
-                    MatAnimation.DOBJIndex = xlu.Item4;
+                    //MatAnimation.JOBJIndex = xlu.Item3;
+                    //MatAnimation.DOBJIndex = xlu.Item4;
 
                     ShapeAnimation.JOBJIndex = xlu.Item3;
                     ShapeAnimation.DOBJIndex = xlu.Item4;

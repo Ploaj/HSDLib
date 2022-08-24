@@ -6,7 +6,7 @@ using HSDRaw;
 using HSDRawViewer.Rendering.Models;
 using System.Linq;
 
-namespace HSDRawViewer.GUI.Plugins.Melee
+namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 {
 
     /// <summary>
@@ -82,6 +82,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public bool HitboxesActive { get => Hitboxes.Any(e => e.Active); }
 
         public bool[] FighterFlagWasSetThisFrame { get; } = new bool[4];
+
         public int[] FighterFlagValues { get; } = new int[4];
 
         public bool AllowInterrupt { get; internal set; }
@@ -90,7 +91,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public Vector3 OverlayColor { get; internal set; } = Vector3.One;
 
-        public bool CharacterInvisibility { get; internal set; } = false;
+        public bool IsInvisible { get; internal set; } = false;
 
         public int BodyCollisionState { get; internal set; } = 0;
 
@@ -134,7 +135,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             BodyCollisionState = 0;
             BoneCollisionStates.Clear();
             OverlayColor = Vector3.One;
-            CharacterInvisibility = false;
+            IsInvisible = false;
             ThrownFighter = false;
             AllowInterrupt = false;
 
@@ -142,7 +143,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 FighterFlagValues[i] = 0;
             ClearFighterFlags();
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -164,14 +165,14 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (subGroup != SubactionGroup.Fighter)
                 return new List<Command>();
 
-            if(structToComman == null)
+            if (structToComman == null)
                 structToComman = new Dictionary<HSDStruct, List<Command>>();
 
             if (structToComman.ContainsKey(str))
                 return structToComman[str];
 
             var data = str.GetData();
-            
+
             var Commands = new List<Command>();
             structToComman.Add(str, Commands);
 
@@ -188,7 +189,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             throw new NotSupportedException("Multiple References not supported");
                         else
                         {
-                            if(r.Value != str) // prevent self reference
+                            if (r.Value != str) // prevent self reference
                             {
                                 cmd.Reference = r.Value;
                                 cmd.ReferenceCommands = GetCommands(cmd.Reference, subGroup, structToComman);
@@ -268,7 +269,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 4 << 2: //end loop
                         loopAmt -= 1;
-                        if(loopAmt > 0)
+                        if (loopAmt > 0)
                             i = loopPos;
                         break;
                     case 5 << 2: //subroutine
@@ -303,7 +304,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             hb.CreatedOnFrame = time;
                             hb.Active = true;
                             hb.BoneID = cmd.Parameters[3];
-                            hb.Size = ((short)cmd.Parameters[6] / 256f);
+                            hb.Size = (short)cmd.Parameters[6] / 256f;
                             hb.Point1 = new Vector3(cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f);
                             hb.Angle = cmd.Parameters[10];
                             hb.Element = cmd.Parameters[19];
@@ -312,7 +313,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     case 13 << 2: // adjust size
                         {
                             if (cmd.Parameters[0] < Hitboxes.Length)
-                                Hitboxes[cmd.Parameters[0]].Size = ((short)cmd.Parameters[1] / 256f); //TODO: ? (short)cmd.Parameters[1] / 150f;
+                                Hitboxes[cmd.Parameters[0]].Size = (short)cmd.Parameters[1] / 256f; //TODO: ? (short)cmd.Parameters[1] / 150f;
                         }
                         break;
                     case 15 << 2:
@@ -344,7 +345,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         break;
                     case 27 << 2:
                         // i don't really know how many bone to assume...
-                        for(int j = 0; j < 100; j++)
+                        for (int j = 0; j < 100; j++)
                         {
                             if (BoneCollisionStates.ContainsKey(j))
                                 BoneCollisionStates[j] = cmd.Parameters[0];
@@ -353,7 +354,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                         }
                         break;
                     case 28 << 2:
-                        if(cmd.Parameters.Length > 1)
+                        if (cmd.Parameters.Length > 1)
                         {
                             if (BoneCollisionStates.ContainsKey(cmd.Parameters[0]))
                                 BoneCollisionStates[cmd.Parameters[0]] = cmd.Parameters[1];
@@ -366,7 +367,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             UpdateVISMethod(cmd.Parameters[0], cmd.Parameters[2]);
                         break;
                     case 37 << 2:
-                        CharacterInvisibility = cmd.Parameters[1] == 1;
+                        IsInvisible = cmd.Parameters[1] == 1;
                         break;
                     case 40 << 2:
                         if (AnimateMaterialMethod != null)
@@ -377,7 +378,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                             AnimateModelMethod(cmd.Parameters[0], cmd.Parameters[1]);
                         break;
                     case 46 << 2: //overlay color
-                        if(cmd.Parameters[0] == 1)
+                        if (cmd.Parameters[0] == 1)
                         {
                         }
                         break;

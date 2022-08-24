@@ -302,20 +302,33 @@ namespace HSDRawViewer.Rendering
 
         public List<MatAnimJoint> Nodes { get; internal set; } = new List<MatAnimJoint>();
 
-        public int JOBJIndex = 0;
+        /// <summary>
+        /// 
+        /// </summary>
+        public MatAnimManager()
+        {
 
-        public int DOBJIndex = 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public MatAnimManager(HSD_MatAnimJoint joint)
+        {
+            FromMatAnim(joint);
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="mobj"></param>
         /// <returns></returns>
-        public void GetMaterialState(HSD_MOBJ mobj, ref MatAnimMaterialState state)
+        public void GetMaterialState(HSD_MOBJ mobj, int jobj_index, int dobj_index, ref MatAnimMaterialState state)
         {
-            if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
+            if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[JOBJIndex].Nodes[DOBJIndex];
+                var node = Nodes[jobj_index].Nodes[dobj_index];
 
                 state.ApplyAnim(node.Tracks, node.Frame);
             }
@@ -327,7 +340,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="frame"></param>
         /// <param name="boneIndex"></param>
         /// <param name="tobj"></param>
-        public MatAnimTextureState GetTextureAnimState(HSD_TOBJ tobj)
+        public MatAnimTextureState GetTextureAnimState(HSD_TOBJ tobj, int jobj_index, int dobj_index)
         {
             if (tobj == null)
                 return null;
@@ -335,12 +348,32 @@ namespace HSDRawViewer.Rendering
             var m = new MatAnimTextureState();
             m.Reset(tobj);
 
-            if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
+            if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[JOBJIndex].Nodes[DOBJIndex];
+                var node = Nodes[jobj_index].Nodes[dobj_index];
 
                 var texAnim = node.TextureAnims.Find(e=>e.TextureID == tobj.TexMapID);
                 if(texAnim != null)
+                    m.ApplyAnim(texAnim.Textures, texAnim.Tracks, texAnim.Frame);
+            }
+
+            return m;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="boneIndex"></param>
+        /// <param name="tobj"></param>
+        public MatAnimTextureState GetTextureAnimState(GXTexMapID mapid, int jobj_index, int dobj_index, ref MatAnimTextureState m)
+        {
+            if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
+            {
+                var node = Nodes[jobj_index].Nodes[dobj_index];
+
+                var texAnim = node.TextureAnims.Find(e => e.TextureID == mapid);
+                if (texAnim != null)
                     m.ApplyAnim(texAnim.Textures, texAnim.Tracks, texAnim.Frame);
             }
 

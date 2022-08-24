@@ -42,6 +42,8 @@ namespace HSDRawViewer.Rendering.Models
 
         public JobjDisplaySettings _settings { get; internal set; } = new JobjDisplaySettings();
 
+        public float ModelScale { get; set; } = 1;
+
         public Vector3 OverlayColor { get; set; } = Vector3.One;
 
 
@@ -70,7 +72,21 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
-        private JointAnimManager JointAnim;
+        public JointAnimManager JointAnim { get; internal set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+
+        public MatAnimManager MatAnim { get; internal set; }
+
+        private bool UpdateMaterialFrame = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public HSD_ShapeAnimJoint ShapeAnim { get; internal set; }
+
 
         public delegate void OnIntialize();
         public OnIntialize Initialize;
@@ -126,7 +142,13 @@ namespace HSDRawViewer.Rendering.Models
                 JointAnim.ApplyAnimation(RootJObj, frame);
             }
 
-            // TODO: material animation
+            if (flags.HasFlag(FrameFlags.Material) && MatAnim != null)
+            {
+                // if frame is -1 don't actually update the frame values
+                if (frame != -1)
+                    MatAnim.SetAllFrames(frame);
+                UpdateMaterialFrame = true;
+            }
 
             // TODO: shape animation
         }
@@ -140,12 +162,16 @@ namespace HSDRawViewer.Rendering.Models
             if (flags.HasFlag(FrameFlags.Joint))
             {
                 JointAnim = null;
-
-                // TODO: material animation
-
-                // TODO: shape animation
-                RootJObj?.ResetTransforms();
+                ResetDefaultStateJoints();
             }
+
+            if (flags.HasFlag(FrameFlags.Material))
+            {
+                MatAnim = null;
+                ResetDefaultStateMaterial();
+            }
+
+            // TODO: shape animation
         }
 
         /// <summary>
@@ -155,20 +181,23 @@ namespace HSDRawViewer.Rendering.Models
         {
             FrameFlags flags = FrameFlags.None;
 
-            JointAnim = joint;
-
-            // TODO: material animation
-
-            // TODO: shape animation
-
             if (joint != null)
+            {
                 flags |= FrameFlags.Joint;
+                JointAnim = joint;
+            }
 
             if (material != null)
+            {
                 flags |= FrameFlags.Material;
+                MatAnim = new MatAnimManager(material);
+            }
 
             if (shape != null)
+            {
+                ShapeAnim = shape;
                 flags |= FrameFlags.Shape;
+            }
 
             // request anim update
             RequestAnimationUpdate(flags, 0);
@@ -206,16 +235,9 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
-        public void LoadMatAnim(HSD_MatAnimJoint matanim)
-        {
-
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public void LoadJObj(HSD_JOBJ desc)
         {
+            ClearAnimation(FrameFlags.Material | FrameFlags.Shape);
             RootJObj = new LiveJObj(desc);
             Initialized = false;
         }
@@ -316,7 +338,15 @@ namespace HSDRawViewer.Rendering.Models
 
             // recalculate transforms
             if (update)
+            {
+                var temp = RootJObj.Scale;
+                RootJObj.Scale *= ModelScale;
                 RootJObj.RecalculateTransforms(camera, true);
+                RootJObj.Scale = temp;
+            }
+
+            // apply material animation update during render only
+            DrawUpdateMaterialAnimation();
 
             // enable depth test
             GL.Enable(EnableCap.DepthTest);
@@ -342,6 +372,44 @@ namespace HSDRawViewer.Rendering.Models
 
             // bone overlay
             RenderBoneOverlay();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DrawUpdateMaterialAnimation()
+        {
+            if (UpdateMaterialFrame)
+            {
+                // apply animation to all render dobjs
+                foreach (var v in RenderDobjs)
+                {
+                    // get material state
+                    MatAnimMaterialState state = v.MaterialState;
+                    MatAnim.GetMaterialState(v._dobj.Mobj, v.JointIndex, v.DisplayIndex, ref state);
+                    v.MaterialState = state;
+
+                    // get texture states
+                    if (v._dobj.Mobj.Textures != null)
+                    {
+                        int ti = 0;
+                        foreach (var i in v._dobj.Mobj.Textures.List)
+                        {
+                            if (ti < v.TextureStates.Length)
+                            {
+                                var ts = v.TextureStates[ti];
+
+                                MatAnim.GetTextureAnimState(i.TexMapID, v.JointIndex, v.DisplayIndex, ref ts);
+
+                                v.TextureStates[ti] = ts;
+                            }
+                            ti++;
+                        }
+                    }
+                }
+
+                UpdateMaterialFrame = false;
+            }
         }
 
         /// <summary>

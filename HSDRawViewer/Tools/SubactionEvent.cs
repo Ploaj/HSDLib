@@ -408,8 +408,7 @@ namespace HSDRawViewer.Tools
             }
 
             // end of script
-            if (Code == 0)
-                r.Write(0, 26);
+            r.Align();
 
             // create compiled struct
             var s = new HSDStruct(r.Bytes.ToArray());

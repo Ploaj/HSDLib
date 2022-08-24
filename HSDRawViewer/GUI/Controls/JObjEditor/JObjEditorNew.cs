@@ -614,9 +614,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 var matAnim = MainForm.Instance.GetSymbol(symbol);
                 if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
                 {
-                    var a = new MatAnimManager();
-                    a.FromMatAnim(maj);
-                    LoadAnimation(a);
+                    LoadAnimation(new MatAnimManager(maj));
                 }
 
                 // set frames

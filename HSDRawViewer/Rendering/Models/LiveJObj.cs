@@ -255,7 +255,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
-        private void SetDefaultSRT()
+        public void SetDefaultSRT()
         {
             Translation = new Vector3(Desc.TX, Desc.TY, Desc.TZ);
             Rotation = new Vector4(Desc.RX, Desc.RY, Desc.RZ, 0);

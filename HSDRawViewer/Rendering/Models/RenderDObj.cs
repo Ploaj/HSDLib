@@ -17,6 +17,10 @@ namespace HSDRawViewer.Rendering.Models
 
         public HSD_DOBJ _dobj { get; internal set; }
 
+        public int JointIndex { get; internal set; }
+
+        public int DisplayIndex { get; internal set; }
+
         public List<RenderPObj> PObjs { get; internal set; } = new List<RenderPObj>();
 
         public bool Selected { get; set; }
@@ -38,6 +42,10 @@ namespace HSDRawViewer.Rendering.Models
         {
             Parent = parent;
             _dobj = dobj;
+
+            // get indicies
+            JointIndex = parent.Root.GetIndexOfDesc(parent.Desc);
+            DisplayIndex = parent.Desc.Dobj.List.IndexOf(dobj);
 
             // initialize texture states
             for (int i = 0; i < TextureStates.Length; i++)

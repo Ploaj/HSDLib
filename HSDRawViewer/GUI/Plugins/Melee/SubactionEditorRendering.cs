@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.GUI.Plugins.SubactionEditor;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -695,7 +696,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             JointManager.SetWorldTransform(0, Matrix4.CreateScale(ModelScale));
 
             // render character model
-            if (!SubactionProcess.CharacterInvisibility && modelToolStripMenuItem.Checked)
+            if (!SubactionProcess.IsInvisible && modelToolStripMenuItem.Checked)
                 JointManager.Render(cam, false);
 
             // render item model

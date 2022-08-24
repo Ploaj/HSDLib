@@ -101,8 +101,8 @@ namespace HSDRawViewer.Rendering.Models
                 MaterialState.Shininess = color.Shininess;
                 MaterialState.Alpha = color.Alpha;
 
-                if (animation != null)
-                    animation.GetMaterialState(mobj, ref MaterialState);
+                //if (animation != null)
+                //    animation.GetMaterialState(mobj, ref MaterialState);
 
                 shader.SetVector4("ambientColor", MaterialState.Ambient);
                 shader.SetVector4("diffuseColor", MaterialState.Diffuse);
@@ -117,8 +117,8 @@ namespace HSDRawViewer.Rendering.Models
                 MaterialState.Ref0 = pp.AlphaRef0 / 255f;
                 MaterialState.Ref1 = pp.AlphaRef1 / 255f;
 
-                if (animation != null)
-                    animation.GetMaterialState(mobj, ref MaterialState);
+                //if (animation != null)
+                //    animation.GetMaterialState(mobj, ref MaterialState);
 
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
                 GL.DepthFunc(GXTranslator.toDepthFunction(pp.DepthFunction));
@@ -174,13 +174,13 @@ namespace HSDRawViewer.Rendering.Models
                     MatAnimTextureState texState = null;
                     if (animation != null)
                     {
-                        texState = animation.GetTextureAnimState(tex);
-                        if (texState != null)
-                        {
-                            displayTex = texState.TOBJ;
-                            blending = texState.Blending;
-                            transform = texState.Transform;
-                        }
+                        //texState = animation.GetTextureAnimState(tex);
+                        //if (texState != null)
+                        //{
+                        //    displayTex = texState.TOBJ;
+                        //    blending = texState.Blending;
+                        //    transform = texState.Transform;
+                        //}
                     }
 
                     // make sure texture is loaded

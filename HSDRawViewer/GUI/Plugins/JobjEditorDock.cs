@@ -54,9 +54,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="joint"></param>
         public void LoadAnimation(HSD_MatAnimJoint joint)
         {
-            MatAnimManager m = new MatAnimManager();
-            m.FromMatAnim(joint);
-            Editor.LoadAnimation(m);
+            Editor.LoadAnimation(new MatAnimManager(joint));
         }
 
         /// <summary>

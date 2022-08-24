@@ -67,6 +67,14 @@ namespace HSDRaw.Tools.Melee
                 i++;
             }
         }
+
+        public void Align()
+        {
+            if (Bytes.Count % 4 != 0)
+            {
+                Bytes.AddRange(new byte[4 - Bytes.Count % 4]);
+            }
+        }
     }
 
     public class MeleeCMDAction
