@@ -103,6 +103,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private HSDStruct _selectedAction;
         private string _selectedActionSymbol;
+        private int _selectStateIndex;
 
 
         private FighterAJManager AJManager;
@@ -163,11 +164,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             _actionList = new ScriptEditorActionList();
             _actionList.Show(dockPanel1, DockState.DockLeft);
 
-            _actionList.SelectAction += (symbol, a) =>
+            _actionList.SelectAction += (symbol, a, index) =>
             {
                 // get selected actin
                 _selectedAction = a;
                 _selectedActionSymbol = symbol;
+                _selectStateIndex = index;
 
                 // set script in editor
                 _subactionEditor.InitScript(SubactionGroup, a);
@@ -204,9 +206,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                 // update renderer script
                 renderer.SetScript(a);
-
-                // set frame
-                renderer.SetFrame(_viewport.glViewport.Frame);
 
                 // update frame tips
                 UpdateFrameTips();
@@ -283,6 +282,22 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         LoadItemModel(21);
                     if (_selectedActionSymbol.Contains("ItemHammer"))
                         LoadItemModel(28);
+                }
+
+                if (_selectStateIndex != -1)
+                {
+                    if (_selectStateIndex >= 108 && _selectStateIndex <= 111)
+                        LoadItemModel(12);
+                    if (_selectStateIndex >= 112 && _selectStateIndex <= 115)
+                        LoadItemModel(11);
+                    if (_selectStateIndex >= 116 && _selectStateIndex <= 119)
+                        LoadItemModel(13);
+                    if (_selectStateIndex >= 120 && _selectStateIndex <= 123)
+                        LoadItemModel(24);
+                    if (_selectStateIndex >= 124 && _selectStateIndex <= 127)
+                        LoadItemModel(22);
+                    if (_selectStateIndex >= 128 && _selectStateIndex <= 131)
+                        LoadItemModel(23);
                 }
             }
         }
@@ -656,6 +671,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //}
 
             _viewport.glViewport.Invalidate();
+
+            // set frame
+            renderer.SetFrame(_viewport.glViewport.Frame);
         }
     }
 }

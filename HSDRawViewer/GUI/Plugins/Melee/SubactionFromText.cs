@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static HSDRawViewer.GUI.Plugins.Melee.SubactionEditor;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -44,62 +43,62 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// 
         /// </summary>
         /// <returns></returns>
-        public static List<SubActionScript> FromBrawlText(string input)
-        {
-            var sa = new List<SubActionScript>();
+        //public static List<SubActionScript> FromBrawlText(string input)
+        //{
+        //    var sa = new List<SubActionScript>();
 
-            var lines = input.Split('\n');
+        //    var lines = input.Split('\n');
 
-            foreach (var v in lines)
-            {
-                var name = v.Split('(')[0].Trim();
-                var param = Regex.Matches(v, @"(.+?)(?:,|$)");
+        //    foreach (var v in lines)
+        //    {
+        //        var name = v.Split('(')[0].Trim();
+        //        var param = Regex.Matches(v, @"(.+?)(?:,|$)");
 
-                if (name.ToLower().Contains("hitbox") && name.ToLower().Contains("create"))
-                {
+        //        if (name.ToLower().Contains("hitbox") && name.ToLower().Contains("create"))
+        //        {
 
-                    var subaction = Tools.SubactionManager.GetSubaction(11 << 2, Tools.SubactionGroup.Fighter);
-                    Dictionary<string, int> remap = hitboxRemapper;
+        //            var subaction = Tools.SubactionManager.GetSubaction(11 << 2, Tools.SubactionGroup.Fighter);
+        //            Dictionary<string, int> remap = hitboxRemapper;
 
-                    int[] saparam = new int[subaction.Parameters.Length];
-                    saparam[13] = 1;
+        //            int[] saparam = new int[subaction.Parameters.Length];
+        //            saparam[13] = 1;
 
-                    Console.WriteLine(name);
+        //            Console.WriteLine(name);
 
-                    foreach (var p in param)
-                    {
-                        var label = Regex.Match(p.ToString(), @"([^:\s]*):").ToString();
-                        var value = Regex.Match(p.ToString(), @"([^:\(\)]+)(?=[,\)])").ToString();
+        //            foreach (var p in param)
+        //            {
+        //                var label = Regex.Match(p.ToString(), @"([^:\s]*):").ToString();
+        //                var value = Regex.Match(p.ToString(), @"([^:\(\)]+)(?=[,\)])").ToString();
 
-                        Console.WriteLine($"\t{label} = {value}");
+        //                Console.WriteLine($"\t{label} = {value}");
 
-                        if (remap.ContainsKey(label.ToString()))
-                        {
-                            if (p.ToString().Contains("Constant"))
-                                saparam[remap[label.ToString()]] = (int)(float.Parse(value));
-                            else
-                            if (value.Contains("true"))
-                                saparam[remap[label.ToString()]] = 1;
-                            else
-                            if (value.Contains("false"))
-                                saparam[remap[label.ToString()]] = 1;
-                            else
-                            if (value.Contains("."))
-                                saparam[remap[label.ToString()]] = (int)(float.Parse(value) * 256);
-                            else
-                                saparam[remap[label.ToString()]] = int.Parse(value);
-                        }
-                    }
+        //                if (remap.ContainsKey(label.ToString()))
+        //                {
+        //                    if (p.ToString().Contains("Constant"))
+        //                        saparam[remap[label.ToString()]] = (int)(float.Parse(value));
+        //                    else
+        //                    if (value.Contains("true"))
+        //                        saparam[remap[label.ToString()]] = 1;
+        //                    else
+        //                    if (value.Contains("false"))
+        //                        saparam[remap[label.ToString()]] = 1;
+        //                    else
+        //                    if (value.Contains("."))
+        //                        saparam[remap[label.ToString()]] = (int)(float.Parse(value) * 256);
+        //                    else
+        //                        saparam[remap[label.ToString()]] = int.Parse(value);
+        //                }
+        //            }
 
-                    sa.Add(new SubActionScript(Tools.SubactionGroup.Fighter)
-                    {
-                        data = subaction.Compile(saparam)
-                    });
-                }
+        //            sa.Add(new SubActionScript(Tools.SubactionGroup.Fighter)
+        //            {
+        //                data = subaction.Compile(saparam)
+        //            });
+        //        }
 
-            }
+        //    }
 
-            return sa;
-        }
+        //    return sa;
+        //}
     }
 }

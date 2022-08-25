@@ -613,10 +613,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             else
             {
                 // multiselect items
-                object[] a = new object[subActionList.SelectedItems.Count];
-                for (int i = 0; i < a.Length; i++)
-                    a[i] = subActionList.SelectedItems[i];
-                propertyGrid1.SelectedObjects = a;
+                //object[] a = new object[subActionList.SelectedItems.Count];
+                //for (int i = 0; i < a.Length; i++)
+                //    a[i] = subActionList.SelectedItems[i];
+                //propertyGrid1.SelectedObjects = a;
 
                 // disable action change for multiple objects
                 cbActionType.Enabled = false;

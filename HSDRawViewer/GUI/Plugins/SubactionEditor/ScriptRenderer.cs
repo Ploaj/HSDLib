@@ -525,7 +525,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 DrawShape.DrawSphere(FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone).WorldTransform, ShieldSize / 2, 16, 16, ShieldColor, 0.5f);
 
             // render gfx spawn
-            foreach (var gfx in Processor.GFXOnFrame)
+            foreach (var gfx in Processor.GFXOnFrame.ToArray())
             {
                 // do processing on bone id
                 var boneID = gfx.Bone;

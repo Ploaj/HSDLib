@@ -16,7 +16,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public ScriptSubrountine[] _subroutines { get; set; }
 
-        public delegate void SelectedAction(string symbol, HSDStruct action);
+        public delegate void SelectedAction(string symbol, HSDStruct action, int index);
         public SelectedAction SelectAction;
 
         public delegate void ActionListUpdated();
@@ -213,7 +213,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (subroutineArrayEditor != null)
                     subroutineArrayEditor.SelectObject(null);
 
-                SelectAction?.Invoke(action.Symbol, action._struct);
+                SelectAction?.Invoke(action.Symbol, action._struct, Array.FindIndex(_actions, a => a == action));
             }
         }
 
@@ -231,7 +231,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (actionArrayEditor != null)
                     actionArrayEditor.SelectObject(null);
 
-                SelectAction?.Invoke(null, action._struct);
+                SelectAction?.Invoke(null, action._struct, -1);
             }
         }
 
