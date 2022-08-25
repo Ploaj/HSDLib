@@ -228,7 +228,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // dipose of resources
             FormClosing += (s, a) =>
             {
-                if (AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+                if (AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     ItCo = null;
                     _animEditor.CloseOnExit = true;
