@@ -23,6 +23,11 @@ namespace HSDRaw.Tools
         }
 
         private float _rate;
+
+        public override string ToString()
+        {
+            return $"Frame: {Frame} Rate: {Rate}";
+        }
     }
 
     /// <summary>
@@ -310,11 +315,16 @@ namespace HSDRaw.Tools
             {
                 // check fsm
                 foreach (var v in frameSpeedMultiplers)
+                {
+                    if (v.Rate <= 0)
+                        continue;
+
                     if (f >= v.Frame && v.Frame >= maxFrame)
                     {
                         frameRate = v.Rate;
                         maxFrame = v.Frame;
                     }
+                }
 
                 // add new key
                 newKeys.Add(new FOBJKey()

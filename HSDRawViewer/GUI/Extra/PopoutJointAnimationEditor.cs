@@ -81,6 +81,8 @@ namespace HSDRawViewer.GUI.Extra
             };
 
             TopMost = true;
+
+            CenterToScreen();
         }
 
         /// <summary>

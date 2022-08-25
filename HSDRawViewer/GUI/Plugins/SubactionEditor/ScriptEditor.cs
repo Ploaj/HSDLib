@@ -4,12 +4,14 @@ using HSDRaw.Common.Animation;
 using HSDRaw.Melee;
 using HSDRaw.Melee.Cmd;
 using HSDRaw.Melee.Pl;
+using HSDRaw.Tools;
 using HSDRaw.Tools.Melee;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -122,9 +124,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private HSDRawFile ItCo;
 
-        private bool IsSaving = false;
-
         private JointAnimManager BackupAnim;
+        public List<FrameSpeedMultiplier> FrameSpeedModifiers { get; set; } = new List<FrameSpeedMultiplier>();
 
 
         /// <summary>
@@ -213,16 +214,33 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             // initialize animation editor
             _animEditor = new PopoutJointAnimationEditor(false);
+            _animEditor.FormClosing += (sender, args) =>
+            {
+                // quietly save changes to animation
+                if (_animEditor.MadeChanges)
+                {
+                    // MessageBox.Show("Changes Made");
+                    //if (MessageBox.Show("Save Changes to Animation?", "Save Animation", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+                    SaveAnimationChanges();
+                }
+            };
 
             // dipose of resources
             FormClosing += (s, a) =>
             {
-                ItCo = null;
-                _animEditor.CloseOnExit = true;
-                _animEditor.Dispose();
-                _actionList.Dispose();
-                _subactionEditor.Dispose();
-                _viewport.Dispose();
+                if (AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+                {
+                    ItCo = null;
+                    _animEditor.CloseOnExit = true;
+                    _animEditor.Dispose();
+                    _actionList.Dispose();
+                    _subactionEditor.Dispose();
+                    _viewport.Dispose();
+                }
+                else
+                {
+                    a.Cancel = true;
+                }
             };
         }
 
@@ -231,6 +249,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void LoadAnimation()
         {
+            // clear fsm
+            FrameSpeedModifiers.Clear();
+
+            //
             if (renderer.FighterModel.RootJObj != null)
             {
                 // get animation from file
@@ -326,6 +348,28 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
+        private void SaveAnimationChanges()
+        {
+            HSDRawFile f = new HSDRawFile();
+
+            f.Roots.Add(new HSDRootNode()
+            {
+                Name = _selectedActionSymbol,
+                Data = renderer.FighterModel.JointAnim.ToFigaTree()
+            });
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                f.Save(stream);
+                AJManager.SetAnimation(_selectedActionSymbol, stream.ToArray());
+            }
+
+            BackupAnim.FromFigaTree(renderer.FighterModel.JointAnim.ToFigaTree());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void loadModelAndAnimationToolStripMenuItem_Click(object sender, EventArgs e)
@@ -402,42 +446,35 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void SaveFighterAnimationFile()
         {
-            //// rendering files not loaded
-            //if (string.IsNullOrEmpty(AJFilePath))
-            //    return;
+            // rendering files not loaded
+            if (string.IsNullOrEmpty(AJFilePath))
+                return;
 
-            //// collect used symbols from all actions
-            //var usedSymbols = AllActions.Select(e => e.Symbol).ToArray();
+            // collect used symbols from all actions
+            var usedSymbols = _actionList._actions.Select(e => e.Symbol).ToArray();
 
-            //// generate new aj file
-            //var newAJFile = AJManager.RebuildAJFile(usedSymbols, false);
+            // generate new aj file
+            var newAJFile = AJManager.RebuildAJFile(usedSymbols, false);
 
-            //// update animation offset and sizes
-            //foreach (var a in AllActions)
-            //{
-            //    // don't write subroutines
-            //    if (a.Subroutine)
-            //        continue;
+            // update animation offset and sizes
+            foreach (var a in _actionList._actions)
+            {
+                // update animation size and offset
+                if (!string.IsNullOrEmpty(a.Symbol))
+                {
+                    var offsize = AJManager.GetOffsetSize(a.Symbol);
+                    a.AnimOffset = offsize.Item1;
+                    a.AnimSize = offsize.Item2;
+                }
+            }
 
-            //    // update animation size and offset
-            //    if (!string.IsNullOrEmpty(a.Symbol))
-            //    {
-            //        var offsize = AJManager.GetOffsetSize(a.Symbol);
-            //        a.AnimOffset = offsize.Item1;
-            //        a.AnimSize = offsize.Item2;
-            //    }
-            //}
+            // save commands
+            if (_table != null)
+                _table.Commands = _actionList.ToActions().ToArray();
 
-            //// save action changes to dat file
-            //IsSaving = true;
-            //SaveAllActionChanges();
-            //IsSaving = false;
-
-            //// dump to file
-            //File.WriteAllBytes(AJFilePath, newAJFile);
+            // dump to file
+            File.WriteAllBytes(AJFilePath, newAJFile);
         }
-
-
 
         /// <summary>
         /// 
@@ -518,51 +555,50 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private bool BuildDemoAJFile(string symbol, string ajpath, int actionstart, int actionend)
         {
-            //if (string.IsNullOrEmpty(symbol))
-            //    return false;
+            if (string.IsNullOrEmpty(symbol))
+                return false;
 
-            //// get actions
-            //var actions = new Action[actionend - actionstart + 1];
-            //for (int i = actionstart; i <= actionend; i++)
-            //    actions[i - actionstart] = AllActions[i];
+            var AllActions = _actionList._actions.ToList();
 
-            //// rebuild aj file
-            //var data = AJManager.RebuildAJFile(actions.Select(e => e.Symbol).ToArray(), false);
+            // get actions
+            var actions = new ScriptAction[actionend - actionstart + 1];
+            for (int i = actionstart; i <= actionend; i++)
+                actions[i - actionstart] = AllActions[i];
 
-            //// update animation offset and sizes
-            //foreach (var a in actions)
-            //{
-            //    // don't write subroutines
-            //    if (a.Subroutine)
-            //        continue;
+            // rebuild aj file
+            var data = AJManager.RebuildAJFile(actions.Select(e => e.Symbol).ToArray(), false);
 
-            //    // update animation size and offset
-            //    if (!string.IsNullOrEmpty(a.Symbol))
-            //    {
-            //        var offsize = AJManager.GetOffsetSize(a.Symbol);
-            //        a.AnimOffset = offsize.Item1;
-            //        a.AnimSize = offsize.Item2;
-            //    }
-            //}
+            // update animation offset and sizes
+            foreach (var a in actions)
+            {
+                // update animation size and offset
+                if (!string.IsNullOrEmpty(a.Symbol))
+                {
+                    var offsize = AJManager.GetOffsetSize(a.Symbol);
+                    a.AnimOffset = offsize.Item1;
+                    a.AnimSize = offsize.Item2;
+                }
+            }
 
-            //// save action changes to dat file
-            //SaveAllActionChanges();
+            // save commands
+            if (_table != null)
+                _table.Commands = _actionList.ToActions().ToArray();
 
-            //// load or create file
-            //HSDRawFile file = null;
-            //if (File.Exists(ajpath))
-            //    file = new HSDRawFile(ajpath);
-            //else
-            //    file = new HSDRawFile();
+            // load or create file
+            HSDRawFile file = null;
+            if (File.Exists(ajpath))
+                file = new HSDRawFile(ajpath);
+            else
+                file = new HSDRawFile();
 
-            //// update or add aj data
-            //var dataAccessor = new HSDAccessor() { _s = new HSDStruct(data) };
-            //if (file[symbol] != null)
-            //    file[symbol].Data = dataAccessor;
-            //else
-            //    file.Roots.Add(new HSDRootNode() { Name = symbol, Data = dataAccessor });
+            // update or add aj data
+            var dataAccessor = new HSDAccessor() { _s = new HSDStruct(data) };
+            if (file[symbol] != null)
+                file[symbol].Data = dataAccessor;
+            else
+                file.Roots.Add(new HSDRootNode() { Name = symbol, Data = dataAccessor });
 
-            //// update or add easy table
+            // TODO: update or add easy table
             //if (symbol == IntroSymbol)
             //{
             //    if (file["gmIntroEasyTable"] != null)
@@ -571,8 +607,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //        file.Roots.Add(new HSDRootNode() { Name = "gmIntroEasyTable", Data = easyTable });
             //}
 
-            //// save file
-            //file.Save(ajpath);
+            // save file
+            file.Save(ajpath);
 
             return true;
         }
@@ -649,31 +685,209 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             //if (fsmMode.Checked)
             //{
-            //    foreach (var fsm in FrameSpeedModifiers)
-            //    {
-            //        viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
-            //        {
-            //            Frame = fsm.Frame,
-            //            Color = Color.Purple,
-            //            Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color,
-            //            Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
-            //        });
+            foreach (var fsm in FrameSpeedModifiers)
+            {
+                _viewport.glViewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                {
+                    Frame = fsm.Frame,
+                    Color = Color.Purple,
+                    Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color,
+                    Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
+                });
 
-            //        viewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
-            //        {
-            //            Frame = fsm.Frame,
-            //            Color = Color.White,
-            //            Text = fsm.Rate.ToString(),
-            //            Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Text,
-            //            Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
-            //        });
-            //    }
+                _viewport.glViewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
+                {
+                    Frame = fsm.Frame,
+                    Color = Color.White,
+                    Text = fsm.Rate.ToString(),
+                    Style = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Text,
+                    Location = GUI.Controls.PlaybackBarFrameTip.PlaybackBarFrameTipLocation.Upper
+                });
+            }
             //}
 
             _viewport.glViewport.Invalidate();
 
             // set frame
             renderer.SetFrame(_viewport.glViewport.Frame);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void OnDatFileSave()
+        {
+            if (!string.IsNullOrEmpty(AJFilePath))
+                SaveFighterAnimationFile();
+
+            if (!string.IsNullOrEmpty(ResultFilePath))
+                SaveDemoAnimationFiles();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+            
+            if (_actionList.SelectedAction != null)
+            {
+                var f = FileIO.OpenFile("Supported Formats |*.dat;*.anim");
+
+                HSDRawFile file;
+
+                // if it's a maya anim then convert to figatree and set the symbol
+                if (f.ToLower().EndsWith(".anim"))
+                {
+                    var anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
+
+                    file = new HSDRawFile();
+                    file.Roots.Add(new HSDRootNode()
+                    {
+                        Name = _selectedActionSymbol,
+                        Data = anim.ToFigaTree(0.01f)
+                    });
+                }
+                else
+                {
+                    // just load dat normally
+                    try
+                    {
+                        file = new HSDRawFile(f);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                }
+
+                // check if figatree data is found
+                if (file == null || file.Roots.Count > 0 && file.Roots[0].Data is HSD_FigaTree tree)
+                {
+                    //grab symbol
+                    var symbol = file.Roots[0].Name;
+
+                    //check if symbol exists and ok to overwrite
+                    if (AJManager.GetAnimationData(symbol) != null)
+                    {
+                        if (MessageBox.Show($"Symbol \"{symbol}\" already exists.\nIs it okay to overwrite?", "Overwrite Symbol", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                            return;
+                    }
+
+                    // set animation data
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        file.Save(stream);
+                        AJManager.SetAnimation(symbol, stream.ToArray());
+                    }
+
+                    // set action symbol
+                    _actionList.SelectedAction.Symbol = symbol;
+                    _selectedActionSymbol = symbol;
+
+                    // reselect action
+                    LoadAnimation();
+
+                    // 
+                    _actionList.Invalidate();
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void asMayaAnimToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+
+            renderer.FighterModel.JointAnim.ExportAsMayaAnim(null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void asFigaTreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+
+            renderer.FighterModel.JointAnim.ExportAsFigatree();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+
+            _animEditor.Show();
+            _animEditor.Visible = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void applyFSMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+
+            // component box edit fsms
+            PopoutCollectionEditor.EditValue(this, this, "FrameSpeedModifiers");
+
+            // remove rates of 0
+            FrameSpeedModifiers.RemoveAll(e => e.Rate <= 0);
+
+            // load backup animation
+            var tempanim = new JointAnimManager();
+            tempanim.FromFigaTree(BackupAnim.ToFigaTree());
+            var backup = BackupAnim;
+
+            // apply fsms to backup animation
+            tempanim.ApplyFSMs(FrameSpeedModifiers);
+
+            // load edited anim
+            renderer.LoadAnimation(_selectedActionSymbol, tempanim);
+            _animEditor.SetJoint(renderer.FighterModel.RootJObj.Desc, tempanim);
+            _viewport.glViewport.MaxFrame = tempanim.FrameCount;
+
+            // new backup
+            BackupAnim = backup;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void applyFSMToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+
+            if (MessageBox.Show("Are you sure you want to apply fsms?\nThis operation cannot be undone.", "Apply FSMs", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                SaveAnimationChanges();
+                FrameSpeedModifiers.Clear();
+                LoadAnimation();
+            }
         }
     }
 }

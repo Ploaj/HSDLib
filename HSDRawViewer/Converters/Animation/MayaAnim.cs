@@ -59,7 +59,10 @@ namespace HSDRawViewer.Converters
             foreach(var n in animation.Nodes)
             {
                 MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
-                mnode.name = !string.IsNullOrEmpty(jointMap[nodeIndex]) ? jointMap[nodeIndex] : "JOBJ_" + nodeIndex;
+                if (jointMap != null && !string.IsNullOrEmpty(jointMap[nodeIndex]))
+                    mnode.name = jointMap[nodeIndex];
+                else
+                    mnode.name = "JOBJ_" + nodeIndex;
                 a.Nodes.Add(mnode);
                 
                 foreach(var t in n.Tracks)

@@ -70,7 +70,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         public override string ToString()
         {
-            return TOBJ.Flags.ToString();
+            return $"{TOBJ.TexMapID} {TOBJ.Flags.ToString()}";
         }
     }
 }

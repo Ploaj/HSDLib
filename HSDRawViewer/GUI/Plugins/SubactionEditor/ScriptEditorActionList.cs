@@ -16,11 +16,19 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public ScriptSubrountine[] _subroutines { get; set; }
 
-        public delegate void SelectedAction(string symbol, HSDStruct action, int index);
-        public SelectedAction SelectAction;
+        public delegate void SelectedActionCallback(string symbol, HSDStruct action, int index);
+        public SelectedActionCallback SelectAction;
 
         public delegate void ActionListUpdated();
         public ActionListUpdated ActionsUpdated;
+
+        public ScriptAction SelectedAction
+        {
+            get
+            {
+                return actionArrayEditor.SelectedObject as ScriptAction;
+            }
+        }
 
         public bool CanAddNewActions
         {

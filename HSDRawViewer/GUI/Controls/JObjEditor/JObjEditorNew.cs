@@ -747,19 +747,20 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             var mult = new FrameSpeedModifierSettings();
 
-            using (PropertyDialog d = new PropertyDialog("Frame Speed Multipler Settings", mult))
-                if (d.ShowDialog() == DialogResult.OK)
-                {
-                    foreach (var j in _jointTree.EnumerateJoints())
-                        foreach (var i in j.Tracks)
-                            i.ApplyFSMs(mult.Modifiers);
+            PopoutCollectionEditor.EditValue(this, mult, "Modifiers");
 
-                    // recalculat frame count
-                    EnableAnimation();
+            if (mult.Modifiers.Count > 0)
+            {
+                foreach (var j in _jointTree.EnumerateJoints())
+                    foreach (var i in j.Tracks)
+                        i.ApplyFSMs(mult.Modifiers);
 
-                    // re apply animation
-                    ApplyEditorAnimation(Frame);
-                }
+                // recalculat frame count
+                EnableAnimation();
+
+                // re apply animation
+                ApplyEditorAnimation(Frame);
+            }
         }
 
 
