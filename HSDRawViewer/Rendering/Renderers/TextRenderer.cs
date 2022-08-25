@@ -97,8 +97,8 @@ namespace HSDRawViewer.Rendering.Renderers
             if (!Initialized)
                 return;
 
-            var pos = Vector3.TransformPosition(Vector3.Zero, worldSpace * cam.MvpMatrix);
-            pos.Xy /= pos.Z;
+            var pos = Vector4.UnitW * (worldSpace * cam.MvpMatrix);
+            pos.Xy /= pos.W;
             pos.Y *= -1;
             pos.X *= cam.RenderWidth / 2;
             pos.Y *= cam.RenderHeight / 2;

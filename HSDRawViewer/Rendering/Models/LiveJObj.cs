@@ -52,7 +52,8 @@ namespace HSDRawViewer.Rendering.Models
         public Vector3 Scale;
 
         public Matrix4 LocalTransform;
-        public Matrix4 WorldTransform;
+        public Matrix4 WorldTransform { get => _worldTransform; set { _worldTransform = value; BindTransform = InvertedTransform * value; } }
+        private Matrix4 _worldTransform;
         private Matrix4 InvertedTransform;
         public Matrix4 BindTransform;
 
@@ -369,7 +370,7 @@ namespace HSDRawViewer.Rendering.Models
             }
 
             // calculate the bind matrix
-            BindTransform = InvertedTransform * WorldTransform;
+            // BindTransform = InvertedTransform * WorldTransform;
 
             // process children
             if (Child != null && updateChildren)

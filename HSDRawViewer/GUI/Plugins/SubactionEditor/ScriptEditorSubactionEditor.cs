@@ -20,8 +20,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private SubactionGroup Type = SubactionGroup.None;
 
-        public delegate void ScriptEditedCallback(HSDStruct str);
+        public delegate void ScriptEditedCallback(List<SubactionEvent> events);
         public ScriptEditedCallback ScriptEdited;
+
+        public delegate void SelectedIndexChange(List<SubactionEvent> selectedEvents);
+        public SelectedIndexChange SelectedIndexedChanged;
 
         private Stack<HSDStruct> UndoDataStack = new Stack<HSDStruct>();
         private Stack<HSDStruct> RedoDataStack = new Stack<HSDStruct>();
@@ -91,7 +94,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (i is SubactionEvent ev)
                     events.Add(ev);
 
-            ScriptEdited?.Invoke(SubactionEvent.CompileEvent(events));
+            ScriptEdited?.Invoke(events);
 
             RedoDataStack.Clear();
             UndoDataStack.Push(SubactionEvent.CompileEvent(events));
@@ -100,14 +103,14 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
-        public void InitScript(SubactionGroup type, HSDStruct data)
+        public void InitScript(SubactionGroup type, List<SubactionEvent> events)
         {
             //
-            LoadData(type, data);
+            LoadData(type, events);
 
             // initialize undo stack
             UndoDataStack.Clear();
-            UndoDataStack.Push(SubactionEvent.CompileEvent(SubactionEvent.GetEvents(type, data)));
+            UndoDataStack.Push(SubactionEvent.CompileEvent(events));
         }
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         /// <param name="type"></param>
         /// <param name="data"></param>
-        private void LoadData(SubactionGroup type, HSDStruct data)
+        private void LoadData(SubactionGroup type, List<SubactionEvent> events)
         {
             // load action types
             if (type != Type)
@@ -128,7 +131,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             Type = type;
 
             //
-            var events = SubactionEvent.GetEvents(type, data);
+            // var events = SubactionEvent.GetEvents(type, data);
 
             //
             subActionList.BeginUpdate();
@@ -152,9 +155,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                 if (undo != null)
                 {
-                    LoadData(Type, undo);
+                    var events = SubactionEvent.GetEvents(Type, undo).ToList();
+                    LoadData(Type, events);
                     RedoDataStack.Push(undo);
-                    ScriptEdited?.Invoke(undo);
+                    ScriptEdited?.Invoke(events);
                 }
             }
         }
@@ -170,9 +174,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                 if (redo != null)
                 {
-                    LoadData(Type, redo);
+                    var events = SubactionEvent.GetEvents(Type, redo).ToList();
+                    LoadData(Type, events);
                     UndoDataStack.Push(redo);
-                    ScriptEdited?.Invoke(redo);
+                    ScriptEdited?.Invoke(events);
                 }
             }
         }
@@ -621,6 +626,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 // disable action change for multiple objects
                 cbActionType.Enabled = false;
             }
+
+            List<SubactionEvent> selected = new List<SubactionEvent>();
+            foreach (SubactionEvent s in subActionList.SelectedItems)
+                selected.Add(s);
+            SelectedIndexedChanged?.Invoke(selected);
         }
 
         /// <summary>

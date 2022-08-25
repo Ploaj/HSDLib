@@ -24,7 +24,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public int Element;
         public Vector3 Point1;
         public Vector3 Point2;
-        public int CommandIndex;
+
+        public SubactionEvent EventSource;
 
         public Vector3 GetWorldPosition(LiveJObj manager)
         {
@@ -57,11 +58,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
     {
         public class Command
         {
-            public Subaction Action;
-
-            public int[] Parameters;
-
-            public HSDStruct Reference;
+            public SubactionEvent Event;
 
             public List<Command> ReferenceCommands = new List<Command>();
         }
@@ -115,9 +112,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public delegate void SpawnGFX(int bone, int gfxid, float x, float y, float z, float range_x, float range_y, float range_z);
         public SpawnGFX SpawnGFXMethod;
 
-
-        private HSDStruct Struct;
-
         /// <summary>
         /// 
         /// </summary>
@@ -147,11 +141,19 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="str"></param>
-        public void SetStruct(HSDStruct str, SubactionGroup subGroup)
+        public void ClearFighterFlags()
         {
-            Struct = str;
-            Commands = GetCommands(Struct, subGroup);
+            for (int i = 0; i < FighterFlagWasSetThisFrame.Length; i++)
+                FighterFlagWasSetThisFrame[i] = false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="str"></param>
+        public void SetStruct(List<SubactionEvent> events, SubactionGroup subGroup)
+        {
+            Commands = GetCommands(events, subGroup);
             ResetState();
             SetFrame(0);
         }
@@ -160,62 +162,45 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// 
         /// </summary>
         /// <param name="data"></param>
-        private List<Command> GetCommands(HSDStruct str, SubactionGroup subGroup, Dictionary<HSDStruct, List<Command>> structToComman = null)
+        private List<Command> GetCommands(List<SubactionEvent> events, SubactionGroup subGroup, Dictionary<HSDStruct, List<Command>> structToComman = null)
         {
             if (subGroup != SubactionGroup.Fighter)
                 return new List<Command>();
 
             if (structToComman == null)
-                structToComman = new Dictionary<HSDStruct, List<Command>>();
-
-            if (structToComman.ContainsKey(str))
-                return structToComman[str];
-
-            var data = str.GetData();
-
-            var Commands = new List<Command>();
-            structToComman.Add(str, Commands);
-
-            for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction(data[i], subGroup);
-
-                var cmd = new Command();
-
-                foreach (var r in str.References)
-                {
-                    if (r.Key >= i && r.Key < i + sa.ByteSize)
-                        if (cmd.Reference != null)
-                            throw new NotSupportedException("Multiple References not supported");
-                        else
-                        {
-                            if (r.Value != str) // prevent self reference
-                            {
-                                cmd.Reference = r.Value;
-                                cmd.ReferenceCommands = GetCommands(cmd.Reference, subGroup, structToComman);
-                            }
-                        }
-                }
-
-                var sub = new byte[sa.ByteSize];
-
-                if (i + sub.Length > data.Length)
-                    break;
-
-                for (int j = 0; j < sub.Length; j++)
-                    sub[j] = data[i + j];
-
-                cmd.Parameters = sa.GetParameters(sub);
-                cmd.Action = sa;
-                Commands.Add(cmd);
-
-                i += sa.ByteSize;
-
-                if (sa.Code == 0)
-                    break;
+                structToComman = new Dictionary<HSDStruct, List<Command>>();
             }
 
-            return Commands;
+            List<Command> commands = new List<Command>();
+
+            foreach (var ev in events)
+            {
+                var command = new Command()
+                {
+                    Event = ev,
+                };
+                commands.Add(command);
+
+                // process pointer data
+                var pointer = ev.GetPointer();
+                if (pointer != null)
+                {
+                    if (structToComman.ContainsKey(pointer))
+                    {
+                        commands = structToComman[pointer];
+                    }
+                    else
+                    {
+                        structToComman.Add(pointer, new List<Command>());
+                        var subcommand = GetCommands(SubactionEvent.GetEvents(subGroup, pointer).ToList(), subGroup, structToComman);
+                        structToComman[pointer] = subcommand;
+                        command.ReferenceCommands = subcommand;
+                    }
+                }
+            }
+
+            return commands;
         }
 
 
@@ -252,19 +237,20 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             for (int i = 0; i < commands.Count; i++)
             {
                 var cmd = commands[i];
-                switch (cmd.Action.Code)
+                var ev = cmd.Event;
+                switch (cmd.Event.Code)
                 {
                     case 0 << 2: //end script
                         time = int.MaxValue;
                         break;
                     case 1 << 2: //synchronous
-                        time += cmd.Parameters[0];
+                        time += ev.GetParameter(0);
                         break;
                     case 2 << 2: //asynchronus
-                        time = cmd.Parameters[0];
+                        time = ev.GetParameter(0);
                         break;
                     case 3 << 2: //start loop
-                        loopAmt = cmd.Parameters[0];
+                        loopAmt = ev.GetParameter(0);
                         loopPos = i;
                         break;
                     case 4 << 2: //end loop
@@ -287,38 +273,38 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                             GFXOnFrame.Add(new GFXSpawn()
                             {
                                 Frame = time,
-                                Bone = cmd.Parameters[0],
-                                ID = cmd.Parameters[4],
-                                Position = new Vector3(cmd.Parameters[6] / 256f, cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f),
-                                Range = new Vector3(cmd.Parameters[9] / 256f, cmd.Parameters[10] / 256f, cmd.Parameters[11] / 256f),
+                                Bone = ev.GetParameter(0),
+                                ID = ev.GetParameter(4),
+                                Position = new Vector3(ev.GetParameter(6) / 256f, ev.GetParameter(7) / 256f, ev.GetParameter(8) / 256f),
+                                Range = new Vector3(ev.GetParameter(9) / 256f, ev.GetParameter(10) / 256f, ev.GetParameter(11) / 256f),
                             });
                         }
                         //SpawnGFXMethod(cmd.Parameters[0], cmd.Parameters[4], cmd.Parameters[6] / 256f, cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f, cmd.Parameters[10] / 256f, cmd.Parameters[11] / 256f);
                         break;
                     case 11 << 2: // Create Hitbox
                         // remove the current hitbox with this id
-                        if (cmd.Parameters[0] < Hitboxes.Length)
+                        if (ev.GetParameter(0) < Hitboxes.Length)
                         {
-                            var hb = Hitboxes[cmd.Parameters[0]];
-                            hb.CommandIndex = i;
+                            var hb = Hitboxes[ev.GetParameter(0)];
+                            hb.EventSource = ev;
                             hb.CreatedOnFrame = time;
                             hb.Active = true;
-                            hb.BoneID = cmd.Parameters[3];
-                            hb.Size = (short)cmd.Parameters[6] / 256f;
-                            hb.Point1 = new Vector3(cmd.Parameters[7] / 256f, cmd.Parameters[8] / 256f, cmd.Parameters[9] / 256f);
-                            hb.Angle = cmd.Parameters[10];
-                            hb.Element = cmd.Parameters[19];
+                            hb.BoneID = ev.GetParameter(3);
+                            hb.Size = (short)ev.GetParameter(6) / 256f;
+                            hb.Point1 = new Vector3(ev.GetParameter(7) / 256f, ev.GetParameter(8) / 256f, ev.GetParameter(9) / 256f);
+                            hb.Angle = ev.GetParameter(10);
+                            hb.Element = ev.GetParameter(19);
                         }
                         break;
                     case 13 << 2: // adjust size
                         {
-                            if (cmd.Parameters[0] < Hitboxes.Length)
-                                Hitboxes[cmd.Parameters[0]].Size = (short)cmd.Parameters[1] / 256f; //TODO: ? (short)cmd.Parameters[1] / 150f;
+                            if (ev.GetParameter(0) < Hitboxes.Length)
+                                Hitboxes[ev.GetParameter(0)].Size = (short)ev.GetParameter(1) / 256f; //TODO: ? (short)cmd.Parameters[1] / 150f;
                         }
                         break;
                     case 15 << 2:
-                        if (cmd.Parameters[0] < Hitboxes.Length)
-                            Hitboxes[cmd.Parameters[0]].Active = false;
+                        if (ev.GetParameter(0) < Hitboxes.Length)
+                            Hitboxes[ev.GetParameter(0)].Active = false;
                         break;
                     case 16 << 2:
                         {
@@ -327,11 +313,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         }
                         break;
                     case 19 << 2:
-                        if (cmd.Parameters[0] < FighterFlagValues.Length)
+                        if (ev.GetParameter(0) < FighterFlagValues.Length)
                         {
-                            fighterFlagSetFrame[cmd.Parameters[0]] = time;
-                            FighterFlagWasSetThisFrame[cmd.Parameters[0]] = true;
-                            FighterFlagValues[cmd.Parameters[0]] = cmd.Parameters[1];
+                            fighterFlagSetFrame[ev.GetParameter(0)] = time;
+                            FighterFlagWasSetThisFrame[ev.GetParameter(0)] = true;
+                            FighterFlagValues[ev.GetParameter(0)] = ev.GetParameter(1);
                         }
                         break;
                     case 20 << 2: // throw
@@ -341,44 +327,44 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         AllowInterrupt = true;
                         break;
                     case 26 << 2:
-                        BodyCollisionState = cmd.Parameters[0];
+                        BodyCollisionState = ev.GetParameter(0);
                         break;
                     case 27 << 2:
                         // i don't really know how many bone to assume...
                         for (int j = 0; j < 100; j++)
                         {
                             if (BoneCollisionStates.ContainsKey(j))
-                                BoneCollisionStates[j] = cmd.Parameters[0];
+                                BoneCollisionStates[j] = ev.GetParameter(0);
                             else
-                                BoneCollisionStates.Add(j, cmd.Parameters[0]);
+                                BoneCollisionStates.Add(j, ev.GetParameter(0));
                         }
                         break;
                     case 28 << 2:
-                        if (cmd.Parameters.Length > 1)
+                        //if (cmd.Parameters.Length > 1)
                         {
-                            if (BoneCollisionStates.ContainsKey(cmd.Parameters[0]))
-                                BoneCollisionStates[cmd.Parameters[0]] = cmd.Parameters[1];
+                            if (BoneCollisionStates.ContainsKey(ev.GetParameter(0)))
+                                BoneCollisionStates[ev.GetParameter(0)] = ev.GetParameter(1);
                             else
-                                BoneCollisionStates.Add(cmd.Parameters[0], cmd.Parameters[1]);
+                                BoneCollisionStates.Add(ev.GetParameter(0), ev.GetParameter(1));
                         }
                         break;
                     case 31 << 2: // struct vis change
                         if (UpdateVISMethod != null)
-                            UpdateVISMethod(cmd.Parameters[0], cmd.Parameters[2]);
+                            UpdateVISMethod(ev.GetParameter(0), ev.GetParameter(2));
                         break;
                     case 37 << 2:
-                        IsInvisible = cmd.Parameters[1] == 1;
+                        IsInvisible = ev.GetParameter(1) == 1;
                         break;
                     case 40 << 2:
                         if (AnimateMaterialMethod != null)
-                            AnimateMaterialMethod(cmd.Parameters[1], cmd.Parameters[3], cmd.Parameters[0], cmd.Parameters[2]);
+                            AnimateMaterialMethod(ev.GetParameter(1), ev.GetParameter(3), ev.GetParameter(0), ev.GetParameter(2));
                         break;
                     case 41 << 2:
                         if (AnimateModelMethod != null)
-                            AnimateModelMethod(cmd.Parameters[0], cmd.Parameters[1]);
+                            AnimateModelMethod(ev.GetParameter(0), ev.GetParameter(1));
                         break;
                     case 46 << 2: //overlay color
-                        if (cmd.Parameters[0] == 1)
+                        if (ev.GetParameter(0) == 1)
                         {
                         }
                         break;
@@ -406,15 +392,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             }
 
             return time;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void ClearFighterFlags()
-        {
-            for (int i = 0; i < FighterFlagWasSetThisFrame.Length; i++)
-                FighterFlagWasSetThisFrame[i] = false;
         }
 
     }

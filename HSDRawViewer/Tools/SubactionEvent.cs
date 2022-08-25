@@ -22,6 +22,8 @@ namespace HSDRawViewer.Tools
 
                 if (Signed)
                 {
+                    _value = SignValue(_value);
+
                     var mask = (1L << (_bitcount - 1)) - 1L;
 
                     if (_value > mask)
@@ -61,6 +63,29 @@ namespace HSDRawViewer.Tools
         public override string ToString()
         {
             return Hex ? "0x" + Value.ToString("X8") : Value.ToString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        private long SignValue(long v)
+        {
+            var isSigned = ((v >> (_bitcount - 1)) & 0x1) == 1;
+
+            if (isSigned)
+            {
+                var bitMask = 0;
+                for (int j = 0; j < _bitcount; j++)
+                    bitMask |= (1 << j);
+                v = ~v;
+                v = v & bitMask;
+                v += 1;
+                v *= -1;
+            }
+
+            return v;
         }
 
         public class CustomIntPropertyConverter : TypeConverter
@@ -246,6 +271,57 @@ namespace HSDRawViewer.Tools
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public int GetParameter(int i)
+        {
+            // load description and code byte
+            var desc = SubactionManager.GetSubaction(Code, Type);
+
+            var p = desc.Parameters[i];
+
+            if (p.IsPointer)
+            {
+                return 0;
+            }
+            if (p.HasEnums)
+            {
+                return ((CustomEnumProperty)this[i].Value).SelectedEnumIndex;
+            }
+            else
+            if (p.IsFloat)
+            {
+                return BitConverter.ToInt32(BitConverter.GetBytes((float)this[i].Value));
+            }
+            else
+            {
+                return (int)((CustomIntProperty)this[i].Value).Value;
+            }
+        }
+
+        /// <summary>
+        /// returns pointer to hsdstruct data if one exists
+        /// returns null otherwise
+        /// </summary>
+        /// <returns></returns>
+        public HSDStruct GetPointer()
+        {
+            var desc = SubactionManager.GetSubaction(Code, Type);
+
+            for (int i = 0; i < desc.Parameters.Length; i++)
+            {
+                var p = desc.Parameters[i];
+
+                if (p.IsPointer)
+                {
+                    return ((CustomPointerProperty)this[i].Value).Pointer;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="type"></param>
         public SubactionEvent(SubactionGroup type, byte code)
         {
@@ -272,6 +348,9 @@ namespace HSDRawViewer.Tools
 
             // get action
             var desc = SubactionManager.GetSubaction(code, Type);
+
+            if (!desc.IsCustom)
+                Code &= 0xFC;
 
             // clear current params
             Clear();

@@ -306,6 +306,9 @@ namespace HSDRawViewer.Rendering
             GL.PushMatrix();
             GL.MultMatrix(ref t);
 
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Front);
+
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 

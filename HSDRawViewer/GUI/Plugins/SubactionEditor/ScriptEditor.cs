@@ -172,14 +172,17 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 _selectedActionSymbol = symbol;
                 _selectStateIndex = index;
 
+                // get events
+                var events = SubactionEvent.GetEvents(SubactionGroup.Fighter, a).ToList();
+
                 // set script in editor
-                _subactionEditor.InitScript(SubactionGroup, a);
+                _subactionEditor.InitScript(SubactionGroup, events);
 
                 // load animation 
                 LoadAnimation();
 
                 // update renderer script
-                renderer.SetScript(a);
+                renderer.SetScript(events);
 
                 // update frame tips
                 UpdateFrameTips();
@@ -199,17 +202,22 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             _subactionEditor = new ScriptEditorSubactionEditor();
             _subactionEditor.Show(dockPanel1, DockState.DockTop);
 
-            _subactionEditor.ScriptEdited += (a) =>
+            _subactionEditor.ScriptEdited += (e) =>
             {
                 // update select action script
                 if (_selectedAction != null)
-                    _selectedAction.SetFromStruct(a);
+                    _selectedAction.SetFromStruct(SubactionEvent.CompileEvent(e));
 
                 // update renderer script
-                renderer.SetScript(a);
+                renderer.SetScript(e);
 
                 // update frame tips
                 UpdateFrameTips();
+            };
+
+            _subactionEditor.SelectedIndexedChanged += (e) =>
+            {
+                renderer.SelectedEvents = e;
             };
 
             // initialize animation editor
@@ -228,7 +236,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // dipose of resources
             FormClosing += (s, a) =>
             {
-                if (AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+                //if (AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     ItCo = null;
                     _animEditor.CloseOnExit = true;
@@ -237,11 +245,49 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     _subactionEditor.Dispose();
                     _viewport.Dispose();
                 }
-                else
-                {
-                    a.Cancel = true;
-                }
+                //else
+                //{
+                //    a.Cancel = true;
+                //}
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        private HSD_FigaTree GetFigatreeFromSymbol(string symbol)
+        {
+            // get animation from file
+            var data = AJManager.GetAnimationData(symbol);
+            if (data != null)
+            {
+                var animFile = new HSDRawFile(data);
+                if (animFile.Roots[0].Data is HSD_FigaTree tree)
+                {
+                    return tree;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="throwstate"></param>
+        private void CheckLoadThrowDummy(int state, int throwstate)
+        {
+            if (_selectStateIndex == state && throwstate < _actionList._actions.Length)
+            {
+                var throwAction = _actionList._actions[throwstate];
+                var treeDummy = GetFigatreeFromSymbol(throwAction.Symbol);
+
+                if (treeDummy != null)
+                    renderer.LoadThrowDummyAnimation(new JointAnimManager(treeDummy));
+            }
         }
 
         /// <summary>
@@ -253,47 +299,54 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             FrameSpeedModifiers.Clear();
 
             //
+            renderer.LoadThrowDummyAnimation(null);
+
+            //
             if (renderer.FighterModel.RootJObj != null)
             {
                 // get animation from file
-                var data = AJManager.GetAnimationData(_selectedActionSymbol);
-                if (data != null)
+                var tree = GetFigatreeFromSymbol(_selectedActionSymbol);
+                if (tree != null)
                 {
-                    var animFile = new HSDRawFile(data);
-                    if (animFile.Roots[0].Data is HSD_FigaTree tree)
-                    {
-                        // load as joint animation
-                        var anim = new JointAnimManager(tree);
+                    // load as joint animation
+                    var anim = new JointAnimManager(tree);
 
-                        // set backup anim
-                        BackupAnim = new JointAnimManager(tree);
+                    // set backup anim
+                    BackupAnim = new JointAnimManager(tree);
 
-                        // load animation in anim editor
-                        _animEditor.SetJoint(renderer.FighterModel.RootJObj.Desc, anim);
+                    // load animation in anim editor
+                    _animEditor.SetJoint(renderer.FighterModel.RootJObj.Desc, anim);
 
-                        // load animation into render
-                        renderer.LoadAnimation(_selectedActionSymbol, anim);
+                    // load animation into render
+                    renderer.LoadAnimation(anim);
 
-                        // set end frame
-                        _viewport.glViewport.Frame = 0;
-                        _viewport.glViewport.MaxFrame = tree.FrameCount;
-                    }
+                    // load throw dummy for thrown animations
+                    //247, 248, 249, 250
+                    //262, 263, 264, 265
+                    CheckLoadThrowDummy(247, 262);
+                    CheckLoadThrowDummy(248, 263);
+                    CheckLoadThrowDummy(249, 264);
+                    CheckLoadThrowDummy(250, 265);
+
+                    // set end frame
+                    _viewport.glViewport.Frame = 0;
+                    _viewport.glViewport.MaxFrame = tree.FrameCount;
                 }
                 else
                 {
                     // load animation into render
-                    renderer.LoadAnimation(_selectedActionSymbol, null);
+                    renderer.LoadAnimation(null);
                 }
 
                 // clear action state render tips
-                renderer.RenderShield = false;
-                renderer.RenderItem = false;
+                renderer.IsShieldState = false;
+                renderer.HasItem = false;
 
                 // load and display optional data
                 if (!string.IsNullOrEmpty(_selectedActionSymbol))
                 {
                     // set sheild render
-                    renderer.RenderShield = _selectedActionSymbol.Contains("Guard");
+                    renderer.IsShieldState = _selectedActionSymbol.Contains("Guard");
 
                     // load optional item model
                     if (_selectedActionSymbol.Contains("ItemParasol"))
@@ -339,7 +392,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     if (item.Model.RootModelJoint != null)
                     {
                         renderer.LoadItemModel(item.Model.RootModelJoint, item.Parameters.ModelScale);
-                        renderer.RenderItem = true;
+                        renderer.HasItem = true;
                     }
                 }
             }
@@ -706,7 +759,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             }
             //}
 
-            _viewport.glViewport.Invalidate();
+            _viewport.Invalidate();
 
             // set frame
             renderer.SetFrame(_viewport.glViewport.Frame);
@@ -822,7 +875,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
                 return;
 
-            renderer.FighterModel.JointAnim.ExportAsFigatree();
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+
+            if (f != null)
+                File.WriteAllBytes(f, AJManager.GetAnimationData(_selectedActionSymbol));
         }
 
         /// <summary>
@@ -864,7 +920,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             tempanim.ApplyFSMs(FrameSpeedModifiers);
 
             // load edited anim
-            renderer.LoadAnimation(_selectedActionSymbol, tempanim);
+            renderer.LoadAnimation(tempanim);
             _animEditor.SetJoint(renderer.FighterModel.RootJObj.Desc, tempanim);
             _viewport.glViewport.MaxFrame = tempanim.FrameCount;
 
@@ -888,6 +944,27 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 FrameSpeedModifiers.Clear();
                 LoadAnimation();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ToggleVisibility_Click(object sender, EventArgs e)
+        {
+            renderer.RenderFighter = fighterModelToolStripMenuItem.Checked;
+            renderer.RenderItem = itemModelToolStripMenuItem.Checked;
+
+            renderer.RenderHitboxes = hitboxesToolStripMenuItem.Checked;
+            renderer.RenderHurtboxes = hurtboxesToolStripMenuItem.Checked;
+            renderer.RenderInterpolation = hitboxInterpolationToolStripMenuItem.Checked;
+            renderer.RenderHitboxInfo = hitboxInfoToolStripMenuItem.Checked;
+
+            renderer.RenderECB = environmentCollisionToolStripMenuItem.Checked;
+            renderer.ECBGrounded = groundedECBToolStripMenuItem.Checked;
+            renderer.RenderLedgeBox = ledgeGrabBoxToolStripMenuItem.Checked;
+            renderer.RenderShield = shieldBubbleToolStripMenuItem.Checked;
         }
     }
 }

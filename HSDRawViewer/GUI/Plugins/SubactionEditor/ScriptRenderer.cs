@@ -90,21 +90,28 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public SBM_PlayerModelLookupTables LookupTable;
 
-        public bool RenderHurtboxes = false;
+        public bool RenderFighter { get; set; } = true;
 
-        public bool RenderShield = false;
+        public bool RenderItem { get; set; } = true;
 
-        public bool RenderECB = false;
+        public bool RenderHitboxes { get; set; } = true;
 
-        public bool ECBGrounded = true;
+        public bool RenderHurtboxes { get; set; } = false;
 
-        public bool RenderLedgeBox = false;
+        public bool RenderHitboxInfo { get; set; } = false;
 
-        public bool RenderItem = false;
+        public bool RenderInterpolation { get; set; } = false;
 
-        public bool RenderHitboxInfo = true;
+        public bool RenderECB { get; set; } = false;
 
-        public bool RenderInterpolation = true;
+        public bool ECBGrounded { get; set; } = true;
+
+        public bool RenderLedgeBox { get; set; } = false;
+
+        public bool RenderShield { get; set; } = true;
+
+        public bool IsShieldState = false;
+        public bool HasItem = false;
 
         public bool RenderBones { get => FighterModel._settings.RenderBones; set => FighterModel._settings.RenderBones = value; }
 
@@ -117,11 +124,24 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public RenderJObj FighterModel { get; internal set; }
         private RenderJObj ItemModel;
+
         private RenderJObj ThrowDummyModel;
+        private JointAnimManager ThrowDummyAnim;
+        private static byte[] ThrowDummyLookup = new byte[]
+        {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x35, 0x36, 0x37, 0x38, 0x39, 0xFF, 0xFF, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0xFF, 0x13, 0x14, 0x16, 0x17, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x3B, 0x3C, 0x00, 0x00
+        };
+        private static byte[] ThrowDummyHide = new byte[]
+        {
+            0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34
+        };
+
         private HurtboxRenderer HurtboxRenderer = new HurtboxRenderer();
 
         private Vector3[] PreviousHitboxPositions = new Vector3[4];
         private Capsule capsule = new Capsule(Vector3.Zero, Vector3.Zero, 0);
+
+        private GLTextRenderer Text = new GLTextRenderer();
 
 
         private static Vector3 ShieldColor = new Vector3(1, 0.4f, 0.4f);
@@ -130,6 +150,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private static Vector3 HitboxSelectedColor = new Vector3(1, 1, 1);
 
+        public List<SubactionEvent> SelectedEvents { get; internal set; } = new List<SubactionEvent>();
+
         /// <summary>
         /// 
         /// </summary>
@@ -137,6 +159,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             FighterModel = new RenderJObj();
             FighterModel._settings.RenderBones = false;
+            FighterModel.Initialize += () =>
+            {
+                ResetModelState();
+            };
 
             ItemModel = new RenderJObj();
             ItemModel._settings.RenderBones = false;
@@ -144,6 +170,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             ThrowDummyModel = new RenderJObj();
             ThrowDummyModel._settings.RenderBones = false;
 
+            ThrowDummyModel.Initialize += () =>
+            {
+                foreach (var v in ThrowDummyHide)
+                    ThrowDummyModel.SetDObjVisible(v, false);
+            };
 
             Processor.UpdateVISMethod += SetModelVis;
             Processor.AnimateMaterialMethod += AnimateMaterial;
@@ -153,9 +184,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
-        public void SetScript(HSDStruct str)
+        public void SetScript(List<SubactionEvent> events)
         {
-            Processor.SetStruct(str, SubactionGroup.Fighter);
+            SelectedEvents.Clear();
+            Processor.SetStruct(events, SubactionGroup.Fighter);
         }
 
         /// <summary>
@@ -191,15 +223,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// 
         /// </summary>
         /// <param name="modelPath"></param>
-        public void LoadThrowDummy(string modelPath)
-        {
-            LoadModel(ThrowDummyModel, modelPath);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="modelPath"></param>
         private void LoadModel(RenderJObj renderJobj, string modelPath)
         {
             // load model
@@ -220,52 +243,34 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
-        public void LoadAnimation(string symbol, JointAnimManager anim)
+        public void LoadAnimation(JointAnimManager anim)
         {
             // clear animation
             FighterModel.ClearAnimation(FrameFlags.Joint);
 
             // load figatree to manager and anim editor
             FighterModel.LoadAnimation(anim, null, null);
+        }
 
-            // load throw dummy for thrown animations
-            //ThrowDummyManager.SetFigaTree(null);
-            //if (name.Contains("Throw") && !name.Contains("Taro"))
-            //{
-            //    // find thrown anim
-            //    Action throwAction = null;
-            //    foreach (Action a in actionList.Items)
-            //    {
-            //        if (a.Symbol != null &&
-            //            a.Symbol.Contains("Taro") &&
-            //            a.Symbol.Contains(name) &&
-            //            !a.Symbol.Equals(treeSymbol))
-            //        {
-            //            throwAction = a;
-            //            break;
-            //        }
-            //    }
-            //    // if throw animation is found
-            //    if (throwAction != null &&
-            //        throwAction.Symbol != null)
-            //    {
-            //        var throwData = AJManager.GetAnimationData(throwAction.Symbol);
-            //        if (throwData != null)
-            //        {
-            //            // load throw animation
-            //            var tanim = new HSDRawFile(throwData);
-            //            if (tanim.Roots[0].Data is HSD_FigaTree tree2)
-            //            {
-            //                ThrowDummyManager.SetFigaTree(tree2);
-            //                if (ThrowDummyLookupTable.Count > 0)
-            //                {
-            //                    ThrowDummyManager.Animation.EnableBoneLookup = true;
-            //                    ThrowDummyManager.Animation.BoneLookup = ThrowDummyLookupTable;
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="modelPath"></param>
+        public void LoadThrowDummy(string modelPath)
+        {
+            // LoadModel(ThrowDummyModel, modelPath);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void LoadThrowDummyAnimation(JointAnimManager anim)
+        {
+            // reset throw dummy
+            // ThrowDummyModel.ResetDefaultStateAll();
+
+            // set anim
+            // ThrowDummyAnim = anim;
         }
 
         /// <summary>
@@ -278,6 +283,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 return;
 
             FighterModel.RequestAnimationUpdate(FrameFlags.Joint, frame - 1);
+            FighterModel.RootJObj.RecalculateTransforms(null, true);
             Processor.SetFrame(frame - 1);
 
             int hitboxId = 0;
@@ -307,6 +313,21 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // apply model part anims
             foreach (var mp in ModelPartsIndices)
                 mp.Apply(FighterModel.RootJObj);
+
+            // update throw dummy
+            if (ThrowDummyAnim != null && ThrowDummyModel.RootJObj != null)
+            {
+                for (int i = 0; i < ThrowDummyAnim.NodeCount; i++)
+                {
+                    var node = ThrowDummyAnim.Nodes[i];
+                    var joint = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[i]);
+
+                    if (joint != null && node.Tracks.Count > 0)
+                    {
+                        joint.ApplyAnimation(node.Tracks, frame);
+                    }
+                }
+            }
 
             // TODO: versus mode previews
 
@@ -414,6 +435,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             FighterModel.Invalidate();
             ThrowDummyModel.Invalidate();
             ItemModel.Invalidate();
+            Text.InitializeRender(@"lib/Consolas.bff");
         }
 
         /// <summary>
@@ -424,6 +446,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             FighterModel.FreeResources();
             ThrowDummyModel.FreeResources();
             ItemModel.FreeResources();
+            Text.Dispose();
         }
 
         /// <summary>
@@ -438,11 +461,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 return;
 
             // render fighter model
-            if (!Processor.IsInvisible)
+            if (RenderFighter && !Processor.IsInvisible)
                 FighterModel.Render(cam);
 
             // render item model
-            if (RenderItem && ItemModel.RootJObj != null && LookupTable != null)
+            if (HasItem && RenderItem && ItemModel.RootJObj != null && LookupTable != null)
             {
                 var fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ItemHoldBone);
                 if (fighterHoldBone != null)
@@ -459,69 +482,81 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
             }
 
-            // TODO: render throw dummy
+            // render throw dummy
+            if (ThrowDummyAnim != null && !Processor.ThrownFighter)
+            {
+                var hip = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[4]);
+                var fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone);
+                if (hip != null && fighterHoldBone != null)
+                {
+                    hip.WorldTransform = fighterHoldBone.WorldTransform;
+                    hip.Child?.RecalculateTransforms(cam, true);
+                }
+                ThrowDummyModel.Render(cam, false);
+            }
 
             // render hurtboxes
             if (RenderHurtboxes)
                 HurtboxRenderer.Render(FighterModel.RootJObj, Hurtboxes, null);
 
             // render hitboxes
-            int hitboxId = 0;
-            bool isHitboxSelected = false;
-            foreach (var hb in Processor.Hitboxes)
+            if (RenderHitboxes)
             {
-                if (!hb.Active)
+                int hitboxId = 0;
+                foreach (var hb in Processor.Hitboxes)
                 {
-                    hitboxId++;
-                    continue;
-                }
+                    if (!hb.Active)
+                    {
+                        hitboxId++;
+                        continue;
+                    }
 
-                // initial hitbox data
-                float alpha = 0.4f;
-                Vector3 hbColor = HitboxColor;
+                    // initial hitbox data
+                    float alpha = 0.4f;
+                    Vector3 hbColor = HitboxColor;
 
-                // get transform data
-                var worldPosition = hb.GetWorldPosition(FighterModel.RootJObj);
-                var worldTransform = Matrix4.CreateTranslation(worldPosition);
+                    // get transform data
+                    var worldPosition = hb.GetWorldPosition(FighterModel.RootJObj);
+                    var worldTransform = Matrix4.CreateTranslation(worldPosition);
 
-                // check for grabbox
-                if (hb.Element == 8)
-                    hbColor = GrabboxColor;
+                    // check for grabbox
+                    if (hb.Element == 8)
+                        hbColor = GrabboxColor;
 
-                // check if hitbox is selected
-                //if (subActionList.SelectedIndices.Count == 1 && hb.CommandIndex == subActionList.SelectedIndex)
-                //{
-                //    hbColor = HitboxSelectedColor;
-                //    isHitboxSelected = true;
-                //    _transWidget.Transform = hb.GetWorldTransform(JointManager.GetJOBJ(0));
-                //}
+                    // check if hitbox is selected
+                    if (SelectedEvents.Contains(hb.EventSource))
+                    {
+                        hbColor = HitboxSelectedColor;
+                    }
 
-                // drawing a capsule takes more processing power, so only draw it if necessary
-                if (hb.Interpolate && RenderInterpolation)
-                {
-                    capsule.SetParameters(worldPosition, PreviousHitboxPositions[hitboxId], hb.Size);
-                    capsule.Draw(Matrix4.Identity, new Vector4(hbColor, alpha));
-                }
-                else
-                {
-                    DrawShape.DrawSphere(worldTransform, hb.Size, 16, 16, hbColor, alpha);
-                }
-
-                // draw hitbox angle
-                if (RenderHitboxInfo)
-                {
-                    if (hb.Angle != 361)
-                        DrawShape.DrawAngleLine(cam, worldTransform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
+                    // drawing a capsule takes more processing power, so only draw it if necessary
+                    if (hb.Interpolate && RenderInterpolation)
+                    {
+                        capsule.SetParameters(worldPosition, PreviousHitboxPositions[hitboxId], hb.Size);
+                        capsule.Draw(Matrix4.Identity, new Vector4(hbColor, alpha));
+                    }
                     else
-                        DrawShape.DrawSakuraiAngle(cam, worldTransform, hb.Size);
+                    {
+                        DrawShape.DrawSphere(worldTransform, hb.Size, 16, 16, hbColor, alpha);
+                    }
 
-                    // TODO: GLTextRenderer.RenderText(cam, hitboxId.ToString(), worldTransform, StringAlignment.Center, true);
+                    // draw hitbox angle
+                    if (RenderHitboxInfo)
+                    {
+                        if (hb.Angle != 361)
+                            DrawShape.DrawAngleLine(cam, worldTransform, hb.Size, MathHelper.DegreesToRadians(hb.Angle));
+                        else
+                            DrawShape.DrawSakuraiAngle(cam, worldTransform, hb.Size);
+
+                        // draw hitbox index
+                        Text.RenderText(cam, hitboxId.ToString(), worldTransform, StringAlignment.Center, true);
+                    }
+                    hitboxId++;
                 }
-                hitboxId++;
             }
 
             // render shield
-            if (RenderShield && LookupTable != null)
+            if (IsShieldState && RenderShield && LookupTable != null)
                 DrawShape.DrawSphere(FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone).WorldTransform, ShieldSize / 2, 16, 16, ShieldColor, 0.5f);
 
             // render gfx spawn

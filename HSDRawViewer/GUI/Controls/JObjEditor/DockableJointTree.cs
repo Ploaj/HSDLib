@@ -44,6 +44,26 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             }
         }
 
+        private IEnumerable<TreeNode> EnumerateTreeNode()
+        {
+            foreach (TreeNode n in treeJOBJ.Nodes)
+            {
+                foreach (var e in EnumerateTreeNode0(n))
+                    yield return e;
+            }
+        }
+
+        private IEnumerable<TreeNode> EnumerateTreeNode0(TreeNode n)
+        {
+            yield return n;
+
+            foreach (TreeNode node in n.Nodes)
+            {
+                foreach (var e in EnumerateTreeNode0(node))
+                    yield return e;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -85,7 +105,13 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             _root = jobj;
             _jointMap.Clear();
-            RefreshTree();
+
+            treeJOBJ.BeginUpdate();
+            treeJOBJ.Nodes.Clear();
+            joint_count = 0;
+            UpdateJObjDisplay(_root, null);
+            treeJOBJ.EndUpdate();
+            treeJOBJ.ExpandAll();
         }
 
         /// <summary>
@@ -134,19 +160,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // nothing was found so return null
             return null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void RefreshTree()
-        {
-            treeJOBJ.BeginUpdate();
-            treeJOBJ.Nodes.Clear();
-            joint_count = 0;
-            UpdateJObjDisplay(_root, null);
-            treeJOBJ.EndUpdate();
-            treeJOBJ.ExpandAll();
         }
 
         /// <summary>
@@ -221,7 +234,15 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (f != null)
             {
                 _jointMap.Load(f);
-                RefreshTree();
+
+                int ji = 0;
+                foreach (var node in EnumerateTreeNode())
+                {
+                    if (_jointMap[ji] != null)
+                        node.Text = $"{ji} : {_jointMap[ji]}";
+
+                    ji++;
+                }
             }
         }
 
