@@ -264,6 +264,30 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
+        public void InvalidateDObjOrder()
+        {
+            // determine new order
+            Dictionary<HSD_DOBJ, int> newOrder = new Dictionary<HSD_DOBJ, int>(RenderDobjs.Count);
+            int i = 0;
+            foreach (var j in RootJObj?.Enumerate)
+            {
+                if (j.Desc.Dobj == null)
+                    continue;
+                foreach (var d in j.Desc.Dobj.List)
+                    newOrder.Add(d, i++);
+            }
+
+            // order render dobjs
+            RenderDobjs = RenderDobjs.OrderBy(e => newOrder[e._dobj]).ToList();
+
+            // update display index
+            foreach (var d in RenderDobjs)
+                d.DisplayIndex = d.Parent.Desc.Dobj.List.IndexOf(d._dobj);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void InitializeRendering()
         {
             Initialized = true;

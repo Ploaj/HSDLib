@@ -100,9 +100,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             {
                 _propertyGrid.SetObjects(dobj);
 
-                RenderJObj.ClearDObjSelection();
-                foreach (var i in indices)
-                    RenderJObj.SetDObjSelected(i, true);
+                UpdateSelectedDObjs(indices);
 
                 // set textures in editor and material tracks
                 if (dobj.Length == 1)
@@ -132,9 +130,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 _textureEditor.SetTextures(null);
             };
 
+            _meshList.ListOrderUpdated += () =>
+            {
+                RenderJObj.InvalidateDObjOrder();
+                UpdateSelectedDObjs(_meshList.SelectedIndices);
+                UpdateVisibility();
+            };
+
             // initialize properties
             _propertyGrid = new DockablePropertyGrid();
-            _propertyGrid.Show(dockPanel1, DockState.DockRight);
+            _propertyGrid.Show(dockPanel1);
+            _propertyGrid.DockState = DockState.DockLeft;
 
             _propertyGrid.PropertyValueUpdated += (sender, args) =>
             {
@@ -165,8 +171,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // initialize texture editor
             _textureEditor = new DockableTextureEditor();
-            _textureEditor.Show(dockPanel1);
-            _textureEditor.DockState = DockState.DockLeft;
+            _textureEditor.Show(dockPanel1, DockState.DockLeft);
+            // _textureEditor.DockState = DockState.DockLeft;
 
             _textureEditor.SelectTObj += (dobj, tobj, index) =>
             {
@@ -185,12 +191,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             RenderJObj = new RenderJObj();
             RenderJObj.Initialize += () =>
             {
-                RenderJObj.ClearDObjSelection();
-                foreach (var i in _meshList.SelectedIndices)
-                    RenderJObj.SetDObjSelected(i, true);
-
+                UpdateSelectedDObjs(_meshList.SelectedIndices);
                 UpdateVisibility();
             };
+
+            // have joint tree appear first
+            _jointTree.Show();
 
             // setup params
             renderModeBox.ComboBox.DataSource = Enum.GetValues(typeof(RenderMode));
@@ -384,7 +390,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 _trackEditor.Show();
 
                 // hide texture panel
-                _textureEditor.DockState = DockState.DockLeftAutoHide;
+                // _textureEditor.DockState = DockState.DockLeftAutoHide;
             }
 
             // calculate max frame count
@@ -463,13 +469,22 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     dobjindex.Add(c.JOBJIndex, 0);
 
                 // update dobj index?
-                c.DOBJIndex = dobjindex[c.JOBJIndex];
-                dobjindex[c.JOBJIndex] += 1;
+                c.DOBJIndex = dobjindex[c.JOBJIndex]++;
 
                 index += 1;
             }
 
             _meshList.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateSelectedDObjs(IEnumerable<int> selected)
+        {
+            RenderJObj.ClearDObjSelection();
+            foreach (var i in selected)
+                RenderJObj.SetDObjSelected(i, true);
         }
 
         /// <summary>

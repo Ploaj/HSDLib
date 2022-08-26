@@ -7,6 +7,7 @@ using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -20,7 +21,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public partial class DockableMeshList : DockContent
     {
-        private BindingList<DObjProxy> dobjList = new BindingList<DObjProxy>();
+        private ObservableCollection<DObjProxy> dobjList = new ObservableCollection<DObjProxy>();
 
         public delegate void DObjSelected(DObjProxy[] dobj, IEnumerable<int> indices);
         public DObjSelected SelectDObj;
@@ -30,6 +31,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         public delegate void OnListUpdate();
         public OnListUpdate ListUpdated;
+
+        public delegate void OnListOrderUpdate();
+        public OnListOrderUpdate ListOrderUpdated;
 
         private HSD_JOBJ _root;
 
@@ -114,8 +118,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // can only move one at a time
             exportToolStripMenuItem.Enabled = listDOBJ.SelectedItems.Count == 1;
-            buttonMoveDown.Enabled = listDOBJ.SelectedItems.Count == 1;
-            buttonMoveUp.Enabled = listDOBJ.SelectedItems.Count == 1;
+            //buttonMoveDown.Enabled = listDOBJ.SelectedItems.Count == 1;
+            //buttonMoveUp.Enabled = listDOBJ.SelectedItems.Count == 1;
         }
 
         /// <summary>
@@ -193,42 +197,74 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void buttonMoveUp_Click(object sender, EventArgs e)
         {
-            if (listDOBJ.SelectedIndices.Count == 1 && listDOBJ.SelectedItem is DObjProxy con)
+            listDOBJ.BeginUpdate();
+
+            // get selected indices
+            IEnumerable<int> indexes = listDOBJ.SelectedIndices.Cast<int>();
+
+            // process selected indicies in reverse
+            foreach (var i in indexes)
             {
-                var newIndex = listDOBJ.SelectedIndex - 1;
+                // get object at index
+                DObjProxy moveItem = dobjList[i];
 
-                HSD_DOBJ prev = null;
-                HSD_DOBJ prevprev = null;
-                foreach (var dobj in con.ParentJOBJ.Dobj?.List)
+                // move dobj down if possible
+                if (moveItem.ParentJOBJ != null)
                 {
-                    if (dobj._s == con.DOBJ._s)
+                    // find dobj in jobj list
+                    HSD_DOBJ prev = null;
+                    HSD_DOBJ prevprev = null;
+                    foreach (var dobj in moveItem.ParentJOBJ.Dobj?.List)
                     {
-                        if (prev == null)
+                        if (dobj == moveItem.DOBJ)
+                        {
+                            // cannot move this item up
+                            if (prev == null)
+                            {
+                                goto LoopEnd;
+                            }
+                            else
+                            {
+                                // move dobj up in jobj list
+                                if (prevprev == null)
+                                {
+                                    moveItem.ParentJOBJ.Dobj.Next = moveItem.DOBJ.Next;
+                                    moveItem.DOBJ.Next = moveItem.ParentJOBJ.Dobj;
+                                    moveItem.ParentJOBJ.Dobj = moveItem.DOBJ;
+                                }
+                                else
+                                {
+                                    prev.Next = moveItem.DOBJ.Next;
+                                    moveItem.DOBJ.Next = prev;
+                                    prevprev.Next = moveItem.DOBJ;
+                                }
+                            }
+
+                            // update list
+                            dobjList.Move(i, i - 1);
+                            listDOBJ.SetSelected(i, false);
+                            listDOBJ.SetSelected(i - 1, true);
+
                             break;
+                        }
 
-                        // totally not confusing
-                        if (prevprev == null)
-                            con.ParentJOBJ.Dobj = con.DOBJ;
-                        else
-                            prevprev.Next = con.DOBJ;
-                        prev.Next = con.DOBJ.Next;
-                        con.DOBJ.Next = prev;
-
-                        dobjList.Remove(con);
-                        dobjList.Insert(newIndex, con);
-
-                        listDOBJ.SelectedIndices.Clear();
-                        listDOBJ.SelectedIndex = -1;
-                        listDOBJ.SelectedIndex = newIndex;
-
-                        break;
+                        prevprev = prev;
+                        prev = dobj;
                     }
-                    prevprev = prev;
-                    prev = dobj;
                 }
-
-                ListUpdated?.Invoke();
             }
+
+            LoopEnd:
+
+            var sel = listDOBJ.SelectedIndices.Cast<int>().ToArray();
+            listDOBJ.DataSource = null;
+            listDOBJ.DataSource = dobjList;
+            foreach (var s in sel)
+                listDOBJ.SetSelected(s, true);
+
+            listDOBJ.EndUpdate();
+
+            ListOrderUpdated?.Invoke();
         }
 
         /// <summary>
@@ -238,41 +274,63 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void buttonMoveDown_Click(object sender, EventArgs e)
         {
-            if (listDOBJ.SelectedIndices.Count == 1 && listDOBJ.SelectedItem is DObjProxy con)
+            listDOBJ.BeginUpdate();
+
+            // get selected indices
+            IEnumerable<int> indexes = listDOBJ.SelectedIndices.Cast<int>().Reverse();
+
+            // process selected indicies in reverse
+            foreach (var i in indexes)
             {
-                if (con.DOBJ.Next == null)
-                    return;
+                // get object at index
+                DObjProxy moveItem = dobjList[i];
 
-                var newIndex = listDOBJ.SelectedIndex + 1;
+                // can't move this item down
+                if (moveItem.DOBJ.Next == null)
+                    goto LoopEnd;
 
-                HSD_DOBJ prev = null;
-                foreach (var dobj in con.ParentJOBJ.Dobj?.List)
+                // move dobj down if possible
+                if (moveItem.ParentJOBJ != null)
                 {
-                    if (dobj._s == con.DOBJ._s)
+                    // find dobj in jobj list
+                    HSD_DOBJ prev = null;
+                    foreach (var dobj in moveItem.ParentJOBJ.Dobj?.List)
                     {
-                        // totally not confusing
-                        if (prev == null)
-                            con.ParentJOBJ.Dobj = con.DOBJ.Next;
-                        else
-                            prev.Next = con.DOBJ.Next;
-                        var newNext = con.DOBJ.Next.Next;
-                        con.DOBJ.Next.Next = con.DOBJ;
-                        con.DOBJ.Next = newNext;
+                        if (dobj == moveItem.DOBJ)
+                        {
+                            // move dobj down in jobj list
+                            if (prev == null)
+                                moveItem.ParentJOBJ.Dobj = moveItem.DOBJ.Next;
+                            else
+                                prev.Next = moveItem.DOBJ.Next;
+                            var newNext = moveItem.DOBJ.Next.Next;
+                            moveItem.DOBJ.Next.Next = moveItem.DOBJ;
+                            moveItem.DOBJ.Next = newNext;
 
-                        dobjList.Remove(con);
-                        dobjList.Insert(newIndex, con);
+                            // update list
+                            dobjList.Move(i, i + 1);
+                            listDOBJ.SetSelected(i, false);
+                            listDOBJ.SetSelected(i + 1, true);
 
-                        listDOBJ.SelectedIndices.Clear();
-                        listDOBJ.SelectedIndex = -1;
-                        listDOBJ.SelectedIndex = newIndex;
+                            break;
+                        }
 
-                        break;
+                        prev = dobj;
                     }
-                    prev = dobj;
                 }
-
-                ListUpdated?.Invoke();
             }
+
+            LoopEnd:
+
+            var sel = listDOBJ.SelectedIndices.Cast<int>().ToArray();
+            listDOBJ.DataSource = null;
+            listDOBJ.DataSource = dobjList;
+            foreach (var s in sel)
+                listDOBJ.SetSelected(s, true);
+
+            listDOBJ.EndUpdate();
+
+            ListOrderUpdated?.Invoke();
         }
 
         /// <summary>
