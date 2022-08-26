@@ -45,6 +45,7 @@
             // 
             // actionArrayEditor
             // 
+            this.actionArrayEditor.AskBeforeDelete = true;
             this.actionArrayEditor.DisplayItemImages = false;
             this.actionArrayEditor.DisplayItemIndices = true;
             this.actionArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -61,7 +62,7 @@
             this.actionArrayEditor.Size = new System.Drawing.Size(275, 440);
             this.actionArrayEditor.TabIndex = 0;
             this.actionArrayEditor.SelectedObjectChanged += new System.EventHandler(this.actionArrayEditor_SelectedObjectChanged);
-            this.actionArrayEditor.OnItemRemove += new HSDRawViewer.GUI.ArrayMemberEditor.OnItemRemoveHandler(this.actionArrayEditor_OnItemRemove);
+            this.actionArrayEditor.OnItemAdded += new HSDRawViewer.GUI.ArrayMemberEditor.OnItemAddedHandler(this.actionArrayEditor_OnItemAdded);
             // 
             // tabControl1
             // 
@@ -98,6 +99,7 @@
             // 
             // subroutineArrayEditor
             // 
+            this.subroutineArrayEditor.CanMove = false;
             this.subroutineArrayEditor.DisplayItemImages = false;
             this.subroutineArrayEditor.DisplayItemIndices = true;
             this.subroutineArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;

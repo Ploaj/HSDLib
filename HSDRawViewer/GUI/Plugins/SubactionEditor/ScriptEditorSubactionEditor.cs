@@ -340,7 +340,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var ac = new SubactionEvent(Type, 4);
+            var ac = new SubactionEvent(Type, 0);
 
             subActionList.Items.Insert(subActionList.SelectedIndex + 1, ac);
             subActionList.SelectedItem = null;

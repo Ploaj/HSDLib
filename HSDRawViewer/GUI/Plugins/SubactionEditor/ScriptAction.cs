@@ -80,6 +80,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public ScriptAction()
         {
             _action = new SBM_FighterAction();
+            _action.SubAction = new HSDRaw.Melee.Cmd.SBM_FighterSubactionData();
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 configuration: Release
 
-image: Visual Studio 2017
+image: Visual Studio 2022
 
 branches:
   only:
@@ -29,9 +29,12 @@ deploy:
 after_build:
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRawViewer.exe"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRawViewer.exe.config"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRawViewer.dll"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\HSDRawViewer.dll.config"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\lib"
-  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\Melee"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\Scripts"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\Shader"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\runtimes"
   - 7z d "HSDRAW.zip" "lib\*.xml"
   - 7z d "HSDRAW.zip" "lib\*.pdb"
   - appveyor PushArtifact "HSDRAW.zip"

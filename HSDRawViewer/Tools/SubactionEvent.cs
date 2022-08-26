@@ -268,6 +268,16 @@ namespace HSDRawViewer.Tools
 
         public SubactionGroup Type { get; internal set; } = SubactionGroup.Fighter;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        public SubactionEvent(SubactionGroup type, byte code)
+        {
+            SetCode(type, code);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -317,15 +327,6 @@ namespace HSDRawViewer.Tools
                 }
             }
             return null;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="type"></param>
-        public SubactionEvent(SubactionGroup type, byte code)
-        {
-            SetCode(type, code);
         }
 
         /// <summary>

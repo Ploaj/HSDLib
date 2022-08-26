@@ -280,6 +280,14 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// 
         /// </summary>
         /// <param name="e"></param>
+        private void actionArrayEditor_OnItemAdded(AddedItemEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
         private void subroutineArrayEditor_OnItemRemove(RemovedItemEventArgs e)
         {
             // remove all references to this item
