@@ -80,12 +80,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _jointTree.SelectJObj += (name, jobj) =>
             {
                 if (jobj.jobj.Flags.HasFlag(JOBJ_FLAG.PTCL))
-                    _propertyGrid.SetObject(new JObjParticlePropertyAccessor(jobj.jobj));
+                    _propertyGrid.SetObject(name, new JObjParticlePropertyAccessor(jobj.jobj));
                 else
                 if (jobj.jobj.Flags.HasFlag(JOBJ_FLAG.SPLINE))
-                    _propertyGrid.SetObject(new JObjSplinePropertyAccessor(jobj.jobj));
+                    _propertyGrid.SetObject(name, new JObjSplinePropertyAccessor(jobj.jobj));
                 else
-                    _propertyGrid.SetObject(new JObjPropertyAccessor(jobj.jobj));
+                    _propertyGrid.SetObject(name, new JObjPropertyAccessor(jobj.jobj));
 
                 RenderJObj.SelectedJObj = jobj.jobj;
 
@@ -106,12 +106,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 if (dobj.Length == 1)
                 {
                     _trackEditor.SetKeys(dobj[0].ToString(), GraphEditor.AnimType.Material, dobj[0].Tracks);
-                    _textureEditor.SetTextures(dobj[0]);
+                    _textureEditor.SetTextures(dobj[0].ToString(), dobj[0]);
                 }
                 else
                 {
                     _trackEditor.SetKeys("", GraphEditor.AnimType.Material, null);
-                    _textureEditor.SetTextures(null);
+                    _textureEditor.SetTextures("", null);
                 }
 
             };
@@ -127,7 +127,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
                 // set materials in editor
                 _trackEditor.SetKeys("", GraphEditor.AnimType.Material, null);
-                _textureEditor.SetTextures(null);
+                _textureEditor.SetTextures("", null);
             };
 
             _meshList.ListOrderUpdated += () =>
@@ -176,7 +176,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             _textureEditor.SelectTObj += (dobj, tobj, index) =>
             {
-                _propertyGrid.SetObject(tobj);
+                // set property editor
+                _propertyGrid.SetObject(tobj.ToString(), tobj);
 
                 // update tracks
                 _trackEditor.SetKeys($"{dobj.ToString()}_Texture_{index}", GraphEditor.AnimType.Texture, dobj.TextureStates[index].Tracks);

@@ -26,7 +26,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         typeof(SBM_ItemSubactionData),
         typeof(SBM_ColorSubactionData),
         typeof(KAR_RdScript) })]
-    public partial class ScriptEditor : SaveableEditorBase
+    public partial class ScriptEditor : SaveableEditorBase, IDrawableInterface
     {
         public override DataNode Node
         {
@@ -127,6 +127,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private JointAnimManager BackupAnim;
         public List<FrameSpeedMultiplier> FrameSpeedModifiers { get; set; } = new List<FrameSpeedMultiplier>();
 
+        public DrawOrder DrawOrder => DrawOrder.First;
+
+
+        public SubactionProcessor Processor = new SubactionProcessor();
+
+        public List<SubactionEvent> SelectedEvents { get; internal set; } = new List<SubactionEvent>();
 
         /// <summary>
         /// 
@@ -151,12 +157,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             };
             _viewport.glViewport.FrameChange += (f) =>
             {
-                renderer.SetFrame(f);
+                renderer.SetFrame(Processor, f);
             };
+            _viewport.glViewport.AddRenderer(this);
 
             // create and add renderer
-            renderer = new ScriptRenderer();
-            _viewport.glViewport.AddRenderer(renderer);
+            renderer = new ScriptRenderer(Processor);
 
             // updating z order
             dockPanel1.UpdateDockWindowZOrder(DockStyle.Left, true);
@@ -182,7 +188,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 LoadAnimation();
 
                 // update renderer script
-                renderer.SetScript(events);
+                SelectedEvents.Clear();
+                Processor.SetStruct(events, SubactionGroup.Fighter);
 
                 // update frame tips
                 UpdateFrameTips();
@@ -202,14 +209,15 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             _subactionEditor = new ScriptEditorSubactionEditor();
             _subactionEditor.Show(dockPanel1, DockState.DockTop);
 
-            _subactionEditor.ScriptEdited += (e) =>
+            _subactionEditor.ScriptEdited += (events) =>
             {
                 // update select action script
                 if (_selectedAction != null)
-                    _selectedAction.SetFromStruct(SubactionEvent.CompileEvent(e));
+                    _selectedAction.SetFromStruct(SubactionEvent.CompileEvent(events));
 
                 // update renderer script
-                renderer.SetScript(e);
+                SelectedEvents.Clear();
+                Processor.SetStruct(events, SubactionGroup.Fighter);
 
                 // update frame tips
                 UpdateFrameTips();
@@ -217,7 +225,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             _subactionEditor.SelectedIndexedChanged += (e) =>
             {
-                renderer.SelectedEvents = e;
+                SelectedEvents = e;
             };
 
             // initialize animation editor
@@ -236,7 +244,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // dipose of resources
             FormClosing += (s, a) =>
             {
-                //if (AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+                if (ForceClose || AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     ItCo = null;
                     _animEditor.CloseOnExit = true;
@@ -245,10 +253,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     _subactionEditor.Dispose();
                     _viewport.Dispose();
                 }
-                //else
-                //{
-                //    a.Cancel = true;
-                //}
+                else
+                {
+                    a.Cancel = true;
+                }
             };
         }
 
@@ -681,10 +689,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 // add frame tips for each frame
                 for (int i = 0; i <= _viewport.glViewport.MaxFrame; i++)
                 {
-                    renderer.Processor.SetFrame(i);
+                    Processor.SetFrame(i);
 
                     // hitbox indication
-                    if (renderer.Processor.HitboxesActive)
+                    if (Processor.HitboxesActive)
                         _viewport.glViewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
                         {
                             Frame = i,
@@ -694,7 +702,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         });
 
                     // interrupt
-                    if (renderer.Processor.AllowInterrupt)
+                    if (Processor.AllowInterrupt)
                         _viewport.glViewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
                         {
                             Frame = i,
@@ -704,7 +712,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         });
 
                     // interrupt
-                    if (renderer.Processor.FighterFlagWasSetThisFrame.Any(e => e != false))
+                    if (Processor.FighterFlagWasSetThisFrame.Any(e => e != false))
                     {
                         _viewport.glViewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
                         {
@@ -716,9 +724,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                         string set = "";
 
-                        for (int k = 0; k < renderer.Processor.FighterFlagWasSetThisFrame.Length; k++)
+                        for (int k = 0; k < Processor.FighterFlagWasSetThisFrame.Length; k++)
                         {
-                            if (renderer.Processor.FighterFlagWasSetThisFrame[k])
+                            if (Processor.FighterFlagWasSetThisFrame[k])
                             {
                                 set += k + " ";
                             }
@@ -762,7 +770,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             _viewport.Invalidate();
 
             // set frame
-            renderer.SetFrame(_viewport.glViewport.Frame);
+            renderer.SetFrame(Processor, _viewport.glViewport.Frame);
         }
 
         /// <summary>
@@ -965,6 +973,78 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             renderer.ECBGrounded = groundedECBToolStripMenuItem.Checked;
             renderer.RenderLedgeBox = ledgeGrabBoxToolStripMenuItem.Checked;
             renderer.RenderShield = shieldBubbleToolStripMenuItem.Checked;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="kbState"></param>
+        public void ViewportKeyPress(KeyEventArgs kbState)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="pick"></param>
+        public void ScreenClick(MouseButtons button, PickInformation pick)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pick"></param>
+        public void ScreenDoubleClick(PickInformation pick)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="pick"></param>
+        /// <param name="deltaX"></param>
+        /// <param name="deltaY"></param>
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        public void ScreenSelectArea(PickInformation start, PickInformation end)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+            renderer.GLInit();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+            renderer.GLFree();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
+        public void Draw(Camera cam, int windowWidth, int windowHeight)
+        {
+            renderer.Draw(cam, Processor, SelectedEvents);
         }
     }
 }

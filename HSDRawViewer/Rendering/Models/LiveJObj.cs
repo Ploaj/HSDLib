@@ -583,6 +583,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="frame"></param>
         public void ApplyAnimation(List<FOBJ_Player> tracks, float frame)
         {
+            SetDefaultSRT();
             foreach (FOBJ_Player t in tracks)
             {
                 switch (t.JointTrackType)

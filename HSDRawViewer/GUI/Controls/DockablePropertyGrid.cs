@@ -35,14 +35,21 @@ namespace HSDRawViewer.GUI.Controls
             };
         }
 
-        public void SetObject(object o)
+        public void SetObject(string name, object o)
         {
+            Text = $"Properties: {name}";
+
             propertyGrid1.SelectedObject = o;
             propertyGrid1.ExpandAllGridItems();
         }
 
         public void SetObjects(object[] o)
         {
+            if (o.Length == 1)
+                Text = $"Properties: {o[0]}";
+            else
+                Text = $"Properties: Object Count {o.Length}";
+
             propertyGrid1.SelectedObjects = o;
             propertyGrid1.ExpandAllGridItems();
         }

@@ -24,9 +24,9 @@ namespace HSDRawViewer.Rendering.Shapes
 
         private List<int> Indices = new List<int>();
 
-        private int Segments = 12;
+        private int Segments = 16;
 
-        private int SubdivisionsHeight = 12;
+        private int SubdivisionsHeight = 16;
 
         public Capsule(Vector3 p1, Vector3 p2, float rad)
         {

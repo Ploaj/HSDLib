@@ -160,6 +160,11 @@ namespace HSDRawViewer
                 }
             };
 
+            FormClosing += (s, a) =>
+            {
+                ClearWorkspace();
+            };
+
         }
 
         /// <summary>
@@ -466,6 +471,9 @@ namespace HSDRawViewer
             List<DockContent> ToRemove = new List<DockContent>();
             foreach (var c in dockPanel.Contents)
             {
+                if (c is SaveableEditorBase save)
+                    save.ForceClose = true;
+
                 if (c is DockContent dc && c != _nodePropertyViewer)
                 {
                     ToRemove.Add(dc);

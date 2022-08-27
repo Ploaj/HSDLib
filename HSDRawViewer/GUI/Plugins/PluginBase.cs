@@ -26,6 +26,8 @@ namespace HSDRawViewer.GUI.Plugins
 
     public class SaveableEditorBase : PluginBase
     {
+        public bool ForceClose { get; set; } = false;
+
         public virtual void OnDatFileSave()
         {
 

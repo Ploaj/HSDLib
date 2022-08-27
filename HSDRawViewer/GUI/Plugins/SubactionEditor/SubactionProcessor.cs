@@ -56,6 +56,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
     /// </summary>
     public class SubactionProcessor
     {
+        public static int MaxHitboxCount = 4;
+
         public class Command
         {
             public SubactionEvent Event;
@@ -74,7 +76,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private List<Command> Commands = new List<Command>();
 
-        public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[4];
+        public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[MaxHitboxCount];
 
         public bool HitboxesActive { get => Hitboxes.Any(e => e.Active); }
 

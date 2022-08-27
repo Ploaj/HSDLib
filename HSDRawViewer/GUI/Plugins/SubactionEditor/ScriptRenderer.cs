@@ -80,10 +80,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         }
     }
 
-    public class ScriptRenderer : IDrawableInterface
+    public class ScriptRenderer
     {
-        public DrawOrder DrawOrder => DrawOrder.First;
-
         public float ShieldSize = 0;
 
         public SBM_EnvironmentCollision ECB;
@@ -119,8 +117,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public List<ModelPartAnimations> ModelPartsIndices = new List<ModelPartAnimations>();
 
-        public SubactionProcessor Processor = new SubactionProcessor();
-
 
         public RenderJObj FighterModel { get; internal set; }
         private RenderJObj ItemModel;
@@ -138,7 +134,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private HurtboxRenderer HurtboxRenderer = new HurtboxRenderer();
 
-        private Vector3[] PreviousHitboxPositions = new Vector3[4];
+        private Vector3[] PreviousHitboxPositions = new Vector3[SubactionProcessor.MaxHitboxCount];
         private Capsule capsule = new Capsule(Vector3.Zero, Vector3.Zero, 0);
 
         private GLTextRenderer Text = new GLTextRenderer();
@@ -150,12 +146,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
         private static Vector3 HitboxSelectedColor = new Vector3(1, 1, 1);
 
-        public List<SubactionEvent> SelectedEvents { get; internal set; } = new List<SubactionEvent>();
-
         /// <summary>
         /// 
         /// </summary>
-        public ScriptRenderer()
+        public ScriptRenderer(SubactionProcessor Processor)
         {
             FighterModel = new RenderJObj();
             FighterModel._settings.RenderBones = false;
@@ -179,15 +173,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             Processor.UpdateVISMethod += SetModelVis;
             Processor.AnimateMaterialMethod += AnimateMaterial;
             Processor.AnimateModelMethod += AnimateModel;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void SetScript(List<SubactionEvent> events)
-        {
-            SelectedEvents.Clear();
-            Processor.SetStruct(events, SubactionGroup.Fighter);
         }
 
         /// <summary>
@@ -277,10 +262,14 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// Calcuates the previous state hitboxes positions and returns them as a dictionary
         /// </summary>
         /// <returns></returns>
-        private void CalculatePreviousState(float frame)
+        private void CalculatePreviousState(SubactionProcessor Processor, float frame)
         {
             if (frame == 0 || !RenderInterpolation)
+            {
+                for (int i = 0; i < PreviousHitboxPositions.Length; i++)
+                    PreviousHitboxPositions[0] = Vector3.Zero;
                 return;
+            }
 
             FighterModel.RequestAnimationUpdate(FrameFlags.Joint, frame - 1);
             FighterModel.RootJObj.RecalculateTransforms(null, true);
@@ -299,10 +288,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
-        public void SetFrame(float frame)
+        public void SetFrame(SubactionProcessor Processor, float frame)
         {
             // calculate previous hitbox state
-            CalculatePreviousState(frame);
+            CalculatePreviousState(Processor, frame);
 
             // reset model state
             ResetModelState();
@@ -455,13 +444,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="cam"></param>
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
-        public void Draw(Camera cam, int windowWidth, int windowHeight)
+        public void Draw(Camera cam, SubactionProcessor processor, List<SubactionEvent> selectedEvents)
         {
             if (FighterModel.RootJObj == null)
                 return;
 
             // render fighter model
-            if (RenderFighter && !Processor.IsInvisible)
+            if (RenderFighter && !processor.IsInvisible)
                 FighterModel.Render(cam);
 
             // render item model
@@ -483,7 +472,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             }
 
             // render throw dummy
-            if (ThrowDummyAnim != null && !Processor.ThrownFighter)
+            if (ThrowDummyAnim != null && !processor.ThrownFighter)
             {
                 var hip = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[4]);
                 var fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone);
@@ -503,7 +492,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (RenderHitboxes)
             {
                 int hitboxId = 0;
-                foreach (var hb in Processor.Hitboxes)
+                foreach (var hb in processor.Hitboxes)
                 {
                     if (!hb.Active)
                     {
@@ -524,7 +513,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         hbColor = GrabboxColor;
 
                     // check if hitbox is selected
-                    if (SelectedEvents.Contains(hb.EventSource))
+                    if (selectedEvents.Contains(hb.EventSource))
                     {
                         hbColor = HitboxSelectedColor;
                     }
@@ -560,7 +549,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 DrawShape.DrawSphere(FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone).WorldTransform, ShieldSize / 2, 16, 16, ShieldColor, 0.5f);
 
             // render gfx spawn
-            foreach (var gfx in Processor.GFXOnFrame.ToArray())
+            foreach (var gfx in processor.GFXOnFrame.ToArray())
             {
                 // do processing on bone id
                 var boneID = gfx.Bone;

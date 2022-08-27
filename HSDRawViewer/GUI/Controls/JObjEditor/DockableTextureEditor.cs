@@ -46,8 +46,10 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// 
         /// </summary>
         /// <param name="mobj"></param>
-        public void SetTextures(DObjProxy dobj)
+        public void SetTextures(string name, DObjProxy dobj)
         {
+            Text = $"Texture Editor: {name}";
+
             _proxy = null;
 
             ClearTextureList();
