@@ -177,8 +177,8 @@ namespace HSDRawViewer.Converters
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
                 Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                HScale = 1,
-                WScale = 1,
+                RepeatT = 1,
+                RepeatS = 1,
                 WrapS = GXWrapMode.CLAMP,
                 WrapT = GXWrapMode.CLAMP,
                 SX = 1,
@@ -203,8 +203,8 @@ namespace HSDRawViewer.Converters
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
                 Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                HScale = 1,
-                WScale = 1,
+                RepeatT = 1,
+                RepeatS = 1,
                 WrapS = GXWrapMode.CLAMP,
                 WrapT = GXWrapMode.CLAMP,
                 SX = 1,
@@ -299,8 +299,8 @@ namespace HSDRawViewer.Converters
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
                 Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                HScale = 1,
-                WScale = 1,
+                RepeatT = 1,
+                RepeatS = 1,
                 WrapS = GXWrapMode.CLAMP,
                 WrapT = GXWrapMode.CLAMP,
                 SX = 1,

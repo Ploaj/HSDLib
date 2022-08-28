@@ -29,9 +29,9 @@ namespace HSDRawViewer.Rendering.Models
 
         public float ShapeBlend { get; set; } = 1;
 
-        public MatAnimMaterialState MaterialState { get; set; } = new MatAnimMaterialState();
+        public LiveMaterial MaterialState { get; set; } = new LiveMaterial();
 
-        public MatAnimTextureState[] TextureStates { get; internal set; } = new MatAnimTextureState[8];
+        public LiveTObj[] TextureStates { get; internal set; } = new LiveTObj[8];
 
         /// <summary>
         /// 
@@ -49,7 +49,7 @@ namespace HSDRawViewer.Rendering.Models
 
             // initialize texture states
             for (int i = 0; i < TextureStates.Length; i++)
-                TextureStates[i] = new MatAnimTextureState();
+                TextureStates[i] = new LiveTObj();
 
             // initialize material state
             ResetMaterialState();

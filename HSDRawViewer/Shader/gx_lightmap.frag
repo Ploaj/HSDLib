@@ -89,9 +89,7 @@ struct TexUnit
 
 	int coord_type;
 	float blend;
-	vec2 uv_scale;
 
-	int mirror_fix;
 	mat4 transform;
 };
 uniform int hasTEX[MAX_TEX];
@@ -138,14 +136,9 @@ vec2 CalculateCoords(TexUnit tex)
 {
     vec2 coords = GetCoordType(tex.coord_type, tex.gensrc);
 
-	coords = (tex.transform * vec4(coords.x, coords.y, 0, 1)).xy;
-	
-	coords *= tex.uv_scale;
+	vec4 coordtransform = (tex.transform * vec4(coords.x, coords.y, 0, 1));
 
-	if(tex.mirror_fix == 1) // GX OPENGL difference
-		coords.y += 1;
-
-	return coords;
+	return coordtransform.xy / coordtransform.w;
 }
 
 vec4 getTextureSampler(int index, vec2 uv)

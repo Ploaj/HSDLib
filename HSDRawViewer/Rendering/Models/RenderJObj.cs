@@ -409,7 +409,7 @@ namespace HSDRawViewer.Rendering.Models
                 foreach (var v in RenderDobjs)
                 {
                     // get material state
-                    MatAnimMaterialState state = v.MaterialState;
+                    LiveMaterial state = v.MaterialState;
                     MatAnim.GetMaterialState(v._dobj.Mobj, v.JointIndex, v.DisplayIndex, ref state);
                     v.MaterialState = state;
 
@@ -667,7 +667,7 @@ namespace HSDRawViewer.Rendering.Models
                     // get texture state data if it exists
                     if (textureStates != null && i < textureStates.Length && textureStates[i] != null)
                     {
-                        MatAnimTextureState texState = textureStates[i];
+                        LiveTObj texState = textureStates[i];
                         displayTex = texState.TOBJ;
                         blending = texState.Blending;
                         transform = texState.Transform;
@@ -682,13 +682,8 @@ namespace HSDRawViewer.Rendering.Models
                     {
                         displayTex = tex;
                         blending = tex.Blending;
-                        transform = Matrix4.CreateScale(tex.SX, tex.SY, tex.SZ) *
-                            Math3D.CreateMatrix4FromEuler(tex.RX, tex.RY, tex.RY) *
-                            Matrix4.CreateTranslation(tex.TX, tex.TY, tex.TZ);
+                        transform = Matrix4.Identity;
 
-                        // invert transform matrix
-                        if (tex.SY != 0 && tex.SX != 0 && tex.SZ != 0)
-                            transform.Invert();
                         if (tev != null)
                         {
                             konst = new Vector4(tev.constant.R / 255f, tev.constant.B / 255f, tev.constant.G / 255f, tev.constantAlpha / 255f);
@@ -721,12 +716,6 @@ namespace HSDRawViewer.Rendering.Models
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, tex.LOD.Bias); //640×548
                     }
 
-                    var wscale = tex.WScale;
-                    var hscale = tex.HScale;
-
-                    var mirrorX = tex.WrapS == GXWrapMode.MIRROR;
-                    var mirrorY = tex.WrapT == GXWrapMode.MIRROR;
-
                     var flags = tex.Flags;
 
                     int coordType = (int)flags & 0xF;
@@ -749,8 +738,6 @@ namespace HSDRawViewer.Rendering.Models
                     _shader.SetInt($"TEX[{i}].alpha_operation", alphaOP);
                     _shader.SetInt($"TEX[{i}].coord_type", coordType);
                     _shader.SetFloat($"TEX[{i}].blend", blending);
-                    _shader.SetBoolToInt($"TEX[{i}].mirror_fix", mirrorY);
-                    _shader.SetVector2($"TEX[{i}].uv_scale", wscale, hscale);
                     _shader.SetMatrix4x4($"TEX[{i}].transform", ref transform);
 
                     bool colorTev = tev != null && tev.active.HasFlag(TOBJ_TEVREG_ACTIVE.COLOR_TEV);

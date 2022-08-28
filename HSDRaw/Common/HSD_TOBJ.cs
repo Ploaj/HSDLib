@@ -112,10 +112,10 @@ namespace HSDRaw.Common
 
 
         [Category("0 - General"), Description("Amount to scale UVs (U) by when applied to a model")]
-        public byte WScale { get => _s.GetByte(0x3C); set => _s.SetByte(0x3C, value); }
+        public byte RepeatS { get => _s.GetByte(0x3C); set => _s.SetByte(0x3C, value); }
 
         [Category("0 - General"), Description("Amount to scale UVs (V) by when applied to a model")]
-        public byte HScale { get => _s.GetByte(0x3D); set => _s.SetByte(0x3D, value); }
+        public byte RepeatT { get => _s.GetByte(0x3D); set => _s.SetByte(0x3D, value); }
 
 
         [Category("2- Transform")]
@@ -322,8 +322,8 @@ namespace HSDRaw.Common
             SX = 1;
             SY = 1;
             SZ = 1;
-            WScale = 1;
-            HScale = 1;
+            RepeatS = 1;
+            RepeatT = 1;
         }
 
         public override bool Equals(object obj)

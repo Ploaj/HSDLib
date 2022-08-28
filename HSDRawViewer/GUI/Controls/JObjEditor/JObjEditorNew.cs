@@ -61,18 +61,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 ApplyEditorAnimation(f);
             };
 
-            // initialize texture editor
-            _trackEditor = new DockableTrackEditor();
-            _trackEditor.Show(dockPanel1);
-            _trackEditor.DockState = DockState.DockBottom;
-            _trackEditor.Hide();
-
-            _trackEditor.TracksUpdated += () =>
-            {
-                RenderJObj.ResetDefaultStateAll();
-                ApplyEditorAnimation(Frame);
-            };
-
             // initialize joint tree
             _jointTree = new DockableJointTree();
             _jointTree.Show(dockPanel1, DockState.DockLeft);
@@ -139,8 +127,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // initialize properties
             _propertyGrid = new DockablePropertyGrid();
-            _propertyGrid.Show(dockPanel1);
-            _propertyGrid.DockState = DockState.DockLeft;
+            _propertyGrid.Show(dockPanel1, DockState.DockRight);
+            // _propertyGrid.DockState = DockState.DockLeft;
 
             _propertyGrid.PropertyValueUpdated += (sender, args) =>
             {
@@ -171,8 +159,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // initialize texture editor
             _textureEditor = new DockableTextureEditor();
-            _textureEditor.Show(dockPanel1, DockState.DockLeft);
-            // _textureEditor.DockState = DockState.DockLeft;
+            _textureEditor.Show(dockPanel1);
+            _textureEditor.DockState = DockState.DockLeft;
 
             _textureEditor.SelectTObj += (dobj, tobj, index) =>
             {
@@ -186,6 +174,17 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _textureEditor.InvalidateTexture += () =>
             {
                 RenderJObj.Invalidate();
+            };
+
+            // initialize texture editor
+            _trackEditor = new DockableTrackEditor();
+            _trackEditor.Show(dockPanel1, DockState.DockBottom);
+            _trackEditor.Hide();
+
+            _trackEditor.TracksUpdated += () =>
+            {
+                RenderJObj.ResetDefaultStateAll();
+                ApplyEditorAnimation(Frame);
             };
 
             // initialize joint manager

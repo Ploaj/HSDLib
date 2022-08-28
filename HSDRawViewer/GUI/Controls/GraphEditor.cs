@@ -229,6 +229,7 @@ namespace HSDRawViewer.GUI.Controls
 
             _ptclButton = new Button();
             _ptclButton.Dock = DockStyle.Top;
+            _ptclButton.Visible = false;
             _ptclButton.Click += (sender, args) =>
             {
                 var options = new ParticleOptions()
@@ -249,6 +250,7 @@ namespace HSDRawViewer.GUI.Controls
             _ptclLabel = new Label();
             _ptclLabel.Dock = DockStyle.Top;
             _ptclLabel.Text = "Effect Bank: Effect ID:";
+            _ptclLabel.Visible = false;
             graphBox.Controls.Add(_ptclLabel);
 
             glviewport.MouseUp += (sender, args) =>

@@ -535,7 +535,7 @@ namespace HSDRawViewer.Converters
             if (ScaleUVs)
             {
 
-                var scale = new Vector2(tex.WScale, tex.HScale);
+                var scale = new Vector2(tex.RepeatS, tex.RepeatT);
                 uv.Xy *= scale;
             }
 
