@@ -998,6 +998,22 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="pick"></param>
         public void ScreenDoubleClick(PickInformation pick)
         {
+            List<SubactionEvent> hitboxes = new List<SubactionEvent>();
+
+            foreach (var hb in Processor.Hitboxes)
+            {
+                if (hb.Active)
+                {
+                    var position = hb.GetWorldPosition(renderer.FighterModel.RootJObj);
+
+                    if (pick.CheckSphereHitDistance(position, hb.Size, out float dis))
+                    {
+                        hitboxes.Add(hb.EventSource);
+                    }
+                }
+            }
+
+            _subactionEditor.SelectEvents(hitboxes);
         }
 
         /// <summary>
@@ -1009,6 +1025,18 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="deltaY"></param>
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
+            foreach (var hb in Processor.Hitboxes)
+            {
+                if (hb.Active && SelectedEvents.Contains(hb.EventSource))
+                {
+                    if (args.Button == MouseButtons.Left)
+                        hb._widget.MouseDown(pick);
+                    else
+                        hb._widget.MouseUp();
+
+                    hb._widget.Drag(pick);
+                }
+            }
         }
 
         /// <summary>
@@ -1045,6 +1073,23 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             renderer.Draw(cam, Processor, SelectedEvents);
+
+            foreach (var hb in Processor.Hitboxes)
+            {
+                if (hb.Active && SelectedEvents.Contains(hb.EventSource))
+                {
+                    hb._widget.Render(cam, null);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool FreezeCamera()
+        {
+            return Processor.Hitboxes.Any(e => e.Active && e._widget.Interacting);
         }
     }
 }

@@ -198,6 +198,21 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        private bool IsCameraFrozen
+        {
+            get
+            {
+                if (Selecting || IsAltKey)
+                    return true;
+
+                foreach (var d in Drawables)
+                    if (d is IDrawableInterface inter && inter.FreezeCamera())
+                        return true;
+                        
+                return false;
+            }
+        }
+
         public ViewportControl()
         {
             InitializeComponent();
@@ -255,7 +270,8 @@ namespace HSDRawViewer.GUI
 
             glControl.MouseClick += (sender, args) =>
             {
-                var point = new Vector2(glControl.PointToClient(Cursor.Position).X, glControl.PointToClient(Cursor.Position).Y);
+                // var point = new Vector2(glControl.PointToClient(Cursor.Position).X, glControl.PointToClient(Cursor.Position).Y);
+                var point = new Vector2(args.X, args.Y);
 
                 foreach (var v in Drawables)
                     if(v is IDrawableInterface inter)
@@ -283,19 +299,40 @@ namespace HSDRawViewer.GUI
 
             glControl.MouseMove += (sender, args) =>
             {
+                // update end position
                 mouseEnd = new Vector2(args.X, args.Y);
 
+                // interact with drawable
                 var p = glControl.PointToClient(Cursor.Position);
                 var point = new Vector2(p.X, p.Y);
-                
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
                          inter.ScreenDrag(args, GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
+
+                // move camera
+                var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+                DeltaCursorPos = PrevCursorPos - pos;
+                PrevCursorPos = pos;
+                if (!IsCameraFrozen)
+                {
+                    var speed = 0.10f;
+                    var speedpane = 0.75f;
+                    if (args.Button == MouseButtons.Right)
+                    {
+                        _camera.Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
+                    }
+                    if (args.Button == MouseButtons.Left && !Lock2D)
+                    {
+                        _camera.RotationXDegrees -= DeltaCursorPos.Y * speed;
+                        _camera.RotationYDegrees -= DeltaCursorPos.X * speed;
+                    }
+                }
 
             };
 
             glControl.MouseUp += (sender, args) =>
             {
+                // select drawable area
                 if (Selecting)
                 {
                     foreach (var v in Drawables)
@@ -308,18 +345,10 @@ namespace HSDRawViewer.GUI
 
             glControl.MouseWheel += (sender, args) =>
             {
+                // zoom camera
                 var zoomMultiplier = 1;
-                try
-                {
-                    //var ks = Keyboard.GetState();
-                    //if (ks.IsKeyDown(Key.ShiftLeft) || ks.IsKeyDown(Key.ShiftRight))
-                    //    zoomMultiplier = 4;
-                }
-                catch (Exception)
-                {
-
-                }
-                _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
+                if (!IsCameraFrozen)
+                    _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
             };
         }
 
@@ -843,35 +872,6 @@ namespace HSDRawViewer.GUI
         private void panel1_MouseEnter(object sender, EventArgs e)
         {
             PrevCursorPos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void panel1_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
-
-            DeltaCursorPos = PrevCursorPos - pos;
-
-            PrevCursorPos = pos;
-
-            if (!Selecting && !IsAltKey)
-            {
-                var speed = 0.10f;
-                var speedpane = 0.75f;
-                if (e.Button == MouseButtons.Right)
-                {
-                    _camera.Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
-                }
-                if (e.Button == MouseButtons.Left && !Lock2D)
-                {
-                    _camera.RotationXDegrees -= DeltaCursorPos.Y * speed;
-                    _camera.RotationYDegrees -= DeltaCursorPos.X * speed;
-                }
-            }
         }
 
         /// <summary>

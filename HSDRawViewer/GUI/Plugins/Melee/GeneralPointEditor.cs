@@ -643,5 +643,9 @@ namespace HSDRawViewer.GUI.Plugins
         public void GLFree()
         {
         }
+        public bool FreezeCamera()
+        {
+            return false;
+        }
     }
 }

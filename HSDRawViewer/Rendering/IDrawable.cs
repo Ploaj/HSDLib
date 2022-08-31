@@ -29,6 +29,8 @@ namespace HSDRawViewer.Rendering
         void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY);
 
         void ScreenSelectArea(PickInformation start, PickInformation end);
+
+        bool FreezeCamera();
     }
 
     /// <summary>

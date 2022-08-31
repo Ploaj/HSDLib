@@ -581,5 +581,21 @@ namespace HSDRawViewer.Rendering
                 // AspectRatio = camera.Aspect;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public Vector3 Project(Matrix4 mat, Vector3 point)
+        {
+            var p = Vector4.TransformRow(new Vector4(point, 1), mat * MvpMatrix);
+            var p2 = p.Xyz / p.W;
+            p2.Xy += Vector2.One;
+            p2.Xy /= 2;
+            p2.Y = 1 - p2.Y;
+            p2.Xy *= new Vector2(RenderWidth, renderHeight);
+            return p2;
+        }
     }
 }

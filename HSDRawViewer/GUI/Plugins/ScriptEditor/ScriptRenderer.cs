@@ -540,6 +540,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         // draw hitbox index
                         Text.RenderText(cam, hitboxId.ToString(), worldTransform, StringAlignment.Center, true);
                     }
+
+                    // increment hitbox id
                     hitboxId++;
                 }
             }

@@ -341,5 +341,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         public void GLFree()
         {
         }
+        public bool FreezeCamera()
+        {
+            return false;
+        }
     }
 }

@@ -87,7 +87,6 @@ namespace HSDRawViewer.GUI
             this.glControl.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.glControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.panel1_KeyDown);
             this.glControl.MouseEnter += new System.EventHandler(this.panel1_MouseEnter);
-            this.glControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             this.glControl.Resize += new System.EventHandler(this.panel1_Resize);
             // 
             // animationGroup

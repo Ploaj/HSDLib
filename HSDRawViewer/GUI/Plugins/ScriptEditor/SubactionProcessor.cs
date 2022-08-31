@@ -5,6 +5,7 @@ using HSDRawViewer.Tools;
 using HSDRaw;
 using HSDRawViewer.Rendering.Models;
 using System.Linq;
+using HSDRawViewer.Rendering.Widgets;
 
 namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 {
@@ -23,16 +24,49 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public int Angle;
         public int Element;
         public Vector3 Point1;
-        public Vector3 Point2;
+
+        private Vector3 UpdatedPoint;
+        private bool UpdatePoint;
 
         public SubactionEvent EventSource;
 
-        public Vector3 GetWorldPosition(LiveJObj manager)
+        public TranslationWidget _widget { get; internal set; } = new TranslationWidget();
+
+        public bool UseLocalTransform = false;
+
+        private Matrix4 boneTransform;
+
+        public Hitbox()
         {
-            return Vector3.TransformPosition(Vector3.Zero, GetWorldTransform(manager));
+            _widget.TransformUpdated += (t) =>
+            {
+                UpdatedPoint = Point1 + (t * boneTransform.Inverted()).ExtractTranslation();
+                ((CustomIntProperty)EventSource[7].Value).Value = (int)(UpdatedPoint.X * 256);
+                ((CustomIntProperty)EventSource[8].Value).Value = (int)(UpdatedPoint.Y * 256);
+                ((CustomIntProperty)EventSource[9].Value).Value = (int)(UpdatedPoint.Z * 256);
+                UpdatePoint = true;
+            };
         }
 
-        public Matrix4 GetWorldTransform(LiveJObj manager)
+        public Vector3 GetWorldPosition(LiveJObj manager)
+        {
+            if (UpdatePoint)
+                Point1 = UpdatedPoint;
+
+            var transform = GetWorldTransform(manager);
+
+            if (!_widget.Interacting)
+                if (UseLocalTransform)
+                    _widget.Transform = transform;
+                else
+                    _widget.Transform = transform.ClearRotation().ClearScale();
+
+            boneTransform = transform;
+
+            return Vector3.TransformPosition(Vector3.Zero, transform);
+        }
+
+        private Matrix4 GetWorldTransform(LiveJObj manager)
         {
             if (manager == null)
                 return Matrix4.Identity;

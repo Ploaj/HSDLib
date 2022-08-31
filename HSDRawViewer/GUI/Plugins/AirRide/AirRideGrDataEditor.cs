@@ -694,7 +694,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 foreach (var t in _tris)
                 {
                     Vector3 hit = Vector3.Zero;
-                    if (pick.CheckTriangleHit2(
+                    if (pick.CheckTriangleHit(
                         GXTranslator.toVector3(_vertices[t.V1]), 
                         GXTranslator.toVector3(_vertices[t.V2]), 
                         GXTranslator.toVector3(_vertices[t.V3]),
@@ -1090,6 +1090,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     }
                 }
             }
+        }
+
+        public bool FreezeCamera()
+        {
+            return false;
         }
     }
 

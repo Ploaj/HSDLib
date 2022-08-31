@@ -12,6 +12,7 @@ using System.ComponentModel;
 using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Tools;
 
 namespace HSDRawViewer
 {
@@ -44,7 +45,7 @@ namespace HSDRawViewer
         {
             return RawHSDFile.GetOffsetFromStruct(str);
         }
-        
+
         public MainForm()
         {
             InitializeComponent();
@@ -52,6 +53,14 @@ namespace HSDRawViewer
             IsMdiContainer = true;
 
             dockPanel.Theme = new VS2015LightTheme();
+
+#if DEBUG
+            var vp = new GUI.Controls.DockableViewport();
+            vp.Dock = DockStyle.Fill;
+            vp.Show(dockPanel);
+            TestRendering test = new TestRendering();
+            vp.glViewport.AddRenderer(test);
+#endif
 
             _nodePropertyViewer = new PropertyView();
             _nodePropertyViewer.Dock = DockStyle.Fill;

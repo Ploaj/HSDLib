@@ -86,6 +86,18 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="events"></param>
+        public void SelectEvents(IEnumerable<SubactionEvent> events)
+        {
+            subActionList.ClearSelected();
+
+            foreach (var e in events)
+                subActionList.SetSelected(subActionList.Items.IndexOf(e), true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void ApplyScriptChanges()
         {
             List<SubactionEvent> events = new List<SubactionEvent>();
