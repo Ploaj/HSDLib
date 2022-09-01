@@ -25,16 +25,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public int Element;
         public Vector3 Point1;
 
-        private Vector3 UpdatedPoint;
-        private bool UpdatePoint;
-
         public SubactionEvent EventSource;
 
         public TranslationWidget _widget { get; internal set; } = new TranslationWidget();
 
         public bool UseLocalTransform = false;
 
-        private Matrix4 boneTransform;
+        private Matrix4 StartTransform;
         private Vector3 StartPoint;
 
         /// <summary>
@@ -44,7 +41,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             _widget.TransformUpdated += (t) =>
             {
-                Point1 = StartPoint + (t * boneTransform.Inverted()).ExtractTranslation();
+                Point1 = StartPoint + (t * StartTransform.Inverted()).ExtractTranslation();
+                // TODO: have editor apply updated event data
                 ((CustomIntProperty)EventSource[7].Value).Value = (int)(Point1.X * 256);
                 ((CustomIntProperty)EventSource[8].Value).Value = (int)(Point1.Y * 256);
                 ((CustomIntProperty)EventSource[9].Value).Value = (int)(Point1.Z * 256);
@@ -67,7 +65,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 else
                     _widget.Transform = transform.ClearRotation().ClearScale();
 
-                boneTransform = transform;
+                StartTransform = transform;
                 StartPoint = Point1;
             }
 
