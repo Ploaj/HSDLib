@@ -576,7 +576,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                                 break;
                             case ScriptDisplayType.Descriptive:
                                 {
-                                    e.Graphics.DrawString($"{e.Index}. {sa.Name}({string.Join(", ", script.GetParamsAsString())})", e.Font, brush, e.Bounds);
+                                    e.Graphics.DrawString($"{e.Index}. {script.ToStringDescriptive()}", e.Font, brush, e.Bounds);
                                 }
                                 break;
                         }

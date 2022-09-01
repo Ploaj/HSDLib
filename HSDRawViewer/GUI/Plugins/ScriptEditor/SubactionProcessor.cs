@@ -35,37 +35,50 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public bool UseLocalTransform = false;
 
         private Matrix4 boneTransform;
+        private Vector3 StartPoint;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Hitbox()
         {
             _widget.TransformUpdated += (t) =>
             {
-                UpdatedPoint = Point1 + (t * boneTransform.Inverted()).ExtractTranslation();
-                ((CustomIntProperty)EventSource[7].Value).Value = (int)(UpdatedPoint.X * 256);
-                ((CustomIntProperty)EventSource[8].Value).Value = (int)(UpdatedPoint.Y * 256);
-                ((CustomIntProperty)EventSource[9].Value).Value = (int)(UpdatedPoint.Z * 256);
-                UpdatePoint = true;
+                Point1 = StartPoint + (t * boneTransform.Inverted()).ExtractTranslation();
+                ((CustomIntProperty)EventSource[7].Value).Value = (int)(Point1.X * 256);
+                ((CustomIntProperty)EventSource[8].Value).Value = (int)(Point1.Y * 256);
+                ((CustomIntProperty)EventSource[9].Value).Value = (int)(Point1.Z * 256);
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <returns></returns>
         public Vector3 GetWorldPosition(LiveJObj manager)
         {
-            if (UpdatePoint)
-                Point1 = UpdatedPoint;
-
             var transform = GetWorldTransform(manager);
 
             if (!_widget.Interacting)
+            {
                 if (UseLocalTransform)
-                    _widget.Transform = transform;
+                    _widget.Transform = transform.ClearScale();
                 else
                     _widget.Transform = transform.ClearRotation().ClearScale();
 
-            boneTransform = transform;
+                boneTransform = transform;
+                StartPoint = Point1;
+            }
 
             return Vector3.TransformPosition(Vector3.Zero, transform);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <returns></returns>
         private Matrix4 GetWorldTransform(LiveJObj manager)
         {
             if (manager == null)
@@ -79,7 +92,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     boneID = 1;
 
             var transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
-            transform.ClearScale();
+            //transform = transform.ClearScale();
 
             return transform;
         }

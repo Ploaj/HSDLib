@@ -515,6 +515,16 @@ namespace HSDRawViewer.Tools
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public string ToStringDescriptive()
+        {
+            var sa = SubactionManager.GetSubaction(Code, Type);
+            return $"{sa.Name}({string.Join(", ", GetParamsAsString())})";
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="type"></param>
         /// <param name="str"></param>
         /// <returns></returns>

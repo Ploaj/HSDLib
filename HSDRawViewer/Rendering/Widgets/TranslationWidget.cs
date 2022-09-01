@@ -18,6 +18,8 @@ namespace HSDRawViewer.Rendering.Widgets
 
     public class TranslationWidget
     {
+        // TODO: option to make x move into negative axis
+
         public Matrix4 Transform = Matrix4.Identity;
 
         public float Size { get; set; } = 4;
@@ -100,7 +102,7 @@ namespace HSDRawViewer.Rendering.Widgets
             if (!Interacting)
             {
                 // calcuate screen scale
-                scale = -Vector3.TransformPosition(center, camera.ModelViewMatrix).Z / 30f;
+                scale = -Vector3.TransformPosition(center, camera.ModelViewMatrix).Z / 40f;
 
                 // adjust scale from fov
                 scale *= (2 * (float)Math.Tan(camera.FovRadians / 2.0));

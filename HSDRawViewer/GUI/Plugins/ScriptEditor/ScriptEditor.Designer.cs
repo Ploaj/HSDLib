@@ -33,6 +33,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAllAsTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,6 +57,9 @@
             this.groundedECBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ledgeGrabBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shieldBubbleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.exportTXTOnSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,7 +77,8 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton2,
             this.toolStripDropDownButton1,
-            this.toolStripDropDownButton3});
+            this.toolStripDropDownButton3,
+            this.toolStripDropDownButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(800, 25);
@@ -84,7 +89,9 @@
             // 
             this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importModelFromFileToolStripMenuItem});
+            this.importModelFromFileToolStripMenuItem,
+            this.toolStripSeparator5,
+            this.exportAllAsTextToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
@@ -97,6 +104,13 @@
             this.importModelFromFileToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.importModelFromFileToolStripMenuItem.Text = "Load Model and Animation";
             this.importModelFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadModelAndAnimationToolStripMenuItem_Click);
+            // 
+            // exportAllAsTextToolStripMenuItem
+            // 
+            this.exportAllAsTextToolStripMenuItem.Name = "exportAllAsTextToolStripMenuItem";
+            this.exportAllAsTextToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.exportAllAsTextToolStripMenuItem.Text = "Export All As Text";
+            this.exportAllAsTextToolStripMenuItem.Click += new System.EventHandler(this.exportAllAsTextToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton1
             // 
@@ -298,6 +312,29 @@
             this.shieldBubbleToolStripMenuItem.Text = "Shield Bubble";
             this.shieldBubbleToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ToggleVisibility_Click);
             // 
+            // toolStripDropDownButton4
+            // 
+            this.toolStripDropDownButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exportTXTOnSaveToolStripMenuItem});
+            this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
+            this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
+            this.toolStripDropDownButton4.Size = new System.Drawing.Size(62, 22);
+            this.toolStripDropDownButton4.Text = "Options";
+            // 
+            // exportTXTOnSaveToolStripMenuItem
+            // 
+            this.exportTXTOnSaveToolStripMenuItem.CheckOnClick = true;
+            this.exportTXTOnSaveToolStripMenuItem.Name = "exportTXTOnSaveToolStripMenuItem";
+            this.exportTXTOnSaveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportTXTOnSaveToolStripMenuItem.Text = "Export TXT on Save";
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(216, 6);
+            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -343,5 +380,9 @@
         private System.Windows.Forms.ToolStripMenuItem groundedECBToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ledgeGrabBoxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem shieldBubbleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportAllAsTextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton4;
+        private System.Windows.Forms.ToolStripMenuItem exportTXTOnSaveToolStripMenuItem;
     }
 }

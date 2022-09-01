@@ -9,6 +9,7 @@ using HSDRaw.Tools.Melee;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
@@ -102,6 +103,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private PopoutJointAnimationEditor _animEditor;
 
         private ScriptRenderer renderer;
+        private GLTextRenderer text = new GLTextRenderer();
 
         private HSDStruct _selectedAction;
         private string _selectedActionSymbol;
@@ -783,6 +785,50 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             if (!string.IsNullOrEmpty(ResultFilePath))
                 SaveDemoAnimationFiles();
+
+            if (exportTXTOnSaveToolStripMenuItem.Checked)
+            {
+                var newPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "_" + _node.Text + ".txt");
+                ExportAsText(newPath);
+            }    
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="f"></param>
+        private void ExportAsText(string f)
+        {
+            using (FileStream strem = new FileStream(f, FileMode.Create))
+            using (StreamWriter w = new StreamWriter(strem))
+            {
+                int i = 0;
+                foreach (var a in _actionList._actions)
+                {
+                    w.WriteLine($"[Flags(0x{a.Flags.ToString("X8")})]");
+                    w.WriteLine($"{i} {a.ToString()}");
+                    w.WriteLine("{");
+                    var sub = SubactionEvent.GetEvents(SubactionGroup, a._struct);
+                    foreach (var ev in sub)
+                    {
+                        w.WriteLine($"\t{ev.ToStringDescriptive()}");
+                    }
+                    w.WriteLine("}");
+                    i++;
+                }
+                i = 0;
+                foreach (var a in _actionList._subroutines)
+                {
+                    w.WriteLine($"{i} {a.ToString()}");
+                    w.WriteLine("{");
+                    var sub = SubactionEvent.GetEvents(SubactionGroup, a._struct);
+                    foreach (var ev in sub)
+                        w.WriteLine($"\t{ev.ToStringDescriptive()}");
+                    w.WriteLine("}");
+                    i++;
+                }
+            }
         }
 
         /// <summary>
@@ -1054,6 +1100,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public void GLInit()
         {
             renderer.GLInit();
+            text.InitializeRender(@"lib\Consolas.bff");
         }
 
         /// <summary>
@@ -1062,6 +1109,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public void GLFree()
         {
             renderer.GLFree();
+            text.Dispose();
         }
 
         /// <summary>
@@ -1078,7 +1126,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 if (hb.Active && SelectedEvents.Contains(hb.EventSource))
                 {
-                    hb._widget.Render(cam, null);
+                    hb._widget.Render(cam, text);
                 }
             }
         }
@@ -1090,6 +1138,19 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public bool FreezeCamera()
         {
             return Processor.Hitboxes.Any(e => e.Active && e._widget.Interacting);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportAllAsTextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.SaveFile("Plain Text (*.txt)|*.txt");
+
+            if (f != null)
+                ExportAsText(f);
         }
     }
 }
