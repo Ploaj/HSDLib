@@ -264,6 +264,11 @@ namespace HSDRawViewer.Rendering.Renderers
             return (short)(cmdList[cmdPtr++] * 0x100 + cmdList[cmdPtr++]);
         }
 
+        private ushort ReadUShort()
+        {
+            return (ushort)(cmdList[cmdPtr++] * 0x100 + cmdList[cmdPtr++]);
+        }
+
         private byte ReadByteRandomize(byte input)
         {
             input += (byte)(cmdList[cmdPtr++] * (float)Gen.RandomGen.NextDouble());
@@ -468,7 +473,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xA4: // spawns particle at position
                             {
-                                int ptclId = ReadShort();
+                                int ptclId = ReadUShort();
 
                                 var desc = Gen.Parent.GetDescriptor(ptclId);
 
@@ -495,7 +500,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xA5: // Spawn Generator at position
                             {
-                                int ptclId = ReadShort();
+                                int ptclId = ReadUShort();
 
                                 int bankid = ptclId / 1000;
                                 int ptcli = ptclId % 1000;
@@ -644,7 +649,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xB9: // spawns particle using current generator
                             {
-                                int ptclId = ReadShort();
+                                int ptclId = ReadUShort();
 
                                 var curr = Gen.BankGen;
                                 var desc = Gen.Parent.GetDescriptor(ptclId);
@@ -1123,7 +1128,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xEF: // Create Generate with flag
                             {
-                                var particleId = ReadShort();
+                                var particleId = ReadUShort();
                                 var flag = cmdList[cmdPtr++];
 
                                 if (Gen != null && Gen.Parent != null)
