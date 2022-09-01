@@ -5,6 +5,7 @@ using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering.GX;
+using HSDRawViewer.Rendering.Models;
 using IONET;
 using IONET.Core;
 using IONET.Core.Model;
@@ -114,8 +115,113 @@ namespace HSDRawViewer.Converters
         {
             var model = ImportModelFromFile();
 
+            if (JointTreeIsSimilar(toReplace, model))
+            {
+                if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
+                    "Preserve the current model's skeleton?\n" +
+                    "(Recommended for online play)",
+                    "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    ReplaceWithBonesFromFile(toReplace, model);
+                }
+            }
+
             if (model != null)
                 toReplace._s.SetFromStruct(model._s);
+        }
+
+
+        /// <summary>
+        /// Returns true if both jobjs have same structure and transform values
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        public static bool JointTreeIsSimilar(HSD_JOBJ from, HSD_JOBJ to)
+        {
+            var fromList = from.BreathFirstList;
+            var toList = to.BreathFirstList;
+
+            // check if they have save joint count
+            if (fromList.Count != toList.Count)
+                return false;
+
+            // check if structure is the same
+            if (!JointTreeMatchesStructure(from, to))
+                return false;
+
+            // check each joint transforms
+            float epsilon = 0.001f;
+            for (int i = 0; i < fromList.Count; i++)
+            {
+                if (Math.Abs(from.TX - to.TX) > epsilon) return false;
+                if (Math.Abs(from.TY - to.TY) > epsilon) return false;
+                if (Math.Abs(from.TZ - to.TZ) > epsilon) return false;
+                if (Math.Abs(from.RX - to.RX) > epsilon) return false;
+                if (Math.Abs(from.RY - to.RY) > epsilon) return false;
+                if (Math.Abs(from.RZ - to.RZ) > epsilon) return false;
+                if (Math.Abs(from.SX - to.SX) > epsilon) return false;
+                if (Math.Abs(from.SY - to.SY) > epsilon) return false;
+                if (Math.Abs(from.SZ - to.SZ) > epsilon) return false;
+            }
+
+            // both joint trees are similar enough!
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="j1"></param>
+        /// <param name="j2"></param>
+        /// <returns></returns>
+        private static bool JointTreeMatchesStructure(HSD_JOBJ j1, HSD_JOBJ j2)
+        {
+            if ((j1.Next == null) != (j2.Next == null))
+                return false;
+
+            if ((j1.Child == null) != (j2.Child == null))
+                return false;
+
+            if (j2.Child != null)
+                return JointTreeMatchesStructure(j1.Child, j2.Child);
+
+            if (j1.Next != null)
+                return JointTreeMatchesStructure(j1.Next, j2.Next);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        public static void ReplaceWithBonesFromFile(HSD_JOBJ from, HSD_JOBJ to)
+        {
+            LiveJObj oldlist = new LiveJObj(to);
+            LiveJObj newlist = new LiveJObj(from);
+
+            if (newlist.JointCount == oldlist.JointCount)
+            {
+                for (int i = 0; i < newlist.JointCount; i++)
+                {
+                    var old = oldlist.GetJObjAtIndex(i).Desc;
+                    var n = newlist.GetJObjAtIndex(i).Desc;
+
+                    old.TX = n.TX; old.TY = n.TY; old.TZ = n.TZ;
+                    old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
+                    old.SX = n.SX; old.SY = n.SY; old.SZ = n.SZ;
+
+                    if (old.InverseWorldTransform != null)
+                    {
+                        if (n.InverseWorldTransform == null)
+                            old.InverseWorldTransform = newlist.GetJObjAtIndex(i).WorldTransform.Inverted().ToHsdMatrix();
+                        else
+                            old.InverseWorldTransform = n.InverseWorldTransform;
+                    }
+                }
+            }
         }
 
         /// <summary>

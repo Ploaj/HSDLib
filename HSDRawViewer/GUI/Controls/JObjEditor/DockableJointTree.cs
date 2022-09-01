@@ -289,38 +289,16 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void replaceBonesFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
             if (f != null)
             {
                 var file = new HSDRawFile(f);
                 if (file.Roots.Count > 0 && file.Roots[0].Data is HSD_JOBJ jobj)
                 {
-                    LiveJObj oldlist = new LiveJObj(_root);
-                    LiveJObj newlist = new LiveJObj(jobj);
+                    Converters.ModelImporter.ReplaceWithBonesFromFile(jobj, _root);
 
-                    if (newlist.JointCount == oldlist.JointCount)
-                    {
-                        for (int i = 0; i < newlist.JointCount; i++)
-                        {
-                            var old = oldlist.GetJObjAtIndex(i).Desc;
-                            var n = newlist.GetJObjAtIndex(i).Desc;
-
-                            old.TX = n.TX; old.TY = n.TY; old.TZ = n.TZ;
-                            old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
-                            old.SX = n.SX; old.SY = n.SY; old.SZ = n.SZ;
-
-                            if (old.InverseWorldTransform != null)
-                            {
-                                if (n.InverseWorldTransform == null)
-                                    old.InverseWorldTransform = newlist.GetJObjAtIndex(i).WorldTransform.Inverted().ToHsdMatrix();
-                                else
-                                    old.InverseWorldTransform = n.InverseWorldTransform;
-                            }
-                        }
-
-                        MessageBox.Show("Skeleton Sucessfully Replaced");
-                    }
+                    MessageBox.Show("Skeleton Sucessfully Replaced");
                 }
             }
         }
