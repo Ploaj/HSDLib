@@ -31,6 +31,7 @@ after_build:
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\HSDRawViewer.dll"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\HSDRawViewer.dll.config"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\HSDRawViewer.runtimeconfig.json"
+  - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\HSDRawViewer.deps.json"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\lib"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\Scripts"
   - 7z a "HSDRAW.zip" "%APPVEYOR_BUILD_FOLDER%\HSDRawViewer\bin\Release\net6.0-windows\Shader"
