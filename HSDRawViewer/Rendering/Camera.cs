@@ -1,4 +1,4 @@
-﻿using OpenTK;
+﻿using OpenTK.Mathematics;
 using System;
 using System.ComponentModel;
 using YamlDotNet.Serialization;
@@ -44,6 +44,18 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         [YamlIgnore]
         public Vector3 DefaultTranslation = new Vector3(0, 10, -80);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [YamlIgnore]
+        public float DefaultRotationX = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [YamlIgnore]
+        public float DefaultRotationY = 0;
 
         /// <summary>
         /// The translation component of the camera's transforms in scene units.
@@ -410,7 +422,7 @@ namespace HSDRawViewer.Rendering
             UpdateMvpMatrix();
 
             // Ensure the vector used for shading gets updated.
-            TransformedPosition = (rotationMatrix * new Vector4(translation, 1)).Xyz;
+            // TransformedPosition = (rotationMatrix * new Vector4(translation, 1)).Xyz;
         }
 
         /// <summary>
@@ -451,6 +463,7 @@ namespace HSDRawViewer.Rendering
         protected virtual void UpdateModelViewMatrix()
         {
             modelViewMatrix = Matrix4.CreateScale(scale) * rotationMatrix * translationMatrix;
+            TransformedPosition = Vector3.TransformPosition(Vector3.Zero, ModelViewMatrix.Inverted());
         }
 
         /// <summary>
@@ -477,8 +490,8 @@ namespace HSDRawViewer.Rendering
         public void RestoreDefault()
         {
             Translation = DefaultTranslation;
-            RotationXRadians = 0;
-            RotationYRadians = 0;
+            RotationXRadians = DefaultRotationX;
+            RotationYRadians = DefaultRotationY;
         }
 
         /// <summary>
@@ -567,6 +580,22 @@ namespace HSDRawViewer.Rendering
                 FovDegrees = camera.FieldOfView;
                 // AspectRatio = camera.Aspect;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public Vector3 Project(Matrix4 mat, Vector3 point)
+        {
+            var p = Vector4.TransformRow(new Vector4(point, 1), mat * MvpMatrix);
+            var p2 = p.Xyz / p.W;
+            p2.Xy += Vector2.One;
+            p2.Xy /= 2;
+            p2.Y = 1 - p2.Y;
+            p2.Xy *= new Vector2(RenderWidth, renderHeight);
+            return p2;
         }
     }
 }

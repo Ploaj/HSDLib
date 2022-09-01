@@ -10,7 +10,7 @@ namespace HSDRawViewer.ContextMenus
 
         public FighterArticleContextMenu() : base()
         {
-            MenuItem addFromFile = new MenuItem("Add Article From File");
+            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add Article From File");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_ArticlePointer root)
@@ -29,7 +29,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(addFromFile);
+            Items.Add(addFromFile);
         }
     }
 }

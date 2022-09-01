@@ -1,40 +1,41 @@
 ﻿using System;
 using System.Linq;
-using WeifenLuo.WinFormsUI.Docking;
 using HSDRaw.Melee.Gr;
 using HSDRawViewer.Rendering;
 using System.Windows.Forms;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
-using OpenTK.Input;
 using System.ComponentModel;
 using HSDRawViewer.GUI.Plugins.Melee;
+using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Controls.MapHeadViewer;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(SBM_Coll_Data) })]
-    public partial class CollDataEditor : DockContent, EditorBase, IDrawableInterface
+    public partial class CollDataEditor : PluginBase, IDrawableInterface
     {
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set
             {
                 _node = value;
-
+                
                 CollData = _node.Accessor as SBM_Coll_Data;
 
                 LoadCollData();
+
+                var map_head = MainForm.Instance.GetSymbol("map_head") as SBM_Map_Head;
+                mapheadviewer.LoadMapHead(map_head);
             }
         }
 
-        public DockState DefaultDockState => DockState.DockLeft;
+        private DataNode _node;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
-
-        private DataNode _node;
 
         private SBM_Coll_Data CollData;
 
@@ -135,16 +136,21 @@ namespace HSDRawViewer.GUI.Plugins
         private float PlatformWidth = 20;
         private float PickRange = 100;
 
+        private MapHeadViewControl mapheadviewer;
+
         public CollDataEditor()
         {
             InitializeComponent();
+
+            mapheadviewer = new MapHeadViewControl();
+            mapheadviewer.Dock = DockStyle.Fill;
+            mapheadviewer.glViewport.AddRenderer(this);
+            groupBox2.Controls.Add(mapheadviewer);
 
             cbSelectType.SelectedIndex = 0;
             cbRenderModes.SelectedIndex = 0;
 
             listLines.DataSource = Lines;
-
-            PluginManager.GetCommonViewport()?.AddRenderer(this);
 
             listBox1.SelectedIndexChanged += (sender, args) =>
             {
@@ -183,10 +189,9 @@ namespace HSDRawViewer.GUI.Plugins
 
                 editLineMenu.Enabled = (propertyGrid1.SelectedObjects.Length > 0 && propertyGrid1.SelectedObject is CollLine);
             };
-
-            FormClosing += (sender, args) =>
+            Disposed += (s, a) =>
             {
-                PluginManager.GetCommonViewport()?.RemoveRenderer(this);
+                mapheadviewer.Dispose();
             };
         }
 
@@ -207,9 +212,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="ray"></param>
         public void ScreenClick(MouseButtons button, PickInformation ray)
         {
-            var mouseState = Mouse.GetState();
-            
-            if (WasDragging && mouseState.IsButtonDown(MouseButton.Right))
+            if (WasDragging && button == MouseButtons.Right)
             {
                 WasDragging = false;
                 Undo();
@@ -224,8 +227,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="ray"></param>
         public void ScreenDoubleClick(PickInformation ray)
         {
-            var keyState = Keyboard.GetState();
-            bool multiSelect = keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight);
+            bool multiSelect = ControlHeld;
 
             float closest = float.MaxValue;
             var pick2D = ray.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
@@ -285,6 +287,9 @@ namespace HSDRawViewer.GUI.Plugins
             }
         }
 
+        private bool ControlHeld = false;
+        private bool AltHeld = false;
+
         private bool WasDragging = false;
         private Vector3 PrevDrag = Vector3.Zero;
 
@@ -292,11 +297,11 @@ namespace HSDRawViewer.GUI.Plugins
         /// 
         /// </summary>
         /// <param name="kbState"></param>
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
-            if(kbState.IsKeyDown(Key.ControlLeft) || kbState.IsKeyDown(Key.ControlRight))
+            if(kbState.Control)
             {
-                if (kbState.IsKeyDown(Key.Z))
+                if (kbState.KeyCode == Keys.Z)
                 {
                     Undo();
                 }
@@ -309,26 +314,22 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="pick"></param>
         /// <param name="Xdelta"></param>
         /// <param name="Ydelta"></param>
-        public void ScreenDrag(PickInformation pick, float Xdelta, float Ydelta)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float Xdelta, float Ydelta)
         {
-            var mouseState = Mouse.GetState();
-
-            var keyState = Keyboard.GetState();
-
-            bool drag = keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
+            bool drag = AltHeld;
 
             // keep track of vertices we've already processed by hashes
             // this is a hacky way to make sure we don't process a shared vertex more than once
             HashSet<Vector2> moved = new HashSet<Vector2>();
             
-            if (WasDragging && mouseState.IsButtonDown(MouseButton.Right))
+            if (WasDragging && args.Button.HasFlag(MouseButtons.Right))
             {
                 // Undo
                 WasDragging = false;
                 Undo();
             }
             else
-            if (drag && mouseState.IsButtonDown(MouseButton.Left))
+            if (drag && args.Button.HasFlag(MouseButtons.Left))
             {
                 // Drag
                 var pick2D = pick.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
@@ -428,9 +429,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             List<object> selected = new List<object>();
 
-            var keyState = Keyboard.GetState();
-
-            if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
+            if (ControlHeld)
                 selected.AddRange(propertyGrid1.SelectedObjects);
 
             if (cbSelectType.SelectedIndex == 1)
@@ -1227,6 +1226,24 @@ namespace HSDRawViewer.GUI.Plugins
             foreach (var l in lines)
                 if (l.InRange(range))
                     yield return l;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+        }
+        public bool FreezeCamera()
+        {
+            return false;
         }
     }
 }

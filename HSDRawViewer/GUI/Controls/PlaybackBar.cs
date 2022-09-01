@@ -76,8 +76,8 @@ namespace HSDRawViewer.GUI.Controls
             {
                 _frame = value;
 
-                if (ValueChanged != null)
-                ValueChanged.Invoke(this, EventArgs.Empty);
+                ValueChanged?.Invoke(this, EventArgs.Empty);
+
                 Invalidate();
             }
         }
@@ -132,7 +132,7 @@ namespace HSDRawViewer.GUI.Controls
             float numberOfFrames = EndFrame - StartFrame + 1;
             var tickWidth = (rect.Width / numberOfFrames);
             var increment = 1;
-            float tickStartY = rect.Height * 0.3f;
+            float tickStartY = rect.Height * 0.4f;
             float tickTipHeight = (rect.Height - tickStartY) / 3;
 
             float tipUpperYStart = tickStartY;
@@ -266,11 +266,11 @@ namespace HSDRawViewer.GUI.Controls
 
             Frame = (float)Math.Floor(x / tickWidth);
 
-            if (_frame < StartFrame)
-                _frame = StartFrame;
+            if (x < 0 || Frame < StartFrame)
+                Frame = StartFrame;
 
-            if (_frame > EndFrame)
-                _frame = EndFrame;
+            if (Frame > EndFrame)
+                Frame = EndFrame;
 
             Invalidate();
         }

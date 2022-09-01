@@ -1,19 +1,18 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI.Controls.JObjEditor;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Animation;
 using System;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_JOBJ) })]
-    public partial class JobjEditorDock : DockContent, EditorBase
+    public partial class JobjEditorDock : PluginBase
     {
-        public DockState DefaultDockState => DockState.DockLeft;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set
@@ -26,7 +25,7 @@ namespace HSDRawViewer.GUI.Plugins
         }
         private DataNode _node;
 
-        public JObjEditor Editor { get; internal set; }
+        public JObjEditorNew Editor { get; internal set; }
 
         /// <summary>
         /// 
@@ -35,7 +34,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             InitializeComponent();
 
-            Editor = new JObjEditor();
+            Editor = new JObjEditorNew();
             Editor.Dock = DockStyle.Fill;
             Controls.Add(Editor);
         }
@@ -46,7 +45,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="joint"></param>
         public void LoadPhysics(SBM_PhysicsGroup group)
         {
-            Editor.LoadPhysics(group);
+            //Editor.LoadPhysics(group);
         }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="joint"></param>
         public void LoadAnimation(HSD_MatAnimJoint joint)
         {
-            Editor.LoadAnimation(joint);
+            Editor.LoadAnimation(new MatAnimManager(joint));
         }
 
         /// <summary>
@@ -73,7 +72,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="anim"></param>
         public void LoadAnimation(HSD_ShapeAnimJoint anim)
         {
-            Editor.LoadAnimation(anim);
+            ShapeAnimManager m = new ShapeAnimManager();
+            m.FromShapeAnim(anim);
+            Editor.LoadAnimation(m);
         }
     }
 }

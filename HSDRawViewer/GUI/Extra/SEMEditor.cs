@@ -5,6 +5,7 @@ using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
 using System.Linq;
 using HSDRaw.MEX;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Extra
 {

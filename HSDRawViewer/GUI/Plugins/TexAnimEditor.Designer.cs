@@ -32,7 +32,7 @@ namespace HSDRawViewer.GUI.Plugins
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TexAnimEditor));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.texturePanel1 = new HSDRawViewer.GUI.Controls.TexturePanel();
+            this.texturePanel1 = new HSDRawViewer.GUI.Controls.TextureViewControl();
             this.arrayMemberEditor1 = new HSDRawViewer.GUI.ArrayMemberEditor();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonImport = new System.Windows.Forms.ToolStripButton();
@@ -221,7 +221,7 @@ namespace HSDRawViewer.GUI.Plugins
 
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private Controls.TexturePanel texturePanel1;
+        private Controls.TextureViewControl texturePanel1;
         private ArrayMemberEditor arrayMemberEditor1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton buttonImport;

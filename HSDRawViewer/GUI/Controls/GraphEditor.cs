@@ -8,9 +8,11 @@ using System.Windows.Forms;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering.Renderers;
-using OpenTK.Input;
 using HSDRawViewer.Converters.Animation;
-using HSDRawViewer.Tools;
+using HSDRawViewer.GUI.Dialog;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using HSDRawViewer.Rendering;
 
 namespace HSDRawViewer.GUI.Controls
 {
@@ -147,24 +149,27 @@ namespace HSDRawViewer.GUI.Controls
         {
             get
             {
-                var state = Keyboard.GetState();
-                return state.IsKeyDown(Key.ControlLeft) || state.IsKeyDown(Key.ControlRight);
+                //var state = Keyboard.GetState();
+                //return state.IsKeyDown(Key.ControlLeft) || state.IsKeyDown(Key.ControlRight);
+                return false;
             }
         }
 
         private Button _ptclButton;
         private Label _ptclLabel;
-        private DrawingPanel _graph;
 
-        public static Brush BackgroundColor = new SolidBrush(Color.FromArgb(255, 40, 40, 40));
-        private static Pen FrameIndicatorPen = new Pen(Color.White);
-        private static Brush SelectionColor = new SolidBrush(Color.FromArgb(90, 128, 128, 200));
+        private GLTextRenderer textRenderer = new GLTextRenderer();
 
-        public static Pen TickColor = new Pen(Color.White);
-        public static Pen BackTickColor = new Pen(Color.FromArgb(255, 50, 50, 50));
+        public static Vector4 FrameIndicatorPen = new Vector4(1f, 1f, 1f, 1f);
+        public static Vector4 SelectionColor = new Vector4(128 / 255f, 128 / 255f, 200 / 255f, 90 / 255f);
 
-        private static Pen LineColor = new Pen(Color.Gray);
-        private static Pen SelectedLineColor = new Pen(Color.White);
+        public static Vector4 TickColor = new Vector4(1f, 1f, 1f, 1f);
+        public static Vector4 BackTickColor = new Vector4(0.2f, 0.2f, 0.2f, 1f);
+
+        private static Vector4 LineColor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+        private static Vector4 SelectedLineColor = new Vector4(1f, 1f, 1f, 1f);
+
+        private static Vector4 FontColor = new Vector4(1f, 1f, 1f, 1f);
 
         public event EventHandler TrackListUpdated;
         protected virtual void OnTrackListUpdated(EventArgs e)
@@ -185,9 +190,6 @@ namespace HSDRawViewer.GUI.Controls
 
         public float Zoom = 0.9f;
 
-        public static Brush FontColor = new SolidBrush(Color.White);
-        private Font _markerFont;
-        private StringFormat _markerFormat = new StringFormat();
 
         public class ParticleOptions
         {
@@ -225,13 +227,9 @@ namespace HSDRawViewer.GUI.Controls
         {
             InitializeComponent();
 
-            _graph = new DrawingPanel();
-            _graph.Dock = DockStyle.Fill;
-            graphBox.Controls.Add(_graph);
-            _graph.BringToFront();
-
             _ptclButton = new Button();
             _ptclButton.Dock = DockStyle.Top;
+            _ptclButton.Visible = false;
             _ptclButton.Click += (sender, args) =>
             {
                 var options = new ParticleOptions()
@@ -252,37 +250,29 @@ namespace HSDRawViewer.GUI.Controls
             _ptclLabel = new Label();
             _ptclLabel.Dock = DockStyle.Top;
             _ptclLabel.Text = "Effect Bank: Effect ID:";
+            _ptclLabel.Visible = false;
             graphBox.Controls.Add(_ptclLabel);
 
-            _markerFont = new Font("Arial", 8);
-            _markerFormat.LineAlignment = StringAlignment.Center;
-            _markerFormat.Alignment = StringAlignment.Center;
-
-            Disposed += (sender, args) =>
-            {
-                _markerFont.Dispose();
-            };
-
-            _graph.MouseUp += (sender, args) =>
+            glviewport.MouseUp += (sender, args) =>
             {
                 SelectFrameFromMouse(args.X);
 
                 if (IsControl)
                     SelectKeysInRange(_startSelectionFrame, _frame);
 
-                _graph.Invalidate();
+                glviewport.Invalidate();
             };
 
-            _graph.MouseDown += (sender, args) =>
+            glviewport.MouseDown += (sender, args) =>
             {
                 SelectFrameFromMouse(args.X);
 
                 _startSelectionFrame = _frame;
 
-                _graph.Invalidate();
+                glviewport.Invalidate();
             };
 
-            _graph.MouseMove += (sender, args) =>
+            glviewport.MouseMove += (sender, args) =>
             {
                 if(args.Button == MouseButtons.Left)
                 {
@@ -290,127 +280,15 @@ namespace HSDRawViewer.GUI.Controls
                 }
             };
 
-            var gr = new GraphRenderer();
-
-            _graph.Paint += (sender, args) =>
+            glviewport.Paint += (sender, args) =>
             {
-                var graphics = args.Graphics;
-
-                // set smoothing
-                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-                // fill background color
-                var rect = _graph.ClientRectangle;
-                graphics.FillRectangle(BackgroundColor, rect);
-
-                var x1 = rect.Width - rect.Width * Zoom;
-                var y1 = rect.Height - rect.Height * Zoom;
-
-                graphics.TranslateTransform(x1 / 2, y1 / 2);
-                graphics.ScaleTransform(Zoom, Zoom);
-
-                // draw frame ticks
-                if (_options.ShowFrameTicks)
-                {
-                    if (_selectedPlayer != null)
-                    {
-                        gr.SetKeys(_selectedPlayer);
-
-                        // horizontal lines
-                        graphics.DrawLine(BackTickColor, -x1, 0, x1 * 2 + rect.Width, 0);
-                        graphics.DrawString(gr.MinValue.ToString("n2"), _markerFont, FontColor, -20, 0, _markerFormat);
-
-                        graphics.DrawLine(BackTickColor, -x1, rect.Height / 4f, x1 * 2 + rect.Width, rect.Height / 4f);
-
-                        graphics.DrawLine(BackTickColor, -x1, rect.Height / 2f, x1 * 2 + rect.Width, rect.Height / 2f);
-                        graphics.DrawString(((gr.MinValue + gr.MaxValue) / 2).ToString("n2"), _markerFont, FontColor, -20, rect.Height / 2f, _markerFormat);
-
-                        graphics.DrawLine(BackTickColor, -x1, rect.Height * 3f / 4f, x1 * 2 + rect.Width, rect.Height * 3f / 4f);
-
-                        graphics.DrawLine(BackTickColor, -x1, rect.Height, x1 * 2 + rect.Width, rect.Height);
-                        graphics.DrawString(gr.MaxValue.ToString("n2"), _markerFont, FontColor, -20, rect.Height, _markerFormat);
-                    }
-
-                    var tickWidth = (rect.Width / (float)_frameCount);
-                    var increment = 1;
-
-                    // fix infinity
-                    if (_frameCount == 0)
-                        tickWidth = 1;
-
-                    // don't crunch numbers too far together
-                    if (tickWidth * Zoom < 40)
-                        increment = (int)Math.Ceiling(40 / (tickWidth * Zoom));
-
-                    // round increment to upper 5
-                    if(increment != 1)
-                        increment = (int)(Math.Ceiling(increment / 5f) * 5f);
-
-                    // vertical
-                    for (int i = 0; i <= _frameCount; i++)
-                    {
-                        if(i % increment == 0)
-                        {
-                            var x = i * tickWidth;
-
-                            // frame line
-                            graphics.DrawLine(BackTickColor, x, 0, x, rect.Height);
-
-                            // tick number
-                            graphics.DrawString(i.ToString(), _markerFont, FontColor, x, -12, _markerFormat);
-
-                            // tick line
-                            graphics.DrawLine(TickColor, x, 0, x, 5f);
-                        }
-                    }
-                }
-
-                // draw tracks
-                foreach (var p in _players)
-                {
-                    if (!_options.ShowAllTracks && p != _selectedPlayer)
-                        continue;
-
-                    gr.RenderTangents = _options.ShowTangents;
-
-                    if(p == _selectedPlayer)
-                        gr.LineColor = SelectedLineColor;
-                    else
-                    {
-                        gr.RenderPoints = false;
-                        gr.LineColor = LineColor;
-                    }
-
-                    gr.SetKeys(p);
-
-                    if (IsControl)
-                        gr.Draw(args.Graphics, rect, 
-                            Math.Min(_frame, _startSelectionFrame), 
-                            Math.Max(_frame, _startSelectionFrame));
-                    else
-                        gr.Draw(args.Graphics, rect, _frame, _frame);
-                }
-
-
-                // draw selection
-                var linex = _frame * (rect.Width / (float)_frameCount);
-
-                if (!float.IsNaN(linex) && !float.IsInfinity(linex))
-                {
-                    if (IsControl)
-                    {
-                        var start = _startSelectionFrame * (rect.Width / (float)_frameCount);
-
-                        graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), _graph.Height);
-
-                        graphics.DrawLine(FrameIndicatorPen, start, 0, start, _graph.Height);
-                    }
-
-                    graphics.DrawLine(FrameIndicatorPen, linex, 0, linex, _graph.Height);
-                }
-
+                Render();
             };
 
+            glviewport.Disposed += (s, a) =>
+            {
+                textRenderer.Dispose();
+            };
         }
 
         /// <summary>
@@ -432,14 +310,14 @@ namespace HSDRawViewer.GUI.Controls
             if(_selectedPlayer == null)
             {
                 panel1.Visible = false;
-                _graph.Visible = false;
+                glviewport.Visible = false;
                 _ptclLabel.Visible = false;
                 _ptclButton.Visible = false;
             }
             if (_selectedPlayer.JointTrackType == JointTrackType.HSD_A_J_PTCL)
             {
                 panel1.Visible = false;
-                _graph.Visible = false;
+                glviewport.Visible = false;
                 _ptclLabel.Visible = true;
                 _ptclButton.Visible = true;
                 UpdatePtclLabel();
@@ -447,7 +325,7 @@ namespace HSDRawViewer.GUI.Controls
             else
             {
                 panel1.Visible = true;
-                _graph.Visible = true;
+                glviewport.Visible = true;
                 _ptclLabel.Visible = false;
                 _ptclButton.Visible = false;
             }
@@ -488,6 +366,8 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="aobj"></param>
         public void LoadTracks(AnimType type, HSD_AOBJ aobj)
         {
+            ClearTracks();
+
             SetTrackType(type);
             
             if (aobj.FObjDesc != null)
@@ -496,6 +376,8 @@ namespace HSDRawViewer.GUI.Controls
 
             if(trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
+
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -505,13 +387,20 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="aobj"></param>
         public void LoadTracks(AnimType type, IEnumerable<FOBJ_Player> players)
         {
+            ClearTracks();
+
             SetTrackType(type);
 
-            foreach (var p in players)
-                AddPlayer(p);
+            if (players != null)
+            {
+                foreach (var p in players)
+                    AddPlayer(p);
+            }
 
             if (trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
+
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -568,7 +457,7 @@ namespace HSDRawViewer.GUI.Controls
         /// </summary>
         private void SelectFrameFromMouse(int mouseX)
         {
-            var position = (mouseX - (_graph.Width - _graph.Width * Zoom) / 2) / (_graph.Width * Zoom);
+            var position = (mouseX - (glviewport.Width - glviewport.Width * Zoom) / 2) / (glviewport.Width * Zoom);
 
             if (position < 0)
                 _frame = 0;
@@ -599,7 +488,7 @@ namespace HSDRawViewer.GUI.Controls
                 label4.Text = _selectedPlayer.GetValue(_frame).ToString();
             }
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -626,7 +515,7 @@ namespace HSDRawViewer.GUI.Controls
                 keyProperty.SelectedObjects = sel.ToArray();
             }
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -655,7 +544,7 @@ namespace HSDRawViewer.GUI.Controls
 
             keyProperty.SelectedObject = null;
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
 
             OnTrackEdited(EventArgs.Empty);
         }
@@ -694,7 +583,7 @@ namespace HSDRawViewer.GUI.Controls
                 }
             }
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
 
             OnTrackEdited(EventArgs.Empty);
         }
@@ -708,21 +597,34 @@ namespace HSDRawViewer.GUI.Controls
         {
             if(_selectedPlayer != null)
             {
-                if(!_selectedPlayer.Keys.Exists(k=>k.Frame == _frame))
+                if(!_selectedPlayer.Keys.Exists(k => k.Frame == _frame))
                 {
-                    var key = new FOBJKey() { Frame = _frame, Value = _selectedPlayer.GetValue(_frame), InterpolationType = GXInterpolationType.HSD_A_OP_LIN };
+                    var currKey = _selectedPlayer.Keys.Last(e => e.Frame < _frame);
+
+                    var key = new FOBJKey() 
+                    { 
+                        Frame = _frame, 
+                        Value = _selectedPlayer.GetValue(_frame), 
+                        InterpolationType = currKey != null ? currKey.InterpolationType : GXInterpolationType.HSD_A_OP_LIN
+                    };
 
                     var insertIndex = _selectedPlayer.Keys.FindIndex(k => k.Frame >= _frame);
 
                     if(insertIndex == -1 || insertIndex >= _selectedPlayer.Keys.Count)
+                    {
                         _selectedPlayer.Keys.Add(key);
+                    }
                     else
+                    {
                         _selectedPlayer.Keys.Insert(insertIndex, key);
+                        key.Tan = AnimationKeyCompressor.CalculateTangent(_selectedPlayer, _frame);
+                    }
 
                     SelectKeyAtFrame();
+
                 }
 
-                _graph.Invalidate();
+                glviewport.Invalidate();
 
                 OnTrackEdited(EventArgs.Empty);
             }
@@ -744,7 +646,7 @@ namespace HSDRawViewer.GUI.Controls
                 trackTypeBox.SelectedIndex = (e.Node.Tag as FOBJ_Player).TrackType;
 
             PrepareGraph();
-            _graph.Invalidate();
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -757,7 +659,7 @@ namespace HSDRawViewer.GUI.Controls
             using (PropertyDialog d = new PropertyDialog("Graph Display Options", _options))
                 d.ShowDialog();
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -798,7 +700,7 @@ namespace HSDRawViewer.GUI.Controls
             else
                 trackTree.SelectedNode = null;
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
 
             OnTrackListUpdated(EventArgs.Empty);
         }
@@ -819,7 +721,7 @@ namespace HSDRawViewer.GUI.Controls
 
             trackTree.SelectedNode = trackTree.Nodes[trackTree.Nodes.Count - 1];
 
-            _graph.Invalidate();
+            glviewport.Invalidate();
 
             OnTrackListUpdated(EventArgs.Empty);
         }
@@ -847,7 +749,7 @@ namespace HSDRawViewer.GUI.Controls
                 if (keys != null)
                 {
                     _selectedPlayer.Keys = keys;
-                    _graph.Invalidate();
+                    glviewport.Invalidate();
                     OnTrackEdited(EventArgs.Empty);
                 }
             }
@@ -924,7 +826,7 @@ NONE - None (do not use)";
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             Zoom = (float)(numericUpDown1.Value) / 100f * 0.9f;
-            _graph.Invalidate();
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -937,7 +839,7 @@ NONE - None (do not use)";
             _options.ShowAllTracks = showAllTracksToolStripMenuItem.Checked;
             _options.ShowFrameTicks = showFrameTicksToolStripMenuItem.Checked;
             _options.ShowTangents = showTangentsToolStripMenuItem.Checked;
-            _graph.Invalidate();
+            glviewport.Invalidate();
         }
 
         /// <summary>
@@ -950,7 +852,7 @@ NONE - None (do not use)";
             if (_selectedPlayer != null)
             {
                 AnimationKeyCompressor.BakeTrack(_selectedPlayer);
-                _graph.Invalidate();
+                glviewport.Invalidate();
                 OnTrackEdited(EventArgs.Empty);
             }
         }
@@ -986,38 +888,249 @@ NONE - None (do not use)";
                 {
                     if(d.ShowDialog() == DialogResult.OK)
                     {
+                        AnimationKeyCompressor.BakeTrack(_selectedPlayer);
                         AnimationKeyCompressor.CompressTrack(_selectedPlayer, _compSettings.CompressionLevel);
-                        _graph.Invalidate();
+                        glviewport.Invalidate();
                         OnTrackEdited(EventArgs.Empty);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void reverseButton_Click(object sender, EventArgs e)
         {
             if (_selectedPlayer != null)
             {
                 _selectedPlayer.Reverse();
-                _graph.Invalidate();
+                glviewport.Invalidate();
                 OnTrackEdited(EventArgs.Empty);
             }
         }
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class DrawingPanel : Panel
-    {
-        public DrawingPanel()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void glviewport_Resize(object sender, EventArgs e)
         {
-            DoubleBuffered = true;
+        }
 
-            Resize += (sender, args) =>
+        private Camera _camera;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void glviewport_Load(object sender, EventArgs e)
+        {
+            GL.ClearColor(0.1568f, 0.1568f, 0.1568f, 1);
+
+            textRenderer.InitializeRender(@"lib\GraphArial.bff");
+
+            // setup camera
+            _camera = new Camera();
+            _camera.RenderWidth = glviewport.Width;
+            _camera.RenderHeight = glviewport.Height;
+            _camera.Translation = new Vector3(0, 10, -80);
+        }
+
+        private GraphRenderer gr = new GraphRenderer();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void Render()
+        {
+            glviewport.MakeCurrent();
+
+            // setup viewport
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.Viewport(0, 0, glviewport.Width, glviewport.Height);
+
+            var rect = glviewport.ClientRectangle;
+            var x1 = rect.Width - rect.Width * Zoom;
+            var y1 = rect.Height - rect.Height * Zoom;
+
+            // create view matrix
+            var v = Matrix4.CreateOrthographicOffCenter(0, glviewport.Width, glviewport.Height, 0, 0, 1);
+            var mv = Matrix4.CreateScale(Zoom) * Matrix4.CreateTranslation(x1 / 2, y1 / 2, 0);
+
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref v);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref mv);
+
+            // draw frame ticks
+            if (_options.ShowFrameTicks)
             {
-                Invalidate();
-            };
+                if (_selectedPlayer != null)
+                {
+                    gr.SetKeys(_selectedPlayer);
+
+                    // horizontal lines
+                    GL.Color4(BackTickColor);
+                    GL.Begin(PrimitiveType.Lines);
+
+                    GL.Vertex2(-x1, 0); GL.Vertex2(x1 * 2 + rect.Width, 0);
+                    GL.Vertex2(-x1, rect.Height / 4f); GL.Vertex2(x1 * 2 + rect.Width, rect.Height / 4f);
+                    GL.Vertex2(-x1, rect.Height / 2f); GL.Vertex2(x1 * 2 + rect.Width, rect.Height / 2f);
+                    GL.Vertex2(-x1, rect.Height * 3f / 4f); GL.Vertex2(x1 * 2 + rect.Width, rect.Height * 3f / 4f);
+                    GL.Vertex2(-x1, rect.Height); GL.Vertex2(x1 * 2 + rect.Width, rect.Height);
+
+                    GL.End();
+
+                    //graphics.DrawLine(BackTickColor, -x1, 0, x1 * 2 + rect.Width, 0);
+                    //graphics.DrawLine(BackTickColor, -x1, rect.Height / 4f, x1 * 2 + rect.Width, rect.Height / 4f);
+                    //graphics.DrawLine(BackTickColor, -x1, rect.Height / 2f, x1 * 2 + rect.Width, rect.Height / 2f);
+                    //graphics.DrawLine(BackTickColor, -x1, rect.Height * 3f / 4f, x1 * 2 + rect.Width, rect.Height * 3f / 4f);
+                    //graphics.DrawLine(BackTickColor, -x1, rect.Height, x1 * 2 + rect.Width, rect.Height);
+
+                    var textPos = Vector3.TransformPosition(new Vector3(-20, 0, 0), mv);
+                    GL.Color4(FontColor);
+                    textRenderer.RenderText(gr.MinValue.ToString("n2"), glviewport.Width, glviewport.Height, (int)textPos.X, (int)textPos.Y, StringAlignment.Center);
+
+                    textPos = Vector3.TransformPosition(new Vector3(-20, rect.Height / 2f, 0), mv);
+                    GL.Color4(FontColor);
+                    textRenderer.RenderText(((gr.MinValue + gr.MaxValue) / 2).ToString("n2"), glviewport.Width, glviewport.Height, (int)textPos.X, (int)textPos.Y, StringAlignment.Center);
+
+                    textPos = Vector3.TransformPosition(new Vector3(-20, rect.Height, 0), mv);
+                    GL.Color4(FontColor);
+                    textRenderer.RenderText(gr.MaxValue.ToString("n2"), glviewport.Width, glviewport.Height, (int)textPos.X, (int)textPos.Y, StringAlignment.Center);
+
+                    //graphics.DrawString(gr.MinValue.ToString("n2"), _markerFont, FontColor, -20, 0, _markerFormat);
+                    //graphics.DrawString(((gr.MinValue + gr.MaxValue) / 2).ToString("n2"), _markerFont, FontColor, -20, rect.Height / 2f, _markerFormat);
+                    //graphics.DrawString(gr.MaxValue.ToString("n2"), _markerFont, FontColor, -20, rect.Height, _markerFormat);
+                }
+
+                var tickWidth = (rect.Width / (float)_frameCount);
+                var increment = 1;
+
+                // fix infinity
+                if (_frameCount == 0)
+                    tickWidth = 1;
+
+                // don't crunch numbers too far together
+                if (tickWidth * Zoom < 40)
+                    increment = (int)Math.Ceiling(40 / (tickWidth * Zoom));
+
+                // round increment to upper 5
+                if (increment != 1)
+                    increment = (int)(Math.Ceiling(increment / 5f) * 5f);
+
+                // draw vertical tick lines
+                GL.Begin(PrimitiveType.Lines);
+                for (int i = 0; i <= _frameCount; i++)
+                {
+                    if (i % increment == 0)
+                    {
+                        var x = i * tickWidth;
+
+                        // frame line
+                        GL.Color4(BackTickColor);
+                        GL.Vertex2(x, 0); GL.Vertex2(x, rect.Height);
+                        //graphics.DrawLine(BackTickColor, x, 0, x, rect.Height);
+
+                        // tick line
+                        GL.Color4(TickColor);
+                        GL.Vertex2(x, 0); GL.Vertex2(x, 5f);
+                        //graphics.DrawLine(TickColor, x, 0, x, 5f);
+                    }
+                }
+                GL.End();
+
+                // draw numbers
+                for (int i = 0; i <= _frameCount; i++)
+                {
+                    if (i % increment == 0)
+                    {
+                        var x = i * tickWidth;
+
+                        // tick number
+                        var textPos = Vector3.TransformPosition(new Vector3(x, -14 * Zoom, 0), mv);
+                        GL.Color4(FontColor);
+                        textRenderer.RenderText(i.ToString(), glviewport.Width, glviewport.Height, (int)textPos.X, (int)textPos.Y, StringAlignment.Center);
+                        // graphics.DrawString(i.ToString(), _markerFont, FontColor, x, -12, _markerFormat);
+                    }
+                }
+            }
+
+            // draw tracks
+            foreach (var p in _players)
+            {
+                if (!_options.ShowAllTracks && p != _selectedPlayer)
+                    continue;
+
+                gr.RenderTangents = _options.ShowTangents;
+
+                if (p == _selectedPlayer)
+                {
+                    gr.LineColor = SelectedLineColor;
+                }
+                else
+                {
+                    gr.RenderPoints = false;
+                    gr.LineColor = LineColor;
+                }
+
+                gr.SetKeys(p);
+
+                if (IsControl)
+                    gr.Draw(rect,
+                        Math.Min(_frame, _startSelectionFrame),
+                        Math.Max(_frame, _startSelectionFrame));
+                else
+                    gr.Draw(rect, _frame, _frame);
+            }
+
+
+            // draw selection
+            var linex = _frame * (rect.Width / (float)_frameCount);
+
+            if (!float.IsNaN(linex) && !float.IsInfinity(linex))
+            {
+                if (IsControl)
+                {
+                    var start = _startSelectionFrame * (rect.Width / (float)_frameCount);
+
+                    //graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), glviewport.Height);
+
+                    //graphics.DrawLine(FrameIndicatorPen, start, 0, start, glviewport.Height);
+
+                    var s1 = Math.Min(start, linex);
+                    var s2 = Math.Abs(start - linex);
+                    GL.Color4(SelectionColor);
+                    GL.Begin(PrimitiveType.Quads);
+                    GL.Vertex2(s1, 0);
+                    GL.Vertex2(s2, 0);
+                    GL.Vertex2(s2, glviewport.Height);
+                    GL.Vertex2(s1, glviewport.Height);
+                    GL.End();
+
+                    GL.Color4(FrameIndicatorPen);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex2(start, 0);
+                    GL.Vertex2(start, glviewport.Height);
+                    GL.End();
+                }
+
+                GL.Color4(FrameIndicatorPen);
+                GL.Begin(PrimitiveType.Lines);
+                GL.Vertex2(linex, 0);
+                GL.Vertex2(linex, rect.Height);
+                GL.End();
+                // graphics.DrawLine(FrameIndicatorPen, linex, 0, linex, glviewport.Height);
+            }
+
+            glviewport.SwapBuffers();
         }
     }
 }

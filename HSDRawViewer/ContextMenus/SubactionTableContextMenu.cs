@@ -1,8 +1,8 @@
 ﻿using HSDRaw;
 using HSDRaw.Melee.Pl;
-using HSDRawViewer.GUI;
 using System;
 using System.Windows.Forms;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -18,7 +18,7 @@ namespace HSDRawViewer.ContextMenus
 
         public SubactionTableContextMenu() : base()
         {
-            MenuItem Export = new MenuItem("Import Subaction Data From File");
+            ToolStripMenuItem Export = new ToolStripMenuItem("Import Subaction Data From File");
             Export.Click += (sender, args) =>
             {
                 var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
@@ -39,11 +39,11 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(Export);
+            Items.Add(Export);
 
 #if DEBUG
 
-            MenuItem rename = new MenuItem("Rename Symbols");
+            ToolStripMenuItem rename = new ToolStripMenuItem("Rename Symbols");
             rename.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
@@ -72,10 +72,10 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(rename);
+            Items.Add(rename);
 
 
-            MenuItem bonemap = new MenuItem("Remap Bone IDs");
+            ToolStripMenuItem bonemap = new ToolStripMenuItem("Remap Bone IDs");
             bonemap.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
@@ -119,10 +119,10 @@ namespace HSDRawViewer.ContextMenus
                     table.Commands = tables;
                 }
             };
-            MenuItems.Add(bonemap);
+            Items.Add(bonemap);
 
 
-            MenuItem soundid = new MenuItem("MEX: Make Sound IDs Portable ");
+            ToolStripMenuItem soundid = new ToolStripMenuItem("MEX: Make Sound IDs Portable ");
             soundid.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
@@ -156,7 +156,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(soundid);
+            Items.Add(soundid);
 #endif
 
         }

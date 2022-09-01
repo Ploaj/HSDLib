@@ -1,4 +1,6 @@
 ﻿using HSDRaw.Common;
+using HSDRawViewer.Rendering.Shaders;
+using OpenTK.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
         private List<TexGroup> TexGs { get; } = new List<TexGroup>();
 
+        private ParticleShader _shader;
 
         private class TexGroup
         {
@@ -89,7 +92,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 Parent = this
             };
 
-            gen.JointPosition = new OpenTK.Vector3(x, y, z);
+            gen.JointPosition = new OpenTK.Mathematics.Vector3(x, y, z);
 
             Generators.Add(gen);
             return gen;
@@ -165,16 +168,28 @@ namespace HSDRawViewer.Rendering.Renderers
         /// 
         /// </summary>
         /// <param name="c"></param>
+        public void Initialize()
+        {
+            _shader = new ParticleShader();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="c"></param>
         public void Render(Camera c)
         {
+            if (_shader == null)
+                return;
+
             // render particles
-            var pos = c.ModelViewMatrix.ExtractTranslation();
-            foreach (var p in Particles.OrderBy(e => (e.Pos - pos).LengthSquared))
+            var pos = c.TransformedPosition;
+            foreach (var p in Particles.OrderBy(e => -(e.Pos - pos).LengthSquared))
             {
                 if (p.TexG >= 0)
-                    p.Render(c, TexGs[p.TexG].GetGLIndices(_manager));
+                    p.Render(c, _shader, TexGs[p.TexG].GetGLIndices(_manager));
                 else
-                    p.Render(c, null);
+                    p.Render(c, _shader, null);
             }
         }
 
@@ -183,6 +198,8 @@ namespace HSDRawViewer.Rendering.Renderers
         /// </summary>
         public void Dispose()
         {
+            if (_shader != null)
+                _shader.Dispose();
             _manager.ClearTextures();
         }
     }

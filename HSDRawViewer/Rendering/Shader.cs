@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Windows.Forms;
 using System.Drawing;
 
 namespace HSDRawViewer.Rendering
 {
-    public class Shader
+    public class Shader : IDisposable
     {
         public int programId;
 
@@ -62,7 +62,6 @@ namespace HSDRawViewer.Rendering
         {
             GL.DeleteProgram(programId);
             GL.DeleteBuffer(BoneBufferID);
-            //GL.DeleteBuffer(BindBufferID);
         }
 
         public int GetUniformBlockIndex(string name)
@@ -393,6 +392,14 @@ namespace HSDRawViewer.Rendering
                 ShowShaderErrorMessageBox(shaderName);
 
             hasCheckedProgramCreation = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            Delete();
         }
     }
 }

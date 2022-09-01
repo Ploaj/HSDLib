@@ -13,6 +13,7 @@ using HSDRaw.Melee;
 using HSDRaw.MEX;
 using HSDRaw.MEX.Stages;
 using HSDRaw.MEX.Menus;
+using System.IO;
 
 namespace HSDRawViewer
 {

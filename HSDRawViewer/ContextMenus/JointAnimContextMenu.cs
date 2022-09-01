@@ -2,8 +2,7 @@
 using System;
 using System.Windows.Forms;
 using System.Linq;
-using HSDRaw.Tools;
-using HSDRawViewer.GUI;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -20,7 +19,7 @@ namespace HSDRawViewer.ContextMenus
 
         public AnimJointContextMenu() : base()
         {
-            MenuItem OpenAsAJ = new MenuItem("Add AOBJ");
+            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Add AOBJ");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
@@ -29,13 +28,13 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
-            MenuItems.Add(OpenAsAJ);
+            Items.Add(OpenAsAJ);
 
 
-            MenuItem addChild = new MenuItem("Add Child");
-            MenuItems.Add(addChild);
+            ToolStripMenuItem addChild = new ToolStripMenuItem("Add Child");
+            Items.Add(addChild);
 
-            MenuItem createJOBJ = new MenuItem("From Scratch");
+            ToolStripMenuItem createJOBJ = new ToolStripMenuItem("From Scratch");
             createJOBJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint root)
@@ -46,10 +45,10 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
-            addChild.MenuItems.Add(createJOBJ);
+            addChild.DropDownItems.Add(createJOBJ);
 
 
-            MenuItem createJOBJFromFile = new MenuItem("From File");
+            ToolStripMenuItem createJOBJFromFile = new ToolStripMenuItem("From File");
             createJOBJFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint root)
@@ -66,11 +65,11 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
-            addChild.MenuItems.Add(createJOBJFromFile);
+            addChild.DropDownItems.Add(createJOBJFromFile);
 
 #if DEBUG
 
-            MenuItem reverse = new MenuItem("Reverse");
+            ToolStripMenuItem reverse = new ToolStripMenuItem("Reverse");
             reverse.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
@@ -95,9 +94,9 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(reverse);
+            Items.Add(reverse);
 #endif
-            MenuItem editAOBJ = new MenuItem("Edit All AObj Flags");
+            ToolStripMenuItem editAOBJ = new ToolStripMenuItem("Edit All AObj Flags");
             editAOBJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
@@ -121,7 +120,7 @@ namespace HSDRawViewer.ContextMenus
 
                 }
             };
-            MenuItems.Add(editAOBJ);
+            Items.Add(editAOBJ);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.GX
+﻿using System.Collections.Generic;
+
+namespace HSDRaw.GX
 {
     public struct GX_Vertex
     {
@@ -57,6 +59,21 @@
         public static bool operator !=(GX_Shape x, GX_Shape y)
         {
             return !(y == x);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GX_Shape shape &&
+                   EqualityComparer<GXVector3>.Default.Equals(POS, shape.POS) &&
+                   EqualityComparer<GXVector3>.Default.Equals(NRM, shape.NRM);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1527933933;
+            hashCode = hashCode * -1521134295 + POS.GetHashCode();
+            hashCode = hashCode * -1521134295 + NRM.GetHashCode();
+            return hashCode;
         }
     }
 }

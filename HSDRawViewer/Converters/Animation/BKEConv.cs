@@ -2,7 +2,7 @@
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -165,7 +165,7 @@ namespace HSDRawViewer.Converters.Animation
                             {
                                 float frame = float.Parse(arg[0]) - 1;
 
-                                var matrix = new OpenTK.Matrix4(
+                                var matrix = new Matrix4(
                                     float.Parse(arg[1]), float.Parse(arg[2]), float.Parse(arg[3]), float.Parse(arg[4]),
                                     float.Parse(arg[5]), float.Parse(arg[6]), float.Parse(arg[7]), float.Parse(arg[8]),
                                     float.Parse(arg[9]), float.Parse(arg[10]), float.Parse(arg[11]), float.Parse(arg[12]),

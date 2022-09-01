@@ -1,16 +1,15 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
-using HSDRawViewer.GUI;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.Converters
 {
@@ -60,7 +59,10 @@ namespace HSDRawViewer.Converters
             foreach(var n in animation.Nodes)
             {
                 MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
-                mnode.name = !string.IsNullOrEmpty(jointMap[nodeIndex]) ? jointMap[nodeIndex] : "JOBJ_" + nodeIndex;
+                if (jointMap != null && !string.IsNullOrEmpty(jointMap[nodeIndex]))
+                    mnode.name = jointMap[nodeIndex];
+                else
+                    mnode.name = "JOBJ_" + nodeIndex;
                 a.Nodes.Add(mnode);
                 
                 foreach(var t in n.Tracks)

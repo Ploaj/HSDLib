@@ -112,10 +112,10 @@ namespace HSDRaw.Common
 
 
         [Category("0 - General"), Description("Amount to scale UVs (U) by when applied to a model")]
-        public byte WScale { get => _s.GetByte(0x3C); set => _s.SetByte(0x3C, value); }
+        public byte RepeatS { get => _s.GetByte(0x3C); set => _s.SetByte(0x3C, value); }
 
         [Category("0 - General"), Description("Amount to scale UVs (V) by when applied to a model")]
-        public byte HScale { get => _s.GetByte(0x3D); set => _s.SetByte(0x3D, value); }
+        public byte RepeatT { get => _s.GetByte(0x3D); set => _s.SetByte(0x3D, value); }
 
 
         [Category("2- Transform")]
@@ -211,11 +211,11 @@ namespace HSDRaw.Common
         public HSD_Tlut TlutData { get => _s.GetReference<HSD_Tlut>(0x50); set => _s.SetReference(0x50, value); }
 
 
-        [Category("3 - Ext"), Description("Defines level-of-detail texture information.")]
+        [Category("3 - Ext"), Description("Defines level-of-detail texture information."), Browsable(false)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_TOBJ_LOD LOD { get => _s.GetReference<HSD_TOBJ_LOD>(0x54); set => _s.SetReference(0x54, value); }
 
-        [Category("3 - Ext"), Description("Texture Environment Unit (TEV) operations for this texture.")]
+        [Category("3 - Ext"), Description("Texture Environment Unit (TEV) operations for this texture."), Browsable(false)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_TOBJ_TEV TEV { get => _s.GetReference<HSD_TOBJ_TEV>(0x58); set => _s.SetReference(0x58, value); }
 
@@ -322,8 +322,8 @@ namespace HSDRaw.Common
             SX = 1;
             SY = 1;
             SZ = 1;
-            WScale = 1;
-            HScale = 1;
+            RepeatS = 1;
+            RepeatT = 1;
         }
 
         public override bool Equals(object obj)

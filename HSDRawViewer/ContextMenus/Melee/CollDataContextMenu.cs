@@ -12,7 +12,7 @@ namespace HSDRawViewer.ContextMenus
 
         public CollDataContextMenu() : base()
         {
-            MenuItem Export = new MenuItem("Export As SVG");
+            ToolStripMenuItem Export = new ToolStripMenuItem("Export As SVG");
             Export.Click += (sender, args) =>
             {
                 using (SaveFileDialog sd = new SaveFileDialog())
@@ -25,10 +25,10 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(Export);
+            Items.Add(Export);
 
 
-            MenuItem ImportSSF = new MenuItem("Import SSF");
+            ToolStripMenuItem ImportSSF = new ToolStripMenuItem("Import SSF");
             ImportSSF.Click += (sender, args) =>
             {
                 using (OpenFileDialog sd = new OpenFileDialog())
@@ -39,19 +39,19 @@ namespace HSDRawViewer.ContextMenus
                         SSFConverter.ImportCollDataFromSSF(MainForm.SelectedDataNode.Accessor as SBM_Coll_Data, SSF.Open(sd.FileName));
                 }
             };
-            MenuItems.Add(ImportSSF);
+            Items.Add(ImportSSF);
 
-            MenuItem ExportSSF = new MenuItem("Export SSF");
+            ToolStripMenuItem ExportSSF = new ToolStripMenuItem("Export SSF");
             ExportSSF.Click += (sender, args) =>
             {
                 SSFConverter.ExportCollDataToSSF(MainForm.SelectedDataNode.Accessor as SBM_Coll_Data);
             };
-            MenuItems.Add(ExportSSF);
+            Items.Add(ExportSSF);
 
 
 
 
-            MenuItem ImportCOLL = new MenuItem("Import COLL");
+            ToolStripMenuItem ImportCOLL = new ToolStripMenuItem("Import COLL");
             ImportCOLL.Click += (sender, args) =>
             {
                 using (OpenFileDialog sd = new OpenFileDialog())
@@ -65,7 +65,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(ImportCOLL);
+            Items.Add(ImportCOLL);
         }
     }
 }

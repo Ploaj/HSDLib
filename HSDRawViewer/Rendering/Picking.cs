@@ -1,4 +1,4 @@
-﻿using OpenTK;
+﻿using OpenTK.Mathematics;
 using System;
 
 namespace HSDRawViewer.Rendering
@@ -26,57 +26,7 @@ namespace HSDRawViewer.Rendering
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pt"></param>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <param name="closest"></param>
-        /// <returns></returns>
-        /// http://csharphelper.com/blog/2016/09/find-the-shortest-distance-between-a-point-and-a-line-segment-in-c/
-        public static float GetDistanceToSegment(Vector2 pt, Vector2 p1, Vector2 p2, out Vector2 closest)
-        {
-            float dx = p2.X - p1.X;
-            float dy = p2.Y - p1.Y;
-            if ((dx == 0) && (dy == 0))
-            {
-                // It's a point not a line segment.
-                closest = p1;
-                dx = pt.X - p1.X;
-                dy = pt.Y - p1.Y;
-                return (float)Math.Sqrt(dx * dx + dy * dy);
-            }
-
-            // Calculate the t that minimizes the distance.
-            float t = ((pt.X - p1.X) * dx + (pt.Y - p1.Y) * dy) /
-                (dx * dx + dy * dy);
-
-            // See if this represents one of the segment's
-            // end points or a point in the middle.
-            if (t < 0)
-            {
-                closest = new Vector2(p1.X, p1.Y);
-                dx = pt.X - p1.X;
-                dy = pt.Y - p1.Y;
-            }
-            else if (t > 1)
-            {
-                closest = new Vector2(p2.X, p2.Y);
-                dx = pt.X - p2.X;
-                dy = pt.Y - p2.Y;
-            }
-            else
-            {
-                closest = new Vector2(p1.X + t * dx, p1.Y + t * dy);
-                dx = pt.X - closest.X;
-                dy = pt.Y - closest.Y;
-            }
-
-            return (float)Math.Sqrt(dx * dx + dy * dy);
-        }
-
-        /// <summary>
-        /// 
+        /// Gets interaction of ray and quad in model space
         /// </summary>
         /// <param name="P1"></param>
         /// <param name="P2"></param>
@@ -85,12 +35,11 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public bool IntersectsQuad(Vector3 P1, Vector3 P2, Vector3 P3, Vector3 P4)
         {
-            Vector3 temp;
-            return IntersectsQuad(P1, P2, P3, P4, out temp);
+            return IntersectsQuad(P1, P2, P3, P4, out Vector3 temp);
         }
 
         /// <summary>
-        /// 
+        /// Gets interaction of ray and quad in model space
         /// </summary>
         /// <param name="P1"></param>
         /// <param name="P2"></param>
@@ -143,7 +92,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="rad"></param>
         /// <param name="closest"></param>
         /// <returns></returns>
-        public bool CheckSphereHit(Vector3 center, float radius, out float distance)
+        public bool CheckSphereHitDistance(Vector3 center, float radius, out float distance)
         {
             Vector3 m = Origin - center;
             float b = Vector3.Dot(m, -Direction);
@@ -168,66 +117,47 @@ namespace HSDRawViewer.Rendering
             if (distance < 0.0f)
                 distance = 0.0f;
 
-            // var q = Origin + distance * -Direction;
+            var q = Origin + distance * -Direction;
 
             return true;
         }
 
-
-        /// <summary>
-        /// Checks if selection point is near bounds
-        /// </summary>
-        /// <param name="selectionPoint"></param>
-        /// <param name="boundMin"></param>
-        /// <param name="boundMax"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        public static bool CheckBoundHit(Vector2 selectionPoint, Vector2 boundMin, Vector2 boundMax, float range)
-        {
-            Vector2 close;
-
-            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMin.X, boundMin.Y), new Vector2(boundMax.X, boundMin.Y), out close) < range)
-                return true;
-            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMax.X, boundMin.Y), new Vector2(boundMax.X, boundMax.Y), out close) < range)
-                return true;
-            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMin.X, boundMin.Y), new Vector2(boundMin.X, boundMax.Y), out close) < range)
-                return true;
-            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMin.X, boundMax.Y), new Vector2(boundMax.X, boundMax.Y), out close) < range)
-                return true;
-
-            return false;
-        }
-        
-        private float coPlanerThreshold = 0.7f; // Some threshold value that is application dependent
-        private float lengthErrorThreshold = 1e-3f;
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
+        /// <param name="sphere"></param>
+        /// <param name="rad"></param>
+        /// <param name="closest"></param>
         /// <returns></returns>
-        public bool IntersectsLine(Vector3 start, Vector3 end)
+        public bool CheckSphereHitIntersection(Vector3 center, float radius, out Vector3 intersection)
         {
-            Vector3 da = End - Origin;  // Unnormalized direction of the ray
-            Vector3 db = end - start;
-            Vector3 dc = start - Origin;
+            Vector3 m = Origin - center;
+            float b = Vector3.Dot(m, -Direction);
+            float c = Vector3.Dot(m, m) - radius * radius;
 
-            if (Math.Abs(Vector3.Dot(dc, Vector3.Cross(da, db))) >= coPlanerThreshold) // Lines are not coplanar
+            intersection = Vector3.Zero;
+            var distance = float.MaxValue;
+
+            // Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
+            if (c > 0.0f && b > 0.0f)
                 return false;
 
-            float s = Vector3.Dot(Vector3.Cross(dc, db), Vector3.Cross(da, db)) / Vector3.Cross(da, db).LengthSquared;
+            float discr = b * b - c;
 
-            if (s >= 0.0f && s <= 1.0f)   // Means we have an intersection
-            {
-                Vector3 intersection = Origin + s * da;
+            // A negative discriminant corresponds to ray missing sphere 
+            if (discr < 0.0f)
+                return false;
 
-                // See if this lies on the segment
-                if ((intersection - start).LengthSquared + (intersection - end).LengthSquared <= (end - start).LengthSquared + lengthErrorThreshold)
-                    return true;
-            }
+            // Ray now found to intersect sphere, compute smallest t value of intersection
+            distance = -b - (float)Math.Sqrt(discr);
 
-            return false;
+            // If t is negative, ray started inside sphere so clamp t to zero 
+            if (distance < 0.0f)
+                distance = 0.0f;
+
+            intersection = Origin + distance * -Direction;
+
+            return true;
         }
 
         /// <summary>
@@ -252,61 +182,16 @@ namespace HSDRawViewer.Rendering
             return CheckLineBox(start, end, Origin, End, ref hit);
         }
 
-        private const double Epsilon = 0.000001d;
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="rayOrigin"></param>
-        /// <param name="rayDirection"></param>
-        /// <param name="vert0"></param>
-        /// <param name="vert1"></param>
-        /// <param name="vert2"></param>
+        /// <param name="v0"></param>
+        /// <param name="v1"></param>
+        /// <param name="v2"></param>
+        /// <param name="hit"></param>
+        /// <param name="depth"></param>
         /// <returns></returns>
-        public bool CheckTriangleHit(Vector3 vert0, Vector3 vert1, Vector3 vert2, ref Vector3 hit)
-        {
-            Vector3 rayOrigin = Origin;
-            Vector3 rayDirection = Direction; 
-
-            var edge1 = vert1 - vert0;
-            var edge2 = vert2 - vert0;
-
-            var pvec = Vector3.Cross(rayDirection, edge2);
-
-            var det = Vector3.Dot(edge1, pvec);
-
-            if (det > -Epsilon && det < Epsilon)
-            {
-                return false;
-            }
-
-            var invDet = 1d / det;
-
-            var tvec = rayOrigin - vert0;
-
-            var u = Vector3.Dot(tvec, pvec) * invDet;
-
-            if (u < 0 || u > 1)
-            {
-                return false;
-            }
-
-            var qvec = Vector3.Cross(tvec, edge1);
-
-            var v = Vector3.Dot(rayDirection, qvec) * invDet;
-
-            if (v < 0 || u + v > 1)
-            {
-                return false;
-            }
-
-            var t = Vector3.Dot(edge2, qvec) * invDet;
-
-            hit = new Vector3((float)t, (float)u, (float)v);
-            return true;
-        }
-
-        public bool CheckTriangleHit2(Vector3 v0, Vector3 v1, Vector3 v2, ref Vector3 hit, out float depth)
+        public bool CheckTriangleHit(Vector3 v0, Vector3 v1, Vector3 v2, ref Vector3 hit, out float depth)
         {
             depth = float.MaxValue;
             var e1 = v1 - v0;

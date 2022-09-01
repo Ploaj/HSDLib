@@ -4,25 +4,19 @@ using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
-using HSDRawViewer.Rendering.Shapes;
-using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
-    // This plugin is so extra lol
     /// <summary>
     /// Special Plugin for Rendering Hurtboxes for fighters
     /// </summary>
     [SupportedTypes(new Type[] { typeof(SBM_HurtboxBank<SBM_Hurtbox>) })]
-    public partial class HurtBoxEditor : DockContent, EditorBase, IDrawable
+    public partial class HurtBoxEditor : PluginBase, IDrawable
     {
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node; set { _node = value;  HBBank = value.Accessor as SBM_HurtboxBank<SBM_Hurtbox>; }
         }
@@ -47,6 +41,10 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private ViewportControl viewport;
         private ArrayMemberEditor editor;
 
+        private HurtboxRenderer hurtboxRenderer = new HurtboxRenderer();
+
+        private RenderJObj RenderJObj = new RenderJObj();
+
         /// <summary>
         /// 
         /// </summary>
@@ -70,12 +68,26 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             FormClosing += (sender, args) =>
             {
-                JOBJManager.CleanupRendering();
                 viewport.Dispose();
                 editor.Dispose();
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLInit()
+        {
+            RenderJObj.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+            RenderJObj.FreeResources();
+        }
 
         /// <summary>
         /// 
@@ -85,26 +97,23 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            JOBJManager.Render(cam);
+            RenderJObj.Render(cam);
 
             var selected = editor.SelectedObject;
             var list = new List<SBM_Hurtbox>();
             foreach (SBM_Hurtbox v in editor.GetItems())
                 list.Add(v);
-            hurtboxRenderer.Render(JOBJManager, list, (HSDAccessor)selected);
+
+            hurtboxRenderer.Render(RenderJObj.RootJObj, list, (HSDAccessor)selected);
         }
-
-        private HurtboxRenderer hurtboxRenderer = new HurtboxRenderer();
-
-        private JOBJManager JOBJManager = new JOBJManager();
 
         /// <summary>
         /// 
         /// </summary>
         private void LoadModel(HSD_JOBJ jobj)
         {
-            JOBJManager.RefreshRendering = true;
-            JOBJManager.SetJOBJ(jobj);
+            RenderJObj.LoadJObj(jobj);
+
             if (!viewport.Visible)
                 viewport.Visible = true;
         }
@@ -116,14 +125,29 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="e"></param>
         private void buttonLoadModel_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            var path = System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath);
+            var filename = System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Nr.dat");
 
-            if(f != null)
+            path = System.IO.Path.Combine(path, filename);
+
+            if (System.IO.File.Exists(path))
             {
-                var hsd = new HSDRawFile(f);
+                var hsd = new HSDRawFile(path);
                 if (hsd.Roots[0].Data is HSD_JOBJ jobj)
                     LoadModel(jobj);
             }
+            else
+            {
+                var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+
+                if (f != null)
+                {
+                    var hsd = new HSDRawFile(f);
+                    if (hsd.Roots[0].Data is HSD_JOBJ jobj)
+                        LoadModel(jobj);
+                }
+            }
+            
         }
     }
 }

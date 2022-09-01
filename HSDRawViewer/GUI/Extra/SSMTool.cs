@@ -19,7 +19,7 @@ namespace HSDRawViewer.GUI.Extra
 
         private DSPViewer dspViewer = new DSPViewer();
 
-        public ContextMenu CMenu = new ContextMenu();
+        public ContextMenuStrip CMenu = new ContextMenuStrip();
 
         public SSMTool()
         {
@@ -27,7 +27,7 @@ namespace HSDRawViewer.GUI.Extra
 
             listBox1.DataSource = Sounds;
 
-            listBox1.ContextMenu = CMenu;
+            listBox1.ContextMenuStrip = CMenu;
 
             Text = "SSM Editor";
 

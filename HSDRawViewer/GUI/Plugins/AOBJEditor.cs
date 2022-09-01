@@ -2,16 +2,13 @@
 using HSDRawViewer.GUI.Controls;
 using System;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_AOBJ) })]
-    public partial class AOBJEditor : DockContent, EditorBase
+    public partial class AOBJEditor : PluginBase
     {
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node { get => _node;
+        public override DataNode Node { get => _node;
             set
             {
                 GraphEditor.AnimType type = GraphEditor.AnimType.Joint;

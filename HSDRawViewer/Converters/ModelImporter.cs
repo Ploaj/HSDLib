@@ -1,7 +1,8 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRaw.Tools;
-using HSDRawViewer.GUI;
+using HSDRawViewer.Extensions;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering.GX;
 using IONET;
@@ -9,12 +10,12 @@ using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
 using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
-using static HSDRawViewer.Converters.ImporterExtensions;
 
 namespace HSDRawViewer.Converters
 {
@@ -242,7 +243,7 @@ namespace HSDRawViewer.Converters
             NewModel = root;
 
             // auto update flags
-            JOBJExtensions.UpdateJOBJFlags(NewModel);
+            NewModel.UpdateFlags();
 
             // apply classical scale flag
             if (Settings.ClassicalScaling)
@@ -630,14 +631,14 @@ namespace HSDRawViewer.Converters
                         v.Colors[0].X,
                         v.Colors[0].Y,
                         v.Colors[0].Z,
-                        settings.ImportVertexAlpha ? v.Colors[0].W : 1);
+                        v.Colors[0].W);
 
                     if (mesh.HasColorSet(1))
                         vertex.CLR1 = new GXColor4(
                         v.Colors[1].X,
                         v.Colors[1].Y,
                         v.Colors[1].Z,
-                        settings.ImportVertexAlpha ? v.Colors[1].W : 1);
+                        v.Colors[1].W);
 
                     vertices.Add(vertex);
                 }

@@ -1,16 +1,16 @@
-﻿using HSDRawViewer.GUI;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus
 {
-    public class CommonContextMenu : ContextMenu
+    public class CommonContextMenu : ContextMenuStrip
     {
         public virtual Type[] SupportedTypes { get; }
 
         public CommonContextMenu()
         {
-            MenuItem delete = new MenuItem("Delete");
+            ToolStripMenuItem delete = new ToolStripMenuItem("Delete");
             delete.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -18,7 +18,7 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Delete();
                 }
             };
-            MenuItem export = new MenuItem("Export");
+            ToolStripMenuItem export = new ToolStripMenuItem("Export");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -26,7 +26,7 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Export();
                 }
             };
-            MenuItem import = new MenuItem("Replace");
+            ToolStripMenuItem import = new ToolStripMenuItem("Replace");
             import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -40,7 +40,7 @@ namespace HSDRawViewer.ContextMenus
                 {
                     if (PluginManager.HasEditor(v))
                     {
-                        MenuItem editor = new MenuItem("Open Editor");
+                        ToolStripMenuItem editor = new ToolStripMenuItem("Open Editor");
 
                         editor.Click += (sender, args) =>
                         {
@@ -50,12 +50,12 @@ namespace HSDRawViewer.ContextMenus
                             }
                         };
 
-                        MenuItems.Add(editor);
+                        Items.Add(editor);
                         break;
                     }
                 }
 
-            MenuItem addRootReference = new MenuItem("Add Reference To Root");
+            ToolStripMenuItem addRootReference = new ToolStripMenuItem("Add Reference To Root");
             addRootReference.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -67,12 +67,12 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
 
-            MenuItems.Add(export);
-            MenuItems.Add(import);
-            MenuItems.Add(delete);
-            MenuItems.Add("-");
-            MenuItems.Add(addRootReference);
-            MenuItems.Add("-");
+            Items.Add(export);
+            Items.Add(import);
+            Items.Add(delete);
+            Items.Add("-");
+            Items.Add(addRootReference);
+            Items.Add("-");
         }
 
         public class RootNameCreator

@@ -1,9 +1,6 @@
 ﻿using HSDRawViewer.ContextMenus;
 using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.Plugins;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Platform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +13,7 @@ namespace HSDRawViewer
     /// </summary>
     public class PluginManager
     {
-        private static Dictionary<Type, ContextMenu> typeToContextMenu;
+        private static Dictionary<Type, ContextMenuStrip> typeToContextMenu;
         private static CommonContextMenu commonContextMenu;
 
         private static Dictionary<Type, Type> typeToEditor;
@@ -24,24 +21,11 @@ namespace HSDRawViewer
         private static bool Initialized = false;
 
         /// <summary>
-        /// Gets the shared viewport control
-        /// </summary>
-        /// <returns></returns>
-        public static ViewportControl GetCommonViewport()
-        {
-            if(MainForm.Instance != null)
-            {
-                return MainForm.Instance.Viewport.glViewport;
-            }
-            return null;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static ContextMenu GetContextMenuFromType(Type t)
+        public static ContextMenuStrip GetContextMenuFromType(Type t)
         {
             if (typeToContextMenu.ContainsKey(t))
             {
@@ -55,11 +39,11 @@ namespace HSDRawViewer
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static EditorBase GetEditorFromType(Type t)
+        public static PluginBase GetEditorFromType(Type t)
         {
             if (typeToEditor.ContainsKey(t))
             {
-                return (EditorBase)Activator.CreateInstance(typeToEditor[t]);
+                return (PluginBase)Activator.CreateInstance(typeToEditor[t]);
             }
             return null;
         }
@@ -85,7 +69,7 @@ namespace HSDRawViewer
             typeToEditor = new Dictionary<Type, Type>();
             InitEditors();
 
-            typeToContextMenu = new Dictionary<Type, ContextMenu>();
+            typeToContextMenu = new Dictionary<Type, ContextMenuStrip>();
             InitContextMenus();
             commonContextMenu = new CommonContextMenu();
 
@@ -117,12 +101,12 @@ namespace HSDRawViewer
         {
             var types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
                          from assemblyType in domainAssembly.GetTypes()
-                         where typeof(EditorBase).IsAssignableFrom(assemblyType)
+                         where typeof(PluginBase).IsAssignableFrom(assemblyType)
                          select assemblyType).ToArray();
 
             foreach (var t in types)
             {
-                if (t != typeof(EditorBase))
+                if (t != typeof(PluginBase))
                 {
                     SupportedTypes suppTypes = (SupportedTypes)Attribute.GetCustomAttribute(t, typeof(SupportedTypes));
 

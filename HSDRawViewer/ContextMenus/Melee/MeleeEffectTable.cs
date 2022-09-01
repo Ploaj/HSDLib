@@ -14,7 +14,7 @@ namespace HSDRawViewer.ContextMenus
         
         public MeleeEffectTable() : base()
         {
-            MenuItem AddNewEffect = new MenuItem("Add new Effect");
+            ToolStripMenuItem AddNewEffect = new ToolStripMenuItem("Add new Effect");
             AddNewEffect.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_EffectTable root)
@@ -36,7 +36,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(AddNewEffect);
+            Items.Add(AddNewEffect);
         }
     }
 }

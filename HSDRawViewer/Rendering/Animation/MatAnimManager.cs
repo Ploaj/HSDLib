@@ -2,7 +2,7 @@
 using HSDRaw.Common.Animation;
 using HSDRaw.GX;
 using HSDRaw.Tools;
-using OpenTK;
+using HSDRawViewer.Rendering.Models;
 using System;
 using System.Collections.Generic;
 
@@ -45,47 +45,6 @@ namespace HSDRawViewer.Rendering
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class MatAnimTextureState
-    {
-        public HSD_TOBJ TOBJ { get; }
-
-        public float Blending { get; }
-
-        public Matrix4 Transform { get; }
-
-        public Vector4 Konst { get; }
-
-        public MatAnimTextureState(HSD_TOBJ tOBJ, float blending, Matrix4 transform, Vector4 konst)
-        {
-            TOBJ = tOBJ;
-            Blending = blending;
-            Transform = transform;
-            Konst = konst;
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct MatAnimMaterialState
-    {
-        public Vector4 Ambient;
-
-        public Vector4 Diffuse;
-
-        public Vector4 Specular;
-
-        public float Shininess;
-
-        public float Alpha;
-
-        public float Ref0;
-
-        public float Ref1;
-    }
 
     /// <summary>
     /// 
@@ -96,39 +55,35 @@ namespace HSDRawViewer.Rendering
 
         public List<MatAnimJoint> Nodes { get; internal set; } = new List<MatAnimJoint>();
 
-        public int JOBJIndex = 0;
+        /// <summary>
+        /// 
+        /// </summary>
+        public MatAnimManager()
+        {
 
-        public int DOBJIndex = 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        public MatAnimManager(HSD_MatAnimJoint joint)
+        {
+            FromMatAnim(joint);
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="mobj"></param>
         /// <returns></returns>
-        public void GetMaterialState(HSD_MOBJ mobj, ref MatAnimMaterialState state)
+        public void GetMaterialState(HSD_MOBJ mobj, int jobj_index, int dobj_index, ref LiveMaterial state)
         {
-            if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
+            if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[JOBJIndex].Nodes[DOBJIndex];
+                var node = Nodes[jobj_index].Nodes[dobj_index];
 
-                foreach(var t in node.Tracks)
-                {
-                    switch ((MatTrackType)t.TrackType)
-                    {
-                        case MatTrackType.HSD_A_M_PE_REF0: state.Ref0 = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_PE_REF1: state.Ref1 = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_ALPHA: state.Alpha = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_R: state.Ambient.X = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_G: state.Ambient.Y = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_AMBIENT_B: state.Ambient.Z = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_R: state.Diffuse.X = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_G: state.Diffuse.Y = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_DIFFUSE_B: state.Diffuse.Z = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_R: state.Specular.X = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_G: state.Specular.Y = t.GetValue(node.Frame); break;
-                        case MatTrackType.HSD_A_M_SPECULAR_B: state.Specular.Z = t.GetValue(node.Frame); break;
-                    }
-                }
+                state.ApplyAnim(node.Tracks, node.Frame);
             }
         }
 
@@ -138,76 +93,44 @@ namespace HSDRawViewer.Rendering
         /// <param name="frame"></param>
         /// <param name="boneIndex"></param>
         /// <param name="tobj"></param>
-        public MatAnimTextureState GetTextureAnimState(HSD_TOBJ tobj)
+        public LiveTObj GetTextureAnimState(HSD_TOBJ tobj, int jobj_index, int dobj_index)
         {
             if (tobj == null)
                 return null;
 
-            var tex = tobj;
-            var blending = tobj.Blending;
-            var TX = tobj.TX;
-            var TY = tobj.TY;
-            var TZ = tobj.TZ;
-            var RX = tobj.RX;
-            var RY = tobj.RY;
-            var RZ = tobj.RZ;
-            var SX = tobj.SX;
-            var SY = tobj.SY;
-            var SZ = tobj.SZ;
-            Vector4 konst = Vector4.One;
-            if (tobj.TEV != null)
-            {
-                konst.X = tobj.TEV.constant.R / 255f;
-                konst.Y = tobj.TEV.constant.G / 255f;
-                konst.Z = tobj.TEV.constant.B / 255f;
-                konst.W = tobj.TEV.constantAlpha / 255f;
-            }
+            var m = new LiveTObj();
+            m.Reset(tobj);
 
-            if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
+            if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[JOBJIndex].Nodes[DOBJIndex];
+                var node = Nodes[jobj_index].Nodes[dobj_index];
 
                 var texAnim = node.TextureAnims.Find(e=>e.TextureID == tobj.TexMapID);
                 if(texAnim != null)
-                {
-                    foreach(var t in texAnim.Tracks)
-                    {
-                        var value = t.GetValue(texAnim.Frame);
-
-                        //TODO: TEV as usual
-                        switch ((TexTrackType)t.TrackType)
-                        {
-                            case TexTrackType.HSD_A_T_TIMG:
-                                tex = texAnim.Textures[(int)value];
-                                break;
-                            case TexTrackType.HSD_A_T_BLEND:
-                            case TexTrackType.HSD_A_T_TS_BLEND:
-                                blending = value;
-                                break;
-                            case TexTrackType.HSD_A_T_TRAU: TX = value; break;
-                            case TexTrackType.HSD_A_T_TRAV: TY = value; break;
-                            case TexTrackType.HSD_A_T_SCAU: SX = value; break;
-                            case TexTrackType.HSD_A_T_SCAV: SY = value; break;
-                            case TexTrackType.HSD_A_T_ROTX: RX = value; break;
-                            case TexTrackType.HSD_A_T_ROTY: RY = value; break;
-                            case TexTrackType.HSD_A_T_ROTZ: RZ = value; break;
-                            case TexTrackType.HSD_A_T_KONST_R: konst.X = value; break;
-                            case TexTrackType.HSD_A_T_KONST_G: konst.Y = value; break;
-                            case TexTrackType.HSD_A_T_KONST_B: konst.Z = value; break;
-                            case TexTrackType.HSD_A_T_KONST_A: konst.W = value; break;
-                        }
-                    }
-                }
+                    m.ApplyAnim(texAnim.Textures, texAnim.Tracks, texAnim.Frame);
             }
 
-            var transform = Matrix4.CreateScale(SX, SY, SZ) *
-                Math3D.CreateMatrix4FromEuler(RX, RY, RZ) *
-                Matrix4.CreateTranslation(TX, TY, TZ);
+            return m;
+        }
 
-            if(SX != 0 && SY != 0 && SZ != 0)
-                transform.Invert();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="boneIndex"></param>
+        /// <param name="tobj"></param>
+        public LiveTObj GetTextureAnimState(GXTexMapID mapid, int jobj_index, int dobj_index, ref LiveTObj m)
+        {
+            if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
+            {
+                var node = Nodes[jobj_index].Nodes[dobj_index];
 
-            return new MatAnimTextureState(tex, blending, transform, konst);
+                var texAnim = node.TextureAnims.Find(e => e.TextureID == mapid);
+                if (texAnim != null)
+                    m.ApplyAnim(texAnim.Textures, texAnim.Tracks, texAnim.Frame);
+            }
+
+            return m;
         }
 
         /// <summary>

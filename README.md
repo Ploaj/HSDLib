@@ -10,7 +10,6 @@ A project utilizing HSDRaw to browse, view, and edit the structure of HSD (.dat)
 
 This program is still a work-in-progress so expect bugs and incomplete features.
 
-
 ## LIB Credits:
 
 * CSCore
@@ -28,14 +27,9 @@ This program is still a work-in-progress so expect bugs and incomplete features.
 * MIT License: https://raw.githubusercontent.com/Pkcs11Admin/Be.HexEditor/master/LICENSE.txt
 
 
-* IONET
-* Copyright (c) 2020 Ploaj
-* GPL Liscense: https://github.com/Ploaj/IONET/blob/master/LICENSE
-
-
 * OpenTK
-* Copyright (c) 2006 - 2014 Stefanos Apostolopoulos stapostol@gmail.com
-* MIT/X11 License: https://github.com/opentk/opentk/blob/develop/License.txt
+* Copyright (c) 2006 - 2022 Stefanos Apostolopoulos stapostol@gmail.com
+* MIT/X11 License: https://github.com/opentk/opentk/blob/master/License.txt
 
 
 * VGAudio

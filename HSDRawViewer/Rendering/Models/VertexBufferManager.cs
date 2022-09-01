@@ -11,9 +11,11 @@ namespace HSDRawViewer.Rendering.Models
     /// </summary>
     public class VertexBufferManager
     {
-        private Dictionary<HSD_DOBJ, int> attributeToBuffer = new Dictionary<HSD_DOBJ, int>();
+        public int BufferCount { get => dobjToVBO.Count; }
 
-        // private Dictionary<HSD_DOBJ, int> dobjToVAO = new Dictionary<HSD_DOBJ, int>();
+        private Dictionary<HSD_DOBJ, int> dobjToVBO = new Dictionary<HSD_DOBJ, int>();
+
+        private Dictionary<HSD_DOBJ, int> dobjToVAO = new Dictionary<HSD_DOBJ, int>();
 
         private Dictionary<HSD_DOBJ, int[]> dobjToShapes = new Dictionary<HSD_DOBJ, int[]>();
 
@@ -26,7 +28,7 @@ namespace HSDRawViewer.Rendering.Models
             // generate buffer
             int _vbo = GL.GenBuffer();
             if (_vbo != -1)
-                attributeToBuffer.Add(dobj, _vbo);
+                dobjToVBO.Add(dobj, _vbo);
             else
                 return;
 
@@ -37,54 +39,53 @@ namespace HSDRawViewer.Rendering.Models
                 BufferUsageHint.StaticDraw);
 
             // generate buffer
-            //int _vao = GL.GenVertexArray();
-            //if (_vao != -1)
-            //    dobjToVAO.Add(dobj, _vao);
-            //else
-            //    return;
+            int _vao = GL.GenVertexArray();
+            if (_vao != -1)
+                dobjToVAO.Add(dobj, _vao);
+            else
+                return;
+            GL.BindVertexArray(_vao);
 
-            //GL.BindVertexArray(_vao);
+            System.Diagnostics.Debug.WriteLine(_vao + " " + _vbo + " " + GL.GetError());
 
-            //System.Diagnostics.Debug.WriteLine(_vao + " " + _vbo + " " + GL.GetError());
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
 
-            //GL.EnableVertexAttribArray(0);
-            //GL.VertexAttribPointer(0, 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
 
-            //GL.EnableVertexAttribArray(1);
-            //GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
-            //GL.EnableVertexAttribArray(2);
-            //GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
+            GL.EnableVertexAttribArray(3);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
 
-            //GL.EnableVertexAttribArray(3);
-            //GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
+            GL.EnableVertexAttribArray(4);
+            GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
 
-            //GL.EnableVertexAttribArray(4);
-            //GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
+            GL.EnableVertexAttribArray(5);
+            GL.VertexAttribPointer(5, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
 
-            //GL.EnableVertexAttribArray(5);
-            //GL.VertexAttribPointer(5, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
+            GL.EnableVertexAttribArray(6);
+            GL.VertexAttribPointer(6, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
 
-            //GL.EnableVertexAttribArray(6);
-            //GL.VertexAttribPointer(6, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
+            GL.EnableVertexAttribArray(7);
+            GL.VertexAttribPointer(7, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 104);
 
-            //GL.EnableVertexAttribArray(7);
-            //GL.VertexAttribPointer(7, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 104);
+            GL.EnableVertexAttribArray(8);
+            GL.VertexAttribPointer(8, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 112);
 
-            //GL.EnableVertexAttribArray(8);
-            //GL.VertexAttribPointer(8, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 112);
+            GL.EnableVertexAttribArray(9);
+            GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
 
-            //GL.EnableVertexAttribArray(9);
-            //GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
+            GL.EnableVertexAttribArray(10);
+            GL.VertexAttribPointer(10, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
 
-            //GL.EnableVertexAttribArray(10);
-            //GL.VertexAttribPointer(10, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
+            GL.EnableVertexAttribArray(11);
+            GL.VertexAttribPointer(11, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
-            //GL.EnableVertexAttribArray(11);
-            //GL.VertexAttribPointer(11, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
-
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            //GL.BindVertexArray(0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindVertexArray(0);
         }
 
         /// <summary>
@@ -127,18 +128,18 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public void ClearRenderingCache()
         {
-            foreach (var v in attributeToBuffer)
+            foreach (var v in dobjToVBO)
                 GL.DeleteBuffer(v.Value);
-            attributeToBuffer.Clear();
+            dobjToVBO.Clear();
 
             foreach (var s in dobjToShapes)
                 foreach (var v in s.Value)
                     GL.DeleteBuffer(v);
             dobjToShapes.Clear();
 
-            //foreach (var v in dobjToVAO)
-            //    GL.DeleteVertexArray(v.Value);
-            //dobjToVAO.Clear();
+            foreach (var v in dobjToVAO)
+                GL.DeleteVertexArray(v.Value);
+            dobjToVAO.Clear();
         }
 
         /// <summary>
@@ -148,54 +149,54 @@ namespace HSDRawViewer.Rendering.Models
         /// <returns></returns>
         public bool EnableBuffers(Shader GXShader, HSD_DOBJ dobj, int shapeset1, int shapeset2, float blend)
         {
-            if (!attributeToBuffer.ContainsKey(dobj))
+            if (!dobjToVBO.ContainsKey(dobj))
                 return false;
 
             // set blend shape
             GXShader.SetFloat("shape_blend", blend);
 
             // 
-            //var _vao = dobjToVAO[dobj];
-            //GL.BindVertexArray(_vao);
+            var _vao = dobjToVAO[dobj];
+            GL.BindVertexArray(_vao);
 
             // normal attributes
-            GL.BindBuffer(BufferTarget.ArrayBuffer, attributeToBuffer[dobj]);
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, attributeToBuffer[dobj]);
 
-            GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
+            //GL.EnableVertexAttribArray(0);
+            //GL.VertexAttribPointer(0, 1, VertexAttribPointerType.Short, false, GX_Vertex.Stride, 0);
 
-            GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
+            //GL.EnableVertexAttribArray(1);
+            //GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
 
-            GL.EnableVertexAttribArray(2);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
+            //GL.EnableVertexAttribArray(2);
+            //GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
-            GL.EnableVertexAttribArray(3);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
+            //GL.EnableVertexAttribArray(3);
+            //GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 32);
 
-            GL.EnableVertexAttribArray(4);
-            GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
+            //GL.EnableVertexAttribArray(4);
+            //GL.VertexAttribPointer(4, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 44);
 
-            GL.EnableVertexAttribArray(5);
-            GL.VertexAttribPointer(5, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
+            //GL.EnableVertexAttribArray(5);
+            //GL.VertexAttribPointer(5, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 88);
 
-            GL.EnableVertexAttribArray(6);
-            GL.VertexAttribPointer(6, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
+            //GL.EnableVertexAttribArray(6);
+            //GL.VertexAttribPointer(6, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 96);
 
-            GL.EnableVertexAttribArray(7);
-            GL.VertexAttribPointer(7, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 104);
+            //GL.EnableVertexAttribArray(7);
+            //GL.VertexAttribPointer(7, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 104);
 
-            GL.EnableVertexAttribArray(8);
-            GL.VertexAttribPointer(8, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 112);
+            //GL.EnableVertexAttribArray(8);
+            //GL.VertexAttribPointer(8, 2, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 112);
 
-            GL.EnableVertexAttribArray(9);
-            GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
+            //GL.EnableVertexAttribArray(9);
+            //GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, true, GX_Vertex.Stride, 56);
 
-            GL.EnableVertexAttribArray(10);
-            GL.VertexAttribPointer(10, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
+            //GL.EnableVertexAttribArray(10);
+            //GL.VertexAttribPointer(10, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 8);
 
-            GL.EnableVertexAttribArray(11);
-            GL.VertexAttribPointer(11, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
+            //GL.EnableVertexAttribArray(11);
+            //GL.VertexAttribPointer(11, 3, VertexAttribPointerType.Float, false, GX_Vertex.Stride, 20);
 
             //shape sets(if exists)
             if (dobjToShapes.ContainsKey(dobj))

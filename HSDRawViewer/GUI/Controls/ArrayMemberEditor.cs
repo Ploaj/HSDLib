@@ -40,6 +40,14 @@ namespace HSDRawViewer.GUI
         public delegate void OnItemAddedHandler(AddedItemEventArgs e);
         public event OnItemAddedHandler OnItemAdded;
 
+        [DefaultValue(false)]
+        public bool AskBeforeDelete
+    {
+            get => _askbeforedelete;
+            set {  _askbeforedelete = value; }
+        }
+        private bool _askbeforedelete = false;
+
         [DefaultValue(true)]
         public bool EnableToolStrip
         {
@@ -516,6 +524,11 @@ namespace HSDRawViewer.GUI
         /// <param name="o"></param>
         public void SelectObject(object o, bool multi = false)
         {
+            if (o == null)
+            {
+                elementList.SelectedItems.Clear();
+            }
+            else
             if (elementList.Items.Contains(o))
             {
                 if(!multi)
@@ -536,6 +549,9 @@ namespace HSDRawViewer.GUI
         {
             if (index != -1)
             {
+                if (AskBeforeDelete && MessageBox.Show($"Are you sure you want to delete {Items[index]}?", "Are you sure?", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+
                 OnItemRemove?.Invoke(new RemovedItemEventArgs() { Index = index });
                 Items.RemoveAt(index);
                 MakeChanges();

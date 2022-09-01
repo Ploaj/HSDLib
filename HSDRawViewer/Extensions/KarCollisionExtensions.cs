@@ -1,11 +1,6 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.Rendering.GX;
-using OpenTK;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenTK.Mathematics;
 
 namespace HSDRaw.AirRide.Gr
 {

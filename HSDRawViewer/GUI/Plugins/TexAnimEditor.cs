@@ -4,20 +4,18 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_TexAnim) })]
-    public partial class TexAnimEditor : DockContent, EditorBase
+    public partial class TexAnimEditor : PluginBase
     {
         private HSD_TexAnim _texAnim => _node.Accessor as HSD_TexAnim;
 
         public TOBJProxy[] Images { get; set; }
 
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

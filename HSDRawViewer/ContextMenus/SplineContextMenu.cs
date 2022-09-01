@@ -1,11 +1,8 @@
 ﻿using HSDRaw.Common;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
@@ -16,7 +13,7 @@ namespace HSDRawViewer.ContextMenus
 
         public SplineContextMenu() : base()
         {
-            MenuItem Import = new MenuItem("Import");
+            ToolStripMenuItem Import = new ToolStripMenuItem("Import");
             Import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
@@ -75,9 +72,9 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(Import);
+            Items.Add(Import);
 
-            MenuItem Export = new MenuItem("Export");
+            ToolStripMenuItem Export = new ToolStripMenuItem("Export");
             Export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
@@ -99,7 +96,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(Export);
+            Items.Add(Export);
         }
 
     }

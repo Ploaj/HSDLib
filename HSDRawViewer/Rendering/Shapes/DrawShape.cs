@@ -2,6 +2,7 @@
 using HSDRawViewer.Rendering.Renderers;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Drawing;
 
@@ -304,6 +305,9 @@ namespace HSDRawViewer.Rendering
             GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
             GL.MultMatrix(ref t);
+
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Front);
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);

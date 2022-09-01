@@ -10,7 +10,7 @@ namespace HSDRawViewer.ContextMenus
 
         public ParticleContextMenu() : base()
         {
-            MenuItem addFromFile = new MenuItem("Add Particle From File");
+            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add Particle From File");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_ParticleGroup root)
@@ -29,9 +29,9 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(addFromFile);
+            Items.Add(addFromFile);
 
-            MenuItem export = new MenuItem("Export PTL");
+            ToolStripMenuItem export = new ToolStripMenuItem("Export PTL");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_ParticleGroup root)
@@ -42,7 +42,7 @@ namespace HSDRawViewer.ContextMenus
                         System.IO.File.WriteAllBytes(f, root._s.GetData());
                 }
             };
-            MenuItems.Add(export);
+            Items.Add(export);
         }
     }
 
@@ -52,7 +52,7 @@ namespace HSDRawViewer.ContextMenus
 
         public TEXGContextMenu() : base()
         {
-            MenuItem addFromFile = new MenuItem("Add TEXG From File");
+            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add TEXG From File");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
@@ -71,9 +71,9 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(addFromFile);
+            Items.Add(addFromFile);
 
-            MenuItem scratch = new MenuItem("Add TEXG From Scratch");
+            ToolStripMenuItem scratch = new ToolStripMenuItem("Add TEXG From Scratch");
             scratch.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
@@ -84,10 +84,10 @@ namespace HSDRawViewer.ContextMenus
                     root.ParticleImages = mod;
                 }
             };
-            MenuItems.Add(scratch);
+            Items.Add(scratch);
 
 
-            MenuItem export = new MenuItem("Export TXG");
+            ToolStripMenuItem export = new ToolStripMenuItem("Export TXG");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
@@ -98,7 +98,7 @@ namespace HSDRawViewer.ContextMenus
                         System.IO.File.WriteAllBytes(f, root._s.GetData());
                 }
             };
-            MenuItems.Add(export);
+            Items.Add(export);
         }
     }
 }

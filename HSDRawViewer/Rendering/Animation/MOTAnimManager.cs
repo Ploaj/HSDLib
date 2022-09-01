@@ -1,7 +1,6 @@
 ﻿using HSDRawViewer.Converters;
 using System;
-using HSDRaw.Common;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Diagnostics;
 using System.Collections.Generic;
 using HSDRawViewer.Rendering.Models;

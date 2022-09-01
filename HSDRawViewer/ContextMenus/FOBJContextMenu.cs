@@ -12,7 +12,7 @@ namespace HSDRawViewer.ContextMenus
 
         public FOBJContextMenu() : base()
         {
-            MenuItem Export = new MenuItem("Export Frames TXT");
+            ToolStripMenuItem Export = new ToolStripMenuItem("Export Frames TXT");
             Export.Click += (sender, args) =>
             {
                 using (SaveFileDialog d = new SaveFileDialog())
@@ -29,9 +29,9 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(Export);
+            Items.Add(Export);
 
-            MenuItem Import = new MenuItem("Import Frames TXT");
+            ToolStripMenuItem Import = new ToolStripMenuItem("Import Frames TXT");
             Import.Click += (sender, args) =>
             {
                 using (OpenFileDialog d = new OpenFileDialog())
@@ -48,7 +48,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(Import);
+            Items.Add(Import);
         }
     }
 }

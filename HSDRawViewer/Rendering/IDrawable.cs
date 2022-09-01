@@ -1,9 +1,10 @@
-﻿using OpenTK;
+﻿using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System;
 using System.Windows.Forms;
 using OpenTK.Input;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace HSDRawViewer.Rendering
 {
@@ -19,15 +20,17 @@ namespace HSDRawViewer.Rendering
     /// </summary>
     public interface IDrawableInterface : IDrawable
     {
-        void ViewportKeyPress(KeyboardState kbState);
+        void ViewportKeyPress(KeyEventArgs kbState);
 
         void ScreenClick(MouseButtons button, PickInformation pick);
 
         void ScreenDoubleClick(PickInformation pick);
 
-        void ScreenDrag(PickInformation pick, float deltaX, float deltaY);
+        void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY);
 
         void ScreenSelectArea(PickInformation start, PickInformation end);
+
+        bool FreezeCamera();
     }
 
     /// <summary>
@@ -37,7 +40,23 @@ namespace HSDRawViewer.Rendering
     {
         DrawOrder DrawOrder { get; }
 
+        /// <summary>
+        /// draw
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="windowWidth"></param>
+        /// <param name="windowHeight"></param>
         void Draw(Camera cam, int windowWidth, int windowHeight);
+
+        /// <summary>
+        /// Init any gl resources you wish to use
+        /// </summary>
+        void GLInit();
+
+        /// <summary>
+        /// Free any gl resources
+        /// </summary>
+        void GLFree();
     }
 
     /// <summary>
@@ -80,6 +99,18 @@ namespace HSDRawViewer.Rendering
             }
 
             GL.End();
+        }
+
+        public void InitializeDrawing()
+        {
+        }
+
+        public void GLInit()
+        {
+        }
+
+        public void GLFree()
+        {
         }
     }
 }

@@ -1,5 +1,8 @@
 ﻿using HSDRaw.Common;
-using OpenTK;
+using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
+using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 
 namespace HSDRawViewer.Rendering.Models
@@ -11,18 +14,46 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool PhysicsEnabled { get; set; } = false;
 
+        public bool Visible { get; set; } = true;
+
+        public bool BranchVisible
+        {
+            get
+            {
+                if (Visible)
+                    return true;
+
+                if (Parent != null)
+                    return Parent.BranchVisible;
+
+                return Visible;
+            }
+        }
+
         public HSD_JOBJ Desc { get; internal set; }
 
         public LiveJObj Parent;
         public LiveJObj Child;
         public LiveJObj Sibling;
 
+        public LiveJObj Root
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.Root;
+
+                return this;
+            }
+        }
+
         public Vector3 Translation;
         public Vector4 Rotation;
         public Vector3 Scale;
 
         public Matrix4 LocalTransform;
-        public Matrix4 WorldTransform;
+        public Matrix4 WorldTransform { get => _worldTransform; set { _worldTransform = value; BindTransform = InvertedTransform * value; } }
+        private Matrix4 _worldTransform;
         private Matrix4 InvertedTransform;
         public Matrix4 BindTransform;
 
@@ -89,6 +120,7 @@ namespace HSDRawViewer.Rendering.Models
 
             Desc = desc;
             SetDefaultSRT();
+            Visible = !desc.Flags.HasFlag(JOBJ_FLAG.HIDDEN);
 
             // recalcuate transforms
             RecalculateTransforms(null, false);
@@ -111,6 +143,42 @@ namespace HSDRawViewer.Rendering.Models
             if (desc.Next != null)
             {
                 Sibling = new LiveJObj(desc.Next, Parent, ref i);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        public LiveJObj AddChild(HSD_JOBJ desc)
+        {
+            if (Child == null)
+            {
+                Child = new LiveJObj(desc);
+                this.Desc.Child = desc;
+                return Child;
+            }
+            else
+            {
+                return Child.AddSibling(desc);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobj"></param>
+        public LiveJObj AddSibling(HSD_JOBJ desc)
+        {
+            if (Sibling == null)
+            {
+                Sibling = new LiveJObj(desc);
+                this.Desc.Next = desc;
+                return Sibling;
+            }
+            else
+            {
+                return Sibling.AddSibling(desc);
             }
         }
 
@@ -171,7 +239,24 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
-        private void SetDefaultSRT()
+        /// <param name="desc"></param>
+        /// <returns></returns>
+        public int GetIndexOfDesc(HSD_JOBJ desc)
+        {
+            int i = 0;
+            foreach (var v in Enumerate)
+            {
+                if (v.Desc == desc)
+                    return i;
+                i++;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetDefaultSRT()
         {
             Translation = new Vector3(Desc.TX, Desc.TY, Desc.TZ);
             Rotation = new Vector4(Desc.RX, Desc.RY, Desc.RZ, 0);
@@ -252,42 +337,40 @@ namespace HSDRawViewer.Rendering.Models
             }
 
             // calculate billboarding
-            if (c != null &&
-                (Desc.Flags & (JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.PBILLBOARD)) != 0)
+            if (c != null)
             {
                 var pos = Vector3.TransformPosition(Vector3.Zero, WorldTransform);
-                var campos = (c.RotationMatrix * new Vector4(c.Translation, 1)).Xyz;
+                var campos = c.TransformedPosition;
 
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.BILLBOARD))
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+                int billboard_type = (((int)Desc.Flags >> 9) & 0x7);
 
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.VBILLBOARD))
+                switch (billboard_type)
                 {
-                    var temp = pos.Y;
-                    pos.Y = 0;
-                    campos.Y = 0;
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, temp, 0);
-                }
-
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.HBILLBOARD))
-                {
-                    var temp = pos.X;
-                    pos.X = 0;
-                    campos.X = 0;
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(temp, 0, 0);
-                }
-
-                if (Desc.Flags.HasFlag(JOBJ_FLAG.RBILLBOARD))
-                {
-                    var temp = pos.Z;
-                    pos.Z = 0;
-                    campos.Z = 0;
-                    WorldTransform = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted() * Matrix4.CreateTranslation(0, 0, temp);
+                    case 1:
+                        {
+                            mkBillBoardMtx(c.ModelViewMatrix);
+                        }
+                        break;
+                    case 2:
+                        {
+                            mkVBillBoardMtx(c.ModelViewMatrix);
+                        }
+                        break;
+                    case 3:
+                        {
+                            mkHBillBoardMtx(c.ModelViewMatrix);
+                        }
+                        break;
+                    case 4:
+                        {
+                            mkRBillBoardMtx(c.ModelViewMatrix);
+                        }
+                        break;
                 }
             }
 
             // calculate the bind matrix
-            BindTransform = InvertedTransform * WorldTransform;
+            // BindTransform = InvertedTransform * WorldTransform;
 
             // process children
             if (Child != null && updateChildren)
@@ -296,6 +379,226 @@ namespace HSDRawViewer.Rendering.Models
             // process siblings
             if (Sibling != null && updateChildren)
                 Sibling.RecalculateTransforms(c, updateChildren);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            Vector3 ax;
+            Vector3 ay = new Vector3(mtx.M21, mtx.M22, mtx.M23);
+            Vector3 az;
+
+            float sx = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
+            float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+            float sy = ay.LengthFast;
+
+            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+
+            if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
+            {
+                az = pos;
+                ax = Vector3.Cross(az, ay);
+                ay = Vector3.Cross(ax, az);
+                sz /= az.LengthFast;
+            }
+            else
+            {
+                az = Vector3.UnitZ;
+                ax = Vector3.Cross(ay, az);
+                ay = Vector3.Cross(az, ax);
+                sz /= az.LengthFast;
+            }
+
+            sx = sx / ax.LengthFast;
+            sy = sy / ay.LengthFast;
+
+            WorldTransform = new Matrix4()
+            {
+                M11 = sx * ax.X,
+                M12 = sx * ax.Y,
+                M13 = sx * ax.Z,
+
+                M21 = sy * ay.X,
+                M22 = sy * ay.Y,
+                M23 = sy * ay.Z,
+
+                M31 = sz * az.X,
+                M32 = sz * az.Y,
+                M33 = sz * az.Z,
+
+                M41 = pos.X,
+                M42 = pos.Y,
+                M43 = pos.Z,
+                M44 = 1,
+            } * mv.Inverted();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkHBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+
+            Vector3 ax = new Vector3(mtx.M11, mtx.M12, mtx.M13);
+            Vector3 ay;
+            Vector3 az;
+
+            float sy = new Vector3(mtx.M21, mtx.M22, mtx.M23).LengthFast;
+            float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+
+            if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
+            {
+                float pos_mag = pos.LengthFast;
+                Vector3 l = new Vector3(
+                    pos.X * (-pos.Y / pos_mag),
+                    pos_mag,
+                    pos.Z * (-pos.Y / pos_mag));
+                az = Vector3.Cross(ax, l);
+            }
+            else
+            {
+                az = Vector3.Cross(ax, Vector3.UnitY);
+            }
+
+            ay = Vector3.Cross(az, ax);
+            sy = sy / ay.LengthFast;
+            sz = sz / az.LengthFast;
+
+            WorldTransform = new Matrix4()
+            {
+                M11 = ax.X,
+                M12 = ax.Y,
+                M13 = ax.Z,
+
+                M21 = sy * ay.X,
+                M22 = sy * ay.Y,
+                M23 = sy * ay.Z,
+
+                M31 = sz * az.X,
+                M32 = sz * az.Y,
+                M33 = sz * az.Z,
+
+                M41 = pos.X,
+                M42 = pos.Y,
+                M43 = pos.Z,
+                M44 = 1,
+            } * mv.Inverted();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkVBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+
+            Vector3 ax;
+            Vector3 ay = new Vector3(mtx.M21, mtx.M22, mtx.M23);
+            Vector3 az;
+
+            float sx = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
+            float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+
+            if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
+            {
+                ax = Vector3.Cross(pos, ay);
+            }
+            else
+            {
+                ax = Vector3.Cross(ay, Vector3.UnitZ);
+            }
+
+            az = Vector3.Cross(ax, ay);
+
+            sx = sx / ax.LengthFast;
+            sz = sz / az.LengthFast;
+
+
+            WorldTransform = new Matrix4()
+            {
+                M11 = sx * ax.X,
+                M12 = sx * ax.Y,
+                M13 = sx * ax.Z,
+
+                M21 = ay.X,
+                M22 = ay.Y,
+                M23 = ay.Z,
+
+                M31 = sz * az.X,
+                M32 = sz * az.Y,
+                M33 = sz * az.Z,
+
+                M41 = pos.X,
+                M42 = pos.Y,
+                M43 = pos.Z,
+                M44 = 1,
+            } * mv.Inverted();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mtx"></param>
+        /// <param name="pmtx"></param>
+        private void mkRBillBoardMtx(Matrix4 mv)
+        {
+            var mtx = WorldTransform * mv;
+
+            float x = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
+            float y = new Vector3(mtx.M21, mtx.M22, mtx.M23).LengthFast;
+            float z = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
+
+            var scamtx = Matrix4.CreateScale(x, y, z);
+
+            var rotmtx = Matrix4.CreateRotationZ(Rotation.Z);
+            rotmtx.M41 = mtx.M41;
+            rotmtx.M42 = mtx.M42;
+            rotmtx.M43 = mtx.M43;
+
+            WorldTransform = rotmtx * scamtx * mv.Inverted();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tracks"></param>
+        /// <param name="frame"></param>
+        public void ApplyAnimation(List<FOBJ_Player> tracks, float frame)
+        {
+            SetDefaultSRT();
+            foreach (FOBJ_Player t in tracks)
+            {
+                switch (t.JointTrackType)
+                {
+                    case JointTrackType.HSD_A_J_ROTX: Rotation.X = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_ROTY: Rotation.Y = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_ROTZ: Rotation.Z = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_TRAX: Translation.X = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_TRAY: Translation.Y = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_TRAZ: Translation.Z = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_SCAX: Scale.X = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_SCAY: Scale.Y = t.GetValue(frame); break;
+                    case JointTrackType.HSD_A_J_SCAZ: Scale.Z = t.GetValue(frame); break;
+                }
+            }
         }
     }
 }

@@ -109,7 +109,7 @@ void main()
 	// calculate material
 	vec3 V = vertPosition - cameraPos;
 
-	if(light.useCamera == 0)
+	if (light.useCamera == 0)
 		V = light.position;
 
 	V = normalize(V);
@@ -146,11 +146,6 @@ void main()
 	{
 		fragColor.rgb *= vertexColor.rgb * vertexColor.aaa;
 		fragColor.a *= vertexColor.a;
-	}
-	else
-	{
-		// material alpha can only be used without vertex color
-		//fragColor.a *= alpha;
 	}
 
 
@@ -209,7 +204,6 @@ void main()
 	// alpha test
 	if (renderOverride == 0 && alpha_test(fragColor.a))
 		discard;
-
 
 	// adjust saturation if needed
 	if(saturate != 1)

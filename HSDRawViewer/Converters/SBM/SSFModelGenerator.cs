@@ -1,13 +1,8 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRawViewer.Converters.Melee;
-using IONET.Core;
-using IONET.Core.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters.SBM
 {
@@ -44,7 +39,7 @@ namespace HSDRawViewer.Converters.SBM
             {
                 var v1 = group.Vertices[l.Vertex1];
                 var v2 = group.Vertices[l.Vertex2];
-                var nrm = new OpenTK.Vector3(v1.X - v2.X, v1.Y - v2.Y, 0).Normalized();
+                var nrm = new OpenTK.Mathematics.Vector3(v1.X - v2.X, v1.Y - v2.Y, 0).Normalized();
                 var normal = new GXVector3(nrm.Y, -nrm.X, nrm.Z);
 
                 triangleList.Add(new GX_Vertex() { POS = new GXVector3(v1.X, v1.Y, 5), NRM = normal });

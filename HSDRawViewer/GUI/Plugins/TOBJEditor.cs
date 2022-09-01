@@ -2,12 +2,12 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_TOBJ) })]
-    public partial class TOBJEditor : DockContent, EditorBase
+    public partial class TOBJEditor : PluginBase
     {
         private HSD_TOBJ _tobj => _node.Accessor as HSD_TOBJ;
 
@@ -28,9 +28,7 @@ namespace HSDRawViewer.GUI.Plugins
             };
         }
 
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set

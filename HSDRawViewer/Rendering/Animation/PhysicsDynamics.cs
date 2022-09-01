@@ -1,7 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Melee.Pl;
 using HSDRawViewer.Rendering.Models;
-using OpenTK;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
@@ -47,7 +47,7 @@ namespace HSDRawViewer.Rendering.Animation
             Console.WriteLine("{0:X8} {1}", BitConverter.ToInt32(BitConverter.GetBytes(f), 0), f);
         }
 
-        public void Reset(JOBJManager m)
+        public void Reset(LiveJObj m)
         {
             //var jobj = Joint.Jobj;
             //Joint.Translation = new Vector3(jobj.TX, jobj.TY, jobj.TZ);
@@ -136,11 +136,12 @@ namespace HSDRawViewer.Rendering.Animation
         /// <param name="m"></param>
         /// <param name="index"></param>
         /// <param name="bone_count"></param>
-        public void InitBones(JOBJManager m, int index, int bone_count)
+        public void InitBones(LiveJObj m, int index, int bone_count)
         {
-            var jobj = m.GetJOBJ(index).Desc;
+            var jobj = m.GetJObjAtIndex(index);
+            var desc = jobj.Desc;
 
-            if (jobj == null)
+            if (desc == null)
             {
                 PhysicsBones = null;
                 return;
@@ -159,19 +160,19 @@ namespace HSDRawViewer.Rendering.Animation
                 // Make matrix dirty 8000fe10
                 // if (jobj != 0) // USER_DEFINED_MTX && jobj.Flags.HasFlag(JOBJ_FLAG.MTX_DIRTY))
 
-                var worldTransform = m.GetWorldTransform(jobj);
+                var worldTransform = jobj.WorldTransform;
 
                 param.Joint = new PhysicsJobj()
                 {
-                    Jobj = jobj,
-                    Live = m.GetLiveJOBJ(jobj),
-                    Translation = new Vector3(jobj.TX, jobj.TY, jobj.TZ),
-                    Rotation = new Vector4(jobj.RX, jobj.RY, jobj.RZ, 0),
-                    Scale = new Vector3(jobj.SX, jobj.SY, jobj.SZ),
+                    Jobj = desc,
+                    Live = jobj,
+                    Translation = new Vector3(desc.TX, desc.TY, desc.TZ),
+                    Rotation = new Vector4(desc.RX, desc.RY, desc.RZ, 0),
+                    Scale = new Vector3(desc.SX, desc.SY, desc.SZ),
                 };
-                param.Rotation = new Vector4(jobj.RX, jobj.RY, jobj.RZ, 0);
-                param.Translation = new Vector3(jobj.TX, jobj.TY, jobj.TZ);
-                param.Scale = new Vector3(jobj.SX, jobj.SY, jobj.SZ);
+                param.Rotation = new Vector4(desc.RX, desc.RY, desc.RZ, 0);
+                param.Translation = new Vector3(desc.TX, desc.TY, desc.TZ);
+                param.Scale = new Vector3(desc.SX, desc.SY, desc.SZ);
                 param.WorldPos = worldTransform.ExtractTranslation();
                 param.rot_orig = new Vector4(param.Rotation.X, param.Rotation.Y, param.Rotation.Z, param.Rotation.W);
                 param.RotAxis = Vector3.UnitX;
@@ -180,7 +181,7 @@ namespace HSDRawViewer.Rendering.Animation
                 param.length_scale = 0;
 
                 // go to child
-                jobj = jobj.Child;
+                desc = desc.Child;
                 BoneNum++;
             }
 
@@ -499,7 +500,7 @@ namespace HSDRawViewer.Rendering.Animation
         /// <param name="apply_phys_num"></param>
         /// <param name="max_apply_physics"></param>
         /// <param name="air_state"></param>
-        public void Think(JOBJManager m, List<SBM_DynamicHitBubble> hitbubbles, bool enable_ground_collision, int max_apply_physics, int air_state)
+        public void Think(LiveJObj m, List<SBM_DynamicHitBubble> hitbubbles, bool enable_ground_collision, int max_apply_physics, int air_state)
         {
             // special flag to skip processing
             if (ApplyNum > 0x100)
@@ -510,7 +511,7 @@ namespace HSDRawViewer.Rendering.Animation
             DynamicsParamHeap dynamic_params = PhysicsBones[0];
 
             // start transform at parent
-            var matrix = m.GetLiveJOBJ(dynamic_params.Joint.Jobj).Parent.WorldTransform;
+            var matrix = m.GetJObjFromDesc(dynamic_params.Joint.Jobj).Parent.WorldTransform;
 
             // get joint
             PhysicsJobj joint;
@@ -652,7 +653,7 @@ namespace HSDRawViewer.Rendering.Animation
                     foreach (var hb in hitbubbles)
                     {
                         var local_2d4 = axis_vector * dynamic_params.Length + dynamic_params.WorldPos;
-                        var hbPos = (Matrix4.CreateTranslation(hb.X, hb.Y, hb.Z) * m.GetWorldTransform(hb.BoneIndex)).ExtractTranslation();
+                        var hbPos = (Matrix4.CreateTranslation(hb.X, hb.Y, hb.Z) * m.GetJObjAtIndex(hb.BoneIndex).WorldTransform).ExtractTranslation();
                         var hitDistance = hbPos - dynamic_params.WorldPos;
 
                         var distance = hitDistance.LengthFast;

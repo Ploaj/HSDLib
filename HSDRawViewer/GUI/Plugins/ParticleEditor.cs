@@ -5,16 +5,13 @@ using HSDRawViewer.Tools;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(HSD_ParticleGroup) })]
-    public partial class ParticleEditor : DockContent, EditorBase, IDrawable
+    public partial class ParticleEditor : PluginBase, IDrawable
     {
-        public DockState DefaultDockState => DockState.Document;
-
-        public DataNode Node
+        public override DataNode Node
         {
             get => _node;
             set
@@ -52,6 +49,8 @@ namespace HSDRawViewer.GUI.Plugins
 
         private HSD_ParticleGroup _group;
         private HSD_TEXGraphicBank _texg;
+
+        private GLTextRenderer TextRenderer = new GLTextRenderer();
 
         /// <summary>
         /// 
@@ -102,6 +101,7 @@ namespace HSDRawViewer.GUI.Plugins
 
             Disposed += (sender, args) =>
             {
+                TextRenderer.Dispose();
                 _system.Dispose();
                 _viewport.Dispose();
             };
@@ -143,6 +143,24 @@ namespace HSDRawViewer.GUI.Plugins
         /// <summary>
         /// 
         /// </summary>
+        public void GLInit()
+        {
+            _system.Initialize();
+            TextRenderer.InitializeRender(@"lib\Consolas.bff");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+            TextRenderer.Dispose();
+            _system.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="cam"></param>
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
@@ -151,10 +169,12 @@ namespace HSDRawViewer.GUI.Plugins
             if (!buttonPause.Checked)
                 _system.Update();
 
+            OpenTK.Graphics.OpenGL.GL.Enable(OpenTK.Graphics.OpenGL.EnableCap.DepthTest);
+
             _system.Render(cam);
 
-            GLTextRenderer.RenderText(cam, $"Generators: {_system.LiveGeneratorCount}", 16, 16);
-            GLTextRenderer.RenderText(cam, $"Particles: {_system.ParticleCount}", 16, 32);
+            TextRenderer.RenderText(cam, $"Generators: {_system.LiveGeneratorCount}", 16, 16);
+            TextRenderer.RenderText(cam, $"Particles: {_system.ParticleCount}", 16, 32);
         }
 
         /// <summary>

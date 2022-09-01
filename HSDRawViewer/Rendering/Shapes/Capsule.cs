@@ -1,4 +1,4 @@
-﻿using OpenTK;
+﻿using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
@@ -24,9 +24,9 @@ namespace HSDRawViewer.Rendering.Shapes
 
         private List<int> Indices = new List<int>();
 
-        private int Segments = 12;
+        private int Segments = 16;
 
-        private int SubdivisionsHeight = 12;
+        private int SubdivisionsHeight = 16;
 
         public Capsule(Vector3 p1, Vector3 p2, float rad)
         {
@@ -159,6 +159,9 @@ namespace HSDRawViewer.Rendering.Shapes
             GL.PushMatrix();
             GL.MultMatrix(ref transform);
             GL.MultMatrix(ref Orientation);
+
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Front);
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);

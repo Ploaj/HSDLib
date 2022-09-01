@@ -12,7 +12,7 @@ namespace HSDRawViewer.ContextMenus
 
         public DOBJContextMenu() : base()
         {
-            MenuItem ImportAfter = new MenuItem("Import DOBJ After");
+            ToolStripMenuItem ImportAfter = new ToolStripMenuItem("Import DOBJ After");
             ImportAfter.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_DOBJ dobj)
@@ -31,7 +31,7 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
             };
-            MenuItems.Add(ImportAfter);
+            Items.Add(ImportAfter);
         }
     }
 }

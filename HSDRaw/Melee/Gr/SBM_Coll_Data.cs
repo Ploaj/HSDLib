@@ -38,6 +38,7 @@ namespace HSDRaw.Melee.Gr
     [Flags]
     public enum CollProperty
     {
+        None = 0,
         DropThrough = 1,
         LedgeGrab   = 2,
         Unknown     = 4 // used on some dynamic collisions (PS and RC)

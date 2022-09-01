@@ -11,9 +11,8 @@ using HSDRawViewer.Rendering.Models;
 using IONET;
 using IONET.Core;
 using IONET.Core.Model;
-using OpenTK;
+using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -23,7 +22,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
     [SupportedTypes(new Type[] { typeof(KAR_grData) })]
-    public partial class AirRideGrDataEditor : DockContent, EditorBase, IDrawableInterface
+    public partial class AirRideGrDataEditor : PluginBase, IDrawableInterface
     {
         public enum EditorMode
         {
@@ -50,8 +49,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             VehicleAreaPosition,
         }
 
-        public DockState DefaultDockState => DockState.Document;
-
         public EditorMode EditMode
         {
             get => _editMode;
@@ -59,7 +56,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         }
         private EditorMode _editMode = EditorMode.Collision;
 
-        public DataNode Node { get => _node;
+        public override DataNode Node { get => _node;
             set
             {
                 _node = value;
@@ -112,7 +109,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private Dictionary<EditorMode, Action> editor_renders;
 
-        private JOBJManager JointManager = new JOBJManager();
+        private RenderJObj RenderJObj = new RenderJObj();
 
         /// <summary>
         /// 
@@ -378,6 +375,22 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <summary>
         /// 
         /// </summary>
+        public void GLInit()
+        {
+            RenderJObj.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void GLFree()
+        {
+            RenderJObj.FreeResources();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="cam"></param>
         /// <param name="windowWidth"></param>
         /// <param name="windowHeight"></param>
@@ -386,7 +399,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             if (_data == null)
                 return;
 
-            JointManager.Render(cam, true);
+            RenderJObj.Render(cam, true);
 
             GL.Enable(EnableCap.DepthTest);
 
@@ -427,7 +440,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 if (arrayMemberEditor1.SelectedObject is KAR_CollisionJoint joint && joint != j)
                     continue;
 
-                var mat = JointManager.GetWorldTransform(j.BoneID);
+                var mat = RenderJObj.RootJObj.GetJObjAtIndex(j.BoneID).WorldTransform;
                 GL.LoadMatrix(ref mat);
 
                 GL.Begin(PrimitiveType.Triangles);
@@ -464,7 +477,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 if (arrayMemberEditor1.SelectedObject is KAR_CollisionJoint joint && joint != j)
                     continue;
 
-                var mat = JointManager.GetWorldTransform(j.BoneID);
+                var mat = RenderJObj.RootJObj.GetJObjAtIndex(j.BoneID).WorldTransform;
                 GL.LoadMatrix(ref mat);
 
                 GL.Begin(PrimitiveType.Lines);
@@ -660,7 +673,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
 
 
-        public void ViewportKeyPress(KeyboardState kbState)
+        public void ViewportKeyPress(KeyEventArgs kbState)
         {
         }
 
@@ -668,7 +681,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         {
         }
 
-        private OpenTK.Vector3 selectedPoint = OpenTK.Vector3.Zero;
+        private Vector3 selectedPoint = Vector3.Zero;
 
         public void ScreenDoubleClick(PickInformation pick)
         {
@@ -680,8 +693,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 int index = 0;
                 foreach (var t in _tris)
                 {
-                    OpenTK.Vector3 hit = OpenTK.Vector3.Zero;
-                    if (pick.CheckTriangleHit2(
+                    Vector3 hit = Vector3.Zero;
+                    if (pick.CheckTriangleHit(
                         GXTranslator.toVector3(_vertices[t.V1]), 
                         GXTranslator.toVector3(_vertices[t.V2]), 
                         GXTranslator.toVector3(_vertices[t.V3]),
@@ -713,7 +726,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 {
                     foreach (var p in s.Points)
                     {
-                        if (pick.CheckAABBHit(new OpenTK.Vector3(p.X, p.Y, p.Z), 2, ref o))
+                        if (pick.CheckAABBHit(new Vector3(p.X, p.Y, p.Z), 2, ref o))
                         {
                             Console.WriteLine(p.X + " " + p.Y + " " + p.Z);
                         }
@@ -723,7 +736,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         }
 
 
-        public void ScreenDrag(PickInformation pick, float deltaX, float deltaY)
+        public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
         }
 
@@ -1073,10 +1086,15 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 {
                     if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
                     {
-                        JointManager.SetJOBJ(m.MainModel.RootNode);
+                        RenderJObj.LoadJObj(m.MainModel.RootNode);
                     }
                 }
             }
+        }
+
+        public bool FreezeCamera()
+        {
+            return false;
         }
     }
 

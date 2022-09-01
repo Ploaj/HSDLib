@@ -13,7 +13,7 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public MapGOBJContextMenu() : base()
         {
-            MenuItem genJointAnim = new MenuItem("Create Joint Animation Bank");
+            ToolStripMenuItem genJointAnim = new ToolStripMenuItem("Create Joint Animation Bank");
             genJointAnim.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj &&
@@ -26,10 +26,10 @@ namespace HSDRawViewer.ContextMenus.Melee
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
-            MenuItems.Add(genJointAnim);
+            Items.Add(genJointAnim);
 
 
-            MenuItem genMatAnim = new MenuItem("Create Material Animation Bank");
+            ToolStripMenuItem genMatAnim = new ToolStripMenuItem("Create Material Animation Bank");
             genMatAnim.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj && 
@@ -42,10 +42,10 @@ namespace HSDRawViewer.ContextMenus.Melee
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
-            MenuItems.Add(genMatAnim);
+            Items.Add(genMatAnim);
 
 
-            MenuItem addFog = new MenuItem("Add Fog Struct");
+            ToolStripMenuItem addFog = new ToolStripMenuItem("Add Fog Struct");
             addFog.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj)
@@ -54,7 +54,7 @@ namespace HSDRawViewer.ContextMenus.Melee
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
-            MenuItems.Add(addFog);
+            Items.Add(addFog);
         }
     }
 }

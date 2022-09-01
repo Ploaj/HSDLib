@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Drawing;
 using System.Linq;
 using HSDRaw.Common;
@@ -103,7 +103,7 @@ namespace HSDRawViewer.Rendering
                 GL.BindTexture(TextureTarget.Texture2D, 0);
 
 #if DEBUG
-                Console.WriteLine($"Loaded Texture {Width}x{Height} {_glid} {RGBAData.Count}");
+                System.Diagnostics.Debug.WriteLine($"Loaded Texture {Width}x{Height} {_glid} {RGBAData.Count}");
 #endif
 
                 RGBAData = null;
@@ -120,7 +120,7 @@ namespace HSDRawViewer.Rendering
                     GL.DeleteTexture(_glid);
 
 #if DEBUG
-                    Console.WriteLine($"Deleted Texture {_glid}");
+                    System.Diagnostics.Debug.WriteLine($"Deleted Texture {_glid}");
 #endif
 
                     Loaded = false;

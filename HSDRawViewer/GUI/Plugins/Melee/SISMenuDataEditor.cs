@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
 {
@@ -16,13 +17,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// big TODO: op codes and editing
     /// </summary>
     [SupportedTypes(new Type[] { typeof(SBM_SISData) })]
-    public partial class SISMenuDataEditor : DockContent, EditorBase
+    public partial class SISMenuDataEditor : PluginBase
     {
-        public DockState DefaultDockState => DockState.Document;
-
         public MeleeMenuText[] MenuTexts { get; set; }
 
-        public DataNode Node
+        public override DataNode Node
         {
             get
             {

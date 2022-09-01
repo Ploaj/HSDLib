@@ -72,8 +72,8 @@ namespace HSDRawViewer.Tools
 
             string sa = "";
 
-            if (File.Exists(@"Melee\ptcl.yml"))
-                sa = File.ReadAllText(@"Melee\ptcl.yml");
+            if (File.Exists(@"Scripts\ptcl.yml"))
+                sa = File.ReadAllText(@"Scripts\ptcl.yml");
 
             Descriptors = deserializer.Deserialize<ParticleDescriptor[]>(sa);
 

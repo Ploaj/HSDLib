@@ -4,18 +4,16 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using HSDRawViewer.Rendering;
 using System.Collections.Generic;
-using OpenTK;
+using OpenTK.Mathematics;
 using System.Linq;
-using OpenTK.Input;
-using System.Timers;
-using HSDRawViewer.Rendering.Renderers;
 using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
-using HSDRawViewer.Tools;
-using System.Threading;
 using HSDRawViewer.GUI.Controls;
+using HSDRawViewer.GUI.Dialog;
+using OpenTK.WinForms;
+using System.Diagnostics;
 
 namespace HSDRawViewer.GUI
 {
@@ -40,9 +38,6 @@ namespace HSDRawViewer.GUI
 
         public Color ViewportBackColor { get; set; } = Color.FromArgb(30, 30, 40);
         public Color GridColor { get; set; } = Color.White;
-
-        [Browsable(false)]
-        public bool ReadyToRender { get; internal set; } = false;
 
         [Browsable(false)]
         public bool EnableHelpDisplay { get; set; } = true;
@@ -93,6 +88,7 @@ namespace HSDRawViewer.GUI
             set
             {
                 _frame = value;
+                FrameChange?.Invoke(_frame);
                 UpdateFrame((decimal)_frame);
             }
         }
@@ -111,8 +107,6 @@ namespace HSDRawViewer.GUI
             set
             {
                 animationTrack.EndFrame = (int)value;
-                nudFrame.Maximum = (decimal)value;
-                nudMaxFrame.Maximum = (decimal)value;
                 nudMaxFrame.Value = (decimal)value;
                 animationTrack.Invalidate();
             }
@@ -130,6 +124,7 @@ namespace HSDRawViewer.GUI
                     PlaybackMode = PlaybackMode.None;
                 }
             }
+            get => animationGroup.Visible;
         }
 
         /// <summary>
@@ -143,24 +138,15 @@ namespace HSDRawViewer.GUI
         public bool Lock2D { get; set; } = false;
 
         [Browsable(false)]
-        public bool IsAltAction
+        public bool IsAltKey
         {
-            get
-            {
-                var keyState = Keyboard.GetState();
-                return keyState.IsKeyDown(Key.AltLeft) || keyState.IsKeyDown(Key.AltRight);
-            }
+            get; internal set;
         }
 
         [Browsable(false)]
-        public bool Frozen
+        public bool IsControlKey
         {
-            get
-            {
-                var keyState = Keyboard.GetState();
-                return keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight) ||
-                       IsAltAction;
-            }
+            get; internal set;
         }
 
         public static int CSPWidth { get; internal set; } = 136 * 2;
@@ -168,17 +154,12 @@ namespace HSDRawViewer.GUI
 
         private List<IDrawable> Drawables { get; set; } = new List<IDrawable>();
 
-        private EventHandler RenderLoop;
-
         private bool Selecting = false;
         private Vector2 mouseStart;
         private Vector2 mouseEnd;
 
         private Vector2 PrevCursorPos;
         private Vector2 DeltaCursorPos;
-
-        public bool EnableCrossHair = false;
-        private Vector3 CrossHair = new Vector3();
 
         [Browsable(false)]
         public bool IsPlaying { get => _playbackMode != PlaybackMode.None; }
@@ -192,11 +173,6 @@ namespace HSDRawViewer.GUI
             set
             {
                 _enableBack = value;
-
-                if (EnableBack)
-                    GL.ClearColor(ViewportBackColor);
-                else
-                    GL.ClearColor(0, 0, 0, 0);
             }
         }
 
@@ -212,13 +188,28 @@ namespace HSDRawViewer.GUI
                 _cspMode = value;
                 if (_cspMode && EnableCSPMode)
                 {
-                    panel1.Dock = DockStyle.Top;
-                    panel1.Height = CSPHeight * 2;
+                    glControl.Dock = DockStyle.Top;
+                    glControl.Height = CSPHeight * 2;
                 }
                 else
                 {
-                    panel1.Dock = DockStyle.Fill;
+                    glControl.Dock = DockStyle.Fill;
                 }
+            }
+        }
+
+        private bool IsCameraFrozen
+        {
+            get
+            {
+                if (Selecting || IsAltKey)
+                    return true;
+
+                foreach (var d in Drawables)
+                    if (d is IDrawableInterface inter && inter.FreezeCamera())
+                        return true;
+                        
+                return false;
             }
         }
 
@@ -226,70 +217,30 @@ namespace HSDRawViewer.GUI
         {
             InitializeComponent();
 
-            Thread drawLoop = new Thread(() =>
-              {
-                  RawTimer timer = new RawTimer();
-                  timer.Start();
-
-                  while (true)
-                  {
-                      if (IsDisposed)
-                          break;
-
-                      timer.Step();
-
-                      if (IsPlaying && timer.Total.Milliseconds > 1000 / _fps)
-                      {
-                          if (_playbackMode == PlaybackMode.Forward && !(!LoopPlayback && Frame == MaxFrame))
-                          {
-                              Frame++;
-                          }
-                          if (_playbackMode == PlaybackMode.Reverse && !(!LoopPlayback && Frame == 0))
-                          {
-                              Frame--;
-                          }
-                          timer.Restart();
-                      }
-                      else
-                          Thread.Sleep(1);
-                  }
-              }
-              );
-            drawLoop.IsBackground = true;
-            drawLoop.Start();
-
-
-            DateTime meansure = DateTime.Now;
-
-            RenderLoop = (sender, args) =>
-            {
-
-                //while (ReadyToRender && panel1 != null && panel1.IsIdle)
-                {
-                    if (MainForm.Instance == null || 
-                    MainForm.Instance.WindowState == FormWindowState.Minimized || 
-                    !Visible ||
-                    _camera == null)
-                        return;
-
-                    var el = DateTime.Now;
-                    var elapsed = el - meansure;
-                    if (ApplicationSettings.UnlockedViewport || elapsed.Milliseconds >= 16)
-                    {
-                        panel1_Paint(null, null);
-
-                        meansure = el;
-                    }
-
-                }
-            };
-
-            Application.Idle += RenderLoop;
-
             nudPlaybackSpeed.Value = 60;
 
-            panel1.KeyDown += (sender, args) =>
+            glControl.LostFocus += (s, a) =>
             {
+                IsAltKey = false;
+                IsControlKey = false;
+            };
+
+            glControl.KeyUp += (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Menu)
+                    IsAltKey = false;
+
+                if (args.KeyCode == Keys.ControlKey)
+                    IsControlKey = false;
+            };
+
+            glControl.KeyDown += (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Menu)
+                    IsAltKey = true;
+
+                if (args.KeyCode == Keys.ControlKey)
+                    IsControlKey = true;
                 /*if (args.Alt)
                 {
                     if (args.KeyCode == Keys.B)
@@ -312,54 +263,76 @@ namespace HSDRawViewer.GUI
                             d.ShowDialog();
                 }*/
 
-                var keyState = OpenTK.Input.Keyboard.GetState();
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                        inter.ViewportKeyPress(keyState);
+                        inter.ViewportKeyPress(args); //keyState
             };
 
-            panel1.MouseClick += (sender, args) =>
+            glControl.MouseClick += (sender, args) =>
             {
-                var point = new Vector2(panel1.PointToClient(Cursor.Position).X, panel1.PointToClient(Cursor.Position).Y);
+                // var point = new Vector2(glControl.PointToClient(Cursor.Position).X, glControl.PointToClient(Cursor.Position).Y);
+                var point = new Vector2(args.X, args.Y);
 
                 foreach (var v in Drawables)
                     if(v is IDrawableInterface inter)
                         inter.ScreenClick(args.Button, GetScreenPosition(point));
+
+                glControl.Focus();
             };
 
-            panel1.DoubleClick += (sender, args) =>
+            glControl.DoubleClick += (sender, args) =>
             {
-                var point = new Vector2(panel1.PointToClient(Cursor.Position).X, panel1.PointToClient(Cursor.Position).Y);
+                var point = new Vector2(glControl.PointToClient(Cursor.Position).X, glControl.PointToClient(Cursor.Position).Y);
 
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
                         inter.ScreenDoubleClick(GetScreenPosition(point));
             };
 
-            panel1.MouseDown += (sender, args) =>
+            glControl.MouseDown += (sender, args) =>
             {
-                var keyState = Keyboard.GetState();
-
-                if (keyState.IsKeyDown(Key.ControlLeft) || keyState.IsKeyDown(Key.ControlRight))
+                if (IsControlKey && args.Button == MouseButtons.Left)
                     Selecting = true;
 
                 mouseStart = new Vector2(args.X, args.Y);
             };
 
-            panel1.MouseMove += (sender, args) =>
+            glControl.MouseMove += (sender, args) =>
             {
+                // update end position
                 mouseEnd = new Vector2(args.X, args.Y);
 
-                var p = panel1.PointToClient(Cursor.Position);
+                // interact with drawable
+                var p = glControl.PointToClient(Cursor.Position);
                 var point = new Vector2(p.X, p.Y);
-                
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                         inter.ScreenDrag(GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
+                         inter.ScreenDrag(args, GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
+
+                // move camera
+                var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
+                DeltaCursorPos = PrevCursorPos - pos;
+                PrevCursorPos = pos;
+                if (!IsCameraFrozen)
+                {
+                    var speed = 0.10f;
+                    var speedpane = 0.75f;
+                    if (args.Button == MouseButtons.Right)
+                    {
+                        _camera.Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
+                    }
+                    if (args.Button == MouseButtons.Left && !Lock2D)
+                    {
+                        _camera.RotationXDegrees -= DeltaCursorPos.Y * speed;
+                        _camera.RotationYDegrees -= DeltaCursorPos.X * speed;
+                    }
+                }
+
             };
 
-            panel1.MouseUp += (sender, args) =>
+            glControl.MouseUp += (sender, args) =>
             {
+                // select drawable area
                 if (Selecting)
                 {
                     foreach (var v in Drawables)
@@ -370,32 +343,18 @@ namespace HSDRawViewer.GUI
                 Selecting = false;
             };
 
-            panel1.MouseWheel += (sender, args) =>
+            glControl.MouseWheel += (sender, args) =>
             {
+                // zoom camera
                 var zoomMultiplier = 1;
-                try
-                {
-                    var ks = Keyboard.GetState();
-
-                    if (ks.IsKeyDown(Key.ShiftLeft) || ks.IsKeyDown(Key.ShiftRight))
-                        zoomMultiplier = 4;
-                }
-                catch (Exception)
-                {
-
-                }
-                _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
-            };
-
-            panel1.VSync = false;
-
-            Disposed += (sender, args) =>
-            {
-                Application.Idle -= RenderLoop;
-                drawLoop.Abort();
+                if (!IsCameraFrozen)
+                    _camera.Zoom(args.Delta / 1000f * zoomMultiplier, true);
             };
         }
-        
+
+        public delegate void FrameChanged(float value);
+        public FrameChanged FrameChange;
+
         /// <summary>
         /// 
         /// </summary>
@@ -410,14 +369,14 @@ namespace HSDRawViewer.GUI
                 {
                     nudFrame.Invoke(d, new object[] { frame });
                 }
-                catch (ObjectDisposedException)
+                catch (Exception)
                 {
 
                 }
             }
             else
             {
-                if (frame > nudFrame.Maximum)
+                if (frame > (decimal)MaxFrame)
                 {
                     if (_playbackMode == PlaybackMode.Forward && !LoopPlayback)
                         Stop();
@@ -431,8 +390,8 @@ namespace HSDRawViewer.GUI
                     if (_playbackMode == PlaybackMode.Reverse && !LoopPlayback)
                         Stop();
 
-                    frame = nudFrame.Maximum;
-                    _frame = (float)nudFrame.Maximum;
+                    frame = (decimal)MaxFrame;
+                    _frame = MaxFrame;
                 }
 
                 nudFrame.Value = frame;
@@ -446,13 +405,13 @@ namespace HSDRawViewer.GUI
         /// <returns></returns>
         private PickInformation GetScreenPosition(Vector2 point)
         {
-            float x = (2.0f * point.X) / panel1.Width - 1.0f;
-            float y = 1.0f - (2.0f * point.Y) / panel1.Height;
+            float x = (2.0f * point.X) / glControl.Width - 1.0f;
+            float y = 1.0f - (2.0f * point.Y) / glControl.Height;
 
             var inv = _camera.MvpMatrix.Inverted();
 
-            Vector4 va = Vector4.Transform(new Vector4(x, y, -1.0f, 1.0f), inv);
-            Vector4 vb = Vector4.Transform(new Vector4(x, y, 1.0f, 1.0f), inv);
+            Vector4 va = new Vector4(x, y, -1.0f, 1.0f) * inv;
+            Vector4 vb = new Vector4(x, y, 1.0f, 1.0f) * inv;
 
             va.Xyz /= va.W;
             vb.Xyz /= vb.W;
@@ -460,7 +419,7 @@ namespace HSDRawViewer.GUI
             Vector3 p1 = va.Xyz;
             Vector3 p2 = p1 - ((va - (va + vb)).Xyz) * 100;
 
-            CrossHair = p1;
+            // CrossHair = p1;
 
             PickInformation info = new PickInformation(new Vector2(point.X, point.Y), p1, p2);
 
@@ -475,6 +434,10 @@ namespace HSDRawViewer.GUI
             Drawables.Clear();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="drawable"></param>
         public void AddRenderer(IDrawable drawable)
         {
             Drawables.Add(drawable);
@@ -482,9 +445,21 @@ namespace HSDRawViewer.GUI
             Drawables = Drawables.OrderBy(x => (int)(x.DrawOrder)).ToList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="drawable"></param>
         public void RemoveRenderer(IDrawable drawable)
         {
-            Drawables.Remove(drawable);
+            if (Drawables.Contains(drawable))
+            {
+                // free resources
+                glControl.MakeCurrent();
+                drawable.GLFree();
+
+                // remove drawable
+                Drawables.Remove(drawable);
+            }
         }
 
         private void nudFrame_ValueChanged(object sender, EventArgs e)
@@ -552,80 +527,98 @@ namespace HSDRawViewer.GUI
         /// <summary>
         /// 
         /// </summary>
-        public void Render()
-        {
-            panel1.Invalidate();
-            AnimationTrackEnabled = false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            ForceDraw();
+            Render();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void ForceDraw()
+        public void Render()
         {
-            if (!ReadyToRender)
-                return;
+            glControl.MakeCurrent();
 
-            panel1.MakeCurrent();
+            // set clear color
+            if (EnableBack)
+                GL.ClearColor(ViewportBackColor);
+            else
+                GL.ClearColor(0, 0, 0, 0);
 
-            GL.Viewport(0, 0, panel1.Width, panel1.Height);
-
+            // setup viewport
+            GL.Viewport(0, 0, glControl.Width, glControl.Height);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.PushAttrib(AttribMask.AllAttribBits);
-
+            // setup immediate mode matricies
+            var v = _camera.PerspectiveMatrix;
+            var m = _camera.ModelViewMatrix;
             GL.MatrixMode(MatrixMode.Projection);
-
-            var v = _camera.MvpMatrix;
             GL.LoadMatrix(ref v);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadMatrix(ref m);
 
-            if (EnableCrossHair)
-            {
-                GL.PointSize(5f);
-                GL.Color3(Color.Yellow);
-                GL.Begin(PrimitiveType.Points);
-                GL.Vertex3(CrossHair);
-                GL.End();
-            }
-
+            // draw grid if enabled
+            GL.Enable(EnableCap.DepthTest);
             if (DisplayGrid)
                 DrawShape.Floor(GridColor, 50, 5);
 
+            // draw drawbles
+            GL.PushAttrib(AttribMask.AllAttribBits);
             foreach (var r in Drawables)
-                r.Draw(_camera, panel1.Width, panel1.Height);
-
+                r.Draw(_camera, glControl.Width, glControl.Height);
             GL.PopAttrib();
 
+            // draw selection
             if (Selecting)
-            {
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.LoadIdentity();
+                RenderSelectionOutline();
 
-                var x1 = (mouseStart.X / panel1.Width) * 2 - 1f;
-                var y1 = 1f - (mouseStart.Y / panel1.Height) * 2;
-                var x2 = (mouseEnd.X / panel1.Width) * 2 - 1f;
-                var y2 = 1f - (mouseEnd.Y / panel1.Height) * 2;
+            // render screenshot outline
+            RenderScreenshotSelection();
 
-                GL.LineWidth(1f);
-                GL.Color3(1f, 1f, 1f);
-                GL.Begin(PrimitiveType.LineLoop);
-                GL.Vertex2(x1, y1);
-                GL.Vertex2(x2, y1);
-                GL.Vertex2(x2, y2);
-                GL.Vertex2(x1, y2);
-                GL.End();
-            }
+            // swap buffer to display render
+            glControl.SwapBuffers();
 
+            // check to take screenshot
+            TakeGLScreenShot();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RenderSelectionOutline()
+        {
+            GL.PushMatrix();
+
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+
+            var x1 = (mouseStart.X / glControl.Width) * 2 - 1f;
+            var y1 = 1f - (mouseStart.Y / glControl.Height) * 2;
+            var x2 = (mouseEnd.X / glControl.Width) * 2 - 1f;
+            var y2 = 1f - (mouseEnd.Y / glControl.Height) * 2;
+
+            GL.LineWidth(1f);
+            GL.Color3(1f, 1f, 1f);
+            GL.Begin(PrimitiveType.LineLoop);
+            GL.Vertex2(x1, y1);
+            GL.Vertex2(x2, y1);
+            GL.Vertex2(x2, y2);
+            GL.Vertex2(x1, y2);
+            GL.End();
+
+            GL.PopMatrix();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RenderScreenshotSelection()
+        {
             if (CSPMode && TakeScreenShot == 0)
             {
                 GL.MatrixMode(MatrixMode.Projection);
@@ -641,8 +634,8 @@ namespace HSDRawViewer.GUI
 
                 // 136 x 188
 
-                float width = CSPWidth / (float)panel1.Width;
-                float height = CSPHeight / (float)panel1.Height;
+                float width = CSPWidth / (float)glControl.Width;
+                float height = CSPHeight / (float)glControl.Height;
 
                 GL.Color4(0.5f, 0.5f, 0.5f, 0.5f);
 
@@ -670,32 +663,25 @@ namespace HSDRawViewer.GUI
 
                 GL.End();
             }
+        }
 
-            /*if (EnableHelpDisplay && !TakeScreenShot)
-            {
-                if (IsAltAction)
-                {
-                    GLTextRenderer.RenderText(_camera, "R - Reset Camera", 0, 0);
-                    GLTextRenderer.RenderText(_camera, "C - Open Camera Settings", 0, 16);
-                    GLTextRenderer.RenderText(_camera, "G - Toggle Grid", 0, 32);
-                    GLTextRenderer.RenderText(_camera, "B - Toggle Backdrop", 0, 48);
-                    GLTextRenderer.RenderText(_camera, "P - Save Screenshot to File", 0, 64);
-                }
-                else
-                {
-                    GLTextRenderer.RenderText(_camera, "Alt+", 0, 0);
-                }
-            }*/
-
-            panel1.SwapBuffers();
-
+        /// <summary>
+        /// 
+        /// </summary>
+        private void TakeGLScreenShot()
+        {
             if (TakeScreenShot == 1)
-                TakeScreenShot = 2;
-            else if (TakeScreenShot == 2)
             {
+                TakeScreenShot = 2;
+            }
+            else
+            if (TakeScreenShot == 2)
+            {
+                TakeScreenShot = 0;
+
                 string fileName;
 
-                if (CSPMode)
+                if (CSPMode && MainForm.Instance.FilePath != null)
                     fileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath), "csp_" + System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + ".png");
                 else
                     fileName = "render_" + System.DateTime.Now.ToString("yyyy-dd-M-HH-mm-ss") + ".png";
@@ -711,17 +697,17 @@ namespace HSDRawViewer.GUI
 
                             Converters.SBM.CSPMaker.MakeCSP(resize);
 
-                            using (var csp = resize.Clone(new Rectangle((panel1.Width - CSPWidth) / 4, (panel1.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2), bitmap.PixelFormat))
+                            using (var csp = resize.Clone(new Rectangle((glControl.Width - CSPWidth) / 4, (glControl.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2), bitmap.PixelFormat))
                                 csp.Save(fileName);
                         }
                     }
                     else
+                    {
                         bitmap.Save(fileName);
+                    }
 
                     MessageBox.Show("Screenshot saved as " + fileName);
                 }
-
-                TakeScreenShot = 0;
             }
         }
 
@@ -788,12 +774,56 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void panel1_Load(object sender, EventArgs e)
         {
+            // set clear color
             GL.ClearColor(ViewportBackColor);
+
+            // setup camera
             _camera = new Camera();
-            _camera.RenderWidth = panel1.Width;
-            _camera.RenderHeight = panel1.Height;
+            _camera.RenderWidth = glControl.Width;
+            _camera.RenderHeight = glControl.Height;
             _camera.Translation = new Vector3(0, 10, -80);
-            ReadyToRender = true;
+
+            // Redraw the screen every 1/20 of a second.
+            Timer _timer = new Timer();
+            _timer.Tick += (sender, e) =>
+            {
+                Render();
+            };
+            _timer.Interval = 12;   // 1000 ms per sec / 50 ms per frame = 20 FPS
+            _timer.Start();
+
+            // advance frame value
+            System.Timers.Timer _timer2 = new System.Timers.Timer();
+            _timer2.Elapsed += (sender, e) =>
+            {
+                if (IsPlaying)
+                {
+                    if (_playbackMode == PlaybackMode.Forward && !(!LoopPlayback && Frame == MaxFrame))
+                    {
+                        Frame++;
+                    }
+                    if (_playbackMode == PlaybackMode.Reverse && !(!LoopPlayback && Frame == 0))
+                    {
+                        Frame--;
+                    }
+                }
+            };
+            _timer2.Interval = 16; // 1000 ms per sec / 50 ms per frame = 20 FPS
+            _timer2.Start();
+
+            // stop timer on dispose
+            Disposed += (sender, args) =>
+            {
+                _timer.Stop();
+                _timer2.Stop();
+
+                _timer.Dispose();
+                _timer2.Dispose();
+            };
+
+            // init gl resources
+            foreach (var r in Drawables)
+                r.GLInit();
         }
 
         /// <summary>
@@ -813,8 +843,8 @@ namespace HSDRawViewer.GUI
         {
             if (_camera != null)
             {
-                _camera.RenderWidth = panel1.Width;
-                _camera.RenderHeight = panel1.Height;
+                _camera.RenderWidth = glControl.Width;
+                _camera.RenderHeight = glControl.Height;
             }
         }
 
@@ -842,38 +872,6 @@ namespace HSDRawViewer.GUI
         private void panel1_MouseEnter(object sender, EventArgs e)
         {
             PrevCursorPos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void panel1_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
-
-            if (PrevCursorPos == null)
-                PrevCursorPos = pos;
-
-            DeltaCursorPos = PrevCursorPos - pos;
-
-            PrevCursorPos = pos;
-
-            if (!Frozen)
-            {
-                var speed = 0.10f;
-                var speedpane = 0.75f;
-                if (e.Button == MouseButtons.Right)
-                {
-                    _camera.Pan(-DeltaCursorPos.X * speedpane, -DeltaCursorPos.Y * speedpane);
-                }
-                if (e.Button == MouseButtons.Left && !Lock2D)
-                {
-                    _camera.RotationXDegrees -= DeltaCursorPos.Y * speed;
-                    _camera.RotationYDegrees -= DeltaCursorPos.X * speed;
-                }
-            }
         }
 
         /// <summary>
@@ -1077,12 +1075,7 @@ namespace HSDRawViewer.GUI
                 d.Color = ViewportBackColor;
 
                 if (d.ShowDialog() == DialogResult.OK)
-                {
                     ViewportBackColor = d.Color;
-
-                    if (EnableBack)
-                        GL.ClearColor(ViewportBackColor);
-                }
             }
         }
 
@@ -1110,6 +1103,22 @@ namespace HSDRawViewer.GUI
         private void animationTrack_KeyDown(object sender, KeyEventArgs e)
         {
             Console.WriteLine(e.KeyCode);
+        }
+
+        public GLControl GetControl()
+        {
+            return glControl;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudMaxFrame_ValueChanged(object sender, EventArgs e)
+        {
+            animationTrack.EndFrame = (float)nudMaxFrame.Value;
+            animationTrack.Invalidate();
         }
     }
 }
