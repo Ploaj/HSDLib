@@ -112,6 +112,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             UpdateJObjDisplay(_root, null);
             treeJOBJ.EndUpdate();
             treeJOBJ.ExpandAll();
+            treeJOBJ.SelectedNode = treeJOBJ.Nodes[0];
         }
 
         /// <summary>

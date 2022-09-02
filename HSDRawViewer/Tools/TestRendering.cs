@@ -26,7 +26,7 @@ namespace HSDRawViewer.Tools
 
             w.TransformUpdated += (t) =>
             {
-                Transform.Row3 = t.Row3;
+                Transform = t;
             };
         }
 

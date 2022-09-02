@@ -14,6 +14,7 @@ namespace HSDRawViewer.Rendering.Widgets
         Y = 2,
         Z = 4,
         View = X | Y | Z,
+        Scale = 8,
     }
 
     public class TranslationWidget
@@ -33,6 +34,8 @@ namespace HSDRawViewer.Rendering.Widgets
         public Vector3 ColorZ = Vector3.UnitZ;
         public Vector3 ColorSelected = new Vector3(1, 1, 0);
 
+        public bool UseScaleInsteadOfView = false;
+
 
         private Vector3 Center1;
         private Vector3 Center2;
@@ -44,6 +47,8 @@ namespace HSDRawViewer.Rendering.Widgets
 
         private float scale;
         private Matrix4 ScaleMatrix;
+
+        public bool PendingUpdate { get; internal set; } = false;
 
         public class Plane
         {
@@ -83,11 +88,14 @@ namespace HSDRawViewer.Rendering.Widgets
         private QuadHitTest YPlane = new QuadHitTest();
         private QuadHitTest ZPlane = new QuadHitTest();
 
-        public bool Interacting { get; internal set; }
+        public bool Interacting { get; set; }
         private bool WasInteracting = false;
 
         public delegate void UpdateTransform(Matrix4 newTransform);
         public UpdateTransform TransformUpdated;
+
+        public delegate void UpdateScale(float scale);
+        public UpdateScale ScaleUpdated;
 
         /// <summary>
         /// 
@@ -158,6 +166,10 @@ namespace HSDRawViewer.Rendering.Widgets
         private Vector3 ZEnd;
         private Vector3 Center;
 
+        private Vector3 CenterOffset;
+
+        private Matrix4 TransformBefore;
+
         /// <summary>
         /// 
         /// </summary>
@@ -188,9 +200,16 @@ namespace HSDRawViewer.Rendering.Widgets
             {
                 switch (SelectedComponent)
                 {
+                    case TranslationComponent.Scale:
+                        {
+                            //CenterPlaneHit = info.GetPlaneIntersection(CenterPlane.Normal, CenterPlane.Position);
+                            //Scale = ScaleBefore + Vector3.Distance(CenterPlaneHit, CenterOffset);
+                            //Transform = Matrix4.CreateScale(Scale) * TransformBefore;
+                        }
+                        break;
                     case TranslationComponent.View:
                         {
-                            CenterPlaneHit = info.GetPlaneIntersection(CenterPlane.Normal, CenterPlane.Position);
+                            CenterPlaneHit = info.GetPlaneIntersection(CenterPlane.Normal, CenterPlane.Position) + CenterOffset;
                             Transform.Row3 = new Vector4(CenterPlaneHit, 1);
                         }
                         break;
@@ -246,7 +265,16 @@ namespace HSDRawViewer.Rendering.Widgets
                 if (p.X > CenterSquare.X && p.X < CenterSquare.Z &&
                     p.Y > CenterSquare.Y && p.Y < CenterSquare.W)
                 {
-                    SelectedComponent = TranslationComponent.View;
+                    if (UseScaleInsteadOfView)
+                    {
+                        //TransformBefore = Transform;
+                        //CenterOffset = info.GetPlaneIntersection(CenterPlane.Normal, CenterPlane.Position);
+                    }
+                    else
+                    {
+                        SelectedComponent = TranslationComponent.View;
+                        CenterOffset = Center - info.GetPlaneIntersection(CenterPlane.Normal, CenterPlane.Position);
+                    }
                 }
                 else
                 if (info.IntersectsQuad(XPlane.P1, XPlane.P2, XPlane.P3, XPlane.P4, out intersect))
@@ -305,8 +333,17 @@ namespace HSDRawViewer.Rendering.Widgets
         /// </summary>
         public void MouseUp()
         {
+            if (Interacting)
+                PendingUpdate = true;
+
             Interacting = false;
             WasInteracting = false;
+
+            //if (SelectedComponent == TranslationComponent.View)
+            //{
+            //    Transform = TransformBefore;
+            //    Scale = ScaleBefore;
+            //}
         }
 
         /// <summary>

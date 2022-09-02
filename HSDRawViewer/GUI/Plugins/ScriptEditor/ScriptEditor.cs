@@ -218,7 +218,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     _selectedAction.SetFromStruct(SubactionEvent.CompileEvent(events));
 
                 // update renderer script
-                SelectedEvents.Clear();
+                SelectedEvents.RemoveAll(e => !events.Contains(e));
                 Processor.SetStruct(events, SubactionGroup.Fighter);
 
                 // update frame tips
@@ -1071,6 +1071,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="deltaY"></param>
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
+            bool update = false;
             foreach (var hb in Processor.Hitboxes)
             {
                 if (hb.Active && SelectedEvents.Contains(hb.EventSource))
@@ -1081,8 +1082,16 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         hb._widget.MouseUp();
 
                     hb._widget.Drag(pick);
+
+                    if (hb._widget.PendingUpdate)
+                    {
+                        update = true;
+                        hb._widget.PendingUpdate = false;
+                    }
                 }
             }
+            if (update)
+                _subactionEditor.ApplyScriptChanges();
         }
 
         /// <summary>
