@@ -95,7 +95,7 @@ namespace HSDRawViewer.GUI.Extra
             jointTree.BeginUpdate();
             jointTree.Nodes.Clear();
 
-            var jobjs = jobj.BreathFirstList;
+            var jobjs = jobj.ToList;
 
             Dictionary<HSD_JOBJ, JointNode> childToParent = new Dictionary<HSD_JOBJ, JointNode>();
             

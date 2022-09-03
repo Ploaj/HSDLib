@@ -200,7 +200,7 @@ namespace HSDRawViewer.Rendering
             if (joint == null)
                 return;
 
-            foreach (var j in joint.BreathFirstList)
+            foreach (var j in joint.ToList)
             {
                 AnimNode n = new AnimNode();
                 if (j.AOBJ != null && j.AOBJ.FObjDesc != null)
@@ -446,7 +446,7 @@ namespace HSDRawViewer.Rendering
             if (jobj == null)
                 return;
 
-            var joints = jobj.BreathFirstList;
+            var joints = jobj.ToList;
 
             if (joints.Count != NodeCount)
                 return;

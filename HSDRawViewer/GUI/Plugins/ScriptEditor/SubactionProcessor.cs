@@ -27,6 +27,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public SubactionEvent EventSource;
 
+        public bool PendingUpdate { get; internal set; } = false;
+
         public TranslationWidget _widget { get; internal set; } = new TranslationWidget();
 
         public bool UseLocalTransform = false;

@@ -32,7 +32,7 @@ namespace HSDRawViewer
         public static void RebuildPOBJs(HSD_JOBJ rootJOBJ)
         {
             var compressor = new POBJ_Generator();
-            foreach (var jobj in rootJOBJ.BreathFirstList)
+            foreach (var jobj in rootJOBJ.ToList)
             {
                 if (jobj.Dobj != null)
                     foreach (var dobj in jobj.Dobj.List)

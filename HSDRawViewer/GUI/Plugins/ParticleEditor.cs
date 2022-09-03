@@ -146,7 +146,7 @@ namespace HSDRawViewer.GUI.Plugins
         public void GLInit()
         {
             _system.Initialize();
-            TextRenderer.InitializeRender(@"lib\Consolas.bff");
+            TextRenderer.InitializeRender(@"Consolas.bff");
         }
 
         /// <summary>

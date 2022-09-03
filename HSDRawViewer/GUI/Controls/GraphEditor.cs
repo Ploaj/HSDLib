@@ -932,7 +932,7 @@ NONE - None (do not use)";
         {
             GL.ClearColor(0.1568f, 0.1568f, 0.1568f, 1);
 
-            textRenderer.InitializeRender(@"lib\GraphArial.bff");
+            textRenderer.InitializeRender(@"GraphArial.bff");
 
             // setup camera
             _camera = new Camera();

@@ -7,6 +7,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -37,13 +38,16 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <summary>
         /// 
         /// </summary>
-        private void LoadFont(string filePath)
+        private void LoadFont(string fontFile)
         {
+            string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); 
+            string filePath = Path.Combine(currentDirectory, "lib\\" + fontFile);
+
             using (FileStream s = new FileStream(filePath, FileMode.Open))
             using (BinaryReader r = new BinaryReader(s))
             {
                 if (r.ReadByte() != 0xBF || r.ReadByte() != 0xF2)
-                    throw new InvalidDataException($"{filePath} was not a valid bff file");
+                    throw new InvalidDataException($"{fontFile} was not a valid bff file");
 
                 image_width = r.ReadInt32();
                 image_height = r.ReadInt32();
@@ -77,10 +81,10 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <summary>
         /// 
         /// </summary>
-        public void InitializeRender(string filePath)
+        public void InitializeRender(string fontFile)
         {
             TextureManager.ClearTextures();
-            LoadFont(filePath);
+            LoadFont(fontFile);
             Initialized = true;
         }
 

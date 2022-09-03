@@ -35,7 +35,7 @@ namespace HSDRawViewer.Tools
         /// </summary>
         public void GLInit()
         {
-            text.InitializeRender(@"lib\Consolas.bff");
+            text.InitializeRender(@"Consolas.bff");
         }
 
         /// <summary>

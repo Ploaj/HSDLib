@@ -74,7 +74,7 @@ namespace HSDRawViewer.ContextMenus
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
                 {
-                    foreach (var n in anim.BreathFirstList)
+                    foreach (var n in anim.ToList)
                     {
                         if (n.AOBJ != null)
                             foreach(var a in n.AOBJ.FObjDesc.List)
@@ -107,7 +107,7 @@ namespace HSDRawViewer.ContextMenus
                     {
                         if (d.ShowDialog() == DialogResult.OK)
                         {
-                            foreach (var n in anim.BreathFirstList)
+                            foreach (var n in anim.ToList)
                             {
                                 if (n.AOBJ != null)
                                 {

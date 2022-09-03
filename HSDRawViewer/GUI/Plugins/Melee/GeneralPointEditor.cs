@@ -294,7 +294,7 @@ namespace HSDRawViewer.GUI.Plugins
         private void LoadData()
         {
             // get jobjs
-            var jobj = GeneralPoints.JOBJReference.BreathFirstList;
+            var jobj = GeneralPoints.JOBJReference.ToList;
 
             // set joints for rendering
             LiveJObj = new LiveJObj(GeneralPoints.JOBJReference);

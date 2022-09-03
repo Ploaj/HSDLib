@@ -106,7 +106,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             if (list.JointIndices != null)
             {
-                var joints = joint.BreathFirstList;
+                var joints = joint.ToList;
                 _positions = list.JointIndices.Array.Select(e => new AirRideGrDataPositionProxy(joints[e])).ToArray();
             }
             else
@@ -126,7 +126,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             if (list.JointIndices != null)
             {
-                var joints = joint.BreathFirstList;
+                var joints = joint.ToList;
                 _positions = list.JointIndices.Array.Select(e => new AirRideGrDataPositionProxy(joints[e])).ToArray();
             }
             else
@@ -159,7 +159,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     rootJoint.AddChild(v._joint);
                     if (list.JointIndices == null)
                         list.JointIndices = new HSDIntArray() { _s = new HSDStruct() };
-                    list.JointIndices.Add(rootJoint.BreathFirstList.Count - 1);
+                    list.JointIndices.Add(rootJoint.ToList.Count - 1);
                 }
                 else
                 // position data
@@ -206,7 +206,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                     rootJoint.AddChild(v._joint);
                     if (list.JointIndices == null)
                         list.JointIndices = new HSDIntArray() { _s = new HSDStruct() };
-                    list.JointIndices.Add(rootJoint.BreathFirstList.Count - 1);
+                    list.JointIndices.Add(rootJoint.ToList.Count - 1);
                 }
                 else
                 // position data

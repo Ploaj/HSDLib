@@ -90,7 +90,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             listDOBJ.DataSource = null;
             dobjList.Clear();
             int ji = 0;
-            foreach (var j in jobj.BreathFirstList)
+            foreach (var j in jobj.ToList)
             {
                 if (j.Dobj != null)
                 {
@@ -362,8 +362,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 if (d.ShowDialog() == DialogResult.OK)
                 {
                     HSD_JOBJ parent = _root;
-                    if (setting.JointIndex < _root.BreathFirstList.Count)
-                        parent = _root.BreathFirstList[setting.JointIndex];
+                    if (setting.JointIndex < _root.ToList.Count)
+                        parent = _root.ToList[setting.JointIndex];
 
                     for (int i = 0; i < setting.NumberToGenerate; i++)
                     {

@@ -1109,7 +1109,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public void GLInit()
         {
             renderer.GLInit();
-            text.InitializeRender(@"lib\Consolas.bff");
+            text.InitializeRender(@"Consolas.bff");
         }
 
         /// <summary>

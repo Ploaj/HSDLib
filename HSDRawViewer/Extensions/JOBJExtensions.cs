@@ -16,7 +16,7 @@ namespace HSDRawViewer
         /// <param name="jobj"></param>
         public static void CleanRootNode(this HSD_JOBJ jobj)
         {
-            var joints = jobj.BreathFirstList;
+            var joints = jobj.ToList;
 
             Matrix4 rot = Matrix4.Identity; ;
             for (int i = 0; i < joints.Count; i++)
@@ -154,7 +154,7 @@ namespace HSDRawViewer
         /// <param name="rootjobj"></param>
         private static void ApplyNarutoMaterials(HSD_JOBJ rootjobj)
         {
-            foreach (var j in rootjobj.BreathFirstList)
+            foreach (var j in rootjobj.ToList)
             {
                 if (j.Dobj != null)
                     foreach (var d in j.Dobj.List)
@@ -178,7 +178,7 @@ namespace HSDRawViewer
             HSD_DOBJ result = null;
 
             List<HSD_POBJ> pobj = new List<HSD_POBJ>();
-            foreach(var j in jobj.BreathFirstList)
+            foreach(var j in jobj.ToList)
             {
                 if (j.Dobj != null)
                 {
@@ -222,7 +222,7 @@ namespace HSDRawViewer
                 HashSet<int> textures = new HashSet<int>();
 
                 // get all tobjs
-                foreach(var j in jobj.BreathFirstList)
+                foreach(var j in jobj.ToList)
                 {
                     if (j.Dobj != null)
                         foreach (var dobj in j.Dobj.List)
@@ -297,7 +297,7 @@ namespace HSDRawViewer
                 }
 
                 // get all tobjs
-                foreach (var j in jobj.BreathFirstList)
+                foreach (var j in jobj.ToList)
                 {
                     if (j.Dobj != null)
                         foreach (var dobj in j.Dobj.List)

@@ -128,7 +128,7 @@ namespace HSDRaw.Common
         /// </summary>
         public void UpdateFlags()
         {
-            var list = BreathFirstList;
+            var list = ToList;
             list.Reverse();
 
             foreach (var j in list)

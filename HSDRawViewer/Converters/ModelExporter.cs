@@ -183,7 +183,7 @@ namespace HSDRawViewer.Converters
         private void ProcessDOBJs()
         {
             var jIndex = 0;
-            foreach (var j in _root.BreathFirstList)
+            foreach (var j in _root.ToList)
             {
                 var dIndex = 0;
                 if (j.Dobj != null)
@@ -378,7 +378,7 @@ namespace HSDRawViewer.Converters
 
                                     IOBone bone = jobjToBone[parent];
                                     if (en == 1)
-                                        bone = jobjToBone[_root.BreathFirstList.Find(e => e.Children.Contains(parent))];
+                                        bone = jobjToBone[_root.ToList.Find(e => e.Children.Contains(parent))];
 
                                     var vertexWeight = new IOBoneWeight()
                                     {

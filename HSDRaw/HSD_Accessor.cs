@@ -179,29 +179,27 @@ namespace HSDRaw
         }
 
         [Browsable(false)]
-        public List<T> BreathFirstList
+        public List<T> ToList
         {
             get
             {
-                Queue<T> Que = new Queue<T>();
-                foreach (T j in List)
-                {
-                    Enqueue(j, Que);
-                }
-                List<T> JOBJS = new List<T>();
-                while (Que.Count > 0)
-                    JOBJS.Add(Que.Dequeue());
-                return JOBJS;
+                return Enumerate.ToList();
             }
         }
 
-        private void Enqueue(T JOBJ, Queue<T> Que)
+        private IEnumerable<T> Enumerate
         {
-            Que.Enqueue(JOBJ);
-            if (JOBJ.Child == null) return;
-            foreach (T Child in JOBJ.Child.List)
+            get
             {
-                Enqueue(Child, Que);
+                yield return (T)this;
+
+                if (Child != null)
+                    foreach (var e in Child.Enumerate)
+                        yield return e;
+
+                if (Next != null)
+                    foreach (var e in Next.Enumerate)
+                        yield return e;
             }
         }
 

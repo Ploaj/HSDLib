@@ -424,7 +424,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             FighterModel.Invalidate();
             ThrowDummyModel.Invalidate();
             ItemModel.Invalidate();
-            Text.InitializeRender(@"lib/Consolas.bff");
+            Text.InitializeRender(@"Consolas.bff");
         }
 
         /// <summary>
