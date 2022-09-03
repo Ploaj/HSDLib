@@ -244,14 +244,14 @@ namespace HSDRaw.Tools
             if (state.t0 == state.t1 || state.op_intrp == GXInterpolationType.HSD_A_OP_CON || state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
                 return state.p0;
 
-            float FrameDiff = Frame - state.t0;
-            float Weight = FrameDiff / (state.t1 - state.t0);
+            float time = Frame - state.t0;
+            float fterm = (state.t1 - state.t0);
 
             if (state.op_intrp == GXInterpolationType.HSD_A_OP_LIN)
-                return AnimationInterpolationHelper.Lerp(state.p0, state.p1, Weight);
+                return AnimationInterpolationHelper.Lerp(fterm, time, state.p0, state.p1);
 
             if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
-                return AnimationInterpolationHelper.SplineGetHermite(1 / (state.t1 - state.t0), FrameDiff, state.p0, state.p1, state.d0, state.d1);
+                return AnimationInterpolationHelper.SplineGetHermite(1 / fterm, time, state.p0, state.p1, state.d0, state.d1);
 
             return state.p0;
         }
@@ -376,9 +376,10 @@ namespace HSDRaw.Tools
     /// </summary>
     public class AnimationInterpolationHelper
     {
-        public static float Lerp(float LHS, float RHS, float Weight)
+        public static float Lerp(float fterm, float time, float p0, float p1)
         {
-            return LHS * (1 - Weight) + RHS * Weight;
+            var d0 = (p1 - p0) / fterm;
+            return d0 * time + p0;
         }
 
         public static float SplineGetHermite(float fterm, float time, float p0, float p1, float d0, float d1)

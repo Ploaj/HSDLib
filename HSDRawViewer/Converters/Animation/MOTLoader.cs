@@ -563,14 +563,18 @@ namespace HSDRawViewer.Converters
             if (index < 0)
                 return Keys[Keys.Count - 1];
 
-            var weight = (time - Keys[index].Time) / (Keys[index + 1].Time - Keys[index].Time);
+            // var weight = (time - Keys[index].Time) / (Keys[index + 1].Time - Keys[index].Time);
+
+            float ftime = time - Keys[index].Time;
+            float fterm = (Keys[index + 1].Time - Keys[index].Time);
+
             return new MOT_KEY()
             {
                 Time = time,
-                X = AnimationInterpolationHelper.Lerp(Keys[index].X, Keys[index + 1].X, weight),
-                Y = AnimationInterpolationHelper.Lerp(Keys[index].Y, Keys[index + 1].Y, weight),
-                Z = AnimationInterpolationHelper.Lerp(Keys[index].Z, Keys[index + 1].Z, weight),
-                W = AnimationInterpolationHelper.Lerp(Keys[index].W, Keys[index + 1].W, weight),
+                X = AnimationInterpolationHelper.Lerp(fterm, ftime, Keys[index].X, Keys[index + 1].X),
+                Y = AnimationInterpolationHelper.Lerp(fterm, ftime, Keys[index].Y, Keys[index + 1].Y),
+                Z = AnimationInterpolationHelper.Lerp(fterm, ftime, Keys[index].Z, Keys[index + 1].Z),
+                W = AnimationInterpolationHelper.Lerp(fterm, ftime, Keys[index].W, Keys[index + 1].W),
             };
         }
     }
