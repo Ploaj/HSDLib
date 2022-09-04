@@ -45,31 +45,31 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
 
         [DisplayName("Use Constant Color"), Category("Material Flags"), Description("")]
-        public bool ConstantColor { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.CONSTANT, value); }
+        public bool ConstantColor { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.CONSTANT); set => DOBJ.Mobj.SetFlag(RENDER_MODE.CONSTANT, value); }
 
         [DisplayName("Use Vertex Color"), Category("Material Flags"), Description("Note: Melee is unable to use both vertex colors and diffuse lighting")]
-        public bool VertexColor { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.VERTEX); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.VERTEX, value); }
+        public bool VertexColor { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.VERTEX); set => DOBJ.Mobj.SetFlag(RENDER_MODE.VERTEX, value); }
 
 
         [DisplayName("Enable Diffuse Shading"), Category("Material Flags"), Description("Note: Melee is unable to use both vertex colors and diffuse lighting")]
-        public bool EnableDiffuse { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.DIFFUSE, value); }
+        public bool EnableDiffuse { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE); set => DOBJ.Mobj.SetFlag(RENDER_MODE.DIFFUSE, value); }
 
         [DisplayName("Enable Specular Shading"), Category("Material Flags"), Description("")]
-        public bool EnableSpecular { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.SPECULAR, value); }
+        public bool EnableSpecular { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR); set => DOBJ.Mobj.SetFlag(RENDER_MODE.SPECULAR, value); }
 
 
         [DisplayName("Shadow"), Category("Material Flags"), Description("Determines if this material is affected by shadows")]
-        public bool UseShadow { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.SHADOW); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.SHADOW, value); }
+        public bool UseShadow { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.SHADOW); set => DOBJ.Mobj.SetFlag(RENDER_MODE.SHADOW, value); }
 
 
         [DisplayName("ZMode Always"), Category("Material Flags"), Description("This object will draw overtop of other objects regardless of depth")]
-        public bool ZAlways { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.ZMODE_ALWAYS); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.ZMODE_ALWAYS, value); }
+        public bool ZAlways { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.ZMODE_ALWAYS); set => DOBJ.Mobj.SetFlag(RENDER_MODE.ZMODE_ALWAYS, value); }
 
         [DisplayName("No ZUpdate"), Category("Material Flags"), Description("This object will not update the depth buffer when drawn")]
-        public bool NoZupdate { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.NO_ZUPDATE, value); }
+        public bool NoZupdate { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE); set => DOBJ.Mobj.SetFlag(RENDER_MODE.NO_ZUPDATE, value); }
 
         [DisplayName("Has Transparency"), Category("Material Flags"), Description("Indicates this material has transparent elements")]
-        public bool XLU { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU); set => DOBJ.Mobj.ClearFlag(RENDER_MODE.XLU, value); }
+        public bool XLU { get => DOBJ.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU); set => DOBJ.Mobj.SetFlag(RENDER_MODE.XLU, value); }
 
         //TOON = (1 << 12),
         //ALPHA_COMPAT = (0 << 13),

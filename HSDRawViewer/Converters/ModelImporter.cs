@@ -15,6 +15,7 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -115,19 +116,21 @@ namespace HSDRawViewer.Converters
         {
             var model = ImportModelFromFile();
 
-            if (JointTreeIsSimilar(toReplace, model))
-            {
-                if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
-                    "Preserve the current model's skeleton?\n" +
-                    "(Recommended for online play)",
-                    "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    ReplaceWithBonesFromFile(toReplace, model);
-                }
-            }
-
             if (model != null)
+            {
+                if (JointTreeIsSimilar(toReplace, model))
+                {
+                    if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
+                        "Preserve the current model's skeleton?\n" +
+                        "(Recommended for online play)",
+                        "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        ReplaceWithBonesFromFile(toReplace, model);
+                    }
+                }
+
                 toReplace._s.SetFromStruct(model._s);
+            }
         }
 
 
@@ -455,8 +458,10 @@ namespace HSDRawViewer.Converters
 
             // determine parent
             HSD_JOBJ parent = rootnode;
-            if (mesh.ParentBone != null && NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
-                parent = NameToJOBJ[mesh.ParentBone.Name];
+            //if (mesh.ParentBone != null && NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
+            //    parent = NameToJOBJ[mesh.ParentBone.Name];
+            if (settings.SingleBindJoint != null && NameToJOBJ.ContainsKey(settings.SingleBindJoint))
+                parent = NameToJOBJ[settings.SingleBindJoint];
 
             Console.WriteLine("Processing " + mesh.Name);
 
@@ -679,7 +684,7 @@ namespace HSDRawViewer.Converters
                         weightList.Add(weight.ToArray());
 
                         // invert single binds
-                        if (v.Envelope.Weights.Count == 1)
+                        if (v.Envelope.Weights.Count == 1 && parent == rootnode)
                         {
                             var inv = jobjToWorldTransform[NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
                             tkvert = Vector3.TransformPosition(tkvert, inv);
@@ -771,10 +776,124 @@ namespace HSDRawViewer.Converters
 
             }
 
+            // generate dummy 
+            if (root == null && settings.IsDummy)
+                root = CreateDummyDObj();
+
+            // force texture count
+            if (root != null && settings.ForceTextureCount >= 0)
+                ForceTextureCount(root, settings.ForceTextureCount);
+
+            // add to list
             if (parent.Dobj == null)
                 parent.Dobj = root;
             else
                 parent.Dobj.Add(root);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private HSD_DOBJ CreateDummyDObj()
+        {
+            var dobj = new HSD_DOBJ()
+            {
+                Mobj = new HSD_MOBJ()
+                {
+                    RenderFlags = RENDER_MODE.CONSTANT,
+                    Material = new HSD_Material()
+                    {
+                        DiffuseColor = Color.White,
+                        SpecularColor = Color.White,
+                        AmbientColor = Color.White,
+                        Shininess = 50
+                    }
+                }
+            };
+
+            return dobj;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ForceTextureCount(HSD_DOBJ dobj, int forceTextureCount)
+        {
+            // get current texture count
+            var texCount = dobj.Mobj.Textures != null ? dobj.Mobj.Textures.List.Count : 0;
+
+            // texture count is perfect
+            if (texCount == forceTextureCount)
+                return;
+
+            // too many textures
+            if (texCount > forceTextureCount)
+            {
+                for (int i = 0; i < texCount - forceTextureCount; i++)
+                {
+                    if (dobj.Mobj.Textures.Next == null)
+                        dobj.Mobj.Textures = null;
+                    else
+                        dobj.Mobj.Textures.RemoveLast();
+                }
+            }
+            else
+            // not enough textures
+            {
+                for (int i = 0; i < forceTextureCount - texCount; i++)
+                {
+                    var tobj = CreateDummyTObj();
+                    if (dobj.Mobj.Textures == null)
+                        dobj.Mobj.Textures = tobj;
+                    else
+                        dobj.Mobj.Textures.Add(tobj);
+                }
+            }
+
+            // update flags
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX0, forceTextureCount >= 0);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX1, forceTextureCount >= 1);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX2, forceTextureCount >= 2);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX3, forceTextureCount >= 3);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX4, forceTextureCount >= 4);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX5, forceTextureCount >= 5);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX6, forceTextureCount >= 6);
+            dobj.Mobj.SetFlag(RENDER_MODE.TEX7, forceTextureCount >= 7);
+
+            // optimize textures
+            dobj.Mobj.Textures.Optimize();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private HSD_TOBJ CreateDummyTObj()
+        {
+            return new HSD_TOBJ()
+            {
+                MagFilter = GXTexFilter.GX_LINEAR,
+                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
+                RepeatT = 1,
+                RepeatS = 1,
+                WrapS = GXWrapMode.CLAMP,
+                WrapT = GXWrapMode.CLAMP,
+                ColorOperation = COLORMAP.PASS,
+                AlphaOperation = ALPHAMAP.PASS,
+                SX = 1,
+                SY = 1,
+                SZ = 1,
+                GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0,
+                Blending = 1,
+                ImageData = new HSD_Image()
+                {
+                    Format = GXTexFmt.I4,
+                    Width = 8,
+                    Height = 8,
+                    ImageData = new byte[32]
+                }
+            };
         }
 
         /// <summary>

@@ -85,7 +85,7 @@ namespace HSDRaw.Common
 
         public HSD_PEDesc PEDesc { get => _s.GetReference<HSD_PEDesc>(0x14); set => _s.SetReference(0x14, value); }
 
-        public void ClearFlag(RENDER_MODE flag, bool enable)
+        public void SetFlag(RENDER_MODE flag, bool enable)
         {
             if (enable)
                 RenderFlags |= flag;

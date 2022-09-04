@@ -12,7 +12,7 @@ namespace HSDRaw.Tools
     /// </summary>
     public class POBJ_Generator
     {
-        public GXCompType VertexColorFormat { get; set; } = GXCompType.RGB565;
+        public GXCompType VertexColorFormat { get; set; } = (GXCompType)GXCompTypeClr.RGB565;
 
         public bool UseTriangleStrips { get; set; } = true;
 
@@ -68,7 +68,7 @@ namespace HSDRaw.Tools
                     {
                         AttributeName = names[i],
                         AttributeType = GXAttribType.GX_DIRECT,
-                        CompType = GXCompType.RGB565,
+                        CompType = (GXCompType)GXCompTypeClr.RGB565,
                         Stride = 4,
                         CompCount = GXCompCnt.ClrRGB
                     };
@@ -79,10 +79,10 @@ namespace HSDRaw.Tools
 
                         switch (attr.CompType)
                         {
-                            case GXCompType.RGBA6:
-                            case GXCompType.RGBA8:
-                            case GXCompType.RGBA4:
-                            case GXCompType.RGBX8:
+                            case (GXCompType)GXCompTypeClr.RGBA6:
+                            case (GXCompType)GXCompTypeClr.RGBA8:
+                            case (GXCompType)GXCompTypeClr.RGBA4:
+                            case (GXCompType)GXCompTypeClr.RGBX8:
                                 attr.CompCount = GXCompCnt.ClrRGBA;
                                 break;
                         }

@@ -89,10 +89,10 @@ namespace HSDRaw.Tools
                     break;
                 case GXAttribName.GX_VA_CLR0:
                 case GXAttribName.GX_VA_CLR1:
-                    if (attr.CompType == GXCompType.RGBA4 ||
-                        attr.CompType == GXCompType.RGBA6 ||
-                        attr.CompType == GXCompType.RGBA8 ||
-                        attr.CompType == GXCompType.RGBX8)
+                    if (attr.CompType == (GXCompType)GXCompTypeClr.RGBA4 ||
+                        attr.CompType == (GXCompType)GXCompTypeClr.RGBA6 ||
+                        attr.CompType == (GXCompType)GXCompTypeClr.RGBA8 ||
+                        attr.CompType == (GXCompType)GXCompTypeClr.RGBX8)
                         attr.CompCount = GXCompCnt.ClrRGBA;
                     else
                         attr.CompCount = GXCompCnt.ClrRGB;
@@ -109,7 +109,7 @@ namespace HSDRaw.Tools
                 foreach(var val in v)
                 {
                     max = Math.Max(max, Math.Abs(val));
-                    if (val< 0)
+                    if (val < 0)
                         signed = true;
                 }
             }
@@ -122,7 +122,9 @@ namespace HSDRaw.Tools
             byte shortScale = 1;
             byte ushortScale = 1;
 
-            while (max != 0 && max * Math.Pow(2, scale) < ushort.MaxValue && scale < byte.MaxValue)
+            while (max != 0 && 
+                max * Math.Pow(2, scale) < ushort.MaxValue && 
+                scale < byte.MaxValue)
             {
                 var val = max * Math.Pow(2, scale);
                 if (val < byte.MaxValue)
@@ -137,24 +139,20 @@ namespace HSDRaw.Tools
                 scale++;
             }
 
+            // check byte error
             double error = 0;
-            if (!signed)
-            // byte or ushort
-            {
-                foreach (float[] v in values)
-                    foreach (var val in v)
-                        error = Math.Max(error, (byte)(val * Math.Pow(2, byteScale)) / Math.Pow(2, byteScale));
-            }
-            else
-            // sbyte or short
-            {
-                foreach (float[] v in values)
-                    foreach (var val in v)
-                        error = (sbyte)(val * Math.Pow(2, sbyteScale)) / Math.Pow(2, sbyteScale);
-            }
+            foreach (float[] v in values)
+                foreach (var val in v)
+                {
+                    if (!signed)
+                        error = Math.Max(error, val - ((byte)(val * Math.Pow(2, byteScale)) / Math.Pow(2, byteScale)));
+                    else
+                        error = Math.Max(error, val - ((sbyte)(val * Math.Pow(2, sbyteScale)) / Math.Pow(2, sbyteScale)));
+                }
+            
 
 
-            if (Math.Abs(max - error) < Epsilon)
+            if (error < Epsilon)
             {
                 if (signed)
                 {
@@ -180,21 +178,21 @@ namespace HSDRaw.Tools
                     attr.Scale = ushortScale;
                 }
 
-                //// make sure error is acceptable
-                //error = 0;
-                //foreach (float[] v in values)
-                //    foreach (var val in v)
-                //        if (signed)
-                //            error = (short)(val * Math.Pow(2, shortScale)) / Math.Pow(2, shortScale);
-                //        else
-                //            error = (ushort)(val * Math.Pow(2, ushortScale)) / Math.Pow(2, ushortScale);
+                // make sure error is acceptable
+                error = 0;
+                foreach (float[] v in values)
+                    foreach (var val in v)
+                        if (signed)
+                            error = Math.Max(error, val - ((short)(val * Math.Pow(2, shortScale)) / Math.Pow(2, shortScale)));
+                        else
+                            error = Math.Max(error, val - ((ushort)(val * Math.Pow(2, ushortScale)) / Math.Pow(2, ushortScale)));
 
-                //// if error is still too large then use float type
-                //if (Math.Abs(max - error) >= Epsilon)
-                //{
-                //    attr.CompType = GXCompType.Float;
-                //    attr.Scale = 1;
-                //}
+                // if error is still too large then use float type
+                if (error >= Epsilon)
+                {
+                    attr.CompType = GXCompType.Float;
+                    attr.Scale = 0;
+                }
             }
 
             // set index type
@@ -204,7 +202,9 @@ namespace HSDRaw.Tools
             
             // calculate stride
             attr.Stride = AttributeStride(attr);
-            
+
+            // print picked compression
+            System.Diagnostics.Debug.WriteLine($"{attr.AttributeName} {attr.CompType} {attr.Scale}");
         }
 
         /// <summary>
@@ -231,14 +231,14 @@ namespace HSDRaw.Tools
                 case GXAttribName.GX_VA_CLR1:
                     switch (type)
                     {
-                        case GXCompType.RGBA4:
-                        case GXCompType.RGB565:
+                        case (GXCompType)GXCompTypeClr.RGBA4:
+                        case (GXCompType)GXCompTypeClr.RGB565:
                             return 2;
-                        case GXCompType.RGB8:
-                        case GXCompType.RGBA6:
+                        case (GXCompType)GXCompTypeClr.RGB8:
+                        case (GXCompType)GXCompTypeClr.RGBA6:
                             return 3;
-                        case GXCompType.RGBX8:
-                        case GXCompType.RGBA8:
+                        case (GXCompType)GXCompTypeClr.RGBX8:
+                        case (GXCompType)GXCompTypeClr.RGBA8:
                             return 4;
                         default:
                             return 0;
@@ -356,7 +356,7 @@ namespace HSDRaw.Tools
                     Writer.Write((short)Scaled);
                     break;
                 case GXCompType.Float:
-                    Writer.Write(Scaled);
+                    Writer.Write((float)Scaled);
                     break;
                 default:
                     Writer.Write((byte)Scaled);

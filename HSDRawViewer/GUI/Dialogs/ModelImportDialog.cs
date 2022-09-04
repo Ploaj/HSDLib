@@ -40,7 +40,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             public MeshImportSettings settings { get; internal set; }
 
-            public MeshItem( IOMesh mesh)
+            public MeshItem(IOMesh mesh)
             {
                 Text = mesh.Name;
                 settings = new MeshImportSettings(mesh);
@@ -160,6 +160,8 @@ namespace HSDRawViewer.GUI.Extra
                     hasVertexAlpha = true;
                 
             }
+            if (meshList.Items.Count > 0)
+                meshList.Items[0].Selected = true;
             // selectAllMesh_Click(null, null);
 
             // fill material list
@@ -216,6 +218,26 @@ namespace HSDRawViewer.GUI.Extra
         {
             public MeshImportSettings[] meshes;
             public MaterialImportSettings[] materials;
+
+            public int[] highpoly;
+            public int[] lowpoly;
+            public int[] metalpoly;
+
+            public MeshPosition[] positions;
+            public DobjInfo[] objects;
+        }
+
+        private class MeshPosition
+        {
+            public string Name;
+            public int Position;
+        }
+
+        private class DobjInfo
+        {
+            public int Position;
+            public int Count;
+            public int Joint;
         }
 
         /// <summary>
@@ -257,29 +279,186 @@ namespace HSDRawViewer.GUI.Extra
 
                 SettingsExport export =  (SettingsExport)deserializer.Deserialize<SettingsExport>(File.ReadAllText(f));
 
-                var meshes = export.meshes.ToList();
-                var materials = export.materials.ToList();
-
-                foreach (MeshItem m in meshList.Items)
+                // apply mesh settings
+                if (export.meshes != null)
                 {
-                    var mesh = meshes.Find(e => e.Name.Equals(m.settings.Name));
-
-                    if (mesh != null)
+                    var meshes = export.meshes.ToList();
+                    foreach (MeshItem m in meshList.Items)
                     {
-                        mesh._poly = m.settings._poly;
-                        m.settings = mesh;
+                        var mesh = meshes.Find(e => e.Name.Equals(m.settings.Name));
+
+                        if (mesh != null)
+                        {
+                            mesh._poly = m.settings._poly;
+                            m.settings = mesh;
+                        }
                     }
                 }
-                foreach (MaterialItem m in materialList.Items)
-                {
-                    var mesh = materials.Find(e => e.Name.Equals(m.settings.Name));
 
-                    if (mesh != null)
+                // apply material settings
+                if (export.materials != null)
+                {
+                    var materials = export.materials.ToList();
+                    foreach (MaterialItem m in materialList.Items)
                     {
-                        mesh._material = m.settings._material;
-                        m.settings = mesh;
+                        var mesh = materials.Find(e => e.Name.Equals(m.settings.Name));
+
+                        if (mesh != null)
+                        {
+                            mesh._material = m.settings._material;
+                            m.settings = mesh;
+                        }
                     }
                 }
+
+                // apply order settings
+                int total = 0;
+                if (export.highpoly != null)
+                    total = Math.Max(total, export.highpoly.Max());
+                if (export.lowpoly != null)
+                    total = Math.Max(total, export.lowpoly.Max());
+                if (export.metalpoly != null)
+                    total = Math.Max(total, export.metalpoly.Max());
+                if (export.positions != null)
+                    total = Math.Max(total, export.positions.Max(e=>e.Position));
+                if (export.objects != null)
+                    total = Math.Max(total, export.objects.Max(e => e.Position));
+
+                // 
+                if (total != 0)
+                {
+                    // index starts at 0 so add 1
+                    total += 1;
+
+                    // gather set positions
+                    Dictionary<int, IOMesh> SetPositions = new Dictionary<int, IOMesh>();
+                    if (export.positions != null)
+                    {
+                        foreach (var i in export.positions)
+                        {
+                            var mesh = _model.Meshes.Find(e => e.Name.Equals(i.Name));
+
+                            if (mesh != null && !SetPositions.ContainsKey(i.Position))
+                            {
+                                _model.Meshes.Remove(mesh);
+                                SetPositions.Add(i.Position, mesh);
+                            }
+                        }
+                    }
+
+                    // gather low and high polys
+                    var high = _model.Meshes.Where(e => !e.Name.Contains("LOW")).ToList();
+                    var low = _model.Meshes.Where(e => e.Name.Contains("LOW")).ToList();
+
+                    // reorder mesh list to account for poly indices
+                    List<IOMesh> newList = new List<IOMesh>();
+                    List<IOMesh> dummies = new List<IOMesh>();
+                    int highIndex = 0;
+                    int lowIndex = 0;
+                    for (int i = 0; i < total; i++)
+                    {
+                        IOMesh current = null;
+
+                        // check for set position
+                        if (SetPositions.ContainsKey(i))
+                        {
+                            current = SetPositions[i];
+                        }
+                        // skip positions that have texture count 0
+                        else if (export.objects != null && export.objects.Any(e => e.Position == i && e.Count == 0))
+                        {
+                            current = new IOMesh() { Name = "Dummy" };
+                            dummies.Add(current);
+                        }
+                        else
+                        // if this is high poly spot add actual mesh
+                        if (export.highpoly != null && export.highpoly.Any(e => e == i) && highIndex < high.Count)
+                        {
+                            current = high[highIndex];
+                            highIndex++;
+                        }
+                        else
+                        // if this is low poly spot add actual mesh
+                        if (export.lowpoly != null && export.lowpoly.Any(e => e == i) && lowIndex < low.Count)
+                        {
+                            current = low[lowIndex];
+                            lowIndex++;
+                        }
+                        else
+                        {
+                            // otherwise add dummy mesh
+                            current = new IOMesh() { Name = "Dummy" };
+                            dummies.Add(current);
+                        }
+
+                        // apply reflective flag if in reflective slot
+                        if (current != null)
+                        {
+                            newList.Add(current);
+
+                            if (export.metalpoly != null && export.metalpoly.Any(e => e == i) && !current.Name.Contains("REFLECTIVE2"))
+                                current.Name += "_REFLECTIVE2";
+                        }
+                    }
+
+                    // account for missing slots by just appending them
+                    for (int i = highIndex; i < high.Count; i++)
+                        newList.Add(high[i]);
+                    for (int i = lowIndex; i < low.Count; i++)
+                        newList.Add(low[i]);
+
+                    if (highIndex < high.Count || lowIndex < low.Count)
+                    {
+                        MessageBox.Show("The imported model has more high or low polygons than the settings allow.\nThis may cause issues with some models.", "Too Many Polygons", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+
+                    // gether mesh items as a list
+                    List<MeshItem> meshItems = new List<MeshItem>();
+                    foreach (MeshItem m in meshList.Items)
+                        meshItems.Add(m);
+
+                    // add settings for dummy
+                    foreach (var d in dummies)
+                        meshItems.Add(new MeshItem(d)
+                        {
+                            settings = new MeshImportSettings()
+                            {
+                                IsDummy = true,
+                                ForceTextureCount = 1,
+                                _poly = d
+                            }
+                        });
+
+                    // remove single binds as they will alter the order of mesh
+                    foreach (var m in meshItems)
+                        m.settings.SingleBind = false;
+
+                    // sort to match new list order
+                    meshItems = meshItems.OrderBy(e=>newList.IndexOf(e.settings._poly)).ToList();
+
+                    // force texture counts
+                    if (export.objects != null)
+                    {
+                        foreach (var i in export.objects)
+                        {
+                            if (i.Position < meshItems.Count)
+                            {
+                                meshItems[i.Position].settings.ForceTextureCount = i.Count;
+                                meshItems[i.Position].settings.SingleBindJoint = _model.Skeleton.GetBoneByIndex(i.Joint).Name;
+                            }
+                        }
+                    }
+
+                    // add mesh items
+                    meshList.Items.Clear();
+                    foreach (var a in meshItems)
+                        meshList.Items.Add(a);
+
+                    // set new mesh list in model
+                    _model.Meshes.Clear();
+                    _model.Meshes.AddRange(newList);
+                }
+
             }
         }
 

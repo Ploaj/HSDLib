@@ -57,6 +57,10 @@ namespace HSDRawViewer.Converters
         [Category("4. Additional Options"), DisplayName("Flip Normals"), Description("Flips direction of normals, useful if model is all black with textures")]
         public bool InvertNormals { get; set; } = false;
 
+        public bool IsDummy = false;
+
+        public int ForceTextureCount = -1;
+
 
         /// <summary>
         /// 

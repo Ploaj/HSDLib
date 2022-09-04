@@ -145,39 +145,39 @@ namespace HSDRaw.GX
             // TODO: are these in the right order?
             switch (CompType)
             {
-                case GXCompType.RGB565:
+                case (GXCompType)GXCompTypeClr.RGB565:
                     var pixel = accessor._s.GetInt16(offset);
                     c[0] = ((((pixel >> 0) & 0x1F) << 3) & 0xff) / 255f;
                     c[1] = ((((pixel >> 5) & 0x3F) << 2) & 0xff) / 255f;
                     c[2] = ((((pixel >> 11) & 0x1F) << 3) & 0xff) / 255f;
                     c[3] = 1;
                     break;
-                case GXCompType.RGB8:
+                case (GXCompType)GXCompTypeClr.RGB8:
                     c[0] = accessor._s.GetByte(offset) / 255f;
                     c[1] = accessor._s.GetByte(offset + 1) / 255f;
                     c[2] = accessor._s.GetByte(offset + 2) / 255f;
                     c[3] = 1;
                     break;
-                case GXCompType.RGBA4:
+                case (GXCompType)GXCompTypeClr.RGBA4:
                     c[0] = (accessor._s.GetByte(offset) >> 4) * 16 / 255f;
                     c[1] = (accessor._s.GetByte(offset) & 0xF) * 16 / 255f;
                     c[2] = (accessor._s.GetByte(offset + 1) >> 4) * 16 / 255f;
                     c[3] = (accessor._s.GetByte(offset + 1) & 0xF) * 16 / 255f;
                     break;
-                case GXCompType.RGBA6: //TODO: this is approximate
+                case (GXCompType)GXCompTypeClr.RGBA6: //TODO: this is approximate
                     var p = accessor._s.GetInt32(offset) & 0xFFFFFF;
                     c[0] = ((p >> 18) & 0x3F) / 0x3F;
                     c[1] = ((p >> 12) & 0x3F) / 0x3F;
                     c[2] = ((p >> 6) & 0x3F) / 0x3F;
                     c[3] = ((p) & 0x3F) / 0x3F;
                     break;
-                case GXCompType.RGBA8:
+                case (GXCompType)GXCompTypeClr.RGBA8:
                     c[0] = accessor._s.GetByte(offset) / 255f;
                     c[1] = accessor._s.GetByte(offset + 1) / 255f;
                     c[2] = accessor._s.GetByte(offset + 2) / 255f;
                     c[3] = accessor._s.GetByte(offset + 3) / 255f;
                     break;
-                case GXCompType.RGBX8:
+                case (GXCompType)GXCompTypeClr.RGBX8:
                     c[0] = accessor._s.GetByte(offset) / 255f;
                     c[1] = accessor._s.GetByte(offset + 1) / 255f;
                     c[2] = accessor._s.GetByte(offset + 2) / 255f;

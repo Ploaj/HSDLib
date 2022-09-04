@@ -156,31 +156,31 @@ namespace HSDRaw.GX
         {
             switch (type)
             {
-                case GXCompType.RGB565: // GX_RGB565
+                case (GXCompType)GXCompTypeClr.RGB565: // GX_RGB565
                     d.Write((short)ClrTo565(clr));
                     break;
-                case GXCompType.RGB8: // GX_RGB888
+                case (GXCompType)GXCompTypeClr.RGB8: // GX_RGB888
                     d.Write(clr[0]);
                     d.Write(clr[1]);
                     d.Write(clr[2]);
                     break;
-                case GXCompType.RGBX8: // GX_RGBX888
+                case (GXCompType)GXCompTypeClr.RGBX8: // GX_RGBX888
                     d.Write(clr[0]);
                     d.Write(clr[1]);
                     d.Write(clr[2]);
                     d.Write(clr[3]);
                     break;
-                case GXCompType.RGBA4: // GX_RGBA4
+                case (GXCompType)GXCompTypeClr.RGBA4: // GX_RGBA4
                     short s = (short)((((clr[0] >> 4) & 0xF) << 12) | (((clr[1] >> 4) & 0xF) << 8) | (((clr[2] >> 4) & 0xF) << 4) | (((clr[3] >> 4) & 0xF)));
                     d.Write((ushort)s);
                     break;
-                case GXCompType.RGBA6: // GX_RGBA6
+                case (GXCompType)GXCompTypeClr.RGBA6: // GX_RGBA6
                     int three = (((clr[0] >> 2) << 18) | ((clr[1] >> 2) << 12) | ((clr[2] >> 2) << 6) | (clr[3] >> 2));
                     d.Write((byte)((three >> 16) & 0xFF));
                     d.Write((byte)((three >> 8) & 0xFF));
                     d.Write((byte)((three) & 0xFF));
                     break;
-                case GXCompType.RGBA8: // GX_RGBa888
+                case (GXCompType)GXCompTypeClr.RGBA8: // GX_RGBa888
                     d.Write(clr[0]);
                     d.Write(clr[1]);
                     d.Write(clr[2]);

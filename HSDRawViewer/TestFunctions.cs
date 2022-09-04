@@ -321,5 +321,121 @@ namespace HSDRawViewer
                 ftfile.Save(ftdat);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="outputPath"></param>
+        /// <param name="ftdat"></param>
+        /// <param name="ftnr"></param>
+        /// <param name="costumeIndex"></param>
+        public static void GenerateYml(string outputPath, string ftdat, string ftnr, int costumeIndex)
+        {
+            var f = new HSDRaw.HSDRawFile(ftdat).Roots[0].Data as HSDRaw.Melee.Pl.SBM_FighterData;
+            var joint = new HSDRaw.HSDRawFile(ftnr).Roots[0].Data as HSDRaw.Common.HSD_JOBJ;
+
+            using (var s = new System.IO.FileStream(outputPath, System.IO.FileMode.Create))
+            using (var w = new System.IO.StreamWriter(s))
+            {
+                // determine high poly indices
+                w.WriteLine("highpoly:");
+                foreach (var i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].HighPoly[0].LookupEntries[0].Entries)
+                    w.WriteLine("- " + i);
+
+                // determine low poly indices
+                w.WriteLine("lowpoly:");
+                foreach (var i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].LowPoly[0].LookupEntries[0].Entries)
+                    w.WriteLine("- " + i);
+
+                // determine metal poly indices
+                w.WriteLine("metalpoly:");
+                if (f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel != null &&
+                    f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel[0].LookupEntries != null)
+                    foreach (var i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel[0].LookupEntries[0].Entries)
+                        w.WriteLine("- " + i);
+
+                // determine texture counts
+                var tobjIndexToDobjIndex = new System.Collections.Generic.Dictionary<int, int>();
+                w.WriteLine("objects:");
+                int di = 0;
+                int tobji = 0;
+                var jointList = joint.ToList;
+                foreach (var j in joint.ToList)
+                {
+                    if (j.Dobj != null)
+                    {
+                        foreach (var dobj in j.Dobj.List)
+                        {
+                            var texCount = (dobj.Mobj.Textures == null ? 0 : dobj.Mobj.Textures.List.Count);
+                            w.WriteLine($"- position: {di}");
+                            w.WriteLine($"  count: {texCount}");
+                            w.WriteLine($"  joint: {jointList.IndexOf(j)}");
+                            for (int i = tobji; i < tobji + texCount; i++)
+                                tobjIndexToDobjIndex.Add(i, di);
+                            tobji += texCount;
+                            di++;
+                        }
+                    }
+                }
+
+                // determine specail positions
+                w.WriteLine("positions:");
+                {
+                    int pi = 0;
+                    foreach (var p in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].HighPoly.Array)
+                    {
+                        int ti = 0;
+                        if (p.LookupEntries != null)
+                            foreach (var t in p.LookupEntries.Array)
+                            {
+                                int ei = 0;
+                                if (ti != 0)
+                                    foreach (var i in t.Entries)
+                                    {
+                                        w.WriteLine($"- name: Object_{pi}_{ti}_{ei}");
+                                        w.WriteLine($"  position: {i}");
+                                        ei++;
+                                    }
+                                ti++;
+                            }
+                        pi++;
+                    }
+                }
+                {
+                    int pi = 0;
+                    foreach (var p in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].LowPoly.Array)
+                    {
+                        int ti = 0;
+                        if (p.LookupEntries != null)
+                            foreach (var t in p.LookupEntries.Array)
+                            {
+                                int ei = 0;
+                                if (ti != 0)
+                                    foreach (var i in t.Entries)
+                                    {
+                                        w.WriteLine($"- name: Object_{pi}_{ti}_{ei}_LOW");
+                                        w.WriteLine($"  position: {i}");
+                                        ei++;
+                                    }
+                                ti++;
+                            }
+                        pi++;
+                    }
+                }
+
+                // determine mat anim texture indices
+                if (f.ModelLookupTables.CostumeMaterialLookups != null && f.ModelLookupTables.CostumeMaterialLookups[costumeIndex].Entries != null)
+                {
+                    int mi = 0;
+                    foreach (var i in f.ModelLookupTables.CostumeMaterialLookups[costumeIndex].Entries.Array)
+                    {
+                        w.WriteLine($"- name: MatAnim_{mi}");
+                        w.WriteLine($"  position: {tobjIndexToDobjIndex[i]}");
+                        mi++;
+                    }
+                }
+
+            }
+        }
     }
 }

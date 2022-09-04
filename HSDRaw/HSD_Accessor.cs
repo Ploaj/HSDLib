@@ -278,6 +278,20 @@ namespace HSDRaw
                 Next.Add(t);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void RemoveLast()
+        {
+            if (Next == null)
+                return;
+
+            if (Next.Next == null)
+                Next = Next.Next;
+            else
+                Next.RemoveLast();
+        }
     }
 
     /// <summary>

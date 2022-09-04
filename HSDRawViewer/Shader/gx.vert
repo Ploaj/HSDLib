@@ -127,6 +127,11 @@ void main()
 			vweights[i] = weights[matrixIndex * MAX_WEIGHTS + i];
 		}
 		
+		// always transform by parent
+		pos = singleBind * pos;
+		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
+		
+
 		// single bind optimization
 		if(isSkeleton == 1 && vweights[0] == 1.0)
 		{

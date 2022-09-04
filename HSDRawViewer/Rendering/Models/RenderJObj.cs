@@ -502,7 +502,7 @@ namespace HSDRawViewer.Rendering.Models
             JOBJ_FLAG jointFlags = dobj.Parent.Desc.Flags;
 
             // setup skeleton flag
-            _shader.SetBoolToInt("isSkeleton", jointFlags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) || jointFlags.HasFlag(JOBJ_FLAG.SKELETON));
+            _shader.SetBoolToInt("isSkeleton", jointFlags.HasFlag(JOBJ_FLAG.SKELETON_ROOT));// || jointFlags.HasFlag(JOBJ_FLAG.SKELETON));
 
             // setup single bind
             Matrix4 single = dobj.Parent.WorldTransform;
