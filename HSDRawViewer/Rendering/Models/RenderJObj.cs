@@ -813,6 +813,9 @@ namespace HSDRawViewer.Rendering.Models
             if (RootJObj == null)
                 return;
 
+            if (_shader == null)
+                return;
+
             // update selected bone
             _shader.SelectedBone = RootJObj.GetIndexOfDesc(SelectedJObj);
 

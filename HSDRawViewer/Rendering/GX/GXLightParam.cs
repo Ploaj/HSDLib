@@ -56,7 +56,7 @@ namespace HSDRawViewer.Rendering.GX
         /// 
         /// </summary>
         /// <param name="shader"></param>
-        public void Bind(Shader shader)
+        public void Bind(Camera cam, Shader shader)
         {
             shader.SetFloat("saturate", Saturation);
 
@@ -64,7 +64,14 @@ namespace HSDRawViewer.Rendering.GX
 
             shader.SetBoolToInt("light.useCamera", UseCameraLight);
 
-            shader.SetVector3("light.position", LightX, LightY, LightZ);
+            if (UseCameraLight)
+            {
+                shader.SetVector3("light.position", cam.TransformedPosition);
+            }
+            else
+            {
+                shader.SetVector3("light.position", LightX, LightY, LightZ);
+            }
 
             shader.SetColor("light.ambient", AmbientColor, 1);
             shader.SetFloat("light.ambientPower", AmbientPower);

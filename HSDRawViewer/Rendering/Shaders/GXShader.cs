@@ -20,6 +20,7 @@ namespace HSDRawViewer.Rendering.Shaders
 
         public GXShader()
         {
+            LoadShader(@"Shader\gx_material.frag", ShaderType.VertexShader);
             LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.vert"));
             LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_uv.frag"));
             LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_lightmap.frag"));
@@ -49,7 +50,8 @@ namespace HSDRawViewer.Rendering.Shaders
             GL.UniformMatrix4(GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
 
             // set camera position
-            var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
+            //var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
+            var campos = camera.TransformedPosition; // Vector4.TransformRow(new Vector4(0, 0, 0, 1), camera.ModelViewMatrix.Inverted());
             SetVector3("cameraPos", campos);
 
             // create sphere matrix
@@ -66,7 +68,7 @@ namespace HSDRawViewer.Rendering.Shaders
             SetWorldTransformBones(WorldTransforms);
 
             // lighting
-            light.Bind(this);
+            light.Bind(camera, this);
 
             // fog
             fog.Bind(this);

@@ -283,6 +283,28 @@ namespace HSDRawViewer.Rendering
             LoadShaderBasedOnType(filePath);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="type"></param>
+        public void LoadShader(string filePath, ShaderType type)
+        {
+            switch (type)
+            {
+                case ShaderType.FragmentShader:
+                    AttachAndCompileShader(filePath, ShaderType.FragmentShader, programId, out fragShaderId);
+                    break;
+                case ShaderType.VertexShader:
+                    AttachAndCompileShader(filePath, ShaderType.VertexShader, programId, out vertShaderId);
+                    break;
+                case ShaderType.GeometryShader:
+                    AttachAndCompileShader(filePath, ShaderType.GeometryShader, programId, out geomShaderId);
+                    hasGeometryShader = true;
+                    break;
+            }
+        }
+
         // Compile and attach before linking.
         public void Link()
         {
@@ -326,6 +348,7 @@ namespace HSDRawViewer.Rendering
             {
                 MessageBox.Show("Shader Compile Error: " + error);
                 File.WriteAllText(type + "_error.txt", error);
+                System.Diagnostics.Debug.WriteLine(error);
             }
             //errorLog.AppendShaderInfoLog(shaderName, id, type);
         }

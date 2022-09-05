@@ -13,7 +13,10 @@ in vec3 vertPosition;
 in vec3 normal;
 in vec3 ntan;
 in vec3 bitan;
+
+in float lambert;
 in float spec;
+
 in vec2 texcoord[MAX_TEX];
 in vec4 vertexColor;
 flat in int vbones[MAX_WEIGHTS];
@@ -76,8 +79,9 @@ vec4 TexturePass(vec4 color, int pass_type);
 vec4 GetToonTexture();
 
 // material
-vec4 GetDiffuseMaterial(vec3 V, vec3 N);
-vec4 GetSpecularMaterial(vec3 V, vec3 N, float specular);
+uniform int perPixelLighting;
+float GetDiffuseMaterial(vec3 N, vec3 L);
+float GetSpecularMaterial(vec3 N, vec3 L, vec3 V);
 
 ///
 /// Algorithm from Chapter 16 of OpenGL Shading Language
@@ -106,29 +110,29 @@ void main()
 	vec4 diffusePass = TexturePass(vec4(diffuseColor.rgb, alpha * diffuseColor.a), PASS_DIFFUSE);
 	vec4 specularPass = TexturePass(specularColor, PASS_SPECULAR);
 
-	// calculate material
-	vec3 V = vertPosition - cameraPos;
-
-	if (light.useCamera == 0)
-		V = light.position;
-
-	V = normalize(V);
-	vec3 N = normalize(normal);
-
 	// get light values
-	vec4 diffuseMaterial = GetDiffuseMaterial(N, V);
-	vec4 specularMaterial = GetSpecularMaterial(N, V, spec);
+	float diffuseLamb = lambert;
+	float specularLamb = spec;
+	if (perPixelLighting == 1)
+	{
+		vec3 V = normalize(cameraPos - vertPosition);
+		vec3 L = normalize(light.position); // - vertPosition
+		diffuseLamb = GetDiffuseMaterial(normal, L);
+		specularLamb = GetSpecularMaterial(normalize(normal), L, V);
+	}
 
+	// get toon shading
+	vec3 diffMatColor = vec3(diffuseLamb);
 	if (useToonShading == 1)
 	{
-		diffuseMaterial = GetToonTexture();
-		specularMaterial = vec4(0);
+		diffMatColor = GetToonTexture().rgb;
+		specularLamb = 0;
 	}
 
 	// calculate fragment color
-	fragColor.rgb =  ambientPass.rgb * diffusePass.rgb * light.ambient.rgb * vec3(light.ambientPower)
-					+ diffusePass.rgb * diffuseMaterial.rgb * light.diffuse.rgb * vec3(light.diffusePower)
-					+ specularPass.rgb * specularMaterial.rgb;
+	fragColor.rgb = ambientPass.rgb	 * diffusePass.rgb     * light.ambient.rgb * vec3(light.ambientPower) + 
+					diffusePass.rgb  * diffMatColor   * light.diffuse.rgb * vec3(light.diffusePower) + 
+					specularPass.rgb * vec3(specularLamb);
 
 	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));
 	
@@ -150,7 +154,7 @@ void main()
 
 
 	// apply bump emboss map
-	fragColor *= GetBumpShading(V);
+	fragColor *= GetBumpShading(normalize(cameraPos - vertPosition));
 
 
 	// gx overlay
@@ -165,7 +169,7 @@ void main()
 	// debug render modes
 	switch(renderOverride)
 	{
-	case 1: fragColor = vec4(vec3(0.5) + N / 2, 1); break;
+	case 1: fragColor = vec4(vec3(0.5) + normal / 2, 1); break;
 	case 2: fragColor = vec4(normalize(ntan), 1); break;
 	case 3: fragColor = vec4(normalize(bitan), 1); break;
 	case 4: fragColor = vertexColor; break;
@@ -182,8 +186,8 @@ void main()
 	case 15: fragColor = diffusePass; break;
 	case 16: fragColor = specularPass; break;
 	case 17: fragColor = TexturePass(vec4(1), PASS_EXT); break;
-	case 18: fragColor = diffusePass * diffuseMaterial; break;
-	case 19: fragColor = specularPass * specularMaterial; break;
+	case 18: fragColor = diffusePass * vec4(diffMatColor, 1); break;
+	case 19: fragColor = specularPass * vec4(vec3(specularLamb), 1); break;
 	case 20: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < MAX_WEIGHTS ; i++)

@@ -25,9 +25,13 @@ out vec3 vertPosition;
 out vec3 normal;
 out vec3 ntan;
 out vec3 bitan;
+
+out float lambert;
 out float spec;
+
 out vec2 texcoord[MAX_TEX];
 out vec4 vertexColor;
+
 flat out int vbones[MAX_WEIGHTS];
 out float vweights[MAX_WEIGHTS];
 out float fogAmt;
@@ -53,6 +57,7 @@ uniform float shape_blend;
 
 uniform vec3 cameraPos;
 
+// material
 struct Light
 {
 	int useCamera;
@@ -61,19 +66,20 @@ struct Light
 	vec4 diffuse;
 	float ambientPower;
 	float diffusePower;
-};
-
+} ;
 uniform Light light;
 
-struct Fog
+float GetDiffuseMaterial(vec3 N, vec3 L);
+float GetSpecularMaterial(vec3 N, vec3 L, vec3 V);
+
+// fog
+uniform struct Fog
 {
 	int type;
 	float start;
 	float end;
 	vec4 color;
-};
-
-uniform Fog fog;
+} fog;
 
 ///
 ///
@@ -182,7 +188,6 @@ void main()
 	// raw outputs
 	posVA = GX_VA_POS;
 	vertPosition = pos.xyz;
-	normal = normalize(normal);
 
 	texcoord[0] = GX_VA_TEX0;
 	texcoord[1] = GX_VA_TEX1;
@@ -192,11 +197,12 @@ void main()
 	vertexColor = GX_VA_CLR0;
 	
 	// view lighting calculations
-	vec3 V = vertPosition - cameraPos;
-	if(light.useCamera == 0)
-		V = light.position;
-	V = normalize(V);
-    spec = clamp(dot(normal, V), 0, 1);
+	normal = normalize(normal);
+	vec3 V = normalize(cameraPos - vertPosition);
+	vec3 L = normalize(light.position); // - vertPosition
+	lambert = GetDiffuseMaterial(normal, L);
+	spec = GetSpecularMaterial(normal, L, V);
+
 
 	// final position
 	gl_Position = mvp * vec4(pos.xyz, 1);
