@@ -26,11 +26,38 @@ struct Light
 	int enabled;
 	int type;
 	vec3 position;
-
-	// common
+	vec3 direction;
 	vec3 color;
+	
+	int atten_enabled;
+	float a0;
+	float a1;
+	float a2;
+	float k0;
+	float k1;
+	float k2;
 };
 uniform Light light[MAX_LIGHT];
+
+
+float Atten(Light light, vec3 vert)
+{
+	if (light.atten_enabled == 0)
+		return 1.0;
+
+	vec3 direction = light.direction;
+	vec3 ldir = light.position - vert;
+	float dist2 = dot(ldir, ldir);
+	float dist = sqrt(dist2);
+	ldir /= dist;
+
+	float att = max(0.0, dot(ldir, direction));
+	
+	float a = max(0.0, light.a2 * (att * att) + light.a1 * att + light.a0);
+	float dnom = light.k2 * dist2 + light.k1 * dist + light.k0;
+
+	return a / dnom;
+}
 
 ///
 ///
@@ -51,6 +78,7 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 		// check if light is enabled and not ambient
 		if (light[i].enabled == 1)
 		{
+			// check if ambient light
 			if (light[i].type == LIGHT_AMBIENT)
 			{
 				amb += light[i].color;
@@ -63,11 +91,13 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 					L = normalize(light[i].position);
 				else
 					L = normalize(light[i].position - vert);
+
+				float atten = Atten(light[i], vert);
 			
 				// calculate light color
 				if (enableDiffuse == 1)
 				{
-					diff += vec3(clamp(dot(N, L), 0, 1)) * light[i].color;
+					diff += vec3(clamp(dot(N, L), 0, 1)) * light[i].color * atten;
 				}
 
 				// calculate specularColor
@@ -75,20 +105,9 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 				{
 					if (dot(N, L) >= 0.0)
 					{
-						spec += vec3(pow(max(0.0, dot(reflect(-L, N), V)), shinniness)) * light[i].color;
+						spec += vec3(pow(max(0.0, dot(reflect(-L, N), V)), shinniness)) * light[i].color * atten;
 					}
 				}
-			
-				// point light attenuation
-//				if (light[i].type == LIGHT_POINT)
-//				{
-//					float dis = length(light[0].position - vert);
-//
-//					float attenuation = 1.0 / (light[0].constant + light[0].linear * dis + 
-//  								 light[0].quadratic * (dis * dis)); 
-//				 
-//					diff  *= attenuation;
-//				}
 			}
 		}
 	}

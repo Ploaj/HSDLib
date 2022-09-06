@@ -1,4 +1,5 @@
-﻿using HSDRaw.Common.Animation;
+﻿using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Controls;
 using System;
 using System.Windows.Forms;
@@ -19,6 +20,8 @@ namespace HSDRawViewer.GUI.Plugins
                         type = GraphEditor.AnimType.Material;
                     if (par.Accessor is HSD_TexAnim)
                         type = GraphEditor.AnimType.Texture;
+                    if (par.Accessor is HSD_LightAnimPointer)
+                        type = GraphEditor.AnimType.Light;
                 }
 
                 if (value.Accessor is HSD_AOBJ aobj)

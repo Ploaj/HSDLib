@@ -514,7 +514,8 @@ namespace HSDRawViewer
                 || SelectedDataNode.Accessor is HSD_FogDesc
                 || SelectedDataNode.Accessor is HSD_Camera
                 || SelectedDataNode.Accessor is SBM_ModelPart
-                || SelectedDataNode.Accessor is SBM_PhysicsGroup)
+                || SelectedDataNode.Accessor is SBM_PhysicsGroup
+                || SelectedDataNode.Accessor is HSDNullPointerArrayAccessor<HSD_Light>)
             {
                 //foreach (var v in dockPanel.Contents)
                 {
@@ -537,6 +538,9 @@ namespace HSDRawViewer
 
                         if (SelectedDataNode.Accessor is HSD_FogDesc fog)
                             jedit.Editor.SetFog(fog);
+
+                        if (SelectedDataNode.Accessor is HSDNullPointerArrayAccessor<HSD_Light> lights)
+                            jedit.Editor.SetLights(lights.Array);
 
                         if (SelectedDataNode.Accessor is HSD_Camera camera)
                             jedit.Editor.SetCamera(camera);

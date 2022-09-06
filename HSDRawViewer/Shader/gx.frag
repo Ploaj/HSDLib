@@ -71,8 +71,7 @@ vec4 GetToonTexture();
 
 // material
 uniform int perPixelLighting;
-float GetDiffuseMaterial(vec3 N, vec3 L);
-float GetSpecularMaterial(vec3 N, vec3 L, vec3 V);
+void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff, inout vec3 spec);
 
 ///
 /// Algorithm from Chapter 16 of OpenGL Shading Language
@@ -97,13 +96,13 @@ void main()
 	}
 
 	// get light values
-//	if (perPixelLighting == 1)
-//	{
-//		vec3 V = normalize(cameraPos - vertPosition);
-//		vec3 L = normalize(light.position); // - vertPosition
-//		diffuseLamb = GetDiffuseMaterial(normal, L);
-//		specularLamb = GetSpecularMaterial(normalize(normal), L, V);
-//	}
+	vec3 finalAmbLight = ambientLight;
+	vec3 finalDiffLight = diffuseLight;
+	vec3 finalSpecLight = specularLight;
+	if (perPixelLighting == 1)
+	{
+		CalculateDiffuseShading(vertPosition, normalize(normal), finalAmbLight, finalDiffLight, finalSpecLight);
+	}
 
 	// get toon shading
 //	if (useToonShading == 1)
@@ -118,9 +117,9 @@ void main()
 	vec4 specularPass = TexturePass(specularColor, PASS_SPECULAR);
 
 	// calculate fragment color
-	fragColor.rgb = ambientPass.rgb	* diffusePass.rgb * ambientLight +
-					diffusePass.rgb * diffuseLight +
-					specularPass.rgb * specularLight;
+	fragColor.rgb = ambientPass.rgb	* diffusePass.rgb * finalAmbLight +
+					diffusePass.rgb * finalDiffLight +
+					specularPass.rgb * finalSpecLight;
 	
 
 	// ext light map
@@ -172,9 +171,9 @@ void main()
 	case 15: fragColor = diffusePass; break;
 	case 16: fragColor = specularPass; break;
 	case 17: fragColor = TexturePass(vec4(1), PASS_EXT); break;
-	case 18: fragColor = vec4(ambientLight, 1); break;
-	case 19: fragColor = vec4(diffuseLight, 1); break;
-	case 20: fragColor = vec4(specularLight, 1); break;
+	case 18: fragColor = vec4(finalAmbLight, 1); break;
+	case 19: fragColor = vec4(finalDiffLight, 1); break;
+	case 20: fragColor = vec4(finalSpecLight, 1); break;
 	case 21: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < MAX_WEIGHTS ; i++)

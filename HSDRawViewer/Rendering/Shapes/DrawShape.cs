@@ -10,16 +10,30 @@ namespace HSDRawViewer.Rendering
 {
     public class DrawShape
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="spline"></param>
+        /// <param name="c1"></param>
+        /// <param name="c2"></param>
+        public static void RenderSpline(HSD_Spline spline, Color c1, Color c2)
+        {
+            RenderSpline(Matrix4.Identity, spline, c1, c2);
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="spline"></param>
-        public static void RenderSpline(HSD_Spline spline, Color c1, Color c2)
+        public static void RenderSpline(Matrix4 transform, HSD_Spline spline, Color c1, Color c2)
         {
             GL.UseProgram(-1);
 
             GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.MultMatrix(ref transform);
 
             GL.LineWidth(2);
             GL.Begin(PrimitiveType.LineStrip);
@@ -41,6 +55,8 @@ namespace HSDRawViewer.Rendering
             foreach(var p in points)
                 GL.Vertex3(p.X, p.Y, p.Z);
             GL.End();
+
+            GL.PopMatrix();
 
             GL.PopAttrib();
         }

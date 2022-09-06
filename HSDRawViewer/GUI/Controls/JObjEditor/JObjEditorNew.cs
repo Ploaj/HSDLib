@@ -491,6 +491,26 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// 
         /// </summary>
         /// <param name="fog"></param>
+        public void SetLights(IEnumerable<HSD_Light> lights)
+        {
+            foreach (var l in RenderJObj._lights)
+                l.Enabled = false;
+
+            int li = 0;
+            foreach (var v in lights)
+            {
+                if (li < RenderJObj._lights.Length)
+                {
+                    RenderJObj._lights[li].LoadLight(v);
+                }
+                li++;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fog"></param>
         public void SetFog(HSD_FogDesc fog)
         {
             RenderJObj._fogParam.LoadFromHSD(fog);

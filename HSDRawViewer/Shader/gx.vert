@@ -58,6 +58,8 @@ uniform float shape_blend;
 
 uniform vec3 cameraPos;
 
+// material
+uniform int perPixelLighting;
 void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff, inout vec3 spec);
 
 // fog
@@ -188,8 +190,16 @@ void main()
 	
 	// view lighting calculations
 	normal = normalize(normal);
-	CalculateDiffuseShading(vertPosition, normal, ambientLight, diffuseLight, specularLight);
-
+	if (perPixelLighting == 0)
+	{
+		CalculateDiffuseShading(vertPosition, normal, ambientLight, diffuseLight, specularLight);
+	}
+	else
+	{
+		ambientLight = vec3(0);
+		diffuseLight = vec3(0);
+		specularLight = vec3(0);
+	}
 
 	// final position
 	gl_Position = mvp * vec4(pos.xyz, 1);

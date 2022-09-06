@@ -47,6 +47,48 @@
             get => _s.GetReference<HSDArrayAccessor<HSD_SegPoly>>(0x14);
             set => _s.SetReference(0x14, value);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public void GetPointOnPath(float path, out float X, out float Y, out float Z)
+        {
+            X = 0;
+            Y = 0;
+            Z = 0;
+
+            for (int i = 0; i < PointCount; i++)
+            {
+                if (path < Lengths[i])
+                {
+                    i--;
+
+                    float prevLength = Lengths[i];
+                    float nextLength = Lengths[i + 1];
+
+                    HSD_Vector3 prevPoint = Points[i];
+                    HSD_Vector3 nextPoint;
+
+                    if (i >= PointCount)
+                    {
+                        nextPoint = Points[0];
+                    }
+                    else
+                    {
+                        nextPoint = Points[i + 1];
+                    }
+
+                    var weight = (path - prevLength) / (nextLength - prevLength);
+
+                    X = prevPoint.X + (nextPoint.X - prevPoint.X) * weight;
+                    Y = prevPoint.Y + (nextPoint.Y - prevPoint.Y) * weight;
+                    Z = prevPoint.Z + (nextPoint.Z - prevPoint.Z) * weight;
+                    return;
+                }
+            }
+        }
     }
 
     /// <summary>

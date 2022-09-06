@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.Common
+﻿using HSDRaw.Common.Animation;
+
+namespace HSDRaw.Common
 {
     public enum REFTYPE
     {
@@ -184,5 +186,17 @@
         public float BoneLength { get => _s.GetFloat(0x00); set => _s.SetFloat(0x00, value); }
 
         public float RotateX { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class HSD_ROBJAnimJoint : HSDAccessor
+    {
+        public override int TrimmedSize => 0x08;
+
+        public HSD_ROBJAnimJoint Next { get => _s.GetReference<HSD_ROBJAnimJoint>(0x00); set => _s.SetReference(0x00, value); }
+
+        public HSD_AOBJ Animation { get => _s.GetReference<HSD_AOBJ>(0x04); set => _s.SetReference(0x04, value); }
     }
 }

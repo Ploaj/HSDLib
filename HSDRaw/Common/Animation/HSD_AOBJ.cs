@@ -35,7 +35,6 @@ namespace HSDRaw.Common.Animation
 
         public HSD_FOBJDesc FObjDesc { get => _s.GetReference<HSD_FOBJDesc>(0x08); set => _s.SetReference(0x08, value); }
 
-        //TODO:
-        //public uint PathAnimJoint { get; set; }
+        public HSD_JOBJ ObjectReference { get => _s.GetReference<HSD_JOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 }

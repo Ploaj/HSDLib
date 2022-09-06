@@ -422,6 +422,8 @@ namespace HSDRawViewer.GUI.Controls
                     tt = typeof(TexTrackType);
                     break;
                 case AnimType.Light:
+                    tt = typeof(LightTrackType);
+                    break;
                 default:
                     tt = typeof(JointTrackType);
                     break;
@@ -447,6 +449,7 @@ namespace HSDRawViewer.GUI.Controls
                 case AnimType.Texture:
                     return ((TexTrackType)type).ToString();
                 case AnimType.Light:
+                    return ((LightTrackType)type).ToString();
                 default:
                     return "Type_" + type;
             }

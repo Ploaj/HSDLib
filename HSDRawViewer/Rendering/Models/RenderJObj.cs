@@ -37,7 +37,7 @@ namespace HSDRawViewer.Rendering.Models
 
         public RenderMode RenderMode { get; set; }
 
-        public RenderLObj[] _lights { get; internal set; } = new RenderLObj[MAX_LIGHTS];
+        public RenderLObj[] _lights { get; } = new RenderLObj[MAX_LIGHTS];
         private RenderLObj cameraLight = new RenderLObj();
         private RenderLObj cameraAmbient = new RenderLObj();
 
@@ -404,9 +404,17 @@ namespace HSDRawViewer.Rendering.Models
 
             // lighting
             _shader.SetFloat("saturate", 1);
-            _shader.SetBoolToInt("perPixelLighting", false);
+            _shader.SetBoolToInt("perPixelLighting", true);
             if (!_settings.UseCameraLight)
             {
+                //for (int i = 0; i < MAX_LIGHTS; i++)
+                //{
+                //    if (i < TestingLights.Trophy1.Length)
+                //        TestingLights.Trophy1[i].Bind(_shader, i);
+                //    else
+                //        _shader.SetBoolToInt($"light[{i}].enabled", false);
+                //}
+
                 for (int i = 0; i < MAX_LIGHTS; i++)
                     _lights[i].Bind(_shader, i);
             }
@@ -442,6 +450,13 @@ namespace HSDRawViewer.Rendering.Models
 
             // render splines
             DrawSplines(camera);
+
+            // draw lights
+            //for (int i = 0; i < MAX_LIGHTS; i++)
+            //{
+            //    if (_lights[i].Enabled && _lights[i].Type != LObjType.AMBIENT)
+            //        DrawShape.DrawSphere(Matrix4.CreateTranslation(_lights[i].Position), 1, 10, 10, _lights[i].Color.Xyz, 1);
+            //}
 
             // bone overlay
             RenderBoneOverlay();
@@ -985,7 +1000,7 @@ namespace HSDRawViewer.Rendering.Models
 
             foreach (var j in RootJObj.Enumerate)
                 if (j.Desc.Spline != null)
-                    DrawShape.RenderSpline(j.Desc.Spline, Color.Yellow, Color.Blue);
+                    DrawShape.RenderSpline(j.WorldTransform, j.Desc.Spline, Color.Yellow, Color.Blue);
         }
 
         /// <summary>

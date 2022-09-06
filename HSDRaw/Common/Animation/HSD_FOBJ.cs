@@ -60,6 +60,33 @@ namespace HSDRaw.Common.Animation
         HSD_A_T_TS_BLEND = 24
     }
 
+    public enum LightTrackType
+    {
+        UNUSED0,
+        UNUSED1,
+        UNUSED2,
+        UNUSED3,
+        UNUSED4,
+        UNUSED5,
+        UNUSED6,
+        UNUSED7,
+        UNUSED8,
+        HSD_A_L_LITC_R = 9,
+        HSD_A_L_LITC_G = 10,
+        HSD_A_L_LITC_B = 11,
+        HSD_A_L_VIS = 12,
+        HSD_A_L_A0 = 13,
+        HSD_A_L_A1 = 14,
+        HSD_A_L_A2 = 15,
+        HSD_A_L_K0 = 16,
+        HSD_A_L_K1 = 17,
+        HSD_A_L_K2 = 18,
+        HSD_A_L_CUTOFF = 19,
+        HSD_A_L_REFDIST = 20,
+        HSD_A_L_REFBRIGHT = 21,
+        HSD_A_L_LITC_A = 22,
+    }
+
     public enum JointTrackType
     {
         HSD_A_J_NONE = 0,
