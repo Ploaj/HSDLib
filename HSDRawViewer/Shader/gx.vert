@@ -26,8 +26,9 @@ out vec3 normal;
 out vec3 ntan;
 out vec3 bitan;
 
-out float lambert;
-out float spec;
+out vec3 ambientLight;
+out vec3 diffuseLight;
+out vec3 specularLight;
 
 out vec2 texcoord[MAX_TEX];
 out vec4 vertexColor;
@@ -57,20 +58,7 @@ uniform float shape_blend;
 
 uniform vec3 cameraPos;
 
-// material
-struct Light
-{
-	int useCamera;
-	vec3 position;
-	vec4 ambient;
-	vec4 diffuse;
-	float ambientPower;
-	float diffusePower;
-} ;
-uniform Light light;
-
-float GetDiffuseMaterial(vec3 N, vec3 L);
-float GetSpecularMaterial(vec3 N, vec3 L, vec3 V);
+void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff, inout vec3 spec);
 
 // fog
 uniform struct Fog
@@ -132,11 +120,13 @@ void main()
 			vbones[i] = envelopeIndex[matrixIndex * MAX_WEIGHTS + i];
 			vweights[i] = weights[matrixIndex * MAX_WEIGHTS + i];
 		}
-		
+
 		// always transform by parent
-		pos = singleBind * pos;
-		normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
-		
+		if (isSkeleton == 0)
+		{
+			pos = singleBind * pos;
+			normal = (inverse(transpose(singleBind)) * vec4(normal, 1)).xyz;
+		}
 
 		// single bind optimization
 		if(isSkeleton == 1 && vweights[0] == 1.0)
@@ -198,10 +188,7 @@ void main()
 	
 	// view lighting calculations
 	normal = normalize(normal);
-	vec3 V = normalize(cameraPos - vertPosition);
-	vec3 L = normalize(light.position); // - vertPosition
-	lambert = GetDiffuseMaterial(normal, L);
-	spec = GetSpecularMaterial(normal, L, V);
+	CalculateDiffuseShading(vertPosition, normal, ambientLight, diffuseLight, specularLight);
 
 
 	// final position

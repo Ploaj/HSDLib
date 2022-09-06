@@ -585,7 +585,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     ShowGrid = _viewport.glViewport.DisplayGrid,
                     ShowBackdrop = _viewport.glViewport.EnableBack,
                     Camera = _viewport.glViewport.Camera,
-                    Lighting = RenderJObj._lightParam,
+                    //Lighting = RenderJObj._lightParam,
                     Settings = RenderJObj._settings,
                     // TODO: Animation = JointAnimation,
                     HiddenNodes = _meshList.EnumerateDObjs.Where(e => !e.Visible).Select((i, e) => e).ToArray(),
@@ -616,8 +616,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (settings.Settings != null)
                 RenderJObj._settings = settings.Settings;
 
-            if (settings.Lighting != null)
-                RenderJObj._lightParam = settings.Lighting;
+            // TODO:
+            //if (settings.Lighting != null)
+            //    RenderJObj._lightParam = settings.Lighting;
 
             if (settings.Animation != null)
             {
@@ -656,8 +657,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void displaySettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Light Settings", RenderJObj._lightParam))
-                d.ShowDialog();
+            //using (PropertyDialog d = new PropertyDialog("Light Settings", RenderJObj._lightParam))
+            //    d.ShowDialog();
         }
 
         /// <summary>

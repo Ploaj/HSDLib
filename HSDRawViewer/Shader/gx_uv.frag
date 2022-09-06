@@ -39,16 +39,6 @@ in vec2 texcoord[4];
 uniform mat4 sphereMatrix;
 uniform vec3 cameraPos;
 
-uniform struct Light
-{
-	int useCamera;
-	vec3 position;
-	vec4 ambient;
-	vec4 diffuse;
-	float ambientPower;
-	float diffusePower;
-} light;
-
 ///
 /// Gets spherical UV coords, this is used for reflection effects
 ///
@@ -68,12 +58,7 @@ vec2 GetSphereCoords()
 ///
 vec2 GetToonCoords()
 {
-	vec3 V = vertPosition - cameraPos;
-
-	if(light.useCamera == 0)
-		V = light.position;
-
-	V = normalize(V);
+	vec3 V = normalize(vertPosition - cameraPos);
 
     float lambert = clamp(dot(normal, V) + 0.4, 0, 1);
 

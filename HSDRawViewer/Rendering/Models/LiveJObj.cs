@@ -55,7 +55,7 @@ namespace HSDRawViewer.Rendering.Models
         public Matrix4 WorldTransform { get => _worldTransform; set { _worldTransform = value; BindTransform = InvertedTransform * value; } }
         private Matrix4 _worldTransform;
         private Matrix4 InvertedTransform;
-        public Matrix4 BindTransform;
+        public Matrix4 BindTransform { get; internal set; }
 
         public int JointCount
         {
@@ -289,6 +289,7 @@ namespace HSDRawViewer.Rendering.Models
                 if (v.Desc.Flags.HasFlag(JOBJ_FLAG.SKELETON) || v.Desc.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                     v.Desc.InverseWorldTransform = v.WorldTransform.Inverted().ToHsdMatrix();
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -339,9 +340,6 @@ namespace HSDRawViewer.Rendering.Models
             // calculate billboarding
             if (c != null)
             {
-                var pos = Vector3.TransformPosition(Vector3.Zero, WorldTransform);
-                var campos = c.TransformedPosition;
-
                 int billboard_type = (((int)Desc.Flags >> 9) & 0x7);
 
                 switch (billboard_type)
@@ -368,9 +366,6 @@ namespace HSDRawViewer.Rendering.Models
                         break;
                 }
             }
-
-            // calculate the bind matrix
-            // BindTransform = InvertedTransform * WorldTransform;
 
             // process children
             if (Child != null && updateChildren)

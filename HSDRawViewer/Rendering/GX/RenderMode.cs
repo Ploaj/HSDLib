@@ -20,8 +20,9 @@
         DiffuseColor,
         SpecularColor,
         ExtColor,
-        DiffusePass,
-        SpecularPass,
+        AmbientLight,
+        DiffuseLight,
+        SpecularLight,
         BoneWeight,
         Fog
     }

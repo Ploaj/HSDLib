@@ -27,6 +27,7 @@ namespace HSDRawViewer.Rendering.Models
     public class RenderJObj
     {
         private static int MAX_TEX { get; } = 4;
+        private static int MAX_LIGHTS { get; } = 4;
 
         private GXShader _shader;
 
@@ -36,7 +37,9 @@ namespace HSDRawViewer.Rendering.Models
 
         public RenderMode RenderMode { get; set; }
 
-        public GXLightParam _lightParam { get; internal set; } = new GXLightParam();
+        public RenderLObj[] _lights { get; internal set; } = new RenderLObj[MAX_LIGHTS];
+        private RenderLObj cameraLight = new RenderLObj();
+        private RenderLObj cameraAmbient = new RenderLObj();
 
         public GXFogParam _fogParam { get; internal set; } = new GXFogParam();
 
@@ -97,14 +100,31 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public RenderJObj()
         {
+            cameraLight.Enabled = true;
+            cameraLight.Type = LObjType.INFINITE;
 
+            cameraAmbient.Enabled = true;
+            cameraAmbient.Type = LObjType.AMBIENT;
+            cameraAmbient.Color = new Vector4(179, 179, 179, 255) / 255f;
+
+            for (int i = 0; i < MAX_LIGHTS; i++)
+                _lights[i] = new RenderLObj();
+
+            _lights[0].Enabled = true;
+            _lights[0].Type = LObjType.AMBIENT;
+            _lights[0].Color = new Vector4(255, 255, 255, 255) / 255f;
+
+            _lights[1].Enabled = true;
+            _lights[1].Type = LObjType.INFINITE;
+            _lights[1].Position = new Vector3(0, 12, 9);
+            _lights[1].Color = new Vector4(200, 200, 200, 255) / 255f;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="desc"></param>
-        public RenderJObj(HSD_JOBJ desc)
+        public RenderJObj(HSD_JOBJ desc) : base()
         {
             LoadJObj(desc);
         }
@@ -380,7 +400,36 @@ namespace HSDRawViewer.Rendering.Models
             SetupShader();
 
             // render with shader
-            _shader.Bind(camera, _lightParam, _fogParam);
+            _shader.Bind(camera, _fogParam);
+
+            // lighting
+            _shader.SetFloat("saturate", 1);
+            _shader.SetBoolToInt("perPixelLighting", false);
+            if (!_settings.UseCameraLight)
+            {
+                for (int i = 0; i < MAX_LIGHTS; i++)
+                    _lights[i].Bind(_shader, i);
+            }
+            else
+            {
+                for (int i = 0; i < MAX_LIGHTS; i++)
+                {
+                    if (i == 0)
+                    {
+                        cameraAmbient.Bind(_shader, i);
+                    }
+                    else
+                    if (i == 1)
+                    {
+                        cameraLight.Position = camera.TransformedPosition;
+                        cameraLight.Bind(_shader, i);
+                    }
+                    else
+                    {
+                        _shader.SetBoolToInt($"light[{i}].enabled", false);
+                    }
+                }
+            }
 
             // Render DOBJS
             RenderJObjDisplay(camera);

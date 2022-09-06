@@ -14,8 +14,9 @@ in vec3 normal;
 in vec3 ntan;
 in vec3 bitan;
 
-in float lambert;
-in float spec;
+in vec3 ambientLight;
+in vec3 diffuseLight;
+in vec3 specularLight;
 
 in vec2 texcoord[MAX_TEX];
 in vec4 vertexColor;
@@ -36,16 +37,6 @@ uniform float alpha;
 
 
 // Non rendering system
-
-uniform struct Light
-{
-	int useCamera;
-	vec3 position;
-	vec4 ambient;
-	vec4 diffuse;
-	float ambientPower;
-	float diffusePower;
-} light;
 
 uniform struct Fog
 {
@@ -105,36 +96,31 @@ void main()
 		return;
 	}
 
+	// get light values
+//	if (perPixelLighting == 1)
+//	{
+//		vec3 V = normalize(cameraPos - vertPosition);
+//		vec3 L = normalize(light.position); // - vertPosition
+//		diffuseLamb = GetDiffuseMaterial(normal, L);
+//		specularLamb = GetSpecularMaterial(normalize(normal), L, V);
+//	}
+
+	// get toon shading
+//	if (useToonShading == 1)
+//	{
+//		diffMatColor = GetToonTexture().rgb;
+//		specularLamb = 0;
+//	}
+
 	// color passes
 	vec4 ambientPass = TexturePass(ambientColor, PASS_AMBIENT);
 	vec4 diffusePass = TexturePass(vec4(diffuseColor.rgb, alpha * diffuseColor.a), PASS_DIFFUSE);
 	vec4 specularPass = TexturePass(specularColor, PASS_SPECULAR);
 
-	// get light values
-	float diffuseLamb = lambert;
-	float specularLamb = spec;
-	if (perPixelLighting == 1)
-	{
-		vec3 V = normalize(cameraPos - vertPosition);
-		vec3 L = normalize(light.position); // - vertPosition
-		diffuseLamb = GetDiffuseMaterial(normal, L);
-		specularLamb = GetSpecularMaterial(normalize(normal), L, V);
-	}
-
-	// get toon shading
-	vec3 diffMatColor = vec3(diffuseLamb);
-	if (useToonShading == 1)
-	{
-		diffMatColor = GetToonTexture().rgb;
-		specularLamb = 0;
-	}
-
 	// calculate fragment color
-	fragColor.rgb = ambientPass.rgb	 * diffusePass.rgb     * light.ambient.rgb * vec3(light.ambientPower) + 
-					diffusePass.rgb  * diffMatColor   * light.diffuse.rgb * vec3(light.diffusePower) + 
-					specularPass.rgb * vec3(specularLamb);
-
-	fragColor.rgb = clamp(fragColor.rgb, ambientPass.rgb * fragColor.rgb, vec3(1));
+	fragColor.rgb = ambientPass.rgb	* diffusePass.rgb * ambientLight +
+					diffusePass.rgb * diffuseLight +
+					specularPass.rgb * specularLight;
 	
 
 	// ext light map
@@ -182,13 +168,14 @@ void main()
 	case 11: fragColor = GetTextureFragment(1); break;
 	case 12: fragColor = GetTextureFragment(2); break;
 	case 13: fragColor = GetTextureFragment(3); break;
-	case 14: fragColor = ambientPass; break;
+	case 14: fragColor = ambientPass * diffusePass; break;
 	case 15: fragColor = diffusePass; break;
 	case 16: fragColor = specularPass; break;
 	case 17: fragColor = TexturePass(vec4(1), PASS_EXT); break;
-	case 18: fragColor = diffusePass * vec4(diffMatColor, 1); break;
-	case 19: fragColor = specularPass * vec4(vec3(specularLamb), 1); break;
-	case 20: 
+	case 18: fragColor = vec4(ambientLight, 1); break;
+	case 19: fragColor = vec4(diffuseLight, 1); break;
+	case 20: fragColor = vec4(specularLight, 1); break;
+	case 21: 
 		fragColor = vec4(0, 0, 0, 1);
 		for(int i = 0; i < MAX_WEIGHTS ; i++)
 			if(vweights[i] > 0)
@@ -201,7 +188,7 @@ void main()
 		if (fragColor.r <= 0)
 			fragColor = vec4(0, 0, 0, 1);
 		break;
-	case 21: fragColor = vec4(vec3(fogAmt), 1); break;
+	case 22: fragColor = vec4(vec3(fogAmt), 1); break;
 	}
 
 

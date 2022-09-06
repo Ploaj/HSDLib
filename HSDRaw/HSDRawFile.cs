@@ -788,6 +788,7 @@ namespace HSDRaw
                 x => x.EndsWith("_texanim") ?  new HSD_TexAnim() : null,
                 x => x.EndsWith("_figatree") ?  new HSD_FigaTree() : null,
                 x => x.EndsWith("_camera") ?  new HSD_Camera() : null,
+                x => x.EndsWith("_scene_lights") ?  new HSDNullPointerArrayAccessor<HSD_Light>() : null,
                 x => x.EndsWith("_scene_models") ||
                     x.Equals("Stc_rarwmdls") ||
                     x.Equals("Stc_scemdls") ||

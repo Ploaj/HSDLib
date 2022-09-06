@@ -15,6 +15,9 @@ namespace HSDRawViewer.Rendering.Models
     /// </summary>
     public class JobjDisplaySettings
     {
+        [Category("1. Display"), DisplayName("Use Camera Light"), Description("Casts directional light from camera position.")]
+        public bool UseCameraLight { get; set; } = true;
+
         [Category("1. Display"), DisplayName("Object Render Mode"), Description("")]
         public ObjectRenderMode RenderObjects { get; set; } = ObjectRenderMode.Visible;
 

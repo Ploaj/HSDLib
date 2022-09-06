@@ -36,7 +36,7 @@ namespace HSDRawViewer.Rendering.Shaders
         /// <summary>
         /// 
         /// </summary>
-        public void Bind(Camera camera, GXLightParam light, GXFogParam fog)
+        public void Bind(Camera camera, GXFogParam fog)
         {
             if (!ProgramCreatedSuccessfully())
                 return;
@@ -66,9 +66,6 @@ namespace HSDRawViewer.Rendering.Shaders
 
             // setup bone binds
             SetWorldTransformBones(WorldTransforms);
-
-            // lighting
-            light.Bind(camera, this);
 
             // fog
             fog.Bind(this);
