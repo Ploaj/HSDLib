@@ -372,6 +372,8 @@ namespace HSDRawViewer.Rendering.Models
                 }
 
                 // load animation if availiable
+                PositionAnim = null;
+                Tracks.Clear();
                 if (v.AnimPointer != null && v.AnimPointer.Length > 0)
                 {
                     LoadAnimation(v.AnimPointer[0]);
