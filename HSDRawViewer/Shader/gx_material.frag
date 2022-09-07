@@ -53,8 +53,9 @@ float Atten(Light light, vec3 vert)
 	ldir /= dist;
 
 	float att = max(0.0, dot(ldir, direction));
+	float att2 = att * att;
 	
-	float a = max(0.0, light.a2 * (att * att) + light.a1 * att + light.a0);
+	float a = max(0.0, light.a2 * att2 + light.a1 * att + light.a0);
 	float dnom = light.k2 * dist2 + light.k1 * dist + light.k0;
 
 	return a / dnom;
@@ -98,7 +99,7 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 				// calculate light color
 				if (enableDiffuse == 1 && (light[i].flags & 0x1) != 0)
 				{
-					diff += vec3(clamp(dot(N, L), 0, 1)) * light[i].color * atten;
+					diff += vec3(max(0.0, dot(N, L))) * light[i].color * atten;
 				}
 
 				// calculate specularColor

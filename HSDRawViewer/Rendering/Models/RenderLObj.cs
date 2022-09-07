@@ -199,7 +199,7 @@ namespace HSDRawViewer.Rendering.Models
             shader.SetBoolToInt($"light[{index}].enabled", Enabled);
             shader.SetInt($"light[{index}].type", (int)Type);
             shader.SetVector3($"light[{index}].position", _position);
-            shader.SetVector3($"light[{index}].direction", (_interest - _position).Normalized());
+            shader.SetVector3($"light[{index}].direction", (_position - _interest).Normalized());
             shader.SetVector3($"light[{index}].color", _color.Xyz);
             int flags = 0;
             if (Diffuse)
@@ -262,7 +262,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="spotfn"></param>
         private void InitLightSpot(float cut_off, GXSpotFunc spotfn)
         {
-            if(cut_off < 0.0f ||	cut_off > 90.0f) 
+            if(cut_off < 0.0f || cut_off > 90.0f) 
                 spotfn = GXSpotFunc.GX_SP_OFF;
 
             var r = (cut_off * Math.PI) / 180.0f;
@@ -287,8 +287,8 @@ namespace HSDRawViewer.Rendering.Models
                     A2 = 1.0f/(1.0f-cr);
                 break;
                 case GXSpotFunc.GX_SP_SHARP:
-                    d = (1.0f-cr)*(1.0f-cr);
-                    A0 = cr* (cr-2.0f);
+                    d = (1.0f - cr) * (1.0f - cr);
+                    A0 = (1.0f / d) * cr * (cr - 2.0f);
                     A1 = 2.0f/d;
                     A2 = -1.0f/d;
                 break;
