@@ -181,7 +181,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 _selectStateIndex = index;
 
                 // get events
-                var events = SubactionEvent.GetEvents(SubactionGroup.Fighter, a).ToList();
+                var events = SubactionEvent.GetEvents(SubactionGroup, a).ToList();
 
                 // set script in editor
                 _subactionEditor.InitScript(SubactionGroup, events);
@@ -191,7 +191,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                 // update renderer script
                 SelectedEvents.Clear();
-                Processor.SetStruct(events, SubactionGroup.Fighter);
+                if (SubactionGroup == SubactionGroup.Fighter)
+                    Processor.SetStruct(events, SubactionGroup);
 
                 // update frame tips
                 UpdateFrameTips();
@@ -219,7 +220,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                 // update renderer script
                 SelectedEvents.RemoveAll(e => !events.Contains(e));
-                Processor.SetStruct(events, SubactionGroup.Fighter);
+                if (SubactionGroup == SubactionGroup.Fighter)
+                    Processor.SetStruct(events, SubactionGroup);
 
                 // update frame tips
                 UpdateFrameTips();

@@ -222,7 +222,7 @@ float TevUnit_GetAlphaInput(TevUnit unit, float tex, int source)
 		case GX_CC_TEXA_A:
 			return tex;
 		case GX_CC_ZERO_A:
-			return 0;
+			return 0.0;
 		case KONST_R:
 			return unit.konst.r;
 		case KONST_G:
@@ -236,7 +236,7 @@ float TevUnit_GetAlphaInput(TevUnit unit, float tex, int source)
 		case TEX1_A:
 			return unit.tev1.a;
 	}
-	return 0;
+	return 0.0;
 }
 
 float TevUnit_GetBias(TevUnit unit)
