@@ -37,9 +37,22 @@ namespace HSDRawViewer.Rendering.Models
 
         public RenderMode RenderMode { get; set; }
 
-        public RenderLObj[] _lights { get; } = new RenderLObj[MAX_LIGHTS];
-        private RenderLObj cameraLight = new RenderLObj();
-        private RenderLObj cameraAmbient = new RenderLObj();
+        private RenderLObj[] _lights { get; } = new RenderLObj[MAX_LIGHTS];
+        private RenderLObj[] _cameraLights { get; } = new RenderLObj[]
+        {
+            new RenderLObj()
+            {
+                Enabled = true,
+                Type = LObjType.AMBIENT,
+                _color = new Vector4(179, 179, 179, 255) / 255f,
+            },
+            new RenderLObj()
+            {
+                Enabled = true,
+                Type = LObjType.INFINITE,
+
+            },
+        };
 
         public GXFogParam _fogParam { get; internal set; } = new GXFogParam();
 
@@ -100,24 +113,17 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public RenderJObj()
         {
-            cameraLight.Enabled = true;
-            cameraLight.Type = LObjType.INFINITE;
-
-            cameraAmbient.Enabled = true;
-            cameraAmbient.Type = LObjType.AMBIENT;
-            cameraAmbient.Color = new Vector4(179, 179, 179, 255) / 255f;
-
             for (int i = 0; i < MAX_LIGHTS; i++)
                 _lights[i] = new RenderLObj();
 
             _lights[0].Enabled = true;
             _lights[0].Type = LObjType.AMBIENT;
-            _lights[0].Color = new Vector4(255, 255, 255, 255) / 255f;
+            _lights[0]._color = new Vector4(255, 255, 255, 255) / 255f;
 
             _lights[1].Enabled = true;
             _lights[1].Type = LObjType.INFINITE;
-            _lights[1].Position = new Vector3(0, 12, 9);
-            _lights[1].Color = new Vector4(200, 200, 200, 255) / 255f;
+            _lights[1]._position = new Vector3(0, 12, 9);
+            _lights[1]._color = new Vector4(200, 200, 200, 255) / 255f;
         }
 
         /// <summary>
@@ -405,38 +411,37 @@ namespace HSDRawViewer.Rendering.Models
             // lighting
             _shader.SetFloat("saturate", 1);
             _shader.SetBoolToInt("perPixelLighting", true);
-            if (!_settings.UseCameraLight)
+            switch (_settings.LightSource)
             {
-                //for (int i = 0; i < MAX_LIGHTS; i++)
-                //{
-                //    if (i < TestingLights.Trophy1.Length)
-                //        TestingLights.Trophy1[i].Bind(_shader, i);
-                //    else
-                //        _shader.SetBoolToInt($"light[{i}].enabled", false);
-                //}
-
-                for (int i = 0; i < MAX_LIGHTS; i++)
-                    _lights[i].Bind(_shader, i);
-            }
-            else
-            {
-                for (int i = 0; i < MAX_LIGHTS; i++)
-                {
-                    if (i == 0)
+                case LightRenderMode.Camera:
                     {
-                        cameraAmbient.Bind(_shader, i);
+                        _cameraLights[1]._position = camera.TransformedPosition;
+                        for (int i = 0; i < MAX_LIGHTS; i++)
+                        {
+                            if (i < _cameraLights.Length)
+                                _cameraLights[i].Bind(_shader, i);
+                            else
+                                _shader.SetBoolToInt($"light[{i}].enabled", false);
+                        }
                     }
-                    else
-                    if (i == 1)
+                    break;
+                case LightRenderMode.Default:
                     {
-                        cameraLight.Position = camera.TransformedPosition;
-                        cameraLight.Bind(_shader, i);
+                        for (int i = 0; i < MAX_LIGHTS; i++)
+                            _lights[i].Bind(_shader, i);
                     }
-                    else
+                    break;
+                case LightRenderMode.Custom:
                     {
-                        _shader.SetBoolToInt($"light[{i}].enabled", false);
+                        for (int i = 0; i < MAX_LIGHTS; i++)
+                        {
+                            if (i < _settings._lights.Length)
+                                _settings._lights[i].Bind(_shader, i);
+                            else
+                                _shader.SetBoolToInt($"light[{i}].enabled", false);
+                        }
                     }
-                }
+                    break;
             }
 
             // Render DOBJS
@@ -452,11 +457,14 @@ namespace HSDRawViewer.Rendering.Models
             DrawSplines(camera);
 
             // draw lights
-            //for (int i = 0; i < MAX_LIGHTS; i++)
-            //{
-            //    if (_lights[i].Enabled && _lights[i].Type != LObjType.AMBIENT)
-            //        DrawShape.DrawSphere(Matrix4.CreateTranslation(_lights[i].Position), 1, 10, 10, _lights[i].Color.Xyz, 1);
-            //}
+            if (_settings.RenderCustomLightPositions && _settings.LightSource == LightRenderMode.Custom)
+            {
+                foreach (var l in _settings._lights)
+                {
+                    if (l.Enabled && l.Type != LObjType.AMBIENT)
+                        DrawShape.DrawSphere(Matrix4.CreateTranslation(l._position), 1, 10, 10, l._color.Xyz, 1);
+                }
+            }
 
             // bone overlay
             RenderBoneOverlay();

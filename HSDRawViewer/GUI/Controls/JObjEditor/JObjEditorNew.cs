@@ -493,18 +493,19 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="fog"></param>
         public void SetLights(IEnumerable<HSD_Light> lights)
         {
-            foreach (var l in RenderJObj._lights)
+            foreach (var l in RenderJObj._settings._lights)
                 l.Enabled = false;
 
             int li = 0;
             foreach (var v in lights)
             {
-                if (li < RenderJObj._lights.Length)
-                {
-                    RenderJObj._lights[li].LoadLight(v);
-                }
+                if (li < RenderJObj._settings._lights.Length)
+                    RenderJObj._settings._lights[li].LoadLight(v);
+
                 li++;
             }
+
+            RenderJObj._settings.LightSource = LightRenderMode.Custom;
         }
 
         /// <summary>
@@ -605,10 +606,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     ShowGrid = _viewport.glViewport.DisplayGrid,
                     ShowBackdrop = _viewport.glViewport.EnableBack,
                     Camera = _viewport.glViewport.Camera,
-                    //Lighting = RenderJObj._lightParam,
                     Settings = RenderJObj._settings,
-                    // TODO: Animation = JointAnimation,
-                    HiddenNodes = _meshList.EnumerateDObjs.Where(e => !e.Visible).Select((i, e) => e).ToArray(),
+                    Animation = ToJointAnim(),
+                    HiddenNodes = _meshList.EnumerateDObjs.Select((i, e) => new { index = e, visible = i.Visible }).Where(e => !e.visible).Select(e=>e.index).ToArray(),
                 };
                 settings.Serialize(f);
             }
@@ -635,10 +635,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             if (settings.Settings != null)
                 RenderJObj._settings = settings.Settings;
-
-            // TODO:
-            //if (settings.Lighting != null)
-            //    RenderJObj._lightParam = settings.Lighting;
 
             if (settings.Animation != null)
             {
@@ -677,8 +673,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void displaySettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //using (PropertyDialog d = new PropertyDialog("Light Settings", RenderJObj._lightParam))
-            //    d.ShowDialog();
+            using (PropertyDialog d = new PropertyDialog("Model Display Settings", RenderJObj._settings))
+                d.ShowDialog();
         }
 
         /// <summary>

@@ -252,7 +252,7 @@
             // 
             this.displaySettingsToolStripMenuItem.Name = "displaySettingsToolStripMenuItem";
             this.displaySettingsToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.displaySettingsToolStripMenuItem.Text = "Light Settings";
+            this.displaySettingsToolStripMenuItem.Text = "Render Settings";
             this.displaySettingsToolStripMenuItem.Click += new System.EventHandler(this.displaySettingsToolStripMenuItem_Click);
             // 
             // fogSettingsToolStripMenuItem

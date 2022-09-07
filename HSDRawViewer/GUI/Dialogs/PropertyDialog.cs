@@ -10,10 +10,11 @@ namespace HSDRawViewer.GUI.Dialog
             InitializeComponent();
 
             CenterToScreen();
-            TopMost = true;
+            // TopMost = true;
 
             Text = name;
             propertyGrid1.SelectedObject = propertyObject;
+            propertyGrid1.ExpandAllGridItems();
         }
 
         public PropertyDialog(string name, object[] propertyObjects)
@@ -24,6 +25,7 @@ namespace HSDRawViewer.GUI.Dialog
 
             Text = name;
             propertyGrid1.SelectedObjects = propertyObjects;
+            propertyGrid1.ExpandAllGridItems();
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -14,28 +14,28 @@ namespace HSDRawViewer.Rendering.Models
             {
                 Enabled = true,
                 Type = HSDRaw.Common.LObjType.AMBIENT,
-                Color = new OpenTK.Mathematics.Vector4(192, 192, 192, 255) / 255f,
+                _color = new OpenTK.Mathematics.Vector4(192, 192, 192, 255) / 255f,
             },
             new RenderLObj()
             {
                 Enabled = true,
                 Type = HSDRaw.Common.LObjType.INFINITE,
-                Color = new OpenTK.Mathematics.Vector4(179, 179, 179, 255) / 255f,
-                Position = new OpenTK.Mathematics.Vector3(7.5f, 12, 9),
+                _color = new OpenTK.Mathematics.Vector4(179, 179, 179, 255) / 255f,
+                _position = new OpenTK.Mathematics.Vector3(7.5f, 12, 9),
             },
             new RenderLObj()
             {
                 Enabled = true,
                 Type = HSDRaw.Common.LObjType.INFINITE,
-                Color = new OpenTK.Mathematics.Vector4(38, 38, 38, 255) / 255f,
-                Position = new OpenTK.Mathematics.Vector3(-2, -12, 2),
+                _color = new OpenTK.Mathematics.Vector4(38, 38, 38, 255) / 255f,
+                _position = new OpenTK.Mathematics.Vector3(-2, -12, 2),
             },
             new RenderLObj()
             {
                 Enabled = true,
                 Type = HSDRaw.Common.LObjType.INFINITE,
-                Color = new OpenTK.Mathematics.Vector4(76, 76, 76, 255) / 255f,
-                Position = new OpenTK.Mathematics.Vector3(-7.5f, 3, -9),
+                _color = new OpenTK.Mathematics.Vector4(76, 76, 76, 255) / 255f,
+                _position = new OpenTK.Mathematics.Vector3(-7.5f, 3, -9),
             },
         };
     }

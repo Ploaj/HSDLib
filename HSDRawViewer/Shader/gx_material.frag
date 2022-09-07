@@ -25,6 +25,7 @@ struct Light
 {
 	int enabled;
 	int type;
+	int flags;
 	vec3 position;
 	vec3 direction;
 	vec3 color;
@@ -95,13 +96,13 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 				float atten = Atten(light[i], vert);
 			
 				// calculate light color
-				if (enableDiffuse == 1)
+				if (enableDiffuse == 1 && (light[i].flags & 0x1) != 0)
 				{
 					diff += vec3(clamp(dot(N, L), 0, 1)) * light[i].color * atten;
 				}
 
 				// calculate specularColor
-				if (enableSpecular == 1)
+				if (enableSpecular == 1 && (light[i].flags & 0x2) != 0)
 				{
 					if (dot(N, L) >= 0.0)
 					{

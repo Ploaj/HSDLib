@@ -6,28 +6,106 @@ using HSDRawViewer.Rendering.Shaders;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Drawing;
+using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Rendering.Models
 {
+    internal class SplineAnim
+    {
+        private float Frame;
+        private float EndFrame;
+        private LiveJObj jobj;
+        private List<FOBJ_Player> tracksPosition = new List<FOBJ_Player>();
+
+        private List<Vector3> Points = new List<Vector3>();
+        private List<float> Lengths = new List<float>();
+
+        public SplineAnim(HSD_AOBJ aobj)
+        {
+            Frame = 0;
+            EndFrame = aobj.EndFrame;
+
+            if (aobj.ObjectReference != null)
+                jobj = new LiveJObj(aobj.ObjectReference);
+
+            if (aobj.FObjDesc != null)
+                foreach (var v in aobj.FObjDesc.List)
+                    tracksPosition.Add(new FOBJ_Player(v));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void AdvanceAnimation(RenderLObj lobj)
+        {
+            foreach (var t in tracksPosition)
+            {
+                switch (t.JointTrackType)
+                {
+                    case JointTrackType.HSD_A_J_PATH:
+                        {
+                            if (jobj != null)
+                            {
+                                jobj.Desc.Spline.GetPointOnPath(t.GetValue(Frame), out float X, out float Y, out float Z);
+                                lobj._position.X = X;
+                                lobj._position.Y = Y;
+                                lobj._position.Z = Z;
+                                lobj._position = Vector3.TransformPosition(lobj._position, jobj.WorldTransform);
+                            }
+                        }
+                        break;
+                    case JointTrackType.HSD_A_J_TRAX:
+                        lobj._position.X = t.GetValue(Frame);
+                        break;
+                }
+            }
+
+            Frame += 1;
+            if (Frame >= EndFrame)
+                Frame = 0;
+        }
+    }
+
     public class RenderLObj
     {
+        [DisplayName("Enabled")]
         public bool Enabled { get; set; } = false;
 
+        [DisplayName("Light Kind")]
         public LObjType Type { get; set; } = LObjType.AMBIENT;
 
-        public Vector3 Position = Vector3.Zero;
+        [DisplayName("Color"), YamlIgnore]
+        public Color LightColor
+        {
+            get
+            {
+                return Color.FromArgb((byte)(_color.W * 255), (byte)(_color.X * 255), (byte)(_color.Y * 255), (byte)(_color.Z * 255));
+            }
+            set
+            {
+                _color.X = value.R / 255f;
+                _color.Y = value.G / 255f;
+                _color.Z = value.B / 255f;
+                _color.W = value.A / 255f;
+            }
+        }
 
-        public Vector3 Interest = Vector3.Zero;
+        [DisplayName("Diffuse")]
+        public bool Diffuse { get; set; } = true;
 
-        public Vector4 Color = Vector4.One;
+        [DisplayName("Specular")]
+        public bool Specular { get; set; } = true;
 
-        // flags
-        public bool Diffuse = true;
+        [YamlIgnore]
+        public Vector3 _position = Vector3.Zero;
 
-        public bool Specular = true;
+        [YamlIgnore]
+        public Vector3 _interest = Vector3.Zero;
+
+        [YamlIgnore]
+        public Vector4 _color = Vector4.One;
 
         private float A0;
         private float A1;
@@ -36,66 +114,14 @@ namespace HSDRawViewer.Rendering.Models
         private float K1;
         private float K2;
 
+        [YamlIgnore]
         private float Frame;
+        [YamlIgnore]
         private float EndFrame;
+        [YamlIgnore]
         private List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
 
-        private class SplineAnim
-        {
-            private float Frame;
-            private float EndFrame;
-            private LiveJObj jobj;
-            private List<FOBJ_Player> tracksPosition = new List<FOBJ_Player>();
-
-            private List<Vector3> Points = new List<Vector3>();
-            private List<float> Lengths = new List<float>();
-
-            public SplineAnim(HSD_AOBJ aobj)
-            {
-                Frame = 0;
-                EndFrame = aobj.EndFrame;
-
-                if (aobj.ObjectReference != null)
-                    jobj = new LiveJObj(aobj.ObjectReference);
-
-                if (aobj.FObjDesc != null)
-                    foreach (var v in aobj.FObjDesc.List)
-                        tracksPosition.Add(new FOBJ_Player(v));
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public void AdvanceAnimation(RenderLObj lobj)
-            {
-                foreach (var t in tracksPosition)
-                {
-                    switch (t.JointTrackType)
-                    {
-                        case JointTrackType.HSD_A_J_PATH:
-                            {
-                                if (jobj != null)
-                                {
-                                    jobj.Desc.Spline.GetPointOnPath(t.GetValue(Frame), out float X, out float Y, out float Z);
-                                    lobj.Position.X = X;
-                                    lobj.Position.Y = Y;
-                                    lobj.Position.Z = Z;
-                                    lobj.Position = Vector3.TransformPosition(lobj.Position, jobj.WorldTransform);
-                                }
-                            }
-                            break;
-                        case JointTrackType.HSD_A_J_TRAX:
-                            lobj.Position.X = t.GetValue(Frame);
-                            break;
-                    }
-                }
-
-                Frame += 1;
-                if (Frame >= EndFrame)
-                    Frame = 0;
-            }
-        }
-
+        [YamlIgnore]
         private SplineAnim PositionAnim;
 
         /// <summary>
@@ -134,10 +160,10 @@ namespace HSDRawViewer.Rendering.Models
                 float value = t.GetValue(Frame);
                 switch ((LightTrackType)t.TrackType)
                 {
-                    case LightTrackType.HSD_A_L_LITC_R: Color.X = value; break;
-                    case LightTrackType.HSD_A_L_LITC_G: Color.Y = value; break;
-                    case LightTrackType.HSD_A_L_LITC_B: Color.Z = value; break;
-                    case LightTrackType.HSD_A_L_LITC_A: Color.W = value; break;
+                    case LightTrackType.HSD_A_L_LITC_R: _color.X = value; break;
+                    case LightTrackType.HSD_A_L_LITC_G: _color.Y = value; break;
+                    case LightTrackType.HSD_A_L_LITC_B: _color.Z = value; break;
+                    case LightTrackType.HSD_A_L_LITC_A: _color.W = value; break;
                     case LightTrackType.HSD_A_L_A0: A0 = value; break;
                     case LightTrackType.HSD_A_L_A1: A1 = value; break;
                     case LightTrackType.HSD_A_L_A2: A2 = value; break;
@@ -172,9 +198,15 @@ namespace HSDRawViewer.Rendering.Models
             // set common params
             shader.SetBoolToInt($"light[{index}].enabled", Enabled);
             shader.SetInt($"light[{index}].type", (int)Type);
-            shader.SetVector3($"light[{index}].position", Position);
-            shader.SetVector3($"light[{index}].direction", (Interest - Position).Normalized());
-            shader.SetVector3($"light[{index}].color", Color.Xyz);
+            shader.SetVector3($"light[{index}].position", _position);
+            shader.SetVector3($"light[{index}].direction", (_interest - _position).Normalized());
+            shader.SetVector3($"light[{index}].color", _color.Xyz);
+            int flags = 0;
+            if (Diffuse)
+                flags |= 0x1;
+            if (Specular)
+                flags |= 0x2;
+            shader.SetInt($"light[{index}].flags", flags);
 
             // set attenuation
             shader.SetBoolToInt($"light[{index}].atten_enabled", Type == LObjType.POINT || Type == LObjType.SPOT);
@@ -299,17 +331,21 @@ namespace HSDRawViewer.Rendering.Models
                 // enable light
                 Enabled = true;
 
+                // flags
+                Diffuse = v.LightObject.Flags.HasFlag(LOBJ_Flags.LOBJ_DIFFUSE);
+                Specular = v.LightObject.Flags.HasFlag(LOBJ_Flags.LOBJ_SPECULAR);
+
                 // load type
                 Type = (LObjType)((int)lo.Flags & 0x3);
 
                 // load color
-                Color = new Vector4(lo.ColorR, lo.ColorG, lo.ColorB, lo.ColorAlpha) / 255f;
+                _color = new Vector4(lo.ColorR, lo.ColorG, lo.ColorB, lo.ColorAlpha) / 255f;
 
                 // load position
                 if (lo.Position != null)
-                    Position = new Vector3(lo.Position.V1, lo.Position.V2, lo.Position.V3);
+                    _position = new Vector3(lo.Position.V1, lo.Position.V2, lo.Position.V3);
                 else
-                    Position = Vector3.Zero;
+                    _position = Vector3.Zero;
 
                 // init atten data
                 if (lo.SpotData != null)
@@ -341,6 +377,15 @@ namespace HSDRawViewer.Rendering.Models
                     LoadAnimation(v.AnimPointer[0]);
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{Type} {LightColor.ToString()}";
         }
     }
 }

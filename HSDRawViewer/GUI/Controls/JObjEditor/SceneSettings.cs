@@ -24,8 +24,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         public JobjDisplaySettings Settings { get; set; }
 
-        public GXLightParam Lighting { get; set; }
-
         public JointAnimManager Animation { get; set; }
 
         public int[] HiddenNodes { get; set; }
