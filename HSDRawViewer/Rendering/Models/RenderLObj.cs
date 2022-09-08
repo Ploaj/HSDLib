@@ -19,9 +19,6 @@ namespace HSDRawViewer.Rendering.Models
         private LiveJObj jobj;
         private List<FOBJ_Player> tracksPosition = new List<FOBJ_Player>();
 
-        private List<Vector3> Points = new List<Vector3>();
-        private List<float> Lengths = new List<float>();
-
         public SplineAnim(HSD_AOBJ aobj)
         {
             Frame = 0;
@@ -38,7 +35,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <summary>
         /// 
         /// </summary>
-        public void AdvanceAnimation(RenderLObj lobj)
+        public Vector3 AdvanceAnimation(Vector3 input)
         {
             foreach (var t in tracksPosition)
             {
@@ -49,15 +46,15 @@ namespace HSDRawViewer.Rendering.Models
                             if (jobj != null)
                             {
                                 jobj.Desc.Spline.GetPointOnPath(t.GetValue(Frame), out float X, out float Y, out float Z);
-                                lobj._position.X = X;
-                                lobj._position.Y = Y;
-                                lobj._position.Z = Z;
-                                lobj._position = Vector3.TransformPosition(lobj._position, jobj.WorldTransform);
+                                input.X = X;
+                                input.Y = Y;
+                                input.Z = Z;
+                                input = Vector3.TransformPosition(input, jobj.WorldTransform);
                             }
                         }
                         break;
                     case JointTrackType.HSD_A_J_TRAX:
-                        lobj._position.X = t.GetValue(Frame);
+                        input.X = t.GetValue(Frame);
                         break;
                 }
             }
@@ -65,6 +62,8 @@ namespace HSDRawViewer.Rendering.Models
             Frame += 1;
             if (Frame >= EndFrame)
                 Frame = 0;
+
+            return input;
         }
     }
 
@@ -123,6 +122,8 @@ namespace HSDRawViewer.Rendering.Models
 
         [YamlIgnore]
         private SplineAnim PositionAnim;
+        [YamlIgnore]
+        private SplineAnim InterestAnim;
 
         /// <summary>
         /// 
@@ -145,6 +146,11 @@ namespace HSDRawViewer.Rendering.Models
                 PositionAnim = new SplineAnim(lightanim.PositionAnim.Animation);
             else
                 PositionAnim = null;
+
+            if (lightanim.InterestAnim != null && lightanim.InterestAnim.Animation != null)
+                InterestAnim = new SplineAnim(lightanim.InterestAnim.Animation);
+            else
+                InterestAnim = null;
         }
 
         /// <summary>
@@ -153,7 +159,10 @@ namespace HSDRawViewer.Rendering.Models
         private void ProcessAnimation()
         {
             if (PositionAnim != null)
-                PositionAnim.AdvanceAnimation(this);
+                _position = PositionAnim.AdvanceAnimation(_position);
+
+            if (InterestAnim != null)
+                _interest = InterestAnim.AdvanceAnimation(_interest);
 
             foreach (var t in Tracks)
             {
@@ -373,6 +382,7 @@ namespace HSDRawViewer.Rendering.Models
 
                 // load animation if availiable
                 PositionAnim = null;
+                InterestAnim = null;
                 Tracks.Clear();
                 if (v.AnimPointer != null && v.AnimPointer.Length > 0)
                 {

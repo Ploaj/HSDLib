@@ -437,5 +437,41 @@ namespace HSDRawViewer
 
             }
         }
+    
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        public static void CheckFlags(string file)
+        {
+            var f = new HSDRawFile(file);
+
+            CheckFlags(f.Roots[0].Data as HSD_JOBJ);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        public static void CheckFlags(HSD_JOBJ jobj)
+        {
+            List<JOBJ_FLAG> originalFlags = jobj.ToList.Select(e => e.Flags).ToList();
+
+            foreach (var v in jobj.ToList)
+                v.Flags = 0;
+
+            jobj.UpdateFlags();
+
+            var list = jobj.ToList;
+            for (int i = 0; i < originalFlags.Count; i++)
+            {
+                if (originalFlags[i] != list[i].Flags)
+                {
+                    System.Diagnostics.Debug.WriteLine($"{i}");
+                    System.Diagnostics.Debug.WriteLine($"\t{originalFlags[i]}");
+                    System.Diagnostics.Debug.WriteLine($"\t{list[i].Flags}");
+                }
+            }
+        }
     }
 }

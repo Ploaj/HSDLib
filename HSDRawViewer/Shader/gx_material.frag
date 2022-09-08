@@ -10,6 +10,7 @@
 // settings
 uniform int enableDiffuse;
 uniform int enableSpecular;
+uniform int useConstant;
 
 // material
 uniform vec4 ambientColor;
@@ -40,7 +41,9 @@ struct Light
 };
 uniform Light light[MAX_LIGHT];
 
-
+///
+///
+///
 float Atten(Light light, vec3 vert)
 {
 	if (light.atten_enabled == 0)
@@ -73,6 +76,19 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 	amb = vec3(0);
 	diff = vec3(0);
 	spec = vec3(0);
+	
+	// check constant flag
+	if (useConstant == 1 || enableDiffuse == 0)
+	{
+		diff = vec3(1);
+		return;
+	}
+	
+	// 
+	if (enableDiffuse == 0)
+	{
+		diff = vec3(1);
+	}
 	
 	// process lights
 	for (int i = 0; i < MAX_LIGHT; i++)

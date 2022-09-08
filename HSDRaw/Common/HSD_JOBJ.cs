@@ -128,93 +128,83 @@ namespace HSDRaw.Common
         /// </summary>
         public void UpdateFlags()
         {
-            var list = ToList;
-            list.Reverse();
+            UpdateFlags(true);
+        }
 
-            foreach (var j in list)
+        /// <summary>
+        /// Autometically sets needed flags for self and all children
+        /// </summary>
+        private void UpdateFlags(bool isRoot)
+        {
+            // process child
+            if (Child != null)
+                Child.UpdateFlags(false);
+
+            // process sibling
+            if (Next != null)
+                Next.UpdateFlags(false);
+
+            // check dobj flags
+            if (Dobj != null)
             {
-                if (j.Dobj != null)
-                {
-                    bool xlu = false;
-                    bool opa = false;
-                    bool lighting = false;
-                    bool specular = false;
-                    bool envelope = false;
+                bool xlu = false;
+                bool opa = false;
+                bool lighting = false;
+                bool specular = false;
+                bool envelope = false;
 
-                    foreach (var dobj in j.Dobj.List)
+                foreach (var dobj in Dobj.List)
+                {
+                    var mobj = dobj.Mobj;
+                    if (mobj != null)
                     {
-                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+                        // get xlu or opa
+                        if (mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
                             xlu = true;
                         else
                             opa = true;
 
-                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE))
+                        // check if lighting is enabled
+                        if (mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE))
                             lighting = true;
 
-                        if (dobj.Mobj != null && dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR))
+                        // check if specular is enabled
+                        if (mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR))
                             specular = true;
-
-                        if (dobj.Pobj != null)
-                        {
-                            foreach (var pobj in dobj.Pobj.List)
-                            {
-                                if (pobj.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
-                                    envelope = true;
-                            }
-                        }
                     }
 
-                    if (opa)
-                        j.Flags |= JOBJ_FLAG.OPA;
-                    else
-                        j.Flags &= ~JOBJ_FLAG.OPA;
-
-                    if (xlu)
-                        j.Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
-                    else
-                        j.Flags &= ~JOBJ_FLAG.XLU;
-
-                    if (specular)
-                        j.Flags |= JOBJ_FLAG.SPECULAR;
-                    else
-                        j.Flags &= ~JOBJ_FLAG.SPECULAR;
-
-                    if (lighting)
-                        j.Flags |= JOBJ_FLAG.LIGHTING;
-                    else
-                        j.Flags &= ~JOBJ_FLAG.LIGHTING;
-
-                    if (envelope)
-                        j.Flags |= JOBJ_FLAG.ENVELOPE_MODEL;
-                    else
-                        j.Flags &= ~JOBJ_FLAG.ENVELOPE_MODEL;
+                    // check if model is enveloped
+                    if (dobj.Pobj != null)
+                    {
+                        foreach (var pobj in dobj.Pobj.List)
+                        {
+                            if (pobj.Flags.HasFlag(POBJ_FLAG.ENVELOPE))
+                                envelope = true;
+                        }
+                    }
                 }
 
-                if (j.InverseWorldTransform != null)
-                    j.Flags |= JOBJ_FLAG.SKELETON;
-                else
-                    j.Flags &= ~JOBJ_FLAG.SKELETON;
+                SetFlag(JOBJ_FLAG.OPA, opa);
+                SetFlag(JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE, xlu);
+                SetFlag(JOBJ_FLAG.SPECULAR, specular);
+                SetFlag(JOBJ_FLAG.LIGHTING, lighting);
+                SetFlag(JOBJ_FLAG.ENVELOPE_MODEL, envelope);
 
-                if (ChildHasFlag(j.Child, JOBJ_FLAG.XLU))
-                    j.Flags |= JOBJ_FLAG.ROOT_XLU;
-                else
-                    j.Flags &= ~JOBJ_FLAG.ROOT_XLU;
-
-                if (ChildHasFlag(j.Child, JOBJ_FLAG.OPA))
-                    j.Flags |= JOBJ_FLAG.ROOT_OPA;
-                else
-                    j.Flags &= ~JOBJ_FLAG.ROOT_OPA;
-
-                if (ChildHasFlag(j.Child, JOBJ_FLAG.TEXEDGE))
-                    j.Flags |= JOBJ_FLAG.ROOT_TEXEDGE;
-                else
-                    j.Flags &= ~JOBJ_FLAG.ROOT_TEXEDGE;
+                //if (xlu)
+                //    Flags |= JOBJ_FLAG.XLU | JOBJ_FLAG.TEXEDGE;
+                //else
+                //    Flags &= ~JOBJ_FLAG.XLU;
             }
 
-            if (ChildHasFlag(Child, JOBJ_FLAG.SKELETON))
-                Flags |= JOBJ_FLAG.SKELETON_ROOT;
-            else
-                Flags &= ~JOBJ_FLAG.SKELETON_ROOT;
+
+            // check if this joint is part of the skeleton
+            SetFlag(JOBJ_FLAG.SKELETON, InverseWorldTransform != null);
+
+            // set root flags
+            SetFlag(JOBJ_FLAG.ROOT_XLU, ChildHasFlag(Child, JOBJ_FLAG.XLU));
+            SetFlag(JOBJ_FLAG.ROOT_OPA, ChildHasFlag(Child, JOBJ_FLAG.OPA));
+            SetFlag(JOBJ_FLAG.ROOT_TEXEDGE, ChildHasFlag(Child, JOBJ_FLAG.TEXEDGE));
+            SetFlag(JOBJ_FLAG.SKELETON_ROOT, isRoot && ChildHasFlag(Child, JOBJ_FLAG.SKELETON));
         }
 
         /// <summary>
@@ -225,24 +215,36 @@ namespace HSDRaw.Common
         /// <returns></returns>
         private static bool ChildHasFlag(HSD_JOBJ jobj, JOBJ_FLAG flag)
         {
+            // joint is null
             if (jobj == null)
                 return false;
 
-            bool hasFlag = jobj.Flags.HasFlag(flag);
+            // joint has flag
+            if (jobj.Flags.HasFlag(flag))
+                return true;
 
-            foreach (var c in jobj.Children)
-            {
-                if (ChildHasFlag(c, flag))
-                    hasFlag = true;
-            }
+            // check if child has flag
+            if (jobj.Child != null && ChildHasFlag(jobj.Child, flag))
+                return true;
 
-            if (jobj.Next != null)
-            {
-                if (ChildHasFlag(jobj.Next, flag))
-                    hasFlag = true;
-            }
+            // check if sibling has flag
+            if (jobj.Next != null && ChildHasFlag(jobj.Next, flag))
+                return true;
 
-            return hasFlag;
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="flag"></param>
+        /// <param name="value"></param>
+        private void SetFlag(JOBJ_FLAG flag, bool value)
+        {
+            if (value)
+                Flags |= flag;
+            else
+                Flags &= ~flag;
         }
     }
 }
