@@ -422,7 +422,7 @@ vec4 PerformTextureOp(int index, vec4 passColor)
 			}
 			break;
 		case COLORMAP_BLEND:
-			passColor = mix(passColor, pass, TEX[index].blend);
+			passColor.rgb = mix(passColor.rgb, pass.rgb, TEX[index].blend);
 			break;
 		case COLORMAP_MODULATE:
 			passColor.rgb *= pass.rgb;

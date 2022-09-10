@@ -461,11 +461,12 @@ namespace HSDRawViewer
                 v.Flags = 0;
 
             jobj.UpdateFlags();
+            JOBJ_FLAG ignore = JOBJ_FLAG.CLASSICAL_SCALING | JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.PTCL | JOBJ_FLAG.SPLINE;
 
             var list = jobj.ToList;
             for (int i = 0; i < originalFlags.Count; i++)
             {
-                if (originalFlags[i] != list[i].Flags)
+                if ((originalFlags[i] & ~ignore) != (list[i].Flags & ~ignore))
                 {
                     System.Diagnostics.Debug.WriteLine($"{i}");
                     System.Diagnostics.Debug.WriteLine($"\t{originalFlags[i]}");

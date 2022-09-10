@@ -56,7 +56,7 @@ namespace HSDRawViewer.Rendering.Models
             //trans.z = tobj->translate.z;
             var trans = Matrix4.CreateTranslation(
                 -TX,
-                -(TY + (TOBJ.WrapT == GXWrapMode.MIRROR ? 1f / (TOBJ.RepeatT / SY) : 0)),
+                -(TY + (TOBJ.WrapT == GXWrapMode.MIRROR ? 1f / (TOBJ.RepeatT / SY) : 0f)),
                 TZ);
 
             //rot.x = tobj->rotate.x;
@@ -75,8 +75,8 @@ namespace HSDRawViewer.Rendering.Models
                 Math.Abs(SY) < Single.Epsilon ? 0 : TOBJ.RepeatT / SY,
                 SZ);
 
-            // make srt matrix
-            return scale * rot * trans;
+            // make trs matrix
+            return trans * rot * scale;
         }
 
         /// <summary>

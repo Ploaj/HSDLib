@@ -544,7 +544,10 @@ namespace HSDRawViewer.Rendering.Models
             }
 
             // render sorted xlu objects last
-            foreach (var xlu in RenderDobjs.Where(e => e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) && e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.XLU)))
+            foreach (var xlu in RenderDobjs.Where(e => 
+                e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) &&
+                (e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.XLU) || e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.TEXEDGE))
+                ))
             {
                 if (DisplayObject(xlu.Visible, xlu.Selected) && xlu.Parent.BranchVisible)
                     RenderDOBJShader(xlu);
