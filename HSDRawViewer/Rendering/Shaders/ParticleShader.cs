@@ -35,9 +35,10 @@ namespace HSDRawViewer.Rendering.Shaders
 
         public ParticleShader()
         {
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\ps.vert"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_alpha_test.frag"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\ps.frag"));
+            var path = AppDomain.CurrentDomain.BaseDirectory;
+            LoadShader(System.IO.Path.Combine(path, @"Shader\ps.vert"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx_alpha_test.frag"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\ps.frag"));
             Link();
 
             if (!ProgramCreatedSuccessfully())

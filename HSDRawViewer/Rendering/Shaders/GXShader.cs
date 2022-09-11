@@ -20,13 +20,14 @@ namespace HSDRawViewer.Rendering.Shaders
 
         public GXShader()
         {
-            LoadShader(@"Shader\gx_material.frag", ShaderType.VertexShader);
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.vert"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_uv.frag"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_lightmap.frag"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_material.frag"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx_alpha_test.frag"));
-            LoadShader(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Shader\gx.frag"));
+            var path = AppDomain.CurrentDomain.BaseDirectory;
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx_material.frag"), ShaderType.VertexShader);
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx.vert"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx_uv.frag"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx_lightmap.frag"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx_material.frag"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx_alpha_test.frag"));
+            LoadShader(System.IO.Path.Combine(path, @"Shader\gx.frag"));
             Link();
 
             if (!ProgramCreatedSuccessfully())
