@@ -17,15 +17,15 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static string OpenFolder()
         {
-            FolderBrowserEx.FolderBrowserDialog folderBrowserDialog = new FolderBrowserEx.FolderBrowserDialog();
-            folderBrowserDialog.Title = "Select a folder";
-            // folderBrowserDialog.InitialFolder = @"C:\";
-            folderBrowserDialog.AllowMultiSelect = false;
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            using (var fbd = new FolderBrowserDialog())
             {
-                return folderBrowserDialog.SelectedFolder;
+                DialogResult result = fbd.ShowDialog();
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    return fbd.SelectedPath;
+                }
+                return null;
             }
-            return null;
         }
 
         /// <summary>
