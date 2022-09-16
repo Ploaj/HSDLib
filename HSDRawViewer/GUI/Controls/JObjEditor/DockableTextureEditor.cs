@@ -64,7 +64,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// </summary>
         private void ClearTextureList()
         {
-            if (TextureLists != null)
+            // if (TextureLists != null)
             {
                 TextureLists = new TObjProxy[0];
                 textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
@@ -115,6 +115,10 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
                 // update map id
                 TextureLists[i].TOBJ.TexMapID = HSDRaw.GX.GXTexMapID.GX_TEXMAP0 + i;
+
+                // set initial texture
+                if (i == 0)
+                    _mobj.Textures = TextureLists[i].TOBJ;
 
                 // update linkage
                 if (i < TextureLists.Length - 1)
