@@ -53,7 +53,7 @@ namespace System.Windows.Forms
             IntPtr hdc2 = bufferedGraphics.GetHdc();
 
             BitBlt(hdc1, bounds.X, bounds.Y,
-                bounds.Width, bounds.Height, hdc2, p.X, p.Y, SRCCOPY);
+                bounds.Width, bounds.Height, hdc2, (int)p.X, (int)p.Y, SRCCOPY);
 
             g.ReleaseHdc(hdc1);
             bufferedGraphics.ReleaseHdc(hdc2);

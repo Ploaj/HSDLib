@@ -125,9 +125,6 @@
     <Compile Update="Tools\FlagEnumEditor.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="GUI\OpenFolderDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <None Update="lib\Consolas.bff">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -187,6 +184,7 @@
     </PackageReference>
     <PackageReference Include="DockPanelSuite" Version="3.1.0" />
     <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.0" />
+    <PackageReference Include="FolderBrowserEx" Version="1.0.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
