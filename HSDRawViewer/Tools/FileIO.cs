@@ -9,22 +9,25 @@ namespace HSDRawViewer.Tools
         private static string PrevSaveLocation = null;
 
         private static string PrevOpenLocation = null;
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
+        /// 
+
         public static string OpenFolder()
         {
-            using (OpenFolderDialog d = new OpenFolderDialog())
+            using (var fbd = new FolderBrowserDialog())
             {
-                if (d.ShowDialog() == DialogResult.OK)
+                DialogResult result = fbd.ShowDialog();
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 {
-                    return d.SelectedPath;
+                    return fbd.SelectedPath;
                 }
+                return null;
             }
-            return null;
         }
 
         /// <summary>
