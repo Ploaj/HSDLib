@@ -9,12 +9,14 @@ namespace HSDRawViewer.Tools
         private static string PrevSaveLocation = null;
 
         private static string PrevOpenLocation = null;
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
+        /// 
+
         public static string OpenFolder()
         {
             using (var fbd = new FolderBrowserDialog())
