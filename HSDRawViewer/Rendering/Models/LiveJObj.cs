@@ -309,9 +309,6 @@ namespace HSDRawViewer.Rendering.Models
                     // get parent scale
                     var parentScale = Parent.LocalTransform.ExtractScale();
 
-                    // get animated vectors
-                    // GetLocalTransformValues(root, out Vector3 trans, out Quaternion rot, out Vector3 scale, index);
-
                     // scale the position only
                     var trans = Translation * parentScale;
 
@@ -336,6 +333,12 @@ namespace HSDRawViewer.Rendering.Models
             {
                 WorldTransform = LocalTransform;
             }
+
+            // resolve ik
+#if DEBUG
+            if (updateChildren)
+                ApplyIK();
+#endif
 
             // calculate billboarding
             if (c != null)
@@ -569,6 +572,28 @@ namespace HSDRawViewer.Rendering.Models
             rotmtx.M43 = mtx.M43;
 
             WorldTransform = rotmtx * scamtx * mv.Inverted();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ApplyIK()
+        {
+            switch (Desc.Flags & JOBJ_FLAG.EFFECTOR)
+            {
+                case JOBJ_FLAG.JOINT1:
+                    IKSolver.ResolveIKJoint1(this);
+                    break;
+                case JOBJ_FLAG.JOINT2:
+                    IKSolver.ResolveIKJoint2(this);
+                    break;
+                case JOBJ_FLAG.EFFECTOR:
+                    IKSolver.ResolveIKEffector(this);
+                    break;
+                default:
+                    IKSolver.RObjUpdateAll(this);
+                    break;
+            }
         }
 
         /// <summary>

@@ -4,11 +4,11 @@ namespace HSDRaw.Common
 {
     public enum REFTYPE
     {
-        EXP = 0x00000000,
-        JOBJ = 0x10000000,
-        LIMIT = 0x20000000,
-        BYTECODE = 0x30000000,
-        IKHINT = 0x40000000,
+        EXP =       0x00000000,
+        JOBJ =      0x10000000,
+        LIMIT =     0x20000000,
+        BYTECODE =  0x30000000,
+        IKHINT =    0x40000000,
     }
 
     public enum ROBJ_LIMIT
@@ -41,7 +41,7 @@ namespace HSDRaw.Common
 
         public REFTYPE RefType { get => (REFTYPE)(Flags & 0x70000000); set => Flags = (Flags & ~0x70000000) | ((int)value & 0x70000000); }
 
-        public int LimitFlag { get => Flags & ~0x70000000; set => Flags = (Flags & 0x70000000) | (value & ~0x70000000); }
+        public int LimitFlag { get => Flags & 0xFFFFFF; set => Flags = (Flags & ~0xFFFFFF) | (value & 0xFFFFFF); }
 
         // union
 

@@ -229,14 +229,22 @@ namespace HSDRaw.Tools.Melee
                     // read dat file
                     var fsize = r.ReadInt32();
                     r.Position -= 4;
-                    var file = r.ReadBytes(fsize);
 
-                    // align in order to move to next
-                    if (r.Position % 0x20 != 0)
-                        r.Position += 0x20 - (r.Position % 0x20);
+                    if (fsize > 0)
+                    {
+                        var file = r.ReadBytes(fsize);
 
-                    // add symbol data
-                    Animations.Add(new AnimationIndexingData(file));
+                        // align in order to move to next
+                        if (r.Position % 0x20 != 0)
+                            r.Position += 0x20 - (r.Position % 0x20);
+
+                        // add symbol data
+                        Animations.Add(new AnimationIndexingData(file));
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }
         }

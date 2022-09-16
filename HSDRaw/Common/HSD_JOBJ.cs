@@ -204,7 +204,11 @@ namespace HSDRaw.Common
             SetFlag(JOBJ_FLAG.ROOT_XLU, ChildHasFlag(Child, JOBJ_FLAG.XLU));
             SetFlag(JOBJ_FLAG.ROOT_OPA, ChildHasFlag(Child, JOBJ_FLAG.OPA));
             SetFlag(JOBJ_FLAG.ROOT_TEXEDGE, ChildHasFlag(Child, JOBJ_FLAG.TEXEDGE));
-            SetFlag(JOBJ_FLAG.SKELETON_ROOT, isRoot && ChildHasFlag(Child, JOBJ_FLAG.SKELETON));
+
+            // TODO: if this joint has any mesh that are not single bound
+            if (isRoot && ChildHasFlag(Child, JOBJ_FLAG.SKELETON))
+                SetFlag(JOBJ_FLAG.SKELETON_ROOT, true);
+            // SetFlag(JOBJ_FLAG.SKELETON_ROOT, isRoot && ChildHasFlag(Child, JOBJ_FLAG.SKELETON));
         }
 
         /// <summary>

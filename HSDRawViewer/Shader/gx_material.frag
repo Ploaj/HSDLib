@@ -78,7 +78,7 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 	spec = vec3(0);
 	
 	// check constant flag
-	if (useConstant == 1 || enableDiffuse == 0)
+	if (useConstant == 1 && enableDiffuse == 0)
 	{
 		diff = vec3(1);
 		return;

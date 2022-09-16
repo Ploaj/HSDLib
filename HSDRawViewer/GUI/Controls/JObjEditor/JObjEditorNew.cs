@@ -724,6 +724,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             foreach (var n in _jointTree.EnumerateJoints())
                 m.Nodes.Add(new AnimNode() { Tracks = n.Tracks });
 
+            m.FrameCount = _viewport.glViewport.MaxFrame;
+
             return m;
         }
 
