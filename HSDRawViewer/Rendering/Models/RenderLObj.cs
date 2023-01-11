@@ -105,6 +105,9 @@ namespace HSDRawViewer.Rendering.Models
 
         [YamlIgnore]
         public Vector4 _color = Vector4.One;
+        public float X { get => _position.X; set => _position.X = value; }
+        public float Y { get => _position.Y; set => _position.Y = value; }
+        public float Z { get => _position.Z; set => _position.Z = value; }
 
         private float A0;
         private float A1;

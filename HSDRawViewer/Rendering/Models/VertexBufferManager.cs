@@ -25,6 +25,10 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="vertices"></param>
         public void AddBuffer(HSD_DOBJ dobj, GX_Vertex[] vertices)
         {
+            // make sure dobj is not already in a vbo
+            if (dobjToVBO.ContainsKey(dobj))
+                return;
+
             // generate buffer
             int _vbo = GL.GenBuffer();
             if (_vbo != -1)

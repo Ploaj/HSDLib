@@ -401,7 +401,7 @@ namespace HSDRawViewer.Rendering.Models
             // enable depth test
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
-            
+
             // prepare shader
             SetupShader();
 
@@ -454,7 +454,8 @@ namespace HSDRawViewer.Rendering.Models
             GL.PopAttrib();
 
             // render splines
-            DrawSplines(camera);
+            if (_settings.RenderSplines)
+                DrawSplines(camera);
 
             // draw lights
             if (_settings.RenderCustomLightPositions && _settings.LightSource == LightRenderMode.Custom)

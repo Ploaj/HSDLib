@@ -241,6 +241,7 @@ namespace HSDRawViewer.GUI
 
                 if (args.KeyCode == Keys.ControlKey)
                     IsControlKey = true;
+
                 /*if (args.Alt)
                 {
                     if (args.KeyCode == Keys.B)

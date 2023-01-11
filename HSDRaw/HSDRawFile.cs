@@ -151,7 +151,11 @@ namespace HSDRaw
                     if (!OffsetContain.Contains(objectOff))
                     {
                         OffsetContain.Add(objectOff);
-                        Offsets.Add(objectOff);
+
+                        if (objectOff % 4 == 0)
+                            Offsets.Add(objectOff);
+                        else
+                            Debug.WriteLine(objectOff + " " + (relocOffset + 4 * i).ToString("X"));
                     }
 
                 }
