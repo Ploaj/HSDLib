@@ -130,32 +130,29 @@ namespace HSDRawViewer.Tools
     }
 
     [TypeConverter(typeof(CustomEnumPropertyConverter))]
-    public class CustomEnumProperty 
+    public class EnumValue
     {
-        private List<string> enums;
+        public string Value { get; set; }
 
-        public string SelectedEnum { get; set; }
+        public CustomEnumProperty Parent;
 
-        public CustomEnumProperty(string[] enums)
+        public EnumValue(CustomEnumProperty parent, string value)
         {
-            this.enums = new List<string>();
-            this.enums.AddRange(enums);
+            Value = value;
+            Parent = parent;
         }
-
-        public List<string> Enums
-        {
-            get { return enums; }
-        }
-
-        public int SelectedEnumIndex { get => enums.IndexOf(SelectedEnum); set => SelectedEnum = enums[value]; }
 
         public override string ToString()
         {
-            return SelectedEnum;
+            return Value;
         }
 
         public class CustomEnumPropertyConverter : TypeConverter
         {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
 
             public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
             {
@@ -166,8 +163,8 @@ namespace HSDRawViewer.Tools
             {
                 var value = context.PropertyDescriptor.GetValue(context.Instance);
 
-                if (value is CustomEnumProperty prop)
-                    return new StandardValuesCollection(prop.Enums);
+                if (value is EnumValue prop)
+                    return new StandardValuesCollection(prop.Parent.Values);
 
                 return base.GetStandardValues(context);
             }
@@ -185,12 +182,11 @@ namespace HSDRawViewer.Tools
 
             public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
             {
-                var v = context.PropertyDescriptor.GetValue(context.Instance);
+                var p = context.PropertyDescriptor.GetValue(context.Instance);
 
-                if (v is CustomEnumProperty prop && value is string str)
+                if (p is EnumValue prop && value is string str)
                 {
-                    prop.SelectedEnum = str;
-                    return prop;
+                    return prop.Parent.Values.Find(e => e.Value == str);
                 }
 
                 return base.ConvertFrom(context, culture, value);
@@ -198,64 +194,70 @@ namespace HSDRawViewer.Tools
         }
     }
 
-    [TypeConverter(typeof(CustomPointerPropertyConverter))]
-    public class CustomPointerProperty
+    public class CustomEnumProperty 
     {
-        public static List<Tuple<string, HSDStruct>> pointers = new List<Tuple<string, HSDStruct>>();
+        public List<EnumValue> Values { get; internal set; } = new List<EnumValue>();
 
-        public HSDStruct Pointer;
-
-        public CustomPointerProperty()
+        public CustomEnumProperty(string[] enums)
         {
-            Pointer = new HSDStruct();
+            foreach (var v in enums)
+                Values.Add(new EnumValue(this, v));
         }
+    }
+
+    [TypeConverter(typeof(CustomPointerPropertyConverter))]
+    public class CustomPointerValue
+    {
+        public static List<CustomPointerValue> Values { get; set; } = new List<CustomPointerValue>();
+
+        public string Value { get; internal set; }
+
+        public HSDStruct Struct { get; internal set; }
 
         public override string ToString()
         {
-            return pointers.FirstOrDefault(e => e.Item2 == Pointer)?.Item1;
+            return Value;
+        }
+    }
+
+
+    public class CustomPointerPropertyConverter : TypeConverter
+    {
+        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        {
+            return true;
         }
 
-        public class CustomPointerPropertyConverter : TypeConverter
-        {
 
-            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return new StandardValuesCollection(CustomPointerValue.Values);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,
+                                              System.Type sourceType)
+        {
+            if (sourceType == typeof(string))
             {
                 return true;
             }
+            else
+                return base.CanConvertFrom(context, sourceType);
+        }
 
-            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value is string str)
             {
-                var value = context.PropertyDescriptor.GetValue(context.Instance);
-
-                if (value is CustomPointerProperty prop)
-                    return new StandardValuesCollection(CustomPointerProperty.pointers.Select(e => e.Item1).ToArray());
-
-                return base.GetStandardValues(context);
+                return CustomPointerValue.Values.Find(e => e.Value == str);
             }
 
-            public override bool CanConvertFrom(ITypeDescriptorContext context,
-                                                  System.Type sourceType)
-            {
-                if (sourceType == typeof(string))
-                {
-                    return true;
-                }
-                else
-                    return base.CanConvertFrom(context, sourceType);
-            }
-
-            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-            {
-                var v = context.PropertyDescriptor.GetValue(context.Instance);
-
-                if (v is CustomPointerProperty prop && value is string str)
-                {
-                    prop.Pointer = CustomPointerProperty.pointers.FirstOrDefault(e => e.Item1 == str)?.Item2;
-                    return prop;
-                }
-
-                return base.ConvertFrom(context, culture, value);
-            }
+            return base.ConvertFrom(context, culture, value);
         }
     }
 
@@ -295,7 +297,7 @@ namespace HSDRawViewer.Tools
             }
             if (p.HasEnums)
             {
-                return ((CustomEnumProperty)this[i].Value).SelectedEnumIndex;
+                return ((EnumValue)this[i].Value).Parent.Values.IndexOf((EnumValue)this[i].Value);
             }
             else
             if (p.IsFloat)
@@ -323,7 +325,7 @@ namespace HSDRawViewer.Tools
 
                 if (p.IsPointer)
                 {
-                    return ((CustomPointerProperty)this[i].Value).Pointer;
+                    return ((CustomPointerValue)this[i].Value).Struct;
                 }
             }
             return null;
@@ -368,12 +370,12 @@ namespace HSDRawViewer.Tools
                 // p.IsPointer
                 if (p.IsPointer)
                 {
-                    Add(p.Name, new CustomPointerProperty());
+                    Add(p.Name, new CustomPointerValue());
                 }
                 else
                 if (p.HasEnums)
                 {
-                    Add(p.Name, new CustomEnumProperty(p.Enums));
+                    Add(p.Name, new CustomEnumProperty(p.Enums).Values[0]);
                 }
                 else
                 if (p.IsFloat)
@@ -418,12 +420,12 @@ namespace HSDRawViewer.Tools
 
                 if (p.IsPointer)
                 {
-                    ((CustomPointerProperty)this[i].Value).Pointer = reference;
+                    this[i].Value = CustomPointerValue.Values.Find(e=>e.Struct == reference);
                 }
                 else
                 if (p.HasEnums)
                 {
-                    ((CustomEnumProperty)this[i].Value).SelectedEnumIndex = value;
+                    this[i].Value = ((EnumValue)this[i].Value).Parent.Values[value];
                 }
                 else
                 if (p.IsFloat)
@@ -468,13 +470,13 @@ namespace HSDRawViewer.Tools
 
                 if (p.IsPointer)
                 {
-                    pointer = ((CustomPointerProperty)this[i].Value).Pointer;
+                    pointer = ((CustomPointerValue)this[i].Value).Struct;
                     r.Write(0, p.BitCount);
                 }
                 else
                 if (p.HasEnums)
                 {
-                    r.Write(((CustomEnumProperty)this[i].Value).SelectedEnumIndex, p.BitCount);
+                    r.Write(((EnumValue)this[i].Value).Parent.Values.IndexOf((EnumValue)this[i].Value), p.BitCount);
                 }
                 else
                 if (p.IsFloat)

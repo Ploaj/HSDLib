@@ -306,7 +306,7 @@ namespace HSDRawViewer.Converters
             var envelopes = pobj.EnvelopeWeights;
 
             var parentTransform = System.Numerics.Matrix4x4.Identity;
-            if (parent != null)
+            if (parent != null && jobjToBone.ContainsKey(parent))
                 parentTransform = jobjToBone[parent].WorldTransform;
 
             var singleBindTransform = System.Numerics.Matrix4x4.Identity;
@@ -344,7 +344,7 @@ namespace HSDRawViewer.Converters
                     mesh.Vertices.Add(vertex);
 
                     // joint parented fake rigging
-                    if (parent != null && parent != _root && !parent.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL))
+                    if (parent != null && parent != _root && !parent.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL) && jobjToBone.ContainsKey(parent))
                     {
                         var vertexWeight = new IOBoneWeight();
                         vertexWeight.BoneName = jobjToBone[parent].Name;

@@ -92,7 +92,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             subActionList.ClearSelected();
 
             foreach (var e in events)
-                subActionList.SetSelected(subActionList.Items.IndexOf(e), true);
+            {
+                var index = subActionList.Items.IndexOf(e);
+
+                if (index >= 0)
+                    subActionList.SetSelected(index, true);
+            }
         }
 
         /// <summary>

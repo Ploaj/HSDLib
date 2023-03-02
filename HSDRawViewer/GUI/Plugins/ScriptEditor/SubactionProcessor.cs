@@ -91,6 +91,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 else
                     boneID = 1;
 
+            if (boneID < 0 || boneID > manager.JointCount)
+                boneID = 0;
+
             var transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
             //transform = transform.ClearScale();
 

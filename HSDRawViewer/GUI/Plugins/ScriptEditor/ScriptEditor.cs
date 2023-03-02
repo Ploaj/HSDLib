@@ -201,7 +201,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             _actionList.ActionsUpdated += () =>
             {
                 // update pointer array
-                CustomPointerProperty.pointers = _actionList.GetPointers();
+                CustomPointerValue.Values = _actionList.GetPointers().Select(e => new CustomPointerValue() { Struct = e.Item2, Value = e.Item1 }).ToList();
 
                 // update data
                 if (_table != null)
