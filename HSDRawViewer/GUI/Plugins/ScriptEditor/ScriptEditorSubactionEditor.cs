@@ -140,12 +140,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // load action types
             if (type != Type)
             {
+                // set type
+                Type = type;
+
+                // set new actions
                 cbActionType.Items.Clear();
                 cbActionType.Items.AddRange(SubactionManager.GetGroup(Type).ToArray());
             }
-
-            // set type
-            Type = type;
 
             //
             // var events = SubactionEvent.GetEvents(type, data);
