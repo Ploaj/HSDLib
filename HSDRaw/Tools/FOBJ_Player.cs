@@ -22,7 +22,7 @@ namespace HSDRaw.Tools
             }
         }
 
-        private float _rate;
+        private float _rate = 1;
 
         public override string ToString()
         {

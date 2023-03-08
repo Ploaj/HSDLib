@@ -172,6 +172,8 @@ namespace HSDRaw.Tools.Melee
                         stream.WriteByte(0xFF);
                 }
 
+                Edited = false;
+
                 return stream.ToArray();
             }
         }
@@ -276,6 +278,8 @@ namespace HSDRaw.Tools.Melee
                 return data.Data;
         }
 
+        public bool Edited { get; internal set; } = false;
+
         /// <summary>
         /// 
         /// </summary>
@@ -294,6 +298,7 @@ namespace HSDRaw.Tools.Melee
             else
             {
                 data.Rename(newsymbol);
+                Edited = true;
                 return true;
             }
         }
@@ -304,6 +309,7 @@ namespace HSDRaw.Tools.Melee
         public void RemoveAnimation(string symbol)
         {
             Animations.RemoveAll(e => e.Symbol == symbol);
+            Edited = true;
         }
 
         /// <summary>
@@ -317,6 +323,7 @@ namespace HSDRaw.Tools.Melee
                 return;
 
             var indexdata = Animations.Find(e => e.Symbol == symbol);
+            Edited = true;
 
             if (indexdata == null)
                 Animations.Add(new AnimationIndexingData(data));

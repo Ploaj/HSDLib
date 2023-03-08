@@ -7,7 +7,7 @@ namespace HSDRawViewer.Converters.Animation
 {
     public class JointAnimationLoader
     {
-        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0)|*.dat;*.anim;*.chr0;";
+        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd)|*.dat;*.anim;*.chr0;*.smd";
 
         /// <summary>
         /// 
@@ -22,6 +22,11 @@ namespace HSDRawViewer.Converters.Animation
 
             if (filePath != null)
             {
+                if (Path.GetExtension(filePath).ToLower().Equals(".smd"))
+                {
+                    return SMDConv.ImportAnimationFromSMD(filePath, _jointMap);
+                }
+                else
                 if (Path.GetExtension(filePath).ToLower().Equals(".chr0"))
                 {
                     return CHR0Converter.LoadCHR0(filePath, _jointMap);

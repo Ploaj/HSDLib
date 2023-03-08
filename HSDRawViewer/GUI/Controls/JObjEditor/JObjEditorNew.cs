@@ -396,10 +396,13 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // calculate max frame count
             vp.MaxFrame = 0;
 
-            vp.MaxFrame = Math.Max(vp.MaxFrame, _jointTree.EnumerateJoints().Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
+            // get max joint animation frame
+            if (_jointTree.EnumerateJoints().Any())
+                vp.MaxFrame = Math.Max(vp.MaxFrame, _jointTree.EnumerateJoints().Max(e => e.Tracks.Count > 0 ? e.Tracks.Max(r => r.FrameCount) : 0));
 
             // todo: max frame of texture animation as well
-            vp.MaxFrame = Math.Max(vp.MaxFrame, _meshList.EnumerateDObjs.Max(e => e.FrameCount));
+            if (_meshList.EnumerateDObjs.Any())
+                vp.MaxFrame = Math.Max(vp.MaxFrame, _meshList.EnumerateDObjs.Max(e => e.FrameCount));
 
             // TODO: find end frame
             //if (ShapeAnimation != null)

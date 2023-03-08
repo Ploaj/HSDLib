@@ -109,7 +109,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private string _selectedActionSymbol;
         private int _selectStateIndex;
 
-
         private FighterAJManager AJManager;
 
         private string AJFilePath;
@@ -248,20 +247,42 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // dipose of resources
             FormClosing += (s, a) =>
             {
-                if (ForceClose || AJManager == null || MessageBox.Show("Are you sure?\nAny animation changes made since last \"Save\" will be lost!", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+                if (AJManager != null && AJManager.Edited)
                 {
-                    ItCo = null;
-                    _animEditor.CloseOnExit = true;
-                    _animEditor.Dispose();
-                    _actionList.Dispose();
-                    _subactionEditor.Dispose();
-                    _viewport.Dispose();
+                    var result = MessageBox.Show("Save Animation Changes?", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        OnDatFileSave();
+                    }
+
+                    if (result == DialogResult.Cancel)
+                    {
+                        a.Cancel = true;
+                    }
+                    else
+                    {
+                        EditorCloseDispose();
+                    }
                 }
                 else
                 {
-                    a.Cancel = true;
+                    EditorCloseDispose();
                 }
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void EditorCloseDispose()
+        {
+            ItCo = null;
+            _animEditor.CloseOnExit = true;
+            _animEditor.Dispose();
+            _actionList.Dispose();
+            _subactionEditor.Dispose();
+            _viewport.Dispose();
         }
 
         /// <summary>
@@ -846,6 +867,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (_actionList.SelectedAction != null)
             {
                 var f = FileIO.OpenFile("Supported Formats |*.dat;*.anim");
+
+                // check if file is null
+                if (f == null)
+                    return;
 
                 HSDRawFile file;
 

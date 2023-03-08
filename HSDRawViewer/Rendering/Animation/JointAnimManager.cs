@@ -462,21 +462,11 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public static JointAnimManager LoadFromFile(JointMap _jointMap)
         {
-            var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim (*.dat*.anim*.chr0)|*.dat;*.anim;*.chr0;");
-            //var f = Tools.FileIO.OpenFile("FigaTree/AnimJoint/MayaAnim/EightingMOT (*.dat*.anim*.mota*.gnta*.xml)|*.dat;*.anim;*.mota;*.gnta;*.chr0;*.xml");
+            var f = Tools.FileIO.OpenFile(JointAnimationLoader.SupportedImportAnimFilter);
 
             if (f != null)
             {
                 return JointAnimationLoader.LoadJointAnimFromFile(_jointMap, f);
-                //if (Path.GetExtension(f).ToLower().Equals(".mota") || Path.GetExtension(f).ToLower().Equals(".gnta") ||
-                //    (Path.GetExtension(f).ToLower().Equals(".xml") && MOT_FILE.IsMotXML(f)))
-                //{
-                //    var jointTable = Tools.FileIO.OpenFile("Joint Connector Value (*.jcv)|*.jcv");
-
-                //    if (jointTable != null)
-                //        LoadAnimation(MOTLoader.GetJointTable(jointTable), new MOT_FILE(f));
-                //}
-                //else
             }
             return null;
         }
