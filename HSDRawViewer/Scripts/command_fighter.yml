@@ -302,6 +302,12 @@
 
 - code: 29
   name: Enable Jab Followup
+  parameters:
+  - name: Toggle
+    bitCount: 26
+    enums: 
+    - Normal
+    - Bunny Hood Override
 
 - code: 30
   name: Set Rapid Jab Flag
@@ -335,23 +341,20 @@
 - code: 34
   name: Throw
   parameters:
-  - name: ThrowType
+  - name: Throw Type
     bitCount: 3
     enums:
     - Throw
     - Release
-  - name: Unknown1
-    bitCount: 14
-    hex: true
   - name: Damage
-    bitCount: 9
+    bitCount: 23
   - name: Angle
     bitCount: 9
   - name: Knockback Growth
     bitCount: 9
   - name: Weight Knockback
     bitCount: 9
-  - name: Unknown2
+  - name: Unused
     bitCount: 5
   - name: Base Knockback
     bitCount: 9
@@ -375,9 +378,33 @@
     - Screw Attack
     - Poison Flower
     - Nothing (No Graphic)
-  - name: Unknown4
-    bitCount: 19
-    hex: true
+  - name: Hit SFX Severity
+    bitCount: 3
+    enums:
+    - Weak
+    - Moderate
+    - Strong
+  - name: Hit SFX Kind
+    bitCount: 4
+    enums:
+    - None
+    - NHit (Punch)
+    - MHit (Kick)
+    - SwdHit (Sword)
+    - SJP_Hit (Super Jump/Coin)
+    - MHit+Bat
+    - Harisen (Fan)
+    - EleHit (Electric)
+    - FireHit (Fire)
+    - Nage_Kamu (Yoshi Chew)
+    - KameKr_Hit (Shell Hit)
+    - GHit (Energy)
+    - Peach_Item (Pan, Club, Racket)
+    - IceHit (Bat)
+    - Empty
+    - Empty
+  - name: Unused
+    bitCount: 12
 
 - code: 35
   name: Held Item Invisibility
