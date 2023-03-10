@@ -905,7 +905,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void importFromOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filePath = Tools.FileIO.OpenFile(IOManager.GetModelImportFileFilter());
+            var filePath = Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false));
 
             if (filePath == null)
                 return;

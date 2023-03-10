@@ -5,15 +5,12 @@ using HSDRawViewer.Tools;
 using IONET.Core.Animation;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters.Animation
 {
     public class SMDConv
     {
-        private static Dictionary<IOAnimationTrackType, JointTrackType> Type = new Dictionary<IOAnimationTrackType, HSDRaw.Common.Animation.JointTrackType>()
+        private static Dictionary<IOAnimationTrackType, JointTrackType> Type = new Dictionary<IOAnimationTrackType, JointTrackType>()
         {
             {IOAnimationTrackType.PositionX, JointTrackType.HSD_A_J_TRAX },
             {IOAnimationTrackType.PositionY, JointTrackType.HSD_A_J_TRAY },
@@ -43,12 +40,26 @@ namespace HSDRawViewer.Converters.Animation
 
                     foreach (var k in t.KeyFrames)
                     {
-                        track.Keys.Add(new FOBJKey()
+                        var key = new FOBJKey()
                         {
                             Frame = k.Frame,
                             Value = k.Value,
                             InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                        });
+                        };
+
+                        if (k is IOKeyFrameConstant)
+                        {
+                            key.InterpolationType = GXInterpolationType.HSD_A_OP_CON;
+                        }
+
+                        if (k is IOKeyFrameHermite hermite)
+                        {
+                            key.Tan = hermite.TangentSlopeOutput;
+                        }
+
+                        // TODO: bezier not supported
+
+                        track.Keys.Add(key);
                     }
 
                     n.Tracks.Add(track);

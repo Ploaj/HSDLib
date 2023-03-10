@@ -187,6 +187,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     dobjList.Remove(rem);
 
                 ListUpdated?.Invoke();
+                listDOBJ.DataSource = null;
+                listDOBJ.DataSource = dobjList;
             }
         }
 

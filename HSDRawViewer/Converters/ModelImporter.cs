@@ -105,7 +105,7 @@ namespace HSDRawViewer.Converters
         /// <param name="toReplace"></param>
         public static HSD_JOBJ ImportModelFromFile()
         {
-            return ImportModelFromFile(Tools.FileIO.OpenFile(IOManager.GetModelImportFileFilter()));
+            return ImportModelFromFile(Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false)));
         }
 
         /// <summary>
