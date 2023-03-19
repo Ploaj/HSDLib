@@ -237,7 +237,6 @@ namespace HSDRawViewer
             return newft;
         }
 
-
         public delegate void EditSubaction(SBM_FighterAction action);
         public delegate void EditAnimation(HSD_FigaTree ft, string name);
 

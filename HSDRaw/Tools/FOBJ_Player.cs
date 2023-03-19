@@ -1,4 +1,5 @@
 ﻿using HSDRaw.Common.Animation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -368,6 +369,35 @@ namespace HSDRaw.Tools
             }
 
             Keys = newkeys;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void EulerFilter()
+        {
+            // only apply to rotation tracks
+            if (JointTrackType != JointTrackType.HSD_A_J_ROTX &&
+                JointTrackType != JointTrackType.HSD_A_J_ROTY &&
+                JointTrackType != JointTrackType.HSD_A_J_ROTZ)
+            {
+                return;
+            }
+
+            // fix continuity errors
+            for (int i = 1; i < Keys.Count; i++)
+            {
+                var prevKey = Keys[i - 1];
+                var key = Keys[i];
+
+                if (Math.Abs(prevKey.Value - key.Value) > Math.PI)
+                {
+                    if (prevKey.Value < key.Value)
+                        key.Value -= (float)(2 * Math.PI);
+                    else
+                        key.Value += (float)(2 * Math.PI);
+                }
+            }
         }
     }
     

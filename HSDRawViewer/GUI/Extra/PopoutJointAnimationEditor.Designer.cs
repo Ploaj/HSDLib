@@ -35,6 +35,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.optimizeAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.applyEulerFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,29 +45,29 @@
             this.jointTree.HideSelection = false;
             this.jointTree.Indent = 12;
             this.jointTree.ItemHeight = 24;
-            this.jointTree.Location = new System.Drawing.Point(0, 31);
-            this.jointTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.jointTree.Location = new System.Drawing.Point(0, 25);
+            this.jointTree.Margin = new System.Windows.Forms.Padding(4);
             this.jointTree.Name = "jointTree";
-            this.jointTree.Size = new System.Drawing.Size(327, 663);
+            this.jointTree.Size = new System.Drawing.Size(287, 626);
             this.jointTree.TabIndex = 1;
             this.jointTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.jointTree_AfterSelect);
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(327, 31);
-            this.splitter1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitter1.Location = new System.Drawing.Point(287, 25);
+            this.splitter1.Margin = new System.Windows.Forms.Padding(4);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(4, 663);
+            this.splitter1.Size = new System.Drawing.Size(4, 626);
             this.splitter1.TabIndex = 2;
             this.splitter1.TabStop = false;
             // 
             // graphEditor1
             // 
             this.graphEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.graphEditor1.Location = new System.Drawing.Point(331, 31);
-            this.graphEditor1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.graphEditor1.Location = new System.Drawing.Point(291, 25);
+            this.graphEditor1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.graphEditor1.Name = "graphEditor1";
-            this.graphEditor1.Size = new System.Drawing.Size(1112, 663);
+            this.graphEditor1.Size = new System.Drawing.Size(972, 626);
             this.graphEditor1.TabIndex = 0;
             // 
             // toolStrip1
@@ -76,7 +77,7 @@
             this.toolStripDropDownButton1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1443, 31);
+            this.toolStrip1.Size = new System.Drawing.Size(1263, 25);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -84,30 +85,38 @@
             // 
             this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.optimizeAllToolStripMenuItem});
+            this.optimizeAllToolStripMenuItem,
+            this.applyEulerFilterToolStripMenuItem});
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(92, 28);
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(76, 22);
             this.toolStripDropDownButton1.Text = "Animation";
             // 
             // optimizeAllToolStripMenuItem
             // 
             this.optimizeAllToolStripMenuItem.Name = "optimizeAllToolStripMenuItem";
-            this.optimizeAllToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.optimizeAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.optimizeAllToolStripMenuItem.Text = "Optimize All";
             this.optimizeAllToolStripMenuItem.Click += new System.EventHandler(this.optimizeAllToolStripMenuItem_Click);
             // 
+            // applyEulerFilterToolStripMenuItem
+            // 
+            this.applyEulerFilterToolStripMenuItem.Name = "applyEulerFilterToolStripMenuItem";
+            this.applyEulerFilterToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.applyEulerFilterToolStripMenuItem.Text = "Apply Euler Filter";
+            this.applyEulerFilterToolStripMenuItem.Click += new System.EventHandler(this.applyEulerFilterToolStripMenuItem_Click);
+            // 
             // PopoutJointAnimationEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1443, 694);
+            this.ClientSize = new System.Drawing.Size(1263, 651);
             this.Controls.Add(this.graphEditor1);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.jointTree);
             this.Controls.Add(this.toolStrip1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "PopoutJointAnimationEditor";
             this.Text = "Joint Animation Editor";
             this.toolStrip1.ResumeLayout(false);
@@ -125,5 +134,6 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem optimizeAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem applyEulerFilterToolStripMenuItem;
     }
 }

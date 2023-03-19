@@ -396,7 +396,7 @@ namespace HSDRawViewer.GUI
                 }
 
                 nudFrame.Value = frame;
-                animationTrack.Frame = (int)frame;
+                animationTrack.Frame = (float)frame;
             }
         }
 
@@ -801,11 +801,11 @@ namespace HSDRawViewer.GUI
                 {
                     if (_playbackMode == PlaybackMode.Forward && !(!LoopPlayback && Frame == MaxFrame))
                     {
-                        Frame++;
+                        Frame += _fps / 60f;
                     }
                     if (_playbackMode == PlaybackMode.Reverse && !(!LoopPlayback && Frame == 0))
                     {
-                        Frame--;
+                        Frame -= _fps / 60f;
                     }
                 }
             };

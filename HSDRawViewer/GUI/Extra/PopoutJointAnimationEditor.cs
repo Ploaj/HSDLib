@@ -47,6 +47,17 @@ namespace HSDRawViewer.GUI.Extra
                     foreach (JointNode child in Nodes)
                         child.Optimize(settings, optimizeChildren);
             }
+
+            public void EulerFilter()
+            {
+                if (AnimNode == null || JOBJ == null)
+                    return;
+
+                foreach (var a in AnimNode.Tracks)
+                {
+                    a.EulerFilter();
+                }
+            }
         }
 
         /// <summary>
@@ -147,6 +158,22 @@ namespace HSDRawViewer.GUI.Extra
                     {
                         node.Optimize(_settings);
                     }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void applyEulerFilterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Apply Euler Filter to all rotation tracks?", "Apply Euler Filter", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                foreach (JointNode node in jointTree.Nodes)
+                {
+                    node.EulerFilter();
+                }
             }
         }
     }
