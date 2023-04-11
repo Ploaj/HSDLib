@@ -212,6 +212,10 @@ namespace HSDRawViewer.Converters
                     var old = oldlist.GetJObjAtIndex(i).Desc;
                     var n = newlist.GetJObjAtIndex(i).Desc;
 
+                    // copy compensate flag if it exists
+                    if (n.Flags.HasFlag(JOBJ_FLAG.MTX_SCALE_COMPENSATE))
+                        old.Flags |= JOBJ_FLAG.MTX_SCALE_COMPENSATE;
+
                     old.TX = n.TX; old.TY = n.TY; old.TZ = n.TZ;
                     old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
                     old.SX = n.SX; old.SY = n.SY; old.SZ = n.SZ;

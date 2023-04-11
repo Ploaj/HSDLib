@@ -45,13 +45,7 @@ namespace HSDRawViewer.Rendering.Models
         public LightRenderMode LightSource { get; set; } = LightRenderMode.Camera;
 
         [Browsable(false)]
-        public RenderLObj[] _lights { get; } = new RenderLObj[]
-        {
-            new RenderLObj(),
-            new RenderLObj(),
-            new RenderLObj(),
-            new RenderLObj(),
-        };
+        public RenderLObj[] _lights { get; internal set; }
 
         [Category("2. Lighting"), DisplayName("Custom Light 0"), Description(""), TypeConverter(typeof(ExpandableObjectConverter)), YamlDotNet.Serialization.YamlIgnore]
         public RenderLObj Light0 { get => _lights[0]; set => _lights[0] = value; }
@@ -64,5 +58,16 @@ namespace HSDRawViewer.Rendering.Models
 
         [Category("2. Lighting"), DisplayName("Custom Light 3"), Description(""), TypeConverter(typeof(ExpandableObjectConverter)), YamlDotNet.Serialization.YamlIgnore]
         public RenderLObj Light3 { get => _lights[3]; set => _lights[3] = value; }
+
+        public JobjDisplaySettings()
+        {
+            _lights = new RenderLObj[]
+            {
+                new RenderLObj(),
+                new RenderLObj(),
+                new RenderLObj(),
+                new RenderLObj(),
+            };
+        }
     }
 }

@@ -1135,5 +1135,40 @@ NONE - None (do not use)";
 
             glviewport.SwapBuffers();
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class ShiftSettings
+        {
+            [Category("Settings"), DisplayName("Shift Amount"), Description("Add this value to all key's values.")]
+            public float ShiftAmount { get; set; } = 0;
+        }
+
+        private static ShiftSettings _shiftSettings = new ShiftSettings();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void shiftValuesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (_selectedPlayer != null)
+            {
+                using (PropertyDialog d = new PropertyDialog("Shift Settings", _shiftSettings))
+                {
+                    if (d.ShowDialog() == DialogResult.OK)
+                    {
+                        foreach (var k in _selectedPlayer.Keys)
+                            k.Value += _shiftSettings.ShiftAmount;
+                        glviewport.Invalidate();
+                        OnTrackEdited(EventArgs.Empty);
+                    }
+                }
+            }
+        }
     }
 }

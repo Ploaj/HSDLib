@@ -17,8 +17,8 @@
         public short ECBBone6 { get => _s.GetInt16(0x0A); set => _s.SetInt16(0x0A, value); }
 
         public float Multiplier { get => _s.GetFloat(0x0C); set => _s.SetFloat(0x0C, value); }
-        public float HorizontalScale { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
-        public float VerticalOffsetFromTop { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
-        public float VerticalScale { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
+        public float LedgeGrabWidth { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
+        public float LedgeGrabYOffset { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
+        public float LedgeGrabHeight { get => _s.GetFloat(0x18); set => _s.SetFloat(0x18, value); }
     }
 }

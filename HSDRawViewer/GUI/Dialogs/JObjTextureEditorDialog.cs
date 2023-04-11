@@ -123,10 +123,25 @@ namespace HSDRawViewer.GUI.Extra
                     tobjs[0].ExportTOBJToFile();
             }
 
+            public void Export(string file_path)
+            {
+                if (tobjs.Count > 0)
+                    using (var bmp = tobjs[0].ToBitmap())
+                        bmp.Save(file_path);
+            }
+
             public Image ToImage()
             {
                 if (tobjs.Count > 0)
                     return TOBJConverter.ToBitmap(tobjs[0]);
+                return null;
+            }
+
+            public HSD_TOBJ GetTObj()
+            {
+                if (tobjs.Count > 0)
+                    return tobjs[0];
+
                 return null;
             }
         }
@@ -282,6 +297,25 @@ namespace HSDRawViewer.GUI.Extra
         private void textureArrayEditor_SelectedObjectChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = textureArrayEditor.SelectedObject;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            var path = FileIO.OpenFolder();
+
+            if (path != null)
+            {
+                int ti = 0;
+                foreach (var proxy in TextureLists)
+                {
+                    proxy.Export(path + $"\\{TOBJConverter.FormatName($"Texture_{ti++}_", proxy.GetTObj())}.png");
+                }
+            }
         }
     }
 }

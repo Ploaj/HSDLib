@@ -18,7 +18,7 @@ namespace HSDRaw.Melee.Gr
 
     public class SBM_GrMurabito : HSDAccessor
     {
-        public override int TrimmedSize => 0x10;
+        public override int TrimmedSize => 0x14;
 
         public HSD_JOBJ Joint { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -31,5 +31,12 @@ namespace HSDRaw.Melee.Gr
         public ushort FriendSpawnChance { get => _s.GetUInt16(0x0C); set => _s.SetUInt16(0x0C, value); }
 
         public ushort FriendId { get => _s.GetUInt16(0x0E); set => _s.SetUInt16(0x0E, value); }
+
+        public string FileName
+        {
+            get => _s.GetString(0x10);
+            set => _s.SetString(0x10, value);
+        }
+
     }
 }

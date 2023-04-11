@@ -305,6 +305,9 @@ namespace HSDRaw.Tools
         /// </summary>
         public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> frameSpeedMultiplers)
         {
+            if (Keys.Count <= 1)
+                return;
+
             //
             var newKeys = new List<FOBJKey>();
 

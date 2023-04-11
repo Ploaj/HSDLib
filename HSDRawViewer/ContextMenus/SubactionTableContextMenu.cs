@@ -138,13 +138,13 @@ namespace HSDRawViewer.ContextMenus
                                     ref data, 
                                     (Tools.Subaction sa, ref int[] p) =>
                                     {
-                                        if (sa.Code == 17 << 2)
+                                        if (sa.Code == 17 << 2 && p[2] > 10000)
                                             p[2] = (p[2] % 1000) + 5000;
 
-                                        if (sa.Code == 54 << 2)
+                                        if (sa.Code == 54 << 2 && p[1] > 10000)
                                             p[1] = (p[1] % 1000) + 5000;
 
-                                        if (sa.Code == 55 << 2)
+                                        if (sa.Code == 55 << 2 && p[1] > 10000)
                                             p[1] = (p[1] % 1000) + 5000;
                                     }, 
                                     Tools.SubactionGroup.Fighter);

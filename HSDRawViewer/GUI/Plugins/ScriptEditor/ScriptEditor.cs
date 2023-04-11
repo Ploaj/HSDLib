@@ -861,7 +861,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="e"></param>
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+            if (renderer.FighterModel.RootJObj == null)
                 return;
             
             if (_actionList.SelectedAction != null)
@@ -1032,10 +1032,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ToggleVisibility_Click(object sender, EventArgs e)
+        private void UpdateRenderCheckboxes(object sender, EventArgs e)
         {
             renderer.RenderFighter = fighterModelToolStripMenuItem.Checked;
             renderer.RenderItem = itemModelToolStripMenuItem.Checked;
+            renderer.RenderBones = bonesToolStripMenuItem.Checked;
 
             renderer.RenderHitboxes = hitboxesToolStripMenuItem.Checked;
             renderer.RenderHurtboxes = hurtboxesToolStripMenuItem.Checked;

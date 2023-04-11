@@ -34,6 +34,7 @@
             this.toolStrip4 = new System.Windows.Forms.ToolStrip();
             this.exporttoolStripButton = new System.Windows.Forms.ToolStripButton();
             this.replaceTextureButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.groupBox1.SuspendLayout();
             this.toolStrip4.SuspendLayout();
@@ -93,7 +94,8 @@
             this.toolStrip4.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exporttoolStripButton,
-            this.replaceTextureButton});
+            this.replaceTextureButton,
+            this.toolStripButton1});
             this.toolStrip4.Location = new System.Drawing.Point(0, 0);
             this.toolStrip4.Name = "toolStrip4";
             this.toolStrip4.Size = new System.Drawing.Size(800, 27);
@@ -117,6 +119,15 @@
             this.replaceTextureButton.Size = new System.Drawing.Size(113, 24);
             this.replaceTextureButton.Text = "Replace Texture";
             this.replaceTextureButton.Click += new System.EventHandler(this.replaceTextureButton_Click);
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(128, 24);
+            this.toolStripButton1.Text = "Export All Textures";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // splitter1
             // 
@@ -155,5 +166,6 @@
         private System.Windows.Forms.ToolStripButton exporttoolStripButton;
         private System.Windows.Forms.ToolStripButton replaceTextureButton;
         private System.Windows.Forms.Splitter splitter1;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }

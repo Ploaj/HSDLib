@@ -109,6 +109,15 @@ namespace HSDRawViewer.Rendering.Models
         public float Y { get => _position.Y; set => _position.Y = value; }
         public float Z { get => _position.Z; set => _position.Z = value; }
 
+        [Browsable(false)]
+        public byte R { get => (byte)(_color.X * 255); set => _color.X = value / 255f; }
+        [Browsable(false)]
+        public byte G { get => (byte)(_color.Y * 255); set => _color.Y = value / 255f; }
+        [Browsable(false)]
+        public byte B { get => (byte)(_color.Z * 255); set => _color.Z = value / 255f; }
+        [Browsable(false)]
+        public byte A { get => (byte)(_color.W * 255); set => _color.W = value / 255f; }
+
         private float A0;
         private float A1;
         private float A2;

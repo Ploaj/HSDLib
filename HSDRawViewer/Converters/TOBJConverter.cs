@@ -156,7 +156,7 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="tobj"></param>
         /// <returns></returns>
-        public static Bitmap ToBitmap(HSD_TOBJ tobj)
+        public static Bitmap ToBitmap(this HSD_TOBJ tobj)
         {
             if (tobj.ImageData == null)
                 return null;

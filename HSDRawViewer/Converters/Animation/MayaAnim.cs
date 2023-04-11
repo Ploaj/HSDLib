@@ -19,6 +19,10 @@ namespace HSDRawViewer.Converters
         {
             [DisplayName("Use Radians"), Description("")]
             public bool UseRadians { get; set; } = true;
+            
+        
+            [DisplayName("Bake Animation"), Description("")]
+            public bool BakeAnimation { get; set; } = false;
         }
 
         private static ExportSettings MayaSettings = new ExportSettings();
@@ -79,74 +83,90 @@ namespace HSDRawViewer.Converters
                         mtrack.output = MayaAnim.OutputType.angular;
 
                     FOBJAnimState prevState = null;
-                    for (int i = 0; i < t.Keys.Count; i++)
+                    if (MayaSettings.BakeAnimation)
                     {
-                        // get maximum frame to use as framecount
-                        frameCount = (int)Math.Max(frameCount, t.Keys[i].Frame);
-
-                        // get current state at this key frame
-                        var state = t.GetState(t.Keys[i].Frame);
-                        bool nextSlope = i + 1 < t.Keys.Count && t.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
-
-                        if (t.Keys[i].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
-                            continue;
-
-
-                        // assuming last frame
-                        // if last frame shift frame information over
-                        if (t.Keys[i].Frame == state.t1)
+                        for (int i = 0; i <= t.FrameCount; i++)
                         {
-                            state.t0 = state.t1;
-                            state.p0 = state.p1;
-                            state.d0 = state.d1;
-                            //state.op_intrp = state.op;
+                            mtrack.keys.Add(new MayaAnim.AnimKey()
+                            {
+                                input = i,
+                                output = t.GetValue(i),
+                                outtan = "linear",
+                                intan = "linear",
+                            });
                         }
-
-                        // generate key with time and value
-                        var animkey = new MayaAnim.AnimKey()
+                    }
+                    else
+                    {
+                        for (int i = 0; i < t.Keys.Count; i++)
                         {
-                            input = state.t0,
-                            output = state.p0,
-                        };
+                            // get maximum frame to use as framecount
+                            frameCount = (int)Math.Max(frameCount, t.Keys[i].Frame);
 
-                        // nothing to do for linear
-                        //if (op_intrp == GXInterpolationType.HSD_A_OP_LIN)
+                            // get current state at this key frame
+                            var state = t.GetState(t.Keys[i].Frame);
+                            bool nextSlope = i + 1 < t.Keys.Count && t.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
 
-                        // set step type for constant and key
-                        if (state.op_intrp == GXInterpolationType.HSD_A_OP_CON ||
-                            state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
-                        {
-                            animkey.intan = "auto";
-                            animkey.outtan = "step";
+                            if (t.Keys[i].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
+                                continue;
+
+
+                            // assuming last frame
+                            // if last frame shift frame information over
+                            if (t.Keys[i].Frame == state.t1)
+                            {
+                                state.t0 = state.t1;
+                                state.p0 = state.p1;
+                                state.d0 = state.d1;
+                                //state.op_intrp = state.op;
+                            }
+
+                            // generate key with time and value
+                            var animkey = new MayaAnim.AnimKey()
+                            {
+                                input = state.t0,
+                                output = state.p0,
+                            };
+
+                            // nothing to do for linear
+                            //if (op_intrp == GXInterpolationType.HSD_A_OP_LIN)
+
+                            // set step type for constant and key
+                            if (state.op_intrp == GXInterpolationType.HSD_A_OP_CON ||
+                                state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
+                            {
+                                animkey.intan = "auto";
+                                animkey.outtan = "step";
+                            }
+
+                            // set tangents for weighted slopes
+                            if (state.op_intrp == GXInterpolationType.HSD_A_OP_SLP
+                                || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0
+                                 || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL)
+                            {
+                                animkey.t1 = state.d0;
+                                animkey.t2 = state.d0;
+                                if (nextSlope && prevState != null)
+                                    animkey.t1 = prevState.d1;
+                                animkey.intan = "spline";
+                                animkey.outtan = "spline";
+                            }
+
+                            prevState = state;
+
+                            animkey.t1 = (float)MathHelper.RadiansToDegrees(Math.Atan(animkey.t1));
+                            animkey.t2 = (float)MathHelper.RadiansToDegrees(Math.Atan(animkey.t2));
+
+                            if (mtrack.IsAngular() && !MayaSettings.UseRadians)
+                            {
+                                animkey.output = MathHelper.RadiansToDegrees(animkey.output);
+                                animkey.t1 = MathHelper.RadiansToDegrees(animkey.t1);
+                                animkey.t2 = MathHelper.RadiansToDegrees(animkey.t2);
+                            }
+
+                            // add final key
+                            mtrack.keys.Add(animkey);
                         }
-
-                        // set tangents for weighted slopes
-                        if (state.op_intrp == GXInterpolationType.HSD_A_OP_SLP
-                            || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0
-                             || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL)
-                        {
-                            animkey.t1 = state.d0;
-                            animkey.t2 = state.d0;
-                            if (nextSlope && prevState != null)
-                                animkey.t1 = prevState.d1;
-                            animkey.intan = "spline";
-                            animkey.outtan = "spline";
-                        }
-
-                        prevState = state;
-
-                        animkey.t1 = (float)MathHelper.RadiansToDegrees(Math.Atan(animkey.t1));
-                        animkey.t2 = (float)MathHelper.RadiansToDegrees(Math.Atan(animkey.t2));
-
-                        if (mtrack.IsAngular() && !MayaSettings.UseRadians)
-                        {
-                            animkey.output = MathHelper.RadiansToDegrees(animkey.output);
-                            animkey.t1 = MathHelper.RadiansToDegrees(animkey.t1);
-                            animkey.t2 = MathHelper.RadiansToDegrees(animkey.t2);
-                        }
-
-                        // add final key
-                        mtrack.keys.Add(animkey);
                     }
                 }
 

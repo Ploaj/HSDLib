@@ -176,9 +176,11 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        public int TakeScreenShot = 0;
+        private int TakeScreenShot { get; set; } = 0;
 
-        public bool EnableCSPMode { get; set; } = false;
+        public delegate void ScreenshotTakenCallack(ViewportControl control);
+        public ScreenshotTakenCallack ScreenshotTaken;
+
         private bool _cspMode = false;
         public bool CSPMode
         {
@@ -186,14 +188,17 @@ namespace HSDRawViewer.GUI
             set
             {
                 _cspMode = value;
-                if (_cspMode && EnableCSPMode)
+                if (_cspMode)
                 {
-                    glControl.Dock = DockStyle.Top;
+                    glControl.Dock = DockStyle.None;
+                    glControl.SendToBack();
+                    glControl.Width = CSPWidth * 2;
                     glControl.Height = CSPHeight * 2;
                 }
                 else
                 {
                     glControl.Dock = DockStyle.Fill;
+                    glControl.BringToFront();
                 }
             }
         }
@@ -708,6 +713,7 @@ namespace HSDRawViewer.GUI
                     }
 
                     MessageBox.Show("Screenshot saved as " + fileName);
+                    ScreenshotTaken?.Invoke(this);
                 }
             }
         }
@@ -1050,6 +1056,14 @@ namespace HSDRawViewer.GUI
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void screenshotButton_Click(object sender, EventArgs e)
+        {
+            Screenshot();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Screenshot()
         {
             TakeScreenShot = 1;
         }

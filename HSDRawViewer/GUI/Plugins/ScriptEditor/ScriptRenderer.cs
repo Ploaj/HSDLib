@@ -31,7 +31,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private int StartBone;
 
-        public int AnimIndex = -1;
+        public int AnimIndex { get; set; } = -1;
 
         /// <summary>
         /// 
@@ -68,12 +68,17 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     int index = e - StartBone;
                     if (index < anim.Nodes.Count)
                     {
-                        // set default transforms
-                        joint.SetDefaultSRT();
-
-                        // apply part animation to joint
                         var node = anim.Nodes[index];
-                        joint.ApplyAnimation(node.Tracks, 0);
+
+                        // check if node is animated
+                        if (node.Tracks.Count > 0)
+                        {
+                            // set default transforms
+                            joint.SetDefaultSRT();
+
+                            // apply part animation to joint
+                            joint.ApplyAnimation(node.Tracks, 0);
+                        }
                     }
                 }
             }
@@ -299,10 +304,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // apply joint animation
             FighterModel.RequestAnimationUpdate(FrameFlags.Joint, frame);
 
-            // apply model part anims
-            foreach (var mp in ModelPartsIndices)
-                mp.Apply(FighterModel.RootJObj);
-
             // update throw dummy
             if (ThrowDummyAnim != null && ThrowDummyModel.RootJObj != null)
             {
@@ -322,6 +323,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             // update processor frame
             Processor.SetFrame(frame);
+
+            // apply model part anims
+            foreach (var mp in ModelPartsIndices)
+                mp.Apply(FighterModel.RootJObj);
         }
 
         /// <summary>
@@ -583,6 +588,16 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (RenderECB && ECB != null)
                 DrawECB();
 
+            // draw bones names
+            if (RenderBones)
+            {
+                int bone_index = 0;
+                foreach (var b in FighterModel.RootJObj.Enumerate)
+                {
+                    Text.RenderText(cam, bone_index++.ToString(), b.WorldTransform, StringAlignment.Center, true);
+                }
+            }
+
             // TODO: intro preview border
         }
 
@@ -634,17 +649,17 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 //behind
                 DrawShape.DrawLedgeBox(
                     topN.Z,
-                    topN.Y + ECB.VerticalOffsetFromTop - ECB.VerticalScale / 2,
-                    topN.Z - (correct + ECB.HorizontalScale),
-                    topN.Y + ECB.VerticalOffsetFromTop + ECB.VerticalScale / 2,
+                    topN.Y + ECB.LedgeGrabYOffset - ECB.LedgeGrabHeight / 2,
+                    topN.Z - (correct + ECB.LedgeGrabWidth),
+                    topN.Y + ECB.LedgeGrabYOffset + ECB.LedgeGrabHeight / 2,
                     Color.Red);
 
                 // in front
                 DrawShape.DrawLedgeBox(
                     topN.Z,
-                    topN.Y + ECB.VerticalOffsetFromTop - ECB.VerticalScale / 2,
-                    topN.Z + correct + ECB.HorizontalScale,
-                    topN.Y + ECB.VerticalOffsetFromTop + ECB.VerticalScale / 2,
+                    topN.Y + ECB.LedgeGrabYOffset - ECB.LedgeGrabHeight / 2,
+                    topN.Z + correct + ECB.LedgeGrabWidth,
+                    topN.Y + ECB.LedgeGrabYOffset + ECB.LedgeGrabHeight / 2,
                     Color.Blue);
             }
         }

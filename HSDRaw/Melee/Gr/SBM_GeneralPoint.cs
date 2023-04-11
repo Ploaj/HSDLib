@@ -47,6 +47,14 @@ namespace HSDRaw.Melee.Gr
         Target8 = 206,
         Target9 = 207,
         Target10 = 208,
+        Bumper1 = 252,
+        Bumper2 = 253,
+        Bumper3 = 254,
+        Bumper4 = 255,
+        Bumper5 = 256,
+        Bumper6 = 257,
+        Bumper7 = 258,
+        Bumper8 = 259,
     }
 
     public class SBM_GeneralPointInfo : HSDAccessor

@@ -217,7 +217,7 @@ namespace HSDRaw.Tools.Melee
                                     newData.Add(0);
                                 break;
                             case 's':
-                                if (ushort.TryParse(p[j + 1].Trim(), out ushort sht))
+                                if (short.TryParse(p[j + 1].Trim(), out short sht))
                                 {
                                     newData.Add((byte)(sht >> 8));
                                     newData.Add((byte)(sht & 0xFF));

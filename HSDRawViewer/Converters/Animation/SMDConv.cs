@@ -62,6 +62,9 @@ namespace HSDRawViewer.Converters.Animation
                         track.Keys.Add(key);
                     }
 
+                    if (track.Keys.Count == 1)
+                        track.Keys[0].InterpolationType = GXInterpolationType.HSD_A_OP_KEY;
+
                     n.Tracks.Add(track);
                 }
                 else

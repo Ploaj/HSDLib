@@ -34,9 +34,22 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private RenderJObj RenderJObj;
 
+        private HSD_JOBJ _root;
+
         private bool RenderInViewport = false;
 
-        private HSD_JOBJ _root;
+        private class ModelAccessory
+        {
+            public int AttachIndex;
+
+            public RenderJObj RenderJObj;
+
+            public HSD_JOBJ _root;
+
+            public bool Remove { get; set; } = false;
+        }
+
+        private List<ModelAccessory> _accessories = new List<ModelAccessory>();
 
         public float Frame { get => _viewport.glViewport.Frame; }
 
@@ -383,7 +396,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (!vp.AnimationTrackEnabled)
             {
                 vp.AnimationTrackEnabled = true;
-                vp.Frame = 0;
+                vp.Frame = 1;
                 vp.MaxFrame = 0;
 
                 // show track editor
@@ -415,6 +428,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         public void GLInit()
         {
             RenderJObj.Invalidate();
+
+            foreach (var v in _accessories)
+                v.RenderJObj.Invalidate();
         }
 
         /// <summary>
@@ -422,6 +438,10 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// </summary>
         public void GLFree()
         {
+            RenderJObj.FreeResources();
+
+            foreach (var v in _accessories)
+                v.RenderJObj.FreeResources();
         }
 
         /// <summary>
@@ -441,6 +461,15 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             RenderJObj._settings.RenderOrientation = showBoneOrientationToolStripMenuItem.Checked;
             RenderJObj._settings.OutlineSelected = showSelectionOutlineToolStripMenuItem.Checked;
             RenderJObj.Render(cam);
+
+            // render accessories
+            foreach (var v in _accessories)
+            {
+                v.RenderJObj._settings = RenderJObj._settings;
+                v.RenderJObj.RootJObj.WorldTransform = RenderJObj.RootJObj.GetJObjAtIndex(v.AttachIndex).WorldTransform;
+                v.RenderJObj.RootJObj.Child.RecalculateTransforms(cam, true);
+                v.RenderJObj.Render(cam, false);
+            }
         }
 
         /// <summary>
@@ -453,6 +482,23 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _jointTree.SetJObj(jobj);
             _meshList.SetJObj(jobj);
             RenderJObj.LoadJObj(jobj);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="attach_bone"></param>
+        /// <param name="jobj"></param>
+        public void AddAccessory(int attach_bone, HSD_JOBJ jobj)
+        {
+            var acc = new ModelAccessory()
+            {
+                _root = jobj,
+                AttachIndex = attach_bone,
+                RenderJObj = new RenderJObj(),
+            };
+            acc.RenderJObj.LoadJObj(jobj);
+            _accessories.Add(acc);
         }
 
         /// <summary>
@@ -637,7 +683,10 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 _viewport.glViewport.Camera = settings.Camera;
 
             if (settings.Settings != null)
+            {
+                showBonesToolStripMenuItem.Checked = settings.Settings.RenderBones;
                 RenderJObj._settings = settings.Settings;
+            }
 
             if (settings.Animation != null)
             {
@@ -645,11 +694,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 LoadAnimation(settings.Animation);
 
                 // load material animation if exists
-                var symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
-                var matAnim = MainForm.Instance.GetSymbol(symbol);
-                if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
+                if (MainForm.SelectedDataNode != null)
                 {
-                    LoadAnimation(new MatAnimManager(maj));
+                    var symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
+                    var matAnim = MainForm.Instance.GetSymbol(symbol);
+                    if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
+                    {
+                        LoadAnimation(new MatAnimManager(maj));
+                    }
                 }
 
                 // set frames
@@ -862,6 +914,16 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     _trackEditor.SetKeys("", GraphEditor.AnimType.Joint, null);
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void TakeScreenshot(ViewportControl.ScreenshotTakenCallack callback = null)
+        {
+            _viewport.glViewport.Screenshot();
+            if (callback != null)
+                _viewport.glViewport.ScreenshotTaken += callback;
         }
     }
 }

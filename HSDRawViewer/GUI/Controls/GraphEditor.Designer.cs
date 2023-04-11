@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GraphEditor));
             this.graphBox = new System.Windows.Forms.GroupBox();
-            this.glviewport = new OpenTK.WinForms.GLControl(new OpenTK.WinForms.GLControlSettings() { NumberOfSamples = 8 });
+            this.glviewport = new OpenTK.WinForms.GLControl();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.trackTree = new System.Windows.Forms.TreeView();
             this.splitter2 = new System.Windows.Forms.Splitter();
@@ -61,6 +61,7 @@
             this.showFrameTicksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showTangentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpButton = new System.Windows.Forms.ToolStripButton();
+            this.shiftValuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.graphBox.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip2.SuspendLayout();
@@ -340,7 +341,8 @@
             this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.bakeToolStripMenuItem,
             this.compressToolStripMenuItem,
-            this.reverseToolStripMenuItem});
+            this.reverseToolStripMenuItem,
+            this.shiftValuesToolStripMenuItem});
             this.toolStripDropDownButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton3.Image")));
             this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
@@ -350,21 +352,21 @@
             // bakeToolStripMenuItem
             // 
             this.bakeToolStripMenuItem.Name = "bakeToolStripMenuItem";
-            this.bakeToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.bakeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.bakeToolStripMenuItem.Text = "Bake";
             this.bakeToolStripMenuItem.Click += new System.EventHandler(this.buttonBakeTrack_Click);
             // 
             // compressToolStripMenuItem
             // 
             this.compressToolStripMenuItem.Name = "compressToolStripMenuItem";
-            this.compressToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.compressToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.compressToolStripMenuItem.Text = "Compress";
             this.compressToolStripMenuItem.Click += new System.EventHandler(this.buttonCompressTrack_Click);
             // 
             // reverseToolStripMenuItem
             // 
             this.reverseToolStripMenuItem.Name = "reverseToolStripMenuItem";
-            this.reverseToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.reverseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.reverseToolStripMenuItem.Text = "Reverse";
             this.reverseToolStripMenuItem.Click += new System.EventHandler(this.reverseButton_Click);
             // 
@@ -385,7 +387,7 @@
             // 
             this.showAllTracksToolStripMenuItem.CheckOnClick = true;
             this.showAllTracksToolStripMenuItem.Name = "showAllTracksToolStripMenuItem";
-            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showAllTracksToolStripMenuItem.Text = "Show All Tracks";
             this.showAllTracksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -395,7 +397,7 @@
             this.showFrameTicksToolStripMenuItem.CheckOnClick = true;
             this.showFrameTicksToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showFrameTicksToolStripMenuItem.Name = "showFrameTicksToolStripMenuItem";
-            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showFrameTicksToolStripMenuItem.Text = "Show Frame Ticks";
             this.showFrameTicksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -405,7 +407,7 @@
             this.showTangentsToolStripMenuItem.CheckOnClick = true;
             this.showTangentsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showTangentsToolStripMenuItem.Name = "showTangentsToolStripMenuItem";
-            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showTangentsToolStripMenuItem.Text = "Show Tangents";
             this.showTangentsToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
             // 
@@ -417,6 +419,13 @@
             this.helpButton.Size = new System.Drawing.Size(52, 22);
             this.helpButton.Text = "Help";
             this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
+            // 
+            // shiftValuesToolStripMenuItem
+            // 
+            this.shiftValuesToolStripMenuItem.Name = "shiftValuesToolStripMenuItem";
+            this.shiftValuesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.shiftValuesToolStripMenuItem.Text = "Shift Values";
+            this.shiftValuesToolStripMenuItem.Click += new System.EventHandler(this.shiftValuesToolStripMenuItem_Click);
             // 
             // GraphEditor
             // 
@@ -479,5 +488,6 @@
         private System.Windows.Forms.ToolStripMenuItem compressToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reverseToolStripMenuItem;
         private OpenTK.WinForms.GLControl glviewport;
+        private System.Windows.Forms.ToolStripMenuItem shiftValuesToolStripMenuItem;
     }
 }
