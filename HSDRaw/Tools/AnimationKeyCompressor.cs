@@ -32,12 +32,28 @@ namespace HSDRaw.Tools
                 }
                 else
                 {
-                    // bake keys
-                    // they need to be backed before being compressed
-                    BakeTrack(track);
+                    if (error != 0)
+                    {
+                        // bake keys
+                        // they need to be backed before being compressed
+                        BakeTrack(track);
 
-                    // perform key fitting compression
-                    CompressTrack(track, error);
+                        // perform key fitting compression
+                        CompressTrack(track, error);
+                    }
+                    else
+                    {
+                        // optimize differences in slope
+                        for (int i = track.Keys.Count - 1; i > 0; i--)
+                        {
+                            // previous slope
+                            if (track.Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
+                                continue;
+
+                            if (Math.Abs(track.Keys[i - 1].Tan - track.Keys[i].Tan) < 0.01f)
+                                track.Keys.RemoveAt(i);
+                        }
+                    }
 
                     // remove constant tracks that don't change value
                     if (IsConstant(track) &&

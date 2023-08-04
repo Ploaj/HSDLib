@@ -52,9 +52,10 @@ namespace HSDRawViewer.Rendering.Models
         public Vector3 Scale;
 
         public Matrix4 LocalTransform;
-        public Matrix4 WorldTransform { get => _worldTransform; set { _worldTransform = value; BindTransform = InvertedTransform * value; } }
+        public Matrix4 WorldTransform { get => _worldTransform; set { _worldTransform = value; BindTransform = _invertedTransform * value; } }
         private Matrix4 _worldTransform;
-        private Matrix4 InvertedTransform;
+        public Matrix4 InvertedTransform { get => _invertedTransform; }
+        private Matrix4 _invertedTransform;
         public Matrix4 BindTransform { get; internal set; }
 
         public int JointCount
@@ -126,13 +127,13 @@ namespace HSDRawViewer.Rendering.Models
             RecalculateTransforms(null, false);
 
             // inverse bind
-            InvertedTransform = WorldTransform.Inverted();
+            _invertedTransform = WorldTransform.Inverted();
 
             // inverse bind can be set from jobj as well
             if ((desc.Flags.HasFlag(JOBJ_FLAG.SKELETON) || desc.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT)) &&
                 desc.InverseWorldTransform != null)
             {
-                InvertedTransform = desc.InverseWorldTransform.ToTKMatrix();
+                _invertedTransform = desc.InverseWorldTransform.ToTKMatrix();
             }
 
             // initialize children

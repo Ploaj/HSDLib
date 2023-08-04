@@ -8,7 +8,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
@@ -37,7 +36,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     for (int i = 0; i < MenuTexts.Length; i++)
                     {
                         MenuTexts[i] = new MeleeMenuText();
-                        MenuTexts[i].Data = sisData._s.GetReference<HSDAccessor>(i * 4 + 8)._s.GetData();
+                        var r = sisData._s.GetReference<HSDAccessor>(i * 4 + 8);
+                        if (r != null)
+                            MenuTexts[i].Data = r._s.GetData();
                     }
 
                     if(sisData.ImageData != null)

@@ -53,10 +53,7 @@ namespace HSDRawViewer.GUI.Extra
                 if (AnimNode == null || JOBJ == null)
                     return;
 
-                foreach (var a in AnimNode.Tracks)
-                {
-                    a.EulerFilter();
-                }
+                Tools.EulerFilter.Filter(AnimNode.Tracks);
             }
         }
 
