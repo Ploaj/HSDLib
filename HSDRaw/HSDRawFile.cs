@@ -859,6 +859,7 @@ namespace HSDRaw
                 x => x.StartsWith("tyExpDifferent") ?  new HSDShortArray() : null,
                 x => x.StartsWith("tyNoGetUsTbl") ?  new HSDShortArray() : null,
                 x => x.StartsWith("grMurabito") ?  new HSDNullPointerArrayAccessor<SBM_GrMurabito>() : null,
+                x => x.StartsWith("itData") ?  new HSDArrayAccessor<KAR_Item>() : null,
                 x => new HSDAccessor(),
         };
 

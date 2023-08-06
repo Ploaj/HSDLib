@@ -4,7 +4,7 @@
     {
         public override int TrimmedSize => 0x18;
 
-        public int Unk1 { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
+        public int Bone { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
         public int Padding { get => _s.GetInt32(0x4); set => _s.SetInt32(0x4, value); }
         public float Size { get => _s.GetFloat(0x8); set => _s.SetFloat(0x8, value); }
         public float X { get => _s.GetFloat(0xc); set => _s.SetFloat(0xc, value); }
