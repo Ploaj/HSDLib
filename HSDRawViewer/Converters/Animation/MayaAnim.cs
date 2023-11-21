@@ -53,9 +53,19 @@ namespace HSDRawViewer.Converters
                     return;
             }
 
+            ExportToMayaAnim(filePath, animation, jointMap, MayaSettings);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="nodes"></param>
+        public static void ExportToMayaAnim(string filePath, JointAnimManager animation, JointMap jointMap, ExportSettings exportSettings)
+        {
             MayaAnim a = new MayaAnim();
 
-            if (!MayaSettings.UseRadians)
+            if (!exportSettings.UseRadians)
                 a.header.angularUnit = "deg";
 
             int nodeIndex = 0;
@@ -83,7 +93,7 @@ namespace HSDRawViewer.Converters
                         mtrack.output = MayaAnim.OutputType.angular;
 
                     FOBJAnimState prevState = null;
-                    if (MayaSettings.BakeAnimation)
+                    if (exportSettings.BakeAnimation)
                     {
                         for (int i = 0; i <= t.FrameCount; i++)
                         {
@@ -157,7 +167,7 @@ namespace HSDRawViewer.Converters
                             animkey.t1 = (float)MathHelper.RadiansToDegrees(Math.Atan(animkey.t1));
                             animkey.t2 = (float)MathHelper.RadiansToDegrees(Math.Atan(animkey.t2));
 
-                            if (mtrack.IsAngular() && !MayaSettings.UseRadians)
+                            if (mtrack.IsAngular() && !exportSettings.UseRadians)
                             {
                                 animkey.output = MathHelper.RadiansToDegrees(animkey.output);
                                 animkey.t1 = MathHelper.RadiansToDegrees(animkey.t1);

@@ -8,64 +8,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Tools
 {
     public class FighterConverter
     {
-        private static void DededeAdditionalProcess(RetargetState state, JointAnimManager anim, JointAnimManager source_anim)
-        {
-            // adjust dedede height
-            const float height = 6.487739f;
-            var xrotni = state.targetMap.IndexOf("XRotN");
-            var hipni = state.targetMap.IndexOf("HipN");
-            if (xrotni != -1 && hipni != -1)
-            {
-                var hipn = anim.Nodes[hipni];
-                var xrotn = anim.Nodes[xrotni];
+        public delegate void AdditionalProcess(RetargetState state, JointAnimManager anim, JointAnimManager src_anim);
 
-                var tray = hipn.Tracks.FirstOrDefault(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAY);
-
-                bool hasxrot = false;
-                var xrottray = xrotn.Tracks.FirstOrDefault(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAY);
-                if (xrottray != null)
-                {
-                    foreach (var k in xrottray.Keys)
-                        if (Math.Abs(k.Value - height) > 0.01f)
-                        {
-                            hasxrot = true;
-                            break;
-                        }
-                }
-
-                if (tray != null && !hasxrot)
-                {
-                    foreach (var k in tray.Keys)
-                        k.Value -= height;
-                }
-            }
-
-            // remove haven keys if it's supposed to be constant
-            //var src_haven_i = state.sourceMap.IndexOf("RHaveN");
-            //var tar_haven_i = state.sourceMap.IndexOf("RHaveN");
-            //if (src_haven_i != -1 && tar_haven_i != -1)
-            //{
-            //    var src_haven = source_anim.Nodes[src_haven_i];
-
-            //    AnimationKeyCompressor.OptimizeJointTracks(state.sourceModel.ToList[src_haven_i], ref src_haven.Tracks, 0.01f);
-
-            //    if (src_haven.Tracks.Count <= 1)
-            //        foreach (var t in anim.Nodes[tar_haven_i].Tracks)
-            //        {
-
-            //        }
-            //}
-        }
-
-        public static void GenerateAnimations(string in_directory, string out_directory, string source_file, string target_file, string source_map, string target_map, string fightername)
+        public static void GenerateAnimations(
+            string in_directory, 
+            string out_directory, 
+            string source_file, 
+            string target_file, 
+            string source_map, 
+            string target_map, 
+            string fightername,
+            AdditionalProcess process)
         {
             List<string> files = new List<string>();
 
@@ -100,7 +59,7 @@ namespace HSDRawViewer.Tools
                         outputPath = out_directory,
                         FighterName = fightername,
 
-                        AnimProcess = DededeAdditionalProcess,
+                        AnimProcess = process,
                     };
 
                     ThreadPool.QueueUserWorkItem(
@@ -130,8 +89,6 @@ namespace HSDRawViewer.Tools
             public HSD_JOBJ sourceModel;
             public JointMap targetMap;
             public JointMap sourceMap;
-
-            public delegate void AdditionalProcess(RetargetState state, JointAnimManager anim, JointAnimManager src_anim);
 
             public AdditionalProcess AnimProcess;
         }
@@ -494,6 +451,24 @@ namespace HSDRawViewer.Tools
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        private static float ClampRotation(float v)
+        {
+            if (System.Math.Abs(System.Math.Abs(v) - Math3D.TwoPI) < 0.001)
+            {
+                if (v > 0)
+                    v -= (float)Math3D.TwoPI;
+
+                if (v < 0)
+                    v += (float)Math3D.TwoPI;
+            }
+            return v;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="animPath"></param>
         /// <param name="state"></param>
         /// <returns></returns>
@@ -508,6 +483,20 @@ namespace HSDRawViewer.Tools
                     JointAnimManager anim = Converters.Animation.JointAnimationLoader.LoadJointAnimFromFile(state.sourceMap, animPath);
                     if (frame_count != -1)
                         anim.FrameCount = frame_count;
+
+                    foreach (var n in anim.Nodes)
+                    {
+                        foreach (var t in n.Tracks)
+                        {
+                            if (t.JointTrackType == JointTrackType.HSD_A_J_ROTX ||
+                                t.JointTrackType == JointTrackType.HSD_A_J_ROTY ||
+                                t.JointTrackType == JointTrackType.HSD_A_J_ROTZ)
+                                foreach (var k in t.Keys)
+                                {
+                                    k.Value = ClampRotation(k.Value);
+                                }
+                        }
+                    }
 
                     // retarget animation
                     var new_anim = AnimationRetarget.Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap);
@@ -652,7 +641,7 @@ namespace HSDRawViewer.Tools
         private static Dictionary<string, int> SetFrameLengths = new Dictionary<string, int>()
         {
             {"DamageFlyTop", 60},
-            {"CliffCatch", 7},
+            {"CliffCatch", 8},
 
             {"Squat", 8 },
             {"SquatRv", 10 },

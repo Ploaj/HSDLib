@@ -245,18 +245,20 @@ namespace HSDRaw
             return value;
         }
 
-
         public int ReadPacked()
         {
-            int type = ReadByte();
-            int i = type;
-            if ((i & 0x80) != 0) // max 16 bit I think
-            {
-                i = ReadByte();
-                type = (type & 0x7F) | (i << 7);
-            }
-            return type;
-        }
+            int result = 0;
+            int shift = 0;
+            int parse;
 
+            do
+            {
+                parse = ReadByte();
+                result |= (parse & 0x7F) << shift;
+                shift += 7;
+            } while ((parse & 0x80) != 0);
+
+            return result;
+        }
     }
 }

@@ -29,6 +29,19 @@ namespace HSDRawViewer.Tools
             return Retarget(anim, src_jobj, tar_jobj, src_map, tar_map);
         }
 
+        private static float ClampRotation(float v)
+        {
+            if (System.Math.Abs(System.Math.Abs(v) - Math3D.TwoPI) < 0.001)
+            {
+                if (v > 0)
+                    v -= (float)Math3D.TwoPI;
+
+                if (v < 0)
+                    v += (float)Math3D.TwoPI;
+            }
+            return v;
+        }
+
         /// <summary>
         /// 
         /// </summary>

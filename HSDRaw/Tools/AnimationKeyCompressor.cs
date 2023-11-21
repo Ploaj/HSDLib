@@ -56,7 +56,7 @@ namespace HSDRaw.Tools
                     }
 
                     // remove constant tracks that don't change value
-                    if (IsConstant(track) &&
+                    if (IsConstant(track, 0.01f) &&
                         Math.Abs(joint.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
                             toRemove.Add(track);
                 }

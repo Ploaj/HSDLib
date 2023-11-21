@@ -58,8 +58,8 @@ namespace HSDRaw.Tools
                             break;
                     }
 
-                    if (j > 0x7FF)
-                        j = 0x7FF;
+                    //if (j > 0x3FF)
+                    //    j = 0x3FF;
 
                     int flag = ((j - 1) << 4) | (int)ip;
                     Writer.WritePacked(flag);

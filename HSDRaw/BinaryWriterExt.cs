@@ -83,18 +83,14 @@ namespace HSDRaw
             Console.WriteLine("Stream at 0x{0}", BaseStream.Position.ToString("X"));
         }
 
-        
         public void WritePacked(int i)
         {
-            if (i > 0xFF || (i & 0x80) > 0)
+            while (i > 0x7F)
             {
                 Write((byte)((i & 0x7F) | 0x80));
-                Write((byte)(i >> 7));
+                i >>= 7;
             }
-            else
-            {
-                Write((byte)i);
-            }
+            Write((byte)(i & 0xFF));
         }
 
     }
