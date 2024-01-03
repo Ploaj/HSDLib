@@ -4,11 +4,13 @@ using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Tools.KeyFilters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using static HSDRawViewer.Tools.AnimationRetarget;
 
 namespace HSDRawViewer.Tools
 {
@@ -24,17 +26,26 @@ namespace HSDRawViewer.Tools
             string source_map, 
             string target_map, 
             string fightername,
-            AdditionalProcess process)
+            AdditionalProcess process,
+            CustomRetargetCallback retargetCB)
         {
             List<string> files = new List<string>();
 
-            foreach (var f in Directory.GetFiles(in_directory))
+            if (File.Exists(in_directory))
             {
-                if (f.EndsWith(".chr0"))
+                files.Add(in_directory);
+            }
+            else
+            {
+                foreach (var f in Directory.GetFiles(in_directory))
                 {
-                    files.Add(f);
+                    if (f.EndsWith(".chr0"))
+                    {
+                        files.Add(f);
+                    }
                 }
             }
+
 
             var src_map = new JointMap(source_map);
             var tar_map = new JointMap(target_map);
@@ -60,6 +71,7 @@ namespace HSDRawViewer.Tools
                         FighterName = fightername,
 
                         AnimProcess = process,
+                        RetargetCallback = retargetCB,
                     };
 
                     ThreadPool.QueueUserWorkItem(
@@ -91,6 +103,7 @@ namespace HSDRawViewer.Tools
             public JointMap sourceMap;
 
             public AdditionalProcess AnimProcess;
+            public CustomRetargetCallback RetargetCallback;
         }
 
         /// <summary>
@@ -107,15 +120,18 @@ namespace HSDRawViewer.Tools
             // retarget animation
             var anim = RetargetAnimation(state.animationPath, state);
 
+            // apply euler filter
+            foreach (var n in anim.Nodes)
+            {
+                DiscontinuityFilter.Filter(n.Tracks);
+                EulerFilter.Filter(n.Tracks);
+            }
+
             // apply appends
             PreProcess(state, anim);
 
-            // apply euler filter
-            foreach (var n in anim.Nodes)
-                EulerFilter.Filter(n.Tracks);
-
             // optimize animation
-            anim.Optimize(state.targetModel, 0.01f);
+            // anim.Optimize(state.targetModel, 0.01f);
 
             // change this animation's name
             if (fname.Equals("LandingHeavy"))
@@ -353,7 +369,7 @@ namespace HSDRawViewer.Tools
             // generate guard skeleton
             var guard_model = HSDAccessor.DeepClone<HSD_JOBJ>(state.targetModel);
             var index = 0;
-            foreach (var j in guard_model.ToList)
+            foreach (var j in guard_model.TreeList)
             {
                 if (index >= anim.NodeCount)
                     break;
@@ -499,7 +515,7 @@ namespace HSDRawViewer.Tools
                     }
 
                     // retarget animation
-                    var new_anim = AnimationRetarget.Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap);
+                    var new_anim = AnimationRetarget.Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap, state.RetargetCallback);
 
                     // perform additional process callback
                     if (state.AnimProcess != null)

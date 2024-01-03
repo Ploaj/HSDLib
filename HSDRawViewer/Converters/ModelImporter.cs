@@ -142,8 +142,8 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static bool JointTreeIsSimilar(HSD_JOBJ from, HSD_JOBJ to)
         {
-            var fromList = from.ToList;
-            var toList = to.ToList;
+            var fromList = from.TreeList;
+            var toList = to.TreeList;
 
             // check if they have save joint count
             if (fromList.Count != toList.Count)

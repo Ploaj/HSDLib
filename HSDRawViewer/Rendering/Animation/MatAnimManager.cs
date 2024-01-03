@@ -144,7 +144,7 @@ namespace HSDRawViewer.Rendering
             if (joint == null)
                 return this;
 
-            foreach (var j in joint.ToList)
+            foreach (var j in joint.TreeList)
             {
                 MatAnimJoint matjoint = new MatAnimJoint();
                 if (j.MaterialAnimation != null)

@@ -49,7 +49,7 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
                     foreach (MapHeadAnimation a in Nodes)
                     {
                         if (a.joint != null)
-                            max = Math.Max(max, a.joint.ToList.Max(e => e.AOBJ != null ? e.AOBJ.EndFrame : 0));
+                            max = Math.Max(max, a.joint.TreeList.Max(e => e.AOBJ != null ? e.AOBJ.EndFrame : 0));
                     }
 
                     return max;

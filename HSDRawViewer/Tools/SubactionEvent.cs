@@ -283,6 +283,17 @@ namespace HSDRawViewer.Tools
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="type"></param>
+        /// <param name="cmdList"></param>
+        /// <param name="reference"></param>
+        public SubactionEvent(SubactionGroup type, byte[] cmdList, HSDStruct reference)
+        {
+            LoadCode(type, cmdList, reference);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public int GetParameter(int i)
         {

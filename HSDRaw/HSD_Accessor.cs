@@ -179,7 +179,7 @@ namespace HSDRaw
         }
 
         [Browsable(false)]
-        public List<T> ToList
+        public List<T> TreeList
         {
             get
             {

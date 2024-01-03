@@ -591,24 +591,31 @@
 - code: 54
   name: Footstep Sound and Graphic Effect
   parameters:
-  - name: Graphic ID
+  - name: Flags
     bitCount: 26
+    hex: true
   - name: Sound ID
     bitCount: 32
-  - name: Unknown3
-    bitCount: 32
-    hex: true
+  - name: Padding
+    bitCount: 16
+  - name: Volume
+    bitCount: 8
+  - name: Panning
+    bitCount: 8
 
 - code: 55
-  name: Sound + Graphic Effect
+  name: Sound and Graphic Effect
   parameters:
   - name: Graphic ID
     bitCount: 26
   - name: Sound ID
     bitCount: 32
-  - name: Unknown1
-    bitCount: 32
-    hex: true
+  - name: Padding
+    bitCount: 16
+  - name: Volume
+    bitCount: 8
+  - name: Panning
+    bitCount: 8
 
 - code: 56
   name: Start Smash Charge

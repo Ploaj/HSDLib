@@ -132,7 +132,7 @@ namespace HSDRawViewer.Tools
                 {
                     if(root != null)
                     {
-                        var bones = root.ToList;
+                        var bones = root.TreeList;
                         var ji = 0;
                         foreach (var j in bones)
                         {

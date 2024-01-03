@@ -84,7 +84,7 @@ namespace HSDRawViewer.Rendering.Animation
             if (joint == null)
                 return this;
 
-            foreach (var j in joint.ToList)
+            foreach (var j in joint.TreeList)
             {
                 ShapeAnimJoint matjoint = new ShapeAnimJoint();
                 if (j.ShapeAnimation != null)

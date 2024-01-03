@@ -22,6 +22,7 @@ using HSDRaw.AirRide.Kx;
 using HSDRaw.AirRide;
 using HSDRaw.Melee.Pl.ftData;
 using HSDRaw.Melee.Ty;
+using HSDRaw.MEX.Akaneia;
 
 namespace HSDRaw
 {
@@ -799,6 +800,7 @@ namespace HSDRaw
                     x.Equals("lupe") ||
                     x.Equals("tdsce") ?  new HSDNullPointerArrayAccessor<HSD_JOBJDesc>() : null,
                 x => x.EndsWith("_model_set") ?  new HSD_JOBJDesc() : null,
+                x => x.EndsWith("_model_group") ?  new HSD_ModelGroup() : null,
                 x => x.Equals("ftDataMario") ?  new SBM_ftDataMario() : null,
                 x => x.Equals("ftDataMars") ?  new SBM_ftDataMars() : null,
                 x => x.Equals("ftDataEmblem") ?  new SBM_ftDataMars() : null,
@@ -860,6 +862,10 @@ namespace HSDRaw
                 x => x.StartsWith("tyNoGetUsTbl") ?  new HSDShortArray() : null,
                 x => x.StartsWith("grMurabito") ?  new HSDNullPointerArrayAccessor<SBM_GrMurabito>() : null,
                 x => x.StartsWith("itData") ?  new HSDArrayAccessor<KAR_Item>() : null,
+                x => x.StartsWith("MemCardBanner") ?  new SBM_MemCardBanner() : null,
+                x => x.StartsWith("MemCardIcon") ?  new SBM_MemCardIcon() : null,
+                x => x.StartsWith("sss_pages") ?  new AK_StagePages() : null,
+                x => x.StartsWith("sss_page") ?  new AK_StagePage() : null,
                 x => new HSDAccessor(),
         };
 

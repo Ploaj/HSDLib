@@ -39,7 +39,9 @@ namespace HSDRawViewer.Converters
 
         public bool ExportTextureInfo { get; set; } = true;
 
-        public bool BlenderExportMode { get; set; } = false;
+        public bool ExportModelInfoSheet { get; set; } = false;
+
+        //public bool BlenderExportMode { get; set; } = false;
     }
 
     /// <summary>
@@ -93,8 +95,13 @@ namespace HSDRawViewer.Converters
                 Optimize = settings.Optimize,
                 FlipWindingOrder = true,
                 ExportTextureInfo = settings.ExportTextureInfo,
-                BlenderMode = settings.BlenderExportMode
+                //BlenderMode = settings.BlenderExportMode
             };
+
+            if (settings.ExportModelInfoSheet)
+            {
+                ModelInfoSheet.Export(settings.Directory + "model_sheet.json", rootJOBJ);
+            }
 
             IOManager.ExportScene(exp.Scene, filePath, exportsettings);
         }
@@ -183,7 +190,7 @@ namespace HSDRawViewer.Converters
         private void ProcessDOBJs()
         {
             var jIndex = 0;
-            foreach (var j in _root.ToList)
+            foreach (var j in _root.TreeList)
             {
                 var dIndex = 0;
                 if (j.Dobj != null)
@@ -378,7 +385,7 @@ namespace HSDRawViewer.Converters
 
                                     IOBone bone = jobjToBone[parent];
                                     if (en == 1)
-                                        bone = jobjToBone[_root.ToList.Find(e => e.Children.Contains(parent))];
+                                        bone = jobjToBone[_root.TreeList.Find(e => e.Children.Contains(parent))];
 
                                     var vertexWeight = new IOBoneWeight()
                                     {

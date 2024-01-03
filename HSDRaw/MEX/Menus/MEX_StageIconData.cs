@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace HSDRaw.MEX.Menus
 {
@@ -12,8 +9,11 @@ namespace HSDRaw.MEX.Menus
         [Browsable(false)]
         public int RuntimeJOBJPointer { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
-        [Browsable(false)]
-        public int WasRandomlySelected { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public bool RandomEnabled 
+        { 
+            get => (_s.GetByte(0x04) & 0x40) != 0; 
+            set => _s.SetByte(0x04, (byte)((_s.GetByte(0x04) & ~0x40) | (value ? 0x40 : 0x00))); 
+        }
 
         [Browsable(false)]
         public byte IconState { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }

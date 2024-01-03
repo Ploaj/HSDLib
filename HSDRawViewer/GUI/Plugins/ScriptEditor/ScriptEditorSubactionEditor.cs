@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRawViewer.GUI.Plugins.ScriptEditor;
 using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
@@ -248,23 +249,24 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (index == -1)
                 index = 0;
 
-            //var text = Clipboard.GetText();
-            //if (text != null)
-            //{
-            //    // try to parse script code
-            //    List<SubactionEvent> scripts = SubactionFromText.FromBrawlText(text);
-            //    if (scripts != null)
-            //    {
-            //        // insert scripts
-            //        scripts.Reverse();
-            //        foreach (var v in scripts)
-            //            // only paste subactions the belong to this group
-            //            if (v.GetGroup() == SubactionGroup)
-            //                subActionList.Items.Insert(index, v.Clone());
+            var text = Clipboard.GetText();
+            if (text != null)
+            {
+                // try to parse script code
+                List<SubactionEvent> scripts = SubactionFromText.FromBrawlText(text);
+                if (scripts != null)
+                {
+                    // insert scripts
+                    scripts.Reverse();
+                    foreach (var v in scripts)
+                        // only paste subactions the belong to this group
+                        if (v.Type == SubactionGroup.Fighter)
+                            subActionList.Items.Insert(index, v);
 
-            //        SaveSelectedActionChanges();
-            //    }
-            //}
+                    // apply changes
+                    ApplyScriptChanges();
+                }
+            }
 
             // Get data object from the clipboard
             IDataObject dataObject = Clipboard.GetDataObject();

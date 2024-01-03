@@ -166,7 +166,7 @@ namespace HSDRawViewer.GUI.Extra
 
             var tex = new List<TextureListProxy>();
 
-            foreach (var jobj in root.ToList)
+            foreach (var jobj in root.TreeList)
             {
                 if (jobj.Dobj == null)
                     continue;

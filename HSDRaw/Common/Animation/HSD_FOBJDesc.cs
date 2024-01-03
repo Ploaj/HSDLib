@@ -96,6 +96,32 @@ namespace HSDRaw.Common.Animation
             }
         }
 
+        public static HSD_FOBJDesc FromFOBJs(IEnumerable<HSD_FOBJ> fobjs)
+        {
+            HSD_FOBJDesc desc = null;
+            HSD_FOBJDesc prev = null;
+
+            foreach (var fobj in fobjs)
+            {
+                var f = new HSD_FOBJDesc();
+                f.FromFOBJ(fobj);
+
+                if (prev == null)
+                {
+                    desc = f;
+                    prev = f;
+                }
+                else
+                {
+                    prev.Next = f;
+                    prev = f;
+                    
+                }
+            }
+
+            return desc;
+        }
+
         public void FromFOBJ(HSD_FOBJ fobj)
         {
             TrackType = fobj.TrackType;

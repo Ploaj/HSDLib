@@ -51,7 +51,7 @@ namespace HSDRawViewer.Rendering.Models
         public Vector4 Rotation;
         public Vector3 Scale;
 
-        public Matrix4 LocalTransform;
+        public Matrix4 LocalTransform { get; internal set; }
         public Matrix4 WorldTransform { get => _worldTransform; set { _worldTransform = value; BindTransform = _invertedTransform * value; } }
         private Matrix4 _worldTransform;
         public Matrix4 InvertedTransform { get => _invertedTransform; }

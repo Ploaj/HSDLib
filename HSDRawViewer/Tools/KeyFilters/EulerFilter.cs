@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSDRawViewer.Tools
+namespace HSDRawViewer.Tools.KeyFilters
 {
     public class EulerFilter
     {

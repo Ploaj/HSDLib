@@ -53,7 +53,11 @@ namespace HSDRawViewer.GUI.Extra
                 if (AnimNode == null || JOBJ == null)
                     return;
 
-                Tools.EulerFilter.Filter(AnimNode.Tracks);
+                // Tools.KeyFilters.EulerFilter.Filter(AnimNode.Tracks);
+                Tools.KeyFilters.DiscontinuityFilter.Filter(AnimNode.Tracks);
+
+                foreach (JointNode child in Nodes)
+                    child.EulerFilter();
             }
         }
 
@@ -103,7 +107,7 @@ namespace HSDRawViewer.GUI.Extra
             jointTree.BeginUpdate();
             jointTree.Nodes.Clear();
 
-            var jobjs = jobj.ToList;
+            var jobjs = jobj.TreeList;
 
             Dictionary<HSD_JOBJ, JointNode> childToParent = new Dictionary<HSD_JOBJ, JointNode>();
             

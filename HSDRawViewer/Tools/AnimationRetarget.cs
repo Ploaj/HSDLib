@@ -26,7 +26,7 @@ namespace HSDRawViewer.Tools
             var src_jobj = new LiveJObj(new HSDRawFile(source_file).Roots[0].Data as HSD_JOBJ);
             var tar_jobj = new LiveJObj(new HSDRawFile(target_file).Roots[0].Data as HSD_JOBJ);
 
-            return Retarget(anim, src_jobj, tar_jobj, src_map, tar_map);
+            return Retarget(anim, src_jobj, tar_jobj, src_map, tar_map, null);
         }
 
         private static float ClampRotation(float v)
@@ -42,6 +42,8 @@ namespace HSDRawViewer.Tools
             return v;
         }
 
+        public delegate void CustomRetargetCallback(string name, float frame, float end_frame, LiveJObj source, LiveJObj target);
+
         /// <summary>
         /// 
         /// </summary>
@@ -50,7 +52,13 @@ namespace HSDRawViewer.Tools
         /// <param name="target_model"></param>
         /// <param name="source_map"></param>
         /// <param name="target_map"></param>
-        public static JointAnimManager Retarget(JointAnimManager source_anim, LiveJObj source_model, LiveJObj target_model, JointMap source_map, JointMap target_map)
+        public static JointAnimManager Retarget(
+            JointAnimManager source_anim, 
+            LiveJObj source_model, 
+            LiveJObj target_model, 
+            JointMap source_map, 
+            JointMap target_map,
+            CustomRetargetCallback cb)
         {
             // create new animation
             JointAnimManager new_anim = new JointAnimManager(target_model.JointCount);
@@ -86,6 +94,13 @@ namespace HSDRawViewer.Tools
 
                     // calculate retarget transform
                     ConstrainWorldTransform(source_joint, target_joint);
+
+                    // override constraint
+                    if (cb != null)
+                    {
+                        cb.Invoke(target_joint_name, f, source_anim.FrameCount, source_joint, target_joint);
+                        target_joint.RecalculateTransforms(null, true);
+                    }
 
                     // bake all keys
                     target_node.AddLinearKey(JointTrackType.HSD_A_J_TRAX, f, target_joint.Translation.X);

@@ -32,7 +32,7 @@ namespace HSDRawViewer
         public static void RebuildPOBJs(HSD_JOBJ rootJOBJ)
         {
             var compressor = new POBJ_Generator();
-            foreach (var jobj in rootJOBJ.ToList)
+            foreach (var jobj in rootJOBJ.TreeList)
             {
                 if (jobj.Dobj != null)
                     foreach (var dobj in jobj.Dobj.List)
@@ -358,8 +358,8 @@ namespace HSDRawViewer
                 w.WriteLine("objects:");
                 int di = 0;
                 int tobji = 0;
-                var jointList = joint.ToList;
-                foreach (var j in joint.ToList)
+                var jointList = joint.TreeList;
+                foreach (var j in joint.TreeList)
                 {
                     if (j.Dobj != null)
                     {
@@ -454,15 +454,15 @@ namespace HSDRawViewer
         /// <param name="file"></param>
         public static void CheckFlags(HSD_JOBJ jobj)
         {
-            List<JOBJ_FLAG> originalFlags = jobj.ToList.Select(e => e.Flags).ToList();
+            List<JOBJ_FLAG> originalFlags = jobj.TreeList.Select(e => e.Flags).ToList();
 
-            foreach (var v in jobj.ToList)
+            foreach (var v in jobj.TreeList)
                 v.Flags = 0;
 
             jobj.UpdateFlags();
             JOBJ_FLAG ignore = JOBJ_FLAG.CLASSICAL_SCALING | JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.PTCL | JOBJ_FLAG.SPLINE;
 
-            var list = jobj.ToList;
+            var list = jobj.TreeList;
             for (int i = 0; i < originalFlags.Count; i++)
             {
                 if ((originalFlags[i] & ~ignore) != (list[i].Flags & ~ignore))

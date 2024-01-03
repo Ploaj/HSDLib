@@ -236,10 +236,10 @@ namespace HSDRaw.Tools
         {
             var state = GetState(Frame);
 
-            if (Frame == state.t0)
+            if (Frame <= state.t0)
                 return state.p0;
 
-            if (Frame == state.t1)
+            if (Frame >= state.t1)
                 return state.p1;
 
             if (state.t0 == state.t1 || state.op_intrp == GXInterpolationType.HSD_A_OP_CON || state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
