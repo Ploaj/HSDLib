@@ -3,6 +3,7 @@
     public class KAR_grCollisionTreeNode : HSDAccessor
     {
         public override int TrimmedSize => 4;
+
         public KAR_grCollisionTree Partition { get => _s.GetReference<KAR_grCollisionTree>(0x0); set => _s.SetReference(0x0, value); }
     }
 
@@ -153,29 +154,29 @@
         public float MaxY { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
         public float MaxZ { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
 
-        public short BucketStart { get => _s.GetInt16(0x18); set => _s.SetInt16(0x18, value); }
+        public short Child1 { get => _s.GetInt16(0x18); set => _s.SetInt16(0x18, value); }
 
-        public short BucketCount { get => _s.GetInt16(0x1A); set => _s.SetInt16(0x1A, value); }
+        public short Child2 { get => _s.GetInt16(0x1A); set => _s.SetInt16(0x1A, value); }
 
-        public short CollTriangleStart { get => _s.GetInt16(0x1C); set => _s.SetInt16(0x1C, value); }
+        public ushort CollTriangleStart { get => _s.GetUInt16(0x1C); set => _s.SetUInt16(0x1C, value); }
 
-        public short CollTriangleCount { get => _s.GetInt16(0x1E); set => _s.SetInt16(0x1E, value); }
-
-
-
-
-
-        public short ZoneIndexStart { get => _s.GetInt16(0x24); set => _s.SetInt16(0x24, value); }
-
-        public short ZoneIndexCount { get => _s.GetInt16(0x26); set => _s.SetInt16(0x26, value); }
+        public ushort CollTriangleCount { get => _s.GetUInt16(0x1E); set => _s.SetUInt16(0x1E, value); }
 
 
 
 
 
-        public short RoughStart { get => _s.GetInt16(0x2c); set => _s.SetInt16(0x2c, value); }
+        public ushort ZoneIndexStart { get => _s.GetUInt16(0x24); set => _s.SetUInt16(0x24, value); }
 
-        public short RoughCount { get => _s.GetInt16(0x2e); set => _s.SetInt16(0x2e, value); }
+        public ushort ZoneIndexCount { get => _s.GetUInt16(0x26); set => _s.SetUInt16(0x26, value); }
+
+
+
+
+
+        public ushort RoughStart { get => _s.GetUInt16(0x2c); set => _s.SetUInt16(0x2c, value); }
+
+        public ushort RoughCount { get => _s.GetUInt16(0x2e); set => _s.SetUInt16(0x2e, value); }
 
         public byte Depth { get => _s.GetByte(0x4C); set => _s.SetByte(0x4C, value); }
     }

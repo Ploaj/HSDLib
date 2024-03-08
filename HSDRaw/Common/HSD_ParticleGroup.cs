@@ -43,7 +43,7 @@ namespace HSDRaw.Common
 
                     if(size == 0)
                     {
-                        p[i - 1] = null;
+                        p[i - 1] = new HSD_ParticleGenerator();
                     }
                     else
                     {

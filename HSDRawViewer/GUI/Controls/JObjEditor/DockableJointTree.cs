@@ -2,6 +2,7 @@
 using HSDRaw.Common;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -230,7 +231,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importFromINIToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("Label INI (*.ini)|*.ini");
+            var f = Tools.FileIO.OpenFile(JointMap.FileFilter);
 
             if (f != null)
             {
@@ -254,7 +255,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void exportToINIToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("Label INI (*.ini)|*.ini");
+            var f = Tools.FileIO.SaveFile(JointMap.FileFilter);
 
             if (f != null)
             {

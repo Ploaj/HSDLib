@@ -1,8 +1,28 @@
 ﻿
 using HSDRaw.GX;
+using System;
 
 namespace HSDRaw.AirRide.Gr.Data
 {
+    [Flags]
+    public enum KCCollFlag
+    {
+        None,
+        Floor       = 0x1,
+        Wall        = 0x2,
+        Ceiling     = 0x4,
+        Unknown     = 0x8,
+    }
+
+    [Flags]
+    public enum KCConveyorDirection
+    {
+        DirBack     = 0x1,
+        DirFront    = 0x2,
+        DirRight    = 0x4,
+        DirLeft     = 0x8,
+    }
+
     public class KAR_CollisionTriangle : HSDAccessor
     {
         public override int TrimmedSize => 0x14;
@@ -13,9 +33,90 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int V3 { get => _s.GetInt32(0x8); set => _s.SetInt32(0x8, value); }
 
-        public int Flags { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
+        /// <summary>
+        /// Determintes the type of collision
+        /// </summary>
+        public KCCollFlag Flags 
+        { 
+            get => (KCCollFlag)(_s.GetInt32(0xc) & 0xF); 
+            set => _s.SetInt32(0xc, (_s.GetInt32(0xc) & ~0xF) | ((int)value & 0xF)); 
+        }
 
-        public int Material { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        /// <summary>
+        /// References data from 0x00 of GrCommon.dat
+        /// </summary>
+        public byte GrCommonIndex 
+        { 
+            get => (byte)((_s.GetInt32(0xc) >> 4) & 0xFF); 
+            set => _s.SetInt32(0xc, (_s.GetInt32(0xc) & ~0xFF0) | ((value & 0xFF) << 4)); 
+        }
+
+        private int _materialflag { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+
+        /// <summary>
+        /// Indicates collision is rough
+        /// This is usually used so you can stop quickly
+        /// </summary>
+        public byte Rough
+        {
+            get => (byte)(_materialflag & 0x3);
+            set => _materialflag = (_materialflag & ~0x3) | (value & 0x3);
+        }
+
+        /// <summary>
+        /// starts at 0x20 in stage node
+        /// </summary>
+        public byte StageNodeReflectIndex
+        {
+            get => (byte)((_materialflag >> 2) & 0x7);
+            set => _materialflag = (_materialflag & ~0x1C) | ((value & 0x7) << 2);
+        }
+
+        /// <summary>
+        /// Indicates to not use tree lookup for this
+        /// </summary>
+        public bool SegmentMove
+        {
+            get => (_materialflag & 0x20) != 0;
+            set => _materialflag = (_materialflag & ~0x20) | (value ? 0x20 : 0);
+        }
+
+        /// <summary>
+        /// Back and Front cannot be used together
+        /// Left and Right cannot be used together
+        /// </summary>
+        public KCConveyorDirection ConveyorDirection
+        {
+            get => (KCConveyorDirection)((_materialflag >> 6) & 0xF);
+            set => _materialflag = (_materialflag & ~0x3C0) | (((int)value & 0xF) << 6);
+        }
+
+        /// <summary>
+        /// starts at 0x40 in stage node
+        /// </summary>
+        public byte StageNodeForceReflectIndex
+        {
+            get => (byte)((_materialflag >> 10) & 0x7);
+            set => _materialflag = (_materialflag & ~0x1C00) | ((value & 0x7) << 10);
+        }
+
+        // TODO:
+        /*
+            00002000 - 800d190c
+            00004000 - 800d1928
+            00008000 - ?? unused ??
+
+            00010000 - ?? unused ??
+            00020000 - 800d1944
+            00040000 - ?? unused ??
+            00080000 - 800d19c8
+
+            00100000 - 800d19e4
+            00200000 - 800d1a00
+            00400000 - 800d1a1c
+            00800000 - 800d1a38
+         */
+
     }
 
     public class KAR_CollisionJoint : HSDAccessor
@@ -32,16 +133,24 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int FaceSize { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
+        /// <summary>
+        /// Values between 0-4
+        /// 0 - seems to be used on bones that are animated, such as the spiny thing at top of city trial
+        /// </summary>
         public int Flags { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
-        // public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        /// <summary>
+        /// When Flag is set to 2 this exists
+        /// Seems to point to a Vec3
+        /// </summary>
+        public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
     }
 
     public class KAR_ZoneCollisionTriangle : HSDAccessor
     {
         public override int TrimmedSize => 0x18;
 
-        public int CollFlags { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
+        public KCCollFlag CollFlags { get => (KCCollFlag)_s.GetInt32(0x0); set => _s.SetInt32(0x0, (int)value); }
 
         public int V1 { get => _s.GetInt32(0x4); set => _s.SetInt32(0x4, value); }
 
@@ -49,6 +158,23 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int V3 { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
+        /// <summary>
+        /// F0000000 - Index
+        /// 01ffffff
+        /// 2/3 - Dash Gate	
+        /// 	- 0x9C of stage
+        /// 	- index< 2
+        /// 4 - Dash Ring 
+        /// 	- 0xB4 of stage
+        /// 	- Index< 2
+        /// 7 - SuperJump
+        /// 9 - Jump
+        /// 10 - Spin
+        /// 11 - AirFlow
+        /// 12/13 - Switch 800d2a1c
+        /// 25 - Dead
+        /// 32 - 800eefd4 - also checks flag 0x2000020
+        /// </summary>
         public int TypeFlags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         public int UnkFlags { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }

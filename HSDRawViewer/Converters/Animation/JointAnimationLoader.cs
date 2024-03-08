@@ -1,13 +1,16 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
+using IONET;
+using IONET.Core;
+using IONET.Core.Animation;
 using System.IO;
 
 namespace HSDRawViewer.Converters.Animation
 {
     public class JointAnimationLoader
     {
-        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd)|*.dat;*.anim;*.chr0;*.smd";
+        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd*.dae)|*.dat;*.anim;*.chr0;*.smd;*.dae";
 
         /// <summary>
         /// 
@@ -37,6 +40,18 @@ namespace HSDRawViewer.Converters.Animation
                     return ConvMayaAnim.ImportFromMayaAnim(filePath, _jointMap);
                 }
                 else
+                if (Path.GetExtension(filePath).ToLower().Equals(".dae"))
+                {
+                    IOScene scene = IOManager.LoadScene(filePath, new ImportSettings());
+
+                    if (scene.Animations.Count == 0)
+                        return null;
+
+                    var ja = new JointAnimManager();
+                    ConvertIOGroup(ja, scene.Animations[0]);
+                    return ja;
+                }
+                else
                 if (Path.GetExtension(filePath).ToLower().Equals(".dat"))
                 {
                     var dat = new HSDRaw.HSDRawFile(filePath);
@@ -50,6 +65,25 @@ namespace HSDRawViewer.Converters.Animation
             }
 
             return null;
+        }
+
+        private static void ConvertIOGroup(JointAnimManager ja, IOAnimation group)
+        {
+            var anim_node = new AnimNode();
+
+            foreach (var iotrack in group.Tracks)
+            {
+                foreach (var k in iotrack.KeyFrames)
+                {
+                    switch (iotrack.ChannelType)
+                    {
+                        case IOAnimationTrackType.PositionX: anim_node.AddLinearKey(JointTrackType.HSD_A_J_TRAX, k.Frame, k.Value); break;
+                    }
+                }
+            }
+
+            foreach (var g in group.Groups)
+                ConvertIOGroup(ja, g);
         }
     }
 }

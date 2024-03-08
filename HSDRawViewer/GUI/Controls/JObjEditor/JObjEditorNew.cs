@@ -8,6 +8,7 @@ using HSDRawViewer.Rendering.Animation;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -924,6 +925,65 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             _viewport.glViewport.Screenshot();
             if (callback != null)
                 _viewport.glViewport.ScreenshotTaken += callback;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importAndRemapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            JointMap from = null;
+            JointMap to = null;
+
+            if (to == null)
+            {
+                var path = FileIO.OpenFile(JointMap.FileFilter, "to.ini");
+                if (path != null)
+                {
+                    to = new JointMap(path);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (from == null)
+            {
+                var path = FileIO.OpenFile(JointMap.FileFilter, "from.ini");
+                if (path != null)
+                {
+                    from = new JointMap(path);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            var anim = JointAnimManager.LoadFromFile(to);
+
+            if (anim != null)
+            {
+                anim = AnimationRemap.Remap(anim, from, to);
+                LoadAnimation(anim);
+            }
+        }
+
+        private void applyEulerFilterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (_trackEditor.IsHidden)
+                return;
+
+            foreach (var j in _jointTree.EnumerateJoints())
+                Tools.KeyFilters.EulerFilter.Filter(j.Tracks);
+
+            // re apply animation
+            ApplyEditorAnimation(Frame);
+
         }
     }
 }

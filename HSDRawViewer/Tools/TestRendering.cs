@@ -1,6 +1,7 @@
 ﻿using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Widgets;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -18,15 +19,53 @@ namespace HSDRawViewer.Tools
         private TranslationWidget w = new TranslationWidget();
         private GLTextRenderer text = new GLTextRenderer();
 
-        private Matrix4 Transform = Matrix4.CreateRotationY(1f);
+        private Matrix4 Transform = Matrix4.Identity;
 
+        private class Triangle
+        {
+            public bool Collided = false;
+            public Vector3 P1;
+            public Vector3 P2;
+            public Vector3 P3;
+        }
+
+        private List<Triangle> Triangles = new List<Triangle>();
+
+        /// <summary>
+        /// 
+        /// </summary>
         public TestRendering()
         {
             w.Transform = Transform;
+            Triangles.Add(new Triangle()
+            { 
+                P1 = new Vector3(-100, 0, 100),
+                P2 = new Vector3(100, 0, -100),
+                P3 = new Vector3(0, 100, 0),
+            });
+
+            //var bb = new BoundingBox(new Vector3(-10, 5, -10), new Vector3(10,25, 10));
+
+            //Vector3 triangleP1 = new Vector3(-10, 0, 10);
+            //Vector3 triangleP2 = new Vector3(10, 0, 0);
+            //Vector3 triangleP3 = new Vector3(0, 10, 0);
+
+            //bool intersection = bb.Intersects(triangleP1, triangleP2, triangleP3);
+
+            //Console.WriteLine(intersection); // This should print true
 
             w.TransformUpdated += (t) =>
             {
                 Transform = t;
+
+                var center = Vector3.TransformPosition(Vector3.Zero, Transform);
+                var bb = new BoundingBox(center + new Vector3(-10, -10, -10), center + new Vector3(10, 10, 10));
+
+                // check triangle collisions
+                foreach (var tri in Triangles)
+                {
+                    tri.Collided = bb.Intersects(tri.P1, tri.P2, tri.P3);
+                }
             };
         }
 
@@ -56,10 +95,21 @@ namespace HSDRawViewer.Tools
         {
             DrawShape.DrawBox(System.Drawing.Color.White, Transform, -10, -10, -10, 10, 10, 10);
 
+            GL.Begin(PrimitiveType.Triangles);
+            foreach (var tri in Triangles)
+            {
+                GL.Color3(tri.Collided ? Vector3.One : Vector3.UnitX);
+
+                GL.Vertex3(tri.P1);
+                GL.Vertex3(tri.P2);
+                GL.Vertex3(tri.P3);
+            }
+            GL.End();
+
             w.Render(cam, text);
 
-            var right = cam.ModelViewMatrix.Row0;
-            var up = cam.ModelViewMatrix.Row1;
+            //var right = cam.ModelViewMatrix.Row0;
+            //var up = cam.ModelViewMatrix.Row1;
             text.RenderText(w.PickPoint.ToString(), cam.RenderWidth, cam.RenderHeight, 0, 16);
             text.RenderText(w.CenterSquare.ToString(), cam.RenderWidth, cam.RenderHeight, 0, 32); ;
         }

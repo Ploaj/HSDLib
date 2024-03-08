@@ -1,7 +1,6 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer.Converters
 {

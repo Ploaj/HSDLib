@@ -7,7 +7,7 @@
     {
         public override int TrimmedSize => 0x18;
 
-        public short Type { get => _s.GetInt16(0x00); set => _s.SetInt16(0x00, value); }
+        public byte Type { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
         public short PointCount { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
 
@@ -17,7 +17,7 @@
         {
             get
             {
-                return _s.GetReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Slice(PointCount);
+                return _s.GetCreateReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Slice(PointCount);
             }
             set
             {

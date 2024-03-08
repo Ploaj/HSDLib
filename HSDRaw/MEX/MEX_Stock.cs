@@ -153,8 +153,6 @@ namespace HSDRaw.MEX
     {
         public override int TrimmedSize => 0x08;
 
-        private static readonly Encoding SHIFT_JIS = Encoding.GetEncoding("Shift_JIS");
-
         public byte ReserveredStockIndex { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
         public HSD_BUTTON Input { get => (HSD_BUTTON)(_s.GetInt32(0x00) & 0xFFFFFF); set => _s.SetInt32(0x00, (ReserveredStockIndex << 24) | ((int)value & 0xFFFFFF)); }
@@ -167,7 +165,7 @@ namespace HSDRaw.MEX
 
                 if(data != null)
                 {
-                    return new string(SHIFT_JIS.GetChars(data._s.GetData()));
+                    return ShiftJIS.ToUnicode(data._s.GetData());
                 }
 
                 return "";
@@ -184,102 +182,15 @@ namespace HSDRaw.MEX
                     if (value.Length > 8)
                         value = value.Substring(0, 8);
 
-                    // shift-jis stylize string and validate
-                    var chars = value.ToCharArray();
-                    for(int i = 0; i < chars.Length; i++)
-                    {
-                        // convert to shift jis
-                        if (CharToShiftChar.ContainsKey(chars[i]))
-                            chars[i] = CharToShiftChar[chars[i]];
-
-                        // TODO: validate char
-                    }
-
                     // set data
                     var s = _s.GetCreateReference<HSDAccessor>(0x04)._s;
-                    s.SetData(SHIFT_JIS.GetBytes(new string(chars)));
+                    s.SetData(ShiftJIS.ToShiftJIS(value));
 
                     // null terminated
                     s.Resize(s.Length + 1);
                 }
             }
         }
-
-        private static Dictionary<char, char> CharToShiftChar = new Dictionary<char, char>()
-            {
-                { ' ' ,' ' },
-                { '0' ,'０' },
-                { '1' ,'１' },
-                { '2' ,'２' },
-                { '3' ,'３' },
-                { '4' ,'４' },
-                { '5' ,'５' },
-                { '6' ,'６' },
-                { '7' ,'７' },
-                { '8' ,'８' },
-                { '9' ,'９' },
-                { 'A' ,'Ａ' },
-                { 'B' ,'Ｂ' },
-                { 'C' ,'Ｃ' },
-                { 'D' ,'Ｄ' },
-                { 'E' ,'Ｅ' },
-                { 'F' ,'Ｆ' },
-                { 'G' ,'Ｇ' },
-                { 'H' ,'Ｈ' },
-                { 'I' ,'Ｉ' },
-                { 'J' ,'Ｊ' },
-                { 'K' ,'Ｋ' },
-                { 'L' ,'Ｌ' },
-                { 'M' ,'Ｍ' },
-                { 'N' ,'Ｎ' },
-                { 'O' ,'Ｏ' },
-                { 'P' ,'Ｐ' },
-                { 'Q' ,'Ｑ' },
-                { 'R' ,'Ｒ' },
-                { 'S' ,'Ｓ' },
-                { 'T' ,'Ｔ' },
-                { 'U' ,'Ｕ' },
-                { 'V' ,'Ｖ' },
-                { 'W' ,'Ｗ' },
-                { 'X' ,'Ｘ' },
-                { 'Y' ,'Ｙ' },
-                { 'Z' ,'Ｚ' },
-                { 'a' ,'Ａ' },
-                { 'b' ,'Ｂ' },
-                { 'c' ,'Ｃ' },
-                { 'd' ,'Ｄ' },
-                { 'e' ,'Ｅ' },
-                { 'f' ,'Ｆ' },
-                { 'g' ,'Ｇ' },
-                { 'h' ,'Ｈ' },
-                { 'i' ,'Ｉ' },
-                { 'j' ,'Ｊ' },
-                { 'k' ,'Ｋ' },
-                { 'l' ,'Ｌ' },
-                { 'm' ,'Ｍ' },
-                { 'n' ,'Ｎ' },
-                { 'o' ,'Ｏ' },
-                { 'p' ,'Ｐ' },
-                { 'q' ,'Ｑ' },
-                { 'r' ,'Ｒ' },
-                { 's' ,'Ｓ' },
-                { 't' ,'Ｔ' },
-                { 'u' ,'Ｕ' },
-                { 'v' ,'Ｖ' },
-                { 'w' ,'Ｗ' },
-                { 'x' ,'Ｘ' },
-                { 'y' ,'Ｙ' },
-                { 'z' ,'Ｚ' },
-                { '+' ,'＋' },
-                { '-' ,'－' },
-                { '=' ,'＝' },
-                { '?' ,'？' },
-                { '!' ,'！' },
-                { '@' ,'＠' },
-                { '%' ,'％' },
-                { '&' ,'＆' },
-                { '$' ,'＄' },
-            };
 
         public override string ToString()
         {

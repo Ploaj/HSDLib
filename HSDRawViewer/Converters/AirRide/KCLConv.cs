@@ -67,7 +67,8 @@ namespace HSDRawViewer.Converters.AirRide
 
                     tris.Add(new KAR_CollisionTriangle()
                     {
-                        Flags = 0x81,
+                        Flags = KCCollFlag.Floor,
+                        GrCommonIndex = 8,
                         V1 = verts.Count + 2,
                         V2 = verts.Count + 1,
                         V3 = verts.Count
@@ -98,7 +99,8 @@ namespace HSDRawViewer.Converters.AirRide
 
                 tris.Add(new KAR_CollisionTriangle()
                 {
-                    Flags = 0x81,
+                    Flags = KCCollFlag.Floor,
+                    GrCommonIndex = 8,
                     V1 = verts.Count,
                     V2 = verts.Count + 1,
                     V3 = verts.Count + 2
@@ -110,7 +112,8 @@ namespace HSDRawViewer.Converters.AirRide
 
                 tris.Add(new KAR_CollisionTriangle()
                 {
-                    Flags = 0x81,
+                    Flags = KCCollFlag.Floor,
+                    GrCommonIndex = 8,
                     V1 = verts.Count,
                     V2 = verts.Count + 1,
                     V3 = verts.Count + 2
@@ -134,7 +137,7 @@ namespace HSDRawViewer.Converters.AirRide
                 }
             };
 
-            tree = BucketGen.GenerateBucketPartition(node);
+            tree = null; // new HSDRaw.Tools.KAR.GrCollisionTreeGenerator(node).Generate();
 
             return node;
         }

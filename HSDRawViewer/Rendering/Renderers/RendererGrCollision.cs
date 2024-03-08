@@ -66,11 +66,11 @@ namespace HSDRawViewer.Rendering.Renderers
             
             foreach(var t in Triangles)
             {
-                if((t.Flags & 0x1) == 0x1)
+                if(((int)t.Flags & 0x1) == 0x1)
                     GL.Color4(1f, 0f, 0f, 0.5f);
-                if ((t.Flags & 0x2) == 0x2)
+                if (((int)t.Flags & 0x2) == 0x2)
                     GL.Color4(0f, 1f, 0f, 0.5f);
-                if ((t.Flags & 0x4) == 0x4)
+                if (((int)t.Flags & 0x4) == 0x4)
                     GL.Color4(0f, 0f, 1f, 0.5f);
 
                 GL.Vertex3(GXTranslator.toVector3(Vertices[t.V1]));

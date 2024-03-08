@@ -139,6 +139,9 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public int GetGLID(int index)
         {
+            if (index == -1)
+                return -1;
+
             return Textures[index].GLID;
         }
 
@@ -194,6 +197,9 @@ namespace HSDRawViewer.Rendering
         /// <param name="tobj"></param>
         public int Add(HSD_TOBJ tobj)
         {
+            if (tobj.ImageData == null)
+                return -1;
+
             List<byte[]> mips = new List<byte[]>();
 
             if (tobj.LOD != null && tobj.ImageData.MaxLOD != 0)

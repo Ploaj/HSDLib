@@ -561,6 +561,18 @@ namespace HSDRaw
             SetBytes(loc, EndianFix(BitConverter.GetBytes(value)));
         }
 
+        public int GetInt24(int loc)
+        {
+            byte[] b = EndianFix(GetBytes(loc, 3));
+            return ((b[2] & 0xFF) << 16) | ((b[1] & 0xFF) << 8) | (b[0] & 0xFF);
+        }
+
+        public void SetInt24(int loc, int value)
+        {
+            var bytes = BitConverter.GetBytes(value);
+            SetBytes(loc, EndianFix(new byte[] { bytes[0], bytes[1], bytes[2] }));
+        }
+
         public short GetInt16(int loc)
         {
             return BitConverter.ToInt16(EndianFix(GetBytes(loc, 2)), 0);

@@ -4,27 +4,28 @@ using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Tools.Animation;
 using HSDRawViewer.Tools.KeyFilters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using static HSDRawViewer.Tools.AnimationRetarget;
+using static HSDRawViewer.Tools.Animation.AnimationRetarget;
 
-namespace HSDRawViewer.Tools
+namespace HSDRawViewer.Tools.Melee
 {
     public class FighterConverter
     {
         public delegate void AdditionalProcess(RetargetState state, JointAnimManager anim, JointAnimManager src_anim);
 
         public static void GenerateAnimations(
-            string in_directory, 
-            string out_directory, 
-            string source_file, 
-            string target_file, 
-            string source_map, 
-            string target_map, 
+            string in_directory,
+            string out_directory,
+            string source_file,
+            string target_file,
+            string source_map,
+            string target_map,
             string fightername,
             AdditionalProcess process,
             CustomRetargetCallback retargetCB)
@@ -471,7 +472,7 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         private static float ClampRotation(float v)
         {
-            if (System.Math.Abs(System.Math.Abs(v) - Math3D.TwoPI) < 0.001)
+            if (Math.Abs(Math.Abs(v) - Math3D.TwoPI) < 0.001)
             {
                 if (v > 0)
                     v -= (float)Math3D.TwoPI;
@@ -515,7 +516,7 @@ namespace HSDRawViewer.Tools
                     }
 
                     // retarget animation
-                    var new_anim = AnimationRetarget.Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap, state.RetargetCallback);
+                    var new_anim = Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap, state.RetargetCallback);
 
                     // perform additional process callback
                     if (state.AnimProcess != null)

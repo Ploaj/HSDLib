@@ -57,6 +57,6 @@ namespace HSDRaw.AirRide.Kx
 
         public int SetupYakumono { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
-        public int Unknown { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
+        public int OnFrame { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
     }
 }

@@ -4,7 +4,7 @@ using HSDRaw.Common.Animation;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 
-namespace HSDRawViewer.Tools
+namespace HSDRawViewer.Tools.Animation
 {
     public class AnimationRetarget
     {
@@ -53,17 +53,17 @@ namespace HSDRawViewer.Tools
         /// <param name="source_map"></param>
         /// <param name="target_map"></param>
         public static JointAnimManager Retarget(
-            JointAnimManager source_anim, 
-            LiveJObj source_model, 
-            LiveJObj target_model, 
-            JointMap source_map, 
+            JointAnimManager source_anim,
+            LiveJObj source_model,
+            LiveJObj target_model,
+            JointMap source_map,
             JointMap target_map,
             CustomRetargetCallback cb)
         {
             // create new animation
             JointAnimManager new_anim = new JointAnimManager(target_model.JointCount);
             new_anim.FrameCount = source_anim.FrameCount;
-                
+
             // reset joints
             source_model.ResetTransforms();
             target_model.ResetTransforms();

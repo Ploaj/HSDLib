@@ -44,6 +44,8 @@
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.importAndRemapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.createToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
@@ -61,6 +63,7 @@
             this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.viewModeBox = new System.Windows.Forms.ToolStripComboBox();
+            this.applyEulerFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -144,11 +147,14 @@
             this.importToolStripMenuItem1,
             this.toolStripMenuItem1,
             this.toolStripSeparator9,
+            this.importAndRemapToolStripMenuItem,
+            this.toolStripSeparator1,
             this.createToolStripMenuItem,
             this.clearToolStripMenuItem,
             this.toolStripSeparator7,
             this.compressAllTracksToolStripMenuItem,
-            this.fSMApplyToolStripMenuItem});
+            this.fSMApplyToolStripMenuItem,
+            this.applyEulerFilterToolStripMenuItem});
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
@@ -197,6 +203,18 @@
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
             this.toolStripSeparator9.Size = new System.Drawing.Size(226, 6);
+            // 
+            // importAndRemapToolStripMenuItem
+            // 
+            this.importAndRemapToolStripMenuItem.Name = "importAndRemapToolStripMenuItem";
+            this.importAndRemapToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.importAndRemapToolStripMenuItem.Text = "Import and Remap";
+            this.importAndRemapToolStripMenuItem.Click += new System.EventHandler(this.importAndRemapToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(226, 6);
             // 
             // createToolStripMenuItem
             // 
@@ -327,6 +345,13 @@
             this.viewModeBox.Size = new System.Drawing.Size(140, 25);
             this.viewModeBox.SelectedIndexChanged += new System.EventHandler(this.viewModeBox_SelectedIndexChanged);
             // 
+            // applyEulerFilterToolStripMenuItem
+            // 
+            this.applyEulerFilterToolStripMenuItem.Name = "applyEulerFilterToolStripMenuItem";
+            this.applyEulerFilterToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.applyEulerFilterToolStripMenuItem.Text = "Apply Euler Filter";
+            this.applyEulerFilterToolStripMenuItem.Click += new System.EventHandler(this.applyEulerFilterToolStripMenuItem_Click);
+            // 
             // JObjEditorNew
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -376,5 +401,8 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox viewModeBox;
         private System.Windows.Forms.ToolStripMenuItem compressAllTracksToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importAndRemapToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem applyEulerFilterToolStripMenuItem;
     }
 }

@@ -9,7 +9,7 @@ namespace HSDRaw.AirRide.Kx
         public KEX_VehicleMetadata MetaData { get => _s.GetReference<KEX_VehicleMetadata>(0x00); set => _s.SetReference(0x00, value); }
 
         // archive strings
-        public HSDArrayAccessor<KEX_VehicleKindArchiveStrings> ArchiveStrings { get => _s.GetReference<HSDArrayAccessor<KEX_VehicleKindArchiveStrings>>(0x04); set => _s.SetReference(0x04, value); }
+        public HSDArrayAccessor<KEX_VehicleArchiveType> ArchiveStrings { get => _s.GetReference<HSDArrayAccessor<KEX_VehicleArchiveType>>(0x04); set => _s.SetReference(0x04, value); }
 
         // runtime archives
         public HSDUIntArray RuntimeArchivePointers { get => _s.GetReference<HSDUIntArray>(0x08); set => _s.SetReference(0x08, value); }
@@ -32,7 +32,7 @@ namespace HSDRaw.AirRide.Kx
         {
             base.New();
             MetaData = new KEX_VehicleMetadata();
-            ArchiveStrings = new HSDArrayAccessor<KEX_VehicleKindArchiveStrings>();
+            ArchiveStrings = new HSDArrayAccessor<KEX_VehicleArchiveType>();
             RuntimeArchivePointers = new HSDUIntArray();
             FunctionTable1 = new HSDUIntArray();
             FunctionTable2 = new HSDUIntArray();
@@ -56,17 +56,11 @@ namespace HSDRaw.AirRide.Kx
         public int NumberOfMetaknightColors { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
     }
 
-    public class KEX_VehicleKindArchiveStrings : HSDAccessor
+    public class KEX_VehicleArchiveType : HSDAccessor
     {
         public override int TrimmedSize => 0x04;
 
-        public HSDArrayAccessor<KEX_VehicleArchiveStrings> VehicleArchives { get => _s.GetReference<HSDArrayAccessor<KEX_VehicleArchiveStrings>>(0x00); set => _s.SetReference(0x00, value); }
-
-        public override void New()
-        {
-            base.New();
-            VehicleArchives = new HSDArrayAccessor<KEX_VehicleArchiveStrings>();
-        }
+        public HSDArrayAccessor<KEX_VehicleArchiveStrings> FileName { get => _s.GetReference<HSDArrayAccessor<KEX_VehicleArchiveStrings>>(0x00); set => _s.SetReference(0x00, value); }
     }
 
     public class KEX_VehicleArchiveStrings : HSDAccessor

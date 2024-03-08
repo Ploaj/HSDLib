@@ -865,7 +865,7 @@ namespace HSDRaw
                 x => x.StartsWith("MemCardBanner") ?  new SBM_MemCardBanner() : null,
                 x => x.StartsWith("MemCardIcon") ?  new SBM_MemCardIcon() : null,
                 x => x.StartsWith("sss_pages") ?  new AK_StagePages() : null,
-                x => x.StartsWith("sss_page") ?  new AK_StagePage() : null,
+                x => x.EndsWith("bitfont") ?  new AK_BitFont() : null,
                 x => new HSDAccessor(),
         };
 

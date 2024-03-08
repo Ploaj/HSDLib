@@ -24,16 +24,16 @@ namespace HSDRaw.AirRide.Gr
 
                 var faceNrm = Vector3.Cross(v1 - v0, v2 - v0).Normalized();
 
-                tri.Flags &= ~0x7;
+                tri.Flags &= ~(KCCollFlag.Ceiling | KCCollFlag.Floor | KCCollFlag.Wall);
 
                 // guess flag
                 if (faceNrm.Y > 0.5f)
-                    tri.Flags |= 0x04;
+                    tri.Flags |= KCCollFlag.Ceiling;
                 else
                 if (faceNrm.Y <= 0.5f && faceNrm.Y > -0.5f)
-                    tri.Flags |= 0x02;
+                    tri.Flags |= KCCollFlag.Wall;
                 else
-                    tri.Flags |= 0x01;
+                    tri.Flags |= KCCollFlag.Floor;
             }
 
             coll.Triangles = tris;

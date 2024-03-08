@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HSDRaw.Tools;
+using System;
+using System.Collections.Generic;
 
 namespace HSDRaw.Common.Animation
 {
@@ -36,5 +38,25 @@ namespace HSDRaw.Common.Animation
         public HSD_FOBJDesc FObjDesc { get => _s.GetReference<HSD_FOBJDesc>(0x08); set => _s.SetReference(0x08, value); }
 
         public HSD_JOBJ ObjectReference { get => _s.GetReference<HSD_JOBJ>(0x0C); set => _s.SetReference(0x0C, value); }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="trackType"></param>
+        /// <param name="keys"></param>
+        public void AddTrack(byte trackType, List<FOBJKey> keys)
+        {
+            HSD_FOBJDesc desc = new HSD_FOBJDesc();
+            desc.SetKeys(keys, trackType);
+
+            if (FObjDesc == null)
+            {
+                FObjDesc = desc;
+            }
+            else
+            {
+                FObjDesc.Add(desc);
+            }
+        }
     }
 }

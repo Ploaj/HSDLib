@@ -148,6 +148,9 @@ namespace HSDRaw.Common
 
                 var offset = _s.GetInt32(i * 4 + 0x18);
 
+                if (offset < 0)
+                    continue;
+
                 var imageData = _s.GetBytes(offset, imageSize);
 
                 tobjs[i].ImageData = new HSD_Image();
@@ -223,14 +226,18 @@ namespace HSDRaw.Common
             for(int i = 0; i < ImageCount; i++)
             {
                 _s.SetInt32(0x18 + i * 4, offset);
-                _s.SetBytes(offset, tobjs[i].ImageData.ImageData);
-                offset += imageSize;
 
-                if (isPaletted)
+                if (tobjs[i].ImageData != null)
                 {
-                    _s.SetInt32(0x18 + (ImageCount + i) * 4, offset);
-                    _s.SetBytes(offset, tobjs[i].TlutData.TlutData);
-                    offset += 0x200;
+                    _s.SetBytes(offset, tobjs[i].ImageData.ImageData);
+                    offset += imageSize;
+
+                    if (isPaletted)
+                    {
+                        _s.SetInt32(0x18 + (ImageCount + i) * 4, offset);
+                        _s.SetBytes(offset, tobjs[i].TlutData.TlutData);
+                        offset += 0x200;
+                    }
                 }
             }
         }

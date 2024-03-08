@@ -130,12 +130,15 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private HSD_TEXGraphicBank SearchForTexG(DataNode d)
         {
+            var sym = MainForm.Instance.GetSymbol(d.Text.Replace("_ptcl", "_texg"));
+            if (sym is HSD_TEXGraphicBank)
+                return (HSD_TEXGraphicBank)sym;
+
             if (d.Parent == null)
                 return (HSD_TEXGraphicBank)MainForm.Instance.GetSymbol("map_texg");
 
             if (((DataNode)d.Parent).Accessor is HSDRaw.Melee.Ef.SBM_EffectTable tbl)
                 return tbl.TextureGraphics;
-
 
             return null;
         }

@@ -1190,6 +1190,15 @@ namespace HSDRawViewer.Rendering.Renderers
                                 int ptclId = ReadShort();
                             }
                             break;
+                        //case 0xF3:
+                        //case 0xF4:
+                        //case 0xF5:
+                        //case 0xF6:
+                        //case 0xF7:
+                        //    {
+                        //        int ptclId = ReadShort();
+                        //    }
+                        //    break;
                         
                         default:
                             throw new NotSupportedException($"Particle Command {final_cmd.ToString("X")} not supported");

@@ -142,18 +142,19 @@ namespace HSDRawViewer.Rendering
         /// <param name="p2"></param>
         /// <param name="p3"></param>
         /// <returns></returns>
-        public static Vector3 CalculateSurfaceNormal(Vector3 p1, Vector3 p2, Vector3 p3)
+        public static Vector3 CalculateSurfaceNormal(Vector3 v1, Vector3 v2, Vector3 v3)
         {
-            var U = p2 - p1;
-            var V = p3 - p1;
+            // Calculate two vectors lying on the plane of the triangle
+            Vector3 vector1 = v2 - v1;
+            Vector3 vector2 = v3 - v1;
 
-            var x = (U.Y * V.Z) - (U.Z * V.Y);
+            // Calculate the cross product of the two vectors to get the surface normal
+            Vector3 normal = Vector3.Cross(vector1, vector2);
 
-            var y = (U.Z * V.X) - (U.X * V.Z);
+            // Normalize the resulting vector to obtain a unit normal vector
+            normal.Normalize();
 
-            var z = (U.X * V.Y) - (U.Y * V.X);
-
-            return new Vector3(x, y, z);
+            return normal;
         }
     }
 }

@@ -186,10 +186,7 @@ namespace HSDRaw.Common
         /// <returns>The result of the calculation.</returns>
         public static HSD_Vector3 operator +(HSD_Vector3 left, HSD_Vector3 right)
         {
-            left.X += right.X;
-            left.Y += right.Y;
-            left.Z += right.Z;
-            return left;
+            return new HSD_Vector3(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
         }
 
         /// <summary>
@@ -200,10 +197,7 @@ namespace HSDRaw.Common
         /// <returns>The result of the calculation.</returns>
         public static HSD_Vector3 operator -(HSD_Vector3 left, HSD_Vector3 right)
         {
-            left.X -= right.X;
-            left.Y -= right.Y;
-            left.Z -= right.Z;
-            return left;
+            return new HSD_Vector3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
         }
 
         /// <summary>
@@ -214,24 +208,7 @@ namespace HSDRaw.Common
         /// <returns>The result of the calculation.</returns>
         public static HSD_Vector3 operator *(HSD_Vector3 vec, float scale)
         {
-            vec.X *= scale;
-            vec.Y *= scale;
-            vec.Z *= scale;
-            return vec;
-        }
-
-        /// <summary>
-        /// Multiplies an instance by a scalar.
-        /// </summary>
-        /// <param name="scale">The scalar.</param>
-        /// <param name="vec">The instance.</param>
-        /// <returns>The result of the calculation.</returns>
-        public static HSD_Vector3 operator *(float scale, HSD_Vector3 vec)
-        {
-            vec.X *= scale;
-            vec.Y *= scale;
-            vec.Z *= scale;
-            return vec;
+            return new HSD_Vector3(vec.X * scale, vec.Y * scale, vec.Z * scale);
         }
 
         /// <summary>
@@ -242,11 +219,7 @@ namespace HSDRaw.Common
         /// <returns>The result of the calculation.</returns>
         public static HSD_Vector3 operator /(HSD_Vector3 vec, float scale)
         {
-            float mult = 1.0f / scale;
-            vec.X *= mult;
-            vec.Y *= mult;
-            vec.Z *= mult;
-            return vec;
+            return vec * (1.0f / scale);
         }
 
         /// <summary>
@@ -254,7 +227,7 @@ namespace HSDRaw.Common
         /// </summary>
         public void Normalize()
         {
-            float scale = 1.0f / this.Length;
+            float scale = 1.0f / Length;
             X *= scale;
             Y *= scale;
             Z *= scale;

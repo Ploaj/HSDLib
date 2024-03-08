@@ -15,6 +15,7 @@ using HSDRawViewer.Tools;
 using HSDRaw.Tools;
 using OpenTK.Mathematics;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer.Converters
 {

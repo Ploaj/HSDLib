@@ -137,6 +137,9 @@ namespace HSDRawViewer.Tools
 
             Clear();
 
+            if (desc == null)
+                return;
+
             if (desc.ParamDesc == null)
                 return;
 
@@ -191,6 +194,9 @@ namespace HSDRawViewer.Tools
 
             // setup code
             SetCode(code);
+
+            if (desc == null)
+                return;
 
             // 
             if (desc.ParamDesc == null)
@@ -407,6 +413,9 @@ namespace HSDRawViewer.Tools
         {
             // load description and code byte
             var desc = ParticleManager.GetParticleDescriptor(_code);
+
+            if (desc == null)
+                return new byte[] { _code };
 
             // 
             if (desc.ParamDesc == null)

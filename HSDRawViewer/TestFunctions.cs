@@ -11,6 +11,7 @@ using HSDRaw.Melee.Pl;
 using HSDRaw.Tools.Melee;
 using System.Linq;
 using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer
 {

@@ -1,4 +1,6 @@
-﻿namespace HSDRaw.GX
+﻿using System;
+
+namespace HSDRaw.GX
 {
     public struct GXVector4
     {
@@ -83,6 +85,30 @@
         public static bool operator !=(GXVector3 x, GXVector3 y)
         {
             return !(x.X == y.X && x.Y == y.Y && x.Z == y.Z);
+        }
+
+        public static GXVector3 operator +(GXVector3 x, GXVector3 y)
+        {
+            return new GXVector3(x.X + y.X, x.Y + y.Y, x.Z + y.Z);
+        }
+
+        public static GXVector3 operator /(GXVector3 x, float v)
+        {
+            return new GXVector3(x.X / v, x.Y / v, x.Z / v);
+        }
+
+        public static float Distance(GXVector3 point1, GXVector3 point2)
+        {
+            float deltaX = point2.X - point1.X;
+            float deltaY = point2.Y - point1.Y;
+            float deltaZ = point2.Z - point1.Z;
+
+            return (float)Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        }
+
+        public override string ToString()
+        {
+            return $"({X}, {Y}, {Z})";
         }
     }
 

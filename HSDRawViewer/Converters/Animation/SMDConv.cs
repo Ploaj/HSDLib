@@ -1,7 +1,7 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
 using IONET.Core.Animation;
 using System;
 using System.Collections.Generic;

@@ -375,6 +375,12 @@ namespace HSDRaw
             arr.Add(value);
             Array = arr.ToArray();
         }
+
+        public void Clear()
+        {
+            _s.References.Clear();
+            _s.Resize(4);
+        }
     }
 
 

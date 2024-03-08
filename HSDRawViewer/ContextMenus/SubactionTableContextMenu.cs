@@ -3,6 +3,7 @@ using HSDRaw.Melee.Pl;
 using System;
 using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -87,8 +88,8 @@ namespace HSDRawViewer.ContextMenus
                     if (target == null)
                         return;
 
-                    var sini = new Tools.JointMap(source);
-                    var tini = new Tools.JointMap(target);
+                    var sini = new JointMap(source);
+                    var tini = new JointMap(target);
 
                     var tables = table.Commands;
 

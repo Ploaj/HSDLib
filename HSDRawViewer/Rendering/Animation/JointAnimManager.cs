@@ -6,7 +6,7 @@ using HSDRawViewer.Converters;
 using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering.Models;
-using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
 using OpenTK;
 using System;
 using System.Collections.Generic;

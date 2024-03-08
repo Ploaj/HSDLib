@@ -97,23 +97,33 @@
     bitCount: 26
     
 - code: 20
-  name: Some particle function
+  name: Spawn Particle Effect
   parameters:
-  - name: Unk1
-    hex: true
-    bitCount: 26
-  - name: Unk2
-    hex: true
+  - name: Bone Index
+    bitCount: 8
+  - name: Some Flag
+    bitCount: 1
+  - name: Param for 370078 (EfKind_QuakeFrame)
+    bitCount: 16
+  - name: Follow Bone Flag
+    bitCount: 1
+  - name: Effect Index
     bitCount: 32
-  - name: Unk3
-    hex: true
-    bitCount: 32
-  - name: Unk4
-    hex: true
-    bitCount: 32
-  - name: Unk5
-    hex: true
-    bitCount: 32
+  - name: X
+    bitCount: 16
+    signed: true
+  - name: Y
+    bitCount: 16
+    signed: true
+  - name: Z
+    bitCount: 16
+    signed: true
+  - name: Range X
+    bitCount: 16
+  - name: Range Y
+    bitCount: 16
+  - name: Range Z
+    bitCount: 16
 
 - code: 21
   name: Color Animation

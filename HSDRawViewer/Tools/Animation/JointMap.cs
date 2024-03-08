@@ -1,16 +1,19 @@
 ﻿using HSDRaw.Common;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace HSDRawViewer.Tools
+namespace HSDRawViewer.Tools.Animation
 {
     /// <summary>
     /// 
     /// </summary>
     public class JointMap
     {
+        public static string FileFilter = @"Joint Map (*.ini)|*.ini";
+
         private class JointInfo
         {
             public string Name;
@@ -22,7 +25,7 @@ namespace HSDRawViewer.Tools
         public string this[int i]
         {
             get { return _indexToName.ContainsKey(i) ? _indexToName[i].Name : null; }
-            set 
+            set
             {
                 if (_indexToName.ContainsKey(i))
                     _indexToName[i].Name = value;
@@ -130,7 +133,7 @@ namespace HSDRawViewer.Tools
                 }
                 else
                 {
-                    if(root != null)
+                    if (root != null)
                     {
                         var bones = root.TreeList;
                         var ji = 0;
