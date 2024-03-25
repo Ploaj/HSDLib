@@ -102,6 +102,7 @@ namespace HSDRawViewer.Converters
             if (settings.ExportModelInfoSheet)
             {
                 ModelInfoSheet.Export(settings.Directory + "model_sheet.json", rootJOBJ);
+                ModelInfoSheet.Import(settings.Directory + "model_sheet.json");
             }
 
             IOManager.ExportScene(exp.Scene, filePath, exportsettings);

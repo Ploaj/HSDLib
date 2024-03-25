@@ -102,6 +102,17 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="filepath"></param>
+        public static void Import(string filepath)
+        {
+            string json = File.ReadAllText(filepath);
+            ModelInfoSheet? thing = JsonSerializer.Deserialize<ModelInfoSheet>(json);
+            Console.WriteLine(json);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
         /// <param name="root"></param>
         public static void Export(string filepath, HSD_JOBJ root)
         {
