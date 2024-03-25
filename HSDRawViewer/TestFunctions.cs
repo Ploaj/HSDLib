@@ -17,19 +17,6 @@ namespace HSDRawViewer
 {
     class TestFunctions
     {
-        /// <summary>
-        /// Test for rebuilding pobjs from scratch
-        /// </summary>
-        /// <param name="path"></param>
-        public static void RebuildPOBJs(string path)
-        {
-            HSDRawFile file = new HSDRawFile(path);
-
-            var rootJOBJ = (HSD_JOBJ)(file.Roots[0].Data);
-
-            file.Save(path + "_rebuilt.dat");
-        }
-
         public static void RebuildPOBJs(HSD_JOBJ rootJOBJ)
         {
             var compressor = new POBJ_Generator();
@@ -92,10 +79,12 @@ namespace HSDRawViewer
         {
             HSDRawFile file = new HSDRawFile(path);
             var oldTree = file.Roots[0].Data as HSD_FigaTree;
-            
+
             HSDRawFile newFile = new HSDRawFile();
-            HSD_FigaTree newTree = new HSD_FigaTree();
-            newTree.FrameCount = oldTree.FrameCount;
+            HSD_FigaTree newTree = new HSD_FigaTree()
+            {
+                FrameCount = oldTree.FrameCount,
+            };
             newFile.Roots = new List<HSDRootNode>();
             newFile.Roots.Add(new HSDRootNode() { Name = file.Roots[0].Name, Data = newTree });
 
@@ -231,10 +220,12 @@ namespace HSDRawViewer
             }
 
 
-            var newft = new HSD_FigaTree();
-            newft.Type = 1;
-            newft.FrameCount = from.FrameCount;
-            newft.Nodes = targetNodes;
+            var newft = new HSD_FigaTree()
+            {
+                Type = 1,
+                FrameCount = from.FrameCount,
+                Nodes = targetNodes,
+            };
             return newft;
         }
 

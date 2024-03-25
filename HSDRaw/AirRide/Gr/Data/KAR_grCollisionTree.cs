@@ -17,7 +17,7 @@
             get
             {
                 var s = _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grPartitionBucket>>(0x00);
-                return s != null ? s.Array : null;
+                return s?.Array;
             }
             set
             {
@@ -43,7 +43,7 @@
             get
             {
                 var s = _s.GetReference<HSDUShortArray>(0x0C);
-                return s != null ? s.Array : null;
+                return s?.Array;
             }
             set
             {
@@ -70,7 +70,7 @@
             get
             {
                 var s = _s.GetReference<HSDUShortArray>(0x18);
-                return s != null ? s.Array : null;
+                return s?.Array;
             }
             set
             {
@@ -97,7 +97,7 @@
             get
             {
                 var s = _s.GetReference<HSDUShortArray>(0x24);
-                return s != null ? s.Array : null;
+                return s?.Array;
             }
             set
             {

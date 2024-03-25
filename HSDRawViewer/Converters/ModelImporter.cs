@@ -457,7 +457,7 @@ namespace HSDRawViewer.Converters
             if (settings.FlipUVs)
                 mesh.FlipUVs();
 
-            if (settings.FlipFaces)
+            if (!settings.FlipFaces)
                 mesh.FlipWindingOrder();
 
             // determine parent
