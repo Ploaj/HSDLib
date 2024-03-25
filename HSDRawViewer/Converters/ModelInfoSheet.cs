@@ -95,7 +95,27 @@ namespace HSDRawViewer.Converters
 
         public void updateJobj(HSD_JOBJ jobj)
         {
+            int objectIndex = 0;
+            foreach (var j in jobj.TreeList)
+            {
+                if (j.Dobj != null)
+                {
+                    foreach (var dobj in j.Dobj.List)
+                    {
+                        MI_Object current = this.Objects[objectIndex];
 
+                        var mobj = dobj.Mobj;
+                        var mat = mobj.Material;
+
+                        mat.AmbientColor = System.Drawing.Color.FromArgb(Convert.ToInt32(current.Ambient, 16));
+                        mat.DiffuseColor = System.Drawing.Color.FromArgb(Convert.ToInt32(current.Diffuse, 16));
+                        mat.SpecularColor = System.Drawing.Color.FromArgb(Convert.ToInt32(current.Specular, 16));
+                        mat.Shininess = current.Shininess;
+                        mat.Alpha = current.Alpha;
+                        objectIndex++;
+                    }
+                }
+            }
         }
 
         /// <summary>
