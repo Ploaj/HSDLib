@@ -614,6 +614,18 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             SetJOBJ(_root);
         }
 
+        private void importModelInfoSheetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearAnimation();
+            var f = Tools.FileIO.OpenFile("JSON (*.json)|*.json");
+            if (f != null)
+            {
+                ModelInfoSheet infoSheet = ModelInfoSheet.Import(f);
+                infoSheet.updateJobj(_root);
+            }
+            SetJOBJ(_root);
+        }
+
         /// <summary>
         /// 
         /// </summary>

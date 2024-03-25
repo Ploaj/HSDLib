@@ -30,7 +30,12 @@ namespace HSDRawViewer.Converters
     {
         private HashSet<byte[]> textures = new HashSet<byte[]>();
 
-        public List<MI_Object> Objects { get; set; } = new List<MI_Object>(); 
+        public List<MI_Object> Objects { get; set; } = new List<MI_Object>();
+
+        public ModelInfoSheet()
+        {
+            // Necessary in order to deserialize
+        }
 
         /// <summary>
         /// 
@@ -88,6 +93,11 @@ namespace HSDRawViewer.Converters
             }
         }
 
+        public void updateJobj(HSD_JOBJ jobj)
+        {
+
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -102,11 +112,10 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="filepath"></param>
-        public static void Import(string filepath)
+        public static ModelInfoSheet Import(string filepath)
         {
             string json = File.ReadAllText(filepath);
-            ModelInfoSheet? thing = JsonSerializer.Deserialize<ModelInfoSheet>(json);
-            Console.WriteLine(json);
+            return JsonSerializer.Deserialize<ModelInfoSheet>(json);
         }
 
         /// <summary>
