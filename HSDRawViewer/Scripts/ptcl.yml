@@ -430,6 +430,38 @@
   params:
   - Particle ID
   
+- code: 0xF3
+  name: KAR 0xF3
+  description: 8042f92c
+  paramDesc: e
+  params:
+  - Unknown
+  
+- code: 0xF4
+  name: KAR 0xF4
+  description: 8042dea4
+  paramDesc: f
+  params:
+  - Unknown
+  
+- code: 0xF5
+  name: KAR 0xF5
+  description: 8042def4
+  paramDesc: 
+  params:
+  
+- code: 0xF6
+  name: KAR 0xF6
+  description: 8042df3c
+  paramDesc: 
+  params:
+  
+- code: 0xF7
+  name: KAR 0xF7
+  description: 8042df74
+  paramDesc: 
+  params:
+  
 - code: 0xFA
   name: Set Loop
   description: 

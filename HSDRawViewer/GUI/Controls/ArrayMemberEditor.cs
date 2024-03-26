@@ -460,6 +460,23 @@ namespace HSDRawViewer.GUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        private void elementList_MeasureItem(object sender, MeasureItemEventArgs e)
+        {
+            // Get the text of the item
+            var itemText = ((ListBox)sender).Items[e.Index].ToString();
+
+            // Measure the size of the text using the Graphics object
+            SizeF textSize = e.Graphics.MeasureString(itemText, elementList.Font);
+
+            // Set the item height to be the height of the text
+            e.ItemHeight = (int)Math.Max(textSize.Height, ImageHeight);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void elementList_DrawItem(object sender, DrawItemEventArgs e)
         {
             try

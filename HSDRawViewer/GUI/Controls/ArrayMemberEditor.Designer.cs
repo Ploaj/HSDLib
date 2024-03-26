@@ -53,12 +53,13 @@
             // elementList
             // 
             this.elementList.Dock = System.Windows.Forms.DockStyle.Top;
-            this.elementList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.elementList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.elementList.FormattingEnabled = true;
             this.elementList.Location = new System.Drawing.Point(0, 25);
             this.elementList.Name = "elementList";
             this.elementList.Size = new System.Drawing.Size(208, 212);
             this.elementList.TabIndex = 4;
+            this.elementList.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.elementList_MeasureItem);
             this.elementList.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.elementList_DrawItem);
             this.elementList.SelectedValueChanged += new System.EventHandler(this.elementList_SelectedValueChanged);
             this.elementList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.elementList_MouseDoubleClick);

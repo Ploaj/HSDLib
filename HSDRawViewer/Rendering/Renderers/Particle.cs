@@ -1190,16 +1190,24 @@ namespace HSDRawViewer.Rendering.Renderers
                                 int ptclId = ReadShort();
                             }
                             break;
-                        //case 0xF3:
-                        //case 0xF4:
-                        //case 0xF5:
-                        //case 0xF6:
-                        //case 0xF7:
-                        //    {
-                        //        int ptclId = ReadShort();
-                        //    }
-                        //    break;
-                        
+
+
+                            // Kirby Air Ride Only
+                        case 0xF3:
+                            {
+                                ReadExtendedByte();
+                            }
+                            break;
+                        case 0xF4:
+                            {
+                                ReadFloat();
+                            }
+                            break;
+                        case 0xF5:
+                        case 0xF6:
+                        case 0xF7:
+                            break;
+
                         default:
                             throw new NotSupportedException($"Particle Command {final_cmd.ToString("X")} not supported");
                     }

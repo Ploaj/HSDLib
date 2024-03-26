@@ -71,8 +71,10 @@ namespace HSDRaw.Common
                 int i = 0;
                 foreach (var v in value)
                 {
-                    if(v == null)
+                    if(v == null || v.IsBlank())
+                    {
                         _s.SetInt32(0x0C + 4 * i++, 0);
+                    }
                     else
                     {
                         if (size % 0x8 != 0)
@@ -92,7 +94,11 @@ namespace HSDRaw.Common
                 size = 0x0C + 4 * value.Length;
                 foreach (var v in value)
                 {
-                    if (v != null)
+                    if (v == null || v.IsBlank())
+                    {
+
+                    }
+                    else
                     {
                         if (size % 0x8 != 0)
                             size += 0x8 - (size % 0x8);
@@ -245,9 +251,22 @@ namespace HSDRaw.Common
             TrackData = new byte[] { 0xFF };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return $"Particle: {TypeShape} TexG: {TexGroup} ";
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsBlank()
+        {
+            return TrackData.Length == 0 || TrackData.Length == 1;
         }
     }
 }
