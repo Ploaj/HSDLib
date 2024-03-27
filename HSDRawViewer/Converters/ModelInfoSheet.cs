@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Converters
 {
@@ -95,6 +96,22 @@ namespace HSDRawViewer.Converters
 
         public void updateJobj(HSD_JOBJ jobj)
         {
+            int sheetSize = Objects.Count;
+            int nodeSize = 0;
+            foreach (var x in jobj.TreeList)
+            {
+                if (x.Dobj != null)
+                {
+                    nodeSize += x.Dobj.List.Count;
+                }
+            }
+            if (sheetSize != nodeSize)
+            {
+                string message = "The model info sheet you are importing has {0} objects but the current model has {1}.";
+                MessageBox.Show(String.Format(message, sheetSize, nodeSize), "Invalid Model Info Sheet");
+                return;
+            }
+
             int objectIndex = 0;
             foreach (var j in jobj.TreeList)
             {
