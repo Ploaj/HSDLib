@@ -21,9 +21,11 @@
     - name: Unused
       bitCount: 1
     - name: X
-      bitCount: 9
+      bitCount: 12
+      signed: true
     - name: Y
-      bitCount: 9
+      bitCount: 12
+      signed: true
     - name: R
       bitCount: 8
     - name: G

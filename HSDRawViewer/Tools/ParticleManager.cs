@@ -72,8 +72,9 @@ namespace HSDRawViewer.Tools
 
             string sa = "";
 
-            if (File.Exists(@"Scripts\ptcl.yml"))
-                sa = File.ReadAllText(@"Scripts\ptcl.yml");
+            var scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\ptcl.yml"); ;
+            if (File.Exists(scriptPath))
+                sa = File.ReadAllText(scriptPath);
 
             Descriptors = deserializer.Deserialize<ParticleDescriptor[]>(sa);
 

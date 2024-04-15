@@ -93,20 +93,59 @@ namespace HSDRawViewer.Tools.AirRide
                 }
 
                 // add triangles
-                var iopoly = new IOPolygon()
+                var iopoly_wall = new IOPolygon()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
+                    MaterialName = "wall"
                 };
-                iomesh.Polygons.Add(iopoly);
+                iomesh.Polygons.Add(iopoly_wall);
+
+                var iopoly_ceil = new IOPolygon()
+                {
+                    PrimitiveType = IOPrimitive.TRIANGLE,
+                    MaterialName = "ceil"
+                };
+                iomesh.Polygons.Add(iopoly_ceil);
+
+                var iopoly_floor = new IOPolygon()
+                {
+                    PrimitiveType = IOPrimitive.TRIANGLE,
+                    MaterialName = "floor"
+                };
+                iomesh.Polygons.Add(iopoly_floor);
+
+                var iopoly_unknown = new IOPolygon()
+                {
+                    PrimitiveType = IOPrimitive.TRIANGLE
+                };
+                iomesh.Polygons.Add(iopoly_unknown);
+
+
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
                     var triangle = _triangles[i];
 
+                    IOPolygon iopoly;
+
+                    switch (triangle.Flags)
+                    {
+                        case KCCollFlag.Wall:
+                            iopoly = iopoly_wall;
+                            break;
+                        case KCCollFlag.Ceiling:
+                            iopoly = iopoly_ceil;
+                            break;
+                        case KCCollFlag.Floor:
+                            iopoly = iopoly_floor;
+                            break;
+                        default:
+                            iopoly = iopoly_unknown;
+                            break;
+                    }
+                    
                     iopoly.Indicies.Add(triangle.V3);
                     iopoly.Indicies.Add(triangle.V2);
                     iopoly.Indicies.Add(triangle.V1);
-
-                    // TODO: separate based on flags
                 }
 
                 // add mesh and root
@@ -115,6 +154,21 @@ namespace HSDRawViewer.Tools.AirRide
 
             // export scene
             IOScene ioscene = new IOScene();
+            ioscene.Materials.Add(new IOMaterial()
+            {
+                Name = "wall",
+                DiffuseColor = new System.Numerics.Vector4(1, 0, 0, 1),
+            });
+            ioscene.Materials.Add(new IOMaterial()
+            {
+                Name = "ceiling",
+                DiffuseColor = new System.Numerics.Vector4(1, 0, 0, 1),
+            });
+            ioscene.Materials.Add(new IOMaterial()
+            {
+                Name = "floor",
+                DiffuseColor = new System.Numerics.Vector4(1, 0, 0, 1),
+            });
             ioscene.Models.Add(iomodel);
             IONET.IOManager.ExportScene(ioscene, filepath, new IONET.ExportSettings()
             {
