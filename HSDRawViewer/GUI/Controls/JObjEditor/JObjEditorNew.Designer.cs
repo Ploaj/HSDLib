@@ -33,6 +33,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importModelInfoSheetStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportModelToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.importSceneSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,6 +98,7 @@
             this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importModelFromFileToolStripMenuItem,
+            this.importModelInfoSheetStripMenuItem,
             this.exportModelToFileToolStripMenuItem,
             this.toolStripSeparator2,
             this.importSceneSettingsToolStripMenuItem,
@@ -113,6 +115,13 @@
             this.importModelFromFileToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
             this.importModelFromFileToolStripMenuItem.Text = "Import Model From File";
             this.importModelFromFileToolStripMenuItem.Click += new System.EventHandler(this.importModelFromFileToolStripMenuItem_Click);
+            // 
+            // importModelInfoSheetStripMenuItem
+            // 
+            this.importModelInfoSheetStripMenuItem.Name = "importModelInfoSheetStripMenuItem";
+            this.importModelInfoSheetStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.importModelInfoSheetStripMenuItem.Text = "Import Model Info Sheet From File";
+            this.importModelInfoSheetStripMenuItem.Click += new System.EventHandler(this.importModelInfoSheetToolStripMenuItem_Click);
             // 
             // exportModelToFileToolStripMenuItem
             // 
@@ -373,6 +382,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
         private System.Windows.Forms.ToolStripMenuItem importModelFromFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importModelInfoSheetStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportModelToFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem importSceneSettingsToolStripMenuItem;

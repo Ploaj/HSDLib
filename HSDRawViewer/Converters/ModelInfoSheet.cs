@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Converters
 {
@@ -30,7 +31,12 @@ namespace HSDRawViewer.Converters
     {
         private HashSet<byte[]> textures = new HashSet<byte[]>();
 
-        public List<MI_Object> Objects { get; set; } = new List<MI_Object>(); 
+        public List<MI_Object> Objects { get; set; } = new List<MI_Object>();
+
+        public ModelInfoSheet()
+        {
+            // Necessary in order to deserialize
+        }
 
         /// <summary>
         /// 
@@ -88,6 +94,47 @@ namespace HSDRawViewer.Converters
             }
         }
 
+        public void updateJobj(HSD_JOBJ jobj)
+        {
+            int sheetSize = Objects.Count;
+            int nodeSize = 0;
+            foreach (var x in jobj.TreeList)
+            {
+                if (x.Dobj != null)
+                {
+                    nodeSize += x.Dobj.List.Count;
+                }
+            }
+            if (sheetSize != nodeSize)
+            {
+                string message = "The model info sheet you are importing has {0} objects but the current model has {1}.";
+                MessageBox.Show(String.Format(message, sheetSize, nodeSize), "Invalid Model Info Sheet");
+                return;
+            }
+
+            int objectIndex = 0;
+            foreach (var j in jobj.TreeList)
+            {
+                if (j.Dobj != null)
+                {
+                    foreach (var dobj in j.Dobj.List)
+                    {
+                        MI_Object current = this.Objects[objectIndex];
+
+                        var mobj = dobj.Mobj;
+                        var mat = mobj.Material;
+
+                        mat.AmbientColor = System.Drawing.Color.FromArgb(Convert.ToInt32(current.Ambient, 16));
+                        mat.DiffuseColor = System.Drawing.Color.FromArgb(Convert.ToInt32(current.Diffuse, 16));
+                        mat.SpecularColor = System.Drawing.Color.FromArgb(Convert.ToInt32(current.Specular, 16));
+                        mat.Shininess = current.Shininess;
+                        mat.Alpha = current.Alpha;
+                        objectIndex++;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -96,6 +143,16 @@ namespace HSDRawViewer.Converters
         {
             string json = JsonSerializer.Serialize(this);
             File.WriteAllText(filepath, json);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filepath"></param>
+        public static ModelInfoSheet Import(string filepath)
+        {
+            string json = File.ReadAllText(filepath);
+            return JsonSerializer.Deserialize<ModelInfoSheet>(json);
         }
 
         /// <summary>
