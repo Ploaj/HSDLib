@@ -31,7 +31,11 @@ namespace HSDRawViewer.Converters
         public bool FlipUVs { get; set; } = true;
         
         public bool ExportBindPose { get; set; } = true;
-        
+
+        public bool ExportMesh { get; set; } = true;
+
+        public bool ExportTextures { get; set; } = true;
+
         public bool ExportMOBJs { get; set; } = false;
         
         public bool ExportTransformedUVs { get => ModelExporter.TransformUVS; set => ModelExporter.TransformUVS = value; }
@@ -133,7 +137,8 @@ namespace HSDRawViewer.Converters
 
             _model.Skeleton.RootBones.Add(ProcessJoints(jobj, jointMap, System.Numerics.Matrix4x4.Identity));
 
-            ProcessDOBJs();
+            if (settings.ExportMesh)
+                ProcessDOBJs();
         }
 
 
@@ -241,8 +246,10 @@ namespace HSDRawViewer.Converters
                                     if (GXImageConverter.IsPalettedFormat(t.ImageData.Format))
                                         name += $"_{t.TlutData.Format}";
 
-                                    using (Bitmap img = TOBJConverter.ToBitmap(t))
-                                        img.Save(_settings.Directory + name + ".png");
+                                    if (_settings.ExportTextures)
+                                    {
+                                        t.SaveImagePNG(_settings.Directory + name + ".png");
+                                    }
 
                                     imageToName.Add(t.ImageData.ImageData, name);
 

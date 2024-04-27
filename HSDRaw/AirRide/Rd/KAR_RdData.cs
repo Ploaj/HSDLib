@@ -24,28 +24,28 @@ namespace HSDRaw.AirRide.Rd
 
         public HSDAccessor Attribute2 { get => _s.GetReference<HSDAccessor>(0x1C); set => _s.SetReference(0x1C, value); }
 
-        public KAR_RdItemProjectileBank ProjectileItems { get => _s.GetReference<KAR_RdItemProjectileBank>(0x20); set => _s.SetReference(0x20, value); }
+        public KAR_RdWeaponBank Weapons { get => _s.GetReference<KAR_RdWeaponBank>(0x20); set => _s.SetReference(0x20, value); }
 
         public HSDFixedLengthPointerArrayAccessor<KAR_RdCap> CapData { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_RdCap>>(0x24); set => _s.SetReference(0x24, value); }
 
     }
 
-    public class KAR_RdItemProjectileBank : HSDAccessor
+    public class KAR_RdWeaponBank : HSDAccessor
     {
         public override int TrimmedSize => 0x10;
 
         public int Count { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
-        public HSDArrayAccessor<KAR_RdItemProjectile> Items { get => _s.GetReference<HSDArrayAccessor<KAR_RdItemProjectile>>(0x04); set => _s.SetReference(0x04, value); }
+        public HSDArrayAccessor<KAR_RdWeapon> Weapons { get => _s.GetReference<HSDArrayAccessor<KAR_RdWeapon>>(0x04); set => _s.SetReference(0x04, value); }
     }
 
-    public class KAR_RdItemProjectile : HSDAccessor
+    public class KAR_RdWeapon : HSDAccessor
     {
         public override int TrimmedSize => 0x08;
 
         public int ID { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
 
-        public KAR_ItemProjectile ProjectileItem { get => _s.GetReference<KAR_ItemProjectile>(0x04); set => _s.SetReference(0x04, value); }
+        public KAR_Weapon WeaponItem { get => _s.GetReference<KAR_Weapon>(0x04); set => _s.SetReference(0x04, value); }
     }
 
     public class KAR_RdMotionTable : HSDAccessor

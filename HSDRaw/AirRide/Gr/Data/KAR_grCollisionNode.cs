@@ -150,7 +150,11 @@ namespace HSDRaw.AirRide.Gr.Data
     {
         public override int TrimmedSize => 0x18;
 
-        public KCCollFlag CollFlags { get => (KCCollFlag)_s.GetInt32(0x0); set => _s.SetInt32(0x0, (int)value); }
+        /// <summary>
+        /// There are only allowed to be 2 entries per zone joint of each kind
+        /// There are 6 kinds
+        /// </summary>
+        public int PolyIndex { get => _s.GetInt32(0x0); set => _s.SetInt32(0x0, value); }
 
         public int V1 { get => _s.GetInt32(0x4); set => _s.SetInt32(0x4, value); }
 
@@ -159,8 +163,16 @@ namespace HSDRaw.AirRide.Gr.Data
         public int V3 { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
         /// <summary>
-        /// F0000000 - Index
-        /// 01ffffff
+        /// 
+        /// </summary>
+        public byte UnknownIndex 
+        {
+            get => (byte)((_s.GetInt32(0x10) >> 25) & 0x7F);
+            set => _s.SetInt32(0x10, ((value & 0x7F) << 25) | (Type & 0x01FFFFFF));
+        }
+
+        /// <summary>
+        /// 0 - 35
         /// 2/3 - Dash Gate	
         /// 	- 0x9C of stage
         /// 	- index< 2
@@ -175,9 +187,12 @@ namespace HSDRaw.AirRide.Gr.Data
         /// 25 - Dead
         /// 32 - 800eefd4 - also checks flag 0x2000020
         /// </summary>
-        public int TypeFlags { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
+        public int Type { get => _s.GetInt32(0x10) & 0x01FFFFFF; set => _s.SetInt32(0x10, (PolyIndex << 25) | (value & 0x01FFFFFF)); }
 
-        public int UnkFlags { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        /// <summary>
+        /// Collision Flags
+        /// </summary>
+        public KCCollFlag CollFlags { get => (KCCollFlag)_s.GetInt32(0x14); set => _s.SetInt32(0x14, (int)value); }
     }
 
     public class KAR_ZoneCollisionJoint : HSDAccessor
@@ -194,9 +209,13 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int ZoneFaceSize { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
-        //public int UnknownPointer { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int x14 { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
-        //public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        public int x18 { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+
+        public HSDAccessor x14_param { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
+
+        public HSDAccessor x18_param { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
 
         public float Mtx00 { get => _s.GetFloat(0x1c); set => _s.SetFloat(0x1c, value); }
 
@@ -363,6 +382,9 @@ namespace HSDRaw.AirRide.Gr.Data
             }
         }
 
+        /// <summary>
+        /// Should always be 8
+        /// </summary>
         public int ZoneVertexCount { get => _s.GetInt32(0x1C); internal set => _s.SetInt32(0x1C, value); }
         
         public KAR_ZoneCollisionTriangle[] ZoneTriangles
@@ -389,7 +411,10 @@ namespace HSDRaw.AirRide.Gr.Data
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Should always be 12
+        /// </summary>
         public int ZoneTriangleCount { get => _s.GetInt32(0x24); internal set => _s.SetInt32(0x24, value); }
         
         public KAR_ZoneCollisionJoint[] ZoneJoints

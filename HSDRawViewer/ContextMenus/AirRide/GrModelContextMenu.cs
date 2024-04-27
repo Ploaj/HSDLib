@@ -16,6 +16,9 @@ namespace HSDRawViewer.ContextMenus.AirRide
     {
         public override Type[] SupportedTypes { get; } = new Type[] { typeof(KAR_grMainModel) };
 
+        /// <summary>
+        /// 
+        /// </summary>
         public GrModelContextMenu()
         {
             ToolStripMenuItem genPages = new ToolStripMenuItem("Recalculate Model Bounding");
@@ -38,7 +41,10 @@ namespace HSDRawViewer.ContextMenus.AirRide
         {
             ModelExporter exp = new ModelExporter(
                 jobj, 
-                new ModelExportSettings(), 
+                new ModelExportSettings()
+                { 
+                    ExportTextures = false,
+                }, 
                 new JointMap());
 
             List<KAR_grStaticBoundingBox> staticBoxes = new List<KAR_grStaticBoundingBox>();

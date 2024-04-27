@@ -19,19 +19,104 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         public GrDataContextMenu() : base()
         {
-            ToolStripMenuItem genPages = new ToolStripMenuItem("Export Collision Model");
-            genPages.Click += (sender, args) =>
+            ToolStripMenuItem ImportCollModel = new ToolStripMenuItem("Import Collision Model");
+            ImportCollModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var f = Tools.FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "coll_model.dae");
+                    var f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
                     if (f != null)
                     {
-                        KARCollisionExporter.ExportCollisionModel(f, data);
+                        // generate collision node
+                        data.CollisionNode = KARCollisionImporter.GenerateCollisionNode(f);
+
+                        // generate partition
+                        var jobj = Converters.ModelImporter.ImportModelFromFile(f);
+                        data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
                     }
                 }
             };
-            Items.Add(genPages);
+            Items.Add(ImportCollModel);
+
+            ToolStripMenuItem ExportCollModel = new ToolStripMenuItem("Export Collision Model");
+            ExportCollModel.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    var modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
+                    var modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+
+                    if (modelPath != null)
+                    {
+                        var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "coll_model.dae");
+                        if (f != null)
+                        {
+                            KARCollisionExporter.ExportCollisionModel(f, modelPath, data);
+                        }
+                    }
+
+                }
+            };
+            Items.Add(ExportCollModel);
+
+            //ToolStripMenuItem ImportZoneModel = new ToolStripMenuItem("Import Zone Model");
+            //ImportZoneModel.Click += (sender, args) =>
+            //{
+            //    if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+            //    {
+            //        var f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
+            //        if (f != null)
+            //        {
+            //            // generate collision node
+            //            data.CollisionNode = KARCollisionImporter.GenerateCollisionNode(f);
+
+            //            // generate partition
+            //            var jobj = Converters.ModelImporter.ImportModelFromFile(f);
+            //            data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
+            //        }
+            //    }
+            //};
+            //Items.Add(ImportZoneModel);
+
+            ToolStripMenuItem ExportZoneModel = new ToolStripMenuItem("Export Zone Model");
+            ExportZoneModel.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    var modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
+                    var modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+
+                    if (modelPath != null)
+                    {
+                        var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "zone_model.dae");
+                        if (f != null)
+                        {
+                            KARCollisionExporter.ExportZoneModel(f, modelPath, data);
+                        }
+                    }
+
+                }
+            };
+            Items.Add(ExportZoneModel);
+
+
+            Items.Add(new ToolStripSeparator());
+
+
+            ToolStripMenuItem ExportAreaBones = new ToolStripMenuItem("Export Area Bones");
+            ExportAreaBones.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "area_pos.dae");
+                    if (f != null)
+                    {
+                        KARPositionExporter.ExportAreaPositions(f, data.PositionNode.ItemAreaPos[0]);
+                    }
+                }
+            };
+            Items.Add(ExportAreaBones);
+
 
 
             ToolStripMenuItem test = new ToolStripMenuItem("Test Edit");
@@ -113,168 +198,103 @@ namespace HSDRawViewer.ContextMenus.AirRide
             };
             Items.Add(clear);
 
-            ToolStripMenuItem coll = new ToolStripMenuItem("Import Collision");
-            coll.Click += (sender, args) =>
-            {
-                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
-                {
-                    var f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
-                    if (f != null)
-                    {
-                        var jobj = Converters.ModelImporter.ImportModelFromFile(f);
-                        data.CollisionNode = GenerateCollisionNode(f);
-                        data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
-                    }
-                }
-            };
-            Items.Add(coll);
 
-
-
-            ToolStripMenuItem ds = new ToolStripMenuItem("Check Collision Angles");
+            ToolStripMenuItem ds = new ToolStripMenuItem("Remove Zone Type Flags");
             ds.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var v = data.CollisionNode.Vertices;
+                    var tri = data.CollisionNode.ZoneTriangles;
+                    var joint = data.CollisionNode.ZoneJoints;
 
-                    float floorMax = float.MinValue;
-                    float floorMin = float.MaxValue;
+                    HashSet<int> flags = new HashSet<int>();
 
-                    float wallMax = float.MinValue;
-                    float wallMin = float.MaxValue;
-
-                    float ceilMax = float.MinValue;
-                    float ceilMin = float.MaxValue;
-
-                    foreach (var t in data.CollisionNode.Triangles)
+                    int ji = 0;
+                    foreach (var j in joint)
                     {
-                        var v1 = v[t.V3];
-                        var v2 = v[t.V2];
-                        var v3 = v[t.V1];
-                        var normal = Math3D.CalculateSurfaceNormal(
-                            new OpenTK.Mathematics.Vector3(v1.X, v1.Y, v1.Z),
-                            new OpenTK.Mathematics.Vector3(v2.X, v2.Y, v2.Z),
-                            new OpenTK.Mathematics.Vector3(v3.X, v3.Y, v3.Z));
+                        for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
+                        {
+                            var t = tri[i];
 
-                        if (t.Flags == KCCollFlag.Floor)
-                        {
-                            floorMax = Math.Max(floorMax, normal.Y);
-                            floorMin = Math.Min(floorMin, normal.Y);
+                            if (!flags.Contains(t.Type) || j.x14 != -1)
+                            {
+                                flags.Add(t.Type);
+
+                                System.Diagnostics.Debug.WriteLine($"Index: {ji} Type: {t.Type} x14: {j.x14} x18: {j.x18}");
+                                if (j.x14_param != null)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"\t0x14 {j.x14_param._s.Length}");
+                                }
+                                if (j.x18_param != null)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"\t0x18 {j.x18_param._s.Length}");
+                                }
+                            }
                         }
-                        if (t.Flags == KCCollFlag.Wall)
-                        {
-                            wallMax = Math.Max(wallMax, normal.Y);
-                            wallMin = Math.Min(wallMin, normal.Y);
-                        }
-                        if (t.Flags == KCCollFlag.Ceiling)
-                        {
-                            ceilMax = Math.Max(ceilMax, normal.Y);
-                            ceilMin = Math.Min(ceilMin, normal.Y);
-                        }
-                        if (t.Flags.HasFlag(KCCollFlag.Unknown))
-                        {
-                            Console.WriteLine("Unknown Flag Detected");
-                        }
+                        ji++;
                     }
 
-                    Console.WriteLine($"Floor| Max: {floorMax} Min: {floorMin}");
-                    Console.WriteLine($"Wall| Max: {wallMax} Min: {wallMin}");
-                    Console.WriteLine($"Ceiling| Max: {ceilMax} Min: {ceilMin}");
+                    data.CollisionNode.ZoneTriangles = tri;
+                    data.CollisionNode.ZoneJoints = joint;
                 }
             };
             Items.Add(ds);
+
+
+            //ToolStripMenuItem ds = new ToolStripMenuItem("Check Collision Angles");
+            //ds.Click += (sender, args) =>
+            //{
+            //    if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+            //    {
+            //        var v = data.CollisionNode.Vertices;
+
+            //        float floorMax = float.MinValue;
+            //        float floorMin = float.MaxValue;
+
+            //        float wallMax = float.MinValue;
+            //        float wallMin = float.MaxValue;
+
+            //        float ceilMax = float.MinValue;
+            //        float ceilMin = float.MaxValue;
+
+            //        foreach (var t in data.CollisionNode.Triangles)
+            //        {
+            //            var v1 = v[t.V3];
+            //            var v2 = v[t.V2];
+            //            var v3 = v[t.V1];
+            //            var normal = Math3D.CalculateSurfaceNormal(
+            //                new OpenTK.Mathematics.Vector3(v1.X, v1.Y, v1.Z),
+            //                new OpenTK.Mathematics.Vector3(v2.X, v2.Y, v2.Z),
+            //                new OpenTK.Mathematics.Vector3(v3.X, v3.Y, v3.Z));
+
+            //            if (t.Flags == KCCollFlag.Floor)
+            //            {
+            //                floorMax = Math.Max(floorMax, normal.Y);
+            //                floorMin = Math.Min(floorMin, normal.Y);
+            //            }
+            //            if (t.Flags == KCCollFlag.Wall)
+            //            {
+            //                wallMax = Math.Max(wallMax, normal.Y);
+            //                wallMin = Math.Min(wallMin, normal.Y);
+            //            }
+            //            if (t.Flags == KCCollFlag.Ceiling)
+            //            {
+            //                ceilMax = Math.Max(ceilMax, normal.Y);
+            //                ceilMin = Math.Min(ceilMin, normal.Y);
+            //            }
+            //            if (t.Flags.HasFlag(KCCollFlag.Unknown))
+            //            {
+            //                Console.WriteLine("Unknown Flag Detected");
+            //            }
+            //        }
+
+            //        Console.WriteLine($"Floor| Max: {floorMax} Min: {floorMin}");
+            //        Console.WriteLine($"Wall| Max: {wallMax} Min: {wallMin}");
+            //        Console.WriteLine($"Ceiling| Max: {ceilMax} Min: {ceilMin}");
+            //    }
+            //};
+            //Items.Add(ds);
         }
 
-        private static KAR_grCollisionNode GenerateCollisionNode(string filepath)
-        {
-            var scene = IONET.IOManager.LoadScene(filepath, new IONET.ImportSettings());
-
-            List<GXVector3> points = new List<GXVector3>();
-            List<KAR_CollisionTriangle> triangles = new List<KAR_CollisionTriangle>();
-
-            // calculate mesh bounding
-            int meshIndex = 0;
-            foreach (var m in scene.Models[0].Meshes)
-            {
-                m.MakeTriangles();
-
-                int pointStart = points.Count;
-
-                foreach (var v in m.Vertices)
-                {
-                    points.Add(new GXVector3() { X = v.Position.X, Y = v.Position.Y, Z = v.Position.Z });
-                }
-
-                foreach (var p in m.Polygons)
-                {
-                    for (int i = 0; i < p.Indicies.Count; i += 3)
-                    {
-                        //var v1 = m.Vertices[p.Indicies[i + 2]];
-                        //var v2 = m.Vertices[p.Indicies[i + 1]];
-                        //var v3 = m.Vertices[p.Indicies[i]];
-                        //var normal = Math3D.CalculateSurfaceNormal(
-                        //    new OpenTK.Mathematics.Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
-                        //    new OpenTK.Mathematics.Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
-                        //    new OpenTK.Mathematics.Vector3(v3.Position.X, v3.Position.Y, v3.Position.Z));
-
-                        //if (normal.Y > 0.8f)
-                        //{
-                        //    flag = KCCollFlag.Floor;
-                        //} 
-                        //else if (normal.Y < -0.8)
-                        //{
-                        //    flag = KCCollFlag.Ceiling;
-                        //}
-                        //else
-                        //{
-                        //    flag = KCCollFlag.Wall;
-                        //}
-
-                        KCCollFlag flag = KCCollFlag.Floor;
-
-                        if (p.MaterialName.ToLower().Contains("wall"))
-                        {
-                            flag = KCCollFlag.Wall;
-                        }
-                        else
-                        if (p.MaterialName.ToLower().Contains("ceiling"))
-                        {
-                            flag = KCCollFlag.Ceiling;
-                        }
-
-                        triangles.Add(new KAR_CollisionTriangle()
-                        {
-                            V1 = p.Indicies[i + 2] + pointStart,
-                            V2 = p.Indicies[i + 1] + pointStart,
-                            V3 = p.Indicies[i + 0] + pointStart,
-                            Flags = flag,
-                            //SegmentMove = true,
-                        });
-                    }
-                }
-
-                meshIndex++;
-            }
-
-            KAR_grCollisionNode collision = new KAR_grCollisionNode();
-
-            collision.Vertices = points.ToArray();
-            collision.Triangles = triangles.ToArray();
-
-            collision.Joints = new KAR_CollisionJoint[]
-            {
-                new KAR_CollisionJoint()
-                {
-                    BoneID = 0,
-                    FaceStart = 0,
-                    FaceSize = triangles.Count,
-                    VertexStart = 0,
-                    VertexSize = points.Count
-                }
-            };
-
-            return collision;
-        }
     }
 }

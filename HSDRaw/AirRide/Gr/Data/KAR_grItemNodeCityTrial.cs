@@ -11,7 +11,7 @@
         
         public int ItemSpawnChanceTableCount { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
         
-        public HSDArrayAccessor<KAR_grItemNodeCityTrialPlayerTable> PlayerTable { get => _s.GetReference<HSDArrayAccessor<KAR_grItemNodeCityTrialPlayerTable>>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSDArrayAccessor<KAR_grItemNodeCityTrialLegendarySpawnTable> LegendarySpawnChanceTable { get => _s.GetReference<HSDArrayAccessor<KAR_grItemNodeCityTrialLegendarySpawnTable>>(0x0C); set => _s.SetReference(0x0C, value); }
 
         // x10 TODO: I don't know what this structure is for
 
@@ -84,38 +84,38 @@
 
     }
 
-    public class KAR_grItemNodeCityTrialPlayerTable : HSDAccessor
+    public class KAR_grItemNodeCityTrialLegendarySpawnTable : HSDAccessor
     {
         public override int TrimmedSize => 0x0E;
 
-        public byte Chance1 { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
+        public byte HydraChanceToAppear { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
-        public byte P2ChanceMin { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
+        public byte HydraPiece1TimingMin { get => _s.GetByte(0x01); set => _s.SetByte(0x01, value); }
 
-        public byte P2ChanceMax { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
+        public byte HydraPiece1TimingMax { get => _s.GetByte(0x02); set => _s.SetByte(0x02, value); }
 
-        public byte P3ChanceMin { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
+        public byte HydraPiece2TimingMin { get => _s.GetByte(0x03); set => _s.SetByte(0x03, value); }
 
-        public byte P3ChanceMax { get => _s.GetByte(0x04); set => _s.SetByte(0x04, value); }
+        public byte HydraPiece2TimingMax { get => _s.GetByte(0x04); set => _s.SetByte(0x04, value); }
 
-        public byte P4ChanceMin { get => _s.GetByte(0x05); set => _s.SetByte(0x05, value); }
+        public byte HydraPiece3TimingMin { get => _s.GetByte(0x05); set => _s.SetByte(0x05, value); }
 
-        public byte P4ChanceMax { get => _s.GetByte(0x06); set => _s.SetByte(0x06, value); }
+        public byte HydraPiece3TimingMax { get => _s.GetByte(0x06); set => _s.SetByte(0x06, value); }
 
 
-        public byte Chance2 { get => _s.GetByte(0x07); set => _s.SetByte(0x07, value); }
+        public byte DragoonChanceToAppear { get => _s.GetByte(0x07); set => _s.SetByte(0x07, value); }
 
-        public byte P2ChanceMin2 { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
+        public byte DragoonPiece1TimingMin { get => _s.GetByte(0x08); set => _s.SetByte(0x08, value); }
 
-        public byte P2ChanceMax2 { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
+        public byte DragoonPiece1TimingMax { get => _s.GetByte(0x09); set => _s.SetByte(0x09, value); }
 
-        public byte P3ChanceMin2 { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
+        public byte DragoonPiece2TimingMin { get => _s.GetByte(0x0A); set => _s.SetByte(0x0A, value); }
 
-        public byte P3ChanceMax2 { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
+        public byte DragoonPiece2TimingMax { get => _s.GetByte(0x0B); set => _s.SetByte(0x0B, value); }
 
-        public byte P4ChanceMin2 { get => _s.GetByte(0x0C); set => _s.SetByte(0x0C, value); }
+        public byte DragoonPiece3TimingMin { get => _s.GetByte(0x0C); set => _s.SetByte(0x0C, value); }
 
-        public byte P4ChanceMax2 { get => _s.GetByte(0x0D); set => _s.SetByte(0x0D, value); }
+        public byte DragoonPiece3TimingMax { get => _s.GetByte(0x0D); set => _s.SetByte(0x0D, value); }
 
 
     }

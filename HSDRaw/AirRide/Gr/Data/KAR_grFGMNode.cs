@@ -50,7 +50,7 @@ namespace HSDRaw.AirRide.Gr.Data
         {
             get
             {
-                if (Type != 1)
+                if (Type != 2)
                     return null;
 
                 return _s.GetReference<HSD_Spline>(0x14);

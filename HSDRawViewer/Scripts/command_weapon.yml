@@ -1,0 +1,99 @@
+﻿- code: 10
+  name: Unknown10
+  parameters:
+  - name: Unknown
+    bitCount: 26
+
+- code: 11
+  name: Set Flag @ 0x1ac
+  parameters:
+  - name: 1 or 0
+    bitCount: 26
+ 
+- code: 12
+  name: Create Hitsphere
+  parameters:
+  - name: ID
+    bitCount: 3
+  - name: Group
+    bitCount: 3
+  - name: Bone
+    bitCount: 8
+  - name: Damage
+    bitCount: 10
+  - name: Unk
+    bitCount: 2
+  - name: Size
+    bitCount: 16
+    signed: true
+  - name: X
+    bitCount: 16
+    signed: true
+  - name: Y
+    bitCount: 16
+    signed: true
+  - name: Z
+    bitCount: 16
+    signed: true
+  - name: Unknown1
+    bitCount: 8
+  - name: Unknown2
+    bitCount: 8
+  - name: Hitstun
+    bitCount: 16
+    signed: true
+  - name: Unknown3
+    bitCount: 16
+    signed: true
+  - name: Unknown4
+    bitCount: 16
+    signed: true
+  - name: Unknown5
+    bitCount: 32
+    hex: true
+    
+- code: 13
+  name: Clear Hitsphere
+  parameters:
+  - name: Value
+    bitCount: 26
+
+- code: 14
+  name: Clear All Hitsphere
+  parameters:
+  - name: None
+    bitCount: 26
+
+- code: 15
+  name: Play Sound
+  parameters:
+  - name: Volume
+    bitCount: 8
+  - name: Unknown
+    bitCount: 18
+  - name: SoundBank
+    bitCount: 16
+  - name: SoundIndex
+    bitCount: 16
+    
+- code: 16
+  name: Spawn Particle
+  parameters:
+  - name: Unknown1
+    bitCount: 26
+  - name: Unknown2
+    bitCount: 32
+  - name: Unknown3
+    bitCount: 32
+  - name: Unknown4
+    bitCount: 32
+  - name: Unknown5
+    bitCount: 32
+
+- code: 17
+  name: Set Script Var
+  parameters:
+  - name: Index
+    bitCount: 2
+  - name: Value
+    bitCount: 24
