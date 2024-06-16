@@ -7,6 +7,15 @@ using System.Linq;
 
 namespace HSDRaw.Tools
 {
+
+    public enum GenCullMode
+    {
+        None,
+        Front,
+        Back,
+        FrontAndBack
+    }
+
     /// <summary>
     /// Special class used for generating POBJs
     /// </summary>
@@ -15,6 +24,8 @@ namespace HSDRaw.Tools
         public GXCompType VertexColorFormat { get; set; } = (GXCompType)GXCompTypeClr.RGB565;
 
         public bool UseTriangleStrips { get; set; } = true;
+
+        public GenCullMode CullMode { get; set; } = GenCullMode.Front;
 
         private Dictionary<GXAttribName, Dictionary<int, int>> nameToIndexHash = new Dictionary<GXAttribName, Dictionary<int, int>>();
         private Dictionary<GXAttribName, GX_Attribute> nameToAttr = new Dictionary<GXAttribName, GX_Attribute>();
@@ -308,6 +319,19 @@ namespace HSDRaw.Tools
 
                 var newpobj = new HSD_POBJ();
                 CreatedPOBJs.Add(newpobj);
+
+                switch (CullMode)
+                {
+                    case GenCullMode.Front:
+                        newpobj.Flags |= POBJ_FLAG.CULLFRONT;
+                        break;
+                    case GenCullMode.Back:
+                        newpobj.Flags |= POBJ_FLAG.CULLBACK;
+                        break;
+                    case GenCullMode.FrontAndBack:
+                        newpobj.Flags |= POBJ_FLAG.CULLFRONT | POBJ_FLAG.CULLBACK;
+                        break;
+                }
 
                 if(singleBind != null)
                     newpobj.SingleBoundJOBJ = singleBind;

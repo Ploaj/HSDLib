@@ -380,6 +380,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             var vp = _viewport.glViewport;
             vp.AnimationTrackEnabled = false;
 
+            // disable save option
+            saveToolStripMenuItem.Enabled = false;
+
             // hide track editor
             _trackEditor.SetKeys("", GraphEditor.AnimType.Texture, null);
             _trackEditor.Hide();
@@ -983,6 +986,27 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             // re apply animation
             ApplyEditorAnimation(Frame);
+
+        }
+
+        public delegate void OnAnimationSaved();
+        public OnAnimationSaved AnimationSaved;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void EnableAnimationSave()
+        {
+            saveToolStripMenuItem.Enabled = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
         }
     }

@@ -41,20 +41,17 @@
   - name: Z
     bitCount: 16
     signed: true
-  - name: Unknown1
+  - name: X2
     bitCount: 8
-  - name: Unknown2
+  - name: Y2
     bitCount: 8
-  - name: Hitstun
+  - name: Z2
     bitCount: 16
-    signed: true
-  - name: Unknown3
+  - name: Field0x04
     bitCount: 16
-    signed: true
-  - name: Unknown4
+  - name: Radius2
     bitCount: 16
-    signed: true
-  - name: Unknown5
+  - name: Flags
     bitCount: 32
     hex: true
     

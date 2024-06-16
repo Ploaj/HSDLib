@@ -194,6 +194,16 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public HSD_MatAnimJoint ToMatAnim()
+        {
+            // TODO:
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="frame"></param>
         public void SetAllFrames(float frame)
         {

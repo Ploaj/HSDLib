@@ -43,6 +43,7 @@
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.importAndRemapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -51,6 +52,7 @@
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.compressAllTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fSMApplyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.applyEulerFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.displaySettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fogSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,7 +65,6 @@
             this.renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             this.viewModeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.applyEulerFilterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -146,6 +147,7 @@
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importToolStripMenuItem1,
             this.toolStripMenuItem1,
+            this.saveToolStripMenuItem,
             this.toolStripSeparator9,
             this.importAndRemapToolStripMenuItem,
             this.toolStripSeparator1,
@@ -181,23 +183,31 @@
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem2.Text = "As Maya .anim";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem3.Text = "As Figatree";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem4.Text = "As AnimJoint";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Enabled = false;
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator9
             // 
@@ -248,6 +258,13 @@
             this.fSMApplyToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
             this.fSMApplyToolStripMenuItem.Text = "Apply Frame Speed Modifiers";
             this.fSMApplyToolStripMenuItem.Click += new System.EventHandler(this.fSMApplyToolStripMenuItem_Click);
+            // 
+            // applyEulerFilterToolStripMenuItem
+            // 
+            this.applyEulerFilterToolStripMenuItem.Name = "applyEulerFilterToolStripMenuItem";
+            this.applyEulerFilterToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
+            this.applyEulerFilterToolStripMenuItem.Text = "Apply Euler Filter";
+            this.applyEulerFilterToolStripMenuItem.Click += new System.EventHandler(this.applyEulerFilterToolStripMenuItem_Click);
             // 
             // renderDropDown
             // 
@@ -345,13 +362,6 @@
             this.viewModeBox.Size = new System.Drawing.Size(140, 25);
             this.viewModeBox.SelectedIndexChanged += new System.EventHandler(this.viewModeBox_SelectedIndexChanged);
             // 
-            // applyEulerFilterToolStripMenuItem
-            // 
-            this.applyEulerFilterToolStripMenuItem.Name = "applyEulerFilterToolStripMenuItem";
-            this.applyEulerFilterToolStripMenuItem.Size = new System.Drawing.Size(229, 22);
-            this.applyEulerFilterToolStripMenuItem.Text = "Apply Euler Filter";
-            this.applyEulerFilterToolStripMenuItem.Click += new System.EventHandler(this.applyEulerFilterToolStripMenuItem_Click);
-            // 
             // JObjEditorNew
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -404,5 +414,6 @@
         private System.Windows.Forms.ToolStripMenuItem importAndRemapToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem applyEulerFilterToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
     }
 }

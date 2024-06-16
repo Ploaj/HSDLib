@@ -287,6 +287,7 @@ namespace HSDRawViewer.Converters
             {
                 UseTriangleStrips = Settings.UseStrips,
                 VertexColorFormat = (GXCompType)Settings.VertexColorFormat,
+
             };
 
             // apply settings to model

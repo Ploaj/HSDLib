@@ -16,16 +16,16 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         public List<FOBJ_Player> Tracks { get; internal set; } = new List<FOBJ_Player>();
     }
+    public enum CullMode
+    {
+        None,
+        Front,
+        Back,
+        FrontAndBack
+    }
 
     public class DObjProxy : MeshListItem
     {
-        public enum CullMode
-        {
-            None,
-            Front,
-            Back,
-            FrontAndBack
-        }
 
         public int JOBJIndex;
         public int DOBJIndex;
