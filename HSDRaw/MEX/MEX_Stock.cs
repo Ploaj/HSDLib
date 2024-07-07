@@ -135,6 +135,7 @@ namespace HSDRaw.MEX
             var newTexAnim = new HSD_TexAnim();
 
             newTexAnim.AnimationObject = new HSD_AOBJ();
+            newTexAnim.AnimationObject.EndFrame = keys.Max(e => e.Frame);
             newTexAnim.AnimationObject.FObjDesc = new HSD_FOBJDesc();
             newTexAnim.AnimationObject.FObjDesc.SetKeys(keys, (byte)TexTrackType.HSD_A_T_TIMG);
             newTexAnim.AnimationObject.FObjDesc.Next = new HSD_FOBJDesc();

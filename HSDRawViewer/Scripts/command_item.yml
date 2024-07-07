@@ -249,9 +249,8 @@
     bitCount: 16
   - name: Volume
     bitCount: 8
-  - name: Unknown
+  - name: Panning
     bitCount: 8
-    hex: true
 
 - code: 17
   name: Set flag at 0xDAC
