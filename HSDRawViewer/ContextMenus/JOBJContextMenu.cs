@@ -24,6 +24,21 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(Import);
 
+            ToolStripMenuItem ImportSheet = new ToolStripMenuItem("Import Model Info Sheet From File");
+            ImportSheet.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
+                {
+                    MainForm.SelectedDataNode.Collapse();
+                    var f = Tools.FileIO.OpenFile("JSON (*.json)|*.json");
+                    if (f != null)
+                    {
+                        ModelInfoSheet infoSheet = ModelInfoSheet.Import(f);
+                        infoSheet.updateJobj(root);
+                    }
+                }
+            };
+            Items.Add(ImportSheet);
 
             ToolStripMenuItem GenerateMatAnimJoint = new ToolStripMenuItem("Generate and Export MatAnimJoint Structure");
             GenerateMatAnimJoint.Click += (sender, args) =>
