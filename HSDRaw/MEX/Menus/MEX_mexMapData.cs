@@ -1,11 +1,12 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.MEX.Menus;
 
 namespace HSDRaw.MEX.Stages
 {
     public class MEX_mexMapData : HSDAccessor
     {
-        public override int TrimmedSize => 0x18;
+        public override int TrimmedSize => 0x20;
 
         public HSD_JOBJ IconModel { get => _s.GetReference<HSD_JOBJ>(0x00); set => _s.SetReference(0x00, value); }
 
@@ -18,5 +19,8 @@ namespace HSDRaw.MEX.Stages
         public HSD_AnimJoint PositionAnimJoint { get => _s.GetReference<HSD_AnimJoint>(0x10); set => _s.SetReference(0x10, value); }
 
         public HSD_MatAnimJoint StageNameMaterialAnimation { get => _s.GetReference<HSD_MatAnimJoint>(0x14); set => _s.SetReference(0x14, value); }
+
+        public MEX_PageStruct PageData { get => _s.GetReference<MEX_PageStruct>(0x18); set => _s.SetReference(0x18, value); }
+
     }
 }

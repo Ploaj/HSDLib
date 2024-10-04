@@ -65,17 +65,53 @@ namespace HSDRawViewer.Rendering
                     //jobj.Rotation.Xyz = rot;
 
 
-                    var rotationOverride = Math3D.EulerToQuat(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ);
+                    //var rotationOverride = Math3D.EulerToQuat(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ);
 
-                    float rot_angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitX, dir));
-                    if (Math.Abs(rot_angle) > 0.000001f)
+                    //float rot_angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitX, dir));
+                    //if (Math.Abs(rot_angle) > 0.000001f)
+                    //{
+                    //    Vector3 rot_axis = Vector3.Cross(Vector3.UnitX, dir).Normalized();
+                    //    rotationOverride *= Quaternion.FromAxisAngle(rot_axis, rot_angle);
+                    //}
+
+                    //{
+                    //    var rotationOverride = Math3D.EulerToQuat(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ).ToAxisAngle();
+                    //    rotationOverride.X = key.X;
+                    //    rotationOverride.Y = key.Y;
+                    //    rotationOverride.Z = key.Z;
+                    //    rotationOverride.W += key.W * (float)Math.PI / 180;
+
+                    //    Matrix4.CreateFromAxisAngle(rotationOverride.Xyz, rotationOverride.W, out Matrix4 aa);
+                    //    jobj.Rotation.Xyz = aa.ExtractRotationEuler();
+                    //    Console.WriteLine(rotationOverride.ToAxisAngle().ToString());
+                    //}
+
                     {
-                        Vector3 rot_axis = Vector3.Cross(Vector3.UnitX, dir).Normalized();
-                        rotationOverride *= Quaternion.FromAxisAngle(rot_axis, rot_angle);
+                        jobj.Rotation.Z = (float)Math.Atan2(key.Y, key.X);
+                        var len = Math.Sqrt(key.Y * key.Y + key.X * key.X);
+                        jobj.Rotation.Y = (float)Math.Atan2(-key.Z, len);
+                        jobj.Rotation.X = key.W * (float)Math.PI / 180;
                     }
 
-                    rotationOverride *= Quaternion.FromEulerAngles(angle * (float)Math.PI / 180, 0, 0);
-                    jobj.Rotation.Xyz = Matrix4.CreateFromQuaternion(rotationOverride).ExtractRotationEuler();
+                    {
+                        //var rotationOverride = Math3D.EulerToQuat(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ);
+
+                        //float rot_angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitX, dir));
+                        //if (Math.Abs(rot_angle) > 0.000001f)
+                        //{
+                        //    Vector3 rot_axis = Vector3.Cross(Vector3.UnitX, dir).Normalized();
+                        //    rotationOverride *= Quaternion.FromAxisAngle(rot_axis, rot_angle);
+                        //}
+
+                        //rotationOverride *= Quaternion.FromEulerAngles(angle * (float)Math.PI / 180, 0, 0);
+                        //jobj.Rotation.Xyz = Matrix4.CreateFromQuaternion(rotationOverride).ExtractRotationEuler();
+
+                        //System.Diagnostics.Debug.WriteLine(jobj.Index);
+                        //System.Diagnostics.Debug.WriteLine($"\t{Math3D.EulerToQuat(jobj.Desc.RX, jobj.Desc.RY, jobj.Desc.RZ).ToAxisAngle().ToString()}");
+                        //System.Diagnostics.Debug.WriteLine($"\t{key.X} {key.Y} {key.Z} {key.W * (float)Math.PI / 180}");
+                        //System.Diagnostics.Debug.WriteLine($"\t{Quaternion.FromAxisAngle(new Vector3(key.X, key.Y, key.Z), key.W * (float)Math.PI / 180)}");
+                        //System.Diagnostics.Debug.WriteLine($"\t{rotationOverride.ToAxisAngle().ToString()}");
+                    }
                 }
             }
         }

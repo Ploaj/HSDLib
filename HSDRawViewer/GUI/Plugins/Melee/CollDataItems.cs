@@ -233,9 +233,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                                 break;
                         }
 
-                    collLineToIndex.Add(line, lineIndex);
-                    lineToCollLine.Add(l, line);
-                    newLines[lineIndex] = line;
+                    if (lineIndex != -1)
+                    {
+                        collLineToIndex.Add(line, lineIndex);
+                        lineToCollLine.Add(l, line);
+                        newLines[lineIndex] = line;
+                    }
                 }
 
                 // Update Links

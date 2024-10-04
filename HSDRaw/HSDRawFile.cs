@@ -786,6 +786,7 @@ namespace HSDRaw
 
         private readonly static Func<string, HSDAccessor>[] symbol_identificators = new Func<string, HSDAccessor>[]
         {
+                x => x.Equals("item_data") ?  new SBM_Article() : null,
                 x => x.EndsWith("matanim_joint") ? new HSD_MatAnimJoint() : null,
                 x => x.EndsWith("shapeanim_joint") ?  new HSD_ShapeAnimJoint() : null,
                 x => x.EndsWith("_animjoint") ?  new HSD_AnimJoint() : null,
@@ -866,6 +867,7 @@ namespace HSDRaw
                 x => x.StartsWith("MemCardIcon") ?  new SBM_MemCardIcon() : null,
                 x => x.StartsWith("sss_pages") ?  new AK_StagePages() : null,
                 x => x.EndsWith("bitfont") ?  new AK_BitFont() : null,
+                x => x.EndsWith("_shape") ?  new AK_Shape() : null,
                 x => new HSDAccessor(),
         };
 

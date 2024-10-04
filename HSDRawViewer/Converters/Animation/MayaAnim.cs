@@ -355,7 +355,8 @@ namespace HSDRawViewer.Converters
             translate,
             rotate,
             scale,
-            visibility
+            visibility,
+            MaxHandle,
         }
 
         public enum TrackType
@@ -370,7 +371,8 @@ namespace HSDRawViewer.Converters
             scaleX,
             scaleY,
             scaleZ,
-            visibility
+            visibility,
+            MaxHandle,
         }
 
         public class Header

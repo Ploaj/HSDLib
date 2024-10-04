@@ -260,7 +260,6 @@ namespace HSDRaw.Common
             level = 0;
             var encodedData = new byte[dataSize];
             var dataOffset = 0;
-            byte[] palData;
             foreach (var mip in mips)
             {
                 var w = (int)Math.Ceiling(width / Math.Pow(2, level));
@@ -270,7 +269,7 @@ namespace HSDRaw.Common
                     format,
                     w,h);
 
-                var encoded = GXImageConverter.EncodeImage(mip, w, h, format, palFormat, out palData);
+                var encoded = GXImageConverter.EncodeImage(mip, w, h, format, palFormat, out byte[] palData);
 
                 Array.Copy(encoded, 0, encodedData, dataOffset, mipSize);
 
@@ -294,8 +293,7 @@ namespace HSDRaw.Common
         /// <param name="palFormat"></param>
         public void EncodeImageData(byte[] data, int width, int height, GXTexFmt format, GXTlutFmt palFormat)
         {
-            byte[] palData;
-            var encodedData = GXImageConverter.EncodeImage(data, width, height, format, palFormat, out palData);
+            var encodedData = GXImageConverter.EncodeImage(data, width, height, format, palFormat, out byte[] palData);
 
             if (GXImageConverter.IsPalettedFormat(format))
             {

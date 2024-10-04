@@ -214,24 +214,24 @@ namespace HSDRaw.Melee
         }
     }
 
-    public class SBM_PlCoUnknownFighterTable : HSDAccessor
+    public class SBM_PlCoFighterBoneExt : HSDAccessor
     {
         public override int TrimmedSize => 0x08;
         
-        public SBM_PlCoUnknownFighterTableEntry[] Entries
+        public SBM_PlCoFighterBoneExtEntry[] Entries
         {
             get
             {
-                if (_s.GetReference<HSDArrayAccessor<SBM_PlCoUnknownFighterTableEntry>>(0) == null)
+                if (_s.GetReference<HSDArrayAccessor<SBM_PlCoFighterBoneExtEntry>>(0) == null)
                     return null;
 
-                return _s.GetReference<HSDArrayAccessor<SBM_PlCoUnknownFighterTableEntry>>(0).Array;
+                return _s.GetReference<HSDArrayAccessor<SBM_PlCoFighterBoneExtEntry>>(0).Array;
             }
             set
             {
                 if(value != null && value.Length > 0)
                 {
-                    _s.GetCreateReference<HSDArrayAccessor<SBM_PlCoUnknownFighterTableEntry>>(0).Array = value;
+                    _s.GetCreateReference<HSDArrayAccessor<SBM_PlCoFighterBoneExtEntry>>(0).Array = value;
                     _s.SetInt32(0x04, value.Length);
                 }
                 else
@@ -243,7 +243,7 @@ namespace HSDRaw.Melee
         }
     }
 
-    public class SBM_PlCoUnknownFighterTableEntry : HSDAccessor
+    public class SBM_PlCoFighterBoneExtEntry : HSDAccessor
     {
         public override int TrimmedSize => 0x04;
 

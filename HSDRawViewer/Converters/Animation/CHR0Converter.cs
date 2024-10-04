@@ -36,12 +36,19 @@ namespace HSDRawViewer.Converters
 
                 int versionNum = r.ReadInt32();
 
-                if (versionNum != 4)
-                    throw new InvalidDataException($"CHR0 version {versionNum} not supported");
-
-                r.Seek(0x10);
+                switch (versionNum)
+                {
+                    case 4: // valid cases
+                    case 5:
+                        r.Seek(0x10);
+                        break;
+                    default:
+                        throw new InvalidDataException($"CHR0 version {versionNum} not supported");
+                }
 
                 var indexGroupOffset = r.ReadUInt32();
+                if (versionNum == 5) // unsure what this is
+                    r.Skip(4);
                 var animName = r.ReadString(r.ReadInt32(), -1);
 
                 r.Skip(4);
@@ -55,7 +62,7 @@ namespace HSDRawViewer.Converters
 
                 for (uint i = 0; i < sectionCount; i++)
                 {
-                    r.Seek(indexGroupOffset + 8 + 16 * i);
+                    r.Seek(indexGroupOffset + 8 + 0x10 * i);
                     r.Skip(4); // id and unknown
                     r.Skip(2); // let
                     r.Skip(2); // right

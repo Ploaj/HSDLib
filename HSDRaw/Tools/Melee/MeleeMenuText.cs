@@ -78,7 +78,7 @@ namespace HSDRaw.Tools.Melee
                 { TEXT_OP_CODE.RESET_SPACING, new Tuple<string, string>("/SPACING", "") },
                 { TEXT_OP_CODE.RESET_SCALING, new Tuple<string, string>("/SCALING", "") },
                 { TEXT_OP_CODE.RIGHT_ALIGNED, new Tuple<string, string>("/RIGHT", "") },
-                { TEXT_OP_CODE.SET_SPACING, new Tuple<string, string>("SPACING", "bbbb") },
+                { TEXT_OP_CODE.SET_SPACING, new Tuple<string, string>("SPACING", "ss") },
                 { TEXT_OP_CODE.SET_SCALING, new Tuple<string, string>("SCALING", "ss") },
                 { TEXT_OP_CODE.CLEAR_TEXT, new Tuple<string, string>("CLEAR_TEXT", "") },
                 { TEXT_OP_CODE.UNKNOWN_04, new Tuple<string, string>("UNK04", "") },

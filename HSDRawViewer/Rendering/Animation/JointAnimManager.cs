@@ -448,10 +448,12 @@ namespace HSDRawViewer.Rendering
 
             var joints = jobj.TreeList;
 
-            if (joints.Count != NodeCount)
-                return;
+            if (NodeCount > joints.Count)
+            {
+                Nodes.RemoveRange(joints.Count, NodeCount - joints.Count);
+            }
 
-            for (int i = 0; i < NodeCount; i++)
+            for (int i = 0; i < Math.Min(joints.Count, NodeCount); i++)
                 AnimationKeyCompressor.OptimizeJointTracks(joints[i], ref Nodes[i].Tracks, error);
         }
 

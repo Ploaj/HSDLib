@@ -17,7 +17,7 @@ namespace HSDRaw.Melee
 
         public HSDFixedLengthPointerArrayAccessor<SBM_BoneLookupTable> BoneTables { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_BoneLookupTable>>(0x10); set => _s.SetReference(0x10, value); }
 
-        public HSDFixedLengthPointerArrayAccessor<SBM_PlCoUnknownFighterTable> FighterTable { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_PlCoUnknownFighterTable>>(0x14); set => _s.SetReference(0x14, value); }
+        public HSDFixedLengthPointerArrayAccessor<SBM_PlCoFighterBoneExt> FighterTable { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<SBM_PlCoFighterBoneExt>>(0x14); set => _s.SetReference(0x14, value); }
 
         public HSDArrayAccessor<ftCommonColorEffect> FighterColorAnims { get => _s.GetReference<HSDArrayAccessor<ftCommonColorEffect>>(0x18); set => _s.SetReference(0x18, value); }
 

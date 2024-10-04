@@ -91,6 +91,49 @@ namespace HSDRaw.Tools
             player.Keys = keys;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
+        //public static void CompressTrack(FOBJ_Player player, float epsilon = 0.001f)
+        //{
+        //    if (player.FrameCount > 1000)
+        //    {
+        //        var newPlayer = new FOBJ_Player();
+
+        //        for (int i = 0; i < player.FrameCount; i += 500)
+        //        {
+        //            var comp = new FOBJ_Player();
+        //            for (int j = i; j < Math.Min(player.FrameCount, i + 500); j++)
+        //            {
+        //                comp.Keys.Add(new FOBJKey()
+        //                {
+        //                    Frame = j - i,
+        //                    Value = player.GetValue(j),
+        //                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN,
+        //                });
+        //            }
+
+        //            var before = comp.Keys.Count;
+        //            CompressTrack2(comp, epsilon);
+        //            System.Diagnostics.Debug.WriteLine($"{before}->{comp.Keys.Count}");
+        //            foreach (var k in comp.Keys)
+        //            {
+        //                k.Frame += i;
+        //            }
+        //            newPlayer.Keys.AddRange(comp.Keys);
+        //        }
+
+        //        player.Keys = newPlayer.Keys;
+        //        System.Diagnostics.Debug.WriteLine($"{player.Keys.Count}");
+        //    }
+        //    else
+        //    {
+        //        CompressTrack2(player, epsilon);
+        //    }
+        //}
+
         /// <summary>
         /// 
         /// </summary>

@@ -3,6 +3,10 @@ using System;
 using System.Windows.Forms;
 using System.Linq;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Rendering.Models;
+using HSDRaw.Tools;
+using System.Collections.Generic;
+using HSDRawViewer.Rendering;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -77,19 +81,11 @@ namespace HSDRawViewer.ContextMenus
                     foreach (var n in anim.TreeList)
                     {
                         if (n.AOBJ != null)
-                            foreach(var a in n.AOBJ.FObjDesc.List)
+                            foreach (var a in n.AOBJ.FObjDesc.List)
                             {
-                                var keys = a.GetDecodedKeys();
-                                var frameCount = keys.Max(e=>e.Frame);
-
-                                Console.WriteLine(frameCount);
-                                
-                                foreach (var k in keys)
-                                {
-                                    k.Frame = frameCount - k.Frame;
-                                }
-
-                                a.SetKeys(keys, a.TrackType);
+                                var player = new FOBJ_Player(a);
+                                player.Reverse();
+                                a.SetKeys(player.Keys, a.TrackType);
                             }
                     }
                 }
@@ -121,6 +117,69 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             Items.Add(editAOBJ);
+
+
+            ToolStripMenuItem invertAnimation = new ToolStripMenuItem("Invert");
+            invertAnimation.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim && 
+                    anim.AOBJ != null &&
+                    anim.AOBJ.FObjDesc != null)
+                {
+                    var jobjdesc = new HSDRaw.Common.HSD_JOBJ()
+                    {
+                        SX = 1,
+                        SY = 1,
+                        SZ = 1,
+                    };
+
+                    LiveJObj jobj = new LiveJObj(jobjdesc);
+
+                    var tracks = anim.AOBJ.FObjDesc.List.Select(e => new FOBJ_Player(e)).ToList();
+                    var node = new AnimNode();
+
+                    for (int i = 0; i <= anim.AOBJ.EndFrame; i++)
+                    {
+                        jobj.ApplyAnimation(tracks, i);
+                        jobj.RecalculateTransforms(null, false);
+
+                        var world = jobj.WorldTransform.Inverted();
+                        var t = world.ExtractTranslation();
+                        var r = world.ExtractRotationEuler();
+
+                        node.AddLinearKey(JointTrackType.HSD_A_J_TRAX, i, t.X);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_TRAY, i, t.Y);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_TRAZ, i, t.Z);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_ROTX, i, r.X);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_ROTY, i, r.Y);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_ROTZ, i, r.Z);
+                    }
+
+                    {
+                        jobj.ApplyAnimation(tracks, 0);
+                        jobj.RecalculateTransforms(null, false);
+
+                        var world = jobj.WorldTransform.Inverted();
+                        var t = world.ExtractTranslation();
+                        var r = world.ExtractRotationEuler();
+
+                        node.AddLinearKey(JointTrackType.HSD_A_J_TRAX, 6000, t.X);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_TRAY, 6000, t.Y);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_TRAZ, 6000, t.Z);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_ROTX, 6000, r.X);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_ROTY, 6000, r.Y);
+                        node.AddLinearKey(JointTrackType.HSD_A_J_ROTZ, 6000, r.Z);
+                    }
+
+                    JointAnimManager m = new JointAnimManager();
+                    m.Nodes.Add(node);
+
+                    var na = m.ToAnimJoint(jobjdesc, AOBJ_Flags.ANIM_LOOP);
+                    anim.AOBJ = na.AOBJ;
+                }
+            };
+            Items.Add(invertAnimation);
+
         }
     }
 }

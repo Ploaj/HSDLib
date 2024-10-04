@@ -4,6 +4,10 @@ namespace HSDRaw.Melee
 {
     public class smSoundTestLoadData : HSDAccessor
     {
+        public override int TrimmedSize => 0x20;
+
+        public int SoundModeCount { get => _s.GetInt32(0x00); set => _s.SetInt32(0x00, value); }
+
         [DisplayName("Sound Modes"), Description("The two sound modes in the sound test")]
         public string[] SoundModes
         {
@@ -21,6 +25,8 @@ namespace HSDRaw.Melee
         {
             get => _s.GetStringArray(0x0C); set => _s.SetStringArray(0x0C, value);
         }
+
+        public int ScriptCount { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         [DisplayName("Sound Effect IDs"), Description("The IDs used to lookup sounds in the SSM sound banks")]
         public int[] SoundIDs

@@ -8,10 +8,12 @@ using HSDRaw.Melee.Pl;
 using HSDRaw.Tools;
 using HSDRaw.Tools.Melee;
 using HSDRawViewer.GUI.Controls;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Tools;
+using Microsoft.VisualBasic.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -858,7 +860,16 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
             }
         }
+        private class MayaImportParams
+        {
+            public string Symbol { get; set; } = "";
 
+            public bool Optimize { get; set; } = true;
+
+            public float OptimizeError { get; set; } = 0.01f;
+
+            public float CompressionError { get; set; } = 0.01f;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -877,19 +888,36 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (f == null)
                     return;
 
-                HSDRawFile file;
+                HSDRawFile file = null;
 
                 // if it's a maya anim then convert to figatree and set the symbol
                 if (f.ToLower().EndsWith(".anim"))
                 {
-                    var anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
-
-                    file = new HSDRawFile();
-                    file.Roots.Add(new HSDRootNode()
+                    var settings = new MayaImportParams()
                     {
-                        Name = _selectedActionSymbol,
-                        Data = anim.ToFigaTree(0.01f)
-                    });
+                        Symbol = _selectedActionSymbol,
+                    };
+                    
+                    using (var prop = new PropertyDialog("Maya Import Settings", settings))
+                    {
+                        if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(settings.Symbol))
+                        {
+                            //if (!settings.Symbol.EndsWith("_figatree"))
+                            //    settings.Symbol += "_figatree";
+
+                            var anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
+
+                            if (settings.Optimize && renderer.FighterModel != null && renderer.FighterModel.RootJObj != null)
+                                anim.Optimize(renderer.FighterModel.RootJObj.Desc, settings.OptimizeError);
+
+                            file = new HSDRawFile();
+                            file.Roots.Add(new HSDRootNode()
+                            {
+                                Name = settings.Symbol,
+                                Data = anim.ToFigaTree(settings.CompressionError)
+                            });
+                        }
+                    }
                 }
                 else
                 {
@@ -905,7 +933,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
 
                 // check if figatree data is found
-                if (file == null || file.Roots.Count > 0 && file.Roots[0].Data is HSD_FigaTree tree)
+                if (file != null && 
+                    file.Roots.Count > 0 && 
+                    file.Roots[0].Data is HSD_FigaTree tree)
                 {
                     //grab symbol
                     var symbol = file.Roots[0].Name;

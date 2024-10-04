@@ -4,6 +4,7 @@ using HSDRaw.Common.Animation;
 using System;
 using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
+using System.Text;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -38,6 +39,25 @@ namespace HSDRawViewer.ContextMenus
             ToolStripMenuItem OpenAsmah = new ToolStripMenuItem("Open As MatAnimJoint");
             OpenAsmah.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_MatAnimJoint());
             Items.Add(OpenAsmah);
+
+#if DEBUG
+            ToolStripMenuItem CopyAsm = new ToolStripMenuItem("Copy ASM to clipboard");
+            CopyAsm.Click += (sender, args) =>
+            {
+                var d = MainForm.SelectedDataNode.Accessor._s;
+
+                StringBuilder str = new StringBuilder();
+
+                str.AppendLine("length: " + d.Length);
+                for (int i = 0; i < d.Length; i += 4)
+                {
+                    str.AppendLine($".long 0x{d.GetInt32(i).ToString("X8")}");
+                }
+
+                Clipboard.SetText(str.ToString());
+            };
+            Items.Add(CopyAsm);
+#endif
         }
 
     }

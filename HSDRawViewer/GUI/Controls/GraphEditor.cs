@@ -1144,6 +1144,12 @@ NONE - None (do not use)";
         {
             [Category("Settings"), DisplayName("Shift Amount"), Description("Add this value to all key's values.")]
             public float ShiftAmount { get; set; } = 0;
+
+            [Category("Settings"), DisplayName("Start Frame"), Description("Frame to start shifting. -1 for all")]
+            public int StartFrame { get; set; } = -1;
+
+            [Category("Settings"), DisplayName("End Frame"), Description("Frame to end shifting. -1 for all")]
+            public int EndFrame { get; set; } = -1;
         }
 
         private static ShiftSettings _shiftSettings = new ShiftSettings();
@@ -1163,7 +1169,17 @@ NONE - None (do not use)";
                     if (d.ShowDialog() == DialogResult.OK)
                     {
                         foreach (var k in _selectedPlayer.Keys)
+                        {
+                            if (_shiftSettings.StartFrame > 0 &&
+                                k.Frame < _shiftSettings.StartFrame)
+                                continue;
+
+                            if (_shiftSettings.EndFrame > 0 &&
+                                k.Frame > _shiftSettings.EndFrame)
+                                continue;
+
                             k.Value += _shiftSettings.ShiftAmount;
+                        }
                         glviewport.Invalidate();
                         OnTrackEdited(EventArgs.Empty);
                     }

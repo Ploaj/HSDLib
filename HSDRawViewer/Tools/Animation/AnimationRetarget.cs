@@ -29,6 +29,11 @@ namespace HSDRawViewer.Tools.Animation
             return Retarget(anim, src_jobj, tar_jobj, src_map, tar_map, null);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
         private static float ClampRotation(float v)
         {
             if (System.Math.Abs(System.Math.Abs(v) - Math3D.TwoPI) < 0.001)
@@ -69,7 +74,7 @@ namespace HSDRawViewer.Tools.Animation
             target_model.ResetTransforms();
 
             // loop through target bones
-            for (var f = 0; f <= source_anim.FrameCount; f++)
+            for (var f = 0; f < source_anim.FrameCount; f++)
             {
                 source_anim.ApplyAnimation(source_model, f);
                 source_model.RecalculateTransforms(null, true);

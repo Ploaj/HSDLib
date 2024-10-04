@@ -565,7 +565,7 @@
     bitCount: 8
 
 - code: 50
-  name: Enable Ragdoll
+  name: Toggle Bone Physics
   parameters:
   - name: Bone ID
     bitCount: 26

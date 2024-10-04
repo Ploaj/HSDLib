@@ -242,7 +242,6 @@ namespace HSDRaw.Tools
         public HSD_POBJ CreatePOBJsFromTriangleList(List<GX_Vertex> triList, GXAttribName[] attributes, List<HSD_Envelope> weights)
         {
             TriangleConverter.TriangleConverter converter = new TriangleConverter.TriangleConverter(UseTriangleStrips, 32, 3, true);
-            int pointCount, faceCount;
 
             HSD_JOBJ singleBind = null;
             
@@ -257,7 +256,7 @@ namespace HSDRaw.Tools
                 attributes = al.ToArray();
             }*/
 
-            var groups = converter.GroupPrimitives(triList.ToArray(), out pointCount, out faceCount);
+            var groups = converter.GroupPrimitives(triList.ToArray(), out int pointCount, out int faceCount);
 
             HSD_POBJ rootPOBJ = null;
             HSD_POBJ prevPOBJ = null;
