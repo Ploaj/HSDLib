@@ -9,6 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>dogg.ico</ApplicationIcon>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GCILib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -132,6 +133,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="lib\GraphArial.bff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Scripts\command_cpu.yml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Scripts\command_weapon.yml">

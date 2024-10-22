@@ -10,6 +10,12 @@ using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Converters
 {
+    public enum ImportNormalSettings
+    {
+        No,
+        Yes,
+        YesIfNoVertexColor
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -35,7 +41,7 @@ namespace HSDRawViewer.Converters
         public string SingleBindJoint { get; internal set; }
 
         [Category("2. Importing Options"), DisplayName("Import Normals"), Description("Imports normals into model. Normals are used for lighting calcuations and reflections.")]
-        public bool ImportNormals { get; set; } = false;
+        public ImportNormalSettings ImportNormals { get; set; } = ImportNormalSettings.No;
 
         [Category("2. Importing Options"), DisplayName("Is Reflective"), Description("")]
         public bool IsReflective { get; set; } = false;
@@ -143,10 +149,15 @@ namespace HSDRawViewer.Converters
             GenerateTB = mesh.Name.Contains("BUMP");
 
             if (mesh.HasNormals)
-                ImportNormals = true;
+                ImportNormals = ImportNormalSettings.Yes;
 
             if (mesh.HasColorSet(0))
+            {
                 ImportVertexColor = UseVertexColor(0);
+
+                if (mesh.HasNormals)
+                    ImportNormals = ImportNormalSettings.YesIfNoVertexColor;
+            }
 
             if (mesh.Name.Contains("SINGLE"))
             {

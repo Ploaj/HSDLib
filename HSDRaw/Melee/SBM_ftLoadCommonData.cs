@@ -48,6 +48,9 @@ namespace HSDRaw.Melee
         public ftLoadCommonDataColors DeathFlashColors { get => _s.GetReference<ftLoadCommonDataColors>(0x4C); set => _s.SetReference(0x4C, value); }
 
         public HSD_JOBJ CubeModel { get => _s.GetReference<HSD_JOBJ>(0x50); set => _s.SetReference(0x50, value); }
+
+        public SBM_PlCoCPUTable CPUTable { get => _s.GetReference<SBM_PlCoCPUTable>(0x58); set => _s.SetReference(0x58, value); }
+
     }
 
 

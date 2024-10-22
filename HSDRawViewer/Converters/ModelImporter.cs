@@ -279,8 +279,7 @@ namespace HSDRawViewer.Converters
         private void Import(BackgroundWorker w)
         {
             // settings
-            if (Settings == null)
-                Settings = new ModelImportSettings();
+            Settings ??= new ModelImportSettings();
 
             // create pobj generate
             POBJ_Generator POBJGen = new POBJ_Generator()
@@ -575,8 +574,13 @@ namespace HSDRawViewer.Converters
                 if (hasBump)
                     Attributes.Add(GXAttribName.GX_VA_NBT);
                 else
-                if (mesh.HasNormals && settings.ImportNormals)
-                    Attributes.Add(GXAttribName.GX_VA_NRM);
+                if (mesh.HasNormals)
+                {
+                    if (settings.ImportNormals == ImportNormalSettings.Yes ||
+                        (settings.ImportNormals == ImportNormalSettings.YesIfNoVertexColor &&
+                        !mesh.HasColorSet(0)))
+                        Attributes.Add(GXAttribName.GX_VA_NRM);
+                }
 
                 // add vertex color attribute if needed
                 if (mesh.HasColorSet(0) && settings.ImportVertexColor)
@@ -978,7 +982,7 @@ namespace HSDRawViewer.Converters
             if (mesh.ImportVertexColor)
                 Mobj.RenderFlags |= RENDER_MODE.VERTEX;
 
-            if (settings.EnableDiffuse)
+            if (settings.EnableDiffuse && mesh.ImportVertexColor == false)
                 Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
 
             if (settings.EnableConstant)
