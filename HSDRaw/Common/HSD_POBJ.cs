@@ -28,7 +28,15 @@ namespace HSDRaw.Common
 
         public override HSD_POBJ Next { get => _s.GetReference<HSD_POBJ>(0x04); set => _s.SetReference(0x04, value); }
 
-        public HSDAccessor Attributes { get => _s.GetReference<HSDAccessor>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDAccessor Attributes
+        {
+            get => _s.GetReference<HSDAccessor>(0x08);
+            set {
+                _s.SetReference(0x08, value);
+
+                EnsureAligned();
+            }
+        }
 
         public POBJ_FLAG Flags { get => (POBJ_FLAG)_s.GetUInt16(0x0C); set => _s.SetUInt16(0x0C, (ushort)value); }
 
@@ -41,6 +49,8 @@ namespace HSDRaw.Common
             {
                 _s.SetBuffer(0x10, value);
                 DisplayListSize = value.Length;
+
+                EnsureAligned();
             }
         }
 
@@ -70,6 +80,8 @@ namespace HSDRaw.Common
                     Flags &= ~POBJ_FLAG.SHAPEANIM;
                 }
                 _s.SetReference(0x14, value);
+
+                EnsureAligned();
             }
         }
 
@@ -95,6 +107,8 @@ namespace HSDRaw.Common
                 }
 
                 _s.SetReference(0x14, value);
+
+                EnsureAligned();
             }
         }
 
@@ -121,6 +135,8 @@ namespace HSDRaw.Common
                 }
                 else
                     _s.SetReference(0x14, null);
+
+                EnsureAligned();
             }
         }
 
@@ -206,6 +222,8 @@ namespace HSDRaw.Common
                 re._s.SetEmbededStruct(off, v._s);
                 off += v.TrimmedSize;
             }
+
+            EnsureAligned();
         }
 
         /// <summary>
@@ -231,16 +249,12 @@ namespace HSDRaw.Common
                 EnvelopeWeights = dl.Envelopes.ToArray();
             else
                 EnvelopeWeights = null;
+
+            EnsureAligned();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected override int Trim()
+        private void EnsureAligned()
         {
-            var trimmed = base.Trim();
-
             var attr = _s.GetReference<HSDAccessor>(0x08);
             // align attribute buffers
             if (attr != null)
@@ -260,8 +274,22 @@ namespace HSDRaw.Common
                     evn._s.IsBufferAligned = true;
                     evn._s.CanBeDuplicate = false;
                 }
-
             }
+        }
+
+        public override void New()
+        {
+            base.New();
+            EnsureAligned();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected override int Trim()
+        {
+            var trimmed = base.Trim();
 
             // guarentee attribute sequence
             // yes this is the messiest hack
