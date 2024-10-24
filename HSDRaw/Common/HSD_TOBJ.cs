@@ -342,7 +342,14 @@ namespace HSDRaw.Common
     {
         public override int TrimmedSize { get; } = 0x18;
 
-        public byte[] ImageData { get => _s.GetBuffer(0x00); set => _s.SetBuffer(0x00, value); }
+        public byte[] ImageData
+        {
+            get => _s.GetBuffer(0x00);
+            set {
+                _s.SetBuffer(0x00, value);
+                EnsureAligned();
+            }
+        }
 
         public short Width { get => _s.GetInt16(0x04); set => _s.SetInt16(0x04, value); }
         public short Height { get => _s.GetInt16(0x06); set => _s.SetInt16(0x06, value); }
@@ -354,14 +361,16 @@ namespace HSDRaw.Common
         public float MinLOD { get => _s.GetFloat(0x10); set => _s.SetFloat(0x10, value); }
         public float MaxLOD { get => _s.GetFloat(0x14); set => _s.SetFloat(0x14, value); }
 
-        protected override int Trim()
+        private void EnsureAligned()
         {
             if (_s.References.ContainsKey(0x00))
                 _s.References[0x00].IsBufferAligned = true;
+        }
 
-            Console.WriteLine("Trimmed Image " + Width + " " + Height);
-
-            return base.Trim();
+        public override void New()
+        {
+            base.New();
+            EnsureAligned();
         }
     }
 
@@ -369,7 +378,14 @@ namespace HSDRaw.Common
     {
         public override int TrimmedSize { get; } = 0x20;// actually 0xE, but it's padded to 4 anyway...
 
-        public byte[] TlutData { get => _s.GetBuffer(0x00); set => _s.SetBuffer(0x00, value); }
+        public byte[] TlutData
+        {
+            get => _s.GetBuffer(0x00);
+            set {
+                _s.SetBuffer(0x00, value);
+                EnsureAligned();
+            }
+        }
         
         public GXTlutFmt Format { get => (GXTlutFmt)_s.GetInt32(0x04); set => _s.SetInt32(0x04, (int)value); }
 
@@ -377,12 +393,16 @@ namespace HSDRaw.Common
 
         public short ColorCount { get => _s.GetInt16(0x0C); set => _s.SetInt16(0x0C, value); }
 
-        protected override int Trim()
+        private void EnsureAligned()
         {
             if (_s.References.ContainsKey(0x00))
                 _s.References[0x00].IsBufferAligned = true;
+        }
 
-            return base.Trim();
+        public override void New()
+        {
+            base.New();
+            EnsureAligned();
         }
     }
 
