@@ -422,9 +422,9 @@ namespace HSDRaw
         /// Saves dat data to filepath
         /// </summary>
         /// <param name="fileName"></param>
-        public void Save(string fileName, bool bufferAlign = true, bool optimize = true, bool trim = false)
+        public void Save(string fileName, bool optimize = true, bool trim = false)
         {
-            Save(new FileStream(fileName, FileMode.Create), bufferAlign, optimize, trim);
+            Save(new FileStream(fileName, FileMode.Create), optimize, trim);
         }
         
         /// <summary>
@@ -578,12 +578,8 @@ namespace HSDRaw
         /// saves dat data to stream with optional alignment
         /// </summary>
         /// <param name="stream"></param>
-        /// <param name="bufferAlign"></param>
-        public void Save(Stream stream, bool bufferAlign = true, bool optimize = true, bool trim = false)
+        public void Save(Stream stream, bool optimize = true, bool trim = false)
         {
-            if (Roots.Count > 0 && (Roots[0].Data is MEX_Data || Roots[0].Data is kexData))
-                bufferAlign = false;
-
             // trim data if desired
             if (trim)
                 TrimData();
@@ -656,22 +652,13 @@ namespace HSDRaw
                 // write structs
                 foreach (var s in _structCache)
                 {
-                    // align buffers and general alignment
-                    // TODO: trim extra data? Not a problem aside from potential filesize
-                    // no refereneces = buffer?
-                    // textures need to be 0x20 aligned... but there is no way to detect which structures are textures
-                    // this can result in unnessecary padding
-                    if (IsBuffer(s) && bufferAlign) 
-                        writer.Align(0x20);
-                    else
-                        if(s.Align)
-                            writer.Align(4);
+                    writer.Align(0x20);
 
                     structToOffset.Add(s, (int)writer.BaseStream.Position - 0x20);
                     writer.Write(s.GetData());
                 }
                 
-                writer.Align(4);
+                writer.Align(0x20);
                 var relocationOffset = writer.BaseStream.Position;
 
                 List<int> relocationOffsets = new List<int>();
