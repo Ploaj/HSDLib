@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Windows.Forms;
 using OpenTK.Graphics.OpenGL;
-using System.Drawing;
 using HSDRawViewer.Rendering;
 using System.Collections.Generic;
 using OpenTK.Mathematics;
 using System.Linq;
 using System.ComponentModel;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-using System.Drawing.Drawing2D;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Dialog;
 using OpenTK.WinForms;
-using System.Diagnostics;
+using HSDRawViewer.Tools;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Gif;
+using System.IO;
 
 namespace HSDRawViewer.GUI
 {
@@ -36,8 +37,8 @@ namespace HSDRawViewer.GUI
         public Camera Camera { get => _camera; set { _camera = value; RefreshSize(); } }
         private Camera _camera;
 
-        public Color ViewportBackColor { get; set; } = Color.FromArgb(30, 30, 40);
-        public Color GridColor { get; set; } = Color.White;
+        public System.Drawing.Color ViewportBackColor { get; set; } = System.Drawing.Color.FromArgb(30, 30, 40);
+        public System.Drawing.Color GridColor { get; set; } = System.Drawing.Color.White;
 
         [Browsable(false)]
         public bool EnableHelpDisplay { get; set; } = true;
@@ -50,7 +51,7 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public PlaybackMode PlaybackMode
         {
-            get => _playbackMode; 
+            get => _playbackMode;
             internal set
             {
                 _playbackMode = value;
@@ -213,7 +214,7 @@ namespace HSDRawViewer.GUI
                 foreach (var d in Drawables)
                     if (d is IDrawableInterface inter && inter.FreezeCamera())
                         return true;
-                        
+
                 return false;
             }
         }
@@ -280,7 +281,7 @@ namespace HSDRawViewer.GUI
                 var point = new Vector2(args.X, args.Y);
 
                 foreach (var v in Drawables)
-                    if(v is IDrawableInterface inter)
+                    if (v is IDrawableInterface inter)
                         inter.ScreenClick(args.Button, GetScreenPosition(point));
 
                 glControl.Focus();
@@ -313,7 +314,7 @@ namespace HSDRawViewer.GUI
                 var point = new Vector2(p.X, p.Y);
                 foreach (var v in Drawables)
                     if (v is IDrawableInterface inter)
-                         inter.ScreenDrag(args, GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
+                        inter.ScreenDrag(args, GetScreenPosition(point), DeltaCursorPos.X * 40, DeltaCursorPos.Y * 40);
 
                 // move camera
                 var pos = new Vector2(Cursor.Position.X, Cursor.Position.Y);
@@ -545,6 +546,14 @@ namespace HSDRawViewer.GUI
         /// </summary>
         public void Render()
         {
+            Render(glControl.Width, glControl.Height);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Render(int width, int height)
+        {
             glControl.MakeCurrent();
 
             // set clear color
@@ -554,7 +563,7 @@ namespace HSDRawViewer.GUI
                 GL.ClearColor(0, 0, 0, 0);
 
             // setup viewport
-            GL.Viewport(0, 0, glControl.Width, glControl.Height);
+            GL.Viewport(0, 0, width, height);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // setup immediate mode matricies
@@ -698,13 +707,18 @@ namespace HSDRawViewer.GUI
                     {
                         using (var resize = ResizeImage(bitmap, Camera.RenderWidth / 2, Camera.RenderHeight / 2))
                         {
+                            // optionally mirror
                             if (_camera.MirrorScreenshot)
-                                resize.MirrorX();
+                                resize.Mutate(ctx => ctx.Flip(FlipMode.Horizontal));
 
+                            // generate csp
                             Converters.SBM.CSPMaker.MakeCSP(resize);
 
-                            using (var csp = resize.Clone(new Rectangle((glControl.Width - CSPWidth) / 4, (glControl.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2), bitmap.PixelFormat))
-                                csp.Save(fileName);
+                            // crop
+                            resize.Mutate(ctx => ctx.Crop(new Rectangle((glControl.Width - CSPWidth) / 4, (glControl.Height - CSPHeight) / 4, CSPWidth / 2, CSPHeight / 2)));
+
+                            // save to file
+                            resize.Save(fileName);
                         }
                     }
                     else
@@ -726,29 +740,15 @@ namespace HSDRawViewer.GUI
         /// <param name="width">The width to resize to.</param>
         /// <param name="height">The height to resize to.</param>
         /// <returns>The resized image.</returns>
-        public static Bitmap ResizeImage(Image image, int width, int height)
+        public static Image<Rgba32> ResizeImage(Image<Rgba32> image, int width, int height)
         {
-            var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
-
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
+            // Clone the input image and resize it
+            return image.Clone(ctx => ctx.Resize(new ResizeOptions
             {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return destImage;
+                Size = new Size(width, height),
+                Mode = ResizeMode.Max, // Adjust as needed (Max, Crop, Stretch, Pad, etc.)
+                Sampler = KnownResamplers.Bicubic // High-quality resampling
+            }));
         }
 
         /// <summary>
@@ -768,7 +768,7 @@ namespace HSDRawViewer.GUI
                 max.Y = Math.Max(max.Y, v.Y);
             }
 
-            if(_camera != null)
+            if (_camera != null)
             {
                 //_camera.FrameBoundingSphere(new Vector3((max.X + min.X) / 2, (max.Y + min.Y) / 2, 0), Math.Max(max.X - min.X, max.Y - min.Y), 0);
             }
@@ -902,10 +902,10 @@ namespace HSDRawViewer.GUI
 
             _camera.RenderWidth = hsdCam.ViewportRight;
             _camera.RenderHeight = hsdCam.ViewportBottom;
-            
+
             _camera.SetLookAt(new Vector3(hsdCam.eye.V1, hsdCam.eye.V2, hsdCam.eye.V3),
                 new Vector3(hsdCam.target.V1, hsdCam.target.V2, hsdCam.target.V3));
-            
+
             _camera.FovRadians = hsdCam.FieldOfView;
 
             _camera.FarClipPlane = hsdCam.FarClip;
@@ -919,7 +919,7 @@ namespace HSDRawViewer.GUI
         /// <param name="height"></param>
         /// <param name="saveAlpha"></param>
         /// <returns></returns>
-        public static Bitmap ReadDefaultFramebufferImagePixels(int width, int height, bool saveAlpha = false)
+        public static Image<Rgba32> ReadDefaultFramebufferImagePixels(int width, int height, bool saveAlpha = false)
         {
             // RGBA unsigned byte
             int pixelSizeInBytes = sizeof(byte) * 4;
@@ -929,10 +929,8 @@ namespace HSDRawViewer.GUI
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             byte[] pixels = GetBitmapPixels(width, height, pixelSizeInBytes, saveAlpha);
 
-            var bitmap = GetBitmap(width, height, pixels);
+            var bitmap = GetImage(width, height, pixels);
 
-            // Adjust for differences in the origin point.
-            bitmap.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
             return bitmap;
         }
 
@@ -990,7 +988,7 @@ namespace HSDRawViewer.GUI
                 }
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -998,15 +996,36 @@ namespace HSDRawViewer.GUI
         /// <param name="height"></param>
         /// <param name="imageData"></param>
         /// <returns></returns>
-        public static Bitmap GetBitmap(int width, int height, byte[] imageData)
+        public static Image<Rgba32> GetImage(int width, int height, byte[] imageData)
         {
-            Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            // Create a new Image<Rgba32> with the specified dimensions
+            var image = new Image<Rgba32>(width, height);
 
-            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp.PixelFormat);
-            Marshal.Copy(imageData, 0, bmpData.Scan0, imageData.Length);
+            // Ensure the input imageData length matches the expected size
+            if (imageData.Length != width * height * 4)
+                throw new ArgumentException("The imageData size does not match the specified dimensions.");
 
-            bmp.UnlockBits(bmpData);
-            return bmp;
+            // Copy the byte array into the image
+            int pixelIndex = 0;
+            image.ProcessPixelRows(accessor =>
+            {
+                for (int y = height - 1; y >= 0; y--)
+                {
+                    Span<Rgba32> row = accessor.GetRowSpan(y);
+                    for (int x = 0; x < width; x++)
+                    {
+                        row[x] = new Rgba32(
+                            imageData[pixelIndex + 2], // R
+                            imageData[pixelIndex + 1], // G
+                            imageData[pixelIndex],     // B
+                            imageData[pixelIndex + 3]  // A
+                        );
+                        pixelIndex += 4;
+                    }
+                }
+            });
+
+            return image;
         }
 
         /// <summary>
@@ -1134,6 +1153,128 @@ namespace HSDRawViewer.GUI
         {
             animationTrack.EndFrame = (float)nudMaxFrame.Value;
             animationTrack.Invalidate();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Image<Rgba32> GenerateBitmap(int width, int height)
+        {
+            Render(width, height);
+            return ReadDefaultFramebufferImagePixels(width, height, true);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportFrameAsPNGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var file = FileIO.SaveFile("PNG (.png)|*.png");
+
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            Frame = 0;
+            using (var bmp = GenerateBitmap(glControl.Width, glControl.Height))
+            {
+                bmp.Save(file);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void exportFrameToFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MaxFrame == 0)
+                return;
+
+            if (!AnimationTrackEnabled)
+                return;
+
+            var file = FileIO.SaveFile("PNG (*.png)|*.png");
+
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            var path = Path.GetDirectoryName(file);
+            var filename = Path.GetFileNameWithoutExtension(file);
+            var ext = Path.GetExtension(file);
+
+            for (int i = 0; i <= MaxFrame; i++)
+            {
+                Frame = i;
+                using (var bmp = GenerateBitmap(glControl.Width, glControl.Height))
+                {
+                    bmp.Save(Path.Combine(path, $"{filename}_{i:D3}{ext}"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void asGIFToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MaxFrame == 0)
+                return;
+
+            if (!AnimationTrackEnabled)
+                return;
+
+            var file = FileIO.SaveFile("GIF (*.gif)|*.gif");
+
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            // Define the width and height of the GIF frames
+            int width = glControl.Width;
+            int height = glControl.Height;
+
+            // Delay between frames in (1/60) of a second.
+            const int frameDelay = 1;
+
+            // Create empty image.
+            Image<Rgba32> gif = null;
+
+            // bake animation
+            for (int i = 0; i <= MaxFrame; i++)
+            {
+                Frame = i;
+                var bmp = GenerateBitmap(glControl.Width, glControl.Height);
+                
+                // Set the delay until the next image is displayed.
+                var metadata = bmp.Frames.RootFrame.Metadata.GetGifMetadata();
+                metadata.FrameDelay = frameDelay;
+
+                // add frame
+                if (gif == null)
+                {
+                    gif = bmp;
+                }
+                else
+                {
+                    gif.Frames.AddFrame(bmp.Frames.RootFrame);
+                    bmp.Dispose();
+                }
+            }
+
+            if (gif != null)
+            {
+                // Set animation loop 
+                var gifMetaData = gif.Metadata.GetGifMetadata();
+                gifMetaData.RepeatCount = 0;
+
+                // Save the final result.
+                gif.SaveAsGif(file);
+            }
         }
     }
 }

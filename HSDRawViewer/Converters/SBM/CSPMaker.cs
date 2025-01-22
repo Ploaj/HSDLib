@@ -1,36 +1,11 @@
-﻿using System;
-using System.Drawing;
+﻿using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
+using System;
 
 namespace HSDRawViewer.Converters.SBM
 {
     public class CSPMaker
     {
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bmp"></param>
-        public static void MakeCSP(Bitmap bmp)
-        {
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            System.Drawing.Imaging.BitmapData bmpData =
-                bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
-                bmp.PixelFormat);
-            
-            IntPtr ptr = bmpData.Scan0;
-            
-            int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-            byte[] rgbValues = new byte[bytes];
-            
-            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-            rgbValues = MakeCSP(rgbValues, bmp.Width, bmp.Height);
-            
-            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-            
-            bmp.UnlockBits(bmpData);
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -52,55 +27,66 @@ namespace HSDRawViewer.Converters.SBM
         /// 
         /// </summary>
         /// <param name="image"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public static byte[] MakeCSP(byte[] image, int width, int height)
+        public static void MakeCSP(Image<Rgba32> image)
         {
-            byte[] shadow = new byte[image.Length];
+            int width = image.Width;
+            int height = image.Height;
 
-            var sx = 10;
-            var sy = 10;
-            
+            // Create a shadow image to store shadow data
+            Image<Rgba32> shadow = image.Clone();
+
+            int sx = 10; // Shadow offset X
+            int sy = 10; // Shadow offset Y
+
             // Apply Outline
-            for(int w = 0; w < width; w++)
+            for (int y = 0; y < height; y++)
             {
-                for(int h = 0; h < height; h++)
+                for (int x = 0; x < width; x++)
                 {
-                    var index = (w + h * width) * 4;
-                    var alpha = image[index + 3] / 255f;
+                    Rgba32 pixel = image[x, y];
+                    float alpha = pixel.A / 255f;
 
-                    // shadow opacity 109 11x11 pixels away
-                    if (w - sx >= 0 && w - sx < width &&
-                        h + sy >= 0 && h + sy < height)
+                    // Calculate shadow position
+                    int shadowX = x - sx;
+                    int shadowY = y + sy;
+
+                    if (shadowX >= 0 && shadowX < width && shadowY >= 0 && shadowY < height)
                     {
-                        var shadow_index = ((w - sx) + (h + sy) * width) * 4;
-                        shadow[shadow_index + 3] = (byte)(109 * alpha);
+                        shadow[shadowX, shadowY] = new Rgba32(
+                            0, 0, 0, (byte)(109 * alpha) // Apply shadow opacity
+                        );
                     }
 
-                    image[index + 0] = Blend(image[index + 0], 0, alpha);
-                    image[index + 1] = Blend(image[index + 1], 0, alpha);
-                    image[index + 2] = Blend(image[index + 2], 0, alpha);
-                    //image[index + 3] = (byte)(image[index + 3] * 2 > 255 ? 255 : image[index + 3] * 2);
+                    // Blend pixel colors
+                    image[x, y] = new Rgba32(
+                        Blend(pixel.R, 0, alpha),
+                        Blend(pixel.G, 0, alpha),
+                        Blend(pixel.B, 0, alpha),
+                        pixel.A // Retain original alpha
+                    );
                 }
             }
 
             // Apply Shadow
-            for (int w = 0; w < width; w++)
+            for (int y = 0; y < height; y++)
             {
-                for (int h = 0; h < height; h++)
+                for (int x = 0; x < width; x++)
                 {
-                    var index = (w + h * width) * 4;
-                    var shadowalpha = shadow[index + 3] / 255f;
-                    var alpha = image[index + 3] / 255f;
+                    Rgba32 pixel = image[x, y];
+                    Rgba32 shadowPixel = shadow[x, y];
 
-                    image[index + 3] = (byte)Math.Min(255, shadow[index + 3] + image[index + 3]);
-                    image[index + 0] = Blend(image[index + 0], shadow[index + 0], alpha); 
-                    image[index + 1] = Blend(image[index + 1], shadow[index + 1], alpha);
-                    image[index + 2] = Blend(image[index + 2], shadow[index + 2], alpha);
+                    float shadowAlpha = shadowPixel.A / 255f;
+                    float alpha = pixel.A / 255f;
+
+                    // Blend shadow and image colors
+                    image[x, y] = new Rgba32(
+                        Blend(pixel.R, shadowPixel.R, alpha),
+                        Blend(pixel.G, shadowPixel.G, alpha),
+                        Blend(pixel.B, shadowPixel.B, alpha),
+                        (byte)Math.Min(255, pixel.A + shadowPixel.A) // Combine alpha channels
+                    );
                 }
             }
-
-            return image;
         }
     }
 }
