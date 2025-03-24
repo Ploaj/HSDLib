@@ -1,50 +1,25 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
+using HSDRaw.GX;
+using HSDRaw.Tools;
 using HSDRawViewer.Converters;
+using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer
 {
     public static class JOBJExtensions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="jobj"></param>
-        public static void CleanRootNode(this HSD_JOBJ jobj)
-        {
-            var joints = jobj.TreeList;
-
-            Matrix4 rot = Matrix4.Identity; ;
-            for (int i = 0; i < joints.Count; i++)
-            {
-                var j = joints[i];
-
-                if(i == 0)
-                {
-                    rot = Math3D.CreateMatrix4FromEuler(j.RX, j.RY, j.RZ);
-                    j.RX = 0;
-                    j.RY = 0;
-                    j.RZ = 0;
-                }
-                else
-                {
-                    // fix position
-                    var pos = Vector3.TransformNormal(new Vector3(j.TX, j.TY, j.TZ), rot);
-                    j.TX = pos.X;
-                    j.TY = pos.Y;
-                    j.TZ = pos.Z;
-                }
-
-                // clean scale
-                j.SX = 1;
-                j.SY = 1;
-                j.SZ = 1;
-            }
-        }
 
         /// <summary>
         /// 
@@ -237,8 +212,8 @@ namespace HSDRawViewer
 
                                     if(!textures.Contains(hash))
                                     {
-                                        using (var bmp = TOBJConverter.ToBitmap(tobj))
-                                            bmp.Save(System.IO.Path.Combine(folder, TOBJConverter.FormatName(hash.ToString("X8"), tobj) + ".png"));
+                                        using (var img = tobj.ToImage())
+                                            img.SaveAsPng(Path.Combine(folder, tobj.FormatName(hash.ToString("X8")) + ".png"));
 
                                         textures.Add(hash);
                                     }
@@ -282,16 +257,16 @@ namespace HSDRawViewer
                 Dictionary<int, HSD_TOBJ> hashToImage = new Dictionary<int, HSD_TOBJ>();
 
                 // load all textures from file
-                foreach(var tf in System.IO.Directory.GetFiles(folder))
+                foreach(var tf in Directory.GetFiles(folder))
                 {
                     if (tf.ToLower().EndsWith(".png"))
                     {
-                        var fn = System.IO.Path.GetFileNameWithoutExtension(tf);
+                        var fn = Path.GetFileNameWithoutExtension(tf);
                         if(fn.Length >= 8 && 
-                            int.TryParse(fn.Substring(0, 8), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hash) && 
-                            TOBJConverter.FormatFromString(fn, out HSDRaw.GX.GXTexFmt texFmt, out HSDRaw.GX.GXTlutFmt tlutFmt))
+                            int.TryParse(fn.Substring(0, 8), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hash) && 
+                            TOBJExtentions.FormatFromString(fn, out GXTexFmt texFmt, out GXTlutFmt tlutFmt))
                         {
-                            hashToImage.Add(hash, TOBJConverter.ImportTOBJFromFile(tf, texFmt, tlutFmt));
+                            hashToImage.Add(hash, TOBJExtentions.ImportTObjFromFile(tf, texFmt, tlutFmt));
                         }
                     }
                 }

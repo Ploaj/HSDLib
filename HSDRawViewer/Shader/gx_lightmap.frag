@@ -405,21 +405,7 @@ vec4 PerformTextureOp(int index, vec4 passColor)
 				passColor.rgb = mix(passColor.rgb, pass.rgb, pass.a);
 			break;
 		case COLORMAP_RGB_MASK:
-			{
-				//TODO: I don't know what this is
-				if(pass.r != 0)
-					passColor.r = pass.r;
-				else
-					passColor.r = 0;
-				if(pass.g != 0)
-					passColor.g = pass.g;
-				else
-					passColor.g = 0;
-				if(pass.b != 0)
-					passColor.b = pass.b;
-				else
-					passColor.b = 0;
-			}
+			passColor.rgb = mix(passColor.rgb, pass.rgb, pass.a);
 			break;
 		case COLORMAP_BLEND:
 			passColor.rgb = mix(passColor.rgb, pass.rgb, TEX[index].blend);

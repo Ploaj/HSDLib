@@ -3,6 +3,7 @@ using HSDRaw.Common.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HSDRaw.Tools
 {
@@ -22,8 +23,8 @@ namespace HSDRaw.Tools
         {
             List<FOBJ_Player> toRemove = new List<FOBJ_Player>();
 
-            // process each track
-            foreach (var track in tracks)
+
+            Parallel.ForEach(tracks, track =>
             {
                 // remove the none tracks
                 if (track.JointTrackType == JointTrackType.HSD_A_J_NONE)
@@ -32,6 +33,13 @@ namespace HSDRaw.Tools
                 }
                 else
                 {
+                    // remove constant tracks that don't change value
+                    if (IsConstant(track, 0.01f) &&
+                        Math.Abs(joint.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
+                    {
+                        toRemove.Add(track);
+                    }
+                    else
                     if (error != 0)
                     {
                         // bake keys
@@ -54,14 +62,8 @@ namespace HSDRaw.Tools
                                 track.Keys.RemoveAt(i);
                         }
                     }
-
-                    // remove constant tracks that don't change value
-                    if (IsConstant(track, 0.01f) &&
-                        Math.Abs(joint.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
-                            toRemove.Add(track);
                 }
-
-            }
+            });
 
             // remove certain tracks
             foreach (var rem in toRemove)

@@ -257,7 +257,19 @@ namespace HSDRawViewer.Converters
 
 
         [Category("MObj Import Options"), DisplayName("Path to MObj"), Description(""), YamlIgnore]
-        public string MobjPath { get => _material != null && _material.DiffuseMap != null ? $"{Path.GetFileNameWithoutExtension(_material.DiffuseMap.FilePath)}.mobj" : null; }
+        public string MobjPath 
+        { 
+            get
+            {
+                if (_material == null)
+                    return "";
+
+                //if (_material.DiffuseMap != null && File.Exists())
+                //    return $"{Path.GetFileNameWithoutExtension(_material.DiffuseMap.FilePath)}.mobj";
+
+                return _material.Name + ".mobj";
+            }
+        }
 
         //[Category("MObj Import Options"), DisplayName("MObj Found"), Description("")]
         //public bool MobjFound { get => _material.DiffuseMap != null ? File.Exists($"{Path.GetFileNameWithoutExtension(_material.DiffuseMap.FilePath)}.mobj") : false; }

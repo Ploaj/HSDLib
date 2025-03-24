@@ -60,7 +60,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         public Image ToImage()
         {
-            return TOBJConverter.ToBitmap(TOBJ);
+            return TOBJ.ToImage().ToBitmap();
         }
 
         public void Dispose()

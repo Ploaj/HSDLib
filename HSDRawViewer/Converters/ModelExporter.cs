@@ -16,6 +16,7 @@ using HSDRaw.Tools;
 using OpenTK.Mathematics;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Tools.Animation;
+using System.Xml.Linq;
 
 namespace HSDRawViewer.Converters
 {
@@ -193,6 +194,52 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        private IEnumerable<byte[]> EnumerateStructs(HSDStruct str, HashSet<HSDStruct> hashes = null)
+        {
+            if (hashes != null &&
+                hashes.Contains(str))
+                yield break;
+
+            if (hashes == null)
+                hashes = new HashSet<HSDStruct>();
+
+            yield return str.GetData();
+
+            foreach (var r in str.References)
+            {
+                foreach (var v in EnumerateStructs(r.Value, hashes))
+                {
+                    yield return v;
+                }
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public uint GenerateHash32(HSDStruct str)
+        {
+            const uint FNV_OFFSET_BASIS = 0x811C9DC5;
+            const uint FNV_PRIME = 0x01000193;
+
+            uint hash = FNV_OFFSET_BASIS;
+
+            foreach (var arr in EnumerateStructs(str))
+            {
+                foreach (byte b in arr)
+                {
+                    hash ^= b;
+                    hash *= FNV_PRIME;
+                }
+            }
+
+            return hash;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void ProcessDOBJs()
         {
             var jIndex = 0;
@@ -214,73 +261,90 @@ namespace HSDRawViewer.Converters
                             mesh.Name = dobj.ClassName;
 
                         // process and export material
-                        IOMaterial m = new IOMaterial();
-                        m.Name = $"Joint_{jIndex}_Object_{dIndex}_Material_{dIndex}";
-                        m.AmbientColor = new System.Numerics.Vector4(
-                            dobj.Mobj.Material.AMB_R / 255f,
-                            dobj.Mobj.Material.AMB_G / 255f,
-                            dobj.Mobj.Material.AMB_B / 255f,
-                            dobj.Mobj.Material.AMB_A / 255f);
-                        m.DiffuseColor = new System.Numerics.Vector4(
-                            dobj.Mobj.Material.DIF_R / 255f,
-                            dobj.Mobj.Material.DIF_G / 255f,
-                            dobj.Mobj.Material.DIF_B / 255f,
-                            dobj.Mobj.Material.DIF_A / 255f);
-                        m.SpecularColor = new System.Numerics.Vector4(
-                            dobj.Mobj.Material.SPC_R / 255f,
-                            dobj.Mobj.Material.SPC_G / 255f,
-                            dobj.Mobj.Material.SPC_B / 255f,
-                            dobj.Mobj.Material.SPC_A / 255f);
-                        m.Shininess = dobj.Mobj.Material.Shininess;
-                        m.Alpha = dobj.Mobj.Material.Alpha;
-
-                        // process and export textures
-                        if (dobj.Mobj.Textures != null)
+                        string matName = $"Material_{GenerateHash32(dobj.Mobj._s):X8}";
+                        if (!Scene.Materials.Exists(e=>e.Name.Equals(matName)))
                         {
-                            foreach (var t in dobj.Mobj.Textures.List)
+                            IOMaterial m = new IOMaterial();
+                            m.Name = matName;
+                            m.AmbientColor = new System.Numerics.Vector4(
+                                dobj.Mobj.Material.AMB_R / 255f,
+                                dobj.Mobj.Material.AMB_G / 255f,
+                                dobj.Mobj.Material.AMB_B / 255f,
+                                dobj.Mobj.Material.AMB_A / 255f);
+                            m.DiffuseColor = new System.Numerics.Vector4(
+                                dobj.Mobj.Material.DIF_R / 255f,
+                                dobj.Mobj.Material.DIF_G / 255f,
+                                dobj.Mobj.Material.DIF_B / 255f,
+                                dobj.Mobj.Material.DIF_A / 255f);
+                            m.SpecularColor = new System.Numerics.Vector4(
+                                dobj.Mobj.Material.SPC_R / 255f,
+                                dobj.Mobj.Material.SPC_G / 255f,
+                                dobj.Mobj.Material.SPC_B / 255f,
+                                dobj.Mobj.Material.SPC_A / 255f);
+                            m.Shininess = dobj.Mobj.Material.Shininess;
+                            m.Alpha = dobj.Mobj.Material.Alpha;
+
+                            // optionally export mobj
+                            if (_settings.ExportMOBJs)
                             {
-                                if (t.ImageData != null && t.ImageData.ImageData != null && !imageToName.ContainsKey(t.ImageData.ImageData))
+                                HSDRawFile mobjFile = new HSDRawFile();
+                                mobjFile.Roots.Add(new HSDRootNode()
                                 {
-                                    var name = $"Texture_{imageToName.Count}_{t.ImageData.Format}";
-
-                                    if (GXImageConverter.IsPalettedFormat(t.ImageData.Format))
-                                        name += $"_{t.TlutData.Format}";
-
-                                    if (_settings.ExportTextures)
-                                    {
-                                        t.SaveImagePNG(_settings.Directory + name + ".png");
-                                    }
-
-                                    imageToName.Add(t.ImageData.ImageData, name);
-
-                                    if (_settings.ExportMOBJs)
-                                    {
-                                        HSDRawFile mobjFile = new HSDRawFile();
-                                        mobjFile.Roots.Add(new HSDRootNode()
-                                        {
-                                            Name = name,
-                                            Data = dobj.Mobj
-                                        });
-                                        mobjFile.Save(_settings.Directory + name + ".mobj");
-                                    }
-                                }
+                                    Name = matName,
+                                    Data = dobj.Mobj
+                                });
+                                mobjFile.Save(_settings.Directory + matName + ".mobj");
                             }
 
-                            m.DiffuseMap = new IOTexture()
+                            // process and export textures
+                            if (dobj.Mobj.Textures != null)
                             {
-                                Name = System.IO.Path.GetFileNameWithoutExtension(imageToName[dobj.Mobj.Textures.ImageData.ImageData]),
-                                FilePath = imageToName[dobj.Mobj.Textures.ImageData.ImageData] + ".png"
-                            };
-                        }
-                        Scene.Materials.Add(m);
+                                foreach (var t in dobj.Mobj.Textures.List)
+                                {
+                                    if (t.ImageData != null && t.ImageData.ImageData != null && !imageToName.ContainsKey(t.ImageData.ImageData))
+                                    {
+                                        var name = $"Texture_{imageToName.Count}_{t.ImageData.Format}";
 
+                                        if (GXImageConverter.IsPalettedFormat(t.ImageData.Format))
+                                            name += $"_{t.TlutData.Format}";
+
+                                        if (_settings.ExportTextures)
+                                        {
+                                            t.SaveImagePNG(_settings.Directory + name + ".png");
+                                        }
+
+                                        imageToName.Add(t.ImageData.ImageData, name);
+                                    }
+
+                                    if (t.DiffuseLightmap)
+                                    {
+                                        m.DiffuseMap = new IOTexture()
+                                        {
+                                            Name = System.IO.Path.GetFileNameWithoutExtension(imageToName[dobj.Mobj.Textures.ImageData.ImageData]),
+                                            FilePath = imageToName[dobj.Mobj.Textures.ImageData.ImageData] + ".png"
+                                        };
+                                    }
+
+                                    if (t.SpecularLightmap)
+                                    {
+                                        m.SpecularMap = new IOTexture()
+                                        {
+                                            Name = System.IO.Path.GetFileNameWithoutExtension(imageToName[dobj.Mobj.Textures.ImageData.ImageData]),
+                                            FilePath = imageToName[dobj.Mobj.Textures.ImageData.ImageData] + ".png"
+                                        };
+                                    }
+                                }
+
+                            }
+                            Scene.Materials.Add(m);
+                        }
+                        
                         // additional attribtues
                         if (single)
                             mesh.Name += "_SINGLE";
 
                         if (reflective)
                             mesh.Name += "_REFLECTIVE";
-
 
                         // process polygons
                         if (dobj.Pobj != null)
@@ -293,7 +357,7 @@ namespace HSDRawViewer.Converters
                                     single = false;
                                 
                                 var poly = ProcessPOBJ(pobj, j, pobj.SingleBoundJOBJ, dobj.Mobj, mesh, _root);
-                                poly.MaterialName = m.Name;
+                                poly.MaterialName = matName;
                                 mesh.Polygons.Add(poly);
                             }
 

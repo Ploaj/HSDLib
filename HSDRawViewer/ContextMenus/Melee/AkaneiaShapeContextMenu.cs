@@ -1,11 +1,6 @@
-﻿using HSDRaw.MEX.Akaneia;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+﻿using HSDRaw.Common;
+using HSDRaw.MEX.Akaneia;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.Melee
@@ -25,7 +20,8 @@ namespace HSDRawViewer.ContextMenus.Melee
 
                     if (f != null)
                     {
-                        var tobj = Converters.TOBJConverter.ImportTOBJFromFile(f, HSDRaw.GX.GXTexFmt.RGBA8, HSDRaw.GX.GXTlutFmt.IA8);
+                        var tobj = new HSD_TOBJ();
+                        tobj.ImportImage(f, HSDRaw.GX.GXTexFmt.RGBA8, HSDRaw.GX.GXTlutFmt.IA8);
                         page.FromTOBJ(tobj);
                     }
                 }

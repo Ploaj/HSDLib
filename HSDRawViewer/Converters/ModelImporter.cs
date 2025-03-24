@@ -919,10 +919,10 @@ namespace HSDRawViewer.Converters
 
             if (File.Exists(Path.Combine(FolderPath, texturePath)))
                 texturePath = Path.Combine(FolderPath, texturePath);
-
+            else
             if (File.Exists(path))
                 texturePath = path;
-
+            else
             if (File.Exists(texturePath + ".png"))
                 texturePath = texturePath + ".png";
 
@@ -963,18 +963,27 @@ namespace HSDRawViewer.Converters
                 settings = new MaterialImportSettings(material);
 
             // optional mobj loading
-            if (settings.ImportMOBJ && 
-                settings.ImportTexture &&
-                material.DiffuseMap != null && 
-                !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
+            if (settings.ImportMOBJ)
             {
-                var textPath = GetFullTexturePath(material.DiffuseMap.FilePath);
-                var mobjPath = Path.Combine(Path.GetDirectoryName(textPath), Path.GetFileNameWithoutExtension(textPath) + ".mobj");
+                var mobjPath = Path.Combine(FolderPath, material.Name + ".mobj");
 
                 if (File.Exists(mobjPath))
                 {
                     Mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
                     return Mobj;
+                }
+                else if (settings.ImportTexture &&
+                    material.DiffuseMap != null &&
+                    !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
+                {
+                    var textPath = GetFullTexturePath(material.DiffuseMap.FilePath);
+                    mobjPath = Path.Combine(Path.GetDirectoryName(textPath), Path.GetFileNameWithoutExtension(textPath) + ".mobj");
+
+                    if (File.Exists(mobjPath))
+                    {
+                        Mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
+                        return Mobj;
+                    }
                 }
             }
 
@@ -1015,7 +1024,8 @@ namespace HSDRawViewer.Converters
                         }
                         else
                         {
-                            var tobj = TOBJConverter.ImportTOBJFromFile(texturePath, settings.TextureFormat, settings.PaletteFormat);
+                            var tobj = new HSD_TOBJ();
+                            tobj.ImportImage(texturePath, settings.TextureFormat, settings.PaletteFormat);
                             tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
 
                             tobj.GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0;
@@ -1024,7 +1034,7 @@ namespace HSDRawViewer.Converters
                             tobj.WrapS = material.DiffuseMap.WrapS.ToGXWrapMode();
                             tobj.WrapT = material.DiffuseMap.WrapT.ToGXWrapMode();
 
-                            if (TOBJConverter.IsTransparent(tobj))
+                            if (tobj.IsTransparent())
                             {
                                 Mobj.RenderFlags |= RENDER_MODE.XLU;
                                 tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;

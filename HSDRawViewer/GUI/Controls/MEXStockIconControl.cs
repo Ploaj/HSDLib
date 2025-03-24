@@ -32,7 +32,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             public Image ToImage()
             {
                 if (TOBJS.Length > 0)
-                    return Converters.TOBJConverter.ToBitmap(TOBJS[0].TOBJ);
+                    return TOBJS[0].TOBJ.ToImage().ToBitmap();
                 return null;
             }
 
@@ -190,7 +190,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             {
                 if(arrayMemberEditor3.SelectedObject is TOBJProxy proxy)
                 {
-                    proxy.TOBJ = Converters.TOBJConverter.ImportTOBJFromFile(file, HSDRaw.GX.GXTexFmt.CI4, HSDRaw.GX.GXTlutFmt.RGB5A3);
+                    proxy.TOBJ = TOBJExtentions.ImportTObjFromFile(file, HSDRaw.GX.GXTexFmt.CI4, HSDRaw.GX.GXTlutFmt.RGB5A3);
                 }
             }
         }
@@ -208,7 +208,7 @@ namespace HSDRawViewer.GUI.MEX.Controls
             {
                 if (arrayMemberEditor2.SelectedObject is StockIconNode node)
                 {
-                    node.TOBJS = new TOBJProxy[] { new TOBJProxy(Converters.TOBJConverter.ImportTOBJFromFile(file, HSDRaw.GX.GXTexFmt.CI4, HSDRaw.GX.GXTlutFmt.RGB5A3)) };
+                    node.TOBJS = new TOBJProxy[] { new TOBJProxy(TOBJExtentions.ImportTObjFromFile(file, HSDRaw.GX.GXTexFmt.CI4, HSDRaw.GX.GXTlutFmt.RGB5A3)) };
                 }
             }
         }

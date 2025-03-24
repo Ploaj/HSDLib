@@ -12,6 +12,7 @@ using HSDRawViewer.Tools.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -909,11 +910,22 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             {
                 if (d.ShowDialog() == DialogResult.OK)
                 {
-                    foreach (var joint in _jointTree.EnumerateJoints())
+                    //foreach (var joint in _jointTree.EnumerateJoints())
+                    //{
+                    //    var tracks = joint.Tracks;
+                    //    AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
+                    //}
+                    int index = 0;
+                    Parallel.ForEach(_jointTree.EnumerateJoints(), joint =>
                     {
-                        var tracks = joint.Tracks;
+                        var i = index;
+                        index++;
+                        System.Diagnostics.Debug.WriteLine($"Starting {i}");
+                        var tracks = joint.Tracks; // Ensure thread-safety if tracks are shared
                         AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
-                    }
+                        System.Diagnostics.Debug.WriteLine($"Done {i}");
+                    });
+
 
                     _trackEditor.SetKeys("", GraphEditor.AnimType.Joint, null);
                 }

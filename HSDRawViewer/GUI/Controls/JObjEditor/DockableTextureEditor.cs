@@ -156,7 +156,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (textureArrayEditor.SelectedObject is TObjProxy proxy)
             {
-                proxy.TOBJ.ExportTOBJToFile();
+                proxy.TOBJ.SaveImagePNG();
             }
         }
 
@@ -167,7 +167,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, System.EventArgs e)
         {
-            var tobj = TOBJConverter.ImportTOBJFromFile();
+            var tobj = TOBJExtentions.ImportTObjFromFile();
 
             if (tobj != null)
             {
@@ -185,7 +185,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (textureArrayEditor.SelectedObject is TObjProxy proxy)
             {
-                var tobj = TOBJConverter.ImportTOBJFromFile();
+                var tobj = TOBJExtentions.ImportTObjFromFile();
 
                 if (tobj != null)
                 {

@@ -5,9 +5,11 @@ using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
 using HSDRaw.GX;
 using HSDRaw.Melee;
-using HSDRawViewer.Converters;
-using HSDRawViewer.Tools;
 using HSDRaw.Tools;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -61,31 +63,52 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     customPaintTrackBar1.Maximum = (int)tobj.ImageData.MaxLOD - 1;
                     panel1.Visible = true;
-                    return BitmapTools.BGRAToBitmap(
+                    return BGRAToBitmap(
                         tobj.GetDecodedImageData(customPaintTrackBar1.Value),
                         (int)Math.Ceiling(tobj.ImageData.Width / Math.Pow(2, customPaintTrackBar1.Value)),
                         (int)Math.Ceiling(tobj.ImageData.Height / Math.Pow(2, customPaintTrackBar1.Value)));
                 }
                 else
                 {
-                    return TOBJConverter.ToBitmap(tobj);
+                    return tobj.ToImage().ToBitmap();
                 }
             }
             else
             if (_node.Accessor is SBM_MemCardBanner banner)
             {
                 var decoded = GXImageConverter.DecodeTPL(GXTexFmt.RGB5A3, 96, 32, banner._s.GetData(), 0);
-                return BitmapTools.BGRAToBitmap(decoded, 96, 32);
+                return BGRAToBitmap(decoded, 96, 32);
             }
             else
             if (_node.Accessor is SBM_MemCardIcon icon)
             {
                 var desc = icon._s.GetData();
                 var decoded = GXImageConverter.DecodeTPL(GXTexFmt.CI8, 32, 32, desc, GXTlutFmt.RGB5A3, 256, icon._s.GetBytes(0x400, 256 * 2), 0);
-                return BitmapTools.BGRAToBitmap(decoded, 32, 32);
+                return BGRAToBitmap(decoded, 32, 32);
             }
 
             return null;
+        }
+
+        public static Bitmap BGRAToBitmap(byte[] data, int width, int height)
+        {
+            if (width == 0) width = 1;
+            if (height == 0) height = 1;
+
+            Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            try
+            {
+                BitmapData bmpData = bmp.LockBits(
+                                     new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
+                                     ImageLockMode.WriteOnly, bmp.PixelFormat);
+
+                Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+                bmp.UnlockBits(bmpData);
+            }
+            catch { bmp.Dispose(); throw; }
+
+            return bmp;
         }
 
         /// <summary>
@@ -94,9 +117,9 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="bmp"></param>
         /// <param name="fmt"></param>
         /// <param name="pal"></param>
-        public void SetImage(Bitmap bmp, GXTexFmt fmt, GXTlutFmt pal)
+        public void SetImage(Image<Bgra32> bmp, GXTexFmt fmt, GXTlutFmt pal)
         {
-            var brga = bmp.GetBGRAData();
+            var brga = bmp.ToTObj(fmt, pal).GetDecodedImageData();
 
             if (_node.Accessor is HSD_TOBJ tobj)
             {
@@ -180,7 +203,7 @@ namespace HSDRawViewer.GUI.Plugins
                 {
                     if(d.ShowDialog() == DialogResult.OK)
                     {
-                        using (var bmp = new Bitmap(import))
+                        using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
                         {
                             d.ApplySettings(bmp);
                             SetImage(bmp, d.TextureFormat, d.PaletteFormat);

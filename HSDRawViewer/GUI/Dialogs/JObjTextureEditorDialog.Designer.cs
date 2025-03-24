@@ -28,133 +28,156 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.textureArrayEditor = new HSDRawViewer.GUI.ArrayMemberEditor();
-            this.toolStrip4 = new System.Windows.Forms.ToolStrip();
-            this.exporttoolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.replaceTextureButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.splitter1 = new System.Windows.Forms.Splitter();
-            this.groupBox1.SuspendLayout();
-            this.toolStrip4.SuspendLayout();
-            this.SuspendLayout();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(JObjTextureEditorDialog));
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+            textureArrayEditor = new ArrayMemberEditor();
+            toolStrip4 = new System.Windows.Forms.ToolStrip();
+            exporttoolStripButton = new System.Windows.Forms.ToolStripButton();
+            replaceTextureButton = new System.Windows.Forms.ToolStripButton();
+            toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            splitter1 = new System.Windows.Forms.Splitter();
+            pictureBox1 = new System.Windows.Forms.PictureBox();
+            groupBox1.SuspendLayout();
+            toolStrip4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            SuspendLayout();
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.propertyGrid1);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBox1.Location = new System.Drawing.Point(471, 27);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox1.Size = new System.Drawing.Size(329, 423);
-            this.groupBox1.TabIndex = 6;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Parameters";
+            groupBox1.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            groupBox1.Controls.Add(propertyGrid1);
+            groupBox1.Location = new System.Drawing.Point(549, 329);
+            groupBox1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            groupBox1.Size = new System.Drawing.Size(351, 268);
+            groupBox1.TabIndex = 6;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Parameters";
             // 
             // propertyGrid1
             // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.HelpVisible = false;
-            this.propertyGrid1.Location = new System.Drawing.Point(4, 19);
-            this.propertyGrid1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyGrid1.Size = new System.Drawing.Size(321, 401);
-            this.propertyGrid1.TabIndex = 1;
-            this.propertyGrid1.ToolbarVisible = false;
+            propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            propertyGrid1.HelpVisible = false;
+            propertyGrid1.Location = new System.Drawing.Point(5, 24);
+            propertyGrid1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            propertyGrid1.Name = "propertyGrid1";
+            propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            propertyGrid1.Size = new System.Drawing.Size(341, 240);
+            propertyGrid1.TabIndex = 1;
+            propertyGrid1.ToolbarVisible = false;
             // 
             // textureArrayEditor
             // 
-            this.textureArrayEditor.AllowDrop = true;
-            this.textureArrayEditor.DisplayItemImages = true;
-            this.textureArrayEditor.DisplayItemIndices = true;
-            this.textureArrayEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textureArrayEditor.EnablePropertyView = false;
-            this.textureArrayEditor.EnablePropertyViewDescription = false;
-            this.textureArrayEditor.EnableToolStrip = false;
-            this.textureArrayEditor.ImageHeight = ((ushort)(64));
-            this.textureArrayEditor.ImageWidth = ((ushort)(64));
-            this.textureArrayEditor.InsertCloneAfterSelected = false;
-            this.textureArrayEditor.ItemHeight = 64;
-            this.textureArrayEditor.ItemIndexOffset = 0;
-            this.textureArrayEditor.Location = new System.Drawing.Point(0, 27);
-            this.textureArrayEditor.Margin = new System.Windows.Forms.Padding(5);
-            this.textureArrayEditor.Name = "textureArrayEditor";
-            this.textureArrayEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
-            this.textureArrayEditor.Size = new System.Drawing.Size(471, 423);
-            this.textureArrayEditor.TabIndex = 4;
-            this.textureArrayEditor.SelectedObjectChanged += new System.EventHandler(this.textureArrayEditor_SelectedObjectChanged);
-            this.textureArrayEditor.DragDrop += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragDrop);
-            this.textureArrayEditor.DragEnter += new System.Windows.Forms.DragEventHandler(this.textureArrayEditor_DragEnter);
+            textureArrayEditor.AllowDrop = true;
+            textureArrayEditor.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            textureArrayEditor.DisplayItemImages = true;
+            textureArrayEditor.DisplayItemIndices = true;
+            textureArrayEditor.EnablePropertyView = false;
+            textureArrayEditor.EnablePropertyViewDescription = false;
+            textureArrayEditor.EnableToolStrip = false;
+            textureArrayEditor.ImageHeight = (ushort)64;
+            textureArrayEditor.ImageWidth = (ushort)64;
+            textureArrayEditor.InsertCloneAfterSelected = false;
+            textureArrayEditor.ItemHeight = 64;
+            textureArrayEditor.ItemIndexOffset = 0;
+            textureArrayEditor.Location = new System.Drawing.Point(0, 27);
+            textureArrayEditor.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            textureArrayEditor.Name = "textureArrayEditor";
+            textureArrayEditor.SelectionMode = System.Windows.Forms.SelectionMode.One;
+            textureArrayEditor.Size = new System.Drawing.Size(538, 573);
+            textureArrayEditor.TabIndex = 4;
+            textureArrayEditor.SelectedObjectChanged += textureArrayEditor_SelectedObjectChanged;
+            textureArrayEditor.DragDrop += textureArrayEditor_DragDrop;
+            textureArrayEditor.DragEnter += textureArrayEditor_DragEnter;
             // 
             // toolStrip4
             // 
-            this.toolStrip4.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exporttoolStripButton,
-            this.replaceTextureButton,
-            this.toolStripButton1});
-            this.toolStrip4.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip4.Name = "toolStrip4";
-            this.toolStrip4.Size = new System.Drawing.Size(800, 27);
-            this.toolStrip4.TabIndex = 5;
-            this.toolStrip4.Text = "toolStrip4";
+            toolStrip4.ImageScalingSize = new System.Drawing.Size(20, 20);
+            toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { exporttoolStripButton, replaceTextureButton, toolStripButton1, toolStripButton2 });
+            toolStrip4.Location = new System.Drawing.Point(0, 0);
+            toolStrip4.Name = "toolStrip4";
+            toolStrip4.Size = new System.Drawing.Size(914, 27);
+            toolStrip4.TabIndex = 5;
+            toolStrip4.Text = "toolStrip4";
             // 
             // exporttoolStripButton
             // 
-            this.exporttoolStripButton.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
-            this.exporttoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exporttoolStripButton.Name = "exporttoolStripButton";
-            this.exporttoolStripButton.Size = new System.Drawing.Size(106, 24);
-            this.exporttoolStripButton.Text = "Export Texture";
-            this.exporttoolStripButton.Click += new System.EventHandler(this.exporttoolStripButton_Click);
+            exporttoolStripButton.Image = Properties.Resources.ts_exportfile;
+            exporttoolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            exporttoolStripButton.Name = "exporttoolStripButton";
+            exporttoolStripButton.Size = new System.Drawing.Size(128, 24);
+            exporttoolStripButton.Text = "Export Texture";
+            exporttoolStripButton.Click += exporttoolStripButton_Click;
             // 
             // replaceTextureButton
             // 
-            this.replaceTextureButton.Image = global::HSDRawViewer.Properties.Resources.ico_replace;
-            this.replaceTextureButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.replaceTextureButton.Name = "replaceTextureButton";
-            this.replaceTextureButton.Size = new System.Drawing.Size(113, 24);
-            this.replaceTextureButton.Text = "Replace Texture";
-            this.replaceTextureButton.Click += new System.EventHandler(this.replaceTextureButton_Click);
+            replaceTextureButton.Image = Properties.Resources.ico_replace;
+            replaceTextureButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            replaceTextureButton.Name = "replaceTextureButton";
+            replaceTextureButton.Size = new System.Drawing.Size(138, 24);
+            replaceTextureButton.Text = "Replace Texture";
+            replaceTextureButton.Click += replaceTextureButton_Click;
             // 
             // toolStripButton1
             // 
-            this.toolStripButton1.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(128, 24);
-            this.toolStripButton1.Text = "Export All Textures";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            toolStripButton1.Image = Properties.Resources.ts_exportfile;
+            toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new System.Drawing.Size(156, 24);
+            toolStripButton1.Text = "Export All Textures";
+            toolStripButton1.Click += toolStripButton1_Click;
+            // 
+            // toolStripButton2
+            // 
+            toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripButton2.Image = (System.Drawing.Image)resources.GetObject("toolStripButton2.Image");
+            toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton2.Name = "toolStripButton2";
+            toolStripButton2.Size = new System.Drawing.Size(91, 24);
+            toolStripButton2.Text = "Edit Texture";
+            toolStripButton2.Click += toolStripButton2_Click;
             // 
             // splitter1
             // 
-            this.splitter1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.splitter1.Location = new System.Drawing.Point(468, 27);
-            this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 423);
-            this.splitter1.TabIndex = 7;
-            this.splitter1.TabStop = false;
+            splitter1.Dock = System.Windows.Forms.DockStyle.Right;
+            splitter1.Location = new System.Drawing.Point(911, 27);
+            splitter1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            splitter1.Name = "splitter1";
+            splitter1.Size = new System.Drawing.Size(3, 573);
+            splitter1.TabIndex = 7;
+            splitter1.TabStop = false;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            pictureBox1.Location = new System.Drawing.Point(547, 30);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new System.Drawing.Size(355, 292);
+            pictureBox1.TabIndex = 8;
+            pictureBox1.TabStop = false;
             // 
             // JObjTextureEditorDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.splitter1);
-            this.Controls.Add(this.textureArrayEditor);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.toolStrip4);
-            this.Name = "JObjTextureEditorDialog";
-            this.Text = "JObjTextureEditor";
-            this.groupBox1.ResumeLayout(false);
-            this.toolStrip4.ResumeLayout(false);
-            this.toolStrip4.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(914, 600);
+            Controls.Add(pictureBox1);
+            Controls.Add(splitter1);
+            Controls.Add(textureArrayEditor);
+            Controls.Add(groupBox1);
+            Controls.Add(toolStrip4);
+            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Name = "JObjTextureEditorDialog";
+            Text = "JObjTextureEditor";
+            groupBox1.ResumeLayout(false);
+            toolStrip4.ResumeLayout(false);
+            toolStrip4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -167,5 +190,7 @@
         private System.Windows.Forms.ToolStripButton replaceTextureButton;
         private System.Windows.Forms.Splitter splitter1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }

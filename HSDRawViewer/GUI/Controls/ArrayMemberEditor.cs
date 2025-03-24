@@ -637,7 +637,7 @@ namespace HSDRawViewer.GUI
         public Image ToImage()
         {
             if (TOBJ != null)
-                return Converters.TOBJConverter.ToBitmap(TOBJ);
+                return TOBJ.ToImage().ToBitmap();
             return null;
         }
 

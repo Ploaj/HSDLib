@@ -4,10 +4,13 @@ using HSDRaw.GX;
 using HSDRawViewer.Converters;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Tools;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using SixLabors.ImageSharp.Processing;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -56,6 +59,26 @@ namespace HSDRawViewer.GUI.Extra
                         return 0;
 
                     return tobjs[0].ImageData.Height;
+                }
+            }
+
+            public System.Drawing.Color Color
+            {
+                get
+                {
+                    using (var img = GetTObj().ToImage())
+                    {
+                        var color = img.GetSolidColor();
+                        if (color != null)
+                        {
+                            return System.Drawing.Color.FromArgb(
+                                ((color.Value.A & 0xFF) << 24) |
+                                ((color.Value.R & 0xFF) << 16) |
+                                ((color.Value.G & 0xFF) << 8) |
+                                ((color.Value.B & 0xFF)));
+                        }
+                    }
+                    return System.Drawing.Color.Black;
                 }
             }
 
@@ -120,20 +143,20 @@ namespace HSDRawViewer.GUI.Extra
             public void Export()
             {
                 if (tobjs.Count > 0)
-                    tobjs[0].ExportTOBJToFile();
+                    tobjs[0].SaveImagePNG();
             }
 
             public void Export(string file_path)
             {
                 if (tobjs.Count > 0)
-                    using (var bmp = tobjs[0].ToBitmap())
+                    using (var bmp = tobjs[0].ToImage())
                         bmp.Save(file_path);
             }
 
-            public Image ToImage()
+            public System.Drawing.Image ToImage()
             {
                 if (tobjs.Count > 0)
-                    return TOBJConverter.ToBitmap(tobjs[0]);
+                    return tobjs[0].ToImage().ToBitmap();
                 return null;
             }
 
@@ -219,7 +242,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
             {
-                if (!TOBJConverter.FormatFromString(f, out GXTexFmt imgFormat, out GXTlutFmt palFormat))
+                if (!TOBJExtentions.FormatFromString(f, out GXTexFmt imgFormat, out GXTlutFmt palFormat))
                 {
                     using (var teximport = new TextureImportDialog())
                         if (teximport.ShowDialog() == DialogResult.OK)
@@ -231,7 +254,7 @@ namespace HSDRawViewer.GUI.Extra
                             return;
                 }
 
-                proxy.Replace(TOBJConverter.ImportTOBJFromFile(f, imgFormat, palFormat));
+                proxy.Replace(TOBJExtentions.ImportTObjFromFile(f, imgFormat, palFormat));
                 textureArrayEditor.Invalidate();
                 textureArrayEditor.Update();
             }
@@ -297,6 +320,18 @@ namespace HSDRawViewer.GUI.Extra
         private void textureArrayEditor_SelectedObjectChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = textureArrayEditor.SelectedObject;
+
+            if (pictureBox1.Image != null)
+                pictureBox1.Image.Dispose();
+
+            if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
+            {
+                pictureBox1.Image = proxy.ToImage();
+            }
+            else
+            {
+                pictureBox1.Image = null;
+            }
         }
 
         /// <summary>
@@ -313,7 +348,57 @@ namespace HSDRawViewer.GUI.Extra
                 int ti = 0;
                 foreach (var proxy in TextureLists)
                 {
-                    proxy.Export(path + $"\\{TOBJConverter.FormatName($"Texture_{ti++}_", proxy.GetTObj())}.png");
+                    proxy.Export(path + $"\\{proxy.GetTObj().FormatName($"Texture_{ti++}_")}.png");
+                }
+            }
+        }
+
+        public class EditTextureSettings
+        {
+            public int Width { get; set; }
+
+            public int Height { get; set; }
+
+            public GXTexFmt TextureFormat { get; set; }
+
+            public GXTlutFmt PaletteFormat { get; set; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
+            {
+                var settings = new EditTextureSettings()
+                {
+                    Width = proxy.Width,
+                    Height = proxy.Height,
+                    TextureFormat = proxy.ImageFormat,
+                    PaletteFormat = proxy.PaletteFormat,
+                };
+
+                using (PropertyDialog d = new PropertyDialog("Edit Texture", settings))
+                {
+                    if (settings.Width < 4)
+                        settings.Width = 4;
+
+                    if (settings.Height < 4)
+                        settings.Height = 4;
+
+                    if (d.ShowDialog() == DialogResult.OK)
+                    {
+                        using (Image<Bgra32> img = proxy.GetTObj().ToImage())
+                        {
+                            img.Mutate(x => x.Resize(settings.Width, settings.Height));
+                            proxy.Replace(img.ToTObj(settings.TextureFormat, settings.PaletteFormat));
+                            textureArrayEditor.Invalidate();
+                            textureArrayEditor.Update();
+                        }
+                    }
                 }
             }
         }

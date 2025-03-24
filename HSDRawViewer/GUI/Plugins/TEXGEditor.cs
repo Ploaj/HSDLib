@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -72,7 +73,7 @@ namespace HSDRawViewer.GUI.Plugins
             }
 
             if (arrayMemberEditor1.SelectedObject is TOBJProxy proxy)
-                texturePanel1.Image = Converters.TOBJConverter.ToBitmap(proxy.TOBJ);
+                texturePanel1.Image = proxy.TOBJ.ToImage().ToBitmap();
         }
 
         /// <summary>
@@ -107,8 +108,9 @@ namespace HSDRawViewer.GUI.Plugins
                 var export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
 
                 if (export != null)
-                    using (var bmp = Converters.TOBJConverter.ToBitmap(proxy.TOBJ))
-                        bmp.Save(export);
+                {
+                    proxy.TOBJ.SaveImagePNG();
+                }
             }
         }
 
@@ -131,7 +133,7 @@ namespace HSDRawViewer.GUI.Plugins
                     int index = 0;
                     foreach(var v in Images)
                     {
-                        using (var bmp = Converters.TOBJConverter.ToBitmap(v.TOBJ))
+                        using (var bmp = v.ToImage())
                             bmp.Save($"{path}/{fname}_{index.ToString("D2")}{extension}");
                         index++;
                     }
@@ -175,7 +177,7 @@ namespace HSDRawViewer.GUI.Plugins
                     }
 
                     foreach (var import in imports)
-                        using (var bmp = new Bitmap(import))
+                        using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
                         {
                             if(width == -1 || height == -1)
                             {
@@ -189,7 +191,7 @@ namespace HSDRawViewer.GUI.Plugins
                                 continue;
                             }
 
-                            arrayMemberEditor1.AddItem(new TOBJProxy() { TOBJ = Converters.TOBJConverter.BitmapToTOBJ(bmp, texFmt, palFmt) });
+                            arrayMemberEditor1.AddItem(new TOBJProxy() { TOBJ = bmp.ToTObj(texFmt, palFmt) });
                         }
 
                     SaveTextures();
@@ -213,8 +215,8 @@ namespace HSDRawViewer.GUI.Plugins
                     var texFmt = _texGraphic.ImageFormat;
                     var palFmt = _texGraphic.PaletteFormat;
 
-                    using (var bmp = new Bitmap(import))
-                        proxy.TOBJ.EncodeImageData(bmp.GetBGRAData(), _texGraphic.Width, _texGraphic.Height, texFmt, palFmt);
+                    using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
+                        proxy.TOBJ.EncodeImageData(bmp.ToTObj(texFmt, palFmt).GetDecodedImageData(), _texGraphic.Width, _texGraphic.Height, texFmt, palFmt);
 
                     SaveTextures();
                 }
