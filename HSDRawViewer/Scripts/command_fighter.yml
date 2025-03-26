@@ -409,11 +409,8 @@
 - code: 35
   name: Held Item Invisibility
   parameters:
-  - name: Unknown
-    bitCount: 25
-    hex: true
   - name: Flag
-    bitCount: 1
+    bitCount: 26
 
 - code: 36
   name: Body Article Invisibility

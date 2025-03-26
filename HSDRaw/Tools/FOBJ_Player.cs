@@ -373,34 +373,38 @@ namespace HSDRaw.Tools
 
             Keys = newkeys;
         }
-
         /// <summary>
         /// 
         /// </summary>
-        public void EulerFilter()
+        public void AxisFilter()
         {
-            // only apply to rotation tracks
-            if (JointTrackType != JointTrackType.HSD_A_J_ROTX &&
-                JointTrackType != JointTrackType.HSD_A_J_ROTY &&
-                JointTrackType != JointTrackType.HSD_A_J_ROTZ)
-            {
-                return;
-            }
+            var pi = (float)Math.PI;
+            var twopi = (float)Math.PI * 2;
 
-            // fix continuity errors
-            for (int i = 1; i < Keys.Count; i++)
-            {
-                var prevKey = Keys[i - 1];
-                var key = Keys[i];
+            var k = new List<FOBJKey>();
+            var prev = GetValue(0);
+            k.Add(new FOBJKey() { Frame = 0, Value = prev, InterpolationType = GXInterpolationType.HSD_A_OP_LIN});
 
-                if (Math.Abs(prevKey.Value - key.Value) > Math.PI)
+            for (int i = 1; i <= FrameCount; i++)
+            {
+                var v = GetValue(i);
+                var delta = v - prev;
+
+                while (delta > pi)
                 {
-                    if (prevKey.Value < key.Value)
-                        key.Value -= (float)(2 * Math.PI);
-                    else
-                        key.Value += (float)(2 * Math.PI);
+                    v -= twopi;
+                    delta -= twopi;
                 }
+                while (delta < -pi)
+                {
+                    v += twopi;
+                    delta += twopi;
+                }
+                k.Add(new FOBJKey() { Frame = i, Value = v, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+                prev = v;
             }
+
+            Keys = k;
         }
     }
     

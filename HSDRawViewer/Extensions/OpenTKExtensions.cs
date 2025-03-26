@@ -1,4 +1,5 @@
-﻿using HSDRaw.Common;
+﻿using CSCore.Streams.SampleConverter;
+using HSDRaw.Common;
 using OpenTK.Mathematics;
 using System;
 
@@ -94,8 +95,26 @@ namespace HSDRawViewer
 
             return quat;
         }
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static Vector4 ToVector4(this Quaternion q)
+        {
+            return new Vector4(q.X, q.Y, q.Z, q.W);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static double Dot(this Quaternion q1, Quaternion q2)
+        {
+            return Vector4.Dot(q1.ToVector4(), q2.ToVector4());
+        }
         /// <summary>
         /// 
         /// </summary>

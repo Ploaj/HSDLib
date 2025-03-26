@@ -19,6 +19,8 @@ namespace HSDRawViewer.GUI.Extra
         {
             //public bool BakeAnimation = true;
             public float ErrorMargin { get; set; } = 0.001f;
+
+            public bool ApplyDiscontinuityFilter { get; set; } = true;
         }
 
         private static OptimizeSettings _settings = new OptimizeSettings();
@@ -41,19 +43,23 @@ namespace HSDRawViewer.GUI.Extra
                 if (AnimNode == null || JOBJ == null)
                     return;
 
+                if (settings.ApplyDiscontinuityFilter)
+                    EulerFilter();
+
                 AnimationKeyCompressor.OptimizeJointTracks(JOBJ, ref AnimNode.Tracks, settings.ErrorMargin);
 
                 if (optimizeChildren)
                     foreach (JointNode child in Nodes)
                         child.Optimize(settings, optimizeChildren);
             }
-
+            /// <summary>
+            /// 
+            /// </summary>
             public void EulerFilter()
             {
                 if (AnimNode == null || JOBJ == null)
                     return;
 
-                // Tools.KeyFilters.EulerFilter.Filter(AnimNode.Tracks);
                 Tools.KeyFilters.DiscontinuityFilter.Filter(AnimNode.Tracks);
 
                 foreach (JointNode child in Nodes)
@@ -144,7 +150,6 @@ namespace HSDRawViewer.GUI.Extra
             if (jointTree.SelectedNode is JointNode node)
                 graphEditor1.LoadTracks(AnimType.Joint, node.AnimNode.Tracks);
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -158,23 +163,8 @@ namespace HSDRawViewer.GUI.Extra
                     foreach (JointNode node in jointTree.Nodes)
                     {
                         node.Optimize(_settings);
+                        MadeChanges = true;
                     }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void applyEulerFilterToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Apply Euler Filter to all rotation tracks?", "Apply Euler Filter", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                foreach (JointNode node in jointTree.Nodes)
-                {
-                    node.EulerFilter();
-                }
             }
         }
     }
