@@ -662,7 +662,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     Camera = _viewport.glViewport.Camera,
                     Settings = RenderJObj._settings,
                     Animation = ToJointAnim(),
-                    HiddenNodes = _meshList.EnumerateDObjs.Select((i, e) => new { index = e, visible = i.Visible }).Where(e => !e.visible).Select(e=>e.index).ToArray(),
+                    HiddenNodes = _meshList.EnumerateDObjs.Select((i, e) => new { index = e, visible = i.Visible }).Where(e => !e.visible).Select(e => e.index).ToArray(),
                 };
                 settings.Serialize(f);
             }
@@ -941,7 +941,19 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (callback != null)
                 _viewport.glViewport.ScreenshotTaken += callback;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private static JointMap OpenJointMap(string fname)
+        {
+            var path = FileIO.OpenFile(JointMap.FileFilter, fname);
+            if (path != null)
+            {
+                return new JointMap(path);
+            }
+            return null;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -949,40 +961,41 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importAndRemapToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JointMap from = null;
-            JointMap to = null;
-
-            if (to == null)
-            {
-                var path = FileIO.OpenFile(JointMap.FileFilter, "to.ini");
-                if (path != null)
-                {
-                    to = new JointMap(path);
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            if (from == null)
-            {
-                var path = FileIO.OpenFile(JointMap.FileFilter, "from.ini");
-                if (path != null)
-                {
-                    from = new JointMap(path);
-                }
-                else
-                {
-                    return;
-                }
-            }
+            JointMap to = OpenJointMap("to.ini");
+            if (to == null) return;
+            JointMap from = OpenJointMap("from.ini");
+            if (to == null) return;
 
             var anim = JointAnimManager.LoadFromFile(to);
-
             if (anim != null)
             {
                 anim = AnimationRemap.Remap(anim, from, to);
+                LoadAnimation(anim);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void importAndRemap2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            JointMap to = OpenJointMap("to.ini");
+            if (to == null) return;
+            JointMap from = OpenJointMap("from.ini");
+            if (to == null) return;
+            var model_path = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "model.dat");
+            if (model_path == null)
+                return;
+            HSD_JOBJ model = new HSDRaw.HSDRawFile(model_path).Roots[0].Data as HSD_JOBJ;
+            if (model == null)
+                return;
+
+            var target = RenderJObj.RootJObj.Desc;
+            var anim = JointAnimManager.LoadFromFile(to);
+            if (anim != null)
+            {
+                anim = AnimationRemap.Remap(anim, from, to, model.TreeList, target.TreeList);
                 LoadAnimation(anim);
             }
         }

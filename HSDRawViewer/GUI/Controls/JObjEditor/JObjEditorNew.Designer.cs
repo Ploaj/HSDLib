@@ -65,6 +65,7 @@
             renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             viewModeBox = new System.Windows.Forms.ToolStripComboBox();
+            importAndRemap2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -133,7 +134,7 @@
             // toolStripDropDownButton1
             // 
             toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importToolStripMenuItem1, toolStripMenuItem1, saveToolStripMenuItem, toolStripSeparator9, importAndRemapToolStripMenuItem, toolStripSeparator1, createToolStripMenuItem, clearToolStripMenuItem, toolStripSeparator7, compressAllTracksToolStripMenuItem, fSMApplyToolStripMenuItem, applyEulerFilterToolStripMenuItem });
+            toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importToolStripMenuItem1, toolStripMenuItem1, saveToolStripMenuItem, toolStripSeparator9, importAndRemapToolStripMenuItem, importAndRemap2ToolStripMenuItem, toolStripSeparator1, createToolStripMenuItem, clearToolStripMenuItem, toolStripSeparator7, compressAllTracksToolStripMenuItem, fSMApplyToolStripMenuItem, applyEulerFilterToolStripMenuItem });
             toolStripDropDownButton1.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton1.Image");
             toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
@@ -326,6 +327,13 @@
             viewModeBox.Size = new System.Drawing.Size(159, 28);
             viewModeBox.SelectedIndexChanged += viewModeBox_SelectedIndexChanged;
             // 
+            // importAndRemap2ToolStripMenuItem
+            // 
+            importAndRemap2ToolStripMenuItem.Name = "importAndRemap2ToolStripMenuItem";
+            importAndRemap2ToolStripMenuItem.Size = new System.Drawing.Size(289, 26);
+            importAndRemap2ToolStripMenuItem.Text = "Import and Remap (Alt)";
+            importAndRemap2ToolStripMenuItem.Click += importAndRemap2ToolStripMenuItem_Click;
+            // 
             // JObjEditorNew
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -379,5 +387,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem applyEulerFilterToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importAndRemap2ToolStripMenuItem;
     }
 }
