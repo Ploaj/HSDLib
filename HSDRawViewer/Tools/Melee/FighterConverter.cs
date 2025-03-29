@@ -125,7 +125,7 @@ namespace HSDRawViewer.Tools.Melee
             foreach (var n in anim.Nodes)
             {
                 DiscontinuityFilter.Filter(n.Tracks);
-                EulerFilter.Filter(n.Tracks);
+                //EulerFilter.Filter(n.Tracks);
             }
 
             // apply appends

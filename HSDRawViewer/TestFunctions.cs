@@ -230,7 +230,7 @@ namespace HSDRawViewer
         }
 
         public delegate void EditSubaction(SBM_FighterAction action);
-        public delegate void EditAnimation(HSD_FigaTree ft, string name);
+        public delegate bool EditAnimation(HSD_FigaTree ft, string name);
 
         /// <summary>
         /// 
@@ -252,7 +252,8 @@ namespace HSDRawViewer
                 if (ftFile[symbol] != null)
                 {
                     var ft = ftFile[symbol].Data as HSD_FigaTree;
-                    editAnim(ft, symbol);
+                    if (!editAnim(ft, symbol))
+                        continue;
                     ftFile[symbol].Data = ft;
 
                     using (MemoryStream stream = new MemoryStream())
@@ -464,6 +465,41 @@ namespace HSDRawViewer
                     System.Diagnostics.Debug.WriteLine($"\t{list[i].Flags}");
                 }
             }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datFile"></param>
+        /// <param name="ajFile"></param>
+        public static void FigtherApplyDiscontinuityFilterToAllAnimations(string datFile, string ajFile)
+        {
+            List<string> filter = new List<string>();
+            EditFighterAnimations(
+                datFile,
+                ajFile,
+                (tree, symbol) =>
+                {
+                    bool filtered = false;
+                    var nodes = tree.Nodes;
+                    foreach (var c in nodes)
+                    {
+                        var tracks = c.Tracks.Select(e => new FOBJ_Player(e.TrackType, e.GetKeys())).ToList();
+                        if (Tools.KeyFilters.DiscontinuityFilter.Filter(tracks))
+                        {
+                            filtered = true;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                        c.Tracks = tracks.Select(e => new HSD_Track(e.ToFobj())).ToList();
+                    }
+                    tree.Nodes = nodes;
+                    if (filtered)
+                        filter.Add(symbol);
+                    return filtered;
+                });
+            System.Diagnostics.Debug.WriteLine(string.Join("\n", filter));
         }
     }
 }

@@ -868,6 +868,7 @@ namespace HSDRaw
                 x => x.StartsWith("sss_pages") ?  new AK_StagePages() : null,
                 x => x.EndsWith("bitfont") ?  new AK_BitFont() : null,
                 x => x.EndsWith("_shape") ?  new AK_Shape() : null,
+                x => x.EndsWith("Color") ?  new HSDColorArray() : null,
                 x => new HSDAccessor(),
         };
 
