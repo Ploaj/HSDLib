@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -21,6 +22,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         [Browsable(false)]
         public uint Flags { get => _action.Flags; set => _action.Flags = value; }
+
+        [Browsable(false)]
+        public HSD_FigaTree Animation { get => _action.Animation; set => _action.Animation = value; }
 
         private string DisplayText
         {

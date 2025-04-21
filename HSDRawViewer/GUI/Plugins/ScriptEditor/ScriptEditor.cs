@@ -13,14 +13,18 @@ using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Tools;
-using Microsoft.VisualBasic.Logging;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using IONET.Collada.FX.Rendering;
+using System.Speech.Synthesis.TtsEngine;
+using System.ComponentModel;
+using HSDRaw.Common;
+using HSDRaw.MEX.Characters;
 
 namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 {
@@ -112,8 +116,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private ScriptRenderer renderer;
         private GLTextRenderer text = new GLTextRenderer();
 
-        private HSDStruct _selectedAction;
-        private string _selectedActionSymbol;
+        private HSDStruct _selectedAction { get; set; }
+        private string _selectedActionSymbol { get; set; }
+        private HSD_FigaTree _selectedAnimation { get; set; }
         private int _selectStateIndex;
 
         private FighterAJManager AJManager;
@@ -179,12 +184,16 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             _actionList = new ScriptEditorActionList();
             _actionList.Show(dockPanel1, DockState.DockLeft);
 
-            _actionList.SelectAction += (symbol, a, index) =>
+            _actionList.SelectAction += (symbol, a, index, animation) =>
             {
                 // get selected actin
                 _selectedAction = a;
                 _selectedActionSymbol = symbol;
                 _selectStateIndex = index;
+                _selectedAnimation = animation;
+
+                if (_selectedAnimation == null)
+                    _selectedAnimation = GetFigatreeFromSymbol(symbol);
 
                 // get events
                 var events = SubactionEvent.GetEvents(SubactionGroup, a).ToList();
@@ -299,6 +308,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <returns></returns>
         private HSD_FigaTree GetFigatreeFromSymbol(string symbol)
         {
+            if (AJManager == null)
+                return null;
+
             // get animation from file
             var data = AJManager.GetAnimationData(symbol);
             if (data != null)
@@ -344,8 +356,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //
             if (renderer.FighterModel.RootJObj != null)
             {
+                var tree = _selectedAnimation;
+
+                if (tree == null)
+                    tree = GetFigatreeFromSymbol(_selectedActionSymbol);
+
                 // get animation from file
-                var tree = GetFigatreeFromSymbol(_selectedActionSymbol);
                 if (tree != null)
                 {
                     // load as joint animation
@@ -470,19 +486,61 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (_node.Text.Contains("Fighter"))
             {
                 LoadFighterAnimationFiles();
+                LoadAnimation();
             }
             else
             if (_node.Text.Contains("Demo"))
             {
                 LoadDemoAnimationFiles();
+                LoadAnimation();
             }
             else
             {
+                foreach (var s in MainForm.Instance.GetSymbols())
+                {
+                    if (s.StartsWith("ftDataKirbyCopy"))
+                    {
+                        if (LoadKirbyAnimationFiles())
+                        {
+                            LoadAnimation();
+                            return;
+                        }
+                    }
+                }
                 MessageBox.Show("Rendering not available for this node", "Unsupported Rendering", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            LoadAnimation();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        private bool LoadKirbyAnimationFiles()
+        {
+            var kbdtPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKb.dat";
+            var kbnrPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKbNr.dat";
 
+            if (!File.Exists(kbdtPath) || !File.Exists(kbnrPath))
+                return false;
+
+            var kbFile = new HSDRawFile(kbdtPath);
+            if (kbFile.Roots.Count == 0 || kbFile.Roots[0].Data is not SBM_FighterData plDat) return false;
+
+            // load misc
+            renderer.FighterModel.ModelScale = plDat.Attributes.ModelScale;
+            renderer.ShieldSize = plDat.Attributes.ShieldSize;
+            renderer.LookupTable = plDat.ModelLookupTables;
+            renderer.ECB = plDat.EnvironmentCollision;
+
+            if (plDat.Hurtboxes != null)
+                renderer.Hurtboxes.AddRange(plDat.Hurtboxes.Hurtboxes);
+
+            if (plDat.ModelPartAnimations != null)
+                renderer.ModelPartsIndices.AddRange(plDat.ModelPartAnimations.Array.Select(e => new ModelPartAnimations(e)));
+
+            // load model
+            renderer.LoadFighterModel(kbnrPath);
+
+            return true;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -820,7 +878,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 var newPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "_" + _node.Text + ".txt");
                 ExportAsText(newPath);
-            }    
+            }
         }
 
 
@@ -866,6 +924,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             public bool Optimize { get; set; } = true;
 
+            public bool ApplyDiscontinutyFilter { get; set; } = true;
+
             public float OptimizeError { get; set; } = 0.01f;
 
             public float CompressionError { get; set; } = 0.01f;
@@ -879,7 +939,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             if (renderer.FighterModel.RootJObj == null)
                 return;
-            
+
             if (_actionList.SelectedAction != null)
             {
                 var f = FileIO.OpenFile("Supported Formats |*.dat;*.anim");
@@ -897,7 +957,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     {
                         Symbol = _selectedActionSymbol,
                     };
-                    
+
                     using (var prop = new PropertyDialog("Maya Import Settings", settings))
                     {
                         if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(settings.Symbol))
@@ -908,7 +968,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                             var anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
 
                             if (settings.Optimize && renderer.FighterModel != null && renderer.FighterModel.RootJObj != null)
-                                anim.Optimize(renderer.FighterModel.RootJObj.Desc, settings.OptimizeError);
+                                anim.Optimize(renderer.FighterModel.RootJObj.Desc, settings.ApplyDiscontinutyFilter, settings.OptimizeError);
 
                             file = new HSDRawFile();
                             file.Roots.Add(new HSDRootNode()
@@ -933,8 +993,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
 
                 // check if figatree data is found
-                if (file != null && 
-                    file.Roots.Count > 0 && 
+                if (file != null &&
+                    file.Roots.Count > 0 &&
                     file.Roots[0].Data is HSD_FigaTree tree)
                 {
                     //grab symbol
@@ -957,6 +1017,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     // set action symbol
                     _actionList.SelectedAction.Symbol = symbol;
                     _selectedActionSymbol = symbol;
+                    _selectedAnimation = tree;
 
                     // reselect action
                     LoadAnimation();
@@ -1223,6 +1284,104 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             if (f != null)
                 ExportAsText(f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class RebakeAnimationSettings
+        {
+            public bool Optimize { get; set; } = true;
+
+            public bool ApplyDiscontinutyFilter { get; set; } = true;
+
+            public float OptimizeError { get; set; } = 0.01f;
+
+            public float CompressionError { get; set; } = 0.01f;
+
+            public uint TrimStartFrame { get; set; } = 0;
+
+            public uint TrimEndFrame { get; set; } = 0;
+
+            [Description("Desired length to stretch animation to. Use -1 if not desired. This is processed after trim frames.")]
+            public int FitLength { get; set; } = -1;
+        }
+
+        private static RebakeAnimationSettings RebakeSettings = new RebakeAnimationSettings();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editAnimationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
+                return;
+
+            //if (MessageBox.Show("Are you sure you want to rebake?\nThis operation cannot be undone.", "Rebake Animation", 
+            //    MessageBoxButtons.YesNoCancel, 
+            //    MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                RebakeSettings.TrimEndFrame = (uint)renderer.FighterModel.JointAnim.FrameCount;
+                using (var prop = new PropertyDialog("Rebake Options", RebakeSettings))
+                {
+                    if (prop.ShowDialog() == DialogResult.OK)
+                    {
+                        // get animation
+                        JointAnimManager anim = renderer.FighterModel.JointAnim;
+
+                        // bake animation
+                        anim.Bake();
+
+                        // trim frame range
+                        anim.Trim((int)RebakeSettings.TrimStartFrame, (int)RebakeSettings.TrimEndFrame);
+
+                        // fit frame total
+                        if (RebakeSettings.FitLength > 0)
+                        {
+                            anim.ApplyFSMs(new FrameSpeedMultiplier[] {
+                            new FrameSpeedMultiplier()
+                                {
+                                    Frame = 0,
+                                    Rate = (RebakeSettings.TrimEndFrame - RebakeSettings.TrimStartFrame) / (float)RebakeSettings.FitLength
+                                }}, false);
+                        }
+
+                        // optimize
+                        if (RebakeSettings.Optimize)
+                            anim.Optimize(renderer.FighterModel.RootJObj.Desc,
+                                RebakeSettings.ApplyDiscontinutyFilter,
+                                RebakeSettings.OptimizeError);
+
+                        //grab symbol
+                        var figa = anim.ToFigaTree(RebakeSettings.CompressionError);
+                        var file = new HSDRawFile();
+                        file.Roots.Add(new HSDRootNode()
+                        {
+                            Name = _selectedActionSymbol,
+                            Data = figa,
+                        });
+
+                        // set animation data
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            file.Save(stream);
+                            AJManager.SetAnimation(_selectedActionSymbol, stream.ToArray());
+                        }
+
+                        // set action symbol
+                        _selectedAnimation = figa;
+
+                        // reselect action
+                        LoadAnimation();
+
+                        // 
+                        _actionList.Invalidate();
+                    }
+                }
+
+            }
         }
     }
 }

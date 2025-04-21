@@ -11,6 +11,8 @@ using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.Animation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -847,7 +849,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             {
                 foreach (var j in _jointTree.EnumerateJoints())
                     foreach (var i in j.Tracks)
-                        i.ApplyFSMs(mult.Modifiers);
+                        i.ApplyFSMs(mult.Modifiers, true);
 
                 // recalculat frame count
                 EnableAnimation();
@@ -973,6 +975,21 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 LoadAnimation(anim);
             }
         }
+
+        private class ImportRemapSettings
+        {
+            [Editor(typeof(System.Windows.Forms.Design.FileNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public string ToINI { get; set; } = null;
+
+            [Editor(typeof(System.Windows.Forms.Design.FileNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public string FromINI { get; set; } = null;
+
+            [Editor(typeof(System.Windows.Forms.Design.FileNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
+            public string FromDAT { get; set; } = null;
+        }
+
+        private static ImportRemapSettings _importRemapSettings = new ImportRemapSettings();
+
         /// <summary>
         /// 
         /// </summary>
@@ -980,24 +997,38 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importAndRemap2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            JointMap to = OpenJointMap("to.ini");
-            if (to == null) return;
-            JointMap from = OpenJointMap("from.ini");
-            if (to == null) return;
-            var model_path = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "model.dat");
-            if (model_path == null)
-                return;
-            HSD_JOBJ model = new HSDRaw.HSDRawFile(model_path).Roots[0].Data as HSD_JOBJ;
-            if (model == null)
-                return;
-
-            var target = RenderJObj.RootJObj.Desc;
-            var anim = JointAnimManager.LoadFromFile(to);
-            if (anim != null)
+            using (var p = new PropertyDialog("Import and Retarget", _importRemapSettings))
             {
-                anim = AnimationRemap.Remap(anim, from, to, model.TreeList, target.TreeList);
-                LoadAnimation(anim);
+                if (p.ShowDialog() == DialogResult.OK)
+                {
+                    if (string.IsNullOrEmpty(_importRemapSettings.ToINI) ||
+                        !File.Exists(_importRemapSettings.ToINI) || 
+                        string.IsNullOrEmpty(_importRemapSettings.FromINI) ||
+                        !File.Exists(_importRemapSettings.FromINI) || 
+                        string.IsNullOrEmpty(_importRemapSettings.FromDAT) ||
+                        !File.Exists(_importRemapSettings.FromDAT))
+                    {
+                        return;
+                    }
+
+                    JointMap to = new JointMap(_importRemapSettings.ToINI);
+                    JointMap from = new JointMap(_importRemapSettings.FromINI);
+                    HSD_JOBJ model = new HSDRaw.HSDRawFile(_importRemapSettings.FromDAT).Roots[0].Data as HSD_JOBJ;
+                    if (model == null)
+                        return;
+
+                    var target = RenderJObj.RootJObj.Desc;
+                    var anim = JointAnimManager.LoadFromFile(from);
+                    if (anim != null)
+                    {
+                        var livefrom = new LiveJObj(model);
+                        var liveto = new LiveJObj(RenderJObj.RootJObj.Desc);
+                        anim = AnimationRetarget.Retarget(anim, livefrom, liveto, from, to, null);
+                        LoadAnimation(anim);
+                    }
+                }
             }
+
         }
 
         private void applyEulerFilterToolStripMenuItem_Click(object sender, EventArgs e)

@@ -866,7 +866,6 @@ namespace HSDRawViewer
             }
             MessageBox.Show($"Trimmed 0x{trimmed.ToString("X")} bytes", "Trimmed File");
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -879,6 +878,16 @@ namespace HSDRawViewer
                     return d.Accessor;
 
             return null;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public IEnumerable<string> GetSymbols()
+        {
+            foreach (DataNode d in treeView1.Nodes)
+                yield return d.Text;
         }
     }
 }

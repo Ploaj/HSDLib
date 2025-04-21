@@ -91,7 +91,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public SBM_EnvironmentCollision ECB;
 
-        public SBM_PlayerModelLookupTables LookupTable;
+        public SBM_PlayerModelLookupTables LookupTable { get; set; }
 
         public bool RenderFighter { get; set; } = true;
 
@@ -364,7 +364,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="objectid"></param>
         private void SetModelVis(int structid, int objectid)
         {
-            SetModelVis(LookupTable.CostumeVisibilityLookups[0].HighPoly[structid], objectid);
+            if (LookupTable != null)
+                SetModelVis(LookupTable.CostumeVisibilityLookups[0].HighPoly[structid], objectid);
         }
 
         /// <summary>

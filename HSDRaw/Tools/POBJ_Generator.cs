@@ -1,7 +1,6 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,6 +23,10 @@ namespace HSDRaw.Tools
         public GXCompType VertexColorFormat { get; set; } = (GXCompType)GXCompTypeClr.RGB565;
 
         public bool UseTriangleStrips { get; set; } = true;
+
+        public bool RoundWeights { get; set; } = true;
+
+        public float Tolerance { get; set; } = 0.0f;
 
         public GenCullMode CullMode { get; set; } = GenCullMode.Front;
 
@@ -150,7 +153,52 @@ namespace HSDRaw.Tools
             
             return (ushort)index;
         }
-        
+
+        class UnorderedTupleArrayComparer : IEqualityComparer<(int, float)[]>
+        {
+            public bool Equals((int, float)[] x, (int, float)[] y)
+            {
+                return AreArraysEqual(x, y);
+            }
+
+            public int GetHashCode((int, float)[] obj)
+            {
+                return GetUnorderedArrayHashCode(obj);
+            }
+
+            private bool AreArraysEqual((int, float)[] a, (int, float)[] b)
+            {
+                if (a == null || b == null) return a == b;
+                if (a.Length != b.Length) return false;
+
+                // Sort both arrays by their tuple values (Item1 and Item2)
+                var sortedA = a.OrderBy(t => t.Item1).ThenBy(t => t.Item2).ToArray();
+                var sortedB = b.OrderBy(t => t.Item1).ThenBy(t => t.Item2).ToArray();
+
+                // Compare sorted arrays element by element
+                for (int i = 0; i < sortedA.Length; i++)
+                {
+                    if (!sortedA[i].Equals(sortedB[i])) return false;
+                }
+
+                return true;
+            }
+
+            private int GetUnorderedArrayHashCode((int, float)[] arr)
+            {
+                if (arr == null) return 0;
+
+                // Sort and generate the hash code based on sorted tuples
+                var sortedArr = arr.OrderBy(t => t.Item1).ThenBy(t => t.Item2).ToArray();
+                int hash = 0;
+                foreach (var item in sortedArr)
+                {
+                    hash ^= item.Item1.GetHashCode() ^ item.Item2.GetHashCode();
+                }
+                return hash;
+            }
+        }
+
 
         /// <summary>
         /// 
@@ -162,9 +210,6 @@ namespace HSDRaw.Tools
         /// <returns></returns>
         public HSD_POBJ CreatePOBJsFromTriangleList(List<GX_Vertex> triList, GXAttribName[] attributes, List<HSD_JOBJ[]> Bones, List<float[]> Weights)
         {
-            List<HSD_Envelope> weights = new List<HSD_Envelope>();
-            Dictionary<int, int> evToIndex = new Dictionary<int, int>();
-
             if(Bones == null)
             {
                 Bones = new List<HSD_JOBJ[]>();
@@ -178,14 +223,21 @@ namespace HSDRaw.Tools
 
             Dictionary<HSDStruct, int> jobjToIndex = new Dictionary<HSDStruct, int>();
             List<HSD_JOBJ> jobjs = new List<HSD_JOBJ>();
-            foreach(var bone in Bones)
+            List<int[]> BonesI = new List<int[]>();
+            foreach (var bone in Bones)
             {
+                int[] bonei = new int[bone.Length];
+                int i = 0;
                 foreach(var b in bone)
+                {
                     if (!jobjToIndex.ContainsKey(b._s))
                     {
                         jobjToIndex.Add(b._s, jobjs.Count);
                         jobjs.Add(b);
                     }
+                    bonei[i++] = jobjToIndex[b._s];
+                }
+                BonesI.Add(bonei);
             }
 
             // length checking
@@ -193,46 +245,136 @@ namespace HSDRaw.Tools
             {
                 throw new IndexOutOfRangeException("Bone and Weight list must have same count as Triangle List");
             }
-            
-            // create a weight list
-            for(int i = 0; i < triList.Count; i++)
-            {
-                var bone = Bones[i];
-                var weight = Weights[i];
 
-                if (bone.Length != weight.Length)
+            // create a weight list
+            List<int> pmtx = new List<int>();
+            List<HSD_Envelope> weights = new List<HSD_Envelope>();
+            Dictionary<(int, float)[], int> env = new Dictionary<(int, float)[], int>(new UnorderedTupleArrayComparer());
+            for (int i = 0; i < triList.Count; i++)
+            {
+                var w = Weights[i];
+                var b = BonesI[i];
+
+                if (w.Length != b.Length)
                     throw new IndexOutOfRangeException("Bone and Weight must have the same lengths");
 
-                var hash = ((IStructuralEquatable)weight).GetHashCode(EqualityComparer<float>.Default);
+                var a = new (int, float)[w.Length];
+                for (int j = 0; j < w.Length; j++)
+                    a[j] = (b[j], w[j]);
 
-                int[] bonei = new int[bone.Length];
-                for (int j = 0; j < bone.Length; j++)
-                    bonei[j] = jobjToIndex[bone[j]._s];
+                a = a.OrderBy(e => e.Item1).ToArray();
 
-                var hash2 = ((IStructuralEquatable)bonei).GetHashCode(EqualityComparer<int>.Default);
-                hash += hash2;
-                
-                if (!evToIndex.ContainsKey(hash))
+                //if (a.Length > 2)
+                //{
+                //    a = ClampWeight(a.ToList());
+                //    System.Diagnostics.Debug.WriteLine(string.Join(", ", a.Select(e => e.Item1 + "-" + e.Item2)));
+                //}
+
+                // optional round weights
+                if (RoundWeights)
+                    a = RoundWeight(a);
+
+                // optional delta tolerance
+                if (Tolerance != 0.0f)
                 {
-                    evToIndex.Add(hash, weights.Count);
+                    var r = env.Keys.FirstOrDefault(d => IsClose(a, d, Tolerance));
+                    if (r != null)
+                        a = r;
+                }
+
+                // check to create new envelope
+                if (!env.ContainsKey(a))
+                {
+                    env.Add(a, weights.Count);
 
                     HSD_Envelope e = new HSD_Envelope();
-                    for (int j = 0; j < bone.Length; j++)
-                        e.Add(bone[j], weight[j]);
-
+                    for (int j = 0; j < a.Length; j++)
+                        e.Add(jobjs[a[j].Item1], a[j].Item2);
                     weights.Add(e);
                 }
 
                 var v = triList[i];
-                v.PNMTXIDX = (ushort)(evToIndex[hash] * 3);
+                v.PNMTXIDX = (ushort)(env[a] * 3);
                 triList[i] = v;
             }
 
-            //Console.WriteLine("WeightList Created: " + weights.Count + " " + triList.Count);
+            //System.Diagnostics.Debug.WriteLine(string.Join("\n", env.Keys.Select(e=>string.Join(", ", e))));
 
             return CreatePOBJsFromTriangleList(triList, attributes, weights);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private static (int, float)[] RoundWeight((int, float)[] a)
+        {
+            double sum = 0;
+            for (int j = 0; j < a.Length; j++)
+            {
+                if (j == a.Length - 1)
+                {
+                    a[j].Item2 = (float)Math.Round(1 - sum, 2);
+                }
+                else
+                {
+                    a[j].Item2 = (float)Math.Round(a[j].Item2, 2);
+                    sum += a[j].Item2;
+                }
+            }
+            return a;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        private static bool IsClose((int, float)[] a, (int, float)[] b, float tolerance)
+        {
+            if (a.Length != b.Length)
+                return false;
 
+            float error = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i].Item1 != b[i].Item1)
+                    return false;
+
+                error += Math.Abs(a[i].Item2 - b[i].Item2);
+            }
+
+            if (error > tolerance)
+                return false;
+
+            return true;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private static (int, float)[] ClampWeight(List<(int, float)> a)
+        {
+            for (int i = a.Count - 1; i >= 0; i--)
+            {
+                if (a[i].Item2 <= 0.1)
+                {
+                    // remove this weight...
+                    var weight = a[i].Item2;
+                    a.RemoveAt(i); 
+                    
+                    int minIndex = a.Select((value, index) => (value, index))
+                                    .OrderBy(pair => pair.value.Item2)
+                                    .First().index;
+                    a[minIndex] = (a[minIndex].Item1, a[minIndex].Item2 + weight);
+                    break;
+                }
+            }
+
+            return a.ToArray();
+        }
         /// <summary>
         /// 
         /// </summary>

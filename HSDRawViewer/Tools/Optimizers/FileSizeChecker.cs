@@ -75,11 +75,13 @@ namespace HSDRawViewer.Tools.Optimizers
             }
 
             // return size report
-            foreach (var o in plist.OrderByDescending(e => e.FighterTotalSize))
+            foreach (var o in plist.OrderByDescending(e => e.FighterTotalSize + e.AnimationFile))
             {
                 if (o.AnimationFile != 0)
                     yield return $"{o.Id} DataSize: 0x{o.FighterTotalSize.ToString("X8")} " +
                         $"AnimationSize: 0x{o.AnimationFile.ToString("X8")} " +
+                        $"EffectSize: 0x{o.EffectFile.ToString("X8")} " +
+                        $"LargestCostume: 0x{o.LargestCostumeFile.ToString("X8")} " +
                         $"TotalSize: 0x{(o.FighterTotalSize + o.AnimationFile).ToString("X8")} " +
                         $"{(o.FighterTotalSize > 0x000E9350 ? $"FighterData over limit! Reduce by: {(o.FighterTotalSize - 0x000E9350) / 1000}KB" : "")}";
             }

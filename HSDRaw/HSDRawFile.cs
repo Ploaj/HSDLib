@@ -23,6 +23,7 @@ using HSDRaw.AirRide;
 using HSDRaw.Melee.Pl.ftData;
 using HSDRaw.Melee.Ty;
 using HSDRaw.MEX.Akaneia;
+using HSDRaw.MEX.Characters;
 
 namespace HSDRaw
 {
@@ -869,6 +870,7 @@ namespace HSDRaw
                 x => x.EndsWith("bitfont") ?  new AK_BitFont() : null,
                 x => x.EndsWith("_shape") ?  new AK_Shape() : null,
                 x => x.EndsWith("Color") ?  new HSDColorArray() : null,
+                x => x.EndsWith("camera_param") ?  new MEX_ResultCameraParam() : null,
                 x => new HSDAccessor(),
         };
 

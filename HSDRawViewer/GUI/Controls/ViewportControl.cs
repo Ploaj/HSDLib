@@ -15,6 +15,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Gif;
 using System.IO;
+using HSDRaw.Common;
 
 namespace HSDRawViewer.GUI
 {
@@ -895,7 +896,7 @@ namespace HSDRawViewer.GUI
         /// 
         /// </summary>
         /// <param name="hsdCam"></param>
-        public void LoadHSDCamera(HSDRaw.Common.HSD_Camera hsdCam)
+        public void LoadHSDCamera(HSD_Camera hsdCam)
         {
             if (hsdCam.ProjectionType != HSDRaw.Common.CameraProjection.PERSPECTIVE)
                 return;
@@ -904,7 +905,7 @@ namespace HSDRawViewer.GUI
             _camera.RenderHeight = hsdCam.ViewportBottom;
 
             _camera.SetLookAt(new Vector3(hsdCam.eye.V1, hsdCam.eye.V2, hsdCam.eye.V3),
-                new Vector3(hsdCam.target.V1, hsdCam.target.V2, hsdCam.target.V3));
+                              new Vector3(hsdCam.target.V1, hsdCam.target.V2, hsdCam.target.V3));
 
             _camera.FovRadians = hsdCam.FieldOfView;
 

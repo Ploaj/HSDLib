@@ -303,7 +303,7 @@ namespace HSDRaw.Tools
         /// <summary>
         /// Applies frame speed multiplier's to animation
         /// </summary>
-        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> frameSpeedMultiplers)
+        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> frameSpeedMultiplers, bool compress)
         {
             if (Keys.Count <= 1)
                 return;
@@ -347,7 +347,8 @@ namespace HSDRaw.Tools
             Keys = newKeys;
 
             // compress track
-            AnimationKeyCompressor.CompressTrack(this);
+            if (compress)
+                AnimationKeyCompressor.CompressTrack(this);
         }
 
         /// <summary>
@@ -405,6 +406,18 @@ namespace HSDRaw.Tools
             }
 
             Keys = k;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Bake()
+        {
+            var k = new List<FOBJKey>();
+
+            for (int i = 0; i <= FrameCount; i++)
+            {
+                k.Add(new FOBJKey() { Frame = i, Value = GetValue(i), InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+            }
         }
     }
     

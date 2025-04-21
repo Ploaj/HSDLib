@@ -29,336 +29,315 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
-            this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.exportAllAsTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asMayaAnimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.asFigaTreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.applyFSMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.applyFSMToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.fighterModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.itemModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.hitboxesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hurtboxesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.hitboxInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.environmentCollisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.groundedECBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ledgeGrabBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shieldBubbleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.exportTXTOnSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip1.SuspendLayout();
-            this.SuspendLayout();
+            dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+            toolStrip1 = new System.Windows.Forms.ToolStrip();
+            toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            importModelFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            exportAllAsTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            asMayaAnimToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            asFigaTreeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            editAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            applyFSMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            applyFSMToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
+            fighterModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            itemModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            hitboxesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            hurtboxesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            hitboxInterpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            hitboxInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            environmentCollisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            groundedECBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ledgeGrabBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            shieldBubbleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
+            exportTXTOnSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // dockPanel1
             // 
-            this.dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dockPanel1.Location = new System.Drawing.Point(0, 25);
-            this.dockPanel1.Name = "dockPanel1";
-            this.dockPanel1.Size = new System.Drawing.Size(800, 425);
-            this.dockPanel1.TabIndex = 0;
+            dockPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            dockPanel1.Location = new System.Drawing.Point(0, 27);
+            dockPanel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            dockPanel1.Name = "dockPanel1";
+            dockPanel1.Size = new System.Drawing.Size(914, 573);
+            dockPanel1.TabIndex = 0;
             // 
             // toolStrip1
             // 
-            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripDropDownButton2,
-            this.toolStripDropDownButton1,
-            this.toolStripDropDownButton3,
-            this.toolStripDropDownButton4});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(800, 25);
-            this.toolStrip1.TabIndex = 9;
-            this.toolStrip1.Text = "toolStrip1";
+            toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton2, toolStripDropDownButton1, toolStripDropDownButton3, toolStripDropDownButton4 });
+            toolStrip1.Location = new System.Drawing.Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new System.Drawing.Size(914, 27);
+            toolStrip1.TabIndex = 9;
+            toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton2
             // 
-            this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importModelFromFileToolStripMenuItem,
-            this.toolStripSeparator5,
-            this.exportAllAsTextToolStripMenuItem});
-            this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
-            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
-            this.toolStripDropDownButton2.Size = new System.Drawing.Size(38, 22);
-            this.toolStripDropDownButton2.Text = "File";
+            toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importModelFromFileToolStripMenuItem, toolStripSeparator5, exportAllAsTextToolStripMenuItem });
+            toolStripDropDownButton2.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton2.Image");
+            toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            toolStripDropDownButton2.Size = new System.Drawing.Size(46, 24);
+            toolStripDropDownButton2.Text = "File";
             // 
             // importModelFromFileToolStripMenuItem
             // 
-            this.importModelFromFileToolStripMenuItem.Name = "importModelFromFileToolStripMenuItem";
-            this.importModelFromFileToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
-            this.importModelFromFileToolStripMenuItem.Text = "Load Model and Animation";
-            this.importModelFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadModelAndAnimationToolStripMenuItem_Click);
+            importModelFromFileToolStripMenuItem.Name = "importModelFromFileToolStripMenuItem";
+            importModelFromFileToolStripMenuItem.Size = new System.Drawing.Size(274, 26);
+            importModelFromFileToolStripMenuItem.Text = "Load Model and Animation";
+            importModelFromFileToolStripMenuItem.Click += loadModelAndAnimationToolStripMenuItem_Click;
             // 
             // toolStripSeparator5
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(216, 6);
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new System.Drawing.Size(271, 6);
             // 
             // exportAllAsTextToolStripMenuItem
             // 
-            this.exportAllAsTextToolStripMenuItem.Name = "exportAllAsTextToolStripMenuItem";
-            this.exportAllAsTextToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
-            this.exportAllAsTextToolStripMenuItem.Text = "Export All As Text";
-            this.exportAllAsTextToolStripMenuItem.Click += new System.EventHandler(this.exportAllAsTextToolStripMenuItem_Click);
+            exportAllAsTextToolStripMenuItem.Name = "exportAllAsTextToolStripMenuItem";
+            exportAllAsTextToolStripMenuItem.Size = new System.Drawing.Size(274, 26);
+            exportAllAsTextToolStripMenuItem.Text = "Export All As Text";
+            exportAllAsTextToolStripMenuItem.Click += exportAllAsTextToolStripMenuItem_Click;
             // 
             // toolStripDropDownButton1
             // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importToolStripMenuItem,
-            this.exportToolStripMenuItem,
-            this.toolStripSeparator2,
-            this.editToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.applyFSMToolStripMenuItem,
-            this.applyFSMToolStripMenuItem1});
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(76, 22);
-            this.toolStripDropDownButton1.Text = "Animation";
+            toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importToolStripMenuItem, exportToolStripMenuItem, toolStripSeparator2, editToolStripMenuItem, editAnimationToolStripMenuItem, toolStripSeparator1, applyFSMToolStripMenuItem, applyFSMToolStripMenuItem1 });
+            toolStripDropDownButton1.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton1.Image");
+            toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            toolStripDropDownButton1.Size = new System.Drawing.Size(92, 24);
+            toolStripDropDownButton1.Text = "Animation";
             // 
             // importToolStripMenuItem
             // 
-            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
-            this.importToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
-            this.importToolStripMenuItem.Text = "Import";
-            this.importToolStripMenuItem.Click += new System.EventHandler(this.importToolStripMenuItem_Click);
+            importToolStripMenuItem.Name = "importToolStripMenuItem";
+            importToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            importToolStripMenuItem.Text = "Import";
+            importToolStripMenuItem.Click += importToolStripMenuItem_Click;
             // 
             // exportToolStripMenuItem
             // 
-            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.asMayaAnimToolStripMenuItem,
-            this.asFigaTreeToolStripMenuItem});
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
-            this.exportToolStripMenuItem.Text = "Export";
+            exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { asMayaAnimToolStripMenuItem, asFigaTreeToolStripMenuItem });
+            exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            exportToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            exportToolStripMenuItem.Text = "Export";
             // 
             // asMayaAnimToolStripMenuItem
             // 
-            this.asMayaAnimToolStripMenuItem.Name = "asMayaAnimToolStripMenuItem";
-            this.asMayaAnimToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-            this.asMayaAnimToolStripMenuItem.Text = "As MayaAnim";
-            this.asMayaAnimToolStripMenuItem.Click += new System.EventHandler(this.asMayaAnimToolStripMenuItem_Click);
+            asMayaAnimToolStripMenuItem.Name = "asMayaAnimToolStripMenuItem";
+            asMayaAnimToolStripMenuItem.Size = new System.Drawing.Size(183, 26);
+            asMayaAnimToolStripMenuItem.Text = "As MayaAnim";
+            asMayaAnimToolStripMenuItem.Click += asMayaAnimToolStripMenuItem_Click;
             // 
             // asFigaTreeToolStripMenuItem
             // 
-            this.asFigaTreeToolStripMenuItem.Name = "asFigaTreeToolStripMenuItem";
-            this.asFigaTreeToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-            this.asFigaTreeToolStripMenuItem.Text = "As FigaTree";
-            this.asFigaTreeToolStripMenuItem.Click += new System.EventHandler(this.asFigaTreeToolStripMenuItem_Click);
+            asFigaTreeToolStripMenuItem.Name = "asFigaTreeToolStripMenuItem";
+            asFigaTreeToolStripMenuItem.Size = new System.Drawing.Size(183, 26);
+            asFigaTreeToolStripMenuItem.Text = "As FigaTree";
+            asFigaTreeToolStripMenuItem.Click += asFigaTreeToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(128, 6);
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new System.Drawing.Size(211, 6);
             // 
             // editToolStripMenuItem
             // 
-            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
-            this.editToolStripMenuItem.Text = "Edit";
-            this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            editToolStripMenuItem.Text = "Edit Keys";
+            editToolStripMenuItem.Click += editToolStripMenuItem_Click;
+            // 
+            // editAnimationToolStripMenuItem
+            // 
+            editAnimationToolStripMenuItem.Name = "editAnimationToolStripMenuItem";
+            editAnimationToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            editAnimationToolStripMenuItem.Text = "Rebake Animation";
+            editAnimationToolStripMenuItem.Click += editAnimationToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(128, 6);
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(211, 6);
             // 
             // applyFSMToolStripMenuItem
             // 
-            this.applyFSMToolStripMenuItem.Name = "applyFSMToolStripMenuItem";
-            this.applyFSMToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
-            this.applyFSMToolStripMenuItem.Text = "Edit FSM";
-            this.applyFSMToolStripMenuItem.Click += new System.EventHandler(this.applyFSMToolStripMenuItem_Click);
+            applyFSMToolStripMenuItem.Name = "applyFSMToolStripMenuItem";
+            applyFSMToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            applyFSMToolStripMenuItem.Text = "Edit FSM";
+            applyFSMToolStripMenuItem.Click += applyFSMToolStripMenuItem_Click;
             // 
             // applyFSMToolStripMenuItem1
             // 
-            this.applyFSMToolStripMenuItem1.Name = "applyFSMToolStripMenuItem1";
-            this.applyFSMToolStripMenuItem1.Size = new System.Drawing.Size(131, 22);
-            this.applyFSMToolStripMenuItem1.Text = "Apply FSM";
-            this.applyFSMToolStripMenuItem1.Click += new System.EventHandler(this.applyFSMToolStripMenuItem1_Click);
+            applyFSMToolStripMenuItem1.Name = "applyFSMToolStripMenuItem1";
+            applyFSMToolStripMenuItem1.Size = new System.Drawing.Size(214, 26);
+            applyFSMToolStripMenuItem1.Text = "Apply FSM";
+            applyFSMToolStripMenuItem1.Click += applyFSMToolStripMenuItem1_Click;
             // 
             // toolStripDropDownButton3
             // 
-            this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fighterModelToolStripMenuItem,
-            this.bonesToolStripMenuItem,
-            this.itemModelToolStripMenuItem,
-            this.toolStripSeparator3,
-            this.hitboxesToolStripMenuItem,
-            this.hurtboxesToolStripMenuItem,
-            this.hitboxInterpolationToolStripMenuItem,
-            this.hitboxInfoToolStripMenuItem,
-            this.toolStripSeparator4,
-            this.environmentCollisionToolStripMenuItem,
-            this.groundedECBToolStripMenuItem,
-            this.ledgeGrabBoxToolStripMenuItem,
-            this.shieldBubbleToolStripMenuItem});
-            this.toolStripDropDownButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton3.Image")));
-            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
-            this.toolStripDropDownButton3.Size = new System.Drawing.Size(45, 22);
-            this.toolStripDropDownButton3.Text = "View";
+            toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { fighterModelToolStripMenuItem, bonesToolStripMenuItem, itemModelToolStripMenuItem, toolStripSeparator3, hitboxesToolStripMenuItem, hurtboxesToolStripMenuItem, hitboxInterpolationToolStripMenuItem, hitboxInfoToolStripMenuItem, toolStripSeparator4, environmentCollisionToolStripMenuItem, groundedECBToolStripMenuItem, ledgeGrabBoxToolStripMenuItem, shieldBubbleToolStripMenuItem });
+            toolStripDropDownButton3.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton3.Image");
+            toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton3.Name = "toolStripDropDownButton3";
+            toolStripDropDownButton3.Size = new System.Drawing.Size(55, 24);
+            toolStripDropDownButton3.Text = "View";
             // 
             // fighterModelToolStripMenuItem
             // 
-            this.fighterModelToolStripMenuItem.Checked = true;
-            this.fighterModelToolStripMenuItem.CheckOnClick = true;
-            this.fighterModelToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.fighterModelToolStripMenuItem.Name = "fighterModelToolStripMenuItem";
-            this.fighterModelToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.fighterModelToolStripMenuItem.Text = "Fighter Model";
-            this.fighterModelToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            fighterModelToolStripMenuItem.Checked = true;
+            fighterModelToolStripMenuItem.CheckOnClick = true;
+            fighterModelToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            fighterModelToolStripMenuItem.Name = "fighterModelToolStripMenuItem";
+            fighterModelToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            fighterModelToolStripMenuItem.Text = "Fighter Model";
+            fighterModelToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // bonesToolStripMenuItem
             // 
-            this.bonesToolStripMenuItem.CheckOnClick = true;
-            this.bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
-            this.bonesToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.bonesToolStripMenuItem.Text = "Bones";
-            this.bonesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            bonesToolStripMenuItem.CheckOnClick = true;
+            bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
+            bonesToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            bonesToolStripMenuItem.Text = "Bones";
+            bonesToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // itemModelToolStripMenuItem
             // 
-            this.itemModelToolStripMenuItem.Checked = true;
-            this.itemModelToolStripMenuItem.CheckOnClick = true;
-            this.itemModelToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.itemModelToolStripMenuItem.Name = "itemModelToolStripMenuItem";
-            this.itemModelToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.itemModelToolStripMenuItem.Text = "Item Model";
-            this.itemModelToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            itemModelToolStripMenuItem.Checked = true;
+            itemModelToolStripMenuItem.CheckOnClick = true;
+            itemModelToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            itemModelToolStripMenuItem.Name = "itemModelToolStripMenuItem";
+            itemModelToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            itemModelToolStripMenuItem.Text = "Item Model";
+            itemModelToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // toolStripSeparator3
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(188, 6);
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new System.Drawing.Size(233, 6);
             // 
             // hitboxesToolStripMenuItem
             // 
-            this.hitboxesToolStripMenuItem.Checked = true;
-            this.hitboxesToolStripMenuItem.CheckOnClick = true;
-            this.hitboxesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.hitboxesToolStripMenuItem.Name = "hitboxesToolStripMenuItem";
-            this.hitboxesToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.hitboxesToolStripMenuItem.Text = "Hitboxes";
-            this.hitboxesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            hitboxesToolStripMenuItem.Checked = true;
+            hitboxesToolStripMenuItem.CheckOnClick = true;
+            hitboxesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            hitboxesToolStripMenuItem.Name = "hitboxesToolStripMenuItem";
+            hitboxesToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            hitboxesToolStripMenuItem.Text = "Hitboxes";
+            hitboxesToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // hurtboxesToolStripMenuItem
             // 
-            this.hurtboxesToolStripMenuItem.CheckOnClick = true;
-            this.hurtboxesToolStripMenuItem.Name = "hurtboxesToolStripMenuItem";
-            this.hurtboxesToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.hurtboxesToolStripMenuItem.Text = "Hurtboxes";
-            this.hurtboxesToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            hurtboxesToolStripMenuItem.CheckOnClick = true;
+            hurtboxesToolStripMenuItem.Name = "hurtboxesToolStripMenuItem";
+            hurtboxesToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            hurtboxesToolStripMenuItem.Text = "Hurtboxes";
+            hurtboxesToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // hitboxInterpolationToolStripMenuItem
             // 
-            this.hitboxInterpolationToolStripMenuItem.CheckOnClick = true;
-            this.hitboxInterpolationToolStripMenuItem.Name = "hitboxInterpolationToolStripMenuItem";
-            this.hitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.hitboxInterpolationToolStripMenuItem.Text = "Hitbox Interpolation";
-            this.hitboxInterpolationToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            hitboxInterpolationToolStripMenuItem.CheckOnClick = true;
+            hitboxInterpolationToolStripMenuItem.Name = "hitboxInterpolationToolStripMenuItem";
+            hitboxInterpolationToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            hitboxInterpolationToolStripMenuItem.Text = "Hitbox Interpolation";
+            hitboxInterpolationToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // hitboxInfoToolStripMenuItem
             // 
-            this.hitboxInfoToolStripMenuItem.CheckOnClick = true;
-            this.hitboxInfoToolStripMenuItem.Name = "hitboxInfoToolStripMenuItem";
-            this.hitboxInfoToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.hitboxInfoToolStripMenuItem.Text = "Hitbox Info";
-            this.hitboxInfoToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            hitboxInfoToolStripMenuItem.CheckOnClick = true;
+            hitboxInfoToolStripMenuItem.Name = "hitboxInfoToolStripMenuItem";
+            hitboxInfoToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            hitboxInfoToolStripMenuItem.Text = "Hitbox Info";
+            hitboxInfoToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // toolStripSeparator4
             // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(188, 6);
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new System.Drawing.Size(233, 6);
             // 
             // environmentCollisionToolStripMenuItem
             // 
-            this.environmentCollisionToolStripMenuItem.CheckOnClick = true;
-            this.environmentCollisionToolStripMenuItem.Name = "environmentCollisionToolStripMenuItem";
-            this.environmentCollisionToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.environmentCollisionToolStripMenuItem.Text = "Environment Collision";
-            this.environmentCollisionToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            environmentCollisionToolStripMenuItem.CheckOnClick = true;
+            environmentCollisionToolStripMenuItem.Name = "environmentCollisionToolStripMenuItem";
+            environmentCollisionToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            environmentCollisionToolStripMenuItem.Text = "Environment Collision";
+            environmentCollisionToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // groundedECBToolStripMenuItem
             // 
-            this.groundedECBToolStripMenuItem.Checked = true;
-            this.groundedECBToolStripMenuItem.CheckOnClick = true;
-            this.groundedECBToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.groundedECBToolStripMenuItem.Name = "groundedECBToolStripMenuItem";
-            this.groundedECBToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.groundedECBToolStripMenuItem.Text = "Grounded ECB";
-            this.groundedECBToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            groundedECBToolStripMenuItem.Checked = true;
+            groundedECBToolStripMenuItem.CheckOnClick = true;
+            groundedECBToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            groundedECBToolStripMenuItem.Name = "groundedECBToolStripMenuItem";
+            groundedECBToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            groundedECBToolStripMenuItem.Text = "Grounded ECB";
+            groundedECBToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // ledgeGrabBoxToolStripMenuItem
             // 
-            this.ledgeGrabBoxToolStripMenuItem.CheckOnClick = true;
-            this.ledgeGrabBoxToolStripMenuItem.Name = "ledgeGrabBoxToolStripMenuItem";
-            this.ledgeGrabBoxToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.ledgeGrabBoxToolStripMenuItem.Text = "Ledge Grab Box";
-            this.ledgeGrabBoxToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            ledgeGrabBoxToolStripMenuItem.CheckOnClick = true;
+            ledgeGrabBoxToolStripMenuItem.Name = "ledgeGrabBoxToolStripMenuItem";
+            ledgeGrabBoxToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            ledgeGrabBoxToolStripMenuItem.Text = "Ledge Grab Box";
+            ledgeGrabBoxToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // shieldBubbleToolStripMenuItem
             // 
-            this.shieldBubbleToolStripMenuItem.Checked = true;
-            this.shieldBubbleToolStripMenuItem.CheckOnClick = true;
-            this.shieldBubbleToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.shieldBubbleToolStripMenuItem.Name = "shieldBubbleToolStripMenuItem";
-            this.shieldBubbleToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.shieldBubbleToolStripMenuItem.Text = "Shield Bubble";
-            this.shieldBubbleToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UpdateRenderCheckboxes);
+            shieldBubbleToolStripMenuItem.Checked = true;
+            shieldBubbleToolStripMenuItem.CheckOnClick = true;
+            shieldBubbleToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            shieldBubbleToolStripMenuItem.Name = "shieldBubbleToolStripMenuItem";
+            shieldBubbleToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            shieldBubbleToolStripMenuItem.Text = "Shield Bubble";
+            shieldBubbleToolStripMenuItem.CheckedChanged += UpdateRenderCheckboxes;
             // 
             // toolStripDropDownButton4
             // 
-            this.toolStripDropDownButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportTXTOnSaveToolStripMenuItem});
-            this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
-            this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
-            this.toolStripDropDownButton4.Size = new System.Drawing.Size(62, 22);
-            this.toolStripDropDownButton4.Text = "Options";
+            toolStripDropDownButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { exportTXTOnSaveToolStripMenuItem });
+            toolStripDropDownButton4.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton4.Image");
+            toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton4.Name = "toolStripDropDownButton4";
+            toolStripDropDownButton4.Size = new System.Drawing.Size(75, 24);
+            toolStripDropDownButton4.Text = "Options";
             // 
             // exportTXTOnSaveToolStripMenuItem
             // 
-            this.exportTXTOnSaveToolStripMenuItem.CheckOnClick = true;
-            this.exportTXTOnSaveToolStripMenuItem.Name = "exportTXTOnSaveToolStripMenuItem";
-            this.exportTXTOnSaveToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.exportTXTOnSaveToolStripMenuItem.Text = "Export TXT on Save";
+            exportTXTOnSaveToolStripMenuItem.CheckOnClick = true;
+            exportTXTOnSaveToolStripMenuItem.Name = "exportTXTOnSaveToolStripMenuItem";
+            exportTXTOnSaveToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            exportTXTOnSaveToolStripMenuItem.Text = "Export TXT on Save";
             // 
             // ScriptEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.dockPanel1);
-            this.Controls.Add(this.toolStrip1);
-            this.Name = "ScriptEditor";
-            this.Text = "ScriptEditor";
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(914, 600);
+            Controls.Add(dockPanel1);
+            Controls.Add(toolStrip1);
+            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Name = "ScriptEditor";
+            Text = "ScriptEditor";
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -395,5 +374,6 @@
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton4;
         private System.Windows.Forms.ToolStripMenuItem exportTXTOnSaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem bonesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editAnimationToolStripMenuItem;
     }
 }

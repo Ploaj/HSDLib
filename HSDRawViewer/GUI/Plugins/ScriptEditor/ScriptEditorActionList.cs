@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Cmd;
 using HSDRaw.Melee.Pl;
 using System;
@@ -16,7 +17,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public ScriptSubrountine[] _subroutines { get; set; }
 
-        public delegate void SelectedActionCallback(string symbol, HSDStruct action, int index);
+        public delegate void SelectedActionCallback(string symbol, HSDStruct action, int index, HSD_FigaTree tree);
         public SelectedActionCallback SelectAction;
 
         public delegate void ActionListUpdated();
@@ -221,7 +222,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (subroutineArrayEditor != null)
                     subroutineArrayEditor.SelectObject(null);
 
-                SelectAction?.Invoke(action.Symbol, action._struct, Array.FindIndex(_actions, a => a == action));
+                SelectAction?.Invoke(
+                    action.Symbol, 
+                    action._struct, 
+                    Array.FindIndex(_actions, a => a == action),
+                    action.Animation);
             }
         }
 
@@ -239,7 +244,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (actionArrayEditor != null)
                     actionArrayEditor.SelectObject(null);
 
-                SelectAction?.Invoke(null, action._struct, -1);
+                SelectAction?.Invoke(null, action._struct, -1, null);
             }
         }
 

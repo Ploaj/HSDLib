@@ -294,11 +294,11 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="fsms"></param>
-        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> fsms)
+        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> fsms, bool compress = true)
         {
             foreach (var n in Nodes)
                 foreach (var t in n.Tracks)
-                    t.ApplyFSMs(fsms);
+                    t.ApplyFSMs(fsms, compress);
 
             // calculate new frame count
             float frameRate = 1;
@@ -376,6 +376,17 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        internal void Bake()
+        {
+            foreach (var n in Nodes)
+            {
+                foreach (var t in n.Tracks)
+                {
+                    t.Bake();
+                }
+            }
+        }
+
         /// <summary>
         /// Trims frames to given region
         /// </summary>
@@ -392,7 +403,6 @@ namespace HSDRawViewer.Rendering
             {
                 foreach (var t in n.Tracks)
                 {
-
                     // the new set of keys after trimming
                     List<FOBJKey> newKeys = t.Keys.Where(e => e.Frame >= startFrame && e.Frame <= endFrame).ToList();
 
@@ -441,7 +451,7 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void Optimize(HSD_JOBJ jobj, float error = 0.001f)
+        public void Optimize(HSD_JOBJ jobj, bool applyDiscontinuityFilter, float error = 0.001f)
         {
             if (jobj == null)
                 return;
@@ -454,7 +464,12 @@ namespace HSDRawViewer.Rendering
             }
 
             for (int i = 0; i < Math.Min(joints.Count, NodeCount); i++)
+            {
+                if (applyDiscontinuityFilter)
+                    Tools.KeyFilters.DiscontinuityFilter.Filter(Nodes[i].Tracks);
+
                 AnimationKeyCompressor.OptimizeJointTracks(joints[i], ref Nodes[i].Tracks, error);
+            }
         }
 
         /// <summary>
