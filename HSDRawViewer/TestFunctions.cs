@@ -1,17 +1,17 @@
-﻿using HSDRaw.Common;
-using HSDRaw;
-using HSDRaw.GX;
-using HSDRaw.Tools;
-using System.Collections.Generic;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.Common.Animation;
-using System;
-using System.IO;
-using System.Text.RegularExpressions;
+using HSDRaw.GX;
 using HSDRaw.Melee.Pl;
+using HSDRaw.Tools;
 using HSDRaw.Tools.Melee;
-using System.Linq;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.Animation;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HSDRawViewer
 {
@@ -19,25 +19,25 @@ namespace HSDRawViewer
     {
         public static void RebuildPOBJs(HSD_JOBJ rootJOBJ)
         {
-            var compressor = new POBJ_Generator();
-            foreach (var jobj in rootJOBJ.TreeList)
+            POBJ_Generator compressor = new();
+            foreach (HSD_JOBJ jobj in rootJOBJ.TreeList)
             {
                 if (jobj.Dobj != null)
-                    foreach (var dobj in jobj.Dobj.List)
+                    foreach (HSD_DOBJ dobj in jobj.Dobj.List)
                     {
                         if (dobj.Pobj != null)
                         {
-                            List<GX_Vertex> triList = new List<GX_Vertex>();
-                            List<HSD_JOBJ[]> bones = new List<HSD_JOBJ[]>();
-                            List<float[]> weights = new List<float[]>();
+                            List<GX_Vertex> triList = new();
+                            List<HSD_JOBJ[]> bones = new();
+                            List<float[]> weights = new();
 
-                            foreach (var pobj in dobj.Pobj.List)
+                            foreach (HSD_POBJ pobj in dobj.Pobj.List)
                             {
-                                var dl = pobj.ToDisplayList();
+                                GX_DisplayList dl = pobj.ToDisplayList();
                                 int off = 0;
-                                foreach (var pri in dl.Primitives)
+                                foreach (GX_PrimitiveGroup pri in dl.Primitives)
                                 {
-                                    var strip = dl.Vertices.GetRange(off, pri.Count);
+                                    List<GX_Vertex> strip = dl.Vertices.GetRange(off, pri.Count);
                                     if (pri.PrimitiveType == GXPrimitiveType.TriangleStrip)
                                         TriangleConverter.StripToList(strip, out strip);
                                     if (pri.PrimitiveType == GXPrimitiveType.Quads)
@@ -48,11 +48,11 @@ namespace HSDRawViewer
                                     {
                                         triList.AddRange(strip);
 
-                                        foreach (var v in strip)
+                                        foreach (GX_Vertex v in strip)
                                         {
                                             if (dl.Envelopes.Count > 0)
                                             {
-                                                var en = dl.Envelopes[v.PNMTXIDX / 3];
+                                                HSD_Envelope en = dl.Envelopes[v.PNMTXIDX / 3];
                                                 HSD_JOBJ[] b = en.JOBJs;
                                                 float[] w = en.Weights;
                                                 bones.Add(b);
@@ -68,7 +68,7 @@ namespace HSDRawViewer
                                 }
                             }
 
-                            dobj.Pobj = compressor.CreatePOBJsFromTriangleList(triList, dobj.Pobj.ToGXAttributes().Select(e=>e.AttributeName).ToArray(), bones, weights);
+                            dobj.Pobj = compressor.CreatePOBJsFromTriangleList(triList, dobj.Pobj.ToGXAttributes().Select(e => e.AttributeName).ToArray(), bones, weights);
                         }
                     }
             }
@@ -77,24 +77,24 @@ namespace HSDRawViewer
 
         public static void RebuildFigaTree(string path, string outpath)
         {
-            HSDRawFile file = new HSDRawFile(path);
-            var oldTree = file.Roots[0].Data as HSD_FigaTree;
+            HSDRawFile file = new(path);
+            HSD_FigaTree oldTree = file.Roots[0].Data as HSD_FigaTree;
 
-            HSDRawFile newFile = new HSDRawFile();
-            HSD_FigaTree newTree = new HSD_FigaTree()
+            HSDRawFile newFile = new();
+            HSD_FigaTree newTree = new()
             {
                 FrameCount = oldTree.FrameCount,
             };
             newFile.Roots = new List<HSDRootNode>();
             newFile.Roots.Add(new HSDRootNode() { Name = file.Roots[0].Name, Data = newTree });
 
-            var newtracks = new List<FigaTreeNode>();
-            foreach (var tracks in oldTree.Nodes)
+            List<FigaTreeNode> newtracks = new();
+            foreach (FigaTreeNode tracks in oldTree.Nodes)
             {
-                var newt = new List<HSD_Track>();
-                foreach(var track in tracks.Tracks)
+                List<HSD_Track> newt = new();
+                foreach (HSD_Track track in tracks.Tracks)
                 {
-                    HSD_Track newtrack = new HSD_Track();
+                    HSD_Track newtrack = new();
                     newtrack.FromFOBJ(FOBJFrameEncoder.EncodeFrames(track.GetKeys(), track.JointTrackType));
                     newt.Add(newtrack);
                 }
@@ -107,7 +107,7 @@ namespace HSDRawViewer
 
         public static void RemoveImageNodes(string filePath)
         {
-            HSDRawFile file = new HSDRawFile(filePath);
+            HSDRawFile file = new(filePath);
 
             file.Roots.RemoveAll(e => e.Name.EndsWith("_image"));
 
@@ -116,12 +116,12 @@ namespace HSDRawViewer
 
         public static void Compare(string oldpath, string newpath)
         {
-            var f1 = new HSDRawFile(oldpath);
-            var f2 = new HSDRawFile(newpath);
+            HSDRawFile f1 = new(oldpath);
+            HSDRawFile f2 = new(newpath);
 
             Console.WriteLine(f1.Roots.Count + " " + f2.Roots.Count);
 
-            for(int i = 0; i < f1.Roots.Count; i++)
+            for (int i = 0; i < f1.Roots.Count; i++)
             {
                 CompareNode(f1.Roots[i].Data._s, f2.Roots[i].Data._s, new HashSet<HSDStruct>(), $"{(i * 4).ToString("X8")}->");
             }
@@ -150,7 +150,7 @@ namespace HSDRawViewer
             {
                 Console.WriteLine($"{path} Reference mismatch");
             }
-            foreach (var re in s2.References)
+            foreach (KeyValuePair<int, HSDStruct> re in s2.References)
             {
                 CompareNode(s1.References[re.Key], s2.References[re.Key], done, path + $"{re.Key.ToString("X8")}->");
             }
@@ -158,32 +158,32 @@ namespace HSDRawViewer
 
         public static void DecompileAllPlDats(string path, string outputTxt)
         {
-            using (StreamWriter w = new StreamWriter(new FileStream(outputTxt, FileMode.Create)))
-                foreach (var f in Directory.GetFiles(path))
+            using StreamWriter w = new(new FileStream(outputTxt, FileMode.Create));
+            foreach (string f in Directory.GetFiles(path))
+            {
+                if (Regex.IsMatch(Path.GetFileName(f), @"Pl..\.dat"))
                 {
-                    if (Regex.IsMatch(Path.GetFileName(f), @"Pl..\.dat"))
+                    HSDRawFile hsd = new(f);
+
+                    foreach (HSDRootNode r in hsd.Roots)
                     {
-                        HSDRawFile hsd = new HSDRawFile(f);
-
-                        foreach (var r in hsd.Roots)
+                        if (r.Data is SBM_FighterData pl)
                         {
-                            if (r.Data is SBM_FighterData pl)
+                            w.WriteLine(r.Name);
+
+                            ActionDecompiler d = new();
+
+                            SBM_FighterAction[] sa = pl.FighterActionTable.Commands;
+
+                            int index = 0;
+                            foreach (SBM_FighterAction v in sa)
                             {
-                                w.WriteLine(r.Name);
-
-                                ActionDecompiler d = new ActionDecompiler();
-
-                                var sa = pl.FighterActionTable.Commands;
-
-                                int index = 0;
-                                foreach (var v in sa)
-                                {
-                                    w.WriteLine(d.Decompile("Function_"+index++ + v.Name != null ? "_" + v.Name : "", v));
-                                }
+                                w.WriteLine(d.Decompile("Function_" + index++ + v.Name != null ? "_" + v.Name : "", v));
                             }
                         }
                     }
                 }
+            }
         }
 
         public class RemapSettings
@@ -193,16 +193,16 @@ namespace HSDRawViewer
 
         public static HSD_FigaTree RemapFigatree(RemapSettings settings, HSD_FigaTree from, int newBoneCount, JointMap mapFrom, JointMap mapTo)
         {
-            var sourceNodes = from.Nodes;
-            var targetNodes = new List<FigaTreeNode>();
-            
+            List<FigaTreeNode> sourceNodes = from.Nodes;
+            List<FigaTreeNode> targetNodes = new();
+
 
             for (int i = 0; i < newBoneCount; i++)
             {
-                FigaTreeNode node = new FigaTreeNode();
+                FigaTreeNode node = new();
                 targetNodes.Add(node);
 
-                var remapIndex = mapFrom.IndexOf(mapTo[i]);
+                int remapIndex = mapFrom.IndexOf(mapTo[i]);
                 if (remapIndex != -1)
                 {
                     // port tracks
@@ -211,16 +211,16 @@ namespace HSDRawViewer
                     if (settings.IgnoreTranslation)
                     {
                         node.Tracks.RemoveAll(
-                            e => 
+                            e =>
                             e.JointTrackType == JointTrackType.HSD_A_J_TRAX ||
-                            e.JointTrackType == JointTrackType.HSD_A_J_TRAY || 
+                            e.JointTrackType == JointTrackType.HSD_A_J_TRAY ||
                             e.JointTrackType == JointTrackType.HSD_A_J_TRAZ);
                     }
                 }
             }
 
 
-            var newft = new HSD_FigaTree()
+            HSD_FigaTree newft = new()
             {
                 Type = 1,
                 FrameCount = from.FrameCount,
@@ -240,42 +240,40 @@ namespace HSDRawViewer
         /// <param name="editAnim"></param>
         public static void EditFighterAnimations(string ftdat, string ajdat, EditAnimation editAnim)
         {
-            FighterAJManager manager = new FighterAJManager(File.ReadAllBytes(ajdat));
+            FighterAJManager manager = new(File.ReadAllBytes(ajdat));
 
-            foreach (var symbol in manager.GetAnimationSymbols())
+            foreach (string symbol in manager.GetAnimationSymbols())
             {
                 if (symbol.Contains("Taro"))
                     continue;
 
-                var ftFile = new HSDRawFile(manager.GetAnimationData(symbol));
+                HSDRawFile ftFile = new(manager.GetAnimationData(symbol));
 
                 if (ftFile[symbol] != null)
                 {
-                    var ft = ftFile[symbol].Data as HSD_FigaTree;
+                    HSD_FigaTree ft = ftFile[symbol].Data as HSD_FigaTree;
                     if (!editAnim(ft, symbol))
                         continue;
                     ftFile[symbol].Data = ft;
 
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        ftFile.Save(stream);
-                        manager.SetAnimation(symbol, stream.ToArray());
-                    }
+                    using MemoryStream stream = new();
+                    ftFile.Save(stream);
+                    manager.SetAnimation(symbol, stream.ToArray());
                 }
             }
 
-            var newAJFile = manager.RebuildAJFile(manager.GetAnimationSymbols().ToArray(), true);
+            byte[] newAJFile = manager.RebuildAJFile(manager.GetAnimationSymbols().ToArray(), true);
 
-            HSDRawFile ftfile = new HSDRawFile(ftdat);
+            HSDRawFile ftfile = new(ftdat);
             if (ftfile.Roots[0].Data is SBM_FighterData data)
             {
-                var sa = data.FighterActionTable.Commands;
+                SBM_FighterAction[] sa = data.FighterActionTable.Commands;
 
-                foreach (var action in sa)
+                foreach (SBM_FighterAction action in sa)
                 {
                     if (action.SymbolName != null && !string.IsNullOrEmpty(action.SymbolName.Value))
                     {
-                        var sizeOffset = manager.GetOffsetSize(action.SymbolName.Value);
+                        Tuple<int, int> sizeOffset = manager.GetOffsetSize(action.SymbolName.Value);
                         action.AnimationOffset = sizeOffset.Item1;
                         action.AnimationSize = sizeOffset.Item2;
                     }
@@ -297,12 +295,12 @@ namespace HSDRawViewer
         /// <param name="editAnim"></param>
         public static void EditFighterActions(string ftdat, EditSubaction editAction)
         {
-            HSDRawFile ftfile = new HSDRawFile(ftdat);
+            HSDRawFile ftfile = new(ftdat);
             if (ftfile.Roots[0].Data is SBM_FighterData data)
             {
-                var sa = data.FighterActionTable.Commands;
+                SBM_FighterAction[] sa = data.FighterActionTable.Commands;
 
-                foreach (var action in sa)
+                foreach (SBM_FighterAction action in sa)
                 {
                     editAction(action);
                 }
@@ -323,120 +321,117 @@ namespace HSDRawViewer
         /// <param name="costumeIndex"></param>
         public static void GenerateYml(string outputPath, string ftdat, string ftnr, int costumeIndex)
         {
-            var f = new HSDRaw.HSDRawFile(ftdat).Roots[0].Data as HSDRaw.Melee.Pl.SBM_FighterData;
-            var joint = new HSDRaw.HSDRawFile(ftnr).Roots[0].Data as HSDRaw.Common.HSD_JOBJ;
+            SBM_FighterData f = new HSDRaw.HSDRawFile(ftdat).Roots[0].Data as HSDRaw.Melee.Pl.SBM_FighterData;
+            HSD_JOBJ joint = new HSDRaw.HSDRawFile(ftnr).Roots[0].Data as HSDRaw.Common.HSD_JOBJ;
 
-            using (var s = new System.IO.FileStream(outputPath, System.IO.FileMode.Create))
-            using (var w = new System.IO.StreamWriter(s))
+            using FileStream s = new(outputPath, System.IO.FileMode.Create);
+            using StreamWriter w = new(s);
+            // determine high poly indices
+            w.WriteLine("highpoly:");
+            foreach (byte i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].HighPoly[0].LookupEntries[0].Entries)
+                w.WriteLine("- " + i);
+
+            // determine low poly indices
+            w.WriteLine("lowpoly:");
+            foreach (byte i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].LowPoly[0].LookupEntries[0].Entries)
+                w.WriteLine("- " + i);
+
+            // determine metal poly indices
+            w.WriteLine("metalpoly:");
+            if (f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel != null &&
+                f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel[0].LookupEntries != null)
+                foreach (byte i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel[0].LookupEntries[0].Entries)
+                    w.WriteLine("- " + i);
+
+            // determine texture counts
+            Dictionary<int, int> tobjIndexToDobjIndex = new();
+            w.WriteLine("objects:");
+            int di = 0;
+            int tobji = 0;
+            List<HSD_JOBJ> jointList = joint.TreeList;
+            foreach (HSD_JOBJ j in joint.TreeList)
             {
-                // determine high poly indices
-                w.WriteLine("highpoly:");
-                foreach (var i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].HighPoly[0].LookupEntries[0].Entries)
-                    w.WriteLine("- " + i);
-
-                // determine low poly indices
-                w.WriteLine("lowpoly:");
-                foreach (var i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].LowPoly[0].LookupEntries[0].Entries)
-                    w.WriteLine("- " + i);
-
-                // determine metal poly indices
-                w.WriteLine("metalpoly:");
-                if (f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel != null &&
-                    f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel[0].LookupEntries != null)
-                    foreach (var i in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].MetalMainModel[0].LookupEntries[0].Entries)
-                        w.WriteLine("- " + i);
-
-                // determine texture counts
-                var tobjIndexToDobjIndex = new System.Collections.Generic.Dictionary<int, int>();
-                w.WriteLine("objects:");
-                int di = 0;
-                int tobji = 0;
-                var jointList = joint.TreeList;
-                foreach (var j in joint.TreeList)
+                if (j.Dobj != null)
                 {
-                    if (j.Dobj != null)
+                    foreach (HSD_DOBJ dobj in j.Dobj.List)
                     {
-                        foreach (var dobj in j.Dobj.List)
+                        int texCount = (dobj.Mobj.Textures == null ? 0 : dobj.Mobj.Textures.List.Count);
+                        w.WriteLine($"- position: {di}");
+                        w.WriteLine($"  count: {texCount}");
+                        w.WriteLine($"  joint: {jointList.IndexOf(j)}");
+                        for (int i = tobji; i < tobji + texCount; i++)
+                            tobjIndexToDobjIndex.Add(i, di);
+                        tobji += texCount;
+                        di++;
+                    }
+                }
+            }
+
+            // determine specail positions
+            w.WriteLine("positions:");
+            {
+                int pi = 0;
+                foreach (SBM_LookupTable p in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].HighPoly.Array)
+                {
+                    int ti = 0;
+                    if (p.LookupEntries != null)
+                        foreach (SBM_LookupEntry t in p.LookupEntries.Array)
                         {
-                            var texCount = (dobj.Mobj.Textures == null ? 0 : dobj.Mobj.Textures.List.Count);
-                            w.WriteLine($"- position: {di}");
-                            w.WriteLine($"  count: {texCount}");
-                            w.WriteLine($"  joint: {jointList.IndexOf(j)}");
-                            for (int i = tobji; i < tobji + texCount; i++)
-                                tobjIndexToDobjIndex.Add(i, di);
-                            tobji += texCount;
-                            di++;
+                            int ei = 0;
+                            if (ti != 0)
+                                foreach (byte i in t.Entries)
+                                {
+                                    w.WriteLine($"- name: Object_{pi}_{ti}_{ei}");
+                                    w.WriteLine($"  position: {i}");
+                                    ei++;
+                                }
+                            ti++;
                         }
-                    }
+                    pi++;
                 }
-
-                // determine specail positions
-                w.WriteLine("positions:");
+            }
+            {
+                int pi = 0;
+                foreach (SBM_LookupTable p in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].LowPoly.Array)
                 {
-                    int pi = 0;
-                    foreach (var p in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].HighPoly.Array)
-                    {
-                        int ti = 0;
-                        if (p.LookupEntries != null)
-                            foreach (var t in p.LookupEntries.Array)
-                            {
-                                int ei = 0;
-                                if (ti != 0)
-                                    foreach (var i in t.Entries)
-                                    {
-                                        w.WriteLine($"- name: Object_{pi}_{ti}_{ei}");
-                                        w.WriteLine($"  position: {i}");
-                                        ei++;
-                                    }
-                                ti++;
-                            }
-                        pi++;
-                    }
+                    int ti = 0;
+                    if (p.LookupEntries != null)
+                        foreach (SBM_LookupEntry t in p.LookupEntries.Array)
+                        {
+                            int ei = 0;
+                            if (ti != 0)
+                                foreach (byte i in t.Entries)
+                                {
+                                    w.WriteLine($"- name: Object_{pi}_{ti}_{ei}_LOW");
+                                    w.WriteLine($"  position: {i}");
+                                    ei++;
+                                }
+                            ti++;
+                        }
+                    pi++;
                 }
-                {
-                    int pi = 0;
-                    foreach (var p in f.ModelLookupTables.CostumeVisibilityLookups.Array[costumeIndex].LowPoly.Array)
-                    {
-                        int ti = 0;
-                        if (p.LookupEntries != null)
-                            foreach (var t in p.LookupEntries.Array)
-                            {
-                                int ei = 0;
-                                if (ti != 0)
-                                    foreach (var i in t.Entries)
-                                    {
-                                        w.WriteLine($"- name: Object_{pi}_{ti}_{ei}_LOW");
-                                        w.WriteLine($"  position: {i}");
-                                        ei++;
-                                    }
-                                ti++;
-                            }
-                        pi++;
-                    }
-                }
+            }
 
-                // determine mat anim texture indices
-                if (f.ModelLookupTables.CostumeMaterialLookups != null && f.ModelLookupTables.CostumeMaterialLookups[costumeIndex].Entries != null)
+            // determine mat anim texture indices
+            if (f.ModelLookupTables.CostumeMaterialLookups != null && f.ModelLookupTables.CostumeMaterialLookups[costumeIndex].Entries != null)
+            {
+                int mi = 0;
+                foreach (ushort i in f.ModelLookupTables.CostumeMaterialLookups[costumeIndex].Entries.Array)
                 {
-                    int mi = 0;
-                    foreach (var i in f.ModelLookupTables.CostumeMaterialLookups[costumeIndex].Entries.Array)
-                    {
-                        w.WriteLine($"- name: MatAnim_{mi}");
-                        w.WriteLine($"  position: {tobjIndexToDobjIndex[i]}");
-                        mi++;
-                    }
+                    w.WriteLine($"- name: MatAnim_{mi}");
+                    w.WriteLine($"  position: {tobjIndexToDobjIndex[i]}");
+                    mi++;
                 }
-
             }
         }
-    
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="file"></param>
         public static void CheckFlags(string file)
         {
-            var f = new HSDRawFile(file);
+            HSDRawFile f = new(file);
 
             CheckFlags(f.Roots[0].Data as HSD_JOBJ);
         }
@@ -449,13 +444,13 @@ namespace HSDRawViewer
         {
             List<JOBJ_FLAG> originalFlags = jobj.TreeList.Select(e => e.Flags).ToList();
 
-            foreach (var v in jobj.TreeList)
+            foreach (HSD_JOBJ v in jobj.TreeList)
                 v.Flags = 0;
 
             jobj.UpdateFlags();
             JOBJ_FLAG ignore = JOBJ_FLAG.CLASSICAL_SCALING | JOBJ_FLAG.BILLBOARD | JOBJ_FLAG.HBILLBOARD | JOBJ_FLAG.VBILLBOARD | JOBJ_FLAG.PTCL | JOBJ_FLAG.SPLINE;
 
-            var list = jobj.TreeList;
+            List<HSD_JOBJ> list = jobj.TreeList;
             for (int i = 0; i < originalFlags.Count; i++)
             {
                 if ((originalFlags[i] & ~ignore) != (list[i].Flags & ~ignore))
@@ -473,17 +468,17 @@ namespace HSDRawViewer
         /// <param name="ajFile"></param>
         public static void FigtherApplyDiscontinuityFilterToAllAnimations(string datFile, string ajFile)
         {
-            List<string> filter = new List<string>();
+            List<string> filter = new();
             EditFighterAnimations(
                 datFile,
                 ajFile,
                 (tree, symbol) =>
                 {
                     bool filtered = false;
-                    var nodes = tree.Nodes;
-                    foreach (var c in nodes)
+                    List<FigaTreeNode> nodes = tree.Nodes;
+                    foreach (FigaTreeNode c in nodes)
                     {
-                        var tracks = c.Tracks.Select(e => new FOBJ_Player(e.TrackType, e.GetKeys())).ToList();
+                        List<FOBJ_Player> tracks = c.Tracks.Select(e => new FOBJ_Player(e.TrackType, e.GetKeys())).ToList();
                         if (Tools.KeyFilters.DiscontinuityFilter.Filter(tracks))
                         {
                             filtered = true;

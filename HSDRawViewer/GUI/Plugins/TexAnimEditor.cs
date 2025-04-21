@@ -1,12 +1,11 @@
 ﻿using HSDRaw.Common.Animation;
+using HSDRawViewer.GUI.Dialog;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using HSDRawViewer.GUI.Dialog;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -46,7 +45,7 @@ namespace HSDRawViewer.GUI.Plugins
                 return;
 
             Images = _texAnim.ToTOBJs().Select(e => new TOBJProxy() { TOBJ = e }).ToArray();
-            arrayMemberEditor1.SetArrayFromProperty(this, "Images");
+            arrayMemberEditor1.SetArrayFromProperty(this, nameof(Images));
 
             if (_texAnim.AnimationObject != null)
                 graphEditor1.LoadTracks(GUI.Controls.GraphEditor.AnimType.Texture, _texAnim.AnimationObject);
@@ -111,7 +110,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (arrayMemberEditor1.SelectedObject is TOBJProxy proxy)
             {
-                var export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
+                string export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
 
                 if (export != null)
                 {
@@ -129,15 +128,15 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (Images != null && Images.Length > 0)
             {
-                var export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
+                string export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
 
                 if (export != null)
                 {
-                    var path = System.IO.Path.GetDirectoryName(export);
-                    var fname = System.IO.Path.GetFileNameWithoutExtension(export);
-                    var extension = System.IO.Path.GetExtension(export);
+                    string path = System.IO.Path.GetDirectoryName(export);
+                    string fname = System.IO.Path.GetFileNameWithoutExtension(export);
+                    string extension = System.IO.Path.GetExtension(export);
                     int index = 0;
-                    foreach(var v in Images)
+                    foreach (TOBJProxy v in Images)
                     {
                         v.TOBJ.SaveImagePNG($"{path}/{fname}_{index.ToString("D2")}{extension}");
                         index++;
@@ -153,34 +152,32 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonImport_Click(object sender, EventArgs e)
         {
-            var imports = Tools.FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
+            string[] imports = Tools.FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
 
             if (imports != null)
             {
-                using (var d = new TextureImportDialog())
+                using TextureImportDialog d = new();
+                if (Images.Length > 0)
                 {
-                    if (Images.Length > 0)
-                    {
-                        var proxy = Images[0];
+                    TOBJProxy proxy = Images[0];
 
-                        d.TextureFormat = proxy.TOBJ.ImageData.Format;
+                    d.TextureFormat = proxy.TOBJ.ImageData.Format;
 
-                        if (proxy.TOBJ.TlutData != null)
-                            d.PaletteFormat = proxy.TOBJ.TlutData.Format;
-                    }
+                    if (proxy.TOBJ.TlutData != null)
+                        d.PaletteFormat = proxy.TOBJ.TlutData.Format;
+                }
 
-                    if (d.ShowDialog() == DialogResult.OK)
-                    {
-                        var texFmt = d.TextureFormat;
-                        var palFmt = d.PaletteFormat;
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    HSDRaw.GX.GXTexFmt texFmt = d.TextureFormat;
+                    HSDRaw.GX.GXTlutFmt palFmt = d.PaletteFormat;
 
-                        foreach (var import in imports)
-                            using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
-                            {
-                                d.ApplySettings(bmp);
-                                arrayMemberEditor1.AddItem(new TOBJProxy() { TOBJ = bmp.ToTObj(texFmt, palFmt) });
-                            }
-                    }
+                    foreach (string import in imports)
+                        using (Image<Bgra32> bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
+                        {
+                            d.ApplySettings(bmp);
+                            arrayMemberEditor1.AddItem(new TOBJProxy() { TOBJ = bmp.ToTObj(texFmt, palFmt) });
+                        }
                 }
             }
         }
@@ -194,28 +191,26 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (arrayMemberEditor1.SelectedObject is TOBJProxy proxy)
             {
-                var import = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                string import = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (import != null)
                 {
-                    using (var d = new TextureImportDialog())
+                    using TextureImportDialog d = new();
+                    d.TextureFormat = proxy.TOBJ.ImageData.Format;
+
+                    if (proxy.TOBJ.TlutData != null)
+                        d.PaletteFormat = proxy.TOBJ.TlutData.Format;
+
+                    if (d.ShowDialog() == DialogResult.OK)
                     {
-                        d.TextureFormat = proxy.TOBJ.ImageData.Format;
-
-                        if (proxy.TOBJ.TlutData != null)
-                            d.PaletteFormat = proxy.TOBJ.TlutData.Format;
-
-                        if (d.ShowDialog() == DialogResult.OK)
+                        using (Image<Bgra32> bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
                         {
-                            using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
-                            {
-                                d.ApplySettings(bmp);
-                                proxy.TOBJ.EncodeImageData(bmp.ToTObj(d.TextureFormat, d.PaletteFormat).GetDecodedImageData(), bmp.Width, bmp.Height, d.TextureFormat, d.PaletteFormat);
-                            }
-
-                            SaveTextures();
-                            SelectNode();
+                            d.ApplySettings(bmp);
+                            proxy.TOBJ.EncodeImageData(bmp.ToTObj(d.TextureFormat, d.PaletteFormat).GetDecodedImageData(), bmp.Width, bmp.Height, d.TextureFormat, d.PaletteFormat);
                         }
+
+                        SaveTextures();
+                        SelectNode();
                     }
                 }
             }

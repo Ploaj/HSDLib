@@ -4,13 +4,9 @@ using IONET.Core.Model;
 using IONET.Core.Skeleton;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -29,7 +25,7 @@ namespace HSDRawViewer.GUI.Extra
 
                 Text = bone.Name;
 
-                foreach (var c in bone.Children)
+                foreach (IOBone c in bone.Children)
                 {
                     Nodes.Add(new JointNode(c));
                 }
@@ -58,9 +54,9 @@ namespace HSDRawViewer.GUI.Extra
             }
         }
 
-        private IOScene _scene;
+        private readonly IOScene _scene;
 
-        private IOModel _model;
+        private readonly IOModel _model;
         public ModelImportSettings settings { get; internal set; } = new ModelImportSettings();
 
         public Dictionary<IOMesh, MeshImportSettings> meshSettings { get; internal set; } = new Dictionary<IOMesh, MeshImportSettings>();
@@ -79,7 +75,7 @@ namespace HSDRawViewer.GUI.Extra
 
             //
             Init();
-                
+
             // set settings
             mainProperty.SelectedObject = settings;
 
@@ -143,7 +139,7 @@ namespace HSDRawViewer.GUI.Extra
             // fill bone tree
             if (_model.Skeleton != null)
             {
-                foreach (var b in _model.Skeleton.RootBones)
+                foreach (IOBone b in _model.Skeleton.RootBones)
                 {
                     boneTree.Nodes.Add(new JointNode(b));
                 }
@@ -152,20 +148,20 @@ namespace HSDRawViewer.GUI.Extra
 
             // fill mesh list
             bool hasVertexAlpha = false;
-            foreach (var m in _model.Meshes)
+            foreach (IOMesh m in _model.Meshes)
             {
                 meshList.Items.Add(new MeshItem(m));
 
                 if (!hasVertexAlpha && m.Vertices.Any(e => (m.HasColorSet(0) && e.Colors[0].W != 1) || (m.HasColorSet(1) && e.Colors[1].W != 1)))
                     hasVertexAlpha = true;
-                
+
             }
             if (meshList.Items.Count > 0)
                 meshList.Items[0].Selected = true;
             // selectAllMesh_Click(null, null);
 
             // fill material list
-            foreach (var m in _scene.Materials)
+            foreach (IOMaterial m in _scene.Materials)
             {
                 materialList.Items.Add(new MaterialItem(m));
             }
@@ -193,7 +189,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void selectAllMesh_Click(object sender, EventArgs e)
         {
-            meshList.BeginUpdate(); 
+            meshList.BeginUpdate();
             foreach (ListViewItem item in meshList.Items)
                 item.Selected = true;
             meshList.EndUpdate();
@@ -212,7 +208,7 @@ namespace HSDRawViewer.GUI.Extra
             materialList.EndUpdate();
         }
 
-        private static string YamlFilter = @"Yaml (*.yml)|*.yml";
+        private static readonly string YamlFilter = @"Yaml (*.yml)|*.yml";
 
         private class SettingsExport
         {
@@ -245,21 +241,21 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         private void ExportSettings()
         {
-            var f = Tools.FileIO.SaveFile(YamlFilter);
+            string f = Tools.FileIO.SaveFile(YamlFilter);
 
             if (f != null)
             {
-                var settings = new SettingsExport()
+                SettingsExport settings = new()
                 {
                     meshes = GetMeshSettings().ToArray(),
                     materials = GetMaterialSettings().ToArray(),
                 };
 
-                var builder = new SerializerBuilder()
+                SerializerBuilder builder = new SerializerBuilder()
                     .WithNamingConvention(CamelCaseNamingConvention.Instance);
 
-                using (StreamWriter writer = File.CreateText(f))
-                    builder.Build().Serialize(writer, settings);
+                using StreamWriter writer = File.CreateText(f);
+                builder.Build().Serialize(writer, settings);
             }
         }
 
@@ -268,24 +264,24 @@ namespace HSDRawViewer.GUI.Extra
         /// </summary>
         private void ImportSettings()
         {
-            var f = Tools.FileIO.OpenFile(YamlFilter);
+            string f = Tools.FileIO.OpenFile(YamlFilter);
 
             if (f != null)
             {
-                var deserializer = new DeserializerBuilder()
+                IDeserializer deserializer = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .IgnoreUnmatchedProperties()
                 .Build();
 
-                SettingsExport export =  (SettingsExport)deserializer.Deserialize<SettingsExport>(File.ReadAllText(f));
+                SettingsExport export = deserializer.Deserialize<SettingsExport>(File.ReadAllText(f));
 
                 // apply mesh settings
                 if (export.meshes != null)
                 {
-                    var meshes = export.meshes.ToList();
+                    List<MeshImportSettings> meshes = export.meshes.ToList();
                     foreach (MeshItem m in meshList.Items)
                     {
-                        var mesh = meshes.Find(e => e.Name.Equals(m.settings.Name));
+                        MeshImportSettings mesh = meshes.Find(e => e.Name.Equals(m.settings.Name));
 
                         if (mesh != null)
                         {
@@ -298,10 +294,10 @@ namespace HSDRawViewer.GUI.Extra
                 // apply material settings
                 if (export.materials != null)
                 {
-                    var materials = export.materials.ToList();
+                    List<MaterialImportSettings> materials = export.materials.ToList();
                     foreach (MaterialItem m in materialList.Items)
                     {
-                        var mesh = materials.Find(e => e.Name.Equals(m.settings.Name));
+                        MaterialImportSettings mesh = materials.Find(e => e.Name.Equals(m.settings.Name));
 
                         if (mesh != null)
                         {
@@ -320,7 +316,7 @@ namespace HSDRawViewer.GUI.Extra
                 if (export.metalpoly != null)
                     total = Math.Max(total, export.metalpoly.Max());
                 if (export.positions != null)
-                    total = Math.Max(total, export.positions.Max(e=>e.Position));
+                    total = Math.Max(total, export.positions.Max(e => e.Position));
                 if (export.objects != null)
                     total = Math.Max(total, export.objects.Max(e => e.Position));
 
@@ -331,12 +327,12 @@ namespace HSDRawViewer.GUI.Extra
                     total += 1;
 
                     // gather set positions
-                    Dictionary<int, IOMesh> SetPositions = new Dictionary<int, IOMesh>();
+                    Dictionary<int, IOMesh> SetPositions = new();
                     if (export.positions != null)
                     {
-                        foreach (var i in export.positions)
+                        foreach (MeshPosition i in export.positions)
                         {
-                            var mesh = _model.Meshes.Find(e => e.Name.Equals(i.Name));
+                            IOMesh mesh = _model.Meshes.Find(e => e.Name.Equals(i.Name));
 
                             if (mesh != null && !SetPositions.ContainsKey(i.Position))
                             {
@@ -347,12 +343,12 @@ namespace HSDRawViewer.GUI.Extra
                     }
 
                     // gather low and high polys
-                    var high = _model.Meshes.Where(e => !e.Name.Contains("LOW")).ToList();
-                    var low = _model.Meshes.Where(e => e.Name.Contains("LOW")).ToList();
+                    List<IOMesh> high = _model.Meshes.Where(e => !e.Name.Contains("LOW")).ToList();
+                    List<IOMesh> low = _model.Meshes.Where(e => e.Name.Contains("LOW")).ToList();
 
                     // reorder mesh list to account for poly indices
-                    List<IOMesh> newList = new List<IOMesh>();
-                    List<IOMesh> dummies = new List<IOMesh>();
+                    List<IOMesh> newList = new();
+                    List<IOMesh> dummies = new();
                     int highIndex = 0;
                     int lowIndex = 0;
                     for (int i = 0; i < total; i++)
@@ -413,12 +409,12 @@ namespace HSDRawViewer.GUI.Extra
                     }
 
                     // gether mesh items as a list
-                    List<MeshItem> meshItems = new List<MeshItem>();
+                    List<MeshItem> meshItems = new();
                     foreach (MeshItem m in meshList.Items)
                         meshItems.Add(m);
 
                     // add settings for dummy
-                    foreach (var d in dummies)
+                    foreach (IOMesh d in dummies)
                         meshItems.Add(new MeshItem(d)
                         {
                             settings = new MeshImportSettings()
@@ -430,16 +426,16 @@ namespace HSDRawViewer.GUI.Extra
                         });
 
                     // remove single binds as they will alter the order of mesh
-                    foreach (var m in meshItems)
+                    foreach (MeshItem m in meshItems)
                         m.settings.SingleBind = false;
 
                     // sort to match new list order
-                    meshItems = meshItems.OrderBy(e=>newList.IndexOf(e.settings._poly)).ToList();
+                    meshItems = meshItems.OrderBy(e => newList.IndexOf(e.settings._poly)).ToList();
 
                     // force texture counts
                     if (export.objects != null)
                     {
-                        foreach (var i in export.objects)
+                        foreach (DobjInfo i in export.objects)
                         {
                             if (i.Position < meshItems.Count)
                             {
@@ -451,7 +447,7 @@ namespace HSDRawViewer.GUI.Extra
 
                     // add mesh items
                     meshList.Items.Clear();
-                    foreach (var a in meshItems)
+                    foreach (MeshItem a in meshItems)
                         meshList.Items.Add(a);
 
                     // set new mesh list in model

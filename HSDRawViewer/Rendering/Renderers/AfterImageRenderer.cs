@@ -1,6 +1,6 @@
 ﻿using HSDRaw.Melee.Pl;
-using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -29,9 +29,9 @@ namespace HSDRawViewer.Rendering.Renderers
             // calculate lengths in reverse order?
             for (int i = key_length; i >= 0; i--)
             {
-                var key = keys[i];
+                AfterImageKey key = keys[i];
 
-                var rot_pos_vec = key.rot * desc.Top - prev_rot_pos_vec;
+                Vector3 rot_pos_vec = key.rot * desc.Top - prev_rot_pos_vec;
 
                 // don't record length 0
                 if (i != key_length)
@@ -66,7 +66,7 @@ namespace HSDRawViewer.Rendering.Renderers
             // calculate top offset;
             float offset_bot = desc.x0 * (desc.Top - desc.Bottom) + desc.Bottom;
             float offset_top = desc.x4 * (desc.Top - desc.Bottom) + desc.Bottom;
-            
+
             float dif_bot = desc.Bottom - offset_bot;
             float dif_top = desc.Top - offset_top;
 
@@ -76,7 +76,7 @@ namespace HSDRawViewer.Rendering.Renderers
             // draw keys in reverse order
             for (int i = key_length; i >= 0; i--)
             {
-                var key = keys[i];
+                AfterImageKey key = keys[i];
 
                 float top_length = (prev_length * dif_top + offset_top);
                 float bot_length = (prev_length * dif_bot + offset_bot);
@@ -98,7 +98,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
                 if (i != 0)
                 {
-                    var key_next = keys[i - 1];
+                    AfterImageKey key_next = keys[i - 1];
 
                     float rot_angle = Vector3.CalculateAngle(key_next.rot, key.rot);
                     float num_of_blend_step = rot_angle / 0.08726646f; // 5 deg to rad
@@ -108,7 +108,7 @@ namespace HSDRawViewer.Rendering.Renderers
                     if (num_of_blend_step != 0)
                     {
                         float angle = 0;
-                        var a = 1 / num_of_blend_step;
+                        float a = 1 / num_of_blend_step;
 
                         float angle_step = a * rot_angle;
                         float top_length_step = a * ((prev_length * dif_top + offset_top) - top_length);
@@ -119,10 +119,10 @@ namespace HSDRawViewer.Rendering.Renderers
                         float tex_step_top = a * (((i - 1f) / key_length) - texx_top);
                         float tex_step_bottom = a * (((i - 1f) / key_length) - texx_bottom);
 
-                        Vector3 start_pos = new Vector3(key.pos);
+                        Vector3 start_pos = new(key.pos);
                         Vector3 pos_step = a * (key_next.pos - key.pos);
 
-                        var normal_cross = Vector3.Cross(key.rot, key_next.rot).Normalized();
+                        Vector3 normal_cross = Vector3.Cross(key.rot, key_next.rot).Normalized();
 
                         for (int blendi = 0; blendi < num_of_blend_step - 2; blendi++)
                         {
@@ -136,7 +136,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             texx_top += tex_step_top;
                             texx_bottom += tex_step_bottom;
 
-                            var rotation = new Vector3(key.rot);
+                            Vector3 rotation = new(key.rot);
                             rotation.RotateAboutUnitAxis(angle, normal_cross);
 
                             //GL.TexCoord2(angle, 0);

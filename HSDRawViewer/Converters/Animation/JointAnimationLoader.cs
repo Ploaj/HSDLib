@@ -47,14 +47,14 @@ namespace HSDRawViewer.Converters.Animation
                     if (scene.Animations.Count == 0)
                         return null;
 
-                    var ja = new JointAnimManager();
+                    JointAnimManager ja = new();
                     ConvertIOGroup(ja, scene.Animations[0]);
                     return ja;
                 }
                 else
                 if (Path.GetExtension(filePath).ToLower().Equals(".dat"))
                 {
-                    var dat = new HSDRaw.HSDRawFile(filePath);
+                    HSDRaw.HSDRawFile dat = new(filePath);
 
                     if (dat.Roots.Count > 0 && dat.Roots[0].Data is HSD_FigaTree tree)
                         return new JointAnimManager(tree);
@@ -69,11 +69,11 @@ namespace HSDRawViewer.Converters.Animation
 
         private static void ConvertIOGroup(JointAnimManager ja, IOAnimation group)
         {
-            var anim_node = new AnimNode();
+            AnimNode anim_node = new();
 
-            foreach (var iotrack in group.Tracks)
+            foreach (IOAnimationTrack iotrack in group.Tracks)
             {
-                foreach (var k in iotrack.KeyFrames)
+                foreach (IOKeyFrame k in iotrack.KeyFrames)
                 {
                     switch (iotrack.ChannelType)
                     {
@@ -82,7 +82,7 @@ namespace HSDRawViewer.Converters.Animation
                 }
             }
 
-            foreach (var g in group.Groups)
+            foreach (IOAnimation g in group.Groups)
                 ConvertIOGroup(ja, g);
         }
     }

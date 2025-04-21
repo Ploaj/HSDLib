@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -63,10 +62,10 @@ namespace HSDRawViewer.Rendering.Models
         {
             _lights = new RenderLObj[]
             {
-                new RenderLObj(),
-                new RenderLObj(),
-                new RenderLObj(),
-                new RenderLObj(),
+                new(),
+                new(),
+                new(),
+                new(),
             };
         }
     }

@@ -1,6 +1,5 @@
 ﻿using HSDRaw.Common;
 using HSDRawViewer.Rendering.Shaders;
-using OpenTK.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +38,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 {
                     GLCache = new List<int>();
 
-                    foreach (var i in Indexes)
+                    foreach (int i in Indexes)
                         GLCache.Add(m.GetGLID(i));
                 }
 
@@ -60,10 +59,10 @@ namespace HSDRawViewer.Rendering.Renderers
                 _manager.ClearTextures();
 
             TexGs.Clear();
-            foreach (var p in bank.ParticleImages)
+            foreach (HSD_TexGraphic p in bank.ParticleImages)
             {
-                TexGroup tg = new TexGroup();
-                foreach (var tobj in p.ConvertToTOBJs())
+                TexGroup tg = new();
+                foreach (HSD_TOBJ tobj in p.ConvertToTOBJs())
                     tg.Indexes.Add(_manager.Add(tobj));
                 TexGs.Add(tg);
             }
@@ -75,7 +74,7 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="id"></param>
         public ParticleGenerator SpawnGenerator(int id)
         {
-            var gen = new ParticleGenerator(_generators[id % 1000]) { Parent = this };
+            ParticleGenerator gen = new(_generators[id % 1000]) { Parent = this };
 
             Generators.Add(gen);
             return gen;
@@ -87,7 +86,7 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="id"></param>
         public ParticleGenerator SpawnGenerator(int id, float x, float y, float z)
         {
-            var gen = new ParticleGenerator(GetDescriptor(id))
+            ParticleGenerator gen = new(GetDescriptor(id))
             {
                 Parent = this
             };
@@ -104,7 +103,7 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="gen"></param>
         public void SpawnGenerator(HSD_ParticleGenerator gen)
         {
-            var g = new ParticleGenerator(gen) { Parent = this };
+            ParticleGenerator g = new(gen) { Parent = this };
 
             Generators.Add(g);
         }
@@ -143,7 +142,7 @@ namespace HSDRawViewer.Rendering.Renderers
         public void Update()
         {
             // update the generators
-            for (int i = Generators.Count - 1; i >= 0; i--) 
+            for (int i = Generators.Count - 1; i >= 0; i--)
             {
                 Generators[i].Update();
 
@@ -183,8 +182,8 @@ namespace HSDRawViewer.Rendering.Renderers
                 return;
 
             // render particles
-            var pos = c.TransformedPosition;
-            foreach (var p in Particles.OrderBy(e => -(e.Pos - pos).LengthSquared))
+            OpenTK.Mathematics.Vector3 pos = c.TransformedPosition;
+            foreach (Particle p in Particles.OrderBy(e => -(e.Pos - pos).LengthSquared))
             {
                 if (p.TexG >= 0)
                     p.Render(c, _shader, TexGs[p.TexG].GetGLIndices(_manager));

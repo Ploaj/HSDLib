@@ -1,10 +1,10 @@
-﻿using System;
-using System.Windows.Forms;
-using System.Reflection;
-using System.Drawing;
-using System.ComponentModel;
+﻿using HSDRaw.Common;
+using System;
 using System.Collections.Generic;
-using HSDRaw.Common;
+using System.ComponentModel;
+using System.Drawing;
+using System.Reflection;
+using System.Windows.Forms;
 using static System.Windows.Forms.ListBox;
 
 namespace HSDRawViewer.GUI
@@ -42,9 +42,9 @@ namespace HSDRawViewer.GUI
 
         [DefaultValue(false)]
         public bool AskBeforeDelete
-    {
+        {
             get => _askbeforedelete;
-            set {  _askbeforedelete = value; }
+            set { _askbeforedelete = value; }
         }
         private bool _askbeforedelete = false;
 
@@ -148,7 +148,7 @@ namespace HSDRawViewer.GUI
         /// Starting offset for item index display
         /// </summary>
         public int ItemIndexOffset { get; set; } = 0;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -158,14 +158,14 @@ namespace HSDRawViewer.GUI
             return elementList.Items;
         }
 
-        private BindingList<object> Items = new BindingList<object>();
+        private readonly BindingList<object> Items = new();
 
         /// <summary>
         /// 
         /// </summary>
         private void MakeChanges()
         {
-            if(Property != null)
+            if (Property != null)
             {
                 MethodInfo method = GetType().GetMethod("ToArray").MakeGenericMethod(new Type[] { Property.PropertyType.GetElementType() });
                 Property.SetValue(_object, method.Invoke(this, new object[] { }));
@@ -204,7 +204,7 @@ namespace HSDRawViewer.GUI
         /// <param name="propertyName"></param>
         public void SetArrayFromProperty(object obj, string propertyName)
         {
-            if(obj == null)
+            if (obj == null)
             {
                 Object = null;
                 Property = null;
@@ -227,7 +227,7 @@ namespace HSDRawViewer.GUI
             IsResetting = true;
             Items.Clear();
             if (_object != null)
-                foreach(var obj in (object[])Property.GetValue(_object))
+                foreach (object obj in (object[])Property.GetValue(_object))
                     Items.Add(obj);
             IsResetting = false;
             elementList.EndUpdate();
@@ -250,10 +250,10 @@ namespace HSDRawViewer.GUI
             else
                 propertyGrid.SelectedObject = elementList.SelectedItem;
 
-            if(!IsResetting)
+            if (!IsResetting)
                 OnSelectedObjectChanged(EventArgs.Empty);
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -291,8 +291,8 @@ namespace HSDRawViewer.GUI
             if (Property == null)
                 return;
 
-            var ob = Activator.CreateInstance(Property.PropertyType.GetElementType());
-            if(ob != null)
+            object ob = Activator.CreateInstance(Property.PropertyType.GetElementType());
+            if (ob != null)
             {
                 OnItemAdded?.Invoke(new AddedItemEventArgs() { Item = ob });
                 if (InsertCloneAfterSelected && SelectedIndex != -1)
@@ -317,7 +317,7 @@ namespace HSDRawViewer.GUI
             {
                 elementList.BeginUpdate();
 
-                var i = elementList.SelectedIndex;
+                int i = elementList.SelectedIndex;
                 object moveItem = elementList.Items[i];
                 Items.Remove(moveItem);
                 Items.Insert(i - 1, moveItem);
@@ -342,7 +342,7 @@ namespace HSDRawViewer.GUI
             {
                 elementList.BeginUpdate();
 
-                var i = elementList.SelectedIndex;
+                int i = elementList.SelectedIndex;
 
                 object moveItem = elementList.Items[i];
                 Items.Remove(moveItem);
@@ -443,7 +443,7 @@ namespace HSDRawViewer.GUI
             if (elementList.SelectedItem == null)
                 return;
 
-            var clone = ObjectExtensions.Copy(elementList.SelectedItem);
+            object clone = ObjectExtensions.Copy(elementList.SelectedItem);
 
             if (InsertCloneAfterSelected && SelectedIndex != -1)
                 Items.Insert(SelectedIndex + 1, clone);
@@ -463,7 +463,7 @@ namespace HSDRawViewer.GUI
         private void elementList_MeasureItem(object sender, MeasureItemEventArgs e)
         {
             // Get the text of the item
-            var itemText = ((ListBox)sender).Items[e.Index].ToString();
+            string itemText = ((ListBox)sender).Items[e.Index].ToString();
 
             // Measure the size of the text using the Graphics object
             SizeF textSize = e.Graphics.MeasureString(itemText, elementList.Font);
@@ -483,9 +483,9 @@ namespace HSDRawViewer.GUI
             {
                 e.DrawBackground();
 
-                var brush = ApplicationSettings.SystemWindowTextColorBrush;
+                Brush brush = ApplicationSettings.SystemWindowTextColorBrush;
 
-                var itemText = ((ListBox)sender).Items[e.Index].ToString();
+                string itemText = ((ListBox)sender).Items[e.Index].ToString();
 
                 if (e.Index < TextOverrides.Count && !string.IsNullOrEmpty(TextOverrides[e.Index]))
                     itemText = TextOverrides[e.Index];
@@ -494,16 +494,16 @@ namespace HSDRawViewer.GUI
                     itemText = "-";
 
                 int offset = 0;
-                
+
                 if (DisplayItemIndices)
                 {
-                    var indText = (e.Index + ItemIndexOffset).ToString() + ".";
-                    var indSize = TextRenderer.MeasureText(indText, e.Font);
+                    string indText = (e.Index + ItemIndexOffset).ToString() + ".";
+                    Size indSize = TextRenderer.MeasureText(indText, e.Font);
 
-                    var indexBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, indSize.Width, indSize.Height);
+                    Rectangle indexBound = new(e.Bounds.X + offset, e.Bounds.Y, indSize.Width, indSize.Height);
 
                     if (e.State == DrawItemState.Selected)
-                        using (var selectedColor = new SolidBrush(Color.White))
+                        using (SolidBrush selectedColor = new(Color.White))
                             e.Graphics.DrawString(indText, e.Font, selectedColor, indexBound, StringFormat.GenericDefault);
                     else
                         e.Graphics.DrawString(indText, e.Font, ApplicationSettings.SystemGrayTextColorBrush, indexBound, StringFormat.GenericDefault);
@@ -513,18 +513,18 @@ namespace HSDRawViewer.GUI
 
                 if (DisplayItemImages && ((ListBox)sender).Items[e.Index] is ImageArrayItem imageitem)
                 {
-                    using (var img = imageitem.ToImage())
-                        if (img != null)
-                        {
-                            var indexBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, ImageWidth, ImageHeight);
+                    using Image img = imageitem.ToImage();
+                    if (img != null)
+                    {
+                        Rectangle indexBound = new(e.Bounds.X + offset, e.Bounds.Y, ImageWidth, ImageHeight);
 
-                            e.Graphics.DrawImage(img, indexBound);
+                        e.Graphics.DrawImage(img, indexBound);
 
-                            offset += ImageWidth;
-                        }
+                        offset += ImageWidth;
+                    }
                 }
-                
-                var textBound = new Rectangle(e.Bounds.X + offset, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
+
+                Rectangle textBound = new(e.Bounds.X + offset, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
                 e.Graphics.DrawString(itemText, e.Font, brush, textBound, StringFormat.GenericDefault);
 
                 e.DrawFocusRectangle();
@@ -548,7 +548,7 @@ namespace HSDRawViewer.GUI
             else
             if (elementList.Items.Contains(o))
             {
-                if(!multi)
+                if (!multi)
                     elementList.SelectedItems.Clear();
 
                 if (!elementList.SelectedItems.Contains(o))
@@ -584,7 +584,7 @@ namespace HSDRawViewer.GUI
         {
             return Items.IndexOf(o);
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -608,10 +608,10 @@ namespace HSDRawViewer.GUI
     {
         Image ToImage();
     }
-    
+
     public class TOBJProxy : ImageArrayItem
     {
-        public HSD_TOBJ TOBJ = new HSD_TOBJ() { SX = 1, SY = 1, SZ = 1 };
+        public HSD_TOBJ TOBJ = new() { SX = 1, SY = 1, SZ = 1 };
 
         /// <summary>
         /// 

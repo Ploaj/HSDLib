@@ -1,5 +1,4 @@
 ﻿using HSDRawViewer.ContextMenus;
-using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.Plugins;
 using System;
 using System.Collections.Generic;
@@ -78,18 +77,18 @@ namespace HSDRawViewer
 
         private static void InitContextMenus()
         {
-            var types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                         from assemblyType in domainAssembly.GetTypes()
-                         where typeof(CommonContextMenu).IsAssignableFrom(assemblyType)
-                         select assemblyType).ToArray();
+            Type[] types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                            from assemblyType in domainAssembly.GetTypes()
+                            where typeof(CommonContextMenu).IsAssignableFrom(assemblyType)
+                            select assemblyType).ToArray();
 
-            foreach (var t in types)
+            foreach (Type t in types)
             {
                 if (t != typeof(CommonContextMenu))
                 {
-                    var ren = (CommonContextMenu)Activator.CreateInstance(t);
+                    CommonContextMenu ren = (CommonContextMenu)Activator.CreateInstance(t);
 
-                    foreach (var v in ren.SupportedTypes)
+                    foreach (Type v in ren.SupportedTypes)
                     {
                         typeToContextMenu.Add(v, ren);
                     }
@@ -99,12 +98,12 @@ namespace HSDRawViewer
 
         private static void InitEditors()
         {
-            var types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                         from assemblyType in domainAssembly.GetTypes()
-                         where typeof(PluginBase).IsAssignableFrom(assemblyType)
-                         select assemblyType).ToArray();
+            Type[] types = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                            from assemblyType in domainAssembly.GetTypes()
+                            where typeof(PluginBase).IsAssignableFrom(assemblyType)
+                            select assemblyType).ToArray();
 
-            foreach (var t in types)
+            foreach (Type t in types)
             {
                 if (t != typeof(PluginBase))
                 {
@@ -112,7 +111,7 @@ namespace HSDRawViewer
 
                     if (suppTypes != null)
                     {
-                        foreach (var v in suppTypes.Types)
+                        foreach (Type v in suppTypes.Types)
                         {
                             typeToEditor.Add(v, t);
                         }

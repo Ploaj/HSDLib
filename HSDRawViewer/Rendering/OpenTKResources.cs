@@ -1,10 +1,6 @@
-﻿using System;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Graphics;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.WinForms;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.Common;
 
 namespace HSDRawViewer.Rendering
 {

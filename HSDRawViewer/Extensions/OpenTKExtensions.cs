@@ -1,5 +1,4 @@
-﻿using CSCore.Streams.SampleConverter;
-using HSDRaw.Common;
+﻿using HSDRaw.Common;
 using OpenTK.Mathematics;
 using System;
 
@@ -56,8 +55,8 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static Vector3 ExtractRotationEuler(this Matrix4 m)
         {
-            var v = Vector3.Zero;
-            var dVar2 = new Vector2(m.M11, m.M12).LengthFast;
+            Vector3 v = Vector3.Zero;
+            float dVar2 = new Vector2(m.M11, m.M12).LengthFast;
             if (dVar2 <= 1.0E-5)
             {
                 v.X = (float)Math.Atan2(-m.M32, m.M22);
@@ -81,12 +80,12 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static Quaternion FromEuler(this Quaternion quat, float X, float Y, float Z)
         {
-            var dVar1 = Math.Cos(0.5f * X);
-            var dVar2 = Math.Cos(0.5f * Y);
-            var dVar3 = Math.Cos(0.5f * Z);
-            var dVar4 = Math.Sin(0.5f * X);
-            var dVar5 = Math.Sin(0.5f * Y);
-            var dVar6 = Math.Sin(0.5f * Z);
+            double dVar1 = Math.Cos(0.5f * X);
+            double dVar2 = Math.Cos(0.5f * Y);
+            double dVar3 = Math.Cos(0.5f * Z);
+            double dVar4 = Math.Sin(0.5f * X);
+            double dVar5 = Math.Sin(0.5f * Y);
+            double dVar6 = Math.Sin(0.5f * Z);
 
             quat.W = (float)(dVar1 * (dVar2 * dVar3) + (dVar4 * (dVar5 * dVar6)));
             quat.X = (float)(dVar4 * (dVar2 * dVar3) - (dVar1 * (dVar5 * dVar6)));

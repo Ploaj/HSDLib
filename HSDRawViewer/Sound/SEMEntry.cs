@@ -18,7 +18,7 @@ namespace HSDRawViewer.Sound
     {
         [YamlIgnore, Description("Bank Name")]
         public string Name { get => SoundBank == null ? "" : SoundBank.Name; set { if (SoundBank != null) SoundBank.Name = value; } }
-        
+
         [YamlIgnore, Description("Unknown Flag"), TypeConverter(typeof(HexType))]
         public uint Flags { get => SoundBank == null ? 0 : (uint)SoundBank.Flag; set { if (SoundBank != null) SoundBank.Flag = (int)value; } }
 
@@ -43,7 +43,7 @@ namespace HSDRawViewer.Sound
         /// </summary>
         public void AddScript(SEMScript value)
         {
-            var ar = Scripts;
+            SEMScript[] ar = Scripts;
             Array.Resize(ref ar, ar.Length + 1);
             ar[ar.Length - 1] = value;
             Scripts = ar;
@@ -57,9 +57,9 @@ namespace HSDRawViewer.Sound
             if (SoundBank == null)
                 return;
 
-            var usedSounds = Scripts.Select(e => e.SoundCommandIndex);
+            IEnumerable<int> usedSounds = Scripts.Select(e => e.SoundCommandIndex);
 
-            List<DSP> newList = new List<DSP>();
+            List<DSP> newList = new();
 
             for (int i = 0; i < SoundBank.Sounds.Length; i++)
             {
@@ -77,7 +77,7 @@ namespace HSDRawViewer.Sound
         /// <returns></returns>
         public static SEMEntry Deserialize(string data)
         {
-            var deserializer = new DeserializerBuilder()
+            IDeserializer deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
 
@@ -90,13 +90,11 @@ namespace HSDRawViewer.Sound
         /// <param name="filepath"></param>
         public void Serialize(string filepath)
         {
-            var builder = new SerializerBuilder();
+            SerializerBuilder builder = new();
             builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
 
-            using (StreamWriter writer = File.CreateText(filepath))
-            {
-                builder.Build().Serialize(writer, this);
-            }
+            using StreamWriter writer = File.CreateText(filepath);
+            builder.Build().Serialize(writer, this);
         }
 
         /// <summary>
@@ -104,46 +102,42 @@ namespace HSDRawViewer.Sound
         /// </summary>
         public void LoadFromPackage(string fileName)
         {
-            using (FileStream s = new FileStream(fileName, FileMode.Open))
-            using (BinaryReaderExt r = new BinaryReaderExt(s))
+            using FileStream s = new(fileName, FileMode.Open);
+            using BinaryReaderExt r = new(s);
+            if (s.Length < 0x14)
+                return;
+
+            if (new string(r.ReadChars(4)) != "SPKG")
+                return;
+
+            GroupFlags = r.ReadUInt32();
+            Flags = r.ReadUInt32();
+
+            int ssmSize = r.ReadInt32();
+            Scripts = new SEMScript[r.ReadInt32()];
+
+            for (int i = 0; i < Scripts.Length; i++)
             {
-                if (s.Length < 0x14)
-                    return;
-
-                if (new string(r.ReadChars(4)) != "SPKG")
-                    return;
-
-                GroupFlags = r.ReadUInt32();
-                Flags = r.ReadUInt32();
-
-                var ssmSize = r.ReadInt32();
-                Scripts = new SEMScript[r.ReadInt32()];
-
-                for(int i = 0; i < Scripts.Length; i++)
+                Scripts[i] = new SEMScript()
                 {
-                    Scripts[i] = new SEMScript()
-                    {
-                        CommandData = r.GetSection(r.ReadUInt32(), r.ReadInt32())
-                    };
-                }
+                    CommandData = r.GetSection(r.ReadUInt32(), r.ReadInt32())
+                };
+            }
 
-                r.PrintPosition();
-                var name = r.ReadString(r.ReadByte());
+            r.PrintPosition();
+            string name = r.ReadString(r.ReadByte());
 
-                if (ssmSize == 0)
-                {
-                    SoundBank = null;
-                }
-                else
-                {
-                    if (SoundBank == null)
-                        SoundBank = new SSM();
-                    
-                    using (MemoryStream ssmStream = new MemoryStream(r.ReadBytes(ssmSize)))
-                    {
-                        SoundBank.Open(name, ssmStream);
-                    }
-                }
+            if (ssmSize == 0)
+            {
+                SoundBank = null;
+            }
+            else
+            {
+                if (SoundBank == null)
+                    SoundBank = new SSM();
+
+                using MemoryStream ssmStream = new(r.ReadBytes(ssmSize));
+                SoundBank.Open(name, ssmStream);
             }
         }
 
@@ -152,42 +146,40 @@ namespace HSDRawViewer.Sound
         /// </summary>
         public void SaveAsPackage(string fileName)
         {
-            using (FileStream s = new FileStream(fileName, FileMode.Create))
-            using (BinaryWriter w = new BinaryWriter(s))
-            {
-                w.Write(new char[]{ 'S', 'P', 'K', 'G'});
+            using FileStream s = new(fileName, FileMode.Create);
+            using BinaryWriter w = new(s);
+            w.Write(new char[] { 'S', 'P', 'K', 'G' });
 
-                w.Write(GroupFlags);
-                w.Write(Flags);
-                w.Write(0);
-                w.Write(Scripts.Length);
-                
-                w.Write(new byte[Scripts.Length * 8]);
+            w.Write(GroupFlags);
+            w.Write(Flags);
+            w.Write(0);
+            w.Write(Scripts.Length);
 
-                w.Write(SoundBank != null ? SoundBank.Name : "");
+            w.Write(new byte[Scripts.Length * 8]);
 
-                if (SoundBank != null)
-                    using (MemoryStream ssmFile = new MemoryStream())
-                    {
-                        SoundBank.WriteToStream(ssmFile, out int bs);
-                        var ssm = ssmFile.ToArray();
-                        w.Write(ssm);
-                        var temp = s.Position;
-                        s.Position = 0x0C;
-                        w.Write(ssm.Length);
-                        s.Position = temp;
-                    }
-            
-                for (int i = 0; i < Scripts.Length; i++)
+            w.Write(SoundBank != null ? SoundBank.Name : "");
+
+            if (SoundBank != null)
+                using (MemoryStream ssmFile = new())
                 {
-                    var temp = s.Position;
-                    s.Position = 0x14 + 8 * i;
-                    w.Write((int)temp);
-                    w.Write(Scripts[i].CommandData.Length);
+                    SoundBank.WriteToStream(ssmFile, out int bs);
+                    byte[] ssm = ssmFile.ToArray();
+                    w.Write(ssm);
+                    long temp = s.Position;
+                    s.Position = 0x0C;
+                    w.Write(ssm.Length);
                     s.Position = temp;
-
-                    w.Write(Scripts[i].CommandData);
                 }
+
+            for (int i = 0; i < Scripts.Length; i++)
+            {
+                long temp = s.Position;
+                s.Position = 0x14 + 8 * i;
+                w.Write((int)temp);
+                w.Write(Scripts[i].CommandData.Length);
+                s.Position = temp;
+
+                w.Write(Scripts[i].CommandData);
             }
         }
     }

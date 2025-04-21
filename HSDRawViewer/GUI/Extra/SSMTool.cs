@@ -1,11 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.IO;
-using HSDRaw;
-using HSDRawViewer.Tools;
+﻿using HSDRaw;
 using HSDRawViewer.Sound;
+using HSDRawViewer.Tools;
+using System;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -15,11 +15,11 @@ namespace HSDRawViewer.GUI.Extra
 
         private int StartIndex;
 
-        public BindingList<DSP> Sounds = new BindingList<DSP>();
+        public BindingList<DSP> Sounds = new();
 
-        private DSPViewer dspViewer = new DSPViewer();
+        private readonly DSPViewer dspViewer = new();
 
-        public ContextMenuStrip CMenu = new ContextMenuStrip();
+        public ContextMenuStrip CMenu = new();
 
         public SSMTool()
         {
@@ -56,7 +56,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var file = FileIO.OpenFile("SSM (*.ssm, *.sdi)|*.ssm;*.sdi");
+            string file = FileIO.OpenFile("SSM (*.ssm, *.sdi)|*.ssm;*.sdi");
 
             if (file != null)
             {
@@ -71,7 +71,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(listBox1.SelectedItem is DSP dsp)
+            if (listBox1.SelectedItem is DSP dsp)
             {
                 dspViewer.DSP = dsp;
             }
@@ -98,7 +98,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filePath = FileIO.SaveFile("SSM (*.ssm)|*.ssm");
+            string filePath = FileIO.SaveFile("SSM (*.ssm)|*.ssm");
 
             if (filePath != null)
             {
@@ -113,13 +113,13 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void importDSPToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var files = FileIO.OpenFiles(DSP.SupportedImportFilter);
+            string[] files = FileIO.OpenFiles(DSP.SupportedImportFilter);
 
             if (files != null)
             {
-                foreach(var file in files)
+                foreach (string file in files)
                 {
-                    var dsp = new DSP();
+                    DSP dsp = new();
                     dsp.FromFormat(File.ReadAllBytes(file), Path.GetExtension(file));
                     Sounds.Add(dsp);
                 }
@@ -165,7 +165,7 @@ namespace HSDRawViewer.GUI.Extra
         }
 
         #endregion
-        
+
         public void OpenFile(string filePath)
         {
             Text = "SSM Editor - " + filePath;
@@ -173,7 +173,7 @@ namespace HSDRawViewer.GUI.Extra
             Sounds.Clear();
             FilePath = filePath;
 
-            if(Path.GetExtension(filePath).ToLower() == ".ssm")
+            if (Path.GetExtension(filePath).ToLower() == ".ssm")
                 OpenSSM(filePath);
 
             if (Path.GetExtension(filePath).ToLower() == ".sdi")
@@ -189,57 +189,55 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="filePath"></param>
         private void OpenSDI(string filePath)
         {
-            var sam = filePath.Replace(".sdi", ".sam");
+            string sam = filePath.Replace(".sdi", ".sam");
             if (!File.Exists(sam))
                 return;
 
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
-            using (BinaryReaderExt d = new BinaryReaderExt(new FileStream(sam, FileMode.Open)))
+            using BinaryReaderExt r = new(new FileStream(filePath, FileMode.Open));
+            using BinaryReaderExt d = new(new FileStream(sam, FileMode.Open));
+            r.BigEndian = true;
+
+            while (true)
             {
-                r.BigEndian = true;
-                
-                while(true)
-                {
-                    var id = r.ReadInt32();
-                    if (id == -1)
-                        break;
-                    var dataoffset = r.ReadUInt32();
-                    var padding = r.ReadInt32();
-                    var flags = r.ReadInt16();
-                    var frequency = r.ReadInt16();
-                    var value = r.ReadInt32();
-                    r.Skip(8); // unknown
-                    uint coefOffset = r.ReadUInt32();
+                int id = r.ReadInt32();
+                if (id == -1)
+                    break;
+                uint dataoffset = r.ReadUInt32();
+                int padding = r.ReadInt32();
+                short flags = r.ReadInt16();
+                short frequency = r.ReadInt16();
+                int value = r.ReadInt32();
+                r.Skip(8); // unknown
+                uint coefOffset = r.ReadUInt32();
 
-                    DSP dsp = new DSP();
-                    dsp.Frequency = frequency;
+                DSP dsp = new();
+                dsp.Frequency = frequency;
 
-                    DSPChannel channel = new DSPChannel();
-                    channel.NibbleCount = value;
+                DSPChannel channel = new();
+                channel.NibbleCount = value;
 
-                    var temp = r.Position;
-                    var end = (uint)d.Length;
-                    if(r.ReadInt32() != -1)
-                        end = r.ReadUInt32();
+                uint temp = r.Position;
+                uint end = (uint)d.Length;
+                if (r.ReadInt32() != -1)
+                    end = r.ReadUInt32();
 
-                    r.Seek(coefOffset);
-                    r.ReadInt32();
-                    r.ReadInt32();
+                r.Seek(coefOffset);
+                r.ReadInt32();
+                r.ReadInt32();
 
-                    for (int i = 0; i < 0x10; i++)
-                        channel.COEF[i] = r.ReadInt16();
+                for (int i = 0; i < 0x10; i++)
+                    channel.COEF[i] = r.ReadInt16();
 
-                    r.Seek(temp);
+                r.Seek(temp);
 
-                    d.Seek(dataoffset);
-                    byte[] data = d.ReadBytes((int)(end - dataoffset));
+                d.Seek(dataoffset);
+                byte[] data = d.ReadBytes((int)(end - dataoffset));
 
-                    channel.Data = data;
-                    channel.InitialPredictorScale = data[0];
-                    dsp.Channels.Add(channel);
+                channel.Data = data;
+                channel.InitialPredictorScale = data[0];
+                dsp.Channels.Add(channel);
 
-                    Sounds.Add(dsp);
-                }
+                Sounds.Add(dsp);
             }
         }
 
@@ -249,10 +247,10 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="filePath"></param>
         private void OpenSSM(string filePath)
         {
-            var ssm = new SSM();
+            SSM ssm = new();
             StartIndex = ssm.StartIndex;
             ssm.Open(filePath);
-            foreach(var s in ssm.Sounds)
+            foreach (DSP s in ssm.Sounds)
                 Sounds.Add(s);
         }
 
@@ -264,7 +262,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             FilePath = filePath;
 
-            var ssm = new SSM();
+            SSM ssm = new();
             ssm.StartIndex = StartIndex;
             ssm.Sounds = Sounds.ToArray();
             ssm.Save(filePath);
@@ -287,14 +285,14 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var file = FileIO.SaveFile(DSP.SupportedExportFilter);
+            string file = FileIO.SaveFile(DSP.SupportedExportFilter);
 
-            if(file != null)
+            if (file != null)
             {
-                var sIndex = 0;
-                foreach(var s in Sounds)
+                int sIndex = 0;
+                foreach (DSP s in Sounds)
                 {
-                    var o = Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + sIndex++.ToString("D2") + Path.GetExtension(file));
+                    string o = Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + sIndex++.ToString("D2") + Path.GetExtension(file));
                     s.ExportFormat(o);
                     //s.ExportFormat(folder + "\\sound_" + sIndex++ + "_channels_" + s.Channels.Count + "_frequency_" + s.Frequency + ".wav");
                 }
@@ -308,7 +306,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void buttonRemove_Click(object sender, EventArgs e)
         {
-            if(listBox1.SelectedItem is DSP dsp)
+            if (listBox1.SelectedItem is DSP dsp)
             {
                 Sounds.Remove(dsp);
             }

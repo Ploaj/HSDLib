@@ -1,10 +1,9 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRawViewer.GUI.Dialog;
 using System;
 using System.Windows.Forms;
-using HSDRawViewer.GUI.Dialog;
-using System.Text;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -14,29 +13,27 @@ namespace HSDRawViewer.ContextMenus
 
         public UnidentifiedContextMenu() : base()
         {
-            ToolStripMenuItem OpenAs = new ToolStripMenuItem("Open As");
+            ToolStripMenuItem OpenAs = new("Open As");
             OpenAs.Click += (sender, args) =>
             {
-                using (HSDTypeDialog d = new HSDTypeDialog())
+                using HSDTypeDialog d = new();
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    if (d.ShowDialog() == DialogResult.OK)
-                    {
-                        var type = Activator.CreateInstance(d.HSDAccessorType);
-                        MainForm.Instance.SelectNode((HSDAccessor)type);
-                    }
+                    object type = Activator.CreateInstance(d.HSDAccessorType);
+                    MainForm.Instance.SelectNode((HSDAccessor)type);
                 }
             };
             Items.Add(OpenAs);
 
-            ToolStripMenuItem OpenAsJOBJ = new ToolStripMenuItem("Open As JOBJ");
+            ToolStripMenuItem OpenAsJOBJ = new("Open As JOBJ");
             OpenAsJOBJ.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_JOBJ());
             Items.Add(OpenAsJOBJ);
 
-            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Open As AnimJoint");
+            ToolStripMenuItem OpenAsAJ = new("Open As AnimJoint");
             OpenAsAJ.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_AnimJoint());
             Items.Add(OpenAsAJ);
 
-            ToolStripMenuItem OpenAsmah = new ToolStripMenuItem("Open As MatAnimJoint");
+            ToolStripMenuItem OpenAsmah = new("Open As MatAnimJoint");
             OpenAsmah.Click += (sender, args) => MainForm.Instance.SelectNode(new HSD_MatAnimJoint());
             Items.Add(OpenAsmah);
 

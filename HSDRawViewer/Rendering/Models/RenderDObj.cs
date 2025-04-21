@@ -2,12 +2,8 @@
 using HSDRaw.GX;
 using HSDRawViewer.Rendering.GX;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -70,14 +66,14 @@ namespace HSDRawViewer.Rendering.Models
             if (_dobj.Mobj.Textures != null)
             {
                 int ti = 0;
-                foreach (var t in _dobj.Mobj.Textures.List)
+                foreach (HSD_TOBJ t in _dobj.Mobj.Textures.List)
                 {
                     // too many textures
                     if (ti >= TextureStates.Length)
                         break;
 
                     // get next texture state
-                    var ts = TextureStates[ti];
+                    LiveTObj ts = TextureStates[ti];
 
                     // reset
                     ts.Reset(t);
@@ -101,19 +97,19 @@ namespace HSDRawViewer.Rendering.Models
                 return;
 
             // List<LivePObj> pobjs = new List<LivePObj>();
-            List<GX_Vertex> vertices = new List<GX_Vertex>();
-            List<List<GX_Shape>> shapesets = new List<List<GX_Shape>>();
+            List<GX_Vertex> vertices = new();
+            List<List<GX_Shape>> shapesets = new();
             PObjs.Clear();
 
             int off = 0;
-            foreach (var pobj in _dobj.Pobj.List)
+            foreach (HSD_POBJ pobj in _dobj.Pobj.List)
             {
                 // skip if attributes are blank
                 if (pobj.Attributes == null)
                     continue;
 
                 // get attributes
-                var attrs = pobj.ToGXAttributes();
+                GX_Attribute[] attrs = pobj.ToGXAttributes();
 
                 // skip if attributes are incomplete
                 // incomplete attributes don't end with null
@@ -121,7 +117,7 @@ namespace HSDRawViewer.Rendering.Models
                     continue;
 
                 // get display list
-                var dl = pobj.ToDisplayList(attrs);
+                GX_DisplayList dl = pobj.ToDisplayList(attrs);
 
                 // add vertices
                 vertices.AddRange(dl.Vertices);
@@ -137,13 +133,13 @@ namespace HSDRawViewer.Rendering.Models
 
 
                 // create pobj cache
-                var pobjCache = new RenderPObj(pobj);
+                RenderPObj pobjCache = new(pobj);
 
                 // init envelopes
                 pobjCache.InitEnvelopes(dl, Parent);
 
                 // load display list
-                foreach (var v in dl.Primitives)
+                foreach (GX_PrimitiveGroup v in dl.Primitives)
                 {
                     pobjCache.DisplayLists.Add(new CachedDL()
                     {
@@ -165,8 +161,8 @@ namespace HSDRawViewer.Rendering.Models
 
     internal class RenderPObj
     {
-        private static int MAX_WEIGHTS = 6;
-        private static int WEIGHT_STRIDE = 10;
+        private static readonly int MAX_WEIGHTS = 6;
+        private static readonly int WEIGHT_STRIDE = 10;
 
         public HSD_POBJ pobj { get; internal set; }
 
@@ -176,7 +172,7 @@ namespace HSDRawViewer.Rendering.Models
 
         public bool HasWeighting = false;
 
-        public List<CachedDL> DisplayLists = new List<CachedDL>();
+        public List<CachedDL> DisplayLists = new();
 
         public RenderPObj(HSD_POBJ pobj)
         {
@@ -200,7 +196,7 @@ namespace HSDRawViewer.Rendering.Models
             else
             {
                 int eni = 0;
-                foreach (var v in dl.Envelopes)
+                foreach (HSD_Envelope v in dl.Envelopes)
                 {
                     if (eni >= WEIGHT_STRIDE)
                         break;
@@ -210,8 +206,8 @@ namespace HSDRawViewer.Rendering.Models
                         if (i >= MAX_WEIGHTS)
                             break;
 
-                        var jobj = v.GetJOBJAt(i);
-                        var jobjIndex = root.GetIndexOfDesc(jobj);
+                        HSD_JOBJ jobj = v.GetJOBJAt(i);
+                        int jobjIndex = root.GetIndexOfDesc(jobj);
 
                         Envelopes[eni * MAX_WEIGHTS + i] = jobjIndex;
                         Weights[eni * MAX_WEIGHTS + i] = v.GetWeightAt(i);

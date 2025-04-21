@@ -18,13 +18,13 @@ namespace HSDRawViewer.Tools.Animation
         /// <param name="target_map"></param>
         public static JointAnimManager Retarget(string anim_file, string source_file, string target_file, string source_map, string target_map)
         {
-            var src_map = new JointMap(source_map);
-            var tar_map = new JointMap(target_map);
+            JointMap src_map = new(source_map);
+            JointMap tar_map = new(target_map);
 
             JointAnimManager anim = Converters.Animation.JointAnimationLoader.LoadJointAnimFromFile(src_map, anim_file);
 
-            var src_jobj = new LiveJObj(new HSDRawFile(source_file).Roots[0].Data as HSD_JOBJ);
-            var tar_jobj = new LiveJObj(new HSDRawFile(target_file).Roots[0].Data as HSD_JOBJ);
+            LiveJObj src_jobj = new(new HSDRawFile(source_file).Roots[0].Data as HSD_JOBJ);
+            LiveJObj tar_jobj = new(new HSDRawFile(target_file).Roots[0].Data as HSD_JOBJ);
 
             return Retarget(anim, src_jobj, tar_jobj, src_map, tar_map, null);
         }
@@ -66,7 +66,7 @@ namespace HSDRawViewer.Tools.Animation
             CustomRetargetCallback cb)
         {
             // create new animation
-            JointAnimManager new_anim = new JointAnimManager(target_model.JointCount);
+            JointAnimManager new_anim = new(target_model.JointCount);
             new_anim.FrameCount = source_anim.FrameCount;
 
             // reset joints
@@ -74,14 +74,14 @@ namespace HSDRawViewer.Tools.Animation
             target_model.ResetTransforms();
 
             // loop through target bones
-            for (var f = 0; f < source_anim.FrameCount; f++)
+            for (int f = 0; f < source_anim.FrameCount; f++)
             {
                 source_anim.ApplyAnimation(source_model, f);
                 source_model.RecalculateTransforms(null, true);
 
                 for (int i = 0; i < target_model.JointCount; i++)
                 {
-                    var target_joint_name = target_map[i];
+                    string target_joint_name = target_map[i];
 
                     // bone not found so skip
                     if (target_joint_name == null)
@@ -93,9 +93,9 @@ namespace HSDRawViewer.Tools.Animation
                         continue;
 
                     // get source and target node
-                    var target_node = new_anim.Nodes[i];
-                    var target_joint = target_model.GetJObjAtIndex(i);
-                    var source_joint = source_model.GetJObjAtIndex(source_joint_index);
+                    AnimNode target_node = new_anim.Nodes[i];
+                    LiveJObj target_joint = target_model.GetJObjAtIndex(i);
+                    LiveJObj source_joint = source_model.GetJObjAtIndex(source_joint_index);
 
                     // calculate retarget transform
                     ConstrainWorldTransform(source_joint, target_joint);
@@ -130,16 +130,16 @@ namespace HSDRawViewer.Tools.Animation
         /// <param name="target"></param>
         private static void ConstrainWorldTransform(LiveJObj source, LiveJObj target)
         {
-            var bind = target.InvertedTransform.Inverted() * source.InvertedTransform;
+            OpenTK.Mathematics.Matrix4 bind = target.InvertedTransform.Inverted() * source.InvertedTransform;
 
-            var rel = bind * source.WorldTransform;
+            OpenTK.Mathematics.Matrix4 rel = bind * source.WorldTransform;
 
             if (target.Parent != null)
                 rel *= target.Parent.WorldTransform.Inverted();
 
-            var relTranslate = rel.ExtractTranslation();
-            var rot = rel.ExtractRotationEuler();
-            var relScale = rel.ExtractScale();
+            OpenTK.Mathematics.Vector3 relTranslate = rel.ExtractTranslation();
+            OpenTK.Mathematics.Vector3 rot = rel.ExtractRotationEuler();
+            OpenTK.Mathematics.Vector3 relScale = rel.ExtractScale();
 
             target.Translation = relTranslate;
             target.Rotation = new OpenTK.Mathematics.Vector4(rot);

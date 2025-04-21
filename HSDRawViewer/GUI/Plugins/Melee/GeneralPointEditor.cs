@@ -1,15 +1,14 @@
-﻿using System;
+﻿using HSDRaw.Common;
 using HSDRaw.Melee.Gr;
-using HSDRaw.Common;
+using HSDRawViewer.Converters.Melee;
+using HSDRawViewer.GUI.Controls.MapHeadViewer;
 using HSDRawViewer.Rendering;
-using System.Windows.Forms;
-using System.ComponentModel;
+using HSDRawViewer.Rendering.Models;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using HSDRawViewer.Converters.Melee;
-using HSDRawViewer.Rendering.Models;
-using WeifenLuo.WinFormsUI.Docking;
-using HSDRawViewer.GUI.Controls.MapHeadViewer;
+using System;
+using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -50,7 +49,7 @@ namespace HSDRawViewer.GUI.Plugins
                 GeneralPoints = _node.Accessor as SBM_GeneralPoints;
                 LoadData();
 
-                var map_head = MainForm.Instance.GetSymbol("map_head") as SBM_Map_Head;
+                SBM_Map_Head map_head = MainForm.Instance.GetSymbol("map_head") as SBM_Map_Head;
                 mapheadviewer.LoadMapHead(map_head);
             }
         }
@@ -60,11 +59,11 @@ namespace HSDRawViewer.GUI.Plugins
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private BindingList<PointLink> PointLinks = new BindingList<PointLink>();
+        private BindingList<PointLink> PointLinks = new();
 
         private LiveJObj LiveJObj;
 
-        private MapHeadViewControl mapheadviewer;
+        private readonly MapHeadViewControl mapheadviewer;
 
         /// <summary>
         /// 
@@ -118,11 +117,11 @@ namespace HSDRawViewer.GUI.Plugins
             Vector3 MinDeath = Vector3.Zero, MaxDeath = Vector3.Zero;
             bool CamSelected = false, DeathSelected = false;
 
-            foreach (var v in PointLinks)
+            foreach (PointLink v in PointLinks)
             {
-                var selected = (propertyGrid1.SelectedObject == v);
+                bool selected = (propertyGrid1.SelectedObject == v);
 
-                var point = v.JObj.WorldTransform.ExtractTranslation();
+                Vector3 point = v.JObj.WorldTransform.ExtractTranslation();
 
                 switch (v.Type)
                 {
@@ -196,7 +195,7 @@ namespace HSDRawViewer.GUI.Plugins
         private bool dragging = false;
         private Vector2 previousPoint = Vector2.Zero;
         private Vector2 previousPickPosition = Vector2.Zero;
-        private float _selectionDistance = 5f;
+        private readonly float _selectionDistance = 5f;
 
         /// <summary>
         /// 
@@ -204,13 +203,13 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="pick"></param>
         private void SelectPoint(PickInformation pick)
         {
-            var selected = false;
-            var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
-            foreach (var v in PointLinks)
+            bool selected = false;
+            Vector3 Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+            foreach (PointLink v in PointLinks)
             {
-                var point = v.JObj.WorldTransform.ExtractTranslation();
+                Vector3 point = v.JObj.WorldTransform.ExtractTranslation();
 
-                var close = Vector3.Zero;
+                Vector3 close = Vector3.Zero;
 
                 if (Math3D.FastDistance(point, Picked, RenderSize))
                 {
@@ -261,7 +260,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="deltaY"></param>
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
-            var Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
+            Vector3 Picked = pick.GetPlaneIntersection(Vector3.UnitZ, Vector3.Zero);
 
             if (mapheadviewer.glViewport.IsAltKey &&
                 args.Button.HasFlag(MouseButtons.Left) &&
@@ -294,13 +293,13 @@ namespace HSDRawViewer.GUI.Plugins
         private void LoadData()
         {
             // get jobjs
-            var jobj = GeneralPoints.JOBJReference.TreeList;
+            System.Collections.Generic.List<HSD_JOBJ> jobj = GeneralPoints.JOBJReference.TreeList;
 
             // set joints for rendering
             LiveJObj = new LiveJObj(GeneralPoints.JOBJReference);
 
             // load points
-            foreach (var v in GeneralPoints.Points)
+            foreach (SBM_GeneralPointInfo v in GeneralPoints.Points)
             {
                 PointLinks.Add(new PointLink()
                 {
@@ -315,7 +314,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private void SavePointChanges()
         {
-            var list = PointLinks;
+            BindingList<PointLink> list = PointLinks;
             SBM_GeneralPointInfo[] p = new SBM_GeneralPointInfo[list.Count];
             for (int i = 0; i < p.Length; i++)
             {
@@ -348,9 +347,9 @@ namespace HSDRawViewer.GUI.Plugins
             // remove jobj and remove from list
             if (PointList.SelectedItem is PointLink link)
             {
-                var jobj = link.JObj.Desc;
+                HSD_JOBJ jobj = link.JObj.Desc;
 
-                foreach (var v in LiveJObj.Enumerate)
+                foreach (LiveJObj v in LiveJObj.Enumerate)
                 {
                     if (v.Sibling != null && v.Sibling.Desc == jobj)
                     {
@@ -393,10 +392,10 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonUp_Click(object sender, EventArgs e)
         {
-            var index = PointList.SelectedIndex;
+            int index = PointList.SelectedIndex;
             if (index == -1)
                 return;
-            var item = PointLinks[index];
+            PointLink item = PointLinks[index];
 
             PointLinks.RemoveAt(index);
             index -= 1;
@@ -416,10 +415,10 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void buttonDown_Click(object sender, EventArgs e)
         {
-            var index = PointList.SelectedIndex;
+            int index = PointList.SelectedIndex;
             if (index == -1)
                 return;
-            var item = PointLinks[index];
+            PointLink item = PointLinks[index];
 
             PointLinks.RemoveAt(index);
             index += 1;
@@ -434,9 +433,9 @@ namespace HSDRawViewer.GUI.Plugins
 
         #region Shapes
 
-        private DrawableCircle circle = new DrawableCircle(0, 0, 1);
+        private readonly DrawableCircle circle = new(0, 0, 1);
 
-        private float RenderSize = 10;
+        private readonly float RenderSize = 10;
 
         private void RenderBounds(Vector3 start, Vector3 end, Vector3 color, bool selected)
         {
@@ -574,20 +573,20 @@ namespace HSDRawViewer.GUI.Plugins
 
         private void importPointsFromSSFFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("Smash Stage File (.ssf)|*.ssf;");
+            string f = Tools.FileIO.OpenFile("Smash Stage File (.ssf)|*.ssf;");
 
             if (f != null)
             {
-                var ssf = SSF.Open(f);
+                SSF ssf = SSF.Open(f);
 
                 PointLinks = new BindingList<PointLink>();
 
                 GeneralPoints.JOBJReference = new HSD_JOBJ();
                 LiveJObj = new LiveJObj(GeneralPoints.JOBJReference);
 
-                foreach (var p in ssf.Points)
+                foreach (SSFPoint p in ssf.Points)
                 {
-                    var pl = new PointLink()
+                    PointLink pl = new()
                     {
                         JObj = LiveJObj.AddChild(new HSD_JOBJ()),
                         X = p.X,

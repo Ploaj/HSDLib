@@ -11,7 +11,7 @@ namespace HSDRawViewer.GUI.Dialog
         {
             InitializeComponent();
 
-            foreach (var v in ApplicationSettings.HSDTypes)
+            foreach (Type v in ApplicationSettings.HSDTypes)
             {
                 comboBoxType.Items.Add(v);
             }

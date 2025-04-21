@@ -291,9 +291,8 @@ namespace BCn
             }
 
             QuantizeValues();
-
-            RgbF32 r0, r1;
-            SpanValues(out r0, out r1);
+            
+            SpanValues(out RgbF32 r0, out RgbF32 r1);
 
             //quantize the endpoints
 

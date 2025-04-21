@@ -1,17 +1,14 @@
 ﻿using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.GUI.Plugins.ScriptEditor
 {
     public class SubactionFromText
     {
 
-        private static Dictionary<string, int> hitboxRemapper = new Dictionary<string, int>()
+        private static readonly Dictionary<string, int> hitboxRemapper = new()
         {
             { "hitbox_id:", 0 }, // ID
             //{ "hitbox_id", 1 }, // Hit Group
@@ -46,18 +43,18 @@ namespace HSDRawViewer.GUI.Plugins.ScriptEditor
         /// <returns></returns>
         public static List<SubactionEvent> FromBrawlText(string input)
         {
-            var sa = new List<SubactionEvent>();
+            List<SubactionEvent> sa = new();
 
-            var lines = input.Split('\n');
+            string[] lines = input.Split('\n');
 
-            foreach (var v in lines)
+            foreach (string v in lines)
             {
-                var name = v.Split('(')[0].Trim();
-                var param = Regex.Matches(v, @"(.+?)(?:,|$)");
+                string name = v.Split('(')[0].Trim();
+                MatchCollection param = Regex.Matches(v, @"(.+?)(?:,|$)");
 
                 if (name.ToLower().Contains("hitbox") && name.ToLower().Contains("create"))
                 {
-                    var subaction = SubactionManager.GetSubaction(11 << 2, SubactionGroup.Fighter);
+                    Subaction subaction = SubactionManager.GetSubaction(11 << 2, SubactionGroup.Fighter);
                     Dictionary<string, int> remap = hitboxRemapper;
 
                     int[] saparam = new int[subaction.Parameters.Length];
@@ -65,10 +62,10 @@ namespace HSDRawViewer.GUI.Plugins.ScriptEditor
 
                     Console.WriteLine(name);
 
-                    foreach (var p in param)
+                    foreach (object p in param)
                     {
-                        var label = Regex.Match(p.ToString(), @"([^:\s]*):").ToString();
-                        var value = Regex.Match(p.ToString(), @"([^:\(\)]+)(?=[,\)])").ToString();
+                        string label = Regex.Match(p.ToString(), @"([^:\s]*):").ToString();
+                        string value = Regex.Match(p.ToString(), @"([^:\(\)]+)(?=[,\)])").ToString();
 
                         Console.WriteLine($"\t{label} = {value}");
 

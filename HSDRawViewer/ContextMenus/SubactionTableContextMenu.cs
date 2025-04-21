@@ -2,8 +2,6 @@
 using HSDRaw.Melee.Pl;
 using System;
 using System.Windows.Forms;
-using HSDRawViewer.GUI.Dialog;
-using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -19,21 +17,21 @@ namespace HSDRawViewer.ContextMenus
 
         public SubactionTableContextMenu() : base()
         {
-            ToolStripMenuItem Export = new ToolStripMenuItem("Import Subaction Data From File");
+            ToolStripMenuItem Export = new("Import Subaction Data From File");
             Export.Click += (sender, args) =>
             {
-                var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
-                if(f != null && MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
+                if (f != null && MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
                 {
-                    var dataToImport = new SBM_FighterActionTable();
+                    SBM_FighterActionTable dataToImport = new();
 
                     dataToImport._s = new HSDRawFile(f).Roots[0].Data._s;
 
-                    if(dataToImport.Count == table.Count)
+                    if (dataToImport.Count == table.Count)
                     {
-                        var importTable = dataToImport.Commands;
-                        var newTable = table.Commands;
+                        SBM_FighterAction[] importTable = dataToImport.Commands;
+                        SBM_FighterAction[] newTable = table.Commands;
                         for (int i = 0; i < table.Count; i++)
                             newTable[i].SubAction = importTable[i].SubAction;
                         table.Commands = newTable;

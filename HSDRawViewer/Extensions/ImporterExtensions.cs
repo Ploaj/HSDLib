@@ -1,5 +1,4 @@
-﻿using HSDRaw.Common;
-using HSDRaw.GX;
+﻿using HSDRaw.GX;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
 using OpenTK.Mathematics;
@@ -65,18 +64,18 @@ namespace HSDRawViewer.Extensions
         /// <param name="root"></param>
         public static void Meleeify(this IOBone root)
         {
-            Dictionary<IOBone, System.Numerics.Matrix4x4> worldTransform = new Dictionary<IOBone, System.Numerics.Matrix4x4>();
-            Queue<IOBone> queue = new Queue<IOBone>();
+            Dictionary<IOBone, System.Numerics.Matrix4x4> worldTransform = new();
+            Queue<IOBone> queue = new();
 
             // gather final positions
             queue.Enqueue(root);
             while (queue.Count > 0)
             {
-                var bone = queue.Dequeue();
+                IOBone bone = queue.Dequeue();
 
                 worldTransform.Add(bone, bone.WorldTransform);
 
-                foreach (var child in bone.Children)
+                foreach (IOBone child in bone.Children)
                     queue.Enqueue(child);
             }
 
@@ -84,32 +83,32 @@ namespace HSDRawViewer.Extensions
             queue.Enqueue(root);
             while (queue.Count > 0)
             {
-                var bone = queue.Dequeue();
+                IOBone bone = queue.Dequeue();
 
                 // reset rotation and scale
-                List<string> specialBones = new List<string>() { "LShoulderJA", "RShoulderJA",
+                List<string> specialBones = new() { "LShoulderJA", "RShoulderJA",
                                                                 "RHaveN", "LHaveN",
                                                                 "LLegJA", "LFootJA",
                                                                 "RLegJA", "RFootJA"};
 
                 Vector3[] specialBoneRotations = new Vector3[]
                 {
-                    new Vector3(-90, 0, 0), new Vector3(-90, 0,-180),
-                    new Vector3(0, -90, -180), new Vector3(-90, -90, 270),
-                    new Vector3(-90, 0, -90), new Vector3(0, 0, -90),
-                    new Vector3(-90, 0, -90), new Vector3(0, 0, -90)
+                    new(-90, 0, 0), new(-90, 0,-180),
+                    new(0, -90, -180), new(-90, -90, 270),
+                    new(-90, 0, -90), new(0, 0, -90),
+                    new(-90, 0, -90), new(0, 0, -90)
                 };
 
-                List<string> commonBones = new List<string>()
+                List<string> commonBones = new()
                 {
                     "TopN", "TransN", "XRotN", "YRotN", "HipN", "WaistN", "LLegJA", "LLegJ", "LKneeJ", "LFootJA", "LFootJ", "RLegJA", "RLegJ", "RKneeJ", "RFootJA", "RFootJ", "BustN", "LShoulderN", "LShoulderJA", "LShoulderJ", "LArmJ", "LHandN", "L1stNa", "L1stNb", "L2ndNa", "L2ndNb", "L3rdNa", "L3rdNb", "L4thNa", "L4thNb", "LThumbNa", "LThumbNb", "LHandNb", "NeckN", "HeadN", "RShoulderN", "RShoulderJA", "RShoulderJ", "RArmJ", "RHandN", "R1stNa", "R1stNb", "R2ndNa", "R2ndNb", "R3rdNa", "R3rdNb", "R4thNa", "R4thNb", "RThumbNa", "RThumbNb", "RHandNb", "ThrowN", "TransN2"
                 };
 
-                var boneIndex = specialBones.IndexOf(bone.Name);
+                int boneIndex = specialBones.IndexOf(bone.Name);
 
                 if (boneIndex != -1)
                 {
-                    var r = specialBoneRotations[boneIndex];
+                    Vector3 r = specialBoneRotations[boneIndex];
                     bone.RotationEuler = new System.Numerics.Vector3((float)(r.X * Math.PI / 180), (float)(r.Y * Math.PI / 180), (float)(r.Z * Math.PI / 180));
                 }
                 else
@@ -136,7 +135,7 @@ namespace HSDRawViewer.Extensions
                     }
                 }
 
-                foreach (var child in bone.Children)
+                foreach (IOBone child in bone.Children)
                     queue.Enqueue(child);
             }
         }

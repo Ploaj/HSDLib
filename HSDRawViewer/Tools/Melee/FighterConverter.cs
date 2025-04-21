@@ -30,7 +30,7 @@ namespace HSDRawViewer.Tools.Melee
             AdditionalProcess process,
             CustomRetargetCallback retargetCB)
         {
-            List<string> files = new List<string>();
+            List<string> files = new();
 
             if (File.Exists(in_directory))
             {
@@ -38,7 +38,7 @@ namespace HSDRawViewer.Tools.Melee
             }
             else
             {
-                foreach (var f in Directory.GetFiles(in_directory))
+                foreach (string f in Directory.GetFiles(in_directory))
                 {
                     if (f.EndsWith(".chr0"))
                     {
@@ -48,47 +48,45 @@ namespace HSDRawViewer.Tools.Melee
             }
 
 
-            var src_map = new JointMap(source_map);
-            var tar_map = new JointMap(target_map);
+            JointMap src_map = new(source_map);
+            JointMap tar_map = new(target_map);
 
-            var src_jobj = new HSDRawFile(source_file).Roots[0].Data as HSD_JOBJ;
-            var tar_jobj = new HSDRawFile(target_file).Roots[0].Data as HSD_JOBJ;
+            HSD_JOBJ src_jobj = new HSDRawFile(source_file).Roots[0].Data as HSD_JOBJ;
+            HSD_JOBJ tar_jobj = new HSDRawFile(target_file).Roots[0].Data as HSD_JOBJ;
 
             int toProcess = files.Count;
 
-            using (ManualResetEvent resetEvent = new ManualResetEvent(false))
+            using ManualResetEvent resetEvent = new(false);
+            foreach (string f in files)
             {
-                foreach (var f in files)
+                RetargetState state = new()
                 {
-                    RetargetState state = new RetargetState()
-                    {
-                        targetMap = tar_map,
-                        sourceMap = src_map,
-                        sourceModel = src_jobj,
-                        targetModel = tar_jobj,
+                    targetMap = tar_map,
+                    sourceMap = src_map,
+                    sourceModel = src_jobj,
+                    targetModel = tar_jobj,
 
-                        animationPath = f,
-                        outputPath = out_directory,
-                        FighterName = fightername,
+                    animationPath = f,
+                    outputPath = out_directory,
+                    FighterName = fightername,
 
-                        AnimProcess = process,
-                        RetargetCallback = retargetCB,
-                    };
+                    AnimProcess = process,
+                    RetargetCallback = retargetCB,
+                };
 
-                    ThreadPool.QueueUserWorkItem(
-                       new WaitCallback(x =>
-                       {
-                           ThreadProc(x);
+                ThreadPool.QueueUserWorkItem(
+                   new WaitCallback(x =>
+                   {
+                       ThreadProc(x);
 
-                           // Safely decrement the counter
-                           if (Interlocked.Decrement(ref toProcess) == 0)
-                               resetEvent.Set();
+                       // Safely decrement the counter
+                       if (Interlocked.Decrement(ref toProcess) == 0)
+                           resetEvent.Set();
 
-                       }), state);
-                }
-
-                resetEvent.WaitOne();
+                   }), state);
             }
+
+            resetEvent.WaitOne();
         }
 
         public class RetargetState
@@ -113,16 +111,16 @@ namespace HSDRawViewer.Tools.Melee
         /// <param name="stateInfo"></param>
         static void ThreadProc(object stateInfo)
         {
-            var state = stateInfo as RetargetState;
+            RetargetState state = stateInfo as RetargetState;
 
             // get animation name
-            var fname = Path.GetFileNameWithoutExtension(state.animationPath);
+            string fname = Path.GetFileNameWithoutExtension(state.animationPath);
 
             // retarget animation
-            var anim = RetargetAnimation(state.animationPath, state);
+            JointAnimManager anim = RetargetAnimation(state.animationPath, state);
 
             // apply euler filter
-            foreach (var n in anim.Nodes)
+            foreach (AnimNode n in anim.Nodes)
             {
                 DiscontinuityFilter.Filter(n.Tracks);
                 //EulerFilter.Filter(n.Tracks);
@@ -139,7 +137,7 @@ namespace HSDRawViewer.Tools.Melee
                 fname = "Landing";
 
             // export animation
-            var symbol = $"Ply{state.FighterName}5K_Share_ACTION_{fname}_figatree";
+            string symbol = $"Ply{state.FighterName}5K_Share_ACTION_{fname}_figatree";
             ExportFigatree(state.outputPath + symbol + ".dat", anim, symbol, 0.001f);
 
             // perform post processing
@@ -156,17 +154,17 @@ namespace HSDRawViewer.Tools.Melee
             string inputDirectory = Path.GetDirectoryName(state.animationPath) + "\\";
 
             // get animation name
-            var fname = Path.GetFileNameWithoutExtension(state.animationPath);
-            var ext = Path.GetExtension(state.animationPath);
+            string fname = Path.GetFileNameWithoutExtension(state.animationPath);
+            string ext = Path.GetExtension(state.animationPath);
 
             // append charge
             if (fname.Equals("AttackHi4") || fname.Equals("AttackLw4") || fname.Equals("AttackS4S") || fname.Equals("AttackS4Hi") || fname.Equals("AttackS4Lw"))
             {
-                var start_anim = inputDirectory + fname.Replace("4Hi", "4").Replace("4Lw", "4").Replace("4S", "4") + "Start" + ext;
+                string start_anim = inputDirectory + fname.Replace("4Hi", "4").Replace("4Lw", "4").Replace("4S", "4") + "Start" + ext;
                 AppendAnimation(state, anim, RetargetAnimation(start_anim, state));
 
-                var wait_anim = inputDirectory + "Wait1" + ext;
-                var appendAnim = RetargetAnimation(wait_anim, state, 2);
+                string wait_anim = inputDirectory + "Wait1" + ext;
+                JointAnimManager appendAnim = RetargetAnimation(wait_anim, state, 2);
                 appendAnim.FrameCount = 1;
                 AppendAnimation(state, anim, appendAnim);
             }
@@ -174,11 +172,11 @@ namespace HSDRawViewer.Tools.Melee
             // append swing
             if (fname.Equals("Swing4"))
             {
-                var start_anim = inputDirectory + fname + "Start" + ext;
+                string start_anim = inputDirectory + fname + "Start" + ext;
                 AppendAnimation(state, anim, RetargetAnimation(start_anim, state));
 
-                var wait_anim = inputDirectory + "Wait1" + ext;
-                var appendAnim = RetargetAnimation(wait_anim, state, 2);
+                string wait_anim = inputDirectory + "Wait1" + ext;
+                JointAnimManager appendAnim = RetargetAnimation(wait_anim, state, 2);
                 appendAnim.FrameCount = 1;
                 AppendAnimation(state, anim, appendAnim);
             }
@@ -186,11 +184,11 @@ namespace HSDRawViewer.Tools.Melee
             // append 1 frame
             if (AppendFrameList.ContainsKey(fname))
             {
-                var file = inputDirectory + AppendFrameList[fname] + ext;
+                string file = inputDirectory + AppendFrameList[fname] + ext;
 
                 if (File.Exists(file))
                 {
-                    var appendAnim = RetargetAnimation(file, state, 2);
+                    JointAnimManager appendAnim = RetargetAnimation(file, state, 2);
                     appendAnim.FrameCount = 1;
                     AppendAnimation(state, anim, appendAnim);
                 }
@@ -201,7 +199,7 @@ namespace HSDRawViewer.Tools.Melee
             {
                 anim.ApplyFSMs(new FrameSpeedMultiplier[]
                     {
-                        new FrameSpeedMultiplier()
+                        new()
                         {
                             Rate = anim.FrameCount / (SetFrameLengths[fname] + 1)
                         }
@@ -217,7 +215,7 @@ namespace HSDRawViewer.Tools.Melee
                 case "WalkFast":
                 case "Run":
                     {
-                        var transN = state.targetMap.IndexOf("TransN");
+                        int transN = state.targetMap.IndexOf("TransN");
 
                         if (transN >= 0)
                             anim.Nodes[transN].Tracks.Clear();
@@ -226,7 +224,7 @@ namespace HSDRawViewer.Tools.Melee
                 case "HeavyWalk1":
                 case "HeavyWalk2":
                     {
-                        var transN = state.targetMap.IndexOf("TransN");
+                        int transN = state.targetMap.IndexOf("TransN");
 
                         if (transN >= 0)
                         {
@@ -237,13 +235,13 @@ namespace HSDRawViewer.Tools.Melee
                                 JointTrackType = JointTrackType.HSD_A_J_TRAX,
                                 Keys = new List<FOBJKey>()
                                 {
-                                    new FOBJKey()
+                                    new()
                                     {
                                         Frame = 0,
                                         Value = 0,
                                         InterpolationType = GXInterpolationType.HSD_A_OP_LIN
                                     },
-                                    new FOBJKey()
+                                    new()
                                     {
                                         Frame = anim.FrameCount,
                                         Value = 5,
@@ -272,14 +270,14 @@ namespace HSDRawViewer.Tools.Melee
 
             for (int i = 0; i < anim.Nodes.Count; i++)
             {
-                foreach (var t in anim.Nodes[i].Tracks)
+                foreach (FOBJ_Player t in anim.Nodes[i].Tracks)
                 {
                     // shift all keys
-                    foreach (var k in t.Keys)
+                    foreach (FOBJKey k in t.Keys)
                         k.Frame += append.FrameCount;
 
                     // add keys from state
-                    var append_track = append.Nodes[i].Tracks.FirstOrDefault(e => e.JointTrackType == t.JointTrackType);
+                    FOBJ_Player append_track = append.Nodes[i].Tracks.FirstOrDefault(e => e.JointTrackType == t.JointTrackType);
 
                     if (append_track != null)
                     {
@@ -310,14 +308,14 @@ namespace HSDRawViewer.Tools.Melee
             anim.FrameCount += 10;
 
             // add 10 dead keys to start
-            var nodes = anim.Nodes;
+            List<AnimNode> nodes = anim.Nodes;
             for (int i = 0; i < anim.NodeCount; i++)
             {
-                foreach (var t in nodes[i].Tracks)
+                foreach (FOBJ_Player t in nodes[i].Tracks)
                 {
-                    var keys = t.Keys;
+                    List<FOBJKey> keys = t.Keys;
 
-                    foreach (var k in keys)
+                    foreach (FOBJKey k in keys)
                         k.Frame += 10;
 
                     keys.Insert(0, new FOBJKey()
@@ -337,13 +335,13 @@ namespace HSDRawViewer.Tools.Melee
         /// <param name="anim"></param>
         private static void PostProcess(RetargetState state, JointAnimManager anim)
         {
-            var fname = Path.GetFileNameWithoutExtension(state.animationPath);
+            string fname = Path.GetFileNameWithoutExtension(state.animationPath);
 
             // generate item screw for air and damage
             if (fname.Equals("ItemScrew"))
             {
                 fname = "ItemScrewAir";
-                var symbol = $"Ply{state.FighterName}5K_Share_ACTION_{fname}_figatree";
+                string symbol = $"Ply{state.FighterName}5K_Share_ACTION_{fname}_figatree";
                 ExportFigatree(state.outputPath + symbol + ".dat", anim, symbol);
 
                 fname = "ItemScrewDamage";
@@ -368,9 +366,9 @@ namespace HSDRawViewer.Tools.Melee
         private static void GenerateGuardModel(RetargetState state, JointAnimManager anim)
         {
             // generate guard skeleton
-            var guard_model = HSDAccessor.DeepClone<HSD_JOBJ>(state.targetModel);
-            var index = 0;
-            foreach (var j in guard_model.TreeList)
+            HSD_JOBJ guard_model = HSDAccessor.DeepClone<HSD_JOBJ>(state.targetModel);
+            int index = 0;
+            foreach (HSD_JOBJ j in guard_model.TreeList)
             {
                 if (index >= anim.NodeCount)
                     break;
@@ -378,7 +376,7 @@ namespace HSDRawViewer.Tools.Melee
                 j.Dobj = null;
                 j.InverseWorldTransform = null;
 
-                foreach (var t in anim.Nodes[index].Tracks)
+                foreach (FOBJ_Player t in anim.Nodes[index].Tracks)
                 {
                     switch (t.JointTrackType)
                     {
@@ -398,7 +396,7 @@ namespace HSDRawViewer.Tools.Melee
 
             guard_model.UpdateFlags();
 
-            var guard_file = new HSDRawFile();
+            HSDRawFile guard_file = new();
             guard_file.Roots.Add(new HSDRootNode() { Name = "guard_joint", Data = guard_model });
             guard_file.Save(state.outputPath + "guard_joint.dat");
         }
@@ -410,24 +408,24 @@ namespace HSDRawViewer.Tools.Melee
         /// <param name="ft"></param>
         private static void GenerateEntryAnim(RetargetState state, JointAnimManager anim)
         {
-            var symbol = "Ply" + state.FighterName + "5K_Share_ACTION_Entry_figatree";
+            string symbol = "Ply" + state.FighterName + "5K_Share_ACTION_Entry_figatree";
 
-            var entry = new JointAnimManager();
+            JointAnimManager entry = new();
             entry.FrameCount = 1;
 
-            foreach (var n in anim.Nodes)
+            foreach (AnimNode n in anim.Nodes)
             {
-                var node = new AnimNode();
+                AnimNode node = new();
                 entry.Nodes.Add(node);
 
-                foreach (var t in n.Tracks)
+                foreach (FOBJ_Player t in n.Tracks)
                 {
                     node.Tracks.Add(new FOBJ_Player()
                     {
                         JointTrackType = t.JointTrackType,
                         Keys = new List<FOBJKey>()
                         {
-                            new FOBJKey()
+                            new()
                             {
                                 Frame = 0,
                                 Value = t.GetValue(0),
@@ -438,7 +436,7 @@ namespace HSDRawViewer.Tools.Melee
                 }
             }
 
-            var output = new HSDRawFile();
+            HSDRawFile output = new();
             output.Roots.Add(new HSDRootNode()
             {
                 Name = symbol,
@@ -456,7 +454,7 @@ namespace HSDRawViewer.Tools.Melee
         private static void ExportFigatree(string file_path, JointAnimManager anim, string symbol, float error = 0.001f)
         {
 
-            var output = new HSDRawFile();
+            HSDRawFile output = new();
             output.Roots.Add(new HSDRootNode()
             {
                 Name = symbol,
@@ -501,14 +499,14 @@ namespace HSDRawViewer.Tools.Melee
                     if (frame_count != -1)
                         anim.FrameCount = frame_count;
 
-                    foreach (var n in anim.Nodes)
+                    foreach (AnimNode n in anim.Nodes)
                     {
-                        foreach (var t in n.Tracks)
+                        foreach (FOBJ_Player t in n.Tracks)
                         {
                             if (t.JointTrackType == JointTrackType.HSD_A_J_ROTX ||
                                 t.JointTrackType == JointTrackType.HSD_A_J_ROTY ||
                                 t.JointTrackType == JointTrackType.HSD_A_J_ROTZ)
-                                foreach (var k in t.Keys)
+                                foreach (FOBJKey k in t.Keys)
                                 {
                                     k.Value = ClampRotation(k.Value);
                                 }
@@ -516,7 +514,7 @@ namespace HSDRawViewer.Tools.Melee
                     }
 
                     // retarget animation
-                    var new_anim = Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap, state.RetargetCallback);
+                    JointAnimManager new_anim = Retarget(anim, new LiveJObj(state.sourceModel), new LiveJObj(state.targetModel), state.sourceMap, state.targetMap, state.RetargetCallback);
 
                     // perform additional process callback
                     if (state.AnimProcess != null)
@@ -539,7 +537,7 @@ namespace HSDRawViewer.Tools.Melee
         /// <summary>
         /// 
         /// </summary>
-        private static Dictionary<string, string> AppendFrameList = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> AppendFrameList = new()
         {
             {"Turn", "Wait1" },
             {"TurnRun", "Run" },
@@ -655,7 +653,7 @@ namespace HSDRawViewer.Tools.Melee
         /// <summary>
         /// 
         /// </summary>
-        private static Dictionary<string, int> SetFrameLengths = new Dictionary<string, int>()
+        private static readonly Dictionary<string, int> SetFrameLengths = new()
         {
             {"DamageFlyTop", 60},
             {"CliffCatch", 8},

@@ -11,16 +11,16 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public AkaneiaShapeContextMenu() : base()
         {
-            ToolStripMenuItem export = new ToolStripMenuItem("Import Shape From Image");
+            ToolStripMenuItem export = new("Import Shape From Image");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is AK_Shape page)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                     if (f != null)
                     {
-                        var tobj = new HSD_TOBJ();
+                        HSD_TOBJ tobj = new();
                         tobj.ImportImage(f, HSDRaw.GX.GXTexFmt.RGBA8, HSDRaw.GX.GXTlutFmt.IA8);
                         page.FromTOBJ(tobj);
                     }

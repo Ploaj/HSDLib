@@ -1,12 +1,10 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Tools;
-using HSDRawViewer.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
 
 namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
@@ -120,7 +118,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             set
             {
                 if (DOBJ.Pobj != null)
-                    foreach (var p in DOBJ.Pobj.List)
+                    foreach (HSD_POBJ p in DOBJ.Pobj.List)
                     {
                         p.Flags &= ~(POBJ_FLAG.CULLBACK | POBJ_FLAG.CULLFRONT);
                         switch (value)
@@ -156,7 +154,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             }
         }
 
-        [DisplayName("Pixel Processing Parameters"), 
+        [DisplayName("Pixel Processing Parameters"),
             Category("Pixel Processing"),
             TypeConverter(typeof(ExpandableObjectConverter))]
         public HSD_PEDesc PixelProcess { get => EnablePP ? _pixelProcess : null; set => _pixelProcess = value; }
@@ -209,7 +207,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 {
                     fc = Math.Max(fc, Tracks.Max(e => e.FrameCount));
                 }
-                foreach (var v in TextureStates)
+                foreach (TextureAnimDesc v in TextureStates)
                 {
                     if (v.Tracks.Count > 0)
                         fc = Math.Max(fc, v.Tracks.Max(e => e.FrameCount));
@@ -266,7 +264,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             Tracks.Clear();
 
             // clear texture anims
-            foreach (var t in TextureStates)
+            foreach (TextureAnimDesc t in TextureStates)
             {
                 t.Textures.Clear();
                 t.Tracks.Clear();

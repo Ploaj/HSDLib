@@ -14,35 +14,35 @@ namespace HSDRawViewer.Converters.Melee
         /// <param name="collData"></param>
         public static void ExportCollDataToSSF(SBM_Coll_Data collData)
         {
-            var f = Tools.FileIO.SaveFile("Smash Stage File (SSF)|*.ssf");
+            string f = Tools.FileIO.SaveFile("Smash Stage File (SSF)|*.ssf");
 
             if (f == null)
                 return;
 
-            SSF ssf = new SSF();
+            SSF ssf = new();
 
-            var LineGroups = new List<CollLineGroup>();
-            var Lines = new List<CollLine>();
+            List<CollLineGroup> LineGroups = new();
+            List<CollLine> Lines = new();
 
             CollDataBuilder.LoadCollData(collData, LineGroups, Lines);
 
-            var groupIndex = 0;
-            foreach(var g in LineGroups)
+            int groupIndex = 0;
+            foreach (CollLineGroup g in LineGroups)
             {
-                SSFGroup group = new SSFGroup();
+                SSFGroup group = new();
                 group.Name = $"Group_{groupIndex++}";
 
                 ssf.Groups.Add(group);
 
-                Dictionary<CollVertex, int> vertexToIndex = new Dictionary<CollVertex, int>();
+                Dictionary<CollVertex, int> vertexToIndex = new();
 
                 // bone is unknown to coll_data
-                
-                foreach(var l in Lines)
+
+                foreach (CollLine l in Lines)
                 {
-                    if(l.Group == g)
+                    if (l.Group == g)
                     {
-                        var line = new SSFLine();
+                        SSFLine line = new();
 
                         if (l.Flag.HasFlag(CollProperty.DropThrough))
                             line.Flags |= SSFLineFlag.DropThrough;
@@ -85,24 +85,24 @@ namespace HSDRawViewer.Converters.Melee
         /// <param name="ssf"></param>
         public static void ImportCollDataFromSSF(SBM_Coll_Data collData, SSF ssf)
         {
-            List<CollLine> lines = new List<CollLine>();
-            List<CollLineGroup> groups = new List<CollLineGroup>();
+            List<CollLine> lines = new();
+            List<CollLineGroup> groups = new();
 
-            foreach (var v in ssf.Groups)
+            foreach (SSFGroup v in ssf.Groups)
             {
-                var group = new CollLineGroup();
-                List<CollVertex> vertices = new List<CollVertex>();
-                foreach (var vert in v.Vertices)
+                CollLineGroup group = new();
+                List<CollVertex> vertices = new();
+                foreach (SSFVertex vert in v.Vertices)
                 {
                     vertices.Add(new CollVertex(vert.X, vert.Y));
                 }
-                foreach (var l in v.Lines)
+                foreach (SSFLine l in v.Lines)
                 {
-                    var line = new CollLine();
+                    CollLine line = new();
                     line.v1 = vertices[l.Vertex1];
                     line.v2 = vertices[l.Vertex2];
 
-                    var slope = line.Slope;
+                    float slope = line.Slope;
 
                     line.Group = group;
                     if (l.Flags.HasFlag(SSFLineFlag.LeftLedge) || l.Flags.HasFlag(SSFLineFlag.RightLedge))

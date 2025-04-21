@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters.Animation
 {
@@ -16,13 +14,13 @@ namespace HSDRawViewer.Converters.Animation
     {
         public static JointAnimManager ToJointAnim(string filePath, JointMap jm)
         {
-            var bke = BKE.Open(filePath);
+            BKE bke = BKE.Open(filePath);
 
-            JointAnimManager anim = new JointAnimManager();
+            JointAnimManager anim = new();
             anim.FrameCount = bke.CountFrames();
             for (int i = 0; i < bke.Nodes.Count; i++)
             {
-                var node = new AnimNode();
+                AnimNode node = new();
 
                 node.Tracks.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAX, Keys = new List<FOBJKey>() });
                 node.Tracks.Add(new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAY, Keys = new List<FOBJKey>() });
@@ -39,20 +37,20 @@ namespace HSDRawViewer.Converters.Animation
                 anim.Nodes.Add(node);
             }
 
-            foreach (var n in bke.Nodes)
+            foreach (BKENode n in bke.Nodes)
             {
                 if (jm.IndexOf(n.Name) == -1)
                     break;
 
-                var node = anim.Nodes[jm.IndexOf(n.Name)];
+                AnimNode node = anim.Nodes[jm.IndexOf(n.Name)];
                 Console.WriteLine(n.Name + " " + n.Parent?.Name);
 
                 for (int f = 0; f < anim.FrameCount; f++)
                 {
-                    var matrix = n.GetLocal(f);
-                    var tra = matrix.ExtractTranslation();
-                    var sca = matrix.ExtractScale();
-                    var rot = matrix.ExtractRotationEuler();
+                    Matrix4 matrix = n.GetLocal(f);
+                    Vector3 tra = matrix.ExtractTranslation();
+                    Vector3 sca = matrix.ExtractScale();
+                    Vector3 rot = matrix.ExtractRotationEuler();
 
                     node.Tracks.Find(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAX).Keys.Add(new FOBJKey() { Frame = f, Value = tra.X, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
                     node.Tracks.Find(e => e.JointTrackType == JointTrackType.HSD_A_J_TRAY).Keys.Add(new FOBJKey() { Frame = f, Value = tra.Y, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
@@ -88,7 +86,7 @@ namespace HSDRawViewer.Converters.Animation
         /// <returns></returns>
         public Matrix4 GetLocal(int frame)
         {
-            var matrix = Keys[frame];
+            Matrix4 matrix = Keys[frame];
             if (Parent != null)
             {
                 //matrix = matrix * Parent.Keys[frame].Inverted();
@@ -122,7 +120,7 @@ namespace HSDRawViewer.Converters.Animation
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            var node = Nodes.Find(e => e.Name == name);
+            BKENode node = Nodes.Find(e => e.Name == name);
 
             if (node != null)
                 return node;
@@ -134,7 +132,7 @@ namespace HSDRawViewer.Converters.Animation
             Nodes.Add(node);
             return node;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -142,17 +140,17 @@ namespace HSDRawViewer.Converters.Animation
         /// <returns></returns>
         public static BKE Open(string filePath)
         {
-            var bke = new BKE();
+            BKE bke = new();
 
-            using (FileStream stream = new FileStream(filePath, FileMode.Open))
-            using (StreamReader r = new StreamReader(stream))
+            using (FileStream stream = new(filePath, FileMode.Open))
+            using (StreamReader r = new(stream))
             {
                 BKENode current = null;
                 while (!r.EndOfStream)
                 {
-                    var arg = r.ReadLine().TrimStart().Split(' ');
+                    string[] arg = r.ReadLine().TrimStart().Split(' ');
 
-                    if (arg[0].Contains("{"))
+                    if (arg[0].Contains('{'))
                     {
                         while (!r.EndOfStream)
                         {
@@ -165,7 +163,7 @@ namespace HSDRawViewer.Converters.Animation
                             {
                                 float frame = float.Parse(arg[0]) - 1;
 
-                                var matrix = new Matrix4(
+                                Matrix4 matrix = new(
                                     float.Parse(arg[1]), float.Parse(arg[2]), float.Parse(arg[3]), float.Parse(arg[4]),
                                     float.Parse(arg[5]), float.Parse(arg[6]), float.Parse(arg[7]), float.Parse(arg[8]),
                                     float.Parse(arg[9]), float.Parse(arg[10]), float.Parse(arg[11]), float.Parse(arg[12]),

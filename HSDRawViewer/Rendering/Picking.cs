@@ -48,12 +48,12 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public bool IntersectsQuad(Vector3 P1, Vector3 P2, Vector3 P3, Vector3 P4, out Vector3 intersection)
         {
-            var mid = (P1 + P2 + P3 + P4) / 4;
+            Vector3 mid = (P1 + P2 + P3 + P4) / 4;
 
-            var nrm = Math3D.CalculateSurfaceNormal(P1, P2, P3);
+            Vector3 nrm = Math3D.CalculateSurfaceNormal(P1, P2, P3);
 
             intersection = GetPlaneIntersection(nrm, mid);
-            
+
             Vector3 V1 = (P2 - P1).Normalized();
             Vector3 V2 = (P3 - P2).Normalized();
             Vector3 V3 = (P4 - P3).Normalized();
@@ -80,11 +80,11 @@ namespace HSDRawViewer.Rendering
             Vector3 rayP = Origin;
             Vector3 rayD = Direction;
             Vector3 planeN = Norm;
-            var d = Vector3.Dot(Position, -Norm);
-            var t = -(d + rayP.Z * planeN.Z + rayP.Y * planeN.Y + rayP.X * planeN.X) / (rayD.Z * planeN.Z + rayD.Y * planeN.Y + rayD.X * planeN.X);
+            float d = Vector3.Dot(Position, -Norm);
+            float t = -(d + rayP.Z * planeN.Z + rayP.Y * planeN.Y + rayP.X * planeN.X) / (rayD.Z * planeN.Z + rayD.Y * planeN.Y + rayD.X * planeN.X);
             return rayP + t * rayD;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -101,13 +101,13 @@ namespace HSDRawViewer.Rendering
             distance = float.MaxValue;
 
             // Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
-            if (c > 0.0f && b > 0.0f) 
+            if (c > 0.0f && b > 0.0f)
                 return false;
 
             float discr = b * b - c;
 
             // A negative discriminant corresponds to ray missing sphere 
-            if (discr < 0.0f) 
+            if (discr < 0.0f)
                 return false;
 
             // Ray now found to intersect sphere, compute smallest t value of intersection
@@ -117,7 +117,7 @@ namespace HSDRawViewer.Rendering
             if (distance < 0.0f)
                 distance = 0.0f;
 
-            var q = Origin + distance * -Direction;
+            Vector3 q = Origin + distance * -Direction;
 
             return true;
         }
@@ -136,7 +136,7 @@ namespace HSDRawViewer.Rendering
             float c = Vector3.Dot(m, m) - radius * radius;
 
             intersection = Vector3.Zero;
-            var distance = float.MaxValue;
+            float distance = float.MaxValue;
 
             // Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
             if (c > 0.0f && b > 0.0f)
@@ -194,34 +194,34 @@ namespace HSDRawViewer.Rendering
         public bool CheckTriangleHit(Vector3 v0, Vector3 v1, Vector3 v2, ref Vector3 hit, out float depth)
         {
             depth = float.MaxValue;
-            var e1 = v1 - v0;
-            var e2 = v2 - v0;
-            var d = -Direction;
-            var p = Origin;
+            Vector3 e1 = v1 - v0;
+            Vector3 e2 = v2 - v0;
+            Vector3 d = -Direction;
+            Vector3 p = Origin;
 
-            var h = Vector3.Cross(d, e2);
+            Vector3 h = Vector3.Cross(d, e2);
 
-            var a = Vector3.Dot(e1, h);
+            float a = Vector3.Dot(e1, h);
 
             if (a > -0.00001 && a < 0.00001)
                 return (false);
 
-            var f = 1 / a;
-            var s = p - v0;
-            var u = f * (Vector3.Dot(s, h));
+            float f = 1 / a;
+            Vector3 s = p - v0;
+            float u = f * (Vector3.Dot(s, h));
 
             if (u < 0.0 || u > 1.0)
                 return (false);
 
-            var q = Vector3.Cross(s, e1);
-            var v = f * Vector3.Dot(d, q);
+            Vector3 q = Vector3.Cross(s, e1);
+            float v = f * Vector3.Dot(d, q);
 
             if (v < 0.0 || u + v > 1.0)
                 return (false);
 
             // at this stage we can compute t to find out where
             // the intersection point is on the line
-            var t = f * Vector3.Dot(e2, q);
+            float t = f * Vector3.Dot(e2, q);
 
 
             if (t > 0.00001) // ray intersection

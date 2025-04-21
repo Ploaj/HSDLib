@@ -1,12 +1,8 @@
 ﻿using HSDRawViewer.Converters.Melee;
 using IONET;
 using OpenTK.Mathematics;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Converters.SBM
 {
@@ -76,16 +72,16 @@ namespace HSDRawViewer.Converters.SBM
         /// <returns></returns>
         private static List<(Vector3, Vector3)> FindIntersectionLines(List<Triangle> triangles, Vector3 planeNormal, float planeD)
         {
-            List<(Vector3, Vector3)> intersectionLines = new ();
+            List<(Vector3, Vector3)> intersectionLines = new();
 
-            foreach (var triangle in triangles)
+            foreach (Triangle triangle in triangles)
             {
                 // Check all three edges of the triangle
                 Vector3? intersect1 = IntersectPlane(planeNormal, planeD, triangle.P1, triangle.P2);
                 Vector3? intersect2 = IntersectPlane(planeNormal, planeD, triangle.P2, triangle.P3);
                 Vector3? intersect3 = IntersectPlane(planeNormal, planeD, triangle.P3, triangle.P1);
 
-                List<Vector3> intersections = new List<Vector3>();
+                List<Vector3> intersections = new();
 
                 if (intersect1.HasValue) intersections.Add(intersect1.Value);
                 if (intersect2.HasValue) intersections.Add(intersect2.Value);
@@ -105,23 +101,23 @@ namespace HSDRawViewer.Converters.SBM
         /// <param name="filePath"></param>
         public static void Convert(string filePath, string ssfFile)
         {
-            var scene = IOManager.LoadScene(filePath, new ImportSettings() { });
+            IONET.Core.IOScene scene = IOManager.LoadScene(filePath, new ImportSettings() { });
 
             // gather all triangles
-            List<Triangle> triangles = new List<Triangle>();
-            foreach (var v in scene.Models)
+            List<Triangle> triangles = new();
+            foreach (IONET.Core.Model.IOModel v in scene.Models)
             {
-                foreach (var m in v.Meshes)
+                foreach (IONET.Core.Model.IOMesh m in v.Meshes)
                 {
                     m.MakeTriangles();
 
-                    foreach (var p in m.Polygons)
+                    foreach (IONET.Core.Model.IOPolygon p in m.Polygons)
                     {
                         for (int i = 0; i < p.Indicies.Count; i += 3)
                         {
-                            var v1 = m.Vertices[p.Indicies[i]];
-                            var v2 = m.Vertices[p.Indicies[i + 1]];
-                            var v3 = m.Vertices[p.Indicies[i + 2]];
+                            IONET.Core.Model.IOVertex v1 = m.Vertices[p.Indicies[i]];
+                            IONET.Core.Model.IOVertex v2 = m.Vertices[p.Indicies[i + 1]];
+                            IONET.Core.Model.IOVertex v3 = m.Vertices[p.Indicies[i + 2]];
                             triangles.Add(new Triangle(
                                 new Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
                                 new Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
@@ -149,13 +145,13 @@ namespace HSDRawViewer.Converters.SBM
             //    System.Diagnostics.Debug.WriteLine($"Line from ({line.Item1.X}, {line.Item1.Y}, {line.Item1.Z}) to ({line.Item2.X}, {line.Item2.Y}, {line.Item2.Z})");
             //}
 
-            var lines = FindIntersectionLines(triangles, -Vector3.UnitZ, 0);
+            List<(Vector3, Vector3)> lines = FindIntersectionLines(triangles, -Vector3.UnitZ, 0);
 
-            var group = new SSFGroup()
+            SSFGroup group = new()
             {
                 Name = "TestGroup"
             };
-            foreach (var line in lines)
+            foreach ((Vector3, Vector3) line in lines)
             {
                 group.Lines.Add(new SSFLine()
                 {
@@ -168,20 +164,20 @@ namespace HSDRawViewer.Converters.SBM
             }
             Fuse(group);
 
-            SSF ssf = new SSF();
+            SSF ssf = new();
             ssf.Groups.Add(group);
             ssf.Save(ssfFile);
         }
 
         private static void Fuse(SSFGroup g)
         {
-            List<Vector2> verts = new ();
+            List<Vector2> verts = new();
             Dictionary<int, int> vertexToPoint = new();
 
             int i = 0;
-            foreach (var v in g.Vertices)
+            foreach (SSFVertex v in g.Vertices)
             {
-                var point = new Vector2(v.X, v.Y);
+                Vector2 point = new(v.X, v.Y);
                 if (!verts.Contains(point))
                 {
                     vertexToPoint.Add(i, verts.Count);
@@ -194,7 +190,7 @@ namespace HSDRawViewer.Converters.SBM
                 i++;
             }
 
-            foreach (var l in g.Lines)
+            foreach (SSFLine l in g.Lines)
             {
                 l.Vertex1 = vertexToPoint[l.Vertex1];
                 l.Vertex2 = vertexToPoint[l.Vertex2];

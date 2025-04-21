@@ -3,7 +3,6 @@ using CSCore.Codecs.MP3;
 using HSDRaw;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using VGAudio.Codecs.GcAdpcm;
 
@@ -47,13 +46,12 @@ namespace HSDRawViewer.Sound
             {
                 if (Channels.Count == 0)
                     return "0:00";
-                var sec = (int)Math.Ceiling(Channels[0].LoopStart / 2 / (double)Frequency * 1.75f * 1000);
+                int sec = (int)Math.Ceiling(Channels[0].LoopStart / 2 / (double)Frequency * 1.75f * 1000);
                 return TimeSpan.FromMilliseconds(sec).ToString();
             }
             set
             {
-                TimeSpan ts;
-                if(TimeSpan.TryParse(value, out ts))
+                if (TimeSpan.TryParse(value, out TimeSpan ts))
                 {
                     SetLoopFromTimeSpan(ts);
                 }
@@ -66,7 +64,7 @@ namespace HSDRawViewer.Sound
             {
                 if (Channels.Count == 0)
                     return "0:00";
-                var sec = (int)Math.Ceiling(Channels[0].Data.Length / (double)Frequency * 1.75f * 1000);
+                int sec = (int)Math.Ceiling(Channels[0].Data.Length / (double)Frequency * 1.75f * 1000);
                 return TimeSpan.FromMilliseconds(sec).ToString();
             }
         }
@@ -85,13 +83,13 @@ namespace HSDRawViewer.Sound
             }
         }
 
-        public List<DSPChannel> Channels = new List<DSPChannel>();
+        public List<DSPChannel> Channels = new();
 
         public void SetLoopFromTimeSpan(TimeSpan s)
         {
-            var sec = (s.TotalMilliseconds / 1.75f / 1000f) * 2 * Frequency;
+            double sec = (s.TotalMilliseconds / 1.75f / 1000f) * 2 * Frequency;
 
-            foreach (var c in Channels)
+            foreach (DSPChannel c in Channels)
                 c.LoopStart = (int)sec;
         }
 
@@ -145,7 +143,7 @@ namespace HSDRawViewer.Sound
         /// <param name="filePath"></param>
         public void ExportFormat(string filePath)
         {
-            var ext = Path.GetExtension(filePath).ToLower();
+            string ext = Path.GetExtension(filePath).ToLower();
 
             switch (ext)
             {
@@ -166,41 +164,39 @@ namespace HSDRawViewer.Sound
         private void FromDSP(byte[] data)
         {
             Channels.Clear();
-            using (BinaryReaderExt r = new BinaryReaderExt(new MemoryStream(data)))
-            {
-                r.BigEndian = true;
+            using BinaryReaderExt r = new(new MemoryStream(data));
+            r.BigEndian = true;
 
-                r.ReadInt32();
-                var nibbleCount = r.ReadInt32();
-                Frequency = r.ReadInt32();
+            r.ReadInt32();
+            int nibbleCount = r.ReadInt32();
+            Frequency = r.ReadInt32();
 
-                var channel = new DSPChannel();
+            DSPChannel channel = new();
 
-                channel.LoopFlag = r.ReadInt16();
-                channel.Format = r.ReadInt16();
-                var LoopStartOffset = r.ReadInt32();
-                var LoopEndOffset = r.ReadInt32();
-                var CurrentAddress = r.ReadInt32();
-                for (int k = 0; k < 0x10; k++)
-                    channel.COEF[k] = r.ReadInt16();
-                channel.Gain = r.ReadInt16();
-                channel.InitialPredictorScale = r.ReadInt16();
-                channel.InitialSampleHistory1 = r.ReadInt16();
-                channel.InitialSampleHistory2 = r.ReadInt16();
-                channel.LoopPredictorScale = r.ReadInt16();
-                channel.LoopSampleHistory1 = r.ReadInt16();
-                channel.LoopSampleHistory2 = r.ReadInt16();
-                r.ReadInt16(); //  padding
+            channel.LoopFlag = r.ReadInt16();
+            channel.Format = r.ReadInt16();
+            int LoopStartOffset = r.ReadInt32();
+            int LoopEndOffset = r.ReadInt32();
+            int CurrentAddress = r.ReadInt32();
+            for (int k = 0; k < 0x10; k++)
+                channel.COEF[k] = r.ReadInt16();
+            channel.Gain = r.ReadInt16();
+            channel.InitialPredictorScale = r.ReadInt16();
+            channel.InitialSampleHistory1 = r.ReadInt16();
+            channel.InitialSampleHistory2 = r.ReadInt16();
+            channel.LoopPredictorScale = r.ReadInt16();
+            channel.LoopSampleHistory1 = r.ReadInt16();
+            channel.LoopSampleHistory2 = r.ReadInt16();
+            r.ReadInt16(); //  padding
 
-                r.Seek(0x60);
-                channel.NibbleCount = nibbleCount;
-                channel.LoopStart = LoopStartOffset - CurrentAddress;
-                channel.Data = r.ReadBytes((int)Math.Ceiling(nibbleCount / 2d));
+            r.Seek(0x60);
+            channel.NibbleCount = nibbleCount;
+            channel.LoopStart = LoopStartOffset - CurrentAddress;
+            channel.Data = r.ReadBytes((int)Math.Ceiling(nibbleCount / 2d));
 
-                Channels.Add(channel);
+            Channels.Add(channel);
 
-                r.BaseStream.Close();
-            }
+            r.BaseStream.Close();
         }
         /// <summary>
         /// 
@@ -216,8 +212,8 @@ namespace HSDRawViewer.Sound
             else
             {
                 // stereo or more
-                var head = Path.GetDirectoryName(filePath) + "\\" + Path.GetFileNameWithoutExtension(filePath);
-                var ext = Path.GetExtension(filePath);
+                string head = Path.GetDirectoryName(filePath) + "\\" + Path.GetFileNameWithoutExtension(filePath);
+                string ext = Path.GetExtension(filePath);
 
                 for (int i = 0; i < Channels.Count; i++)
                 {
@@ -234,41 +230,39 @@ namespace HSDRawViewer.Sound
         /// <param name="channel"></param>
         private void ExportDSPChannel(string filePath, DSPChannel channel)
         {
-            using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(filePath, FileMode.Create)))
-            {
-                w.BigEndian = true;
+            using BinaryWriterExt w = new(new FileStream(filePath, FileMode.Create));
+            w.BigEndian = true;
 
-                var samples = channel.NibbleCount * 7 / 8;
+            int samples = channel.NibbleCount * 7 / 8;
 
-                w.Write(samples);
-                w.Write(channel.NibbleCount);
-                w.Write(Frequency);
+            w.Write(samples);
+            w.Write(channel.NibbleCount);
+            w.Write(Frequency);
 
-                w.Write(channel.LoopFlag);
-                w.Write(channel.Format);
-                w.Write(2);
-                w.Write(channel.NibbleCount - 2);
-                w.Write(2);
-                foreach (var v in channel.COEF)
-                    w.Write(v);
-                w.Write(channel.Gain);
-                w.Write(channel.InitialPredictorScale);
-                w.Write(channel.InitialSampleHistory1);
-                w.Write(channel.InitialSampleHistory2);
-                w.Write(channel.LoopPredictorScale);
-                w.Write(channel.LoopSampleHistory1);
-                w.Write(channel.LoopSampleHistory2);
-                w.Write((short)0);
+            w.Write(channel.LoopFlag);
+            w.Write(channel.Format);
+            w.Write(2);
+            w.Write(channel.NibbleCount - 2);
+            w.Write(2);
+            foreach (short v in channel.COEF)
+                w.Write(v);
+            w.Write(channel.Gain);
+            w.Write(channel.InitialPredictorScale);
+            w.Write(channel.InitialSampleHistory1);
+            w.Write(channel.InitialSampleHistory2);
+            w.Write(channel.LoopPredictorScale);
+            w.Write(channel.LoopSampleHistory1);
+            w.Write(channel.LoopSampleHistory2);
+            w.Write((short)0);
 
-                w.Write(new byte[0x14]);
+            w.Write(new byte[0x14]);
 
-                w.Write(channel.Data);
+            w.Write(channel.Data);
 
-                if (w.BaseStream.Position % 0x8 != 0)
-                    w.Write(new byte[0x08 - w.BaseStream.Position % 0x08]);
+            if (w.BaseStream.Position % 0x8 != 0)
+                w.Write(new byte[0x08 - w.BaseStream.Position % 0x08]);
 
-                w.BaseStream.Close();
-            }
+            w.BaseStream.Close();
         }
 
         #endregion
@@ -277,7 +271,7 @@ namespace HSDRawViewer.Sound
 
         private void FromHPS(byte[] data)
         {
-            var dsp = HPS.ToDSP(data);
+            DSP dsp = HPS.ToDSP(data);
             Channels = dsp.Channels;
             Frequency = dsp.Frequency;
         }
@@ -298,67 +292,64 @@ namespace HSDRawViewer.Sound
 
             Channels.Clear();
 
-            using (BinaryReader r = new BinaryReader(new MemoryStream(wavFile)))
+            using BinaryReader r = new(new MemoryStream(wavFile));
+            if (new string(r.ReadChars(4)) != "RIFF")
+                throw new NotSupportedException("File is not a valid WAVE file");
+
+            r.BaseStream.Position = 0x14;
+            short comp = r.ReadInt16();
+            short channelCount = r.ReadInt16();
+            Frequency = r.ReadInt32();
+            r.ReadInt32();// block rate
+            r.ReadInt16();// block align
+            short bpp = r.ReadInt16();
+
+            if (comp != 1)
+                throw new NotSupportedException("Compressed WAVE files not supported");
+
+            if (bpp != 16)
+                throw new NotSupportedException("Only 16 bit WAVE formats accepted");
+
+            while (r.ReadByte() == 0) ;
+            r.BaseStream.Seek(-1, SeekOrigin.Current);
+
+            while (new string(r.ReadChars(4)) != "data")
             {
-                if (new string(r.ReadChars(4)) != "RIFF")
-                    throw new NotSupportedException("File is not a valid WAVE file");
+                int skip = r.ReadInt32();
+                r.BaseStream.Position += skip;
+            }
 
-                r.BaseStream.Position = 0x14;
-                var comp = r.ReadInt16();
-                var channelCount = r.ReadInt16();
-                Frequency = r.ReadInt32();
-                r.ReadInt32();// block rate
-                r.ReadInt16();// block align
-                var bpp = r.ReadInt16();
+            int channelSizes = r.ReadInt32() / channelCount / 2;
 
-                if (comp != 1)
-                    throw new NotSupportedException("Compressed WAVE files not supported");
+            List<List<short>> channels = new();
 
-                if (bpp != 16)
-                    throw new NotSupportedException("Only 16 bit WAVE formats accepted");
+            for (int i = 0; i < channelCount; i++)
+                channels.Add(new List<short>());
 
-                while (r.ReadByte() == 0);
-                r.BaseStream.Seek(-1, SeekOrigin.Current);
-                
-                while (new string(r.ReadChars(4)) != "data")
+            for (int i = 0; i < channelSizes; i++)
+            {
+                foreach (List<short> v in channels)
                 {
-                    var skip = r.ReadInt32();
-                    r.BaseStream.Position += skip;
+                    v.Add(r.ReadInt16());
                 }
-                
-                var channelSizes = r.ReadInt32() / channelCount / 2;
+            }
 
-                List<List<short>> channels = new List<List<short>>();
+            Channels.Clear();
+            foreach (List<short> data in channels)
+            {
+                DSPChannel c = new();
 
-                for (int i = 0; i < channelCount; i++)
-                    channels.Add(new List<short>());
+                short[] ss = data.ToArray();
 
-                for (int i = 0; i < channelSizes; i++)
-                {
-                    foreach (var v in channels)
-                    {
-                        v.Add(r.ReadInt16());
-                    }
-                }
+                c.COEF = GcAdpcmCoefficients.CalculateCoefficients(ss);
 
-                Channels.Clear();
-                foreach (var data in channels)
-                {
-                    var c = new DSPChannel();
+                c.Data = GcAdpcmEncoder.Encode(ss, c.COEF);
 
-                    var ss = data.ToArray();
+                c.NibbleCount = c.Data.Length * 2;
 
-                    c.COEF = GcAdpcmCoefficients.CalculateCoefficients(ss);
+                c.InitialPredictorScale = c.Data[0];
 
-                    c.Data = GcAdpcmEncoder.Encode(ss, c.COEF);
-
-                    c.NibbleCount = c.Data.Length * 2;
-
-                    c.InitialPredictorScale = c.Data[0];
-
-                    Channels.Add(c);
-                }
-
+                Channels.Add(c);
             }
         }
 
@@ -368,60 +359,58 @@ namespace HSDRawViewer.Sound
         /// <returns></returns>
         public byte[] ToWAVE()
         {
-            using (var stream = new MemoryStream())
+            using MemoryStream stream = new();
+            using (BinaryWriter w = new(stream))
             {
-                using (BinaryWriter w = new BinaryWriter(stream))
+                w.Write("RIFF".ToCharArray());
+                w.Write(0); // wave size
+
+                w.Write("WAVE".ToCharArray());
+
+                short BitsPerSample = 16;
+                int byteRate = Frequency * Channels.Count * BitsPerSample / 8;
+                short blockAlign = (short)(Channels.Count * BitsPerSample / 8);
+
+                w.Write("fmt ".ToCharArray());
+                w.Write(16); // chunk size
+                w.Write((short)1); // compression
+                w.Write((short)Channels.Count);
+                w.Write(Frequency);
+                w.Write(byteRate);
+                w.Write(blockAlign);
+                w.Write(BitsPerSample);
+
+                w.Write("data".ToCharArray());
+                long subchunkOffset = w.BaseStream.Position;
+                w.Write(0);
+
+                int subChunkSize = 0;
+                if (Channels.Count == 1)
                 {
-                    w.Write("RIFF".ToCharArray());
-                    w.Write(0); // wave size
-
-                    w.Write("WAVE".ToCharArray());
-
-                    short BitsPerSample = 16;
-                    var byteRate = Frequency * Channels.Count * BitsPerSample / 8;
-                    short blockAlign = (short)(Channels.Count * BitsPerSample / 8);
-
-                    w.Write("fmt ".ToCharArray());
-                    w.Write(16); // chunk size
-                    w.Write((short)1); // compression
-                    w.Write((short)Channels.Count);
-                    w.Write(Frequency);
-                    w.Write(byteRate);
-                    w.Write(blockAlign);
-                    w.Write(BitsPerSample);
-
-                    w.Write("data".ToCharArray());
-                    var subchunkOffset = w.BaseStream.Position;
-                    w.Write(0);
-
-                    int subChunkSize = 0;
-                    if (Channels.Count == 1)
-                    {
-                        short[] sound_data = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
-                        subChunkSize += sound_data.Length * 2;
-                        foreach (var s in sound_data)
-                            w.Write(s);
-                    }
-                    if (Channels.Count == 2)
-                    {
-                        short[] sound_data1 = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
-                        short[] sound_data2 = GcAdpcmDecoder.Decode(Channels[1].Data, Channels[1].COEF);
-                        subChunkSize += (sound_data1.Length + sound_data2.Length) * 2;
-                        for (int i = 0; i < sound_data1.Length; i++)
-                        {
-                            w.Write(sound_data1[i]);
-                            w.Write(sound_data2[i]);
-                        }
-                    }
-
-                    w.BaseStream.Position = subchunkOffset;
-                    w.Write(subChunkSize);
-
-                    w.BaseStream.Position = 4;
-                    w.Write((int)(w.BaseStream.Length - 8));
+                    short[] sound_data = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
+                    subChunkSize += sound_data.Length * 2;
+                    foreach (short s in sound_data)
+                        w.Write(s);
                 }
-                return stream.ToArray();
+                if (Channels.Count == 2)
+                {
+                    short[] sound_data1 = GcAdpcmDecoder.Decode(Channels[0].Data, Channels[0].COEF);
+                    short[] sound_data2 = GcAdpcmDecoder.Decode(Channels[1].Data, Channels[1].COEF);
+                    subChunkSize += (sound_data1.Length + sound_data2.Length) * 2;
+                    for (int i = 0; i < sound_data1.Length; i++)
+                    {
+                        w.Write(sound_data1[i]);
+                        w.Write(sound_data2[i]);
+                    }
+                }
+
+                w.BaseStream.Position = subchunkOffset;
+                w.Write(subChunkSize);
+
+                w.BaseStream.Position = 4;
+                w.Write((int)(w.BaseStream.Length - 8));
             }
+            return stream.ToArray();
         }
 
         #endregion
@@ -430,52 +419,44 @@ namespace HSDRawViewer.Sound
 
         private void FromMP3(byte[] data)
         {
-            using (MemoryStream s = new MemoryStream(data))
-            using (IWaveSource soundSource = new DmoMp3Decoder(s))
-            using (MemoryStream w = new MemoryStream())
-            {
-                soundSource.WriteToWaveStream(w);
-                FromWAVE(w.ToArray());
-            }
+            using MemoryStream s = new(data);
+            using IWaveSource soundSource = new DmoMp3Decoder(s);
+            using MemoryStream w = new();
+            soundSource.WriteToWaveStream(w);
+            FromWAVE(w.ToArray());
         }
 
         private void FromM4A(byte[] data)
         {
-            using (MemoryStream s = new MemoryStream(data))
-            using (IWaveSource soundSource = new CSCore.Codecs.DDP.DDPDecoder(s))
-            using (MemoryStream w = new MemoryStream())
-            {
-                soundSource.WriteToWaveStream(w);
-                FromWAVE(w.ToArray());
-            }
+            using MemoryStream s = new(data);
+            using IWaveSource soundSource = new CSCore.Codecs.DDP.DDPDecoder(s);
+            using MemoryStream w = new();
+            soundSource.WriteToWaveStream(w);
+            FromWAVE(w.ToArray());
         }
 
         private void FromWMA(byte[] data)
         {
-            using (MemoryStream s = new MemoryStream(data))
-            using (IWaveSource soundSource = new CSCore.Codecs.WMA.WmaDecoder(s))
-            using (MemoryStream w = new MemoryStream())
-            {
-                soundSource.WriteToWaveStream(w);
-                FromWAVE(w.ToArray());
-            }
+            using MemoryStream s = new(data);
+            using IWaveSource soundSource = new CSCore.Codecs.WMA.WmaDecoder(s);
+            using MemoryStream w = new();
+            soundSource.WriteToWaveStream(w);
+            FromWAVE(w.ToArray());
         }
 
         private void FromAIFF(byte[] data)
         {
-            using (MemoryStream s = new MemoryStream(data))
-            using (IWaveSource soundSource = new CSCore.Codecs.AIFF.AiffReader(s))
-            using (MemoryStream w = new MemoryStream())
-            {
-                soundSource.WriteToWaveStream(w);
-                FromWAVE(w.ToArray());
-            }
+            using MemoryStream s = new(data);
+            using IWaveSource soundSource = new CSCore.Codecs.AIFF.AiffReader(s);
+            using MemoryStream w = new();
+            soundSource.WriteToWaveStream(w);
+            FromWAVE(w.ToArray());
         }
 
         #endregion
 
         //[Browsable(false)]
-       // public int Index { get; set; }
+        // public int Index { get; set; }
 
         public override string ToString()
         {

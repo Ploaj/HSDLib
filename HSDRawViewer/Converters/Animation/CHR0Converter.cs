@@ -3,9 +3,7 @@ using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools.Animation;
-using OpenTK;
 using OpenTK.Mathematics;
-using System;
 using System.IO;
 
 namespace HSDRawViewer.Converters
@@ -19,14 +17,14 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static JointAnimManager LoadCHR0(string filePath, JointMap jointMap)
         {
-            JointAnimManager anim = new JointAnimManager();
-            
-            for(int i = 0; i < jointMap.Count; i++)
+            JointAnimManager anim = new();
+
+            for (int i = 0; i < jointMap.Count; i++)
             {
                 anim.Nodes.Add(new AnimNode());
             }
 
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
+            using (BinaryReaderExt r = new(new FileStream(filePath, FileMode.Open)))
             {
                 r.BigEndian = true;
                 if (r.BaseStream.Length < 4 || new string(r.ReadChars(4)) != "CHR0")
@@ -46,10 +44,10 @@ namespace HSDRawViewer.Converters
                         throw new InvalidDataException($"CHR0 version {versionNum} not supported");
                 }
 
-                var indexGroupOffset = r.ReadUInt32();
+                uint indexGroupOffset = r.ReadUInt32();
                 if (versionNum == 5) // unsure what this is
                     r.Skip(4);
-                var animName = r.ReadString(r.ReadInt32(), -1);
+                string animName = r.ReadString(r.ReadInt32(), -1);
 
                 r.Skip(4);
                 anim.FrameCount = r.ReadUInt16() - 1;
@@ -57,7 +55,7 @@ namespace HSDRawViewer.Converters
                 r.Skip(8);
 
                 r.Seek(indexGroupOffset);
-                var sectionOffset = r.ReadUInt32() + indexGroupOffset;
+                uint sectionOffset = r.ReadUInt32() + indexGroupOffset;
                 int sectionCount = r.ReadInt32();
 
                 for (uint i = 0; i < sectionCount; i++)
@@ -66,8 +64,8 @@ namespace HSDRawViewer.Converters
                     r.Skip(4); // id and unknown
                     r.Skip(2); // let
                     r.Skip(2); // right
-                    var boneName = r.ReadString(r.ReadInt32() + (int)indexGroupOffset, -1);
-                    var dataOffset = r.ReadUInt32() + indexGroupOffset;
+                    string boneName = r.ReadString(r.ReadInt32() + (int)indexGroupOffset, -1);
+                    uint dataOffset = r.ReadUInt32() + indexGroupOffset;
                     if (dataOffset == indexGroupOffset)
                     {
                         sectionCount += 1;
@@ -79,8 +77,8 @@ namespace HSDRawViewer.Converters
 
                     r.Seek(dataOffset);
 
-                    var nameOff = r.Position + r.ReadUInt32();
-                    var flags = r.ReadInt32();
+                    uint nameOff = r.Position + r.ReadUInt32();
+                    int flags = r.ReadInt32();
                     //Console.WriteLine(boneName + " " + flags.ToString("X"));
                     //r.PrintPosition();
                     //01BFE019
@@ -107,21 +105,21 @@ namespace HSDRawViewer.Converters
                     int Tiso = (flags >> 0x6) & 0x1;
                     int Riso = (flags >> 0x5) & 0x1;
                     int Siso = (flags >> 0x4) & 0x1;
-                    
-                    AnimNode node = new AnimNode();
-                    FOBJ_Player trackX = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAX };
-                    FOBJ_Player trackY = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAY };
-                    FOBJ_Player trackZ = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_TRAZ };
-                    FOBJ_Player trackRX = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTX };
-                    FOBJ_Player trackRY = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTY };
-                    FOBJ_Player trackRZ = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_ROTZ };
-                    FOBJ_Player trackSX = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAX };
-                    FOBJ_Player trackSY = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAY };
-                    FOBJ_Player trackSZ = new FOBJ_Player() { JointTrackType = JointTrackType.HSD_A_J_SCAZ };
+
+                    AnimNode node = new();
+                    FOBJ_Player trackX = new() { JointTrackType = JointTrackType.HSD_A_J_TRAX };
+                    FOBJ_Player trackY = new() { JointTrackType = JointTrackType.HSD_A_J_TRAY };
+                    FOBJ_Player trackZ = new() { JointTrackType = JointTrackType.HSD_A_J_TRAZ };
+                    FOBJ_Player trackRX = new() { JointTrackType = JointTrackType.HSD_A_J_ROTX };
+                    FOBJ_Player trackRY = new() { JointTrackType = JointTrackType.HSD_A_J_ROTY };
+                    FOBJ_Player trackRZ = new() { JointTrackType = JointTrackType.HSD_A_J_ROTZ };
+                    FOBJ_Player trackSX = new() { JointTrackType = JointTrackType.HSD_A_J_SCAX };
+                    FOBJ_Player trackSY = new() { JointTrackType = JointTrackType.HSD_A_J_SCAY };
+                    FOBJ_Player trackSZ = new() { JointTrackType = JointTrackType.HSD_A_J_SCAZ };
 
                     if (hasS == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackSX, trackSY, trackSZ, Siso == 1, SXfixed == 1, SYfixed == 1, SZfixed == 1, s_type, dataOffset);
-                    
+
                     if (hasR == 1)
                         ReadKeys(r, node, (int)anim.FrameCount, trackRX, trackRY, trackRZ, Riso == 1, RXfixed == 1, RYfixed == 1, RZfixed == 1, r_type, dataOffset);
 
@@ -138,24 +136,24 @@ namespace HSDRawViewer.Converters
                     if (trackSY.Keys.Count > 0) node.Tracks.Add(trackSY);
                     if (trackSZ.Keys.Count > 0) node.Tracks.Add(trackSZ);
 
-                    foreach (var k in trackRX.Keys)
+                    foreach (FOBJKey k in trackRX.Keys)
                     {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
                         k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
-                    foreach (var k in trackRY.Keys)
+                    foreach (FOBJKey k in trackRY.Keys)
                     {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
                         k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
-                    foreach (var k in trackRZ.Keys)
+                    foreach (FOBJKey k in trackRZ.Keys)
                     {
                         k.Value = MathHelper.DegreesToRadians(k.Value);
                         k.Tan = MathHelper.DegreesToRadians(k.Tan);
                     }
 
                     // make sure all tracks start at frame 0
-                    foreach (var track in node.Tracks)
+                    foreach (FOBJ_Player track in node.Tracks)
                     {
                         if (track.Keys.Count > 0 && track.Keys[0].Frame != 0)
                         {
@@ -183,10 +181,10 @@ namespace HSDRawViewer.Converters
         {
             if (isIsotrophic)
             {
-                var temp = r.Position + 4;
+                uint temp = r.Position + 4;
                 if (!isXFixed && !isYFixed && !isZFixed)
                 {
-                    var offset = r.ReadUInt32() + r.Position;
+                    uint offset = r.ReadUInt32() + r.Position;
                     r.Seek(offset);
                 }
                 float iss = r.ReadSingle();
@@ -229,8 +227,8 @@ namespace HSDRawViewer.Converters
 
         private static void ReadTrack(BinaryReaderExt r, int frameCount, int type, FOBJ_Player track, uint dataOffset, AnimNode node)
         {
-            var offset = r.ReadUInt32() + dataOffset;
-            var temp = r.Position;
+            uint offset = r.ReadUInt32() + dataOffset;
+            uint temp = r.Position;
             r.Seek(offset);
 
             int fCount = -1;
@@ -251,13 +249,13 @@ namespace HSDRawViewer.Converters
 
                 for (int i = 0; i < fCount; i++)
                 {
-                    var v = r.ReadInt32();
+                    int v = r.ReadInt32();
                     frame[i] = (v >> 24) & 0xFF;
                     int th = v & 0xFFFFFF;
                     step[i] = base2 + ((th >> 12) & 0xfff) * stepb;
                     tan[i] = (Sign12Bit(th & 0xfff) / 32f);
 
-                    track.Keys.Add(new FOBJKey() { Frame = frame[i], Value = step[i], Tan = tan[i], InterpolationType = GXInterpolationType.HSD_A_OP_SPL});
+                    track.Keys.Add(new FOBJKey() { Frame = frame[i], Value = step[i], Tan = tan[i], InterpolationType = GXInterpolationType.HSD_A_OP_SPL });
                 }
             }
 

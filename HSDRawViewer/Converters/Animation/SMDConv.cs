@@ -10,7 +10,7 @@ namespace HSDRawViewer.Converters.Animation
 {
     public class SMDConv
     {
-        private static Dictionary<IOAnimationTrackType, JointTrackType> Type = new Dictionary<IOAnimationTrackType, JointTrackType>()
+        private static readonly Dictionary<IOAnimationTrackType, JointTrackType> Type = new()
         {
             {IOAnimationTrackType.PositionX, JointTrackType.HSD_A_J_TRAX },
             {IOAnimationTrackType.PositionY, JointTrackType.HSD_A_J_TRAY },
@@ -25,22 +25,22 @@ namespace HSDRawViewer.Converters.Animation
 
         private static void ProcessNodes(JointAnimManager manager, IOAnimation node)
         {
-            AnimNode n = new AnimNode();
+            AnimNode n = new();
 
             System.Diagnostics.Debug.WriteLine(node.Name);
 
-            foreach (var t in node.Tracks)
+            foreach (IOAnimationTrack t in node.Tracks)
             {
                 if (Type.ContainsKey(t.ChannelType))
                 {
-                    var track = new FOBJ_Player()
+                    FOBJ_Player track = new()
                     {
                         JointTrackType = Type[t.ChannelType]
                     };
 
-                    foreach (var k in t.KeyFrames)
+                    foreach (IOKeyFrame k in t.KeyFrames)
                     {
-                        var key = new FOBJKey()
+                        FOBJKey key = new()
                         {
                             Frame = k.Frame,
                             Value = k.Value,
@@ -75,7 +75,7 @@ namespace HSDRawViewer.Converters.Animation
 
             manager.Nodes.Add(n);
 
-            foreach (var child in node.Groups)
+            foreach (IOAnimation child in node.Groups)
             {
                 ProcessNodes(manager, child);
             }
@@ -84,17 +84,17 @@ namespace HSDRawViewer.Converters.Animation
         public static JointAnimManager ImportAnimationFromSMD(string filePath, JointMap jointMap)
         {
             // import scene
-            var scene = IONET.IOManager.LoadScene(filePath, new IONET.ImportSettings());
+            IONET.Core.IOScene scene = IONET.IOManager.LoadScene(filePath, new IONET.ImportSettings());
 
             // get animation
-            var anim = scene.Animations[0];
+            IOAnimation anim = scene.Animations[0];
 
             // create blank joint animation
-            JointAnimManager animation = new JointAnimManager();
+            JointAnimManager animation = new();
             animation.FrameCount = anim.GetFrameCount();
 
             // process
-            foreach (var child in anim.Groups)
+            foreach (IOAnimation child in anim.Groups)
                 ProcessNodes(animation, child);
 
             // return result

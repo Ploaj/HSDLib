@@ -17,12 +17,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public static void LoadCollData(SBM_Coll_Data CollData, IList<CollLineGroup> LineGroups, IList<CollLine> Lines)
         {
             // Load Vertices
-            Dictionary<int, CollVertex> indexToVertex = new Dictionary<int, CollVertex>();
-            Dictionary<CollVertex, int> vertexToIndex = new Dictionary<CollVertex, int>();
-            List<Vector2> v = new List<Vector2>();
-            foreach (var ve in CollData.Vertices)
+            Dictionary<int, CollVertex> indexToVertex = new();
+            Dictionary<CollVertex, int> vertexToIndex = new();
+            List<Vector2> v = new();
+            foreach (SBM_CollVertex ve in CollData.Vertices)
             {
-                var vert = new CollVertex(ve.X, ve.Y);
+                CollVertex vert = new(ve.X, ve.Y);
                 indexToVertex.Add(v.Count, vert);
                 vertexToIndex.Add(vert, v.Count);
                 v.Add(new Vector2(ve.X, ve.Y));
@@ -30,16 +30,16 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             // Frame Viewport
             //PluginManager.GetCommonViewport().FrameView(v);
-            
-            var links = CollData.Links;
-            var verts = CollData.Vertices;
-            var groups = CollData.LineGroups.ToList();
+
+            SBM_CollLine[] links = CollData.Links;
+            SBM_CollVertex[] verts = CollData.Vertices;
+            List<SBM_CollLineGroup> groups = CollData.LineGroups.ToList();
 
             //List<Line> Lines = new List<Line>();
 
             for (int lineIndex = 0; lineIndex < links.Length; lineIndex++)
             {
-                var line = links[lineIndex];
+                SBM_CollLine line = links[lineIndex];
                 Lines.Add(new CollLine()
                 {
                     v1 = indexToVertex[line.VertexIndex1],
@@ -53,8 +53,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
             for (int lineIndex = 0; lineIndex < links.Length; lineIndex++)
             {
-                var line = links[lineIndex];
-                var l = Lines[lineIndex];
+                SBM_CollLine line = links[lineIndex];
+                CollLine l = Lines[lineIndex];
 
                 if (line.NextLineAltGroup != -1)
                     l.AltNext = Lines[line.NextLineAltGroup];
@@ -63,15 +63,15 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     l.AltPrevious = Lines[line.PreviousLineAltGroup];
             }
 
-            foreach (var group in groups)
+            foreach (SBM_CollLineGroup group in groups)
             {
                 // Create group and range
-                var lineGroup = new CollLineGroup();
+                CollLineGroup lineGroup = new();
                 lineGroup.Range = new Vector4(group.XMin, group.YMin, group.XMax, group.YMax);
 
                 // add vertices
-                var index = 0;
-                foreach (var l in Lines)
+                int index = 0;
+                foreach (CollLine l in Lines)
                 {
                     // if the vertex belongs to this group
                     if ((vertexToIndex[l.v1] >= group.VertexStart && vertexToIndex[l.v1] < group.VertexStart + group.VertexCount) ||
@@ -99,19 +99,19 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             //TODO: Optimize
 
             // gather all tops
-            var topCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
+            int topCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
 
             // gather all bottoms
-            var bottomCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
+            int bottomCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
 
             // gather all rights
-            var leftCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
+            int leftCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
 
             // gather all lefts
-            var rightCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
+            int rightCount = Lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
 
             // gather all dynamic collisions
-            var dynamicCount = Lines.Count(e => e.DynamicCollision);
+            int dynamicCount = Lines.Count(e => e.DynamicCollision);
 
             int topOffset = 0;
             int bottomOffset = topCount;
@@ -125,27 +125,27 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             // TODO: 
 
             SBM_CollLine[] newLines = new SBM_CollLine[totalLines];
-            List<SBM_CollVertex> vertices = new List<SBM_CollVertex>();
+            List<SBM_CollVertex> vertices = new();
 
             // cache
-            Dictionary<CollLine, SBM_CollLine> lineToCollLine = new Dictionary<CollLine, SBM_CollLine>();
-            Dictionary<SBM_CollLine, int> collLineToIndex = new Dictionary<SBM_CollLine, int>();
-            Dictionary<SBM_CollLine, CollLine> lineToAltNext = new Dictionary<SBM_CollLine, CollLine>();
-            Dictionary<SBM_CollLine, CollLine> lineToAltPrev = new Dictionary<SBM_CollLine, CollLine>();
+            Dictionary<CollLine, SBM_CollLine> lineToCollLine = new();
+            Dictionary<SBM_CollLine, int> collLineToIndex = new();
+            Dictionary<SBM_CollLine, CollLine> lineToAltNext = new();
+            Dictionary<SBM_CollLine, CollLine> lineToAltPrev = new();
 
             // groups
-            List<SBM_CollLineGroup> groups = new List<SBM_CollLineGroup>();
+            List<SBM_CollLineGroup> groups = new();
             int boff = 0, toff = 0, loff = 0, roff = 0, doff = 0;
-            foreach (var g in LineGroups)
+            foreach (CollLineGroup g in LineGroups)
             {
-                var lines = Lines.Where(e => e.Group == g).ToList();
-                var groupBottom = lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
-                var groupTop = lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
-                var groupRight = lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
-                var groupLeft = lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
-                var groupDynamic = lines.Count(e => e.DynamicCollision);
+                List<CollLine> lines = Lines.Where(e => e.Group == g).ToList();
+                int groupBottom = lines.Count(e => e.CollisionFlag == CollPhysics.Bottom && !e.DynamicCollision);
+                int groupTop = lines.Count(e => e.CollisionFlag == CollPhysics.Top && !e.DynamicCollision);
+                int groupRight = lines.Count(e => e.CollisionFlag == CollPhysics.Right && !e.DynamicCollision);
+                int groupLeft = lines.Count(e => e.CollisionFlag == CollPhysics.Left && !e.DynamicCollision);
+                int groupDynamic = lines.Count(e => e.DynamicCollision);
 
-                var group = new SBM_CollLineGroup();
+                SBM_CollLineGroup group = new();
                 group.XMin = g.Range.X;
                 group.YMin = g.Range.Y;
                 group.XMax = g.Range.Z;
@@ -168,23 +168,23 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                     group.DynamicLineIndex = (short)(dynamicOffset + doff);
                 group.DynamicLineCount = (short)groupDynamic;
 
-                Dictionary<CollLine, CollLine> nextPointToLine = new Dictionary<CollLine, CollLine>();
-                Dictionary<CollLine, CollLine> prevPointToLine = new Dictionary<CollLine, CollLine>();
-                List<Vector2> groupVertices = new List<Vector2>();
-                foreach (var l in lines)
+                Dictionary<CollLine, CollLine> nextPointToLine = new();
+                Dictionary<CollLine, CollLine> prevPointToLine = new();
+                List<Vector2> groupVertices = new();
+                foreach (CollLine l in lines)
                 {
-                    var line = new SBM_CollLine();
+                    SBM_CollLine line = new();
 
                     line.NextLineAltGroup = -1;
                     line.NextLine = -1;
                     line.PreviousLine = -1;
                     line.PreviousLineAltGroup = -1;
 
-                    var v1 = l.v1.ToVector2();
-                    var v2 = l.v2.ToVector2();
+                    Vector2 v1 = l.v1.ToVector2();
+                    Vector2 v2 = l.v2.ToVector2();
 
-                    var prevPoint = lines.Find(e => e != l && e.v1 == l.v2);
-                    var nextPoint = lines.Find(e => e != l && e.v2 == l.v1);
+                    CollLine prevPoint = lines.Find(e => e != l && e.v1 == l.v2);
+                    CollLine nextPoint = lines.Find(e => e != l && e.v2 == l.v1);
                     if (prevPoint != null)
                         prevPointToLine.Add(l, prevPoint);
                     if (nextPoint != null)
@@ -242,9 +242,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 }
 
                 // Update Links
-                foreach (var l in lines)
+                foreach (CollLine l in lines)
                 {
-                    var line = lineToCollLine[l];
+                    SBM_CollLine line = lineToCollLine[l];
 
                     if (prevPointToLine.ContainsKey(l))
                         line.PreviousLine = (short)collLineToIndex[lineToCollLine[prevPointToLine[l]]];
@@ -256,12 +256,12 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 group.VertexStart = (short)vertices.Count;
                 group.VertexCount = (short)groupVertices.Count;
 
-                foreach (var v in groupVertices)
+                foreach (Vector2 v in groupVertices)
                     vertices.Add(new SBM_CollVertex() { X = v.X, Y = v.Y });
             }
 
             // update alt group links
-            foreach (var v in newLines)
+            foreach (SBM_CollLine v in newLines)
             {
                 if (v == null)
                     continue;
@@ -312,7 +312,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     /// </summary>
     public class CollLineGroup
     {
-        public Vector4 Range = new Vector4();
+        public Vector4 Range = new();
 
         public float MinX { get => Range.X; set => Range.X = value; }
         public float MinY { get => Range.Y; set => Range.Y = value; }
@@ -321,9 +321,9 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         public void CalcuateRange(IList<CollVertex> vertices)
         {
-            Vector4 newRange = new Vector4(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
+            Vector4 newRange = new(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
 
-            foreach (var v in vertices)
+            foreach (CollVertex v in vertices)
             {
                 newRange.X = Math.Min(newRange.X, v.X);
                 newRange.Y = Math.Min(newRange.Y, v.Y);
@@ -426,7 +426,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         public float X { get; set; }
         public float Y { get; set; }
 
-        private Stack<Tuple<float, float>> previous = new Stack<Tuple<float, float>>();
+        private readonly Stack<Tuple<float, float>> previous = new();
 
         /// <summary>
         /// 
@@ -444,7 +444,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             if (previous.Count == 0)
                 return;
 
-            var prev = previous.Pop();
+            Tuple<float, float> prev = previous.Pop();
 
             X = prev.Item1;
             Y = prev.Item2;

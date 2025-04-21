@@ -1,5 +1,4 @@
 ﻿using HSDRaw.Common;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,7 +19,7 @@ namespace HSDRawViewer.Tools.Animation
             public float Error = 0.001f;
         }
 
-        private Dictionary<int, JointInfo> _indexToName = new Dictionary<int, JointInfo>();
+        private readonly Dictionary<int, JointInfo> _indexToName = new();
 
         public string this[int i]
         {
@@ -59,7 +58,7 @@ namespace HSDRawViewer.Tools.Animation
         /// <returns></returns>
         public int IndexOf(string name)
         {
-            foreach (var v in _indexToName)
+            foreach (KeyValuePair<int, JointInfo> v in _indexToName)
                 if (v.Value.Name == name)
                     return v.Key;
 
@@ -92,21 +91,20 @@ namespace HSDRawViewer.Tools.Animation
         /// </summary>
         public void Load(string filePath)
         {
-            var text = File.ReadAllText(filePath);
+            string text = File.ReadAllText(filePath);
             text = Regex.Replace(text, @"\#.*", "");
 
-            var lines = text.Split('\n');
+            string[] lines = text.Split('\n');
 
             _indexToName.Clear();
-            foreach (var r in lines)
+            foreach (string r in lines)
             {
-                var args = r.Split('=');
+                string[] args = r.Split('=');
 
                 if (args.Length >= 2)
                 {
-                    var name = args[1].Trim();
-                    var i = 0;
-                    if (int.TryParse(new string(args[0].Where(c => char.IsDigit(c)).ToArray()), out i))
+                    string name = args[1].Trim();
+                    if (int.TryParse(new string(args[0].Where(c => char.IsDigit(c)).ToArray()), out int i))
                     {
                         this[i] = name;
                         if (args.Length > 2 && float.TryParse(args[2], out float result))
@@ -124,27 +122,27 @@ namespace HSDRawViewer.Tools.Animation
         /// <param name="filePath"></param>
         public void Save(string filePath, HSD_JOBJ root = null)
         {
-            using (FileStream stream = new FileStream(filePath, FileMode.Create))
-            using (StreamWriter w = new StreamWriter(stream))
-                if (_indexToName.Count > 0)
+            using FileStream stream = new(filePath, FileMode.Create);
+            using StreamWriter w = new(stream);
+            if (_indexToName.Count > 0)
+            {
+                foreach (KeyValuePair<int, JointInfo> b in _indexToName)
+                    w.WriteLine($"JOBJ_{b.Key}={b.Value}");
+            }
+            else
+            {
+                if (root != null)
                 {
-                    foreach (var b in _indexToName)
-                        w.WriteLine($"JOBJ_{b.Key}={b.Value}");
-                }
-                else
-                {
-                    if (root != null)
+                    List<HSD_JOBJ> bones = root.TreeList;
+                    int ji = 0;
+                    foreach (HSD_JOBJ j in bones)
                     {
-                        var bones = root.TreeList;
-                        var ji = 0;
-                        foreach (var j in bones)
-                        {
-                            if (!string.IsNullOrEmpty(j.ClassName))
-                                w.WriteLine($"JOBJ_{ji}={j.ClassName}");
-                            ji++;
-                        }
+                        if (!string.IsNullOrEmpty(j.ClassName))
+                            w.WriteLine($"JOBJ_{ji}={j.ClassName}");
+                        ji++;
                     }
                 }
+            }
         }
     }
 }

@@ -2,26 +2,27 @@
 using HSDRawViewer.GUI.MEX.Controls;
 using System;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins
 {
     [SupportedTypes(new Type[] { typeof(MEX_Stock) })]
     public partial class MEXStockIconEditor : PluginBase
     {
-        public override DataNode Node { get => node;
+        public override DataNode Node
+        {
+            get => node;
             set
             {
                 node = value;
 
-                if(node.Accessor is MEX_Stock stock)
+                if (node.Accessor is MEX_Stock stock)
                     stockControl.LoadStockNode(stock);
             }
         }
 
         private DataNode node;
 
-        private MEXStockIconControl stockControl;
+        private readonly MEXStockIconControl stockControl;
 
         public MEXStockIconEditor()
         {

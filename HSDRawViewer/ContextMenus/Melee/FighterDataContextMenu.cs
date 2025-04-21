@@ -1,7 +1,6 @@
-﻿using System;
+﻿using HSDRaw.Melee.Pl;
+using System;
 using System.Windows.Forms;
-using HSDRaw.Melee.Pl;
-using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus.Melee
 {
@@ -23,12 +22,12 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public FighterDataContextMenu() : base()
         {
-            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add Article Folder");
+            ToolStripMenuItem addFromFile = new("Add Article Folder");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_FighterData root)
                 {
-                    if(root.Articles == null)
+                    if (root.Articles == null)
                         root.Articles = new SBM_ArticlePointer();
                 }
             };

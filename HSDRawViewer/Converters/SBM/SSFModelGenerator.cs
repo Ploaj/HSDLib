@@ -15,7 +15,7 @@ namespace HSDRawViewer.Converters.SBM
         /// <returns></returns>
         public static HSD_JOBJ GenerateModel(SSFGroup group)
         {
-            var jobj = new HSD_JOBJ()
+            HSD_JOBJ jobj = new()
             {
                 Flags = JOBJ_FLAG.CLASSICAL_SCALING,
                 SX = 1,
@@ -26,21 +26,21 @@ namespace HSDRawViewer.Converters.SBM
             if (group.Lines.Count == 0)
                 return jobj;
 
-            var attributes = new GXAttribName[]
+            GXAttribName[] attributes = new GXAttribName[]
             {
                 GXAttribName.GX_VA_POS,
                 GXAttribName.GX_VA_NRM,
                 GXAttribName.GX_VA_NULL
             };
 
-            var triangleList = new List<GX_Vertex>();
+            List<GX_Vertex> triangleList = new();
 
-            foreach (var l in group.Lines)
+            foreach (SSFLine l in group.Lines)
             {
-                var v1 = group.Vertices[l.Vertex1];
-                var v2 = group.Vertices[l.Vertex2];
-                var nrm = new OpenTK.Mathematics.Vector3(v1.X - v2.X, v1.Y - v2.Y, 0).Normalized();
-                var normal = new GXVector3(nrm.Y, -nrm.X, nrm.Z);
+                SSFVertex v1 = group.Vertices[l.Vertex1];
+                SSFVertex v2 = group.Vertices[l.Vertex2];
+                OpenTK.Mathematics.Vector3 nrm = new OpenTK.Mathematics.Vector3(v1.X - v2.X, v1.Y - v2.Y, 0).Normalized();
+                GXVector3 normal = new(nrm.Y, -nrm.X, nrm.Z);
 
                 triangleList.Add(new GX_Vertex() { POS = new GXVector3(v1.X, v1.Y, 5), NRM = normal });
                 triangleList.Add(new GX_Vertex() { POS = new GXVector3(v1.X, v1.Y, -5), NRM = normal });
@@ -51,7 +51,7 @@ namespace HSDRawViewer.Converters.SBM
                 triangleList.Add(new GX_Vertex() { POS = new GXVector3(v1.X, v1.Y, -5), NRM = normal });
             }
 
-            var gen = new HSDRaw.Tools.POBJ_Generator();
+            HSDRaw.Tools.POBJ_Generator gen = new();
             jobj.Dobj = new HSD_DOBJ()
             {
                 Mobj = new HSD_MOBJ()

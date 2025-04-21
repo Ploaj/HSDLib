@@ -9,7 +9,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
     {
         public HSD_Spline[] _items { get; set; }
 
-        private KAR_grSplineList _list;
+        private readonly KAR_grSplineList _list;
 
         public GrSplineEditor(KAR_grSplineList splineList)
         {
@@ -19,7 +19,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
 
         public void Render(object selected)
         {
-            foreach (var s in _items)
+            foreach (HSD_Spline s in _items)
             {
                 if (selected != null && s == (HSD_Spline)selected)
                     DrawShape.RenderSpline(s, Color.Yellow, Color.Red);

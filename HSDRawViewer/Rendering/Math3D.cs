@@ -95,22 +95,22 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public static Matrix4 CreateMatrix4FromEuler(float X, float Y, float Z)
         {
-            var sx = (float)Math.Sin(X);
-            var cx = (float)Math.Cos(X);
-            var sy = (float)Math.Sin(Y);
-            var cy = (float)Math.Cos(Y);
-            var sz = (float)Math.Sin(Z);
-            var cz = (float)Math.Cos(Z);
+            float sx = (float)Math.Sin(X);
+            float cx = (float)Math.Cos(X);
+            float sy = (float)Math.Sin(Y);
+            float cy = (float)Math.Cos(Y);
+            float sz = (float)Math.Sin(Z);
+            float cz = (float)Math.Cos(Z);
 
-            var M11 = cy * cz;
-            var M12 = cy * sz;
-            var M13 = -sy;
-            var M21 = cz * sx * sy - cx * sz;
-            var M22 = sz * sx * sy + cx * cz;
-            var M23 = sx * cy;
-            var M31 = cz * cx * sy + sx * sz;
-            var M32 = sz * cx * sy - sx * cz;
-            var M33 = cx * cy;
+            float M11 = cy * cz;
+            float M12 = cy * sz;
+            float M13 = -sy;
+            float M21 = cz * sx * sy - cx * sz;
+            float M22 = sz * sx * sy + cx * cz;
+            float M23 = sx * cy;
+            float M31 = cz * cx * sy + sx * sz;
+            float M32 = sz * cx * sy - sx * cz;
+            float M33 = cx * cy;
 
             return new Matrix4(
                 M11, M12, M13, 0,

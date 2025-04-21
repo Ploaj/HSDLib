@@ -43,7 +43,7 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         [YamlIgnore]
-        public Vector3 DefaultTranslation = new Vector3(0, 10, -80);
+        public Vector3 DefaultTranslation = new(0, 10, -80);
 
         /// <summary>
         /// 
@@ -72,7 +72,7 @@ namespace HSDRawViewer.Rendering
             }
         }
         [YamlIgnore]
-        private Vector3 translation = new Vector3(0, 10, -80);
+        private Vector3 translation = new(0, 10, -80);
 
         public float X { get => translation.X; set => Translation = new Vector3(value, translation.Y, translation.Z); }
         public float Y { get => translation.Y; set => Translation = new Vector3(translation.X, value, translation.Z); }
@@ -446,15 +446,15 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         protected virtual void UpdatePerspectiveMatrix()
         {
-            switch(_mode)
+            switch (_mode)
             {
                 case CameraMode.Orthogonal:
-                    perspectiveMatrix = Matrix4.CreateOrthographicOffCenter(-renderWidth/2, renderWidth / 2, -renderHeight /2, renderHeight / 2, nearClipPlane, farClipPlane);
+                    perspectiveMatrix = Matrix4.CreateOrthographicOffCenter(-renderWidth / 2, renderWidth / 2, -renderHeight / 2, renderHeight / 2, nearClipPlane, farClipPlane);
                     break;
                 case CameraMode.Persepective:
                     perspectiveMatrix = Matrix4.CreatePerspectiveFieldOfView((float)(2 * Math.Atan(Math.Tan(fovRadians / 2) / Math.Max(AspectRatio, 1))), RenderWidth / (float)RenderHeight, nearClipPlane, farClipPlane);
                     break;
-            }        
+            }
         }
 
         /// <summary>
@@ -589,8 +589,8 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public Vector3 Project(Matrix4 mat, Vector3 point)
         {
-            var p = Vector4.TransformRow(new Vector4(point, 1), mat * MvpMatrix);
-            var p2 = p.Xyz / p.W;
+            Vector4 p = Vector4.TransformRow(new Vector4(point, 1), mat * MvpMatrix);
+            Vector3 p2 = p.Xyz / p.W;
             p2.Xy += Vector2.One;
             p2.Xy /= 2;
             p2.Y = 1 - p2.Y;

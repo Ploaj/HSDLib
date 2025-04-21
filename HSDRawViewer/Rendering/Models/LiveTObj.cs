@@ -54,7 +54,7 @@ namespace HSDRawViewer.Rendering.Models
             //trans.x = -tobj->translate.x;
             //trans.y = -(tobj->translate.y + (tobj->wrap_t == GX_MIRROR ? 1.0F / ((f32)tobj->repeat_t / tobj->scale.y) : 0.0F));
             //trans.z = tobj->translate.z;
-            var trans = Matrix4.CreateTranslation(
+            Matrix4 trans = Matrix4.CreateTranslation(
                 -TX,
                 -(TY + (TOBJ.WrapT == GXWrapMode.MIRROR ? 1f / (TOBJ.RepeatT / SY) : 0f)),
                 TZ);
@@ -62,7 +62,7 @@ namespace HSDRawViewer.Rendering.Models
             //rot.x = tobj->rotate.x;
             //rot.y = tobj->rotate.y;
             //rot.z = -tobj->rotate.z;
-            var rot = Math3D.CreateMatrix4FromEuler(
+            Matrix4 rot = Math3D.CreateMatrix4FromEuler(
                 RX,
                 RY,
                 -RZ);
@@ -70,7 +70,7 @@ namespace HSDRawViewer.Rendering.Models
             //scale.x = fabsf(tobj->scale.x) < FLT_EPSILON ? 0.0F : (f32)tobj->repeat_s / tobj->scale.x;
             //scale.y = fabsf(tobj->scale.y) < FLT_EPSILON ? 0.0F : (f32)tobj->repeat_t / tobj->scale.y;
             //scale.z = tobj->scale.z;
-            var scale = Matrix4.CreateScale(
+            Matrix4 scale = Matrix4.CreateScale(
                 Math.Abs(SX) < Single.Epsilon ? 0 : TOBJ.RepeatS / SX,
                 Math.Abs(SY) < Single.Epsilon ? 0 : TOBJ.RepeatT / SY,
                 SZ);
@@ -114,9 +114,9 @@ namespace HSDRawViewer.Rendering.Models
             // initialize tev data
             if (t.TEV != null)
             {
-                var k = t.TEV.constant;
-                var t0 = t.TEV.tev0;
-                var t1 = t.TEV.tev1;
+                System.Drawing.Color k = t.TEV.constant;
+                System.Drawing.Color t0 = t.TEV.tev0;
+                System.Drawing.Color t1 = t.TEV.tev1;
 
                 if (t.TEV.active.HasFlag(TOBJ_TEVREG_ACTIVE.KONST_R))
                     Konst.X = k.R / 255f;
@@ -155,9 +155,9 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="frame"></param>
         public void ApplyAnim(List<HSD_TOBJ> textures, List<FOBJ_Player> tracks, float frame)
         {
-            foreach (var t in tracks)
+            foreach (FOBJ_Player t in tracks)
             {
-                var value = t.GetValue(frame);
+                float value = t.GetValue(frame);
 
                 switch ((TexTrackType)t.TrackType)
                 {

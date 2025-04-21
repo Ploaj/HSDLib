@@ -10,16 +10,16 @@ namespace HSDRawViewer.ContextMenus
 
         public ParticleContextMenu() : base()
         {
-            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add Particle From File");
+            ToolStripMenuItem addFromFile = new("Add Particle From File");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_ParticleGroup root)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
                     if (f != null)
                     {
-                        var file = new HSDRaw.HSDRawFile(f);
-                        var mod = root.Generators;
+                        HSDRaw.HSDRawFile file = new(f);
+                        HSD_ParticleGenerator[] mod = root.Generators;
                         Array.Resize(ref mod, mod.Length + 1);
                         mod[mod.Length - 1] = new HSD_ParticleGenerator()
                         {
@@ -31,12 +31,12 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(addFromFile);
 
-            ToolStripMenuItem export = new ToolStripMenuItem("Export PTL");
+            ToolStripMenuItem export = new("Export PTL");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_ParticleGroup root)
                 {
-                    var f = Tools.FileIO.SaveFile("Particle (*.ptl)|*.ptl");
+                    string f = Tools.FileIO.SaveFile("Particle (*.ptl)|*.ptl");
 
                     if (f != null)
                         System.IO.File.WriteAllBytes(f, root._s.GetData());
@@ -52,16 +52,16 @@ namespace HSDRawViewer.ContextMenus
 
         public TEXGContextMenu() : base()
         {
-            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add TEXG From File");
+            ToolStripMenuItem addFromFile = new("Add TEXG From File");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
                     if (f != null)
                     {
-                        var file = new HSDRaw.HSDRawFile(f);
-                        var mod = root.ParticleImages;
+                        HSDRaw.HSDRawFile file = new(f);
+                        HSD_TexGraphic[] mod = root.ParticleImages;
                         Array.Resize(ref mod, mod.Length + 1);
                         mod[mod.Length - 1] = new HSD_TexGraphic()
                         {
@@ -73,12 +73,12 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(addFromFile);
 
-            ToolStripMenuItem scratch = new ToolStripMenuItem("Add TEXG From Scratch");
+            ToolStripMenuItem scratch = new("Add TEXG From Scratch");
             scratch.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
                 {
-                    var mod = root.ParticleImages;
+                    HSD_TexGraphic[] mod = root.ParticleImages;
                     Array.Resize(ref mod, mod.Length + 1);
                     mod[mod.Length - 1] = new HSD_TexGraphic();
                     root.ParticleImages = mod;
@@ -87,12 +87,12 @@ namespace HSDRawViewer.ContextMenus
             Items.Add(scratch);
 
 
-            ToolStripMenuItem export = new ToolStripMenuItem("Export TXG");
+            ToolStripMenuItem export = new("Export TXG");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_TEXGraphicBank root)
                 {
-                    var f = Tools.FileIO.SaveFile("TEXG (*.txg)|*.txg");
+                    string f = Tools.FileIO.SaveFile("TEXG (*.txg)|*.txg");
 
                     if (f != null)
                         System.IO.File.WriteAllBytes(f, root._s.GetData());

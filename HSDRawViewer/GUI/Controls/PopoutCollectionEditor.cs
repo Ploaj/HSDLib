@@ -13,7 +13,7 @@ namespace HSDRawViewer.GUI.Controls
             PropertyDescriptor prop = TypeDescriptor.GetProperties(component)[propertyName];
             if (prop == null) throw new ArgumentException("propertyName");
             UITypeEditor editor = (UITypeEditor)prop.GetEditor(typeof(UITypeEditor));
-            PopoutCollectionEditor ctx = new PopoutCollectionEditor(owner, component, prop);
+            PopoutCollectionEditor ctx = new(owner, component, prop);
             if (editor != null && editor.GetEditStyle(ctx) == UITypeEditorEditStyle.Modal)
             {
                 object value = prop.GetValue(component);

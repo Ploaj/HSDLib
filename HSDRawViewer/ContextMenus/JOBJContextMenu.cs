@@ -13,7 +13,7 @@ namespace HSDRawViewer.ContextMenus
 
         public JOBJContextMenu() : base()
         {
-            ToolStripMenuItem Import = new ToolStripMenuItem("Import Model From File");
+            ToolStripMenuItem Import = new("Import Model From File");
             Import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
@@ -25,16 +25,16 @@ namespace HSDRawViewer.ContextMenus
             Items.Add(Import);
 
 
-            ToolStripMenuItem GenerateMatAnimJoint = new ToolStripMenuItem("Generate and Export MatAnimJoint Structure");
+            ToolStripMenuItem GenerateMatAnimJoint = new("Generate and Export MatAnimJoint Structure");
             GenerateMatAnimJoint.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
                 {
-                    var file = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "matanim_joint.dat");
-                    if(file != null)
+                    string file = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "matanim_joint.dat");
+                    if (file != null)
                     {
-                        HSDRawFile f = new HSDRawFile();
-                        HSDRootNode r = new HSDRootNode();
+                        HSDRawFile f = new();
+                        HSDRootNode r = new();
                         r.Name = "matanim_joint";
                         r.Data = GenerateMatAnimJointFromJOBJ(root);
                         f.Roots.Add(r);
@@ -44,10 +44,10 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(GenerateMatAnimJoint);
 
-            ToolStripMenuItem addChild = new ToolStripMenuItem("Add Child");
+            ToolStripMenuItem addChild = new("Add Child");
             Items.Add(addChild);
 
-            ToolStripMenuItem createJOBJ = new ToolStripMenuItem("From Scratch");
+            ToolStripMenuItem createJOBJ = new("From Scratch");
             createJOBJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
@@ -65,17 +65,17 @@ namespace HSDRawViewer.ContextMenus
             addChild.DropDownItems.Add(createJOBJ);
 
 
-            ToolStripMenuItem createJOBJFromFile = new ToolStripMenuItem("From File");
+            ToolStripMenuItem createJOBJFromFile = new("From File");
             createJOBJFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_JOBJ root)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
-                    if(f != null)
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    if (f != null)
                     {
-                        HSDRaw.HSDRawFile file = new HSDRaw.HSDRawFile(f);
+                        HSDRaw.HSDRawFile file = new(f);
 
-                        var node = file.Roots[0].Data;
+                        HSDAccessor node = file.Roots[0].Data;
                         if (node is HSD_JOBJ newchild)
                             root.AddChild(newchild);
                     }
@@ -93,10 +93,10 @@ namespace HSDRawViewer.ContextMenus
         /// <returns></returns>
         public static HSD_MatAnimJoint GenerateMatAnimJointFromJOBJ(HSD_JOBJ node)
         {
-            HSD_MatAnimJoint joint = new HSD_MatAnimJoint();
+            HSD_MatAnimJoint joint = new();
 
             if (node.Dobj != null)
-                foreach (var v in node.Dobj.List)
+                foreach (HSD_DOBJ v in node.Dobj.List)
                 {
                     if (joint.MaterialAnimation == null)
                         joint.MaterialAnimation = new HSD_MatAnim();
@@ -104,7 +104,7 @@ namespace HSDRawViewer.ContextMenus
                         joint.MaterialAnimation.Add(new HSD_MatAnim() { });
                 }
 
-            foreach(var v in node.Children)
+            foreach (HSD_JOBJ v in node.Children)
             {
                 joint.AddChild(GenerateMatAnimJointFromJOBJ(v));
             }
@@ -120,9 +120,9 @@ namespace HSDRawViewer.ContextMenus
         /// <returns></returns>
         public static HSD_AnimJoint GenerateAnimJointFromJOBJ(HSD_JOBJ node)
         {
-            HSD_AnimJoint joint = new HSD_AnimJoint();
+            HSD_AnimJoint joint = new();
 
-            foreach (var v in node.Children)
+            foreach (HSD_JOBJ v in node.Children)
                 joint.AddChild(GenerateAnimJointFromJOBJ(v));
 
             return joint;

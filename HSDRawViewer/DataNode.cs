@@ -1,25 +1,24 @@
-﻿using System.Windows.Forms;
-using HSDRaw;
-using System.Collections.Generic;
-using System;
+﻿using HSDRaw;
+using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
-using System.Linq;
+using HSDRaw.Melee;
+using HSDRaw.Melee.Ef;
 using HSDRaw.Melee.Gr;
 using HSDRaw.Melee.Pl;
-using HSDRaw.AirRide.Gr.Data;
-using HSDRaw.Melee.Ef;
-using HSDRaw.Melee;
 using HSDRaw.MEX;
-using HSDRaw.MEX.Stages;
 using HSDRaw.MEX.Menus;
-using System.IO;
+using HSDRaw.MEX.Stages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer
 {
     public class DataNode : TreeNode
     {
-        private bool ReferenceNode = false;
+        private readonly bool ReferenceNode = false;
         private HSDRootNode Root { get; set; }
         public string RootText { set { Root.Name = value; } }
         public bool IsRootNode { get => Root != null; }
@@ -37,18 +36,20 @@ namespace HSDRawViewer
             }
         }
 
-        private System.Drawing.Color KnownColor = System.Drawing.SystemColors.ControlText;
-        private System.Drawing.Color UnknownColor = System.Drawing.SystemColors.GrayText;
-        private System.Drawing.Color ReferenceNodeColor = System.Drawing.Color.DarkRed;
-        private System.Drawing.Color PluginEnabledColor = System.Drawing.Color.Purple; 
+        private readonly System.Drawing.Color KnownColor = System.Drawing.SystemColors.ControlText;
+        private readonly System.Drawing.Color UnknownColor = System.Drawing.SystemColors.GrayText;
+        private readonly System.Drawing.Color ReferenceNodeColor = System.Drawing.Color.DarkRed;
+        private readonly System.Drawing.Color PluginEnabledColor = System.Drawing.Color.Purple;
 
-        public HSDAccessor Accessor { get => _accessor;
+        public HSDAccessor Accessor
+        {
+            get => _accessor;
             set
             {
                 if (PluginManager.HasEditor(value.GetType()))
                     ForeColor = PluginEnabledColor;
 
-                if(value.GetType() == typeof(HSDAccessor))
+                if (value.GetType() == typeof(HSDAccessor))
                     ForeColor = UnknownColor;
 
                 if (ReferenceNode)
@@ -76,7 +77,7 @@ namespace HSDRawViewer
         }
         private HSDAccessor _accessor;
 
-        private static Dictionary<Type, string> typeToImageKey = new Dictionary<Type, string>()
+        private static readonly Dictionary<Type, string> typeToImageKey = new()
         {
             { typeof(HSD_JOBJ), "jobj" },
             { typeof(HSD_DOBJ), "dobj" },
@@ -131,7 +132,7 @@ namespace HSDRawViewer
         /// <returns></returns>
         private bool CheckGenericType(HSDAccessor o)
         {
-            if(o.GetType().IsGenericType)
+            if (o.GetType().IsGenericType)
             {
                 if (o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDArrayAccessor<>))
                     || o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(HSDNullPointerArrayAccessor<>))
@@ -144,7 +145,7 @@ namespace HSDRawViewer
             }
             return false;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -159,9 +160,9 @@ namespace HSDRawViewer
 
             if (Accessor is HSD_JOBJ jobj && jobj.ClassName != null)
                 Text = jobj.ClassName + ":" + Text;
-        
+
             // add dummy only if this node has references or if there is an array in the accessor's properties
-            if(accessor._s.References.Count != 0 || Accessor.GetType().GetProperties().ToList().Find(e=>e.PropertyType.IsArray) != null)
+            if (accessor._s.References.Count != 0 || Accessor.GetType().GetProperties().ToList().Find(e => e.PropertyType.IsArray) != null)
                 Nodes.Add(new TreeNode()); // dummy
         }
 
@@ -172,14 +173,14 @@ namespace HSDRawViewer
         /// <param name="index"></param>
         private void AddNext(string name, HSDAccessor access, int index, List<DataNode> nodes)
         {
-            foreach (var prop in access.GetType().GetProperties())
+            foreach (System.Reflection.PropertyInfo prop in access.GetType().GetProperties())
             {
                 if (prop.Name == "Next")
                 {
-                    var acc = (HSDAccessor)prop.GetValue(access);
+                    HSDAccessor acc = (HSDAccessor)prop.GetValue(access);
                     if (acc != null)
                     {
-                        var node = new DataNode(name + "_" + index, acc);
+                        DataNode node = new(name + "_" + index, acc);
                         nodes.Add(node);
                         AddNext(name, acc, index + 1, nodes);
                     }
@@ -196,8 +197,8 @@ namespace HSDRawViewer
             {
                 if (IsArrayMember)
                 {
-                    var prop = parent.Accessor.GetType().GetProperty(ArrayName);
-                    var arr = prop.GetValue(parent.Accessor) as HSDAccessor[];
+                    System.Reflection.PropertyInfo prop = parent.Accessor.GetType().GetProperty(ArrayName);
+                    HSDAccessor[] arr = prop.GetValue(parent.Accessor) as HSDAccessor[];
                     arr[ArrayIndex] = Accessor;
                     prop.SetValue(parent.Accessor, arr);
 
@@ -214,38 +215,37 @@ namespace HSDRawViewer
         /// </summary>
         public void ExpandData()
         {
-            Dictionary<HSDStruct, IEnumerable<DataNode>> labeledNodes = new Dictionary<HSDStruct, IEnumerable<DataNode>>();
+            Dictionary<HSDStruct, IEnumerable<DataNode>> labeledNodes = new();
 
-            foreach(var prop in Accessor.GetType().GetProperties())
+            foreach (System.Reflection.PropertyInfo prop in Accessor.GetType().GetProperties())
             {
                 // skip these properties
-                if (prop.Name.Equals("Item") || 
+                if (prop.Name.Equals("Item") ||
                     prop.Name.Equals("Children"))
                     continue;
 
                 // handle arrays
                 if (prop.PropertyType.IsArray)
                 {
-                    var acc = prop.GetValue(Accessor) as HSDAccessor[];
+                    HSDAccessor[] acc = prop.GetValue(Accessor) as HSDAccessor[];
 
                     if (acc != null)
                     {
                         int index = 0;
-                        foreach (var a in acc)
+                        foreach (HSDAccessor a in acc)
                         {
                             if (a == null) continue;
 
                             // add to labeled nodes so we don't get this node labeled as unknown
-                            if(!labeledNodes.ContainsKey(a._s))
+                            if (!labeledNodes.ContainsKey(a._s))
                                 labeledNodes.Add(a._s, null);
 
-                            var node = new DataNode
-                                (prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}_({prop.PropertyType.Name})"), a)
-                                {
-                                    IsArrayMember = true,
-                                    ArrayName = prop.Name,
-                                    ArrayIndex = index,
-                                };
+                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_{index}_({prop.PropertyType.Name})"), a)
+                            {
+                                IsArrayMember = true,
+                                ArrayName = prop.Name,
+                                ArrayIndex = index,
+                            };
 
                             // gives folder icon
                             if (string.IsNullOrEmpty(node.SelectedImageKey))
@@ -255,16 +255,16 @@ namespace HSDRawViewer
                             }
 
                             // add substructs too so they don't get appended at the end
-                            foreach (var ss in a._s.References)
-                                if(!labeledNodes.ContainsKey(ss.Value))
+                            foreach (KeyValuePair<int, HSDStruct> ss in a._s.References)
+                                if (!labeledNodes.ContainsKey(ss.Value))
                                     labeledNodes.Add(ss.Value, null);
 
-                            List<DataNode> nodes = new List<DataNode>();
+                            List<DataNode> nodes = new();
                             nodes.Add(node);
                             AddNext(prop.Name, a, 1, nodes);
                             index++;
 
-                            foreach (var n in nodes)
+                            foreach (DataNode n in nodes)
                                 SafeExpand(n);
 
                             //if (!labeledNodes.ContainsKey(a._s))
@@ -273,19 +273,19 @@ namespace HSDRawViewer
                     }
 
                 }
-                
+
                 // handle accessors
                 if (prop.PropertyType.IsSubclassOf(typeof(HSDAccessor)) || prop.PropertyType == typeof(HSDAccessor))
                 {
-                    var acc = prop.GetValue(Accessor) as HSDAccessor;
-                    
+                    HSDAccessor acc = prop.GetValue(Accessor) as HSDAccessor;
+
                     if (acc != null && acc._s != Accessor._s)
                     {
                         if (prop.Name != "Next")
                         {
-                            var node = new DataNode(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_({prop.PropertyType.Name})"), acc);
-                            
-                            List<DataNode> nodes = new List<DataNode>();
+                            DataNode node = new(prop.Name + (typeToImageKey.ContainsKey(acc.GetType()) ? "" : $"_({prop.PropertyType.Name})"), acc);
+
+                            List<DataNode> nodes = new();
                             nodes.Add(node);
                             AddNext(prop.Name, acc, 1, nodes);
                             if (!labeledNodes.ContainsKey(acc._s))
@@ -300,11 +300,11 @@ namespace HSDRawViewer
             }
 
             // appends structs without labels
-            foreach (var v in Accessor._s.References)
+            foreach (KeyValuePair<int, HSDStruct> v in Accessor._s.References)
             {
                 if (!labeledNodes.ContainsKey(v.Value))
                 {
-                    var node = new DataNode("0x" + v.Key.ToString("X6"), Accessor._s.GetReference<HSDAccessor>(v.Key));
+                    DataNode node = new("0x" + v.Key.ToString("X6"), Accessor._s.GetReference<HSDAccessor>(v.Key));
                     SafeExpand(node);
                 }
                 else
@@ -323,7 +323,7 @@ namespace HSDRawViewer
             if (nodes == null)
                 return;
 
-            foreach (var v in nodes)
+            foreach (DataNode v in nodes)
                 SafeExpand(v);
         }
 
@@ -336,7 +336,7 @@ namespace HSDRawViewer
                 return;
 
             TreeNode par = Parent;
-            while(par is DataNode parent)
+            while (par is DataNode parent)
             {
                 if (n.Accessor._s.Equals(parent.Accessor._s))
                     return;
@@ -351,12 +351,12 @@ namespace HSDRawViewer
         /// </summary>
         public void Export()
         {
-            var f = Tools.FileIO.SaveFile("HSD (*.dat)|*.dat", Text + ".dat");
-            
+            string f = Tools.FileIO.SaveFile("HSD (*.dat)|*.dat", Text + ".dat");
+
             if (f != null)
             {
-                HSDRawFile r = new HSDRawFile();
-                HSDRootNode root = new HSDRootNode();
+                HSDRawFile r = new();
+                HSDRootNode root = new();
                 root.Data = Accessor;
                 root.Name = System.IO.Path.GetFileNameWithoutExtension(f);
                 r.Roots.Add(root);
@@ -372,7 +372,7 @@ namespace HSDRawViewer
         private bool OpenDAT(out HSDRawFile file)
         {
             file = null;
-            var f = Tools.FileIO.OpenFile("HSD (*.dat)|*.dat");
+            string f = Tools.FileIO.OpenFile("HSD (*.dat)|*.dat");
             if (f != null)
             {
                 file = new HSDRawFile(f);
@@ -389,7 +389,7 @@ namespace HSDRawViewer
         {
             Accessor._s.SetData(newStruct._s.GetData());
             Accessor._s.References.Clear();
-            foreach (var v in newStruct._s.References)
+            foreach (KeyValuePair<int, HSDStruct> v in newStruct._s.References)
             {
                 Accessor._s.References.Add(v.Key, v.Value);
             }
@@ -420,13 +420,12 @@ namespace HSDRawViewer
             if (!CanEdit())
                 return;
 
-            HSDRawFile file;
-            if (OpenDAT(out file))
+            if (OpenDAT(out HSDRawFile file))
             {
                 ReplaceMe(file.Roots[0].Data);
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -439,9 +438,9 @@ namespace HSDRawViewer
             {
                 if (Accessor is HSD_DOBJ dobj)
                 {
-                    var current = new HSD_DOBJ();
+                    HSD_DOBJ current = new();
                     current._s = Accessor._s;
-                    
+
                     if (PrevNode is DataNode prev && prev.Accessor is HSD_DOBJ next)
                     {
                         next.Next = current.Next;
@@ -455,23 +454,23 @@ namespace HSDRawViewer
                 if (IsArrayMember)
                 {
                     // this is a mess
-                    var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+                    System.Reflection.PropertyInfo prop = parent.Accessor.GetType().GetProperty(ArrayName);
 
-                    var arr = prop.GetValue(parent.Accessor) as object[];
-                    
-                    var list = arr.ToList();
+                    object[] arr = prop.GetValue(parent.Accessor) as object[];
+
+                    List<object> list = arr.ToList();
                     list.RemoveAt(ArrayIndex);
 
-                    var outputArray = Array.CreateInstance(Accessor.GetType(), list.Count);
+                    Array outputArray = Array.CreateInstance(Accessor.GetType(), list.Count);
                     Array.Copy(list.ToArray(), outputArray, list.Count);
 
                     prop.SetValue(parent.Accessor, outputArray);
                 }
                 else
-                if(parent.Accessor._s.RemoveReferenceToStruct(Accessor._s))
+                if (parent.Accessor._s.RemoveReferenceToStruct(Accessor._s))
                     parent.Nodes.Remove(this);
-                else 
-                if(PrevNode is DataNode prev)
+                else
+                if (PrevNode is DataNode prev)
                 {
                     prev.Accessor._s.RemoveReferenceToStruct(Accessor._s);
                 }
@@ -481,7 +480,7 @@ namespace HSDRawViewer
             }
             else
             {
-                if(!ReferenceNode)
+                if (!ReferenceNode)
                     MainForm.DeleteRoot(this);
             }
         }
@@ -491,13 +490,13 @@ namespace HSDRawViewer
         /// </summary>
         public void NotifyChange()
         {
-            if(Parent != null && Parent is DataNode parent)
+            if (Parent != null && Parent is DataNode parent)
             {
                 if (IsArrayMember)
                 {
-                    var prop = parent.Accessor.GetType().GetProperty(ArrayName);
+                    System.Reflection.PropertyInfo prop = parent.Accessor.GetType().GetProperty(ArrayName);
 
-                    var arr = prop.GetValue(parent.Accessor) as object[];
+                    object[] arr = prop.GetValue(parent.Accessor) as object[];
 
                     arr[ArrayIndex] = Accessor;
 
@@ -507,17 +506,16 @@ namespace HSDRawViewer
             }
         }
 
-#region Special
+        #region Special
 
         /// <summary>
         /// Opens a <see cref="SBM_Map_GOBJ"/> from a dat file and appends it to the <see cref="SBM_Map_Head"/>
         /// </summary>
         public void ImportModelGroup()
         {
-            HSDRawFile file;
-            if (Accessor is SBM_Map_Head head && OpenDAT(out file))
+            if (Accessor is SBM_Map_Head head && OpenDAT(out HSDRawFile file))
             {
-                var group = head.ModelGroups.Array.ToList();
+                List<SBM_Map_GOBJ> group = head.ModelGroups.Array.ToList();
 
                 group.Add(new SBM_Map_GOBJ() { _s = file.Roots[0].Data._s });
 
@@ -527,7 +525,7 @@ namespace HSDRawViewer
             }
         }
 
-#endregion
+        #endregion
 
     }
 }

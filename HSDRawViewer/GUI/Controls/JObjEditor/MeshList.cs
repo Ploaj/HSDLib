@@ -30,16 +30,16 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             DrawItem += Ditem;
 
 
-            HashSet<int> _selIndex = new HashSet<int>();
-            HashSet<int> _newSet = new HashSet<int>();
+            HashSet<int> _selIndex = new();
+            HashSet<int> _newSet = new();
             bool updating = false;
             SelectedIndexChanged += (sender, args) =>
             {
                 if (updating)
                     return;
 
-                var mpos = PointToClient(Cursor.Position);
-                var index = IndexFromPoint(mpos);
+                Point mpos = PointToClient(Cursor.Position);
+                int index = IndexFromPoint(mpos);
 
                 if (index != -1 &&
                     Items[index] is MeshListItem checkable &&
@@ -56,7 +56,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                         BeginUpdate();
                         SelectedIndices.Clear();
                         SelectedIndex = -1;
-                        foreach (var v in _selIndex)
+                        foreach (int v in _selIndex)
                             SelectedIndices.Add(v);
                         EndUpdate();
                         updating = false;
@@ -67,7 +67,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                         if (SelectedIndices.Contains(index))
                         {
                             bool state = !checkable.Visible;
-                            foreach (var s in SelectedItems)
+                            foreach (object s in SelectedItems)
                                 if (s is MeshListItem mesh)
                                     mesh.Visible = state;
                         }
@@ -101,7 +101,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         public void SetAllVisibleState(bool visible)
         {
-            foreach (var v in Items)
+            foreach (object v in Items)
                 if (v is MeshListItem mesh)
                     mesh.Visible = visible;
 
@@ -111,26 +111,26 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
         private void Ditem(object sender, DrawItemEventArgs e)
         {
-            using (var textBrush = new SolidBrush(ForeColor))
-                try
+            using SolidBrush textBrush = new(ForeColor);
+            try
+            {
+                e.DrawBackground();
+                Rectangle rect = e.Bounds;
+
+                if (((ListBox)sender).Items[e.Index] is MeshListItem mesh)
                 {
-                    e.DrawBackground();
-                    Rectangle rect = e.Bounds;
-
-                    if (((ListBox)sender).Items[e.Index] is MeshListItem mesh)
-                    {
-                        e.Graphics.DrawImage(mesh.Visible ? Properties.Resources.ts_visible : Properties.Resources.ts_hidden, rect.X, rect.Y, ItemHeight, ItemHeight);
-                        rect.X += ItemHeight;
-                    }
-
-                    e.Graphics.DrawString($"{e.Index}. {((ListBox)sender).Items[e.Index].ToString()}", Font, textBrush, rect, StringFormat.GenericDefault);
-
-                    e.DrawFocusRectangle();
+                    e.Graphics.DrawImage(mesh.Visible ? Properties.Resources.ts_visible : Properties.Resources.ts_hidden, rect.X, rect.Y, ItemHeight, ItemHeight);
+                    rect.X += ItemHeight;
                 }
-                catch
-                {
 
-                }
+                e.Graphics.DrawString($"{e.Index}. {((ListBox)sender).Items[e.Index].ToString()}", Font, textBrush, rect, StringFormat.GenericDefault);
+
+                e.DrawFocusRectangle();
+            }
+            catch
+            {
+
+            }
         }
 
 

@@ -1,12 +1,5 @@
-﻿using HSDRaw;
-using HSDRaw.AirRide.Gr.Data;
-using HSDRaw.Common;
-using HSDRawViewer.Rendering;
+﻿using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
-using System;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
 {

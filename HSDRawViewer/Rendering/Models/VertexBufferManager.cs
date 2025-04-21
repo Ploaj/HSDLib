@@ -1,5 +1,4 @@
-﻿using HSDRaw;
-using HSDRaw.Common;
+﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
@@ -13,11 +12,11 @@ namespace HSDRawViewer.Rendering.Models
     {
         public int BufferCount { get => dobjToVBO.Count; }
 
-        private Dictionary<HSD_DOBJ, int> dobjToVBO = new Dictionary<HSD_DOBJ, int>();
+        private readonly Dictionary<HSD_DOBJ, int> dobjToVBO = new();
 
-        private Dictionary<HSD_DOBJ, int> dobjToVAO = new Dictionary<HSD_DOBJ, int>();
+        private readonly Dictionary<HSD_DOBJ, int> dobjToVAO = new();
 
-        private Dictionary<HSD_DOBJ, int[]> dobjToShapes = new Dictionary<HSD_DOBJ, int[]>();
+        private readonly Dictionary<HSD_DOBJ, int[]> dobjToShapes = new();
 
         /// <summary>
         /// 
@@ -37,9 +36,9 @@ namespace HSDRawViewer.Rendering.Models
                 return;
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, 
-                vertices.Length * System.Runtime.InteropServices.Marshal.SizeOf(typeof(GX_Vertex)), 
-                vertices, 
+            GL.BufferData(BufferTarget.ArrayBuffer,
+                vertices.Length * System.Runtime.InteropServices.Marshal.SizeOf(typeof(GX_Vertex)),
+                vertices,
                 BufferUsageHint.StaticDraw);
 
             // generate buffer
@@ -102,21 +101,20 @@ namespace HSDRawViewer.Rendering.Models
                 dobjToShapes.Add(dobj, new int[shapes.Count]);
             else
             {
-                foreach (var v in dobjToShapes[dobj])
+                foreach (int v in dobjToShapes[dobj])
                     GL.DeleteBuffer(v);
 
                 dobjToShapes[dobj] = new int[shapes.Count];
             }
 
             int si = 0;
-            foreach(var shape in shapes)
+            foreach (List<GX_Shape> shape in shapes)
             {
                 // convert to array
-                var arr = shape.ToArray();
+                GX_Shape[] arr = shape.ToArray();
 
                 // generate buffer
-                int buf;
-                GL.GenBuffers(1, out buf);
+                GL.GenBuffers(1, out int buf);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, buf);
                 GL.BufferData(BufferTarget.ArrayBuffer, arr.Length * GX_Shape.Stride, arr, BufferUsageHint.StaticDraw);
 
@@ -132,16 +130,16 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public void ClearRenderingCache()
         {
-            foreach (var v in dobjToVBO)
+            foreach (KeyValuePair<HSD_DOBJ, int> v in dobjToVBO)
                 GL.DeleteBuffer(v.Value);
             dobjToVBO.Clear();
 
-            foreach (var s in dobjToShapes)
-                foreach (var v in s.Value)
+            foreach (KeyValuePair<HSD_DOBJ, int[]> s in dobjToShapes)
+                foreach (int v in s.Value)
                     GL.DeleteBuffer(v);
             dobjToShapes.Clear();
 
-            foreach (var v in dobjToVAO)
+            foreach (KeyValuePair<HSD_DOBJ, int> v in dobjToVAO)
                 GL.DeleteVertexArray(v.Value);
             dobjToVAO.Clear();
         }
@@ -160,7 +158,7 @@ namespace HSDRawViewer.Rendering.Models
             GXShader.SetFloat("shape_blend", blend);
 
             // 
-            var _vao = dobjToVAO[dobj];
+            int _vao = dobjToVAO[dobj];
             GL.BindVertexArray(_vao);
 
             // normal attributes

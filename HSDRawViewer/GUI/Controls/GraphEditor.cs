@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Windows.Forms;
-using HSDRaw.Common.Animation;
+﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
-using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Renderers;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using HSDRawViewer.Rendering;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Controls
 {
@@ -29,7 +29,7 @@ namespace HSDRawViewer.GUI.Controls
                 set
                 {
                     key.Frame = value;
-                    if(slopekey != null)
+                    if (slopekey != null)
                         slopekey.Frame = value;
                 }
             }
@@ -100,10 +100,10 @@ namespace HSDRawViewer.GUI.Controls
 
         public FOBJ_Player[] TrackPlayers { get => _players.ToArray(); }
 
-        private List<FOBJ_Player> _players = new List<FOBJ_Player>();
+        private readonly List<FOBJ_Player> _players = new();
 
-        private static GraphDisplayOptions _options = new GraphDisplayOptions();
-        
+        private static readonly GraphDisplayOptions _options = new();
+
         private int _selectedPlayerIndex = 0;
 
         private int _startSelectionFrame = 0;
@@ -155,21 +155,21 @@ namespace HSDRawViewer.GUI.Controls
             }
         }
 
-        private Button _ptclButton;
-        private Label _ptclLabel;
+        private readonly Button _ptclButton;
+        private readonly Label _ptclLabel;
 
-        private GLTextRenderer textRenderer = new GLTextRenderer();
+        private readonly GLTextRenderer textRenderer = new();
 
-        public static Vector4 FrameIndicatorPen = new Vector4(1f, 1f, 1f, 1f);
-        public static Vector4 SelectionColor = new Vector4(128 / 255f, 128 / 255f, 200 / 255f, 90 / 255f);
+        public static Vector4 FrameIndicatorPen = new(1f, 1f, 1f, 1f);
+        public static Vector4 SelectionColor = new(128 / 255f, 128 / 255f, 200 / 255f, 90 / 255f);
 
-        public static Vector4 TickColor = new Vector4(1f, 1f, 1f, 1f);
-        public static Vector4 BackTickColor = new Vector4(0.2f, 0.2f, 0.2f, 1f);
+        public static Vector4 TickColor = new(1f, 1f, 1f, 1f);
+        public static Vector4 BackTickColor = new(0.2f, 0.2f, 0.2f, 1f);
 
-        private static Vector4 LineColor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
-        private static Vector4 SelectedLineColor = new Vector4(1f, 1f, 1f, 1f);
+        private static Vector4 LineColor = new(0.5f, 0.5f, 0.5f, 1f);
+        private static Vector4 SelectedLineColor = new(1f, 1f, 1f, 1f);
 
-        private static Vector4 FontColor = new Vector4(1f, 1f, 1f, 1f);
+        private static Vector4 FontColor = new(1f, 1f, 1f, 1f);
 
         public event EventHandler TrackListUpdated;
         protected virtual void OnTrackListUpdated(EventArgs e)
@@ -232,18 +232,18 @@ namespace HSDRawViewer.GUI.Controls
             _ptclButton.Visible = false;
             _ptclButton.Click += (sender, args) =>
             {
-                var options = new ParticleOptions()
+                ParticleOptions options = new()
                 {
                     ParticleBank = _selectedPlayer.PtclBank,
                     ParticleId = _selectedPlayer.PtclId
                 };
-                using (PropertyDialog d = new PropertyDialog("Particle Options", options))
-                    if(d.ShowDialog() == DialogResult.OK)
-                    {
-                        _selectedPlayer.PtclBank = options.ParticleBank;
-                        _selectedPlayer.PtclId = options.ParticleId;
-                        UpdatePtclLabel();
-                    }
+                using PropertyDialog d = new("Particle Options", options);
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    _selectedPlayer.PtclBank = options.ParticleBank;
+                    _selectedPlayer.PtclId = options.ParticleId;
+                    UpdatePtclLabel();
+                }
             };
             graphBox.Controls.Add(_ptclButton);
 
@@ -274,7 +274,7 @@ namespace HSDRawViewer.GUI.Controls
 
             glviewport.MouseMove += (sender, args) =>
             {
-                if(args.Button == MouseButtons.Left)
+                if (args.Button == MouseButtons.Left)
                 {
                     SelectFrameFromMouse(args.X);
                 }
@@ -307,7 +307,7 @@ namespace HSDRawViewer.GUI.Controls
         /// </summary>
         private void PrepareGraph()
         {
-            if(_selectedPlayer == null)
+            if (_selectedPlayer == null)
             {
                 panel1.Visible = false;
                 glviewport.Visible = false;
@@ -338,7 +338,7 @@ namespace HSDRawViewer.GUI.Controls
         public HSD_FOBJDesc ToFOBJs()
         {
             HSD_FOBJDesc fobj = null;
-            foreach(var p in _players)
+            foreach (FOBJ_Player p in _players)
             {
                 HSD_FOBJDesc f = p.ToFobjDesc();
 
@@ -369,12 +369,12 @@ namespace HSDRawViewer.GUI.Controls
             ClearTracks();
 
             SetTrackType(type);
-            
+
             if (aobj.FObjDesc != null)
-                foreach (var v in aobj.FObjDesc.List)
+                foreach (HSD_FOBJDesc v in aobj.FObjDesc.List)
                     AddPlayer(new FOBJ_Player(v));
 
-            if(trackTree.Nodes.Count > 0)
+            if (trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
 
             glviewport.Invalidate();
@@ -393,7 +393,7 @@ namespace HSDRawViewer.GUI.Controls
 
             if (players != null)
             {
-                foreach (var p in players)
+                foreach (FOBJ_Player p in players)
                     AddPlayer(p);
             }
 
@@ -412,7 +412,7 @@ namespace HSDRawViewer.GUI.Controls
             _animType = type;
 
             trackTypeBox.Items.Clear();
-            var tt = typeof(JointTrackType);
+            Type tt = typeof(JointTrackType);
             switch (_animType)
             {
                 case AnimType.Material:
@@ -429,7 +429,7 @@ namespace HSDRawViewer.GUI.Controls
                     break;
             }
 
-            foreach (var item in Enum.GetValues(tt))
+            foreach (object item in Enum.GetValues(tt))
                 trackTypeBox.Items.Add(item);
         }
 
@@ -460,7 +460,7 @@ namespace HSDRawViewer.GUI.Controls
         /// </summary>
         private void SelectFrameFromMouse(int mouseX)
         {
-            var position = (mouseX - (glviewport.Width - glviewport.Width * Zoom) / 2) / (glviewport.Width * Zoom);
+            float position = (mouseX - (glviewport.Width - glviewport.Width * Zoom) / 2) / (glviewport.Width * Zoom);
 
             if (position < 0)
                 _frame = 0;
@@ -479,15 +479,15 @@ namespace HSDRawViewer.GUI.Controls
 
             if (_selectedPlayer != null)
             {
-                var keyIndex = _selectedPlayer.Keys.FindIndex(e => e.Frame == _frame && e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
-                if(keyIndex != -1)
+                int keyIndex = _selectedPlayer.Keys.FindIndex(e => e.Frame == _frame && e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
+                if (keyIndex != -1)
                 {
-                    var key = _selectedPlayer.Keys[keyIndex];
-                    var slope = keyIndex + 1 < Keys.Count && Keys[keyIndex + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP ? Keys[keyIndex + 1] : null;
+                    FOBJKey key = _selectedPlayer.Keys[keyIndex];
+                    FOBJKey slope = keyIndex + 1 < Keys.Count && Keys[keyIndex + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP ? Keys[keyIndex + 1] : null;
 
                     keyProperty.SelectedObject = new KeyProxy() { key = key, slopekey = slope };
                 }
-                
+
                 label4.Text = _selectedPlayer.GetValue(_frame).ToString();
             }
 
@@ -503,15 +503,15 @@ namespace HSDRawViewer.GUI.Controls
 
             if (_selectedPlayer != null)
             {
-                List<object> sel = new List<object>(); 
-                for(int i = Math.Min(start, end); i < Math.Max(start, end); i++)
+                List<object> sel = new();
+                for (int i = Math.Min(start, end); i < Math.Max(start, end); i++)
                 {
-                    var keyIndex = _selectedPlayer.Keys.FindIndex(e => e.Frame == _frame && e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
+                    int keyIndex = _selectedPlayer.Keys.FindIndex(e => e.Frame == _frame && e.InterpolationType != GXInterpolationType.HSD_A_OP_SLP);
                     if (keyIndex != -1)
                     {
-                        var key = _selectedPlayer.Keys[keyIndex];
-                        var slope = keyIndex + 1 < Keys.Count && Keys[keyIndex + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP ? Keys[keyIndex + 1] : null;
-                        
+                        FOBJKey key = _selectedPlayer.Keys[keyIndex];
+                        FOBJKey slope = keyIndex + 1 < Keys.Count && Keys[keyIndex + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP ? Keys[keyIndex + 1] : null;
+
                         sel.Add(new KeyProxy() { key = key, slopekey = slope });
                     }
                 }
@@ -534,7 +534,7 @@ namespace HSDRawViewer.GUI.Controls
 
             return false;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -562,11 +562,11 @@ namespace HSDRawViewer.GUI.Controls
             // sort keys
             if (e.ChangedItem.Label.Equals("Frame") && _selectedPlayer != null)
                 _selectedPlayer.Keys = _selectedPlayer.Keys.OrderBy(k => k.Frame).ToList();
-            
+
             // add/remove slope key
-            foreach(KeyProxy k in keyProperty.SelectedObjects)
+            foreach (KeyProxy k in keyProperty.SelectedObjects)
             {
-                var next = Keys.IndexOf(k.key) + 1;
+                int next = Keys.IndexOf(k.key) + 1;
 
                 if (next < Keys.Count & !k.DifferentTangents)
                 {
@@ -577,7 +577,7 @@ namespace HSDRawViewer.GUI.Controls
                 {
                     if (!Keys.Contains(k.slopekey))
                     {
-                        if(next < Keys.Count && Keys[next].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
+                        if (next < Keys.Count && Keys[next].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
                         {
                             k.slopekey.Frame = Keys[next].Frame;
                             Keys.Insert(next, k.slopekey);
@@ -598,22 +598,22 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="e"></param>
         private void addKeyButton_Click(object sender, EventArgs e)
         {
-            if(_selectedPlayer != null)
+            if (_selectedPlayer != null)
             {
-                if(!_selectedPlayer.Keys.Exists(k => k.Frame == _frame))
+                if (!_selectedPlayer.Keys.Exists(k => k.Frame == _frame))
                 {
-                    var currKey = _selectedPlayer.Keys.Last(e => e.Frame < _frame);
+                    FOBJKey currKey = _selectedPlayer.Keys.Last(e => e.Frame < _frame);
 
-                    var key = new FOBJKey() 
-                    { 
-                        Frame = _frame, 
-                        Value = _selectedPlayer.GetValue(_frame), 
+                    FOBJKey key = new()
+                    {
+                        Frame = _frame,
+                        Value = _selectedPlayer.GetValue(_frame),
                         InterpolationType = currKey != null ? currKey.InterpolationType : GXInterpolationType.HSD_A_OP_LIN
                     };
 
-                    var insertIndex = _selectedPlayer.Keys.FindIndex(k => k.Frame >= _frame);
+                    int insertIndex = _selectedPlayer.Keys.FindIndex(k => k.Frame >= _frame);
 
-                    if(insertIndex == -1 || insertIndex >= _selectedPlayer.Keys.Count)
+                    if (insertIndex == -1 || insertIndex >= _selectedPlayer.Keys.Count)
                     {
                         _selectedPlayer.Keys.Add(key);
                     }
@@ -659,7 +659,7 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="e"></param>
         private void optionsButton_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Graph Display Options", _options))
+            using (PropertyDialog d = new("Graph Display Options", _options))
                 d.ShowDialog();
 
             glviewport.Invalidate();
@@ -698,7 +698,7 @@ namespace HSDRawViewer.GUI.Controls
                 trackTree.Nodes.RemoveAt(_selectedPlayerIndex);
             }
 
-            if(trackTree.Nodes.Count > 0)
+            if (trackTree.Nodes.Count > 0)
                 trackTree.SelectedNode = trackTree.Nodes[0];
             else
                 trackTree.SelectedNode = null;
@@ -715,7 +715,7 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="e"></param>
         private void addTrackButton_Click(object sender, EventArgs e)
         {
-            var player = new FOBJ_Player() { Keys = new List<FOBJKey>() };
+            FOBJ_Player player = new() { Keys = new List<FOBJKey>() };
 
             player.Keys.Add(new FOBJKey() { Frame = 0, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
             player.Keys.Add(new FOBJKey() { Frame = _frameCount == 0 ? 10 : _frameCount, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
@@ -748,7 +748,7 @@ namespace HSDRawViewer.GUI.Controls
         {
             if (_selectedPlayer != null)
             {
-                var keys = HSDK.LoadKeys();
+                List<FOBJKey> keys = HSDK.LoadKeys();
                 if (keys != null)
                 {
                     _selectedPlayer.Keys = keys;
@@ -778,11 +778,11 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="e"></param>
         private void helpButton_Click(object sender, EventArgs e)
         {
-            using (HelpBox hb = new HelpBox(HelpText))
-                hb.ShowDialog();
+            using HelpBox hb = new(HelpText);
+            hb.ShowDialog();
         }
 
-        private static string HelpText = @"Graph Editor:
+        private static readonly string HelpText = @"Graph Editor:
 
 Click on Graph to select keys and frames
 
@@ -869,7 +869,7 @@ NONE - None (do not use)";
             public float CompressionLevel { get; set; } = 0.001f;
         }
 
-        private static CompSettings _compSettings = new CompSettings();
+        private static readonly CompSettings _compSettings = new();
 
         /// <summary>
         /// 
@@ -887,15 +887,13 @@ NONE - None (do not use)";
                     _graph.Invalidate();
                     OnTrackEdited(EventArgs.Empty);
                 }*/
-                using (PropertyDialog d = new PropertyDialog("Compression Settings", _compSettings))
+                using PropertyDialog d = new("Compression Settings", _compSettings);
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    if(d.ShowDialog() == DialogResult.OK)
-                    {
-                        AnimationKeyCompressor.BakeTrack(_selectedPlayer);
-                        AnimationKeyCompressor.CompressTrack(_selectedPlayer, _compSettings.CompressionLevel);
-                        glviewport.Invalidate();
-                        OnTrackEdited(EventArgs.Empty);
-                    }
+                    AnimationKeyCompressor.BakeTrack(_selectedPlayer);
+                    AnimationKeyCompressor.CompressTrack(_selectedPlayer, _compSettings.CompressionLevel);
+                    glviewport.Invalidate();
+                    OnTrackEdited(EventArgs.Empty);
                 }
             }
         }
@@ -944,7 +942,7 @@ NONE - None (do not use)";
             _camera.Translation = new Vector3(0, 10, -80);
         }
 
-        private GraphRenderer gr = new GraphRenderer();
+        private readonly GraphRenderer gr = new();
 
         /// <summary>
         /// 
@@ -958,13 +956,13 @@ NONE - None (do not use)";
 
             GL.Viewport(0, 0, glviewport.Width, glviewport.Height);
 
-            var rect = glviewport.ClientRectangle;
-            var x1 = rect.Width - rect.Width * Zoom;
-            var y1 = rect.Height - rect.Height * Zoom;
+            Rectangle rect = glviewport.ClientRectangle;
+            float x1 = rect.Width - rect.Width * Zoom;
+            float y1 = rect.Height - rect.Height * Zoom;
 
             // create view matrix
-            var v = Matrix4.CreateOrthographicOffCenter(0, glviewport.Width, glviewport.Height, 0, 0, 1);
-            var mv = Matrix4.CreateScale(Zoom) * Matrix4.CreateTranslation(x1 / 2, y1 / 2, 0);
+            Matrix4 v = Matrix4.CreateOrthographicOffCenter(0, glviewport.Width, glviewport.Height, 0, 0, 1);
+            Matrix4 mv = Matrix4.CreateScale(Zoom) * Matrix4.CreateTranslation(x1 / 2, y1 / 2, 0);
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref v);
@@ -997,7 +995,7 @@ NONE - None (do not use)";
                     //graphics.DrawLine(BackTickColor, -x1, rect.Height * 3f / 4f, x1 * 2 + rect.Width, rect.Height * 3f / 4f);
                     //graphics.DrawLine(BackTickColor, -x1, rect.Height, x1 * 2 + rect.Width, rect.Height);
 
-                    var textPos = Vector3.TransformPosition(new Vector3(-20, 0, 0), mv);
+                    Vector3 textPos = Vector3.TransformPosition(new Vector3(-20, 0, 0), mv);
                     GL.Color4(FontColor);
                     textRenderer.RenderText(gr.MinValue.ToString("n2"), glviewport.Width, glviewport.Height, (int)textPos.X, (int)textPos.Y, StringAlignment.Center);
 
@@ -1014,8 +1012,8 @@ NONE - None (do not use)";
                     //graphics.DrawString(gr.MaxValue.ToString("n2"), _markerFont, FontColor, -20, rect.Height, _markerFormat);
                 }
 
-                var tickWidth = (rect.Width / (float)_frameCount);
-                var increment = 1;
+                float tickWidth = (rect.Width / (float)_frameCount);
+                int increment = 1;
 
                 // fix infinity
                 if (_frameCount == 0)
@@ -1035,7 +1033,7 @@ NONE - None (do not use)";
                 {
                     if (i % increment == 0)
                     {
-                        var x = i * tickWidth;
+                        float x = i * tickWidth;
 
                         // frame line
                         GL.Color4(BackTickColor);
@@ -1055,10 +1053,10 @@ NONE - None (do not use)";
                 {
                     if (i % increment == 0)
                     {
-                        var x = i * tickWidth;
+                        float x = i * tickWidth;
 
                         // tick number
-                        var textPos = Vector3.TransformPosition(new Vector3(x, -14 * Zoom, 0), mv);
+                        Vector3 textPos = Vector3.TransformPosition(new Vector3(x, -14 * Zoom, 0), mv);
                         GL.Color4(FontColor);
                         textRenderer.RenderText(i.ToString(), glviewport.Width, glviewport.Height, (int)textPos.X, (int)textPos.Y, StringAlignment.Center);
                         // graphics.DrawString(i.ToString(), _markerFont, FontColor, x, -12, _markerFormat);
@@ -1067,7 +1065,7 @@ NONE - None (do not use)";
             }
 
             // draw tracks
-            foreach (var p in _players)
+            foreach (FOBJ_Player p in _players)
             {
                 if (!_options.ShowAllTracks && p != _selectedPlayer)
                     continue;
@@ -1096,20 +1094,20 @@ NONE - None (do not use)";
 
 
             // draw selection
-            var linex = _frame * (rect.Width / (float)_frameCount);
+            float linex = _frame * (rect.Width / (float)_frameCount);
 
             if (!float.IsNaN(linex) && !float.IsInfinity(linex))
             {
                 if (IsControl)
                 {
-                    var start = _startSelectionFrame * (rect.Width / (float)_frameCount);
+                    float start = _startSelectionFrame * (rect.Width / (float)_frameCount);
 
                     //graphics.FillRectangle(SelectionColor, Math.Min(start, linex), 0, Math.Abs(start - linex), glviewport.Height);
 
                     //graphics.DrawLine(FrameIndicatorPen, start, 0, start, glviewport.Height);
 
-                    var s1 = Math.Min(start, linex);
-                    var s2 = Math.Abs(start - linex);
+                    float s1 = Math.Min(start, linex);
+                    float s2 = Math.Abs(start - linex);
                     GL.Color4(SelectionColor);
                     GL.Begin(PrimitiveType.Quads);
                     GL.Vertex2(s1, 0);
@@ -1152,7 +1150,7 @@ NONE - None (do not use)";
             public int EndFrame { get; set; } = -1;
         }
 
-        private static ShiftSettings _shiftSettings = new ShiftSettings();
+        private static readonly ShiftSettings _shiftSettings = new();
 
         /// <summary>
         /// 
@@ -1164,25 +1162,23 @@ NONE - None (do not use)";
 
             if (_selectedPlayer != null)
             {
-                using (PropertyDialog d = new PropertyDialog("Shift Settings", _shiftSettings))
+                using PropertyDialog d = new("Shift Settings", _shiftSettings);
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    if (d.ShowDialog() == DialogResult.OK)
+                    foreach (FOBJKey k in _selectedPlayer.Keys)
                     {
-                        foreach (var k in _selectedPlayer.Keys)
-                        {
-                            if (_shiftSettings.StartFrame > 0 &&
-                                k.Frame < _shiftSettings.StartFrame)
-                                continue;
+                        if (_shiftSettings.StartFrame > 0 &&
+                            k.Frame < _shiftSettings.StartFrame)
+                            continue;
 
-                            if (_shiftSettings.EndFrame > 0 &&
-                                k.Frame > _shiftSettings.EndFrame)
-                                continue;
+                        if (_shiftSettings.EndFrame > 0 &&
+                            k.Frame > _shiftSettings.EndFrame)
+                            continue;
 
-                            k.Value += _shiftSettings.ShiftAmount;
-                        }
-                        glviewport.Invalidate();
-                        OnTrackEdited(EventArgs.Empty);
+                        k.Value += _shiftSettings.ShiftAmount;
                     }
+                    glviewport.Invalidate();
+                    OnTrackEdited(EventArgs.Empty);
                 }
             }
         }

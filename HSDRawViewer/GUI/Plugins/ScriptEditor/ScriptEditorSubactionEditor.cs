@@ -15,7 +15,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
     {
         public enum ScriptDisplayType
         {
-            Simple, 
+            Simple,
             Descriptive,
         };
 
@@ -27,10 +27,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public delegate void SelectedIndexChange(List<SubactionEvent> selectedEvents);
         public SelectedIndexChange SelectedIndexedChanged;
 
-        private Stack<HSDStruct> UndoDataStack = new Stack<HSDStruct>();
-        private Stack<HSDStruct> RedoDataStack = new Stack<HSDStruct>();
+        private readonly Stack<HSDStruct> UndoDataStack = new();
+        private readonly Stack<HSDStruct> RedoDataStack = new();
 
-        private Timer dragDropTimer;
+        private readonly Timer dragDropTimer;
         private Point dragDropMousePosition;
 
         /// <summary>
@@ -92,9 +92,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             subActionList.ClearSelected();
 
-            foreach (var e in events)
+            foreach (SubactionEvent e in events)
             {
-                var index = subActionList.Items.IndexOf(e);
+                int index = subActionList.Items.IndexOf(e);
 
                 if (index >= 0)
                     subActionList.SetSelected(index, true);
@@ -106,9 +106,9 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         public void ApplyScriptChanges()
         {
-            List<SubactionEvent> events = new List<SubactionEvent>();
+            List<SubactionEvent> events = new();
 
-            foreach (var i in subActionList.Items)
+            foreach (object i in subActionList.Items)
                 if (i is SubactionEvent ev)
                     events.Add(ev);
 
@@ -155,7 +155,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //
             subActionList.BeginUpdate();
             subActionList.Items.Clear();
-            foreach (var v in events)
+            foreach (SubactionEvent v in events)
                 subActionList.Items.Add(v);
             subActionList.EndUpdate();
 
@@ -170,11 +170,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             if (UndoDataStack.Count > 0)
             {
-                var undo = UndoDataStack.Pop();
+                HSDStruct undo = UndoDataStack.Pop();
 
                 if (undo != null)
                 {
-                    var events = SubactionEvent.GetEvents(Type, undo).ToList();
+                    List<SubactionEvent> events = SubactionEvent.GetEvents(Type, undo).ToList();
                     LoadData(Type, events);
                     RedoDataStack.Push(undo);
                     ScriptEdited?.Invoke(events);
@@ -189,11 +189,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             if (RedoDataStack.Count > 0)
             {
-                var redo = RedoDataStack.Pop();
+                HSDStruct redo = RedoDataStack.Pop();
 
                 if (redo != null)
                 {
-                    var events = SubactionEvent.GetEvents(Type, redo).ToList();
+                    List<SubactionEvent> events = SubactionEvent.GetEvents(Type, redo).ToList();
                     LoadData(Type, events);
                     UndoDataStack.Push(redo);
                     ScriptEdited?.Invoke(events);
@@ -209,12 +209,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             subActionList.BeginUpdate();
             if (subActionList.SelectedItems.Count != 0)
             {
-                var toRemove = new List<object>();
+                List<object> toRemove = new();
 
-                foreach (var v in subActionList.SelectedItems)
+                foreach (object v in subActionList.SelectedItems)
                     toRemove.Add(v);
 
-                foreach (var v in toRemove)
+                foreach (object v in toRemove)
                     subActionList.Items.Remove(v);
             }
             subActionList.EndUpdate();
@@ -231,7 +231,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             Clipboard.Clear();
 
             // get collections of selected scripts
-            var scripts = new List<SubactionEvent>();
+            List<SubactionEvent> scripts = new();
             foreach (SubactionEvent scr in subActionList.SelectedItems)
                 scripts.Add(scr);
 
@@ -245,11 +245,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private void Paste()
         {
             // get insert index
-            var index = subActionList.SelectedIndex + 1;
+            int index = subActionList.SelectedIndex + 1;
             if (index == -1)
                 index = 0;
 
-            var text = Clipboard.GetText();
+            string text = Clipboard.GetText();
             if (text != null)
             {
                 // try to parse script code
@@ -258,7 +258,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 {
                     // insert scripts
                     scripts.Reverse();
-                    foreach (var v in scripts)
+                    foreach (SubactionEvent v in scripts)
                         // only paste subactions the belong to this group
                         if (v.Type == SubactionGroup.Fighter)
                             subActionList.Items.Insert(index, v);
@@ -282,11 +282,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     if (scripts != null && scripts.Item1 == Type)
                     {
                         // insert scripts
-                        var events = SubactionEvent.GetEvents(Type, scripts.Item2).Reverse();
+                        IEnumerable<SubactionEvent> events = SubactionEvent.GetEvents(Type, scripts.Item2).Reverse();
 
                         // only paste subactions the belong to this group
                         subActionList.BeginUpdate();
-                        foreach (var v in events)
+                        foreach (SubactionEvent v in events)
                             if (v.Type == Type)
                                 subActionList.Items.Insert(index, v);
                         subActionList.EndUpdate();
@@ -303,7 +303,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void ReplacePaste()
         {
-            var selectedIndex = subActionList.SelectedIndex;
+            int selectedIndex = subActionList.SelectedIndex;
             if (selectedIndex != -1)
             {
                 RemoveSelected();
@@ -360,7 +360,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="e"></param>
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var ac = new SubactionEvent(Type, 0);
+            SubactionEvent ac = new(Type, 0);
 
             subActionList.Items.Insert(subActionList.SelectedIndex + 1, ac);
             subActionList.SelectedItem = null;
@@ -484,15 +484,15 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             int index = subActionList.IndexFromPoint(point);
             if (index < 0) index = subActionList.Items.Count - 1;
 
-            List<object> data = new List<object>();
+            List<object> data = new();
 
-            foreach (var i in subActionList.SelectedItems)
+            foreach (object i in subActionList.SelectedItems)
                 data.Add(i);
 
-            foreach (var i in data)
+            foreach (object i in data)
                 subActionList.Items.Remove(i);
 
-            foreach (var i in data)
+            foreach (object i in data)
             {
                 subActionList.Items.Insert(index, i);
             }
@@ -565,29 +565,27 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 if (subActionList.Items[e.Index] is SubactionEvent script)
                 {
-                    var sa = SubactionManager.GetSubaction(script.Code, script.Type);
+                    Subaction sa = SubactionManager.GetSubaction(script.Code, script.Type);
 
                     Color color = Color.DarkBlue;
 
                     if (sa.IsCustom)
                         color = Color.DarkOrange;
 
-                    using (var brush = new SolidBrush(color))
+                    using SolidBrush brush = new(color);
+                    switch (displayType)
                     {
-                        switch (displayType)
-                        {
-                            case ScriptDisplayType.Simple:
-                                {
-                                    e.Graphics.DrawString($"{e.Index}. {sa.Name}", e.Font, brush, e.Bounds);
+                        case ScriptDisplayType.Simple:
+                            {
+                                e.Graphics.DrawString($"{e.Index}. {sa.Name}", e.Font, brush, e.Bounds);
 
-                                }
-                                break;
-                            case ScriptDisplayType.Descriptive:
-                                {
-                                    e.Graphics.DrawString($"{e.Index}. {script.ToStringDescriptive()}", e.Font, brush, e.Bounds);
-                                }
-                                break;
-                        }
+                            }
+                            break;
+                        case ScriptDisplayType.Descriptive:
+                            {
+                                e.Graphics.DrawString($"{e.Index}. {script.ToStringDescriptive()}", e.Font, brush, e.Bounds);
+                            }
+                            break;
                     }
                     //int i = 1;
                     //if (displayType == ScriptDisplayType.ex)
@@ -602,8 +600,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
                 else
                 {
-                    using (var brush = new SolidBrush(e.ForeColor))
-                        e.Graphics.DrawString(subActionList.Items[e.Index].ToString(), e.Font, brush, e.Bounds);
+                    using SolidBrush brush = new(e.ForeColor);
+                    e.Graphics.DrawString(subActionList.Items[e.Index].ToString(), e.Font, brush, e.Bounds);
                 }
 
             }
@@ -647,7 +645,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 cbActionType.Enabled = false;
             }
 
-            List<SubactionEvent> selected = new List<SubactionEvent>();
+            List<SubactionEvent> selected = new();
             foreach (SubactionEvent s in subActionList.SelectedItems)
                 selected.Add(s);
             SelectedIndexedChanged?.Invoke(selected);

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using HSDRawViewer.Rendering.Renderers;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using System.Drawing;
-using HSDRawViewer.Rendering.Renderers;
+using System;
 
 namespace HSDRawViewer.Rendering.Widgets
 {
@@ -32,7 +31,7 @@ namespace HSDRawViewer.Rendering.Widgets
         public Vector3 ColorX = Vector3.UnitX;
         public Vector3 ColorY = Vector3.UnitY;
         public Vector3 ColorZ = Vector3.UnitZ;
-        public Vector3 ColorSelected = new Vector3(1, 1, 0);
+        public Vector3 ColorSelected = new(1, 1, 0);
 
         public bool UseScaleInsteadOfView = false;
 
@@ -56,7 +55,7 @@ namespace HSDRawViewer.Rendering.Widgets
             public Vector3 Normal;
         }
 
-        private Plane CenterPlane = new Plane();
+        private readonly Plane CenterPlane = new();
         private Vector3 CenterPlaneHit;
 
         public class QuadHitTest
@@ -68,7 +67,7 @@ namespace HSDRawViewer.Rendering.Widgets
 
             public Vector3 Offset;
 
-            public Plane plane = new Plane();
+            public Plane plane = new();
 
             public void Init(Vector3 normal, Vector3 plane1, Vector3 plane2, ref Matrix4 trans)
             {
@@ -84,9 +83,9 @@ namespace HSDRawViewer.Rendering.Widgets
 
         private PickInformation ray;
 
-        private QuadHitTest XPlane = new QuadHitTest();
-        private QuadHitTest YPlane = new QuadHitTest();
-        private QuadHitTest ZPlane = new QuadHitTest();
+        private readonly QuadHitTest XPlane = new();
+        private readonly QuadHitTest YPlane = new();
+        private readonly QuadHitTest ZPlane = new();
 
         public bool Interacting { get; set; }
         private bool WasInteracting = false;
@@ -104,7 +103,7 @@ namespace HSDRawViewer.Rendering.Widgets
         private void Update(Camera camera)
         {
             // temporary center
-            var center = Transform.ExtractTranslation();
+            Vector3 center = Transform.ExtractTranslation();
 
             // update scaling only if not currently interacting with widget
             if (!Interacting)
@@ -126,9 +125,9 @@ namespace HSDRawViewer.Rendering.Widgets
             }
 
             // get right and up vectors
-            var invMv = (Transform * camera.ModelViewMatrix).Inverted();
-            var right = invMv.Row0.Xyz;
-            var up = invMv.Row1.Xyz;
+            Matrix4 invMv = (Transform * camera.ModelViewMatrix).Inverted();
+            Vector3 right = invMv.Row0.Xyz;
+            Vector3 up = invMv.Row1.Xyz;
 
             // update center collision plane
             CenterPlane.Position = center;
@@ -147,7 +146,7 @@ namespace HSDRawViewer.Rendering.Widgets
 
 
             // calculate x quad
-            var trans = ScaleMatrix * Transform;
+            Matrix4 trans = ScaleMatrix * Transform;
             XPlane.Init(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ, ref trans);
             YPlane.Init(Vector3.UnitY, Vector3.UnitX, Vector3.UnitZ, ref trans);
             ZPlane.Init(Vector3.UnitZ, Vector3.UnitY, Vector3.UnitX, ref trans);
@@ -180,7 +179,7 @@ namespace HSDRawViewer.Rendering.Widgets
         /// <returns></returns>
         private Vector3 GetPlaneInsectionAxis(PickInformation info, QuadHitTest plane, Vector3 axis, Vector3 offset)
         {
-            var hit = info.GetPlaneIntersection(plane.plane.Normal, plane.plane.Position) + offset;
+            Vector3 hit = info.GetPlaneIntersection(plane.plane.Normal, plane.plane.Position) + offset;
             hit = Vector3.TransformPosition(hit, Transform.Inverted());
             return Vector3.TransformPosition(hit * axis, Transform);
         }
@@ -259,8 +258,7 @@ namespace HSDRawViewer.Rendering.Widgets
 
                 SelectedComponent = TranslationComponent.None;
 
-                var p = info.ScreenPoint;
-                Vector3 intersect;
+                Vector2 p = info.ScreenPoint;
 
                 if (p.X > CenterSquare.X && p.X < CenterSquare.Z &&
                     p.Y > CenterSquare.Y && p.Y < CenterSquare.W)
@@ -277,7 +275,7 @@ namespace HSDRawViewer.Rendering.Widgets
                     }
                 }
                 else
-                if (info.IntersectsQuad(XPlane.P1, XPlane.P2, XPlane.P3, XPlane.P4, out intersect))
+                if (info.IntersectsQuad(XPlane.P1, XPlane.P2, XPlane.P3, XPlane.P4, out Vector3 intersect))
                 {
                     XPlane.Offset = XPlane.P1 - intersect;
                     SelectedComponent = TranslationComponent.Y | TranslationComponent.Z;
@@ -357,19 +355,19 @@ namespace HSDRawViewer.Rendering.Widgets
             {
                 case TranslationComponent.X:
                     {
-                        var trans = Matrix4.CreateRotationZ(-1.57f) * Matrix4.CreateTranslation(direction * Size);
+                        Matrix4 trans = Matrix4.CreateRotationZ(-1.57f) * Matrix4.CreateTranslation(direction * Size);
                         GL.MultMatrix(ref trans);
                     }
                     break;
                 case TranslationComponent.Y:
                     {
-                        var trans = Matrix4.CreateTranslation(direction * Size);
+                        Matrix4 trans = Matrix4.CreateTranslation(direction * Size);
                         GL.MultMatrix(ref trans);
                     }
                     break;
                 case TranslationComponent.Z:
                     {
-                        var trans = Matrix4.CreateRotationX(1.57f) * Matrix4.CreateTranslation(direction * Size);
+                        Matrix4 trans = Matrix4.CreateRotationX(1.57f) * Matrix4.CreateTranslation(direction * Size);
                         GL.MultMatrix(ref trans);
                     }
                     break;
@@ -403,7 +401,7 @@ namespace HSDRawViewer.Rendering.Widgets
 
             GL.MatrixMode(MatrixMode.Modelview);
             GL.PushMatrix();
-            var trans = ScaleMatrix * Transform;
+            Matrix4 trans = ScaleMatrix * Transform;
             GL.MultMatrix(ref trans);
 
             // render components

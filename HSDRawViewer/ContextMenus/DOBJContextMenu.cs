@@ -1,8 +1,8 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRawViewer.Tools;
 using System;
 using System.Windows.Forms;
-using HSDRaw;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -12,18 +12,18 @@ namespace HSDRawViewer.ContextMenus
 
         public DOBJContextMenu() : base()
         {
-            ToolStripMenuItem ImportAfter = new ToolStripMenuItem("Import DOBJ After");
+            ToolStripMenuItem ImportAfter = new("Import DOBJ After");
             ImportAfter.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_DOBJ dobj)
                 {
-                    var f = FileIO.OpenFile("DAT (.dat)|*.dat");
+                    string f = FileIO.OpenFile("DAT (.dat)|*.dat");
                     if (f != null)
                     {
-                        HSDRawFile dat = new HSDRawFile(f);
-                        HSD_DOBJ newDOBJ = new HSD_DOBJ();
+                        HSDRawFile dat = new(f);
+                        HSD_DOBJ newDOBJ = new();
                         newDOBJ._s = dat.Roots[0].Data._s;
-                        if(newDOBJ._s.Length == newDOBJ.TrimmedSize)
+                        if (newDOBJ._s.Length == newDOBJ.TrimmedSize)
                         {
                             newDOBJ.Next = dobj.Next;
                             dobj.Next = newDOBJ;

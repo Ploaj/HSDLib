@@ -1,15 +1,15 @@
 ﻿using HSDRaw.Common;
+using HSDRaw.Melee.Gr;
+using HSDRawViewer.GUI.Plugins.Melee;
+using HSDRawViewer.Tools.Animation;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using OpenTK.Mathematics;
-using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using HSDRawViewer.GUI.Plugins.Melee;
-using HSDRaw.Melee.Gr;
-using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer.Converters
 {
@@ -29,7 +29,7 @@ namespace HSDRawViewer.Converters
             {
                 get
                 {
-                    var angle = Math.Atan2((P1.Y - P0.Y), (P1.X - P0.X));
+                    double angle = Math.Atan2((P1.Y - P0.Y), (P1.X - P0.X));
 
                     if (angle < 0)
                         angle += 360;
@@ -60,15 +60,15 @@ namespace HSDRawViewer.Converters
 
             public bool FindIntersection(Line line, out Vector2 intersection)
             {
-                var p0_x = P0.X;
-                var p0_y = P0.Y;
-                var p1_x = P1.X;
-                var p1_y = P1.Y;
+                float p0_x = P0.X;
+                float p0_y = P0.Y;
+                float p1_x = P1.X;
+                float p1_y = P1.Y;
 
-                var p2_x = line.P0.X;
-                var p2_y = line.P0.Y;
-                var p3_x = line.P1.X;
-                var p3_y = line.P1.Y;
+                float p2_x = line.P0.X;
+                float p2_y = line.P0.Y;
+                float p3_x = line.P1.X;
+                float p3_y = line.P1.Y;
 
                 intersection = Vector2.Zero;
 
@@ -87,7 +87,7 @@ namespace HSDRawViewer.Converters
                     return true;
                 }
                 // No collision
-                return false; 
+                return false;
             }
 
             const float EPSILON = 0.001f;
@@ -106,11 +106,11 @@ namespace HSDRawViewer.Converters
 
         public static List<Vector2> PolyTrace(IEnumerable<Line> lines)
         {
-            var pointToPoint = new Dictionary<Vector2, HashSet<Vector2>>();
+            Dictionary<Vector2, HashSet<Vector2>> pointToPoint = new();
 
-            var startPoint = new Vector2(float.MinValue, 0);
+            Vector2 startPoint = new(float.MinValue, 0);
 
-            foreach (var line in lines)
+            foreach (Line line in lines)
             {
                 if (!pointToPoint.ContainsKey(line.P0))
                     pointToPoint.Add(line.P0, new HashSet<Vector2>());
@@ -128,26 +128,26 @@ namespace HSDRawViewer.Converters
                     startPoint = line.P1;
             }
 
-            var poly = new List<Vector2>();
+            List<Vector2> poly = new();
 
-            var point = startPoint;
-            var prevPoint = startPoint + Vector2.UnitX;
+            Vector2 point = startPoint;
+            Vector2 prevPoint = startPoint + Vector2.UnitX;
 
-            while(poly.Count == 0 || point != startPoint)
+            while (poly.Count == 0 || point != startPoint)
             {
                 Vector2 nextPoint = point;
-                var smallestAngle = double.MaxValue;
+                double smallestAngle = double.MaxValue;
 
-                foreach(var connected in pointToPoint[point])
+                foreach (Vector2 connected in pointToPoint[point])
                 {
-                    var a = (prevPoint - point).Normalized();
-                    var b = (connected - point).Normalized();
-                    var angle = Math.Atan2(a.X * b.Y - a.Y * b.X, a.X * b.X + a.Y * b.Y);
+                    Vector2 a = (prevPoint - point).Normalized();
+                    Vector2 b = (connected - point).Normalized();
+                    double angle = Math.Atan2(a.X * b.Y - a.Y * b.X, a.X * b.X + a.Y * b.Y);
 
                     if (angle <= 0)
                         angle += Math.PI * 2;
 
-                    if(angle < smallestAngle)
+                    if (angle < smallestAngle)
                     {
                         smallestAngle = angle;
                         nextPoint = connected;
@@ -175,34 +175,34 @@ namespace HSDRawViewer.Converters
         public static List<Vector2> ModelToLines(HSD_JOBJ root)
         {
             // get model as easier to access form
-            ModelExporter mx = new ModelExporter(root, new ModelExportSettings() { Optimize = true }, new JointMap());
-            var scene = mx.Scene;
+            ModelExporter mx = new(root, new ModelExportSettings() { Optimize = true }, new JointMap());
+            IONET.Core.IOScene scene = mx.Scene;
 
-            HashSet<Line> lines = new HashSet<Line>();
-            List<Vector2> polygon = new List<Vector2>();
+            HashSet<Line> lines = new();
+            List<Vector2> polygon = new();
 
             // go through each triangle and check collision with plane
             // if it collides, get the intersection points as a line
             //foreach (var m in scene.Models[0].Meshes)
             {
-                var m = scene.Models[0].Meshes[1];
+                IONET.Core.Model.IOMesh m = scene.Models[0].Meshes[1];
                 // for each polygon
-                foreach (var p in m.Polygons)
+                foreach (IONET.Core.Model.IOPolygon p in m.Polygons)
                 {
                     if (p.PrimitiveType != IONET.Core.Model.IOPrimitive.TRIANGLE)
                         continue;
 
                     for (int i = 0; i < p.Indicies.Count; i += 3)
                     {
-                        var v1 = IOVertexToTKVector(m.Vertices[p.Indicies[i]]);
-                        var v2 = IOVertexToTKVector(m.Vertices[p.Indicies[i + 1]]);
-                        var v3 = IOVertexToTKVector(m.Vertices[p.Indicies[i + 2]]);
+                        Vector2 v1 = IOVertexToTKVector(m.Vertices[p.Indicies[i]]);
+                        Vector2 v2 = IOVertexToTKVector(m.Vertices[p.Indicies[i + 1]]);
+                        Vector2 v3 = IOVertexToTKVector(m.Vertices[p.Indicies[i + 2]]);
 
-                        var l1 = new Line() { P0 = v1, P1 = v2 };
-                        var l2 = new Line() { P0 = v2, P1 = v3 };
-                        var l3 = new Line() { P0 = v1, P1 = v3 };
+                        Line l1 = new() { P0 = v1, P1 = v2 };
+                        Line l2 = new() { P0 = v2, P1 = v3 };
+                        Line l3 = new() { P0 = v1, P1 = v3 };
 
-                        if(!lines.Contains(l1))
+                        if (!lines.Contains(l1))
                             lines.Add(l1);
                         if (!lines.Contains(l2))
                             lines.Add(l2);
@@ -212,16 +212,16 @@ namespace HSDRawViewer.Converters
                 }
 
                 // break overlapping lines
-                var lineList = new List<Line>();
+                List<Line> lineList = new();
 
-                foreach (var line in lines)
+                foreach (Line line in lines)
                 {
-                    List<Vector2> intersections = new List<Vector2>();
+                    List<Vector2> intersections = new();
 
                     // check if this line intersects any other line
-                    foreach(var l in lines)
+                    foreach (Line l in lines)
                     {
-                        if(line != l && !line.IsPointOnLine(l.P0) && !line.IsPointOnLine(l.P1) &&
+                        if (line != l && !line.IsPointOnLine(l.P0) && !line.IsPointOnLine(l.P1) &&
                             line.FindIntersection(l, out Vector2 intersection) &&
                             intersection != line.P0 &&
                             intersection != line.P1 &&
@@ -235,7 +235,7 @@ namespace HSDRawViewer.Converters
                     {
                         intersections.Add(line.P1);
                         Vector2 prev = line.P0;
-                        foreach(var l in intersections.OrderBy(e => Vector2.DistanceSquared(line.P0, e)))
+                        foreach (Vector2 l in intersections.OrderBy(e => Vector2.DistanceSquared(line.P0, e)))
                         {
                             lineList.Add(new Line() { P0 = prev, P1 = l });
                             prev = l;
@@ -245,7 +245,7 @@ namespace HSDRawViewer.Converters
 
                 //polygon.AddRange(PolyTrace(lineList));
 
-                foreach(var line in lineList)
+                foreach (Line line in lineList)
                 {
                     polygon.Add(line.P0);
                     polygon.Add(line.P1);
@@ -275,7 +275,7 @@ namespace HSDRawViewer.Converters
 
         public static SBM_Coll_Data JOBJtoCollData(HSD_JOBJ root)
         {
-            List<Line> Lines = new List<Line>();
+            List<Line> Lines = new();
 
             // TODO;
             /*var scene = ModelExporter.JOBJtoScene(root);
@@ -309,16 +309,16 @@ namespace HSDRawViewer.Converters
                 }*/
 
 
-            CollLineGroup lineGroup = new CollLineGroup();
+            CollLineGroup lineGroup = new();
 
             // gather unique vertices
-            Dictionary<Vector2, CollVertex> vertToVert = new Dictionary<Vector2, CollVertex>();
+            Dictionary<Vector2, CollVertex> vertToVert = new();
 
             // generate and connect lines
-            List<CollLine> collLines = new List<CollLine>();
-            Dictionary<Vector2, CollLine> leftPointToLine = new Dictionary<Vector2, CollLine>();
-            Dictionary<Vector2, CollLine> rightPointToLine = new Dictionary<Vector2, CollLine>();
-            foreach (var l in Lines)
+            List<CollLine> collLines = new();
+            Dictionary<Vector2, CollLine> leftPointToLine = new();
+            Dictionary<Vector2, CollLine> rightPointToLine = new();
+            foreach (Line l in Lines)
             {
                 if (!vertToVert.ContainsKey(l.P0))
                     vertToVert.Add(l.P0, new CollVertex(l.P0.X, l.P0.Y));
@@ -348,7 +348,7 @@ namespace HSDRawViewer.Converters
                    continue;
                }*/
 
-                CollLine cl = new CollLine();
+                CollLine cl = new();
                 cl.Group = lineGroup;
                 cl.Material = HSDRaw.Melee.Gr.CollMaterial.Basic;
                 cl.CollisionFlag = CollPhysics.Top;
@@ -364,12 +364,12 @@ namespace HSDRawViewer.Converters
                 collLines.Add(cl);
             }
 
-            List<CollLineGroup> collLineGroups = new List<CollLineGroup>();
+            List<CollLineGroup> collLineGroups = new();
             collLineGroups.Add(lineGroup);
 
             lineGroup.CalcuateRange(vertToVert.Values.ToArray());
 
-            var cd = new SBM_Coll_Data();
+            SBM_Coll_Data cd = new();
 
             CollDataBuilder.GenerateCollData(collLines, collLineGroups, cd);
 
@@ -378,30 +378,28 @@ namespace HSDRawViewer.Converters
 
         private static void OutputSVG(List<Line> Lines)
         {
-            svg svg = new svg();
+            svg svg = new();
 
-            var groups = new List<svgShape>();
+            List<svgShape> groups = new();
 
-            svgGroup g = new svgGroup();
-            List<svgShape> lines = new List<svgShape>();
+            svgGroup g = new();
+            List<svgShape> lines = new();
             float scale = 20;
-            foreach (var l in Lines)
+            foreach (Line l in Lines)
                 lines.Add(new svgLine() { x1 = l.P0.X * scale, y1 = l.P0.Y * scale, x2 = l.P1.X * scale, y2 = l.P1.Y * scale });
             g.shapes = lines.ToArray();
             groups.Add(g);
 
             svg.groups = groups.ToArray();
 
-            using (var settings = new XmlTextWriter(new FileStream("test.svg", FileMode.Create), Encoding.UTF8))
-            {
-                settings.Indentation = 4;
-                settings.Formatting = Formatting.Indented;
-                //settings.Namespaces = false;
-                //settings.Settings.OmitXmlDeclaration = true;
+            using XmlTextWriter settings = new(new FileStream("test.svg", FileMode.Create), Encoding.UTF8);
+            settings.Indentation = 4;
+            settings.Formatting = Formatting.Indented;
+            //settings.Namespaces = false;
+            //settings.Settings.OmitXmlDeclaration = true;
 
-                XmlSerializer serializer = new XmlSerializer(typeof(svg));
-                serializer.Serialize(settings, svg);
-            }
+            XmlSerializer serializer = new(typeof(svg));
+            serializer.Serialize(settings, svg);
         }
 
         private static int LinePlaneIntersection(Vector3 P0, Vector3 P1, Vector3 V0, Vector3 N0, out Vector3 I)
@@ -445,7 +443,7 @@ namespace HSDRawViewer.Converters
 
             Vector2 v1 = rayOrigin - point1;
             Vector2 v2 = point2 - point1;
-            Vector2 v3 = new Vector2(-rayDirection.Y, rayDirection.X);
+            Vector2 v3 = new(-rayDirection.Y, rayDirection.X);
 
             float dot = Vector2.Dot(v2, v3);
             if (Math.Abs(dot) < 0.000001)

@@ -3,11 +3,7 @@ using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Rendering.Widgets;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.Tools
@@ -16,8 +12,8 @@ namespace HSDRawViewer.Tools
     {
         public DrawOrder DrawOrder => DrawOrder.First;
 
-        private TranslationWidget w = new TranslationWidget();
-        private GLTextRenderer text = new GLTextRenderer();
+        private readonly TranslationWidget w = new();
+        private readonly GLTextRenderer text = new();
 
         private Matrix4 Transform = Matrix4.Identity;
 
@@ -29,7 +25,7 @@ namespace HSDRawViewer.Tools
             public Vector3 P3;
         }
 
-        private List<Triangle> Triangles = new List<Triangle>();
+        private readonly List<Triangle> Triangles = new();
 
         /// <summary>
         /// 
@@ -38,7 +34,7 @@ namespace HSDRawViewer.Tools
         {
             w.Transform = Transform;
             Triangles.Add(new Triangle()
-            { 
+            {
                 P1 = new Vector3(-100, 0, 100),
                 P2 = new Vector3(100, 0, -100),
                 P3 = new Vector3(0, 100, 0),
@@ -58,11 +54,11 @@ namespace HSDRawViewer.Tools
             {
                 Transform = t;
 
-                var center = Vector3.TransformPosition(Vector3.Zero, Transform);
-                var bb = new BoundingBox(center + new Vector3(-10, -10, -10), center + new Vector3(10, 10, 10));
+                Vector3 center = Vector3.TransformPosition(Vector3.Zero, Transform);
+                BoundingBox bb = new(center + new Vector3(-10, -10, -10), center + new Vector3(10, 10, 10));
 
                 // check triangle collisions
-                foreach (var tri in Triangles)
+                foreach (Triangle tri in Triangles)
                 {
                     tri.Collided = bb.Intersects(tri.P1, tri.P2, tri.P3);
                 }
@@ -96,7 +92,7 @@ namespace HSDRawViewer.Tools
             DrawShape.DrawBox(System.Drawing.Color.White, Transform, -10, -10, -10, 10, 10, 10);
 
             GL.Begin(PrimitiveType.Triangles);
-            foreach (var tri in Triangles)
+            foreach (Triangle tri in Triangles)
             {
                 GL.Color3(tri.Collided ? Vector3.One : Vector3.UnitX);
 

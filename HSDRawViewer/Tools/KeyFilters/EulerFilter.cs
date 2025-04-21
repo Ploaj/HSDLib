@@ -3,8 +3,6 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Tools.KeyFilters
 {
@@ -16,9 +14,9 @@ namespace HSDRawViewer.Tools.KeyFilters
         /// <param name="tracks"></param>
         public static void Filter(List<FOBJ_Player> tracks)
         {
-            var x = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTX);
-            var y = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTY);
-            var z = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTZ);
+            FOBJ_Player x = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTX);
+            FOBJ_Player y = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTY);
+            FOBJ_Player z = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTZ);
 
             if (x != null && y != null && z != null)
                 Filter(x, y, z);
@@ -38,27 +36,27 @@ namespace HSDRawViewer.Tools.KeyFilters
             if (x.Keys.Count <= 1 || y.Keys.Count <= 1 || z.Keys.Count <= 1)
                 return;
 
-            Vector3 prev = new Vector3(x.GetValue(0), y.GetValue(0), z.GetValue(0));
+            Vector3 prev = new(x.GetValue(0), y.GetValue(0), z.GetValue(0));
 
-            List<FOBJKey> xfilter = new List<FOBJKey>();
-            List<FOBJKey> yfilter = new List<FOBJKey>();
-            List<FOBJKey> zfilter = new List<FOBJKey>();
+            List<FOBJKey> xfilter = new();
+            List<FOBJKey> yfilter = new();
+            List<FOBJKey> zfilter = new();
 
             for (int i = 0; i < x.FrameCount; i++)
             {
-                var e = new Vector3(
+                Vector3 e = new(
                     naive_flip_diff(prev.X, x.GetValue(i)),
                     naive_flip_diff(prev.Y, y.GetValue(i)),
                     naive_flip_diff(prev.Z, z.GetValue(i)));
 
-                var fe = flip_euler(e);
+                Vector3 fe = flip_euler(e);
                 fe = new Vector3(
                     naive_flip_diff(prev.X, fe.X),
                     naive_flip_diff(prev.Y, fe.Y),
                     naive_flip_diff(prev.Z, fe.Z));
 
-                var de = euler_distance(prev, e);
-                var dfe = euler_distance(prev, fe);
+                float de = euler_distance(prev, e);
+                float dfe = euler_distance(prev, fe);
 
                 if (dfe < de)
                     e = fe;

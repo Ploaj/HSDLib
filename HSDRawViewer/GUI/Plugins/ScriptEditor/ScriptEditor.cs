@@ -14,17 +14,13 @@ using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Tools;
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using IONET.Collada.FX.Rendering;
-using System.Speech.Synthesis.TtsEngine;
-using System.ComponentModel;
-using HSDRaw.Common;
-using HSDRaw.MEX.Characters;
 
 namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 {
@@ -59,7 +55,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
                     SBM_FighterAction[] su = new SBM_FighterAction[]
                     {
-                        new SBM_FighterAction()
+                        new()
                         {
                             SubAction = sudata,
                             Name = "Script"
@@ -105,16 +101,16 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         private SubactionGroup SubactionGroup = SubactionGroup.Fighter;
 
-        private ScriptEditorActionList _actionList;
+        private readonly ScriptEditorActionList _actionList;
 
-        private ScriptEditorSubactionEditor _subactionEditor;
+        private readonly ScriptEditorSubactionEditor _subactionEditor;
 
-        private DockableViewport _viewport;
+        private readonly DockableViewport _viewport;
 
-        private PopoutJointAnimationEditor _animEditor;
+        private readonly PopoutJointAnimationEditor _animEditor;
 
-        private ScriptRenderer renderer;
-        private GLTextRenderer text = new GLTextRenderer();
+        private readonly ScriptRenderer renderer;
+        private readonly GLTextRenderer text = new();
 
         private HSDStruct _selectedAction { get; set; }
         private string _selectedActionSymbol { get; set; }
@@ -143,7 +139,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public DrawOrder DrawOrder => DrawOrder.First;
 
 
-        public SubactionProcessor Processor = new SubactionProcessor();
+        public SubactionProcessor Processor = new();
 
         public List<SubactionEvent> SelectedEvents { get; internal set; } = new List<SubactionEvent>();
 
@@ -196,7 +192,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     _selectedAnimation = GetFigatreeFromSymbol(symbol);
 
                 // get events
-                var events = SubactionEvent.GetEvents(SubactionGroup, a).ToList();
+                List<SubactionEvent> events = SubactionEvent.GetEvents(SubactionGroup, a).ToList();
 
                 // set script in editor
                 _subactionEditor.InitScript(SubactionGroup, events);
@@ -265,7 +261,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 if (AJManager != null && AJManager.Edited)
                 {
-                    var result = MessageBox.Show("Save Animation Changes?", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                    DialogResult result = MessageBox.Show("Save Animation Changes?", "Closing Action Editor", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
 
                     if (result == DialogResult.Yes)
                     {
@@ -312,10 +308,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 return null;
 
             // get animation from file
-            var data = AJManager.GetAnimationData(symbol);
+            byte[] data = AJManager.GetAnimationData(symbol);
             if (data != null)
             {
-                var animFile = new HSDRawFile(data);
+                HSDRawFile animFile = new(data);
                 if (animFile.Roots[0].Data is HSD_FigaTree tree)
                 {
                     return tree;
@@ -334,8 +330,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             if (_selectStateIndex == state && throwstate < _actionList._actions.Length)
             {
-                var throwAction = _actionList._actions[throwstate];
-                var treeDummy = GetFigatreeFromSymbol(throwAction.Symbol);
+                ScriptAction throwAction = _actionList._actions[throwstate];
+                HSD_FigaTree treeDummy = GetFigatreeFromSymbol(throwAction.Symbol);
 
                 if (treeDummy != null)
                     renderer.LoadThrowDummyAnimation(new JointAnimManager(treeDummy));
@@ -356,7 +352,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //
             if (renderer.FighterModel.RootJObj != null)
             {
-                var tree = _selectedAnimation;
+                HSD_FigaTree tree = _selectedAnimation;
 
                 if (tree == null)
                     tree = GetFigatreeFromSymbol(_selectedActionSymbol);
@@ -365,7 +361,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (tree != null)
                 {
                     // load as joint animation
-                    var anim = new JointAnimManager(tree);
+                    JointAnimManager anim = new(tree);
 
                     // set backup anim
                     BackupAnim = new JointAnimManager(tree);
@@ -443,7 +439,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 if (ItCo["itPublicData"]?.Data is itPublicData it)
                 {
-                    var item = it.Items.Articles[id];
+                    SBM_Article item = it.Items.Articles[id];
 
                     if (item.Model.RootModelJoint != null)
                     {
@@ -459,7 +455,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void SaveAnimationChanges()
         {
-            HSDRawFile f = new HSDRawFile();
+            HSDRawFile f = new();
 
             f.Roots.Add(new HSDRootNode()
             {
@@ -467,7 +463,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 Data = renderer.FighterModel.JointAnim.ToFigaTree()
             });
 
-            using (MemoryStream stream = new MemoryStream())
+            using (MemoryStream stream = new())
             {
                 f.Save(stream);
                 AJManager.SetAnimation(_selectedActionSymbol, stream.ToArray());
@@ -496,7 +492,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             }
             else
             {
-                foreach (var s in MainForm.Instance.GetSymbols())
+                foreach (string s in MainForm.Instance.GetSymbols())
                 {
                     if (s.StartsWith("ftDataKirbyCopy"))
                     {
@@ -515,13 +511,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private bool LoadKirbyAnimationFiles()
         {
-            var kbdtPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKb.dat";
-            var kbnrPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKbNr.dat";
+            string kbdtPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKb.dat";
+            string kbnrPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlKbNr.dat";
 
             if (!File.Exists(kbdtPath) || !File.Exists(kbnrPath))
                 return false;
 
-            var kbFile = new HSDRawFile(kbdtPath);
+            HSDRawFile kbFile = new(kbdtPath);
             if (kbFile.Roots.Count == 0 || kbFile.Roots[0].Data is not SBM_FighterData plDat) return false;
 
             // load misc
@@ -546,14 +542,14 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void LoadFighterAnimationFiles()
         {
-            var aFile = MainForm.Instance.FilePath.Replace(".dat", "AJ.dat");
-            var cFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
+            string aFile = MainForm.Instance.FilePath.Replace(".dat", "AJ.dat");
+            string cFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
 
             // try to automatically locate files
             bool openFiles = true;
             if (File.Exists(aFile) && File.Exists(cFile))
             {
-                var r = MessageBox.Show($"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", "Open Files", MessageBoxButtons.YesNoCancel);
+                DialogResult r = MessageBox.Show($"Load {System.IO.Path.GetFileName(aFile)} and {System.IO.Path.GetFileName(cFile)}", "Open Files", MessageBoxButtons.YesNoCancel);
 
                 if (r == DialogResult.Cancel)
                     return;
@@ -578,12 +574,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             AJManager = new FighterAJManager(File.ReadAllBytes(aFile));
 
             // item data
-            var itcoPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\ItCo.dat";
+            string itcoPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\ItCo.dat";
             if (File.Exists(itcoPath))
                 ItCo = new HSDRawFile(itcoPath);
 
             // dummy model
-            var dummyPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlMrNr.dat";
+            string dummyPath = Path.GetDirectoryName(MainForm.Instance.FilePath) + "\\PlMrNr.dat";
             if (File.Exists(dummyPath))
                 renderer.LoadThrowDummy(dummyPath);
 
@@ -602,18 +598,18 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 return;
 
             // collect used symbols from all actions
-            var usedSymbols = _actionList._actions.Select(e => e.Symbol).ToArray();
+            string[] usedSymbols = _actionList._actions.Select(e => e.Symbol).ToArray();
 
             // generate new aj file
-            var newAJFile = AJManager.RebuildAJFile(usedSymbols, false);
+            byte[] newAJFile = AJManager.RebuildAJFile(usedSymbols, false);
 
             // update animation offset and sizes
-            foreach (var a in _actionList._actions)
+            foreach (ScriptAction a in _actionList._actions)
             {
                 // update animation size and offset
                 if (!string.IsNullOrEmpty(a.Symbol))
                 {
-                    var offsize = AJManager.GetOffsetSize(a.Symbol);
+                    Tuple<int, int> offsize = AJManager.GetOffsetSize(a.Symbol);
                     a.AnimOffset = offsize.Item1;
                     a.AnimSize = offsize.Item2;
                 }
@@ -633,11 +629,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private void LoadDemoAnimationFiles()
         {
             // attempt to automatically locate files
-            var modelFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
+            string modelFile = MainForm.Instance.FilePath.Replace(".dat", "Nr.dat");
 
-            var path = Path.GetDirectoryName(MainForm.Instance.FilePath);
-            var fighterKey = Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath).Replace("Pl", "");
-            var fighterName = _node.Parent.Text.Replace("ftData", "");
+            string path = Path.GetDirectoryName(MainForm.Instance.FilePath);
+            string fighterKey = Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath).Replace("Pl", "");
+            string fighterName = _node.Parent.Text.Replace("ftData", "");
 
             ResultFilePath = Path.Combine(path, $"GmRstM{fighterKey}.dat");
             WaitFilePath = Path.Combine(path, $"Pl{fighterKey}DViWaitAJ.dat");
@@ -709,23 +705,23 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (string.IsNullOrEmpty(symbol))
                 return false;
 
-            var AllActions = _actionList._actions.ToList();
+            List<ScriptAction> AllActions = _actionList._actions.ToList();
 
             // get actions
-            var actions = new ScriptAction[actionend - actionstart + 1];
+            ScriptAction[] actions = new ScriptAction[actionend - actionstart + 1];
             for (int i = actionstart; i <= actionend; i++)
                 actions[i - actionstart] = AllActions[i];
 
             // rebuild aj file
-            var data = AJManager.RebuildAJFile(actions.Select(e => e.Symbol).ToArray(), false);
+            byte[] data = AJManager.RebuildAJFile(actions.Select(e => e.Symbol).ToArray(), false);
 
             // update animation offset and sizes
-            foreach (var a in actions)
+            foreach (ScriptAction a in actions)
             {
                 // update animation size and offset
                 if (!string.IsNullOrEmpty(a.Symbol))
                 {
-                    var offsize = AJManager.GetOffsetSize(a.Symbol);
+                    Tuple<int, int> offsize = AJManager.GetOffsetSize(a.Symbol);
                     a.AnimOffset = offsize.Item1;
                     a.AnimSize = offsize.Item2;
                 }
@@ -743,7 +739,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 file = new HSDRawFile();
 
             // update or add aj data
-            var dataAccessor = new HSDAccessor() { _s = new HSDStruct(data) };
+            HSDAccessor dataAccessor = new() { _s = new HSDStruct(data) };
             if (file[symbol] != null)
                 file[symbol].Data = dataAccessor;
             else
@@ -836,7 +832,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             //if (fsmMode.Checked)
             //{
-            foreach (var fsm in FrameSpeedModifiers)
+            foreach (FrameSpeedMultiplier fsm in FrameSpeedModifiers)
             {
                 _viewport.glViewport.FrameTips.Add(new GUI.Controls.PlaybackBarFrameTip()
                 {
@@ -876,7 +872,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             if (exportTXTOnSaveToolStripMenuItem.Checked)
             {
-                var newPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "_" + _node.Text + ".txt");
+                string newPath = Path.Combine(Path.GetDirectoryName(MainForm.Instance.FilePath), Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "_" + _node.Text + ".txt");
                 ExportAsText(newPath);
             }
         }
@@ -888,34 +884,32 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="f"></param>
         private void ExportAsText(string f)
         {
-            using (FileStream strem = new FileStream(f, FileMode.Create))
-            using (StreamWriter w = new StreamWriter(strem))
+            using FileStream strem = new(f, FileMode.Create);
+            using StreamWriter w = new(strem);
+            int i = 0;
+            foreach (ScriptAction a in _actionList._actions)
             {
-                int i = 0;
-                foreach (var a in _actionList._actions)
+                w.WriteLine($"[Flags(0x{a.Flags.ToString("X8")})]");
+                w.WriteLine($"{i} {a.ToString()}");
+                w.WriteLine("{");
+                IEnumerable<SubactionEvent> sub = SubactionEvent.GetEvents(SubactionGroup, a._struct);
+                foreach (SubactionEvent ev in sub)
                 {
-                    w.WriteLine($"[Flags(0x{a.Flags.ToString("X8")})]");
-                    w.WriteLine($"{i} {a.ToString()}");
-                    w.WriteLine("{");
-                    var sub = SubactionEvent.GetEvents(SubactionGroup, a._struct);
-                    foreach (var ev in sub)
-                    {
-                        w.WriteLine($"\t{ev.ToStringDescriptive()}");
-                    }
-                    w.WriteLine("}");
-                    i++;
+                    w.WriteLine($"\t{ev.ToStringDescriptive()}");
                 }
-                i = 0;
-                foreach (var a in _actionList._subroutines)
-                {
-                    w.WriteLine($"{i} {a.ToString()}");
-                    w.WriteLine("{");
-                    var sub = SubactionEvent.GetEvents(SubactionGroup, a._struct);
-                    foreach (var ev in sub)
-                        w.WriteLine($"\t{ev.ToStringDescriptive()}");
-                    w.WriteLine("}");
-                    i++;
-                }
+                w.WriteLine("}");
+                i++;
+            }
+            i = 0;
+            foreach (ScriptSubrountine a in _actionList._subroutines)
+            {
+                w.WriteLine($"{i} {a.ToString()}");
+                w.WriteLine("{");
+                IEnumerable<SubactionEvent> sub = SubactionEvent.GetEvents(SubactionGroup, a._struct);
+                foreach (SubactionEvent ev in sub)
+                    w.WriteLine($"\t{ev.ToStringDescriptive()}");
+                w.WriteLine("}");
+                i++;
             }
         }
         private class MayaImportParams
@@ -942,7 +936,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             if (_actionList.SelectedAction != null)
             {
-                var f = FileIO.OpenFile("Supported Formats |*.dat;*.anim");
+                string f = FileIO.OpenFile("Supported Formats |*.dat;*.anim");
 
                 // check if file is null
                 if (f == null)
@@ -953,30 +947,28 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 // if it's a maya anim then convert to figatree and set the symbol
                 if (f.ToLower().EndsWith(".anim"))
                 {
-                    var settings = new MayaImportParams()
+                    MayaImportParams settings = new()
                     {
                         Symbol = _selectedActionSymbol,
                     };
 
-                    using (var prop = new PropertyDialog("Maya Import Settings", settings))
+                    using PropertyDialog prop = new("Maya Import Settings", settings);
+                    if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(settings.Symbol))
                     {
-                        if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(settings.Symbol))
+                        //if (!settings.Symbol.EndsWith("_figatree"))
+                        //    settings.Symbol += "_figatree";
+
+                        JointAnimManager anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
+
+                        if (settings.Optimize && renderer.FighterModel != null && renderer.FighterModel.RootJObj != null)
+                            anim.Optimize(renderer.FighterModel.RootJObj.Desc, settings.ApplyDiscontinutyFilter, settings.OptimizeError);
+
+                        file = new HSDRawFile();
+                        file.Roots.Add(new HSDRootNode()
                         {
-                            //if (!settings.Symbol.EndsWith("_figatree"))
-                            //    settings.Symbol += "_figatree";
-
-                            var anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
-
-                            if (settings.Optimize && renderer.FighterModel != null && renderer.FighterModel.RootJObj != null)
-                                anim.Optimize(renderer.FighterModel.RootJObj.Desc, settings.ApplyDiscontinutyFilter, settings.OptimizeError);
-
-                            file = new HSDRawFile();
-                            file.Roots.Add(new HSDRootNode()
-                            {
-                                Name = settings.Symbol,
-                                Data = anim.ToFigaTree(settings.CompressionError)
-                            });
-                        }
+                            Name = settings.Symbol,
+                            Data = anim.ToFigaTree(settings.CompressionError)
+                        });
                     }
                 }
                 else
@@ -998,7 +990,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     file.Roots[0].Data is HSD_FigaTree tree)
                 {
                     //grab symbol
-                    var symbol = file.Roots[0].Name;
+                    string symbol = file.Roots[0].Name;
 
                     //check if symbol exists and ok to overwrite
                     if (AJManager.GetAnimationData(symbol) != null)
@@ -1008,7 +1000,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     }
 
                     // set animation data
-                    using (MemoryStream stream = new MemoryStream())
+                    using (MemoryStream stream = new())
                     {
                         file.Save(stream);
                         AJManager.SetAnimation(symbol, stream.ToArray());
@@ -1052,7 +1044,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (renderer.FighterModel.RootJObj == null || renderer.FighterModel.JointAnim == null)
                 return;
 
-            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+            string f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
 
             if (f != null)
                 File.WriteAllBytes(f, AJManager.GetAnimationData(_selectedActionSymbol));
@@ -1083,15 +1075,15 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 return;
 
             // component box edit fsms
-            PopoutCollectionEditor.EditValue(this, this, "FrameSpeedModifiers");
+            PopoutCollectionEditor.EditValue(this, this, nameof(FrameSpeedModifiers));
 
             // remove rates of 0
             FrameSpeedModifiers.RemoveAll(e => e.Rate <= 0);
 
             // load backup animation
-            var tempanim = new JointAnimManager();
+            JointAnimManager tempanim = new();
             tempanim.FromFigaTree(BackupAnim.ToFigaTree());
-            var backup = BackupAnim;
+            JointAnimManager backup = BackupAnim;
 
             // apply fsms to backup animation
             tempanim.ApplyFSMs(FrameSpeedModifiers);
@@ -1168,13 +1160,13 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="pick"></param>
         public void ScreenDoubleClick(PickInformation pick)
         {
-            List<SubactionEvent> hitboxes = new List<SubactionEvent>();
+            List<SubactionEvent> hitboxes = new();
 
-            foreach (var hb in Processor.Hitboxes)
+            foreach (Hitbox hb in Processor.Hitboxes)
             {
                 if (hb.Active)
                 {
-                    var position = hb.GetWorldPosition(renderer.FighterModel.RootJObj);
+                    OpenTK.Mathematics.Vector3 position = hb.GetWorldPosition(renderer.FighterModel.RootJObj);
 
                     if (pick.CheckSphereHitDistance(position, hb.Size, out float dis))
                     {
@@ -1196,7 +1188,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
             bool update = false;
-            foreach (var hb in Processor.Hitboxes)
+            foreach (Hitbox hb in Processor.Hitboxes)
             {
                 if (hb.Active && SelectedEvents.Contains(hb.EventSource))
                 {
@@ -1255,7 +1247,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             renderer.Draw(cam, Processor, SelectedEvents);
 
-            foreach (var hb in Processor.Hitboxes)
+            foreach (Hitbox hb in Processor.Hitboxes)
             {
                 if (hb.Active && SelectedEvents.Contains(hb.EventSource))
                 {
@@ -1280,7 +1272,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="e"></param>
         private void exportAllAsTextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("Plain Text (*.txt)|*.txt");
+            string f = Tools.FileIO.SaveFile("Plain Text (*.txt)|*.txt");
 
             if (f != null)
                 ExportAsText(f);
@@ -1307,7 +1299,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             public int FitLength { get; set; } = -1;
         }
 
-        private static RebakeAnimationSettings RebakeSettings = new RebakeAnimationSettings();
+        private static readonly RebakeAnimationSettings RebakeSettings = new();
 
         /// <summary>
         /// 
@@ -1324,61 +1316,59 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             //    MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 RebakeSettings.TrimEndFrame = (uint)renderer.FighterModel.JointAnim.FrameCount;
-                using (var prop = new PropertyDialog("Rebake Options", RebakeSettings))
+                using PropertyDialog prop = new("Rebake Options", RebakeSettings);
+                if (prop.ShowDialog() == DialogResult.OK)
                 {
-                    if (prop.ShowDialog() == DialogResult.OK)
+                    // get animation
+                    JointAnimManager anim = renderer.FighterModel.JointAnim;
+
+                    // bake animation
+                    anim.Bake();
+
+                    // trim frame range
+                    anim.Trim((int)RebakeSettings.TrimStartFrame, (int)RebakeSettings.TrimEndFrame);
+
+                    // fit frame total
+                    if (RebakeSettings.FitLength > 0)
                     {
-                        // get animation
-                        JointAnimManager anim = renderer.FighterModel.JointAnim;
-
-                        // bake animation
-                        anim.Bake();
-
-                        // trim frame range
-                        anim.Trim((int)RebakeSettings.TrimStartFrame, (int)RebakeSettings.TrimEndFrame);
-
-                        // fit frame total
-                        if (RebakeSettings.FitLength > 0)
-                        {
-                            anim.ApplyFSMs(new FrameSpeedMultiplier[] {
-                            new FrameSpeedMultiplier()
+                        anim.ApplyFSMs(new FrameSpeedMultiplier[] {
+                            new()
                                 {
                                     Frame = 0,
                                     Rate = (RebakeSettings.TrimEndFrame - RebakeSettings.TrimStartFrame) / (float)RebakeSettings.FitLength
                                 }}, false);
-                        }
-
-                        // optimize
-                        if (RebakeSettings.Optimize)
-                            anim.Optimize(renderer.FighterModel.RootJObj.Desc,
-                                RebakeSettings.ApplyDiscontinutyFilter,
-                                RebakeSettings.OptimizeError);
-
-                        //grab symbol
-                        var figa = anim.ToFigaTree(RebakeSettings.CompressionError);
-                        var file = new HSDRawFile();
-                        file.Roots.Add(new HSDRootNode()
-                        {
-                            Name = _selectedActionSymbol,
-                            Data = figa,
-                        });
-
-                        // set animation data
-                        using (MemoryStream stream = new MemoryStream())
-                        {
-                            file.Save(stream);
-                            AJManager.SetAnimation(_selectedActionSymbol, stream.ToArray());
-                        }
-
-                        // set action symbol
-                        _selectedAnimation = figa;
-
-                        // reselect action
-                        LoadAnimation();
-
-                        // 
-                        _actionList.Invalidate();
                     }
+
+                    // optimize
+                    if (RebakeSettings.Optimize)
+                        anim.Optimize(renderer.FighterModel.RootJObj.Desc,
+                            RebakeSettings.ApplyDiscontinutyFilter,
+                            RebakeSettings.OptimizeError);
+
+                    //grab symbol
+                    HSD_FigaTree figa = anim.ToFigaTree(RebakeSettings.CompressionError);
+                    HSDRawFile file = new();
+                    file.Roots.Add(new HSDRootNode()
+                    {
+                        Name = _selectedActionSymbol,
+                        Data = figa,
+                    });
+
+                    // set animation data
+                    using (MemoryStream stream = new())
+                    {
+                        file.Save(stream);
+                        AJManager.SetAnimation(_selectedActionSymbol, stream.ToArray());
+                    }
+
+                    // set action symbol
+                    _selectedAnimation = figa;
+
+                    // reselect action
+                    LoadAnimation();
+
+                    // 
+                    _actionList.Invalidate();
                 }
 
             }

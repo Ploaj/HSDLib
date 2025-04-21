@@ -29,19 +29,19 @@ namespace HSDRawViewer.Tools.Optimizers
         public static IEnumerable<string> RunReport(string filesystem)
         {
             //gather all player ids
-            var plist = new List<Info>();
+            List<Info> plist = new();
 
             // gather info
-            foreach (var f in System.IO.Directory.GetFiles(filesystem))
+            foreach (string f in System.IO.Directory.GetFiles(filesystem))
             {
-                var fname = System.IO.Path.GetFileNameWithoutExtension(f);
+                string fname = System.IO.Path.GetFileNameWithoutExtension(f);
                 if (fname.Length >= 4)
                 {
-                    var id = fname.Substring(2, 2);
+                    string id = fname.Substring(2, 2);
                     if (id == "Co")
                         continue;
 
-                    var p = plist.Find(e => e.Id == id);
+                    Info p = plist.Find(e => e.Id == id);
 
                     if (p == null)
                     {
@@ -75,7 +75,7 @@ namespace HSDRawViewer.Tools.Optimizers
             }
 
             // return size report
-            foreach (var o in plist.OrderByDescending(e => e.FighterTotalSize + e.AnimationFile))
+            foreach (Info o in plist.OrderByDescending(e => e.FighterTotalSize + e.AnimationFile))
             {
                 if (o.AnimationFile != 0)
                     yield return $"{o.Id} DataSize: 0x{o.FighterTotalSize.ToString("X8")} " +
@@ -89,7 +89,7 @@ namespace HSDRawViewer.Tools.Optimizers
             // pick 3 largest animation files
             // start with zelda + sheik
             int animSize = plist.Find(e => e.Id == "Zd").AnimationFile + plist.Find(e => e.Id == "Sk").AnimationFile;
-            var animOrder = plist.OrderByDescending(e => e.Id == "Sk" || e.Id == "Zd" || e.Id == "Gl" || e.Id == "Gk" || e.Id == "Bo" ? 0 : e.AnimationFile).ToArray();
+            Info[] animOrder = plist.OrderByDescending(e => e.Id == "Sk" || e.Id == "Zd" || e.Id == "Gl" || e.Id == "Gk" || e.Id == "Bo" ? 0 : e.AnimationFile).ToArray();
             animSize += animOrder[0].AnimationFile + animOrder[1].AnimationFile + animOrder[2].AnimationFile;
 
             if (animSize > AnimationHeap)
@@ -97,7 +97,7 @@ namespace HSDRawViewer.Tools.Optimizers
 
             // now do the same for data
             int dataSize = plist.Find(e => e.Id == "Zd").FighterTotalSize + plist.Find(e => e.Id == "Sk").FighterTotalSize;
-            var dataOrder = plist.OrderByDescending(e => e.Id == "Sk" || e.Id == "Zd" ? 0 : e.FighterTotalSize).ToArray();
+            Info[] dataOrder = plist.OrderByDescending(e => e.Id == "Sk" || e.Id == "Zd" ? 0 : e.FighterTotalSize).ToArray();
 
             if (dataSize > FighterHeap)
                 yield return $"Fighter Heap Overflow: Zd, Sk, {dataOrder[0].Id}, {dataOrder[1].Id}, {dataOrder[2].Id}";

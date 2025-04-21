@@ -1,5 +1,4 @@
-﻿using HSDRawViewer.GUI;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.Tools
@@ -19,15 +18,13 @@ namespace HSDRawViewer.Tools
 
         public static string OpenFolder()
         {
-            using (var fbd = new FolderBrowserDialog())
+            using FolderBrowserDialog fbd = new();
+            DialogResult result = fbd.ShowDialog();
+            if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
-                DialogResult result = fbd.ShowDialog();
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-                {
-                    return fbd.SelectedPath;
-                }
-                return null;
+                return fbd.SelectedPath;
             }
+            return null;
         }
 
         /// <summary>
@@ -37,21 +34,19 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static string OpenFile(string filter, string filename = "")
         {
-            using (OpenFileDialog d = new OpenFileDialog())
+            using OpenFileDialog d = new();
+            d.Filter = filter;
+            d.FileName = filename;
+
+            if (PrevOpenLocation != null)
             {
-                d.Filter = filter;
-                d.FileName = filename;
+                d.InitialDirectory = PrevOpenLocation;
+            }
 
-                if (PrevOpenLocation != null)
-                {
-                    d.InitialDirectory = PrevOpenLocation;
-                }
-
-                if(d.ShowDialog() == DialogResult.OK)
-                {
-                    PrevOpenLocation = Path.GetDirectoryName(d.FileName);
-                    return d.FileName;
-                }
+            if (d.ShowDialog() == DialogResult.OK)
+            {
+                PrevOpenLocation = Path.GetDirectoryName(d.FileName);
+                return d.FileName;
             }
             return null;
         }
@@ -63,15 +58,13 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static string[] OpenFiles(string filter)
         {
-            using (OpenFileDialog d = new OpenFileDialog())
-            {
-                d.Filter = filter;
-                d.Multiselect = true;
+            using OpenFileDialog d = new();
+            d.Filter = filter;
+            d.Multiselect = true;
 
-                if (d.ShowDialog() == DialogResult.OK)
-                {
-                    return d.FileNames;
-                }
+            if (d.ShowDialog() == DialogResult.OK)
+            {
+                return d.FileNames;
             }
             return null;
         }
@@ -93,23 +86,21 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static string SaveFile(string filter, string defaultName, string caption = "Save File")
         {
-            using (SaveFileDialog d = new SaveFileDialog())
+            using SaveFileDialog d = new();
+            d.Title = caption;
+            d.Filter = filter;
+
+            d.FileName = defaultName;
+
+            if (PrevSaveLocation != null)
             {
-                d.Title = caption;
-                d.Filter = filter;
+                d.InitialDirectory = PrevSaveLocation;
+            }
 
-                d.FileName = defaultName;
-
-                if (PrevSaveLocation != null)
-                {
-                    d.InitialDirectory = PrevSaveLocation;
-                }
-
-                if (d.ShowDialog() == DialogResult.OK)
-                {
-                    PrevSaveLocation = Path.GetDirectoryName(d.FileName);
-                    return d.FileName;
-                }
+            if (d.ShowDialog() == DialogResult.OK)
+            {
+                PrevSaveLocation = Path.GetDirectoryName(d.FileName);
+                return d.FileName;
             }
             return null;
         }

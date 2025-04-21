@@ -133,7 +133,7 @@ namespace HSDRawViewer.Tools
         {
             _code = code;
 
-            var desc = ParticleManager.GetParticleDescriptor(code);
+            ParticleDescriptor desc = ParticleManager.GetParticleDescriptor(code);
 
             Clear();
 
@@ -186,11 +186,11 @@ namespace HSDRawViewer.Tools
         public void LoadCode(byte[] cmdList, ref int cmdPtr)
         {
             // load description and code byte
-            var code = GetByteCode(cmdList, cmdPtr);
-            var desc = ParticleManager.GetParticleDescriptor(code);
+            byte code = GetByteCode(cmdList, cmdPtr);
+            ParticleDescriptor desc = ParticleManager.GetParticleDescriptor(code);
 
             // get normal byte
-            var cmd = cmdList[cmdPtr++];
+            byte cmd = cmdList[cmdPtr++];
 
             // setup code
             SetCode(code);
@@ -347,7 +347,7 @@ namespace HSDRawViewer.Tools
                 return false;
 
             // check end of data cmd
-            var code = GetByteCode(cmdList, cmdPtr);
+            byte code = GetByteCode(cmdList, cmdPtr);
             if (code == 0xFF || code == 0xFE)
                 return false;
 
@@ -370,7 +370,7 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         private static byte GetByteCode(byte[] cmdList, int cmdPtr)
         {
-            var cmd = cmdList[cmdPtr];
+            byte cmd = cmdList[cmdPtr];
 
             if (cmd < 0x80)
             {
@@ -388,7 +388,7 @@ namespace HSDRawViewer.Tools
             }
             else
             {
-                var final_cmd = cmd & 0xF8;
+                int final_cmd = cmd & 0xF8;
 
                 if ((cmd & 0xF8) > 0x98)
                 {
@@ -412,7 +412,7 @@ namespace HSDRawViewer.Tools
         public byte[] CompileCode()
         {
             // load description and code byte
-            var desc = ParticleManager.GetParticleDescriptor(_code);
+            ParticleDescriptor desc = ParticleManager.GetParticleDescriptor(_code);
 
             if (desc == null)
                 return new byte[] { _code };
@@ -421,7 +421,7 @@ namespace HSDRawViewer.Tools
             if (desc.ParamDesc == null)
                 return new byte[] { _code };
 
-            List<byte> o = new List<byte>();
+            List<byte> o = new();
             o.Add(_code);
 
             // load params from data
@@ -504,7 +504,7 @@ namespace HSDRawViewer.Tools
                         {
                             ColorStep v = (ColorStep)this[i].Value;
 
-                            o.Add((byte)((byte)v.Flag));
+                            o.Add((byte)v.Flag);
                             o.Add(v.Step);
 
                             if (v.Flag.HasFlag(PrimEnvFlag.R))
@@ -542,9 +542,9 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public override string ToString()
         {
-            var desc = ParticleManager.GetParticleDescriptor(_code);
+            ParticleDescriptor desc = ParticleManager.GetParticleDescriptor(_code);
 
-            StringBuilder b = new StringBuilder();
+            StringBuilder b = new();
 
             bool first = true;
             foreach (CustomProperty v in base.List)

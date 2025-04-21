@@ -15,9 +15,9 @@ namespace HSDRawViewer.Rendering.Models
     internal class SplineAnim
     {
         private float Frame;
-        private float EndFrame;
-        private LiveJObj jobj;
-        private List<FOBJ_Player> tracksPosition = new List<FOBJ_Player>();
+        private readonly float EndFrame;
+        private readonly LiveJObj jobj;
+        private readonly List<FOBJ_Player> tracksPosition = new();
 
         public SplineAnim(HSD_AOBJ aobj)
         {
@@ -28,7 +28,7 @@ namespace HSDRawViewer.Rendering.Models
                 jobj = new LiveJObj(aobj.ObjectReference);
 
             if (aobj.FObjDesc != null)
-                foreach (var v in aobj.FObjDesc.List)
+                foreach (HSD_FOBJDesc v in aobj.FObjDesc.List)
                     tracksPosition.Add(new FOBJ_Player(v));
         }
 
@@ -37,7 +37,7 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public Vector3 AdvanceAnimation(Vector3 input)
         {
-            foreach (var t in tracksPosition)
+            foreach (FOBJ_Player t in tracksPosition)
             {
                 switch (t.JointTrackType)
                 {
@@ -130,7 +130,7 @@ namespace HSDRawViewer.Rendering.Models
         [YamlIgnore]
         private float EndFrame;
         [YamlIgnore]
-        private List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
+        private readonly List<FOBJ_Player> Tracks = new();
 
         [YamlIgnore]
         private SplineAnim PositionAnim;
@@ -150,7 +150,7 @@ namespace HSDRawViewer.Rendering.Models
 
                 Tracks.Clear();
                 if (lightanim.LightAnim.FObjDesc != null)
-                    foreach (var v in lightanim.LightAnim.FObjDesc.List)
+                    foreach (HSD_FOBJDesc v in lightanim.LightAnim.FObjDesc.List)
                         Tracks.Add(new FOBJ_Player(v));
             }
 
@@ -176,7 +176,7 @@ namespace HSDRawViewer.Rendering.Models
             if (InterestAnim != null)
                 _interest = InterestAnim.AdvanceAnimation(_interest);
 
-            foreach (var t in Tracks)
+            foreach (FOBJ_Player t in Tracks)
             {
                 float value = t.GetValue(Frame);
                 switch ((LightTrackType)t.TrackType)
@@ -247,32 +247,32 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="dist_fn"></param>
         private void InitLightDistAttn(float ref_dist, float ref_brite, GXBrightnessDistance dist_fn)
         {
-            if (ref_dist < 0.0f || ref_brite < 0.0f || ref_brite >= 1.0f) 
+            if (ref_dist < 0.0f || ref_brite < 0.0f || ref_brite >= 1.0f)
                 dist_fn = GXBrightnessDistance.GX_DA_OFF;
 
-            switch(dist_fn) 
+            switch (dist_fn)
             {
                 case GXBrightnessDistance.GX_DA_GENTLE:
                     K0 = 1.0f;
-                    K1 = (1.0f-ref_brite)/(ref_brite* ref_dist);
+                    K1 = (1.0f - ref_brite) / (ref_brite * ref_dist);
                     K2 = 0.0f;
-                break;
+                    break;
                 case GXBrightnessDistance.GX_DA_MEDIUM:
                     K0 = 1.0f;
-                    K1 = 0.5f*(1.0f-ref_brite)/(ref_brite* ref_dist);
-                    K2 = 0.5f*(1.0f-ref_brite)/(ref_brite* ref_dist* ref_dist);
-                break;
+                    K1 = 0.5f * (1.0f - ref_brite) / (ref_brite * ref_dist);
+                    K2 = 0.5f * (1.0f - ref_brite) / (ref_brite * ref_dist * ref_dist);
+                    break;
                 case GXBrightnessDistance.GX_DA_STEEP:
                     K0 = 1.0f;
                     K1 = 0.0f;
-                    K2 = (1.0f-ref_brite)/(ref_brite* ref_dist* ref_dist);
-                break;
+                    K2 = (1.0f - ref_brite) / (ref_brite * ref_dist * ref_dist);
+                    break;
                 case GXBrightnessDistance.GX_DA_OFF:
                 default:
                     K0 = 1.0f;
                     K1 = 0.0f;
                     K2 = 0.0f;
-                break;
+                    break;
             }
         }
 
@@ -283,54 +283,54 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="spotfn"></param>
         private void InitLightSpot(float cut_off, GXSpotFunc spotfn)
         {
-            if(cut_off < 0.0f || cut_off > 90.0f) 
+            if (cut_off < 0.0f || cut_off > 90.0f)
                 spotfn = GXSpotFunc.GX_SP_OFF;
 
-            var r = (cut_off * Math.PI) / 180.0f;
-            var cr = (float)Math.Cos(r);
+            double r = (cut_off * Math.PI) / 180.0f;
+            float cr = (float)Math.Cos(r);
             float d;
 
-            switch(spotfn) 
+            switch (spotfn)
             {
                 case GXSpotFunc.GX_SP_FLAT:
-                    A0 = -1000.0f*cr;
+                    A0 = -1000.0f * cr;
                     A1 = 1000.0f;
                     A2 = 0.0f;
-                break;
+                    break;
                 case GXSpotFunc.GX_SP_COS:
-                    A0 = -cr/(1.0f-cr);
-                    A1 = 1.0f/(1.0f-cr);
+                    A0 = -cr / (1.0f - cr);
+                    A1 = 1.0f / (1.0f - cr);
                     A2 = 0.0f;
-                break;
+                    break;
                 case GXSpotFunc.GX_SP_COS2:
                     A0 = 0.0f;
-                    A1 = -cr/(1.0f-cr);
-                    A2 = 1.0f/(1.0f-cr);
-                break;
+                    A1 = -cr / (1.0f - cr);
+                    A2 = 1.0f / (1.0f - cr);
+                    break;
                 case GXSpotFunc.GX_SP_SHARP:
                     d = (1.0f - cr) * (1.0f - cr);
                     A0 = (1.0f / d) * cr * (cr - 2.0f);
-                    A1 = 2.0f/d;
-                    A2 = -1.0f/d;
-                break;
+                    A1 = 2.0f / d;
+                    A2 = -1.0f / d;
+                    break;
                 case GXSpotFunc.GX_SP_RING1:
-                    d = (1.0f-cr)*(1.0f-cr);
-                    A0 = -4.0f*cr/d;
-                    A1 = 4.0f*(1.0f+cr)/d;
-                    A2 = -4.0f/d;
-                break;
+                    d = (1.0f - cr) * (1.0f - cr);
+                    A0 = -4.0f * cr / d;
+                    A1 = 4.0f * (1.0f + cr) / d;
+                    A2 = -4.0f / d;
+                    break;
                 case GXSpotFunc.GX_SP_RING2:
-                    d = (1.0f-cr)*(1.0f-cr);
-                    A0 = 1.0f-2.0f*cr* cr/d;
-                    A1 = 4.0f*cr/d;
-                    A2 = -2.0f/d;
-                break;
+                    d = (1.0f - cr) * (1.0f - cr);
+                    A0 = 1.0f - 2.0f * cr * cr / d;
+                    A1 = 4.0f * cr / d;
+                    A2 = -2.0f / d;
+                    break;
                 case GXSpotFunc.GX_SP_OFF:
                 default:
                     A0 = 1.0f;
                     A1 = 0.0f;
                     A2 = 0.0f;
-                break;
+                    break;
             }
         }
 
@@ -347,7 +347,7 @@ namespace HSDRawViewer.Rendering.Models
 
             if (v.LightObject != null)
             {
-                var lo = v.LightObject;
+                HSD_LOBJ lo = v.LightObject;
 
                 // enable light
                 Enabled = true;
@@ -383,7 +383,7 @@ namespace HSDRawViewer.Rendering.Models
                 else
                 if (lo.AttenuationFlags == LOBJ_AttenuationFlags.LOBJ_LIGHT_ATTN)
                 {
-                    var att = lo._s.GetReference<HSD_LightAttn>(0x18);
+                    HSD_LightAttn att = lo._s.GetReference<HSD_LightAttn>(0x18);
                     A0 = att.A0;
                     A1 = att.A1;
                     A2 = att.A2;

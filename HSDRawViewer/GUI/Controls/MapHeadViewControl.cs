@@ -14,8 +14,8 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
         {
             if (m.Msg == 0x203) // identified double click
             {
-                var localPos = PointToClient(Cursor.Position);
-                var hitTestInfo = HitTest(localPos);
+                System.Drawing.Point localPos = PointToClient(Cursor.Position);
+                TreeViewHitTestInfo hitTestInfo = HitTest(localPos);
                 if (hitTestInfo.Location == TreeViewHitTestLocations.StateImage)
                     m.Result = IntPtr.Zero;
                 else
@@ -152,11 +152,11 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
         {
             float max = 0;
             int index = 0;
-            foreach (var group in head.ModelGroups.Array)
+            foreach (SBM_Map_GOBJ group in head.ModelGroups.Array)
             {
                 if (group.RootNode != null)
                 {
-                    var g = new MapHeadGroup($"Group_{index}", group);
+                    MapHeadGroup g = new($"Group_{index}", group);
                     max = Math.Max(max, g.MaxFrame);
                     treeView1.Nodes.Add(g);
                 }
@@ -200,7 +200,7 @@ namespace HSDRawViewer.GUI.Controls.MapHeadViewer
         {
             // remove dead
             for (int i = treeView1.Nodes.Count - 1; i >= 0; i--)
-                if (treeView1.Nodes[i] is MapHeadGroup g &&  g.Dead)
+                if (treeView1.Nodes[i] is MapHeadGroup g && g.Dead)
                 {
                     g.Free();
                     treeView1.Nodes.RemoveAt(i);

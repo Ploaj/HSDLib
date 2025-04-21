@@ -10,7 +10,7 @@ namespace HSDRawViewer.ContextMenus
 
         public MapHeadContextMenu() : base()
         {
-            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Import Model Group");
+            ToolStripMenuItem OpenAsAJ = new("Import Model Group");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_Map_Head)

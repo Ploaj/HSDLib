@@ -9,7 +9,9 @@ namespace HSDRawViewer.GUI.Plugins
     [SupportedTypes(new Type[] { typeof(HSD_AOBJ) })]
     public partial class AOBJEditor : PluginBase
     {
-        public override DataNode Node { get => _node;
+        public override DataNode Node
+        {
+            get => _node;
             set
             {
                 GraphEditor.AnimType type = GraphEditor.AnimType.Joint;
@@ -36,7 +38,7 @@ namespace HSDRawViewer.GUI.Plugins
         private DataNode _node;
         private HSD_AOBJ aobj;
 
-        private GraphEditor graphEditor;
+        private readonly GraphEditor graphEditor;
 
         /// <summary>
         /// 

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Forms;
-using HSDRawViewer.Sound;
+﻿using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
+using System;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -37,13 +37,13 @@ namespace HSDRawViewer.GUI.Extra
             if (_entry == null)
                 return;
 
-            var files = FileIO.OpenFiles(DSP.SupportedImportFilter);
+            string[] files = FileIO.OpenFiles(DSP.SupportedImportFilter);
 
             if (files != null)
             {
-                foreach (var file in files)
+                foreach (string file in files)
                 {
-                    var dsp = new DSP();
+                    DSP dsp = new();
 
                     dsp.FromFile(file);
 
@@ -65,7 +65,7 @@ namespace HSDRawViewer.GUI.Extra
             if (MessageBox.Show("Are you sure?", "Delete Sound", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes && soundArrayEditor.SelectedIndex != -1)
             {
                 // index to delete
-                var index = soundArrayEditor.SelectedIndex;
+                int index = soundArrayEditor.SelectedIndex;
 
                 soundArrayEditor.RemoveAt(index);
 

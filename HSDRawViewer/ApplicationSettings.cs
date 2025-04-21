@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Globalization;
 using System.Linq;
 
@@ -22,7 +21,7 @@ namespace HSDRawViewer
         [Browsable(false),]
         public static Brush SystemGrayTextColorBrush = new SolidBrush(System.Drawing.SystemColors.GrayText);
 
-        [Browsable(false), ]
+        [Browsable(false),]
         public static bool UnlockedViewport { get; set; } = false;
 
         [Browsable(false)]
@@ -30,13 +29,13 @@ namespace HSDRawViewer
 
         [Browsable(false)]
         public static string ImageFileFilter { get; } = "Supported Image Formats|*.png;*.bmp;*.jpg;*.jpeg";
-        
+
         [Browsable(false)]
         public static List<Type> HSDTypes { get; internal set; } = new List<Type>();
 
         [Browsable(false)]
-        private static List<MMDevice> AudioDevices = new List<MMDevice>();
-        
+        private static readonly List<MMDevice> AudioDevices = new();
+
         public static MMDevice DefaultDevice { get; set; }
 
         /// <summary>
@@ -64,17 +63,15 @@ namespace HSDRawViewer
 
             HSDTypes.AddRange(types);
 
-            using (var mmdeviceEnumerator = new MMDeviceEnumerator())
+            using MMDeviceEnumerator mmdeviceEnumerator = new();
+            using (MMDeviceCollection mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
             {
-                using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
+                foreach (MMDevice device in mmdeviceCollection)
                 {
-                    foreach (var device in mmdeviceCollection)
-                    {
-                        AudioDevices.Add(device);
-                    }
+                    AudioDevices.Add(device);
                 }
-                DefaultDevice = mmdeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
             }
+            DefaultDevice = mmdeviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
         }
 
 
@@ -84,13 +81,11 @@ namespace HSDRawViewer
         public static void SelectAudioPlaybackDevice()
         {
             // TODO: save selected device
-            var c = new DefaultDeviceSelecter() { Device = DefaultDevice };
-            using (PropertyDialog d = new PropertyDialog("Select Audio Device", c))
+            DefaultDeviceSelecter c = new() { Device = DefaultDevice };
+            using PropertyDialog d = new("Select Audio Device", c);
+            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if(d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    DefaultDevice = c.Device;
-                }
+                DefaultDevice = c.Device;
             }
         }
 
@@ -128,7 +123,7 @@ namespace HSDRawViewer
                 else
                     return base.CanConvertFrom(context, sourceType);
             }
-            
+
             public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
             {
                 return true;

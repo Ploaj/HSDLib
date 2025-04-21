@@ -1,5 +1,4 @@
 ﻿using HSDRaw.Melee.Gr;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -10,7 +9,7 @@ namespace HSDRawViewer.Converters
 {
     public class ConvSVG
     {
-        private static Dictionary<CollMaterial, string> materialToColor = new Dictionary<CollMaterial, string>()
+        private static readonly Dictionary<CollMaterial, string> materialToColor = new()
         {
             { CollMaterial.Basic, "stroke:#808080" },
             { CollMaterial.Rock, "stroke:#806060)" },
@@ -30,13 +29,13 @@ namespace HSDRawViewer.Converters
 
         public static void CollDataToSVG(string filename, SBM_Coll_Data colldata)
         {
-            svg svg = new svg();
+            svg svg = new();
 
-            var groups = new List<svgShape>();
-            foreach (var area in colldata.LineGroups)
+            List<svgShape> groups = new();
+            foreach (SBM_CollLineGroup area in colldata.LineGroups)
             {
-                svgGroup g = new svgGroup();
-                List<svgShape> lines = new List<svgShape>();
+                svgGroup g = new();
+                List<svgShape> lines = new();
                 lines.AddRange(AreaToList(colldata, area.TopLineIndex, area.TopLineCount).ToArray());
                 lines.AddRange(AreaToList(colldata, area.LeftLineIndex, area.LeftLineCount).ToArray());
                 lines.AddRange(AreaToList(colldata, area.RightLineIndex, area.RightLineCount).ToArray());
@@ -46,38 +45,36 @@ namespace HSDRawViewer.Converters
             }
             svg.groups = groups.ToArray();
 
-            using (var settings = new XmlTextWriter(new FileStream(filename, FileMode.Create), Encoding.UTF8))
-            {
-                settings.Indentation = 4;
-                settings.Formatting = Formatting.Indented;
-                //settings.Namespaces = false;
-                //settings.Settings.OmitXmlDeclaration = true;
+            using XmlTextWriter settings = new(new FileStream(filename, FileMode.Create), Encoding.UTF8);
+            settings.Indentation = 4;
+            settings.Formatting = Formatting.Indented;
+            //settings.Namespaces = false;
+            //settings.Settings.OmitXmlDeclaration = true;
 
-                XmlSerializer serializer = new XmlSerializer(typeof(svg));
-                serializer.Serialize(settings, svg);
-            }
+            XmlSerializer serializer = new(typeof(svg));
+            serializer.Serialize(settings, svg);
         }
 
         private static List<svgShape> AreaToList(SBM_Coll_Data colldata, int start, int count)
         {
-            var list = new List<svgShape>();
+            List<svgShape> list = new();
             for (int i = start; i < start + count; i++)
             {
-                var link = colldata.Links[i];
-                svgLine line = new svgLine()
+                SBM_CollLine link = colldata.Links[i];
+                svgLine line = new()
                 {
                     x1 = 500 + colldata.Vertices[link.VertexIndex1].X,
                     y1 = 500 - colldata.Vertices[link.VertexIndex1].Y,
                     x2 = 500 + colldata.Vertices[link.VertexIndex2].X,
                     y2 = 500 - colldata.Vertices[link.VertexIndex2].Y
                 };
-                line.style = materialToColor[(CollMaterial)link.Material];
+                line.style = materialToColor[link.Material];
                 list.Add(line);
             }
             return list;
         }
     }
-    
+
     public class svg
     {
         [XmlAttribute]
@@ -85,10 +82,10 @@ namespace HSDRawViewer.Converters
 
         [XmlAttribute]
         public float height { get; set; } = 1000;
-        
+
         [XmlElement("line", typeof(svgLine))]
         public svgShape[] shapes { get; set; }
-        
+
         [XmlElement("g", typeof(svgGroup))]
         public svgShape[] groups { get; set; }
     }
@@ -121,5 +118,5 @@ namespace HSDRawViewer.Converters
         [XmlAttribute]
         public string style { get; set; } = "stroke:rgb(255,0,0);";
     }
-    
+
 }

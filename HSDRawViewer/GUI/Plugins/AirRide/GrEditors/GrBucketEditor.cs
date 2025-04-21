@@ -1,17 +1,10 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.GX;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
-using HSDRawViewer.Rendering.Widgets;
-using HSDRawViewer.Tools;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
 {
@@ -19,15 +12,15 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
     {
         public KAR_grPartitionBucket[] _items { get; set; }
 
-        private ushort[] trilookup;
+        private readonly ushort[] trilookup;
 
-        private GXVector3[] _vertices;
-        private KAR_CollisionTriangle[] _triangles;
-        private KAR_CollisionJoint[] _joints;
+        private readonly GXVector3[] _vertices;
+        private readonly KAR_CollisionTriangle[] _triangles;
+        private readonly KAR_CollisionJoint[] _joints;
 
-        private GXVector3[] _zvertices;
-        private KAR_ZoneCollisionTriangle[] _ztriangles;
-        private KAR_ZoneCollisionJoint[] _zjoints;
+        private readonly GXVector3[] _zvertices;
+        private readonly KAR_ZoneCollisionTriangle[] _ztriangles;
+        private readonly KAR_ZoneCollisionJoint[] _zjoints;
 
         /// <summary>
         /// 
@@ -66,7 +59,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
             //}
 
             GL.Enable(EnableCap.DepthTest);
-            foreach (var j in _joints)
+            foreach (KAR_CollisionJoint j in _joints)
             {
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.PushMatrix();
@@ -79,11 +72,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
                 GL.Begin(PrimitiveType.Triangles);
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
-                    var tri = _triangles[i];
+                    KAR_CollisionTriangle tri = _triangles[i];
 
-                    var v1 = _vertices[tri.V3];
-                    var v2 = _vertices[tri.V2];
-                    var v3 = _vertices[tri.V1];
+                    GXVector3 v1 = _vertices[tri.V3];
+                    GXVector3 v2 = _vertices[tri.V2];
+                    GXVector3 v3 = _vertices[tri.V1];
 
                     //GL.Color4(new Vector4(CalculateSurfaceNormal(v1, v2, v3), 0.5f));
                     if (tri.Flags.HasFlag(KCCollFlag.Wall))
@@ -114,11 +107,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
                 GL.Begin(PrimitiveType.Lines);
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
-                    var tri = _triangles[i];
+                    KAR_CollisionTriangle tri = _triangles[i];
 
-                    var v1 = _vertices[tri.V3];
-                    var v2 = _vertices[tri.V2];
-                    var v3 = _vertices[tri.V1];
+                    GXVector3 v1 = _vertices[tri.V3];
+                    GXVector3 v2 = _vertices[tri.V2];
+                    GXVector3 v3 = _vertices[tri.V1];
 
                     GL.Color3(1f, 1f, 1f);
 
@@ -171,7 +164,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
             // render buckets
-            foreach (var b in _items)
+            foreach (KAR_grPartitionBucket b in _items)
             {
                 if (b == null)
                     continue;
@@ -182,12 +175,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
                     GL.Begin(PrimitiveType.Triangles);
                     for (int i = b.CollTriangleStart; i < b.CollTriangleStart + b.CollTriangleCount; i++)
                     {
-                        var index = trilookup[i];
-                        var tri = _triangles[index];
+                        ushort index = trilookup[i];
+                        KAR_CollisionTriangle tri = _triangles[index];
 
-                        var v1 = _vertices[tri.V3];
-                        var v2 = _vertices[tri.V2];
-                        var v3 = _vertices[tri.V1];
+                        GXVector3 v1 = _vertices[tri.V3];
+                        GXVector3 v2 = _vertices[tri.V2];
+                        GXVector3 v3 = _vertices[tri.V1];
 
                         GL.Color3(CalculateSurfaceNormal(v1, v2, v3));
 

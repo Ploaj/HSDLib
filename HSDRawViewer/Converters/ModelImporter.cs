@@ -10,7 +10,6 @@ using IONET;
 using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
-using OpenTK;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -30,25 +29,25 @@ namespace HSDRawViewer.Converters
         private ModelImportSettings Settings;
 
         // lookup mesh settings from iomesh
-        private Dictionary<IOMesh, MeshImportSettings> meshSettings = new Dictionary<IOMesh, MeshImportSettings>();
+        private readonly Dictionary<IOMesh, MeshImportSettings> meshSettings = new();
 
         // lookup material settings from iomaterial
-        private Dictionary<IOMaterial, MaterialImportSettings> materialSettings = new Dictionary<IOMaterial, MaterialImportSettings>();
+        private readonly Dictionary<IOMaterial, MaterialImportSettings> materialSettings = new();
 
         // cache the jobj names to their respective jobj
-        private Dictionary<string, HSD_JOBJ> NameToJOBJ = new Dictionary<string, HSD_JOBJ>();
+        private readonly Dictionary<string, HSD_JOBJ> NameToJOBJ = new();
 
         // Indicates jobjs that need the SKELETON flag set along with inverted transform
-        private List<HSD_JOBJ> EnvelopedJOBJs = new List<HSD_JOBJ>();
+        private readonly List<HSD_JOBJ> EnvelopedJOBJs = new();
 
         // for cleaning root
         private Matrix4 CleanRotMatrix = Matrix4.Identity;
 
         // 
-        private Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new Dictionary<HSD_JOBJ, Matrix4>();
+        private readonly Dictionary<HSD_JOBJ, Matrix4> jobjToWorldTransform = new();
 
         // cache textures
-        private Dictionary<string, HSD_TOBJ> pathToTObj = new Dictionary<string, HSD_TOBJ>();
+        private readonly Dictionary<string, HSD_TOBJ> pathToTObj = new();
 
         /// <summary>
         /// 
@@ -58,12 +57,12 @@ namespace HSDRawViewer.Converters
         /// <summary>
         /// 
         /// </summary>
-        private IOScene scene;
+        private readonly IOScene scene;
 
         /// <summary>
         /// 
         /// </summary>
-        private IOModel model;
+        private readonly IOModel model;
 
         /// <summary>
         /// 
@@ -74,25 +73,23 @@ namespace HSDRawViewer.Converters
         {
             if (f != null)
             {
-                var scene = IONET.IOManager.LoadScene(f, new IONET.ImportSettings()
+                IOScene scene = IONET.IOManager.LoadScene(f, new IONET.ImportSettings()
                 {
                     Triangulate = true,
                 });
 
-                using (ModelImportDialog d = new ModelImportDialog(scene, scene.Models[0]))
+                using ModelImportDialog d = new(scene, scene.Models[0]);
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    if (d.ShowDialog() == DialogResult.OK)
+                    ModelImporter imp = new(Path.GetDirectoryName(f), scene, scene.Models[0], d.settings, d.GetMeshSettings(), d.GetMaterialSettings());
+
+                    using (ProgressBarDisplay pb = new(imp))
                     {
-                        ModelImporter imp = new ModelImporter(Path.GetDirectoryName(f), scene, scene.Models[0], d.settings, d.GetMeshSettings(), d.GetMaterialSettings());
-
-                        using (ProgressBarDisplay pb = new ProgressBarDisplay(imp))
-                        {
-                            pb.DoWork();
-                            pb.ShowDialog();
-                        }
-
-                        return imp.NewModel;
+                        pb.DoWork();
+                        pb.ShowDialog();
                     }
+
+                    return imp.NewModel;
                 }
             }
 
@@ -114,7 +111,7 @@ namespace HSDRawViewer.Converters
         /// <param name="toReplace"></param>
         public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
         {
-            var model = ImportModelFromFile();
+            HSD_JOBJ model = ImportModelFromFile();
 
             if (model != null)
             {
@@ -142,8 +139,8 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static bool JointTreeIsSimilar(HSD_JOBJ from, HSD_JOBJ to)
         {
-            var fromList = from.TreeList;
-            var toList = to.TreeList;
+            List<HSD_JOBJ> fromList = from.TreeList;
+            List<HSD_JOBJ> toList = to.TreeList;
 
             // check if they have save joint count
             if (fromList.Count != toList.Count)
@@ -202,15 +199,15 @@ namespace HSDRawViewer.Converters
         /// <param name="to"></param>
         public static void ReplaceWithBonesFromFile(HSD_JOBJ from, HSD_JOBJ to)
         {
-            LiveJObj oldlist = new LiveJObj(to);
-            LiveJObj newlist = new LiveJObj(from);
+            LiveJObj oldlist = new(to);
+            LiveJObj newlist = new(from);
 
             if (newlist.JointCount == oldlist.JointCount)
             {
                 for (int i = 0; i < newlist.JointCount; i++)
                 {
-                    var old = oldlist.GetJObjAtIndex(i).Desc;
-                    var n = newlist.GetJObjAtIndex(i).Desc;
+                    HSD_JOBJ old = oldlist.GetJObjAtIndex(i).Desc;
+                    HSD_JOBJ n = newlist.GetJObjAtIndex(i).Desc;
 
                     // copy compensate flag if it exists
                     if (n.Flags.HasFlag(JOBJ_FLAG.MTX_SCALE_COMPENSATE))
@@ -247,11 +244,11 @@ namespace HSDRawViewer.Converters
             this.Settings = settings;
 
             // generate mesh lookup
-            foreach (var m in meshSettings)
+            foreach (MeshImportSettings m in meshSettings)
                 this.meshSettings.Add(m._poly, m);
 
             // generate material lookup
-            foreach (var m in materialSettings)
+            foreach (MaterialImportSettings m in materialSettings)
                 this.materialSettings.Add(m._material, m);
         }
 
@@ -282,7 +279,7 @@ namespace HSDRawViewer.Converters
             Settings ??= new ModelImportSettings();
 
             // create pobj generate
-            POBJ_Generator POBJGen = new POBJ_Generator()
+            POBJ_Generator POBJGen = new()
             {
                 UseTriangleStrips = Settings.UseStrips,
                 VertexColorFormat = (GXCompType)Settings.VertexColorFormat,
@@ -297,7 +294,7 @@ namespace HSDRawViewer.Converters
             ProgressStatus = "Processing Joints...";
             w.ReportProgress(30);
             HSD_JOBJ root = null;
-            foreach (var r in model.Skeleton.RootBones)
+            foreach (IOBone r in model.Skeleton.RootBones)
             {
                 if (r.Name == "Armature")
                     continue;
@@ -319,7 +316,7 @@ namespace HSDRawViewer.Converters
 
             // process mesh
             ProgressStatus = "Processing Mesh...";
-            foreach (var mesh in model.Meshes)
+            foreach (IOMesh mesh in model.Meshes)
             {
                 ProcessMesh(scene, mesh, root, ref POBJGen);
 
@@ -333,12 +330,12 @@ namespace HSDRawViewer.Converters
             // calculate inverse binds
             if (Settings.EnvelopeAll)
             {
-                foreach (var v in jobjToWorldTransform)
+                foreach (KeyValuePair<HSD_JOBJ, Matrix4> v in jobjToWorldTransform)
                     v.Key.InverseWorldTransform = v.Value.Inverted().ToHsdMatrix();
             }
             else
             {
-                foreach (var jobj in EnvelopedJOBJs)
+                foreach (HSD_JOBJ jobj in EnvelopedJOBJs)
                 {
                     ProgressStatus = "Generating Inverse Transforms...";
                     if (jobjToWorldTransform.ContainsKey(jobj))
@@ -407,7 +404,7 @@ namespace HSDRawViewer.Converters
             }
 #endif
             // create jobj
-            HSD_JOBJ jobj = new HSD_JOBJ()
+            HSD_JOBJ jobj = new()
             {
                 TX = bone.TranslationX,
                 TY = bone.TranslationY,
@@ -431,7 +428,7 @@ namespace HSDRawViewer.Converters
             jobjToWorldTransform.Add(jobj, bone.WorldTransform.ToTKMatrix());
 
             // recursivly add children
-            foreach (var child in bone.Children)
+            foreach (IOBone child in bone.Children)
             {
                 jobj.AddChild(IOBoneToJOBJ(child));
             }
@@ -473,7 +470,7 @@ namespace HSDRawViewer.Converters
             {
                 mesh.CalculateTangentBitangent();
 
-                foreach (var v in mesh.Vertices)
+                foreach (IOVertex v in mesh.Vertices)
                 {
                     v.Tangent /= 100;
                     v.Binormal /= 100;
@@ -483,7 +480,7 @@ namespace HSDRawViewer.Converters
             // begin processing polygons
             HSD_DOBJ root = null;
             HSD_DOBJ prev = null;
-            foreach (var poly in mesh.Polygons)
+            foreach (IOPolygon poly in mesh.Polygons)
             {
                 // Skip Empty Polygon
                 if (poly.Indicies.Count == 0)
@@ -495,7 +492,7 @@ namespace HSDRawViewer.Converters
                     continue;
 
                 // Generate DOBJ
-                HSD_DOBJ dobj = new HSD_DOBJ();
+                HSD_DOBJ dobj = new();
 
                 if (Settings.ImportMeshNames)
                     dobj.ClassName = mesh.Name;
@@ -508,7 +505,7 @@ namespace HSDRawViewer.Converters
 
 
                 // generate material
-                var material = scene.Materials.Find(e => e.Name == poly.MaterialName);
+                IOMaterial material = scene.Materials.Find(e => e.Name == poly.MaterialName);
                 dobj.Mobj = GenerateMaterial(settings, material);
 
 
@@ -516,19 +513,19 @@ namespace HSDRawViewer.Converters
 
 
                 // reflective mobjs do not use uvs
-                var hasReflection = settings.IsReflective;
+                bool hasReflection = settings.IsReflective;
 #if DEBUG
                 if (Settings.MetalModel)
                     hasReflection = true;
 #endif
 
                 // bump maps need tangents and bitangents
-                var hasBump = settings.GenerateTB;
+                bool hasBump = settings.GenerateTB;
 
                 // Assess additional attributes based on the material MOBJ
                 if (dobj.Mobj.Textures != null)
                 {
-                    foreach (var t in dobj.Mobj.Textures.List)
+                    foreach (HSD_TOBJ t in dobj.Mobj.Textures.List)
                     {
                         if (t.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
                             hasReflection = true;
@@ -538,7 +535,7 @@ namespace HSDRawViewer.Converters
                 }
 
                 // assess attributes
-                List<GXAttribName> Attributes = new List<GXAttribName>();
+                List<GXAttribName> Attributes = new();
 
                 // determine if position normal matrix is needed
                 if (mesh.HasEnvelopes() && Settings.ImportSkinning && !settings.SingleBind)
@@ -595,55 +592,55 @@ namespace HSDRawViewer.Converters
                 {
 #endif
 
-                    if (mesh.HasUVSet(0))
-                        Attributes.Add(GXAttribName.GX_VA_TEX0);
+                if (mesh.HasUVSet(0))
+                    Attributes.Add(GXAttribName.GX_VA_TEX0);
 
-                    if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX1);
+                if ((mesh.HasUVSet(1) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 1)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX1);
 
-                    if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX2);
+                if ((mesh.HasUVSet(2) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 2)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX2);
 
-                    if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX3);
+                if ((mesh.HasUVSet(3) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 3)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX3);
 
-                    if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX4);
+                if ((mesh.HasUVSet(4) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 4)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX4);
 
-                    if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX5);
+                if ((mesh.HasUVSet(5) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 5)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX5);
 
-                    if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX6);
+                if ((mesh.HasUVSet(6) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 6)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX6);
 
-                    if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
-                        Attributes.Add(GXAttribName.GX_VA_TEX7);
+                if ((mesh.HasUVSet(7) || (dobj.Mobj.Textures != null && dobj.Mobj.Textures.List.Count > 7)))
+                    Attributes.Add(GXAttribName.GX_VA_TEX7);
 
 #if DEBUG
                 }
 #endif
 
                 // being processing mesh
-                var vertices = new List<GX_Vertex>();
-                var jobjList = new List<HSD_JOBJ[]>();
-                var weightList = new List<float[]>();
+                List<GX_Vertex> vertices = new();
+                List<HSD_JOBJ[]> jobjList = new();
+                List<float[]> weightList = new();
 
                 // generarte vertex list
-                foreach (var face in poly.Indicies)
+                foreach (int face in poly.Indicies)
                 {
-                    var v = mesh.Vertices[face];
+                    IOVertex v = mesh.Vertices[face];
 
-                    GX_Vertex vertex = new GX_Vertex();
+                    GX_Vertex vertex = new();
 
-                    var tkvert = new Vector3(v.Position.X, v.Position.Y, v.Position.Z);
-                    var tknrm = new Vector3(v.Normal.X, v.Normal.Y, v.Normal.Z);
-                    var tktan = new Vector3(v.Tangent.X, v.Tangent.Y, v.Tangent.Z);
-                    var tkbitan = new Vector3(v.Binormal.X, v.Binormal.Y, v.Binormal.Z);
+                    Vector3 tkvert = new(v.Position.X, v.Position.Y, v.Position.Z);
+                    Vector3 tknrm = new(v.Normal.X, v.Normal.Y, v.Normal.Z);
+                    Vector3 tktan = new(v.Tangent.X, v.Tangent.Y, v.Tangent.Z);
+                    Vector3 tkbitan = new(v.Binormal.X, v.Binormal.Y, v.Binormal.Z);
 
                     // transform by inverse of parent
                     if (jobjToWorldTransform[parent] != Matrix4.Identity)
                     {
-                        var parentTransform = jobjToWorldTransform[parent].Inverted();
+                        Matrix4 parentTransform = jobjToWorldTransform[parent].Inverted();
                         tkvert = Vector3.TransformPosition(tkvert, parentTransform);
                         tknrm = Vector3.TransformNormal(tknrm, parentTransform).Normalized();
                         tktan = Vector3.TransformNormal(tktan, parentTransform);
@@ -654,8 +651,8 @@ namespace HSDRawViewer.Converters
                     if (mesh.HasEnvelopes() && Settings.ImportSkinning)
                     {
                         // create weighting lists
-                        List<float> weight = new List<float>();
-                        List<HSD_JOBJ> bones = new List<HSD_JOBJ>();
+                        List<float> weight = new();
+                        List<HSD_JOBJ> bones = new();
 
                         // single bind if there are no weights
                         if (v.Envelope.Weights.Count == 0)
@@ -669,7 +666,7 @@ namespace HSDRawViewer.Converters
                             throw new Exception($"Too many weights! {v.Envelope.Weights.Count} in {mesh.Name}");
 
                         // process weights
-                        foreach (var bw in v.Envelope.Weights)
+                        foreach (IOBoneWeight bw in v.Envelope.Weights)
                         {
                             // check if skeleton actually contains bone
                             if (NameToJOBJ.ContainsKey(bw.BoneName))
@@ -695,7 +692,7 @@ namespace HSDRawViewer.Converters
                         // invert single binds
                         if (v.Envelope.Weights.Count == 1 && parent == rootnode)
                         {
-                            var inv = jobjToWorldTransform[NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
+                            Matrix4 inv = jobjToWorldTransform[NameToJOBJ[v.Envelope.Weights[0].BoneName]].Inverted();
                             tkvert = Vector3.TransformPosition(tkvert, inv);
                             tknrm = Vector3.TransformNormal(tknrm, inv).Normalized();
                             tktan = Vector3.TransformNormal(tktan, inv);
@@ -806,7 +803,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private HSD_DOBJ CreateDummyDObj()
         {
-            var dobj = new HSD_DOBJ()
+            HSD_DOBJ dobj = new()
             {
                 Mobj = new HSD_MOBJ()
                 {
@@ -830,7 +827,7 @@ namespace HSDRawViewer.Converters
         private void ForceTextureCount(HSD_DOBJ dobj, int forceTextureCount)
         {
             // get current texture count
-            var texCount = dobj.Mobj.Textures != null ? dobj.Mobj.Textures.List.Count : 0;
+            int texCount = dobj.Mobj.Textures != null ? dobj.Mobj.Textures.List.Count : 0;
 
             // texture count is perfect
             if (texCount == forceTextureCount)
@@ -852,7 +849,7 @@ namespace HSDRawViewer.Converters
             {
                 for (int i = 0; i < forceTextureCount - texCount; i++)
                 {
-                    var tobj = CreateDummyTObj();
+                    HSD_TOBJ tobj = CreateDummyTObj();
                     if (dobj.Mobj.Textures == null)
                         dobj.Mobj.Textures = tobj;
                     else
@@ -912,7 +909,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         private string GetFullTexturePath(string path)
         {
-            var texturePath = path;
+            string texturePath = path;
 
             if (texturePath.Contains("file://"))
                 texturePath = texturePath.Replace("file://", "");
@@ -938,7 +935,7 @@ namespace HSDRawViewer.Converters
         private HSD_MOBJ GenerateMaterial(MeshImportSettings mesh, IOMaterial material)
         {
             // create blank mobj
-            var Mobj = new HSD_MOBJ();
+            HSD_MOBJ Mobj = new();
             Mobj.Material = new HSD_Material()
             {
                 AMB_A = 0xFF,
@@ -965,7 +962,7 @@ namespace HSDRawViewer.Converters
             // optional mobj loading
             if (settings.ImportMOBJ)
             {
-                var mobjPath = Path.Combine(FolderPath, material.Name + ".mobj");
+                string mobjPath = Path.Combine(FolderPath, material.Name + ".mobj");
 
                 if (File.Exists(mobjPath))
                 {
@@ -976,7 +973,7 @@ namespace HSDRawViewer.Converters
                     material.DiffuseMap != null &&
                     !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
                 {
-                    var textPath = GetFullTexturePath(material.DiffuseMap.FilePath);
+                    string textPath = GetFullTexturePath(material.DiffuseMap.FilePath);
                     mobjPath = Path.Combine(Path.GetDirectoryName(textPath), Path.GetFileNameWithoutExtension(textPath) + ".mobj");
 
                     if (File.Exists(mobjPath))
@@ -1012,7 +1009,7 @@ namespace HSDRawViewer.Converters
             {
                 if (material.DiffuseMap != null && !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
                 {
-                    var texturePath = GetFullTexturePath(material.DiffuseMap.FilePath);
+                    string texturePath = GetFullTexturePath(material.DiffuseMap.FilePath);
 
                     if (File.Exists(texturePath) && (texturePath.ToLower().EndsWith(".png") || texturePath.ToLower().EndsWith(".bmp")))
                     {
@@ -1024,7 +1021,7 @@ namespace HSDRawViewer.Converters
                         }
                         else
                         {
-                            var tobj = new HSD_TOBJ();
+                            HSD_TOBJ tobj = new();
                             tobj.ImportImage(texturePath, settings.TextureFormat, settings.PaletteFormat);
                             tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
 

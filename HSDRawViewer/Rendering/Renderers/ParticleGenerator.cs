@@ -1,8 +1,6 @@
 ﻿using HSDRaw.Common;
 using OpenTK.Mathematics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -190,7 +188,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 case ParticleType.Sphere:
                     SphereParam1.X = Velocity.Length;
 
-                    var dVar6 = Velocity.Xz.Length;
+                    float dVar6 = Velocity.Xz.Length;
                     if (1.17549435E-38 <= dVar6)
                         SphereParam1.Y = (float)Math.Atan2(Velocity.Y, dVar6);
                     else if (Velocity.Y < 0)
@@ -235,17 +233,17 @@ namespace HSDRawViewer.Rendering.Renderers
             if (NumToSpawn < 1)
                 return NumToSpawn;
 
-            var local_c8 = new Vector3(Velocity);
-            var vel_mag = local_c8.Length;
+            Vector3 local_c8 = new(Velocity);
+            float vel_mag = local_c8.Length;
 
             // transform matrix
-            var matrix = Matrix4.Identity;
+            Matrix4 matrix = Matrix4.Identity;
 
             // 8039dc10 - 8039dce0
             // initial matrix stuff
-            if (Flags.HasFlag(GeneratorFlags.x100) && 
+            if (Flags.HasFlag(GeneratorFlags.x100) &&
                 (Joint != null) &&
-                Flags.HasFlag(GeneratorFlags.BillboardA) && 
+                Flags.HasFlag(GeneratorFlags.BillboardA) &&
                 !Kind.HasFlag(ParticleKind.BillboardA | ParticleKind.BillboardG))
             {
                 // gets rotation matrix from Joint
@@ -304,10 +302,10 @@ namespace HSDRawViewer.Rendering.Renderers
 
             // 8039dde4 - 8039df60
             // calculate velocity rotation matrix
-            if (Shape != ParticleType.Line && 
+            if (Shape != ParticleType.Line &&
                 vel_mag > 0)
             {
-                var vn = new Vector3(Velocity).Normalized();
+                Vector3 vn = new Vector3(Velocity).Normalized();
 
                 float angle;
 
@@ -318,10 +316,10 @@ namespace HSDRawViewer.Rendering.Renderers
                 else
                     angle = (float)Math.PI / 2;
 
-                var dVar8 = (float)Math.Sin(angle);
-                var dVar14 = (float)Math.Cos(angle);
+                float dVar8 = (float)Math.Sin(angle);
+                float dVar14 = (float)Math.Cos(angle);
 
-                var fVar1 = (vn.Y * dVar8) + (vn.Z * dVar14);
+                float fVar1 = (vn.Y * dVar8) + (vn.Z * dVar14);
 
                 if (Math.Abs(fVar1) >= 0)
                     angle = (float)Math.Atan2(vn.X, fVar1);
@@ -330,8 +328,8 @@ namespace HSDRawViewer.Rendering.Renderers
                 else
                     angle = (float)Math.PI / 2;
 
-                var dVar9 = (float)Math.Sin(angle);
-                var dVar16 = (float)Math.Cos(angle);
+                float dVar9 = (float)Math.Sin(angle);
+                float dVar16 = (float)Math.Cos(angle);
 
                 float M11 = dVar16;
                 float M12 = -dVar8 * dVar9;
@@ -349,7 +347,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 float M42 = 0;
                 float M43 = 0;
 
-                var rotMtx = new Matrix4(
+                Matrix4 rotMtx = new(
                     M11, M12, M13, 0,
                     M21, M22, M23, 0,
                     M31, M32, M33, 0,
@@ -421,7 +419,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         float radius;
                         float range;
                         float angle_x, angle_y;
-                        var kind = Shape;
+                        ParticleType kind = Shape;
 
                         // generate spawn radius and range
                         if (Radius >= 0)
@@ -449,7 +447,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 }
                                 else
                                 {
-                                    var in_f18 = (ConeParam.Y - ConeParam.X) / NumToSpawn;
+                                    float in_f18 = (ConeParam.Y - ConeParam.X) / NumToSpawn;
                                     angle_y = in_f18 * (float)RandomGen.NextDouble() + ConeParam.X;
 
                                     angle_y += in_f18;
@@ -459,7 +457,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             case ParticleType.Cone:
                                 if (Angle >= 0)
                                 {
-                                    angle_y = (ConeParam.Y - ConeParam.X) * (float)RandomGen.Next() + ConeParam.X;
+                                    angle_y = (ConeParam.Y - ConeParam.X) * RandomGen.Next() + ConeParam.X;
 
                                     if (Math.Abs(radius) > 0)
                                         angle_x = Angle + ((float)Math.PI / 2 - (float)Math.Atan2(ConeParam.Z, radius));
@@ -470,7 +468,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 }
                                 else
                                 {
-                                    var in_f18 = (ConeParam.Y - ConeParam.X) / NumToSpawn;
+                                    float in_f18 = (ConeParam.Y - ConeParam.X) / NumToSpawn;
                                     angle_y = in_f18 * (float)RandomGen.NextDouble() + ConeParam.X;
 
                                     angle_y += in_f18;
@@ -491,7 +489,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 }
                                 else
                                 {
-                                    var in_f18 = (DiscParam.Y - DiscParam.X) / NumToSpawn;
+                                    float in_f18 = (DiscParam.Y - DiscParam.X) / NumToSpawn;
                                     angle_y = in_f18 * (float)RandomGen.NextDouble() + DiscParam.X;
                                     angle_y += in_f18;
                                     angle_x = range * -Angle;
@@ -499,7 +497,7 @@ namespace HSDRawViewer.Rendering.Renderers
                                 break;
                         }
 
-                        Vector3 spawn_pos = new Vector3(
+                        Vector3 spawn_pos = new(
                             (float)(radius * Math.Cos(angle_y)),
                             (float)(radius * Math.Sin(angle_y)),
                             0);
@@ -507,7 +505,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         // calculate z spawn position
                         if (kind == ParticleType.Cone || kind == ParticleType.Cylinder)
                         {
-                            var rand = (float)RandomGen.NextDouble();
+                            float rand = (float)RandomGen.NextDouble();
                             if (kind == ParticleType.Cone)
                             {
                                 spawn_pos.X *= 1 - rand;
@@ -521,8 +519,8 @@ namespace HSDRawViewer.Rendering.Renderers
                         }
 
                         // calculate spawn velocity
-                        var dVar10 = vel_mag * (float)Math.Sin(angle_x);
-                        var spawn_vel = new Vector3(
+                        float dVar10 = vel_mag * (float)Math.Sin(angle_x);
+                        Vector3 spawn_vel = new(
                             (float)(dVar10 * Math.Cos(angle_y)),
                             (float)(dVar10 * Math.Sin(angle_y)),
                             (float)(vel_mag * Math.Cos(angle_x))
@@ -641,7 +639,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
                         spawn_pos -= new Vector3(0.5f);
 
-                        Vector3 base_pos = new Vector3(
+                        Vector3 base_pos = new(
                             RectParam4.X * spawn_pos.Z +
                             RectParam2.X * spawn_pos.X +
                             RectParam3.X * spawn_pos.Y,
@@ -695,10 +693,10 @@ namespace HSDRawViewer.Rendering.Renderers
                             dVar15 = dVar15 * (float)Math.Sqrt(RandomGen.NextDouble());
                         else
                             dVar15 = -dVar15;
-                        
+
                         // calculate spawn direction
                         float spawn_angle = (float)(2 * Math.PI * RandomGen.NextDouble());
-                        Vector3 spawn_dir = new Vector3(
+                        Vector3 spawn_dir = new(
                             (float)(Math.Sin(radius) * Math.Cos(spawn_angle)),
                             (float)(Math.Sin(radius) * Math.Sin(spawn_angle)),
                             (float)Math.Cos(radius)

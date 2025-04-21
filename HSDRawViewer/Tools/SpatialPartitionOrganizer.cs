@@ -30,7 +30,7 @@ namespace HSDRawViewer.Tools
     {
         public static readonly int MAX_TRIANGLE_COUNT = 80;
 
-        private BoundingBox box;
+        private readonly BoundingBox box;
 
         public float MinX => box.Min.X;
         public float MinY => box.Min.Y;
@@ -41,7 +41,7 @@ namespace HSDRawViewer.Tools
         public float MaxZ => box.Max.Z;
 
 
-        public List<SpatialTriangle> _triangles = new List<SpatialTriangle>();
+        public List<SpatialTriangle> _triangles = new();
 
         public int TriangleCount => _triangles.Count;
 
@@ -65,7 +65,7 @@ namespace HSDRawViewer.Tools
 
         public bool ContainsPoly(IEnumerable<SpatialTriangle> tris)
         {
-            foreach (var t in tris)
+            foreach (SpatialTriangle t in tris)
             {
                 if (box.Intersects(t.p1, t.p2, t.p3))
                     return true;
@@ -78,10 +78,10 @@ namespace HSDRawViewer.Tools
         {
             if (TriangleCount > MAX_TRIANGLE_COUNT)
             {
-                var min = box.Min;
-                var max = box.Max;
-                var mid = box.Center;
-                var ext = box.Extents;
+                Vector3 min = box.Min;
+                Vector3 max = box.Max;
+                Vector3 mid = box.Center;
+                Vector3 ext = box.Extents;
 
                 if (ext.X > ext.Y && ext.X > ext.Z)
                 {
@@ -111,7 +111,7 @@ namespace HSDRawViewer.Tools
                         new Vector3(max.X, max.Y, max.Z));
                 }
 
-                foreach (var t in _triangles)
+                foreach (SpatialTriangle t in _triangles)
                 {
                     Child1.AddTriangle(t);
                     Child2.AddTriangle(t);
@@ -149,10 +149,10 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         private static SpatialBox Organize(IEnumerable<SpatialTriangle> triangles)
         {
-            Vector3 min = new Vector3(float.MaxValue);
-            Vector3 max = new Vector3(float.MinValue);
+            Vector3 min = new(float.MaxValue);
+            Vector3 max = new(float.MinValue);
 
-            foreach (var t in triangles)
+            foreach (SpatialTriangle t in triangles)
             {
                 min = Vector3.ComponentMin(min, t.Min);
                 max = Vector3.ComponentMax(max, t.Max);
@@ -161,8 +161,8 @@ namespace HSDRawViewer.Tools
             min = new Vector3(-5000, -5000, -5000);
             max = new Vector3(5000, 5000, 5000);
 
-            var root = new SpatialBox(min, max);
-            foreach (var t in triangles)
+            SpatialBox root = new(min, max);
+            foreach (SpatialTriangle t in triangles)
                 root.AddTriangle(t);
             root.Optimize();
 
@@ -177,25 +177,25 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static KAR_grCollisionTree GeneratePartition(LiveJObj model, KAR_grCollisionNode coll)
         {
-            var _vertices = coll.Vertices;
-            var _triangles = coll.Triangles;
-            var _joints = coll.Joints;
+            HSDRaw.GX.GXVector3[] _vertices = coll.Vertices;
+            KAR_CollisionTriangle[] _triangles = coll.Triangles;
+            KAR_CollisionJoint[] _joints = coll.Joints;
 
             // add triangles
-            List<SpatialTriangle> triangles = new List<SpatialTriangle>();
-            foreach (var j in _joints)
+            List<SpatialTriangle> triangles = new();
+            foreach (KAR_CollisionJoint j in _joints)
             {
                 Matrix4 trans = model.GetJObjAtIndex(j.BoneID).WorldTransform;
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
-                    var tri = _triangles[i];
+                    KAR_CollisionTriangle tri = _triangles[i];
 
                     if (tri.SegmentMove)
                         continue;
 
-                    var v1 = GXTranslator.toVector3(_vertices[tri.V3]);
-                    var v2 = GXTranslator.toVector3(_vertices[tri.V2]);
-                    var v3 = GXTranslator.toVector3(_vertices[tri.V1]);
+                    Vector3 v1 = GXTranslator.toVector3(_vertices[tri.V3]);
+                    Vector3 v2 = GXTranslator.toVector3(_vertices[tri.V2]);
+                    Vector3 v3 = GXTranslator.toVector3(_vertices[tri.V1]);
 
                     triangles.Add(new SpatialTriangle()
                     {
@@ -207,59 +207,59 @@ namespace HSDRawViewer.Tools
                 }
             }
             // create initial bucket
-            var root = Organize(triangles);
+            SpatialBox root = Organize(triangles);
 
             // gather rough lookup
-            Dictionary<int, ushort> triangleToRough = new Dictionary<int, ushort>();
+            Dictionary<int, ushort> triangleToRough = new();
             for (int i = 0; i < _triangles.Length; i++)
             {
-                var t = _triangles[i];
+                KAR_CollisionTriangle t = _triangles[i];
 
                 if (t.Rough != 0)
                     triangleToRough.Add(i, (ushort)triangleToRough.Count);
             }
 
             // generate space triangles for zones
-            var zvertices = coll.ZoneVertices;
-            var ztriangles = coll.ZoneTriangles;
-            var zjoints = coll.ZoneJoints;
-            List<List<SpatialTriangle>> zonetris = new List<List<SpatialTriangle>>();
+            HSDRaw.GX.GXVector3[] zvertices = coll.ZoneVertices;
+            KAR_ZoneCollisionTriangle[] ztriangles = coll.ZoneTriangles;
+            KAR_ZoneCollisionJoint[] zjoints = coll.ZoneJoints;
+            List<List<SpatialTriangle>> zonetris = new();
             if (zjoints != null)
-            foreach (var j in zjoints)
-            {
-                List<SpatialTriangle> zt = new List<SpatialTriangle>();
-                Matrix4 trans = model.GetJObjAtIndex(j.BoneID).WorldTransform;
-
-                for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
+                foreach (KAR_ZoneCollisionJoint j in zjoints)
                 {
-                    var tri = ztriangles[i];
+                    List<SpatialTriangle> zt = new();
+                    Matrix4 trans = model.GetJObjAtIndex(j.BoneID).WorldTransform;
 
-                    var v1 = GXTranslator.toVector3(zvertices[tri.V3]);
-                    var v2 = GXTranslator.toVector3(zvertices[tri.V2]);
-                    var v3 = GXTranslator.toVector3(zvertices[tri.V1]);
-
-                    zt.Add(new SpatialTriangle()
+                    for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                     {
-                        p1 = Vector3.TransformPosition(v1, trans),
-                        p2 = Vector3.TransformPosition(v2, trans),
-                        p3 = Vector3.TransformPosition(v3, trans),
-                    });
+                        KAR_ZoneCollisionTriangle tri = ztriangles[i];
+
+                        Vector3 v1 = GXTranslator.toVector3(zvertices[tri.V3]);
+                        Vector3 v2 = GXTranslator.toVector3(zvertices[tri.V2]);
+                        Vector3 v3 = GXTranslator.toVector3(zvertices[tri.V1]);
+
+                        zt.Add(new SpatialTriangle()
+                        {
+                            p1 = Vector3.TransformPosition(v1, trans),
+                            p2 = Vector3.TransformPosition(v2, trans),
+                            p3 = Vector3.TransformPosition(v3, trans),
+                        });
+                    }
+
+                    zonetris.Add(zt);
                 }
 
-                zonetris.Add(zt);
-            }
-
             // gather partition data
-            List<KAR_grPartitionBucket> partBuckets = new List<KAR_grPartitionBucket>();
-            List<ushort> collTris = new List<ushort>();
-            List<ushort> roughTris = new List<ushort>();
-            List<ushort> zones = new List<ushort>();
+            List<KAR_grPartitionBucket> partBuckets = new();
+            List<ushort> collTris = new();
+            List<ushort> roughTris = new();
+            List<ushort> zones = new();
 
             // process spatial buckets
             void processBucket(SpatialBox b)
             {
                 // create partition data
-                var pt = new KAR_grPartitionBucket()
+                KAR_grPartitionBucket pt = new()
                 {
                     Child1 = -1,
                     Child2 = -1,
@@ -277,9 +277,9 @@ namespace HSDRawViewer.Tools
                 partBuckets.Add(pt);
 
                 // tris
-                foreach (var tri in b._triangles)
+                foreach (SpatialTriangle tri in b._triangles)
                 {
-                    var t = _triangles[tri.Index];
+                    KAR_CollisionTriangle t = _triangles[tri.Index];
 
                     // skip seg move
                     if (t.SegmentMove)
@@ -322,7 +322,7 @@ namespace HSDRawViewer.Tools
             processBucket(root);
 
             // create partition node
-            KAR_grCollisionTree partition = new KAR_grCollisionTree();
+            KAR_grCollisionTree partition = new();
 
             // set buckets
             partition.Buckets = partBuckets.ToArray();

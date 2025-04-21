@@ -23,7 +23,7 @@ namespace HSDRawViewer.GUI.Plugins
                     _texg = SearchForTexG(_node);
 
                     _generators = g.Generators.ToArray();
-                    generateArrayEditor.SetArrayFromProperty(this, "_generators");
+                    generateArrayEditor.SetArrayFromProperty(this, nameof(_generators));
 
                     SetupRendering();
 
@@ -39,9 +39,9 @@ namespace HSDRawViewer.GUI.Plugins
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private ViewportControl _viewport;
+        private readonly ViewportControl _viewport;
 
-        private ParticleSystem _system = new ParticleSystem();
+        private readonly ParticleSystem _system = new();
 
         public HSD_ParticleGenerator[] _generators { get; set; }
 
@@ -50,7 +50,7 @@ namespace HSDRawViewer.GUI.Plugins
         private HSD_ParticleGroup _group;
         private HSD_TEXGraphicBank _texg;
 
-        private GLTextRenderer TextRenderer = new GLTextRenderer();
+        private readonly GLTextRenderer TextRenderer = new();
 
         /// <summary>
         /// 
@@ -80,7 +80,7 @@ namespace HSDRawViewer.GUI.Plugins
                 if (generateArrayEditor.SelectedObject is HSD_ParticleGenerator gen)
                 {
                     _events = ParticleManager.DecompileCode(gen.TrackData).ToArray();
-                    ptclEventArrayEditor.SetArrayFromProperty(this, "_events");
+                    ptclEventArrayEditor.SetArrayFromProperty(this, nameof(_events));
 
                     SelectedEventChanged();
                 }
@@ -130,7 +130,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// </summary>
         private HSD_TEXGraphicBank SearchForTexG(DataNode d)
         {
-            var sym = MainForm.Instance.GetSymbol(d.Text.Replace("_ptcl", "_texg"));
+            HSDRaw.HSDAccessor sym = MainForm.Instance.GetSymbol(d.Text.Replace("_ptcl", "_texg"));
             if (sym is HSD_TEXGraphicBank)
                 return (HSD_TEXGraphicBank)sym;
 
@@ -261,7 +261,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="e"></param>
         private void cbEventType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ptclEventArrayEditor.SelectedObject is ParticleEvent env && 
+            if (ptclEventArrayEditor.SelectedObject is ParticleEvent env &&
                 cbEventType.SelectedItem is ParticleDescriptor desc)
             {
                 if (desc.Code != env.Code)

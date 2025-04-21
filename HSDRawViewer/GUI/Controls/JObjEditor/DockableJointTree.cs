@@ -1,6 +1,5 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
-using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.Animation;
 using System;
@@ -28,7 +27,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             foreach (TreeNode n in treeJOBJ.Nodes)
             {
-                foreach (var e in EnumerateJoints0(n))
+                foreach (JObjProxy e in EnumerateJoints0(n))
                     yield return e;
             }
         }
@@ -40,7 +39,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             foreach (TreeNode node in n.Nodes)
             {
-                foreach (var e in EnumerateJoints0(node))
+                foreach (JObjProxy e in EnumerateJoints0(node))
                     yield return e;
             }
         }
@@ -49,7 +48,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             foreach (TreeNode n in treeJOBJ.Nodes)
             {
-                foreach (var e in EnumerateTreeNode0(n))
+                foreach (TreeNode e in EnumerateTreeNode0(n))
                     yield return e;
             }
         }
@@ -60,7 +59,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             foreach (TreeNode node in n.Nodes)
             {
-                foreach (var e in EnumerateTreeNode0(node))
+                foreach (TreeNode e in EnumerateTreeNode0(node))
                     yield return e;
             }
         }
@@ -76,7 +75,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             _jointMap = new JointMap();
 
-            treeJOBJ.NodeMouseClick += delegate (object sender, TreeNodeMouseClickEventArgs e) {
+            treeJOBJ.NodeMouseClick += delegate (object sender, TreeNodeMouseClickEventArgs e)
+            {
                 TreeNode selected = e.Node;
 
                 // If node already selected - unselect, then reselect
@@ -127,7 +127,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             foreach (TreeNode n in treeJOBJ.Nodes)
             {
-                var p = GetProxyAtIndex0(n, index, ref i);
+                JObjProxy p = GetProxyAtIndex0(n, index, ref i);
 
                 if (p != null)
                     return p;
@@ -154,7 +154,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // check children
             foreach (TreeNode c in node.Nodes)
             {
-                var p = GetProxyAtIndex0(c, index, ref i);
+                JObjProxy p = GetProxyAtIndex0(c, index, ref i);
 
                 if (p != null)
                     return p;
@@ -171,7 +171,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="parent"></param>
         private void UpdateJObjDisplay(HSD_JOBJ jobj, TreeNode parent)
         {
-            TreeNode node = new TreeNode();
+            TreeNode node = new();
 
             // if joint map is loaded then display joint map name
             if (_jointMap[joint_count] != null)
@@ -231,14 +231,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importFromINIToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(JointMap.FileFilter);
+            string f = Tools.FileIO.OpenFile(JointMap.FileFilter);
 
             if (f != null)
             {
                 _jointMap.Load(f);
 
                 int ji = 0;
-                foreach (var node in EnumerateTreeNode())
+                foreach (TreeNode node in EnumerateTreeNode())
                 {
                     if (_jointMap[ji] != null)
                         node.Text = $"{ji} : {_jointMap[ji]}";
@@ -255,7 +255,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void exportToINIToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile(JointMap.FileFilter);
+            string f = Tools.FileIO.SaveFile(JointMap.FileFilter);
 
             if (f != null)
             {
@@ -291,11 +291,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void replaceBonesFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+            string f = FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
             if (f != null)
             {
-                var file = new HSDRawFile(f);
+                HSDRawFile file = new(f);
                 if (file.Roots.Count > 0 && file.Roots[0].Data is HSD_JOBJ jobj)
                 {
                     Converters.ModelImporter.ReplaceWithBonesFromFile(jobj, _root);

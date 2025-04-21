@@ -1,6 +1,6 @@
-﻿using System;
+﻿using HSDRawViewer.GUI.Dialog;
+using System;
 using System.Windows.Forms;
-using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -10,7 +10,7 @@ namespace HSDRawViewer.ContextMenus
 
         public CommonContextMenu()
         {
-            ToolStripMenuItem delete = new ToolStripMenuItem("Delete");
+            ToolStripMenuItem delete = new("Delete");
             delete.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -18,7 +18,7 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Delete();
                 }
             };
-            ToolStripMenuItem export = new ToolStripMenuItem("Export");
+            ToolStripMenuItem export = new("Export");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -26,7 +26,7 @@ namespace HSDRawViewer.ContextMenus
                     MainForm.SelectedDataNode.Export();
                 }
             };
-            ToolStripMenuItem import = new ToolStripMenuItem("Replace");
+            ToolStripMenuItem import = new("Replace");
             import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
@@ -36,11 +36,11 @@ namespace HSDRawViewer.ContextMenus
             };
 
             if (SupportedTypes != null)
-                foreach (var v in SupportedTypes)
+                foreach (Type v in SupportedTypes)
                 {
                     if (PluginManager.HasEditor(v))
                     {
-                        ToolStripMenuItem editor = new ToolStripMenuItem("Open Editor");
+                        ToolStripMenuItem editor = new("Open Editor");
 
                         editor.Click += (sender, args) =>
                         {
@@ -55,15 +55,15 @@ namespace HSDRawViewer.ContextMenus
                     }
                 }
 
-            ToolStripMenuItem addRootReference = new ToolStripMenuItem("Add Reference To Root");
+            ToolStripMenuItem addRootReference = new("Add Reference To Root");
             addRootReference.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode != null)
                 {
-                    var setting = new RootNameCreator();
-                    using (var prop = new PropertyDialog("Symbol Name", setting))
-                        if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(setting.SymbolName))
-                            MainForm.AddRoot(setting.SymbolName, MainForm.SelectedDataNode.Accessor);
+                    RootNameCreator setting = new();
+                    using PropertyDialog prop = new("Symbol Name", setting);
+                    if (prop.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(setting.SymbolName))
+                        MainForm.AddRoot(setting.SymbolName, MainForm.SelectedDataNode.Accessor);
                 }
             };
 

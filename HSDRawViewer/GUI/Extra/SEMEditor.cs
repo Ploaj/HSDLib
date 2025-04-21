@@ -1,17 +1,17 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows.Forms;
+﻿using HSDRaw.MEX;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
+using System;
+using System.ComponentModel;
 using System.Linq;
-using HSDRaw.MEX;
-using HSDRawViewer.GUI.Dialog;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
 {
     public partial class SEMEditor : UserControl
     {
-        private SoundScriptEditor _scriptEditor;
+        private readonly SoundScriptEditor _scriptEditor;
 
         /// <summary>
         /// 
@@ -30,7 +30,7 @@ namespace HSDRawViewer.GUI.Extra
             Controls.Add(_scriptEditor);
             _scriptEditor.BringToFront();
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -48,7 +48,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             Entries = SEM.ReadSEMFile(path, true, mex).ToArray();
 
-            entryList.SetArrayFromProperty(this, "Entries");
+            entryList.SetArrayFromProperty(this, nameof(Entries));
         }
 
 
@@ -69,10 +69,10 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void importSPKG_Click(object sender, EventArgs e)
         {
-            var f = FileIO.OpenFile("SEM Package (*.spk)|*.spk");
+            string f = FileIO.OpenFile("SEM Package (*.spk)|*.spk");
             if (f != null)
             {
-                SEMEntry entry = new SEMEntry();
+                SEMEntry entry = new();
                 entry.LoadFromPackage(f);
                 entryList.AddItem(entry);
             }
@@ -87,7 +87,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (entryList.SelectedObject is SEMEntry _entry)
             {
-                var f = FileIO.SaveFile("SEM Package (*.spk)|*.spk");
+                string f = FileIO.SaveFile("SEM Package (*.spk)|*.spk");
                 if (f != null)
                     _entry.SaveAsPackage(f);
             }
@@ -102,7 +102,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (entryList.SelectedObject is SEMEntry _entry)
             {
-                var f = FileIO.OpenFile("SEM Package (*.spk)|*.spk");
+                string f = FileIO.OpenFile("SEM Package (*.spk)|*.spk");
                 if (f != null)
                 {
                     _entry.LoadFromPackage(f);
@@ -128,20 +128,18 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void buttonAddEntry_Click(object sender, EventArgs e)
         {
-            var name = new SEMName();
-            using (PropertyDialog d = new PropertyDialog("SSM Name", name))
+            SEMName name = new();
+            using PropertyDialog d = new("SSM Name", name);
+            if (d.ShowDialog() == DialogResult.OK)
             {
-                if (d.ShowDialog() == DialogResult.OK)
+                entryList.AddItem(new SEMEntry()
                 {
-                    entryList.AddItem(new SEMEntry()
+                    SoundBank = new SSM()
                     {
-                        SoundBank = new SSM()
-                        {
-                            Name = name.Name.ToLower().EndsWith(".ssm") ? name.Name : name.Name + ".ssm"
-                        },
-                        Scripts = new SEMScript[0]
-                    });
-                }
+                        Name = name.Name.ToLower().EndsWith(".ssm") ? name.Name : name.Name + ".ssm"
+                    },
+                    Scripts = new SEMScript[0]
+                });
             }
         }
 
@@ -226,17 +224,15 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void renameButton_Click(object sender, EventArgs e)
         {
-            if(entryList.SelectedObject is SEMEntry entry)
+            if (entryList.SelectedObject is SEMEntry entry)
             {
-                var renameBox = new RenameBox();
+                RenameBox renameBox = new();
 
                 renameBox.NewName = entry.Name;
 
-                using (PropertyDialog d = new PropertyDialog("Rename", renameBox))
-                {
-                    if (d.ShowDialog() == DialogResult.OK)
-                        entry.Name = renameBox.NewName;
-                }
+                using PropertyDialog d = new("Rename", renameBox);
+                if (d.ShowDialog() == DialogResult.OK)
+                    entry.Name = renameBox.NewName;
             }
         }
     }

@@ -1,11 +1,6 @@
 ﻿using HSDRaw.Melee;
-using HSDRaw.Melee.Gr;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.Melee
@@ -16,32 +11,28 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public CpuTableContextMenu() : base()
         {
-            ToolStripMenuItem Export = new ToolStripMenuItem("Export Command List");
+            ToolStripMenuItem Export = new("Export Command List");
             Export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_PlCoCPUTable table)
                 {
-                    using (SaveFileDialog sd = new SaveFileDialog())
+                    using SaveFileDialog sd = new();
+                    sd.Filter = "Text (.txt)|*.txt";
+
+                    if (sd.ShowDialog() == DialogResult.OK)
                     {
-                        sd.Filter = "Text (.txt)|*.txt";
+                        using FileStream fstream = new(sd.FileName, FileMode.Create);
+                        using StreamWriter writer = new(fstream);
+                        SBM_CPUCommand[] com = table.Scripts.Array;
 
-                        if (sd.ShowDialog() == DialogResult.OK)
+                        for (int i = 0; i < com.Length; i++)
                         {
-                            using (var fstream = new FileStream(sd.FileName, FileMode.Create))
-                            using (var writer = new StreamWriter(fstream))
+                            writer.WriteLine($"Script - {i}");
+                            if (com[i] != null)
                             {
-                                var com = table.Scripts.Array;
-
-                                for (int i = 0; i < com.Length; i++)
-                                {
-                                    writer.WriteLine($"Script - {i}");
-                                    if (com[i] != null)
-                                    {
-                                        writer.WriteLine("{");
-                                        writer.WriteLine(com[i].Script);
-                                        writer.WriteLine("}");
-                                    }
-                                }
+                                writer.WriteLine("{");
+                                writer.WriteLine(com[i].Script);
+                                writer.WriteLine("}");
                             }
                         }
                     }

@@ -1,5 +1,4 @@
 ﻿using HSDRaw.GX;
-using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
@@ -164,7 +163,7 @@ namespace HSDRawViewer.Rendering.GX
                     return BlendingFactor.SrcAlpha;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -193,7 +192,7 @@ namespace HSDRawViewer.Rendering.GX
             }
             return DepthFunction.Never;
         }
-        
+
         public static BlendEquationMode toBlendEquationMode(GXBlendMode mode)
         {
             switch (mode)

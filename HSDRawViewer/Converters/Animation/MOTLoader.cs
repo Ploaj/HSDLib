@@ -2,10 +2,10 @@
 using HSDRaw.Tools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
-using System.Diagnostics;
 
 namespace HSDRawViewer.Converters
 {
@@ -28,20 +28,18 @@ namespace HSDRawViewer.Converters
                 return new short[0];
             }
 
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
-            {
-                r.BigEndian = true;
+            using BinaryReaderExt r = new(new FileStream(filePath, FileMode.Open));
+            r.BigEndian = true;
 
-                r.Seek(0x10);
-                var count = r.ReadInt16();
+            r.Seek(0x10);
+            short count = r.ReadInt16();
 
-                short[] vals = new short[count];
+            short[] vals = new short[count];
 
-                for (int i = 0; i < vals.Length; i++)
-                    vals[i] = r.ReadInt16();
+            for (int i = 0; i < vals.Length; i++)
+                vals[i] = r.ReadInt16();
 
-                return vals;
-            }
+            return vals;
         }
 
         /// <summary>
@@ -51,9 +49,9 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static List<MOT_FILE> UnpackMOTs(string path)
         {
-            var anims = new List<MOT_FILE>();
+            List<MOT_FILE> anims = new();
 
-            using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(path, FileMode.Open)))
+            using (BinaryReaderExt r = new(new FileStream(path, FileMode.Open)))
             {
                 r.BigEndian = true;
 
@@ -71,7 +69,7 @@ namespace HSDRawViewer.Converters
                     r.Seek(headerSize + i * 4);
                     r.Seek(r.ReadUInt32());
 
-                    MOT_FILE anim = new MOT_FILE();
+                    MOT_FILE anim = new();
                     if (r.Position != 0)
                         anim.Parse(r);
                     anims.Add(anim);
@@ -91,27 +89,27 @@ namespace HSDRawViewer.Converters
 
         public float EndTime;
 
-        public List<MOT_JOINT> Joints = new List<MOT_JOINT>();
+        public List<MOT_JOINT> Joints = new();
 
         public static bool IsMotXML(string filePath)
         {
-            XmlReaderSettings settings = new XmlReaderSettings();
+            XmlReaderSettings settings = new();
             settings.IgnoreWhitespace = true;
-            using (XmlReader r = XmlReader.Create(filePath, settings))
-                while (r.Read())
+            using XmlReader r = XmlReader.Create(filePath, settings);
+            while (r.Read())
+            {
+                switch (r.NodeType)
                 {
-                    switch (r.NodeType)
-                    {
-                        case XmlNodeType.Element:
+                    case XmlNodeType.Element:
+                        {
+                            if (r.Name == "MOT")
                             {
-                                if (r.Name == "MOT")
-                                {
-                                    return true;
-                                }
+                                return true;
                             }
-                            break;
-                    }
+                        }
+                        break;
                 }
+            }
 
             return false;
         }
@@ -125,15 +123,15 @@ namespace HSDRawViewer.Converters
         {
             if (Path.GetExtension(filePath).ToLower().Equals(".xml"))
             {
-                XmlReaderSettings settings = new XmlReaderSettings();
+                XmlReaderSettings settings = new();
                 settings.IgnoreWhitespace = true;
-                using (XmlReader r = XmlReader.Create(filePath, settings))
-                    ParseXML(r);
+                using XmlReader r = XmlReader.Create(filePath, settings);
+                ParseXML(r);
             }
             else
             {
-                using (BinaryReaderExt r = new BinaryReaderExt(new FileStream(filePath, FileMode.Open)))
-                    Parse(r);
+                using BinaryReaderExt r = new(new FileStream(filePath, FileMode.Open));
+                Parse(r);
             }
         }
 
@@ -143,58 +141,56 @@ namespace HSDRawViewer.Converters
         /// <param name="filename"></param>
         public void Save(string filename)
         {
-            using (BinaryWriterExt w = new BinaryWriterExt(new FileStream(filename, FileMode.Create)))
+            using BinaryWriterExt w = new(new FileStream(filename, FileMode.Create));
+            w.BigEndian = true;
+            if (Joints.Count == 0)
+                return;
+
+            uint animStart = (uint)w.BaseStream.Position;
+            w.Write(Joints.Count);
+            w.Write(0x10);
+            w.Write(PlaySpeed);
+            w.Write(EndTime);
+
+            // padding
+            long headerStart = w.BaseStream.Position;
+            w.Write(new byte[Joints.Count * 0x20]);
+
+            for (int j = 0; j < Joints.Count; j++)
             {
-                w.BigEndian = true;
-                if (Joints.Count == 0)
-                    return;
+                MOT_JOINT joint = Joints[j];
 
-                var animStart = (uint)w.BaseStream.Position;
-                w.Write(Joints.Count);
-                w.Write(0x10);
-                w.Write(PlaySpeed);
-                w.Write(EndTime);
+                uint temp = (uint)w.BaseStream.Position;
+                w.Seek((uint)(headerStart + j * 0x20));
+                w.Write(joint.Flag1);
+                w.Write(joint.Flag2);
+                w.Write((short)joint.TrackFlag);
+                w.Write(joint.BoneID);
+                w.Write((short)joint.Keys.Count);
+                w.Write(joint.MaxTime);
+                w.Write(joint.Unknown);
+                w.Seek(temp);
 
-                // padding
-                var headerStart = w.BaseStream.Position;
-                w.Write(new byte[Joints.Count * 0x20]);
-
-                for (int j = 0; j < Joints.Count; j++)
+                WriteAt(w, (int)(headerStart + j * 0x20 + 0x10), (int)(w.BaseStream.Position - animStart));
+                foreach (MOT_KEY k in joint.Keys)
                 {
-                    var joint = Joints[j];
+                    w.Write(k.Time);
+                }
+                if (w.BaseStream.Position % 0x10 != 0)
+                    w.Write(new byte[0x10 - w.BaseStream.Position % 0x10]);
 
-                    var temp = (uint)w.BaseStream.Position;
-                    w.Seek((uint)(headerStart + j * 0x20));
-                    w.Write(joint.Flag1);
-                    w.Write(joint.Flag2);
-                    w.Write((short)joint.TrackFlag);
-                    w.Write(joint.BoneID);
-                    w.Write((short)joint.Keys.Count);
-                    w.Write(joint.MaxTime);
-                    w.Write(joint.Unknown);
-                    w.Seek(temp);
-
-                    WriteAt(w, (int)(headerStart + j * 0x20 + 0x10), (int)(w.BaseStream.Position - animStart));
-                    foreach (var k in joint.Keys)
+                if (joint.Flag1 == 0x02)
+                {
+                    WriteAt(w, (int)(headerStart + j * 0x20 + 0x14), (int)(w.BaseStream.Position - animStart));
+                    foreach (MOT_KEY k in joint.Keys)
                     {
-                        w.Write(k.Time);
+                        w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.X), 2)));
+                        w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.Y), 2)));
+                        w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.Z), 2)));
+                        w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.W), 2)));
                     }
                     if (w.BaseStream.Position % 0x10 != 0)
                         w.Write(new byte[0x10 - w.BaseStream.Position % 0x10]);
-
-                    if (joint.Flag1 == 0x02)
-                    {
-                        WriteAt(w, (int)(headerStart + j * 0x20 + 0x14), (int)(w.BaseStream.Position - animStart));
-                        foreach (var k in joint.Keys)
-                        {
-                            w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.X), 2)));
-                            w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.Y), 2)));
-                            w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.Z), 2)));
-                            w.Write((BitConverter.ToInt16(BitConverter.GetBytes(k.W), 2)));
-                        }
-                        if (w.BaseStream.Position % 0x10 != 0)
-                            w.Write(new byte[0x10 - w.BaseStream.Position % 0x10]);
-                    }
                 }
             }
 
@@ -208,7 +204,7 @@ namespace HSDRawViewer.Converters
             file.WriteAttributeString("PlaySpeed", "" + PlaySpeed);
             file.WriteAttributeString("EndTime", "" + EndTime);
 
-            foreach (var j in Joints)
+            foreach (MOT_JOINT j in Joints)
             {
                 file.WriteStartElement("Joint");
                 file.WriteAttributeString("Flag1", "" + j.Flag1);
@@ -225,9 +221,9 @@ namespace HSDRawViewer.Converters
                 float currTime = Single.PositiveInfinity;
 
                 // Find the next keyframe
-                foreach (var j in Joints)
+                foreach (MOT_JOINT j in Joints)
                 {
-                    foreach (var k in j.Keys)
+                    foreach (MOT_KEY k in j.Keys)
                     {
                         if (k.Time > prevTime)
                         {
@@ -237,14 +233,14 @@ namespace HSDRawViewer.Converters
                     }
                 }
 
-                var keys = new List<MOT_KEY>();
-                var joints = new List<int>();
+                List<MOT_KEY> keys = new();
+                List<int> joints = new();
 
                 int jointIdx = 0;
                 // Find all joints that have this keyframe
-                foreach (var j in Joints)
+                foreach (MOT_JOINT j in Joints)
                 {
-                    foreach (var k in j.Keys)
+                    foreach (MOT_KEY k in j.Keys)
                     {
                         if (k.Time == currTime)
                         {
@@ -267,7 +263,7 @@ namespace HSDRawViewer.Converters
                 file.WriteAttributeString("Time", "" + currTime);
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    var k = keys[i];
+                    MOT_KEY k = keys[i];
                     int j = joints[i];
 
                     file.WriteStartElement("Joint");
@@ -287,11 +283,11 @@ namespace HSDRawViewer.Converters
 
         public void ExportXML(string filename)
         {
-            XmlWriterSettings settings = new XmlWriterSettings();
+            XmlWriterSettings settings = new();
             settings.Indent = true;
             settings.IndentChars = "\t";
-            using (XmlWriter file = XmlWriter.Create(filename, settings))
-                WriteXML(file);
+            using XmlWriter file = XmlWriter.Create(filename, settings);
+            WriteXML(file);
         }
 
         private void ParseXML(XmlReader r)
@@ -333,7 +329,7 @@ namespace HSDRawViewer.Converters
                             {
                                 if (r.Name == "Joint")
                                 {
-                                    var j = new MOT_JOINT();
+                                    MOT_JOINT j = new();
 
                                     string strFlag1 = r.GetAttribute("Flag1");
                                     string strFlag2 = r.GetAttribute("Flag2");
@@ -398,42 +394,40 @@ namespace HSDRawViewer.Converters
                                         throw new NotSupportedException("No Key element defined");
                                     }
 
-                                    int index;
                                     string indexStr;
-                                    float X, Y, Z, W;
                                     string xStr, yStr, zStr, wStr;
 
                                     indexStr = r.GetAttribute("Index");
-                                    if (!int.TryParse(indexStr, out index))
+                                    if (!int.TryParse(indexStr, out int index))
                                     {
                                         throw new NotSupportedException("Unable to parse Index attribute");
                                     }
 
                                     xStr = r.GetAttribute("X");
-                                    if (!float.TryParse(xStr, out X))
+                                    if (!float.TryParse(xStr, out float X))
                                     {
                                         throw new NotSupportedException("Unable to parse X attribute");
                                     }
 
                                     yStr = r.GetAttribute("Y");
-                                    if (!float.TryParse(yStr, out Y))
+                                    if (!float.TryParse(yStr, out float Y))
                                     {
                                         throw new NotSupportedException("Unable to parse Y attribute");
                                     }
 
                                     zStr = r.GetAttribute("Z");
-                                    if (!float.TryParse(zStr, out Z))
+                                    if (!float.TryParse(zStr, out float Z))
                                     {
                                         throw new NotSupportedException("Unable to parse Z attribute");
                                     }
 
                                     wStr = r.GetAttribute("W");
-                                    if (!float.TryParse(wStr, out W))
+                                    if (!float.TryParse(wStr, out float W))
                                     {
                                         throw new NotSupportedException("Unable to parse W attribute");
                                     }
 
-                                    var key = new MOT_KEY();
+                                    MOT_KEY key = new();
                                     key.Time = time;
                                     key.X = X;
                                     key.Y = Y;
@@ -451,7 +445,7 @@ namespace HSDRawViewer.Converters
 
         private void WriteAt(BinaryWriterExt ext, int pos, int value)
         {
-            var tmp = ext.BaseStream.Position;
+            long tmp = ext.BaseStream.Position;
             ext.BaseStream.Position = pos;
 
             ext.Write(value);
@@ -463,16 +457,16 @@ namespace HSDRawViewer.Converters
         {
             r.BigEndian = true;
 
-            var start = r.Position;
+            uint start = r.Position;
 
-            var sectionCount = r.ReadInt32();
-            var sectionHeaderLength = r.ReadInt32();
+            int sectionCount = r.ReadInt32();
+            int sectionHeaderLength = r.ReadInt32();
             PlaySpeed = r.ReadSingle();
             EndTime = r.ReadSingle();
 
             for (int j = 0; j < sectionCount; j++)
             {
-                MOT_JOINT joint = new MOT_JOINT();
+                MOT_JOINT joint = new();
 
                 Joints.Add(joint);
 
@@ -480,15 +474,15 @@ namespace HSDRawViewer.Converters
                 joint.Flag2 = r.ReadByte();
                 joint.TrackFlag = (MOT_FLAGS)r.ReadUInt16();
                 joint.BoneID = r.ReadInt16();
-                var floatCount = r.ReadInt16();
+                short floatCount = r.ReadInt16();
 
                 joint.MaxTime = r.ReadSingle();
                 joint.Unknown = r.ReadInt32();
 
-                var offset1 = r.ReadUInt32() + start;
-                var offset2 = r.ReadUInt32() + start;
-                var offset3 = r.ReadUInt32() + start;
-                var offset4 = r.ReadUInt32() + start;
+                uint offset1 = r.ReadUInt32() + start;
+                uint offset2 = r.ReadUInt32() + start;
+                uint offset3 = r.ReadUInt32() + start;
+                uint offset4 = r.ReadUInt32() + start;
 
                 if (offset3 != start)
                     throw new NotSupportedException("Section 3 detected");
@@ -496,10 +490,10 @@ namespace HSDRawViewer.Converters
                 if (offset4 != start)
                     throw new NotSupportedException("Section 4 detected");
 
-                var temp = r.Position;
+                uint temp = r.Position;
                 for (uint k = 0; k < floatCount; k++)
                 {
-                    MOT_KEY key = new MOT_KEY();
+                    MOT_KEY key = new();
 
                     r.Seek(offset1 + 4 * k);
                     key.Time = r.ReadSingle();
@@ -548,7 +542,7 @@ namespace HSDRawViewer.Converters
 
         public int Unknown;
 
-        public List<MOT_KEY> Keys = new List<MOT_KEY>();
+        public List<MOT_KEY> Keys = new();
 
         public MOT_KEY GetKey(float time)
         {
@@ -562,7 +556,7 @@ namespace HSDRawViewer.Converters
                 return Keys[0];
 
             // Keys.FindIndex should not return 0 here due to above check
-            var index = Keys.FindIndex(e => e.Time > time) - 1;
+            int index = Keys.FindIndex(e => e.Time > time) - 1;
 
             // If index is negative all keys come before the provided time, pick the last one
             if (index < 0)

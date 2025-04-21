@@ -1,6 +1,8 @@
 ﻿using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Tools.Animation;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -8,8 +10,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using HSDRawViewer.GUI.Dialog;
-using HSDRawViewer.Tools.Animation;
 
 namespace HSDRawViewer.Converters
 {
@@ -19,15 +19,15 @@ namespace HSDRawViewer.Converters
         {
             [DisplayName("Use Radians"), Description("")]
             public bool UseRadians { get; set; } = true;
-            
-        
+
+
             [DisplayName("Bake Animation"), Description("")]
             public bool BakeAnimation { get; set; } = false;
         }
 
-        private static ExportSettings MayaSettings = new ExportSettings();
+        private static readonly ExportSettings MayaSettings = new();
 
-        private static Dictionary<JointTrackType, MayaAnim.TrackType> jointTrackToMayaTrack = new Dictionary<JointTrackType, MayaAnim.TrackType>()
+        private static readonly Dictionary<JointTrackType, MayaAnim.TrackType> jointTrackToMayaTrack = new()
         {
             { JointTrackType.HSD_A_J_ROTX, MayaAnim.TrackType.rotateX },
             { JointTrackType.HSD_A_J_ROTY, MayaAnim.TrackType.rotateY },
@@ -47,7 +47,7 @@ namespace HSDRawViewer.Converters
         /// <param name="nodes"></param>
         public static void ExportToMayaAnim(string filePath, JointAnimManager animation, JointMap jointMap)
         {
-            using (PropertyDialog d = new PropertyDialog("Maya Settings", MayaSettings))
+            using (PropertyDialog d = new("Maya Settings", MayaSettings))
             {
                 if (d.ShowDialog() != DialogResult.OK)
                     return;
@@ -63,28 +63,28 @@ namespace HSDRawViewer.Converters
         /// <param name="nodes"></param>
         public static void ExportToMayaAnim(string filePath, JointAnimManager animation, JointMap jointMap, ExportSettings exportSettings)
         {
-            MayaAnim a = new MayaAnim();
+            MayaAnim a = new();
 
             if (!exportSettings.UseRadians)
                 a.header.angularUnit = "deg";
 
             int nodeIndex = 0;
             int frameCount = 0;
-            foreach (var n in animation.Nodes)
+            foreach (AnimNode n in animation.Nodes)
             {
-                MayaAnim.MayaNode mnode = new MayaAnim.MayaNode();
+                MayaAnim.MayaNode mnode = new();
                 if (jointMap != null && !string.IsNullOrEmpty(jointMap[nodeIndex]))
                     mnode.name = jointMap[nodeIndex];
                 else
                     mnode.name = "JOBJ_" + nodeIndex;
                 a.Nodes.Add(mnode);
 
-                foreach (var t in n.Tracks)
+                foreach (FOBJ_Player t in n.Tracks)
                 {
                     if (!jointTrackToMayaTrack.ContainsKey(t.JointTrackType))
                         continue;
 
-                    MayaAnim.MayaTrack mtrack = new MayaAnim.MayaTrack();
+                    MayaAnim.MayaTrack mtrack = new();
                     mnode.atts.Add(mtrack);
 
                     mtrack.type = jointTrackToMayaTrack[t.JointTrackType];
@@ -114,7 +114,7 @@ namespace HSDRawViewer.Converters
                             frameCount = (int)Math.Max(frameCount, t.Keys[i].Frame);
 
                             // get current state at this key frame
-                            var state = t.GetState(t.Keys[i].Frame);
+                            FOBJAnimState state = t.GetState(t.Keys[i].Frame);
                             bool nextSlope = i + 1 < t.Keys.Count && t.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
 
                             if (t.Keys[i].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
@@ -132,7 +132,7 @@ namespace HSDRawViewer.Converters
                             }
 
                             // generate key with time and value
-                            var animkey = new MayaAnim.AnimKey()
+                            MayaAnim.AnimKey animkey = new()
                             {
                                 input = state.t0,
                                 output = state.p0,
@@ -197,27 +197,27 @@ namespace HSDRawViewer.Converters
         /// <param name="filePath"></param>
         public static JointAnimManager ImportFromMayaAnim(string filePath, JointMap jointMap)
         {
-            var mayaFile = new MayaAnim();
+            MayaAnim mayaFile = new();
             mayaFile.Open(filePath);
 
-            JointAnimManager animation = new JointAnimManager();
+            JointAnimManager animation = new();
             animation.FrameCount = mayaFile.header.endTime - mayaFile.header.startTime;
 
-            var nodeCount = jointMap == null || jointMap.Count == 0 ? mayaFile.Nodes.Count : Math.Max(mayaFile.Nodes.Count, jointMap.Count);
+            int nodeCount = jointMap == null || jointMap.Count == 0 ? mayaFile.Nodes.Count : Math.Max(mayaFile.Nodes.Count, jointMap.Count);
 
             for (int i = 0; i < nodeCount; i++)
                 animation.Nodes.Add(new AnimNode());
 
             // process and encode FOBJ keys
             int index = 0;
-            foreach (var mNode in mayaFile.Nodes)
+            foreach (MayaAnim.MayaNode mNode in mayaFile.Nodes)
             {
-                var node = animation.Nodes[index++];
+                AnimNode node = animation.Nodes[index++];
                 System.Diagnostics.Debug.WriteLine(mNode.name);
 
                 if (jointMap != null && jointMap.Count > 0)
                 {
-                    var nodeIndex = jointMap.IndexOf(mNode.name);
+                    int nodeIndex = jointMap.IndexOf(mNode.name);
 
                     if (nodeIndex != -1)
                         node = animation.Nodes[nodeIndex];
@@ -225,23 +225,23 @@ namespace HSDRawViewer.Converters
                         continue;
                 }
 
-                foreach (var mTrack in mNode.atts)
+                foreach (MayaAnim.MayaTrack mTrack in mNode.atts)
                 {
-                    FOBJ_Player t = new FOBJ_Player();
+                    FOBJ_Player t = new();
                     t.Keys = new List<FOBJKey>();
                     t.JointTrackType = jointTrackToMayaTrack.FirstOrDefault(e => e.Value == mTrack.type).Key;
 
                     System.Diagnostics.Debug.WriteLine("\t" + mTrack.type);
 
-                    var degrees = mayaFile.header.angularUnit == "deg";
-                    var trackUnit = (mTrack.IsAngular() && degrees);
+                    bool degrees = mayaFile.header.angularUnit == "deg";
+                    bool trackUnit = (mTrack.IsAngular() && degrees);
 
                     for (int i = 0; i < mTrack.keys.Count; i++)
                     {
-                        var mKey = mTrack.keys[i];
-                        var mKeyNext = i + 1 < mTrack.keys.Count ? mTrack.keys[i + 1] : mTrack.keys[i];
+                        MayaAnim.AnimKey mKey = mTrack.keys[i];
+                        MayaAnim.AnimKey mKeyNext = i + 1 < mTrack.keys.Count ? mTrack.keys[i + 1] : mTrack.keys[i];
 
-                        var k = new FOBJKey();
+                        FOBJKey k = new();
                         k.Frame = mKey.input - mayaFile.header.startTime;
                         k.Value = trackUnit ? MathHelper.DegreesToRadians(mKey.output) : mKey.output;
                         switch (mKey.outtan)
@@ -281,7 +281,7 @@ namespace HSDRawViewer.Converters
                                 {
                                     t.Keys.Add(k);
 
-                                    var slp = new FOBJKey();
+                                    FOBJKey slp = new();
                                     slp.Frame = mKeyNext.input - 1;
                                     slp.InterpolationType = GXInterpolationType.HSD_A_OP_SLP;
                                     slp.Tan = AngleToTan(mKey.t2, degrees);
@@ -455,7 +455,7 @@ namespace HSDRawViewer.Converters
             public OutputType output;
             public InfinityType preInfinity, postInfinity;
             public bool weighted = false;
-            public List<AnimKey> keys = new List<AnimKey>();
+            public List<AnimKey> keys = new();
 
             public MayaTrack()
             {
@@ -477,11 +477,11 @@ namespace HSDRawViewer.Converters
         public class MayaNode
         {
             public string name;
-            public List<MayaTrack> atts = new List<MayaTrack>();
+            public List<MayaTrack> atts = new();
         }
 
         public Header header;
-        public List<MayaNode> Nodes = new List<MayaNode>();
+        public List<MayaNode> Nodes = new();
 
         public MayaAnim()
         {
@@ -490,171 +490,167 @@ namespace HSDRawViewer.Converters
 
         public void Open(string fileName)
         {
-            using (StreamReader r = new StreamReader(new FileStream(fileName, FileMode.Open)))
+            using StreamReader r = new(new FileStream(fileName, FileMode.Open));
+            MayaTrack currentData = null;
+            while (!r.EndOfStream)
             {
-                MayaTrack currentData = null;
-                while (!r.EndOfStream)
+                string line = r.ReadLine();
+                string[] args = line.Trim().Replace(";", "").Split(' ');
+
+                switch (args[0])
                 {
-                    var line = r.ReadLine();
-                    var args = line.Trim().Replace(";", "").Split(' ');
+                    case "animVersion":
+                        header.animVersion = float.Parse(args[1]);
+                        break;
+                    case "mayaVersion":
+                        header.mayaVersion = args[1];
+                        break;
+                    case "timeUnit":
+                        header.timeUnit = args[1];
+                        break;
+                    case "linearUnit":
+                        header.linearUnit = args[1];
+                        break;
+                    case "angularUnit":
+                        header.angularUnit = args[1];
+                        break;
+                    case "startTime":
+                        header.startTime = float.Parse(args[1]);
+                        break;
+                    case "endTime":
+                        header.endTime = float.Parse(args[1]);
+                        break;
+                    case "anim":
+                        string nodeName = "";
+                        if (args.Length == 7)
+                            nodeName = args[3];
+                        else
+                            nodeName = args[1];
+                        MayaNode currentNode = Nodes.Find(e => e.name.Equals(nodeName));
+                        if (currentNode == null)
+                        {
+                            currentNode = new MayaNode();
+                            currentNode.name = nodeName;
+                            Nodes.Add(currentNode);
+                        }
+                        currentData = new MayaTrack();
+                        if (args.Length == 7)
+                        {
+                            //currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
+                            currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
+                            currentNode.atts.Add(currentData);
+                        }
+                        break;
+                    case "animData":
+                        if (currentData == null)
+                            continue;
+                        string dataLine = r.ReadLine();
+                        while (!dataLine.Contains("}"))
+                        {
+                            string[] dataArgs = dataLine.Trim().Replace(";", "").Split(' ');
+                            switch (dataArgs[0])
+                            {
+                                case "input":
+                                    currentData.input = (InputType)Enum.Parse(typeof(InputType), dataArgs[1]);
+                                    break;
+                                case "output":
+                                    currentData.output = (OutputType)Enum.Parse(typeof(OutputType), dataArgs[1]);
+                                    break;
+                                case "weighted":
+                                    currentData.weighted = dataArgs[1] == "1";
+                                    break;
+                                case "preInfinity":
+                                    currentData.preInfinity = (InfinityType)Enum.Parse(typeof(InfinityType), dataArgs[1]);
+                                    break;
+                                case "postInfinity":
+                                    currentData.postInfinity = (InfinityType)Enum.Parse(typeof(InfinityType), dataArgs[1]);
+                                    break;
+                                case "keys":
+                                    string keyLine = r.ReadLine();
+                                    while (!keyLine.Contains('}'))
+                                    {
+                                        string[] keyArgs = keyLine.Trim().Replace(";", "").Split(' ');
 
-                    switch (args[0])
-                    {
-                        case "animVersion":
-                            header.animVersion = float.Parse(args[1]);
-                            break;
-                        case "mayaVersion":
-                            header.mayaVersion = args[1];
-                            break;
-                        case "timeUnit":
-                            header.timeUnit = args[1];
-                            break;
-                        case "linearUnit":
-                            header.linearUnit = args[1];
-                            break;
-                        case "angularUnit":
-                            header.angularUnit = args[1];
-                            break;
-                        case "startTime":
-                            header.startTime = float.Parse(args[1]);
-                            break;
-                        case "endTime":
-                            header.endTime = float.Parse(args[1]);
-                            break;
-                        case "anim":
-                            var nodeName = "";
-                            if (args.Length == 7)
-                                nodeName = args[3];
-                            else
-                                nodeName = args[1];
-                            var currentNode = Nodes.Find(e => e.name.Equals(nodeName));
-                            if (currentNode == null)
-                            {
-                                currentNode = new MayaNode();
-                                currentNode.name = nodeName;
-                                Nodes.Add(currentNode);
-                            }
-                            currentData = new MayaTrack();
-                            if (args.Length == 7)
-                            {
-                                //currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
-                                currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
-                                currentNode.atts.Add(currentData);
-                            }
-                            break;
-                        case "animData":
-                            if (currentData == null)
-                                continue;
-                            string dataLine = r.ReadLine();
-                            while (!dataLine.Contains("}"))
-                            {
-                                var dataArgs = dataLine.Trim().Replace(";", "").Split(' ');
-                                switch (dataArgs[0])
-                                {
-                                    case "input":
-                                        currentData.input = (InputType)Enum.Parse(typeof(InputType), dataArgs[1]);
-                                        break;
-                                    case "output":
-                                        currentData.output = (OutputType)Enum.Parse(typeof(OutputType), dataArgs[1]);
-                                        break;
-                                    case "weighted":
-                                        currentData.weighted = dataArgs[1] == "1";
-                                        break;
-                                    case "preInfinity":
-                                        currentData.preInfinity = (InfinityType)Enum.Parse(typeof(InfinityType), dataArgs[1]);
-                                        break;
-                                    case "postInfinity":
-                                        currentData.postInfinity = (InfinityType)Enum.Parse(typeof(InfinityType), dataArgs[1]);
-                                        break;
-                                    case "keys":
-                                        string keyLine = r.ReadLine();
-                                        while (!keyLine.Contains("}"))
+                                        AnimKey key = new()
                                         {
-                                            var keyArgs = keyLine.Trim().Replace(";", "").Split(' ');
+                                            input = float.Parse(keyArgs[0]),
+                                            output = float.Parse(keyArgs[1])
+                                        };
 
-                                            var key = new AnimKey()
-                                            {
-                                                input = float.Parse(keyArgs[0]),
-                                                output = float.Parse(keyArgs[1])
-                                            };
-
-                                            if (keyArgs.Length >= 7)
-                                            {
-                                                key.intan = keyArgs[2];
-                                                key.outtan = keyArgs[3];
-                                            }
-
-                                            if (keyArgs.Length > 8)
-                                            {
-                                                key.t1 = float.Parse(keyArgs[7]);
-                                                key.w1 = float.Parse(keyArgs[8]);
-                                            }
-                                            if (keyArgs.Length > 10)
-                                            {
-                                                key.t2 = float.Parse(keyArgs[9]);
-                                                key.w2 = float.Parse(keyArgs[10]);
-                                            }
-
-                                            if (key.input <= header.endTime)
-                                                currentData.keys.Add(key);
-
-                                            keyLine = r.ReadLine();
+                                        if (keyArgs.Length >= 7)
+                                        {
+                                            key.intan = keyArgs[2];
+                                            key.outtan = keyArgs[3];
                                         }
-                                        break;
 
-                                }
-                                dataLine = r.ReadLine();
+                                        if (keyArgs.Length > 8)
+                                        {
+                                            key.t1 = float.Parse(keyArgs[7]);
+                                            key.w1 = float.Parse(keyArgs[8]);
+                                        }
+                                        if (keyArgs.Length > 10)
+                                        {
+                                            key.t2 = float.Parse(keyArgs[9]);
+                                            key.w2 = float.Parse(keyArgs[10]);
+                                        }
+
+                                        if (key.input <= header.endTime)
+                                            currentData.keys.Add(key);
+
+                                        keyLine = r.ReadLine();
+                                    }
+                                    break;
+
                             }
-                            break;
-                    }
+                            dataLine = r.ReadLine();
+                        }
+                        break;
                 }
             }
         }
 
         public void Save(string fileName)
         {
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(fileName))
+            using System.IO.StreamWriter file = new(fileName);
+            file.WriteLine("animVersion " + header.animVersion + ";");
+            file.WriteLine("mayaVersion " + header.mayaVersion + ";");
+            file.WriteLine("timeUnit " + header.timeUnit + ";");
+            file.WriteLine("linearUnit " + header.linearUnit + ";");
+            file.WriteLine("angularUnit " + header.angularUnit + ";");
+            file.WriteLine("startTime " + header.startTime + ";");
+            file.WriteLine("endTime " + header.endTime + ";");
+
+            int Row = 0;
+
+            foreach (MayaNode animBone in Nodes)
             {
-                file.WriteLine("animVersion " + header.animVersion + ";");
-                file.WriteLine("mayaVersion " + header.mayaVersion + ";");
-                file.WriteLine("timeUnit " + header.timeUnit + ";");
-                file.WriteLine("linearUnit " + header.linearUnit + ";");
-                file.WriteLine("angularUnit " + header.angularUnit + ";");
-                file.WriteLine("startTime " + header.startTime + ";");
-                file.WriteLine("endTime " + header.endTime + ";");
-
-                int Row = 0;
-
-                foreach (MayaNode animBone in Nodes)
+                int TrackIndex = 0;
+                if (animBone.atts.Count == 0)
                 {
-                    int TrackIndex = 0;
-                    if (animBone.atts.Count == 0)
-                    {
-                        file.WriteLine($"anim {animBone.name} 0 1 {TrackIndex++};");
-                    }
-                    foreach (MayaTrack animData in animBone.atts)
-                    {
-                        file.WriteLine($"anim {animData.controlType}.{animData.type} {animData.type} {animBone.name} 0 1 {TrackIndex++};");
-                        file.WriteLine("animData {");
-                        file.WriteLine($" input {animData.input};");
-                        file.WriteLine($" output {animData.output};");
-                        file.WriteLine($" weighted {(animData.weighted ? 1 : 0)};");
-                        file.WriteLine($" preInfinity {animData.preInfinity};");
-                        file.WriteLine($" postInfinity {animData.postInfinity};");
-
-                        file.WriteLine(" keys {");
-                        foreach (AnimKey key in animData.keys)
-                        {
-                            string tanin = key.intan == "spline" || key.intan == "fixed" || key.intan == "auto" ? " " + key.t1 + " " + key.w1 : "";
-                            string tanout = key.intan == "spline" || key.outtan == "fixed" || key.outtan == "auto" ? " " + key.t2 + " " + key.w2 : "";
-                            file.WriteLine($" {key.input} {key.output:N6} {key.intan} {key.outtan} 1 1 0{tanin}{tanout};");
-                        }
-                        file.WriteLine(" }");
-
-                        file.WriteLine("}");
-                    }
-                    Row++;
+                    file.WriteLine($"anim {animBone.name} 0 1 {TrackIndex++};");
                 }
+                foreach (MayaTrack animData in animBone.atts)
+                {
+                    file.WriteLine($"anim {animData.controlType}.{animData.type} {animData.type} {animBone.name} 0 1 {TrackIndex++};");
+                    file.WriteLine("animData {");
+                    file.WriteLine($" input {animData.input};");
+                    file.WriteLine($" output {animData.output};");
+                    file.WriteLine($" weighted {(animData.weighted ? 1 : 0)};");
+                    file.WriteLine($" preInfinity {animData.preInfinity};");
+                    file.WriteLine($" postInfinity {animData.postInfinity};");
+
+                    file.WriteLine(" keys {");
+                    foreach (AnimKey key in animData.keys)
+                    {
+                        string tanin = key.intan == "spline" || key.intan == "fixed" || key.intan == "auto" ? " " + key.t1 + " " + key.w1 : "";
+                        string tanout = key.intan == "spline" || key.outtan == "fixed" || key.outtan == "auto" ? " " + key.t2 + " " + key.w2 : "";
+                        file.WriteLine($" {key.input} {key.output:N6} {key.intan} {key.outtan} 1 1 0{tanin}{tanout};");
+                    }
+                    file.WriteLine(" }");
+
+                    file.WriteLine("}");
+                }
+                Row++;
             }
         }
 

@@ -1,17 +1,14 @@
 ﻿using HSDRaw.Common;
-using HSDRawViewer.Rendering.Shaders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
-using HSDRawViewer.Rendering.GX;
-using OpenTK.Mathematics;
-using System.Drawing;
-using HSDRaw.GX;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.Rendering.GX;
+using HSDRawViewer.Rendering.Shaders;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace HSDRawViewer.Rendering.Models
 {
@@ -40,13 +37,13 @@ namespace HSDRawViewer.Rendering.Models
         private RenderLObj[] _lights { get; } = new RenderLObj[MAX_LIGHTS];
         private RenderLObj[] _cameraLights { get; } = new RenderLObj[]
         {
-            new RenderLObj()
+            new()
             {
                 Enabled = true,
                 Type = LObjType.AMBIENT,
                 _color = new Vector4(179, 179, 179, 255) / 255f,
             },
-            new RenderLObj()
+            new()
             {
                 Enabled = true,
                 Type = LObjType.INFINITE,
@@ -63,22 +60,22 @@ namespace HSDRawViewer.Rendering.Models
         public Vector3 OverlayColor { get; set; } = Vector3.One;
 
 
-        private Dictionary<byte[], int> imageBufferTextureIndex = new Dictionary<byte[], int>();
+        private readonly Dictionary<byte[], int> imageBufferTextureIndex = new();
 
         /// <summary>
         /// collection of renderable dobjs
         /// </summary>
-        private List<RenderDObj> RenderDobjs = new List<RenderDObj>();
+        private List<RenderDObj> RenderDobjs = new();
 
         /// <summary>
         /// For managing opengl buffers
         /// </summary>
-        private VertexBufferManager BufferManager = new VertexBufferManager();
+        private readonly VertexBufferManager BufferManager = new();
 
         /// <summary>
         /// For managing opengl textures
         /// </summary>
-        private TextureManager TextureManager = new TextureManager();
+        private readonly TextureManager TextureManager = new();
 
         /// <summary>
         /// 
@@ -147,7 +144,7 @@ namespace HSDRawViewer.Rendering.Models
                 RenderDobjs[dobj_index].MaterialState.ApplyAnim(tracks, frame);
 
                 int ti = 0;
-                foreach (var t in textureStates)
+                foreach (List<FOBJ_Player> t in textureStates)
                 {
                     if (ti >= RenderDobjs[dobj_index].TextureStates.Length)
                         break;
@@ -254,7 +251,7 @@ namespace HSDRawViewer.Rendering.Models
         public void ResetDefaultStateMaterial()
         {
             // reset materials
-            foreach (var d in RenderDobjs)
+            foreach (RenderDObj d in RenderDobjs)
                 d.ResetMaterialState();
         }
 
@@ -293,13 +290,13 @@ namespace HSDRawViewer.Rendering.Models
         public void InvalidateDObjOrder()
         {
             // determine new order
-            Dictionary<HSD_DOBJ, int> newOrder = new Dictionary<HSD_DOBJ, int>(RenderDobjs.Count);
+            Dictionary<HSD_DOBJ, int> newOrder = new(RenderDobjs.Count);
             int i = 0;
-            foreach (var j in RootJObj?.Enumerate)
+            foreach (LiveJObj j in RootJObj?.Enumerate)
             {
                 if (j.Desc.Dobj == null)
                     continue;
-                foreach (var d in j.Desc.Dobj.List)
+                foreach (HSD_DOBJ d in j.Desc.Dobj.List)
                     newOrder.Add(d, i++);
             }
 
@@ -307,7 +304,7 @@ namespace HSDRawViewer.Rendering.Models
             RenderDobjs = RenderDobjs.OrderBy(e => newOrder[e._dobj]).ToList();
 
             // update display index
-            foreach (var d in RenderDobjs)
+            foreach (RenderDObj d in RenderDobjs)
                 d.DisplayIndex = d.Parent.Desc.Dobj.List.IndexOf(d._dobj);
         }
 
@@ -325,22 +322,22 @@ namespace HSDRawViewer.Rendering.Models
             _shader = new GXShader();
 
             // initial dobj cache
-            foreach (var j in RootJObj?.Enumerate)
+            foreach (LiveJObj j in RootJObj?.Enumerate)
             {
                 if (j.Desc.Dobj == null)
                     continue;
 
                 // initialize all dobjs
-                foreach (var d in j.Desc.Dobj.List)
+                foreach (HSD_DOBJ d in j.Desc.Dobj.List)
                 {
-                    var dob = new RenderDObj(j, d);
+                    RenderDObj dob = new(j, d);
                     dob.InitializeBufferData(BufferManager);
                     RenderDobjs.Add(dob);
 
                     // preload textures
                     if (d.Mobj != null && d.Mobj.Textures != null)
                     {
-                        foreach (var t in d.Mobj.Textures.List)
+                        foreach (HSD_TOBJ t in d.Mobj.Textures.List)
                         {
                             PreLoadTexture(t);
                         }
@@ -389,7 +386,7 @@ namespace HSDRawViewer.Rendering.Models
             // recalculate transforms
             if (update)
             {
-                var temp = RootJObj.Scale;
+                Vector3 temp = RootJObj.Scale;
                 RootJObj.Scale *= ModelScale;
                 RootJObj.RecalculateTransforms(camera, true);
                 RootJObj.Scale = temp;
@@ -460,7 +457,7 @@ namespace HSDRawViewer.Rendering.Models
             // draw lights
             if (_settings.RenderCustomLightPositions && _settings.LightSource == LightRenderMode.Custom)
             {
-                foreach (var l in _settings._lights)
+                foreach (RenderLObj l in _settings._lights)
                 {
                     if (l.Enabled && l.Type != LObjType.AMBIENT)
                         DrawShape.DrawSphere(Matrix4.CreateTranslation(l._position), 1, 10, 10, l._color.Xyz, 1);
@@ -479,7 +476,7 @@ namespace HSDRawViewer.Rendering.Models
             if (UpdateMaterialFrame)
             {
                 // apply animation to all render dobjs
-                foreach (var v in RenderDobjs)
+                foreach (RenderDObj v in RenderDobjs)
                 {
                     // get material state
                     LiveMaterial state = v.MaterialState;
@@ -490,11 +487,11 @@ namespace HSDRawViewer.Rendering.Models
                     if (v._dobj.Mobj.Textures != null)
                     {
                         int ti = 0;
-                        foreach (var i in v._dobj.Mobj.Textures.List)
+                        foreach (HSD_TOBJ i in v._dobj.Mobj.Textures.List)
                         {
                             if (ti < v.TextureStates.Length)
                             {
-                                var ts = v.TextureStates[ti];
+                                LiveTObj ts = v.TextureStates[ti];
 
                                 MatAnim.GetTextureAnimState(i.TexMapID, v.JointIndex, v.DisplayIndex, ref ts);
 
@@ -538,14 +535,14 @@ namespace HSDRawViewer.Rendering.Models
         private void RenderJObjDisplay(Camera camera)
         {
             // render opaque dobjs first
-            foreach (var opa in RenderDobjs.Where(e => !e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) && e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.OPA)))
+            foreach (RenderDObj opa in RenderDobjs.Where(e => !e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) && e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.OPA)))
             {
                 if (DisplayObject(opa.Visible, opa.Selected) && opa.Parent.BranchVisible)
                     RenderDOBJShader(opa);
             }
 
             // render sorted xlu objects last
-            foreach (var xlu in RenderDobjs.Where(e => 
+            foreach (RenderDObj xlu in RenderDobjs.Where(e =>
                 e._dobj.Mobj.RenderFlags.HasFlag(RENDER_MODE.XLU) &&
                 (e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.XLU) || e.Parent.Desc.Flags.HasFlag(JOBJ_FLAG.TEXEDGE))
                 ))
@@ -557,7 +554,7 @@ namespace HSDRawViewer.Rendering.Models
             // render selection outline
             GL.DepthFunc(DepthFunction.Always);
             if (_settings.OutlineSelected)
-                foreach (var i in RenderDobjs.Where(e => e.Selected))
+                foreach (RenderDObj i in RenderDobjs.Where(e => e.Selected))
                 {
                     RenderDOBJShader(i, true);
                 }
@@ -599,10 +596,10 @@ namespace HSDRawViewer.Rendering.Models
             if (BufferManager.EnableBuffers(_shader, dobj._dobj, (int)shapeBlend, (int)shapeBlend + 1, shapeBlend - (int)shapeBlend))
             {
                 // render pobjs
-                foreach (var p in dobj.PObjs)
+                foreach (RenderPObj p in dobj.PObjs)
                 {
                     // get flags
-                    var pobjflags = p.pobj.Flags;
+                    POBJ_FLAG pobjflags = p.pobj.Flags;
 
                     // load envelopes
                     GL.Uniform1(_shader.GetVertexAttributeUniformLocation("envelopeIndex"), p.Envelopes.Length, ref p.Envelopes[0]);
@@ -643,7 +640,7 @@ namespace HSDRawViewer.Rendering.Models
                     }
 
                     // draw display lists
-                    foreach (var dl in p.DisplayLists)
+                    foreach (CachedDL dl in p.DisplayLists)
                         GL.DrawArrays(dl.PrimType, dl.Offset, dl.Count);
                 }
             }
@@ -658,10 +655,10 @@ namespace HSDRawViewer.Rendering.Models
             if (dobj == null && dobj._dobj != null && dobj._dobj.Mobj != null)
                 return;
 
-            var mobj = dobj._dobj.Mobj;
-            var MaterialState = dobj.MaterialState;
-            var textureStates = dobj.TextureStates;
-            var parentJOBJ = dobj.Parent.Desc;
+            HSD_MOBJ mobj = dobj._dobj.Mobj;
+            LiveMaterial MaterialState = dobj.MaterialState;
+            LiveTObj[] textureStates = dobj.TextureStates;
+            HSD_JOBJ parentJOBJ = dobj.Parent.Desc;
 
             // init GL state
             GL.Enable(EnableCap.Texture2D);
@@ -688,7 +685,7 @@ namespace HSDRawViewer.Rendering.Models
             _shader.SetFloat("alpha", MaterialState.Alpha);
 
             // pixel processing
-            var pp = mobj.PEDesc;
+            HSD_PEDesc pp = mobj.PEDesc;
             if (pp != null)
             {
                 GL.BlendFunc(GXTranslator.toBlendingFactor(pp.SrcFactor), GXTranslator.toBlendingFactor(pp.DstFactor));
@@ -702,7 +699,7 @@ namespace HSDRawViewer.Rendering.Models
             }
 
             // all flag
-            var enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);
+            bool enableAll = mobj.RenderFlags.HasFlag(RENDER_MODE.DF_ALL);
 
             _shader.SetBoolToInt("no_zupdate", mobj.RenderFlags.HasFlag(RENDER_MODE.NO_ZUPDATE));
             _shader.SetBoolToInt("enableSpecular", parentJOBJ.Flags.HasFlag(JOBJ_FLAG.SPECULAR) && mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
@@ -721,7 +718,7 @@ namespace HSDRawViewer.Rendering.Models
             // Bind Textures
             if (mobj.Textures != null)
             {
-                var textures = mobj.Textures.List;
+                List<HSD_TOBJ> textures = mobj.Textures.List;
                 for (int i = 0; i < textures.Count; i++)
                 {
                     // make sure texture is not out of supported range
@@ -729,8 +726,8 @@ namespace HSDRawViewer.Rendering.Models
                         break;
 
                     // get texture
-                    var tex = textures[i];
-                    var tev = tex.TEV;
+                    HSD_TOBJ tex = textures[i];
+                    HSD_TOBJ_TEV tev = tex.TEV;
 
                     // texture state info
                     HSD_TOBJ displayTex;
@@ -776,7 +773,7 @@ namespace HSDRawViewer.Rendering.Models
                     PreLoadTexture(displayTex);
 
                     // grab texture id
-                    var texid = TextureManager.GetGLID(imageBufferTextureIndex[displayTex.ImageData.ImageData]);
+                    int texid = TextureManager.GetGLID(imageBufferTextureIndex[displayTex.ImageData.ImageData]);
 
                     // set texture
                     GL.ActiveTexture(TextureUnit.Texture0 + i);
@@ -792,7 +789,7 @@ namespace HSDRawViewer.Rendering.Models
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, tex.LOD.Bias); //640×548
                     }
 
-                    var flags = tex.Flags;
+                    TOBJ_FLAGS flags = tex.Flags;
 
                     int coordType = (int)flags & 0xF;
                     int colorOP = ((int)flags >> 16) & 0xF;
@@ -857,11 +854,11 @@ namespace HSDRawViewer.Rendering.Models
         {
             if (!imageBufferTextureIndex.ContainsKey(tobj.ImageData.ImageData))
             {
-                var rawImageData = tobj.ImageData.ImageData;
-                var width = tobj.ImageData.Width;
-                var height = tobj.ImageData.Height;
+                byte[] rawImageData = tobj.ImageData.ImageData;
+                short width = tobj.ImageData.Width;
+                short height = tobj.ImageData.Height;
 
-                List<byte[]> mips = new List<byte[]>();
+                List<byte[]> mips = new();
 
                 if (tobj.LOD != null && tobj.ImageData.MaxLOD != 0)
                 {
@@ -873,7 +870,7 @@ namespace HSDRawViewer.Rendering.Models
                     mips.Add(tobj.GetDecodedImageData());
                 }
 
-                var index = TextureManager.Add(mips, width, height);
+                int index = TextureManager.Add(mips, width, height);
 
                 imageBufferTextureIndex.Add(rawImageData, index);
             }
@@ -900,7 +897,7 @@ namespace HSDRawViewer.Rendering.Models
 
             // update shader bone transforms
             int i = 0;
-            foreach (var v in RootJObj.Enumerate)
+            foreach (LiveJObj v in RootJObj.Enumerate)
             {
                 if (i < Shader.MAX_BONES)
                 {
@@ -933,7 +930,7 @@ namespace HSDRawViewer.Rendering.Models
             if (_settings.RenderOrientation)
                 mag = 2; //Vector3.TransformPosition(new Vector3(1, 0, 0), camera.MvpMatrix.Inverted()).Length / 30;
 
-            foreach (var b in RootJObj.Enumerate)
+            foreach (LiveJObj b in RootJObj.Enumerate)
                 RenderBone(mag, b, b.Desc.Equals(SelectedJObj));
 
             GL.PopAttrib();
@@ -952,8 +949,8 @@ namespace HSDRawViewer.Rendering.Models
             {
                 Matrix4 parentTransform = jobj.Parent.WorldTransform;
 
-                var bonePosition = transform.ExtractTranslation();
-                var parentPosition = parentTransform.ExtractTranslation();
+                Vector3 bonePosition = transform.ExtractTranslation();
+                Vector3 parentPosition = parentTransform.ExtractTranslation();
 
                 GL.LineWidth(1f);
                 GL.Begin(PrimitiveType.Lines);
@@ -1010,7 +1007,7 @@ namespace HSDRawViewer.Rendering.Models
             if (RootJObj == null)
                 return;
 
-            foreach (var j in RootJObj.Enumerate)
+            foreach (LiveJObj j in RootJObj.Enumerate)
                 if (j.Desc.Spline != null)
                     DrawShape.RenderSpline(j.WorldTransform, j.Desc.Spline, Color.Yellow, Color.Blue);
         }
@@ -1020,7 +1017,7 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public void ClearDObjSelection()
         {
-            foreach (var d in RenderDobjs)
+            foreach (RenderDObj d in RenderDobjs)
                 d.Selected = false;
         }
 

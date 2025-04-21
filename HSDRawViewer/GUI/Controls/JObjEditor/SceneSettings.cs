@@ -1,5 +1,4 @@
 ﻿using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using System.IO;
 using YamlDotNet.Serialization;
@@ -35,7 +34,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <returns></returns>
         public static SceneSettings Deserialize(string filePath)
         {
-            var deserializer = new DeserializerBuilder()
+            IDeserializer deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .IgnoreUnmatchedProperties()
             .Build();
@@ -49,13 +48,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="filepath"></param>
         public void Serialize(string filepath)
         {
-            var builder = new SerializerBuilder();
+            SerializerBuilder builder = new();
             builder.WithNamingConvention(CamelCaseNamingConvention.Instance);
 
-            using (StreamWriter writer = File.CreateText(filepath))
-            {
-                builder.Build().Serialize(writer, this);
-            }
+            using StreamWriter writer = File.CreateText(filepath);
+            builder.Build().Serialize(writer, this);
         }
     }
 }

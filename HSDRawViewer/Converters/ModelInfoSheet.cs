@@ -1,13 +1,7 @@
 ﻿using HSDRaw.Common;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace HSDRawViewer.Converters
 {
@@ -28,9 +22,9 @@ namespace HSDRawViewer.Converters
 
     public class ModelInfoSheet
     {
-        private HashSet<byte[]> textures = new HashSet<byte[]>();
+        private readonly HashSet<byte[]> textures = new();
 
-        public List<MI_Object> Objects { get; set; } = new List<MI_Object>(); 
+        public List<MI_Object> Objects { get; set; } = new List<MI_Object>();
 
         /// <summary>
         /// 
@@ -47,15 +41,15 @@ namespace HSDRawViewer.Converters
         private void ParseJoint(HSD_JOBJ jobj)
         {
             int ji = 0;
-            foreach (var j in jobj.TreeList)
+            foreach (HSD_JOBJ j in jobj.TreeList)
             {
                 if (j.Dobj != null)
                 {
-                    var di = 0;
-                    foreach (var dobj in j.Dobj.List)
+                    int di = 0;
+                    foreach (HSD_DOBJ dobj in j.Dobj.List)
                     {
-                        var mobj = dobj.Mobj;
-                        var mat = mobj.Material;
+                        HSD_MOBJ mobj = dobj.Mobj;
+                        HSD_Material mat = mobj.Material;
                         Objects.Add(new MI_Object()
                         {
                             Name = $"Joint_{ji}_Object_{di}",
@@ -78,11 +72,11 @@ namespace HSDRawViewer.Converters
         /// <param name="texture"></param>
         private void ProcessTexture(HSD_TOBJ texture)
         {
-            foreach (var t in texture.List)
+            foreach (HSD_TOBJ t in texture.List)
             {
                 if (t.ImageData != null && t.ImageData.ImageData != null && !textures.Contains(t.ImageData.ImageData))
                 {
-                    var name = $"Texture_{textures.Count}_{t.ImageData.Format}";
+                    //string name = $"Texture_{textures.Count}_{t.ImageData.Format}";
                     textures.Add(t.ImageData.ImageData);
                 }
             }

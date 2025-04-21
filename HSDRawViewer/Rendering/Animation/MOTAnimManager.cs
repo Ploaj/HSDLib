@@ -1,9 +1,9 @@
 ﻿using HSDRawViewer.Converters;
-using System;
-using OpenTK.Mathematics;
-using System.Diagnostics;
-using System.Collections.Generic;
 using HSDRawViewer.Rendering.Models;
+using OpenTK.Mathematics;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace HSDRawViewer.Rendering
 {
@@ -17,20 +17,20 @@ namespace HSDRawViewer.Rendering
 
         public override void ApplyAnimation(LiveJObj jobj, float frame)
         {
-            foreach (var v in jobj.Enumerate)
+            foreach (LiveJObj v in jobj.Enumerate)
                 ApplyAnimation0(v, frame);
         }
 
         private void ApplyAnimation0(LiveJObj jobj, float frame)
         {
-            var joints = _motFile.Joints.FindAll(
-                e => e.BoneID >= 0 && 
-                e.BoneID < _motJointTable.Length && 
+            List<MOT_JOINT> joints = _motFile.Joints.FindAll(
+                e => e.BoneID >= 0 &&
+                e.BoneID < _motJointTable.Length &&
                 _motJointTable[e.BoneID] == jobj.Index);
 
-            foreach (var j in joints)
+            foreach (MOT_JOINT j in joints)
             {
-                var key = j.GetKey(frame / 60f);
+                MOT_KEY key = j.GetKey(frame / 60f);
                 if (key == null)
                 {
                     continue;
@@ -46,8 +46,8 @@ namespace HSDRawViewer.Rendering
                 }
                 if (j.TrackFlag.HasFlag(MOT_FLAGS.ROTATE))
                 {
-                    var dir = new Vector3(key.X, key.Y, key.Z);
-                    var angle = key.W;
+                    Vector3 dir = new(key.X, key.Y, key.Z);
+                    float angle = key.W;
 
                     ///
                     //var local_2a4 = new Vector3(org_axis_vector.X, org_axis_vector.Y, org_axis_vector.Z);
@@ -88,7 +88,7 @@ namespace HSDRawViewer.Rendering
 
                     {
                         jobj.Rotation.Z = (float)Math.Atan2(key.Y, key.X);
-                        var len = Math.Sqrt(key.Y * key.Y + key.X * key.X);
+                        double len = Math.Sqrt(key.Y * key.Y + key.X * key.X);
                         jobj.Rotation.Y = (float)Math.Atan2(-key.Z, len);
                         jobj.Rotation.X = key.W * (float)Math.PI / 180;
                     }
@@ -137,18 +137,19 @@ namespace HSDRawViewer.Rendering
         {
             FrameCount = endFrame - startFrame;
             _motFile.EndTime = 0f;
-            foreach (var j in _motFile.Joints)
+            foreach (MOT_JOINT j in _motFile.Joints)
             {
-                var startKey = j.GetKey(startFrame / 60f);
-                var endKey = j.GetKey(endFrame / 60f);
-                var middleKeys = j.Keys.FindAll(k => k.Time >= startFrame / 60f && k.Time <= endFrame / 60f);
+                MOT_KEY startKey = j.GetKey(startFrame / 60f);
+                MOT_KEY endKey = j.GetKey(endFrame / 60f);
+                List<MOT_KEY> middleKeys = j.Keys.FindAll(k => k.Time >= startFrame / 60f && k.Time <= endFrame / 60f);
 
                 j.Keys = new List<MOT_KEY>();
                 if (middleKeys.Count == 0)
                 {
                     j.Keys.Add(startKey);
                     j.Keys.Add(endKey);
-                } else
+                }
+                else
                 {
                     if (middleKeys[0].Time - startKey.Time > 0.001)
                     {
@@ -164,7 +165,7 @@ namespace HSDRawViewer.Rendering
                 }
 
                 Debug.Assert(j.Keys.Count > 0);
-                foreach (var k in j.Keys)
+                foreach (MOT_KEY k in j.Keys)
                 {
                     k.Time -= startFrame / 60f;
                 }

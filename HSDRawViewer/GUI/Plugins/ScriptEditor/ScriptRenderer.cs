@@ -2,7 +2,6 @@
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
-using HSDRaw.Tools.Melee;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
@@ -12,10 +11,7 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.SubactionEditor
@@ -25,11 +21,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
     /// </summary>
     public class ModelPartAnimations
     {
-        private byte[] Entries;
+        private readonly byte[] Entries;
 
-        private JointAnimManager[] Anims;
+        private readonly JointAnimManager[] Anims;
 
-        private int StartBone;
+        private readonly int StartBone;
 
         public int AnimIndex { get; set; } = -1;
 
@@ -55,12 +51,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (AnimIndex < 0 || AnimIndex >= Anims.Length)
                 return;
 
-            var anim = Anims[AnimIndex];
+            JointAnimManager anim = Anims[AnimIndex];
 
-            foreach (var e in Entries)
+            foreach (byte e in Entries)
             {
                 // get this joint at index
-                var joint = root.GetJObjAtIndex(e);
+                LiveJObj joint = root.GetJObjAtIndex(e);
 
                 if (joint != null)
                 {
@@ -68,7 +64,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     int index = e - StartBone;
                     if (index < anim.Nodes.Count)
                     {
-                        var node = anim.Nodes[index];
+                        AnimNode node = anim.Nodes[index];
 
                         // check if node is animated
                         if (node.Tracks.Count > 0)
@@ -118,38 +114,38 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public bool RenderBones { get => FighterModel._settings.RenderBones; set => FighterModel._settings.RenderBones = value; }
 
-        public List<SBM_Hurtbox> Hurtboxes = new List<SBM_Hurtbox>();
+        public List<SBM_Hurtbox> Hurtboxes = new();
 
-        public List<ModelPartAnimations> ModelPartsIndices = new List<ModelPartAnimations>();
+        public List<ModelPartAnimations> ModelPartsIndices = new();
 
 
         public RenderJObj FighterModel { get; internal set; }
-        private RenderJObj ItemModel;
+        private readonly RenderJObj ItemModel;
 
-        private RenderJObj ThrowDummyModel;
-        private JointAnimManager ThrowDummyAnim;
-        private static byte[] ThrowDummyLookup = new byte[]
+        private readonly RenderJObj ThrowDummyModel;
+        private readonly JointAnimManager ThrowDummyAnim;
+        private static readonly byte[] ThrowDummyLookup = new byte[]
         {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x35, 0x36, 0x37, 0x38, 0x39, 0xFF, 0xFF, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0xFF, 0x13, 0x14, 0x16, 0x17, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x3B, 0x3C, 0x00, 0x00
         };
-        private static byte[] ThrowDummyHide = new byte[]
+        private static readonly byte[] ThrowDummyHide = new byte[]
         {
             0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34
         };
 
-        private HurtboxRenderer HurtboxRenderer = new HurtboxRenderer();
+        private readonly HurtboxRenderer HurtboxRenderer = new();
 
-        private Vector3[] PreviousHitboxPositions = new Vector3[SubactionProcessor.MaxHitboxCount];
-        private Capsule capsule = new Capsule(Vector3.Zero, Vector3.Zero, 0);
+        private readonly Vector3[] PreviousHitboxPositions = new Vector3[SubactionProcessor.MaxHitboxCount];
+        private readonly Capsule capsule = new(Vector3.Zero, Vector3.Zero, 0);
 
-        private GLTextRenderer Text = new GLTextRenderer();
+        private readonly GLTextRenderer Text = new();
 
 
-        private static Vector3 ShieldColor = new Vector3(1, 0.4f, 0.4f);
-        private static Vector3 ThrowDummyColor = new Vector3(0, 1, 1);
-        private static Vector3 HitboxColor = new Vector3(1, 0, 0);
-        private static Vector3 GrabboxColor = new Vector3(1, 0, 1);
-        private static Vector3 HitboxSelectedColor = new Vector3(1, 1, 1);
+        private static Vector3 ShieldColor = new(1, 0.4f, 0.4f);
+        private static Vector3 ThrowDummyColor = new(0, 1, 1);
+        private static Vector3 HitboxColor = new(1, 0, 0);
+        private static Vector3 GrabboxColor = new(1, 0, 1);
+        private static Vector3 HitboxSelectedColor = new(1, 1, 1);
 
         /// <summary>
         /// 
@@ -171,7 +167,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             ThrowDummyModel.Initialize += () =>
             {
-                foreach (var v in ThrowDummyHide)
+                foreach (byte v in ThrowDummyHide)
                     ThrowDummyModel.SetDObjVisible(v, false);
             };
 
@@ -216,7 +212,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         private void LoadModel(RenderJObj renderJobj, string modelPath)
         {
             // load model
-            var modelFile = new HSDRawFile(modelPath);
+            HSDRawFile modelFile = new(modelPath);
             if (modelFile.Roots.Count > 0 && modelFile.Roots[0].Data is HSD_JOBJ jobj)
             {
                 // load fighter model
@@ -281,7 +277,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             Processor.SetFrame(frame - 1);
 
             int hitboxId = 0;
-            foreach (var hb in Processor.Hitboxes)
+            foreach (Hitbox hb in Processor.Hitboxes)
             {
                 if (hb.Active)
                     PreviousHitboxPositions[hitboxId] = hb.GetWorldPosition(FighterModel.RootJObj);
@@ -309,8 +305,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 for (int i = 0; i < ThrowDummyAnim.NodeCount; i++)
                 {
-                    var node = ThrowDummyAnim.Nodes[i];
-                    var joint = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[i]);
+                    AnimNode node = ThrowDummyAnim.Nodes[i];
+                    LiveJObj joint = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[i]);
 
                     if (joint != null && node.Tracks.Count > 0)
                     {
@@ -325,7 +321,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             Processor.SetFrame(frame);
 
             // apply model part anims
-            foreach (var mp in ModelPartsIndices)
+            foreach (ModelPartAnimations mp in ModelPartsIndices)
                 mp.Apply(FighterModel.RootJObj);
         }
 
@@ -347,12 +343,12 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     SetModelVis(i, 0);
 
                 // hide low poly
-                foreach (var lut in LookupTable.CostumeVisibilityLookups[0].LowPoly.Array)
+                foreach (SBM_LookupTable lut in LookupTable.CostumeVisibilityLookups[0].LowPoly.Array)
                     SetModelVis(lut, -1);
             }
 
             // reset model parts
-            foreach (var mp in ModelPartsIndices)
+            foreach (ModelPartAnimations mp in ModelPartsIndices)
                 mp.AnimIndex = -1;
 
         }
@@ -377,10 +373,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             if (lookuptable.LookupEntries != null)
             {
-                var structs = lookuptable.LookupEntries.Array;
+                SBM_LookupEntry[] structs = lookuptable.LookupEntries.Array;
 
                 for (int i = 0; i < structs.Length; i++)
-                    foreach (var v in structs[i].Entries)
+                    foreach (byte v in structs[i].Entries)
                         FighterModel.SetDObjVisible(v, i == objectid);
             }
         }
@@ -396,7 +392,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             {
                 if (matflag == 1)
                 {
-                    foreach (var v in LookupTable.CostumeMaterialLookups[0].Entries.Array)
+                    foreach (ushort v in LookupTable.CostumeMaterialLookups[0].Entries.Array)
                     {
                         FighterModel.MatAnim.SetFrame(v, frame);
                         FighterModel.RequestAnimationUpdate(FrameFlags.Material, -1);
@@ -404,7 +400,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
                 else
                 {
-                    var idx = LookupTable.CostumeMaterialLookups[0].Entries[index];
+                    ushort idx = LookupTable.CostumeMaterialLookups[0].Entries[index];
                     FighterModel.MatAnim.SetFrame(idx, frame);
                     FighterModel.RequestAnimationUpdate(FrameFlags.Material, -1);
                 }
@@ -462,7 +458,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // render item model
             if (HasItem && RenderItem && ItemModel.RootJObj != null && LookupTable != null)
             {
-                var fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ItemHoldBone);
+                LiveJObj fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ItemHoldBone);
                 if (fighterHoldBone != null)
                 {
                     if (ItemModel.RootJObj.Child != null)
@@ -480,8 +476,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // render throw dummy
             if (ThrowDummyAnim != null && !processor.ThrownFighter)
             {
-                var hip = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[4]);
-                var fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone);
+                LiveJObj hip = ThrowDummyModel.RootJObj.GetJObjAtIndex(ThrowDummyLookup[4]);
+                LiveJObj fighterHoldBone = FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone);
                 if (hip != null && fighterHoldBone != null)
                 {
                     hip.WorldTransform = fighterHoldBone.WorldTransform;
@@ -498,7 +494,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (RenderHitboxes)
             {
                 int hitboxId = 0;
-                foreach (var hb in processor.Hitboxes)
+                foreach (Hitbox hb in processor.Hitboxes)
                 {
                     if (!hb.Active)
                     {
@@ -511,8 +507,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     Vector3 hbColor = HitboxColor;
 
                     // get transform data
-                    var worldPosition = hb.GetWorldPosition(FighterModel.RootJObj);
-                    var worldTransform = Matrix4.CreateTranslation(worldPosition);
+                    Vector3 worldPosition = hb.GetWorldPosition(FighterModel.RootJObj);
+                    Matrix4 worldTransform = Matrix4.CreateTranslation(worldPosition);
 
                     // check for grabbox
                     if (hb.Element == 8)
@@ -557,14 +553,14 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 DrawShape.DrawSphere(FighterModel.RootJObj.GetJObjAtIndex(LookupTable.ShieldBone).WorldTransform, ShieldSize / 2, 16, 16, ShieldColor, 0.5f);
 
             // render gfx spawn
-            foreach (var gfx in processor.GFXOnFrame.ToArray())
+            foreach (SubactionProcessor.GFXSpawn gfx in processor.GFXOnFrame.ToArray())
             {
                 // do processing on bone id
-                var boneID = gfx.Bone;
+                int boneID = gfx.Bone;
                 if (boneID == 0)
-                { 
+                {
                     // special case for character like mewtwo with a leading bone
-                    var ro = FighterModel.RootJObj.GetJObjAtIndex(1);
+                    LiveJObj ro = FighterModel.RootJObj.GetJObjAtIndex(1);
                     if (ro != null && ro.Child == null)
                         boneID = 2;
                     else
@@ -572,11 +568,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 }
 
                 // get bone effect is attached to
-                var bone = FighterModel.RootJObj.GetJObjAtIndex(boneID);
+                LiveJObj bone = FighterModel.RootJObj.GetJObjAtIndex(boneID);
                 if (bone != null)
                 {
                     // get transform without scale
-                    var transform = Matrix4.CreateTranslation(gfx.Position) * bone.WorldTransform;
+                    Matrix4 transform = Matrix4.CreateTranslation(gfx.Position) * bone.WorldTransform;
                     transform = transform.ClearScale();
 
                     // draw sphere indicator
@@ -593,7 +589,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (RenderBones)
             {
                 int bone_index = 0;
-                foreach (var b in FighterModel.RootJObj.Enumerate)
+                foreach (LiveJObj b in FighterModel.RootJObj.Enumerate)
                 {
                     Text.RenderText(cam, bone_index++.ToString(), b.WorldTransform, StringAlignment.Center, true);
                 }
@@ -617,21 +613,21 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void DrawECB()
         {
-            var topN = FighterModel.RootJObj.GetJObjAtIndex(1).WorldTransform.ExtractTranslation();
+            Vector3 topN = FighterModel.RootJObj.GetJObjAtIndex(1).WorldTransform.ExtractTranslation();
 
-            var bone1 = GetWorldBonePosition(ECB.ECBBone1);
-            var bone2 = GetWorldBonePosition(ECB.ECBBone2);
-            var bone3 = GetWorldBonePosition(ECB.ECBBone3);
-            var bone4 = GetWorldBonePosition(ECB.ECBBone4);
-            var bone5 = GetWorldBonePosition(ECB.ECBBone5);
-            var bone6 = GetWorldBonePosition(ECB.ECBBone6);
+            Vector3 bone1 = GetWorldBonePosition(ECB.ECBBone1);
+            Vector3 bone2 = GetWorldBonePosition(ECB.ECBBone2);
+            Vector3 bone3 = GetWorldBonePosition(ECB.ECBBone3);
+            Vector3 bone4 = GetWorldBonePosition(ECB.ECBBone4);
+            Vector3 bone5 = GetWorldBonePosition(ECB.ECBBone5);
+            Vector3 bone6 = GetWorldBonePosition(ECB.ECBBone6);
 
-            var minx = float.MaxValue;
-            var miny = float.MaxValue;
-            var maxx = float.MinValue;
-            var maxy = float.MinValue;
+            float minx = float.MaxValue;
+            float miny = float.MaxValue;
+            float maxx = float.MinValue;
+            float maxy = float.MinValue;
 
-            foreach (var p in new Vector3[] { bone1, bone2, bone3, bone4, bone5, bone6 })
+            foreach (Vector3 p in new Vector3[] { bone1, bone2, bone3, bone4, bone5, bone6 })
             {
                 minx = Math.Min(minx, p.Z);
                 maxx = Math.Max(maxx, p.Z);
@@ -645,7 +641,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // ledge grab
             if (RenderLedgeBox)
             {
-                var correct = Math.Abs(minx - maxx) / 2;
+                float correct = Math.Abs(minx - maxx) / 2;
 
                 //behind
                 DrawShape.DrawLedgeBox(

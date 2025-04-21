@@ -9,8 +9,8 @@ namespace HSDRawViewer.Rendering
 
         public Vector3 Max { get; internal set; }
 
-        public Vector3 Center => (Max + Min) / 2; 
-        
+        public Vector3 Center => (Max + Min) / 2;
+
         public Vector3 Extents
         {
             get { return (Max - Min) * 0.5f; }
@@ -37,7 +37,7 @@ namespace HSDRawViewer.Rendering
         public bool Intersects(Vector3 triangleP0, Vector3 triangleP1, Vector3 triangleP2)
         {
             // Create a Triangle object from the input points
-            Triangle triangle = new Triangle { p0 = triangleP0, p1 = triangleP1, p2 = triangleP2 };
+            Triangle triangle = new() { p0 = triangleP0, p1 = triangleP1, p2 = triangleP2 };
 
             // Test separating axes
             if (TestSeparatingAxis(triangle, Vector3.Cross(triangle.p1 - triangle.p0, triangle.p2 - triangle.p0)))

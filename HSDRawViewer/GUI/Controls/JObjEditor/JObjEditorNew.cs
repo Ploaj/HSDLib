@@ -24,23 +24,23 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
     {
         public DrawOrder DrawOrder => DrawOrder.First;
 
-        private DockablePropertyGrid _propertyGrid;
+        private readonly DockablePropertyGrid _propertyGrid;
 
-        private DockableJointTree _jointTree;
+        private readonly DockableJointTree _jointTree;
 
-        private DockableMeshList _meshList;
+        private readonly DockableMeshList _meshList;
 
-        private DockableTextureEditor _textureEditor;
+        private readonly DockableTextureEditor _textureEditor;
 
-        private DockableTrackEditor _trackEditor;
+        private readonly DockableTrackEditor _trackEditor;
 
-        private DockableViewport _viewport;
+        private readonly DockableViewport _viewport;
 
-        private RenderJObj RenderJObj;
+        private readonly RenderJObj RenderJObj;
 
         private HSD_JOBJ _root;
 
-        private bool RenderInViewport = false;
+        private readonly bool RenderInViewport = false;
 
         private class ModelAccessory
         {
@@ -53,7 +53,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             public bool Remove { get; set; } = false;
         }
 
-        private List<ModelAccessory> _accessories = new List<ModelAccessory>();
+        private readonly List<ModelAccessory> _accessories = new();
 
         public float Frame { get => _viewport.glViewport.Frame; }
 
@@ -256,14 +256,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void ApplyEditorAnimation(float frame)
         {
             // joints
-            foreach (var p in _jointTree.EnumerateJoints())
+            foreach (JObjProxy p in _jointTree.EnumerateJoints())
             {
                 RenderJObj.RootJObj.GetJObjFromDesc(p.jobj).ApplyAnimation(p.Tracks, frame);
             }
 
             // dobjs
             int di = 0;
-            foreach (var d in _meshList.EnumerateDObjs)
+            foreach (DObjProxy d in _meshList.EnumerateDObjs)
             {
                 RenderJObj.SetMaterialAnimation(di, frame, d.Tracks, d.TextureStates.Select(e => e.Tracks), d.TextureStates.Select(e => e.Textures).ToList());
                 di++;
@@ -286,7 +286,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // set animation
             for (int i = 0; i < animation.NodeCount; i++)
             {
-                var pro = _jointTree.GetProxyAtIndex(i);
+                JObjProxy pro = _jointTree.GetProxyAtIndex(i);
 
                 if (pro != null)
                 {
@@ -315,21 +315,21 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             // set animation
             int ji = 0;
-            foreach (var j in matanim.Nodes)
+            foreach (MatAnimJoint j in matanim.Nodes)
             {
-                var mi = 0;
-                foreach (var mat in j.Nodes)
+                int mi = 0;
+                foreach (MatAnim mat in j.Nodes)
                 {
-                    var d = _meshList.EnumerateDObjs.FirstOrDefault(e => e.DOBJIndex == mi && e.JOBJIndex == ji);
+                    DObjProxy d = _meshList.EnumerateDObjs.FirstOrDefault(e => e.DOBJIndex == mi && e.JOBJIndex == ji);
 
                     if (d != null)
                     {
                         d.Tracks.Clear();
                         d.Tracks.AddRange(mat.Tracks);
 
-                        foreach (var t in mat.TextureAnims)
+                        foreach (MatAnimTexture t in mat.TextureAnims)
                         {
-                            var tstate = d.TextureStates[t.TextureID - HSDRaw.GX.GXTexMapID.GX_TEXMAP0];
+                            TextureAnimDesc tstate = d.TextureStates[t.TextureID - HSDRaw.GX.GXTexMapID.GX_TEXMAP0];
                             tstate.Tracks.Clear();
                             tstate.Tracks.AddRange(t.Tracks);
                             tstate.Textures.Clear();
@@ -369,18 +369,18 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void ClearAnimation()
         {
             // clear animations
-            foreach (var j in _jointTree.EnumerateJoints())
+            foreach (JObjProxy j in _jointTree.EnumerateJoints())
                 j.Tracks.Clear();
 
             // reset material animation
-            foreach (var d in _meshList.EnumerateDObjs)
+            foreach (DObjProxy d in _meshList.EnumerateDObjs)
                 d.ClearAnimation();
 
             // reset joint animation
             RenderJObj.ResetDefaultStateAll();
 
             // disable viewport
-            var vp = _viewport.glViewport;
+            ViewportControl vp = _viewport.glViewport;
             vp.AnimationTrackEnabled = false;
 
             // disable save option
@@ -397,7 +397,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void EnableAnimation()
         {
             // enable viewport
-            var vp = _viewport.glViewport;
+            ViewportControl vp = _viewport.glViewport;
 
             // enable view if not already
             if (!vp.AnimationTrackEnabled)
@@ -436,7 +436,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             RenderJObj.Invalidate();
 
-            foreach (var v in _accessories)
+            foreach (ModelAccessory v in _accessories)
                 v.RenderJObj.Invalidate();
         }
 
@@ -447,7 +447,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             RenderJObj.FreeResources();
 
-            foreach (var v in _accessories)
+            foreach (ModelAccessory v in _accessories)
                 v.RenderJObj.FreeResources();
         }
 
@@ -470,7 +470,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             RenderJObj.Render(cam);
 
             // render accessories
-            foreach (var v in _accessories)
+            foreach (ModelAccessory v in _accessories)
             {
                 v.RenderJObj._settings = RenderJObj._settings;
                 v.RenderJObj.RootJObj.WorldTransform = RenderJObj.RootJObj.GetJObjAtIndex(v.AttachIndex).WorldTransform;
@@ -498,7 +498,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="jobj"></param>
         public void AddAccessory(int attach_bone, HSD_JOBJ jobj)
         {
-            var acc = new ModelAccessory()
+            ModelAccessory acc = new()
             {
                 _root = jobj,
                 AttachIndex = attach_bone,
@@ -514,8 +514,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void UpdateVisibility()
         {
             int index = 0;
-            Dictionary<int, int> dobjindex = new Dictionary<int, int>();
-            foreach (var c in _meshList.EnumerateDObjs)
+            Dictionary<int, int> dobjindex = new();
+            foreach (DObjProxy c in _meshList.EnumerateDObjs)
             {
                 // show or hide
                 RenderJObj.SetDObjVisible(index, c.Visible);
@@ -539,7 +539,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void UpdateSelectedDObjs(IEnumerable<int> selected)
         {
             RenderJObj.ClearDObjSelection();
-            foreach (var i in selected)
+            foreach (int i in selected)
                 RenderJObj.SetDObjSelected(i, true);
         }
 
@@ -549,11 +549,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="fog"></param>
         public void SetLights(IEnumerable<HSD_Light> lights)
         {
-            foreach (var l in RenderJObj._settings._lights)
+            foreach (RenderLObj l in RenderJObj._settings._lights)
                 l.Enabled = false;
 
             int li = 0;
-            foreach (var v in lights)
+            foreach (HSD_Light v in lights)
             {
                 if (li < RenderJObj._settings._lights.Length)
                     RenderJObj._settings._lights[li].LoadLight(v);
@@ -637,7 +637,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importSceneSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = FileIO.OpenFile("Scene (*.yaml)|*.yml");
+            string f = FileIO.OpenFile("Scene (*.yaml)|*.yml");
 
             if (f != null)
                 LoadSceneYAML(f);
@@ -651,11 +651,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void exportSceneSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = FileIO.SaveFile("Scene (*.yaml)|*.yml");
+            string f = FileIO.SaveFile("Scene (*.yaml)|*.yml");
 
             if (f != null)
             {
-                SceneSettings settings = new SceneSettings()
+                SceneSettings settings = new()
                 {
                     Frame = _viewport.glViewport.Frame,
                     CSPMode = _viewport.glViewport.CSPMode,
@@ -676,7 +676,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="filePath"></param>
         public void LoadSceneYAML(string filePath)
         {
-            var settings = SceneSettings.Deserialize(filePath);
+            SceneSettings settings = SceneSettings.Deserialize(filePath);
 
             _viewport.glViewport.CSPMode = settings.CSPMode;
 
@@ -703,8 +703,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 // load material animation if exists
                 if (MainForm.SelectedDataNode != null)
                 {
-                    var symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
-                    var matAnim = MainForm.Instance.GetSymbol(symbol);
+                    string symbol = MainForm.SelectedDataNode.Text.Replace("_joint", "_matanim_joint");
+                    HSDRaw.HSDAccessor matAnim = MainForm.Instance.GetSymbol(symbol);
                     if (matAnim != null && matAnim is HSD_MatAnimJoint maj)
                     {
                         LoadAnimation(new MatAnimManager(maj));
@@ -718,7 +718,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (settings.HiddenNodes != null)
             {
                 int i = 0;
-                foreach (var d in _meshList.EnumerateDObjs)
+                foreach (DObjProxy d in _meshList.EnumerateDObjs)
                 {
                     d.Visible = !settings.HiddenNodes.Contains(i);
                     i++;
@@ -735,8 +735,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void displaySettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Model Display Settings", RenderJObj._settings))
-                d.ShowDialog();
+            using PropertyDialog d = new("Model Display Settings", RenderJObj._settings);
+            d.ShowDialog();
         }
 
         /// <summary>
@@ -746,8 +746,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void fogSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Fog Settings", RenderJObj._fogParam))
-                d.ShowDialog();
+            using PropertyDialog d = new("Fog Settings", RenderJObj._fogParam);
+            d.ShowDialog();
         }
 
         /// <summary>
@@ -757,7 +757,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var anim = JointAnimManager.LoadFromFile(_jointTree._jointMap);
+            JointAnimManager anim = JointAnimManager.LoadFromFile(_jointTree._jointMap);
 
             if (anim != null)
             {
@@ -781,9 +781,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <returns></returns>
         private JointAnimManager ToJointAnim()
         {
-            JointAnimManager m = new JointAnimManager();
+            JointAnimManager m = new();
 
-            foreach (var n in _jointTree.EnumerateJoints())
+            foreach (JObjProxy n in _jointTree.EnumerateJoints())
                 m.Nodes.Add(new AnimNode() { Tracks = n.Tracks });
 
             m.FrameCount = _viewport.glViewport.MaxFrame;
@@ -841,14 +841,14 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (_trackEditor.IsHidden)
                 return;
 
-            var mult = new FrameSpeedModifierSettings();
+            FrameSpeedModifierSettings mult = new();
 
             PopoutCollectionEditor.EditValue(this, mult, "Modifiers");
 
             if (mult.Modifiers.Count > 0)
             {
-                foreach (var j in _jointTree.EnumerateJoints())
-                    foreach (var i in j.Tracks)
+                foreach (JObjProxy j in _jointTree.EnumerateJoints())
+                    foreach (FOBJ_Player i in j.Tracks)
                         i.ApplyFSMs(mult.Modifiers, true);
 
                 // recalculat frame count
@@ -875,18 +875,16 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void createToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var settings = new AnimationCreationSettings();
-            using (PropertyDialog d = new PropertyDialog("Create Animation", settings))
+            AnimationCreationSettings settings = new();
+            using PropertyDialog d = new("Create Animation", settings);
+            if (d.ShowDialog() == DialogResult.OK && settings.FrameCount > 0)
             {
-                if (d.ShowDialog() == DialogResult.OK && settings.FrameCount > 0)
-                {
-                    // enable animation editing
-                    EnableAnimation();
+                // enable animation editing
+                EnableAnimation();
 
-                    // set the new max frame
-                    var vp = _viewport.glViewport;
-                    vp.MaxFrame = settings.FrameCount;
-                }
+                // set the new max frame
+                ViewportControl vp = _viewport.glViewport;
+                vp.MaxFrame = settings.FrameCount;
             }
         }
 
@@ -899,7 +897,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             public float ErrorMargin { get; set; } = 0.001f;
         }
 
-        private static OptimizeSettings _settings = new OptimizeSettings();
+        private static readonly OptimizeSettings _settings = new();
 
         /// <summary>
         /// 
@@ -908,29 +906,27 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void compressAllTracksToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Animation Optimize Settings", _settings))
+            using PropertyDialog d = new("Animation Optimize Settings", _settings);
+            if (d.ShowDialog() == DialogResult.OK)
             {
-                if (d.ShowDialog() == DialogResult.OK)
+                //foreach (var joint in _jointTree.EnumerateJoints())
+                //{
+                //    var tracks = joint.Tracks;
+                //    AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
+                //}
+                int index = 0;
+                Parallel.ForEach(_jointTree.EnumerateJoints(), joint =>
                 {
-                    //foreach (var joint in _jointTree.EnumerateJoints())
-                    //{
-                    //    var tracks = joint.Tracks;
-                    //    AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
-                    //}
-                    int index = 0;
-                    Parallel.ForEach(_jointTree.EnumerateJoints(), joint =>
-                    {
-                        var i = index;
-                        index++;
-                        System.Diagnostics.Debug.WriteLine($"Starting {i}");
-                        var tracks = joint.Tracks; // Ensure thread-safety if tracks are shared
-                        AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
-                        System.Diagnostics.Debug.WriteLine($"Done {i}");
-                    });
+                    int i = index;
+                    index++;
+                    System.Diagnostics.Debug.WriteLine($"Starting {i}");
+                    List<FOBJ_Player> tracks = joint.Tracks; // Ensure thread-safety if tracks are shared
+                    AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
+                    System.Diagnostics.Debug.WriteLine($"Done {i}");
+                });
 
 
-                    _trackEditor.SetKeys("", GraphEditor.AnimType.Joint, null);
-                }
+                _trackEditor.SetKeys("", GraphEditor.AnimType.Joint, null);
             }
         }
 
@@ -949,7 +945,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <returns></returns>
         private static JointMap OpenJointMap(string fname)
         {
-            var path = FileIO.OpenFile(JointMap.FileFilter, fname);
+            string path = FileIO.OpenFile(JointMap.FileFilter, fname);
             if (path != null)
             {
                 return new JointMap(path);
@@ -968,7 +964,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             JointMap from = OpenJointMap("from.ini");
             if (to == null) return;
 
-            var anim = JointAnimManager.LoadFromFile(to);
+            JointAnimManager anim = JointAnimManager.LoadFromFile(to);
             if (anim != null)
             {
                 anim = AnimationRemap.Remap(anim, from, to);
@@ -988,7 +984,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             public string FromDAT { get; set; } = null;
         }
 
-        private static ImportRemapSettings _importRemapSettings = new ImportRemapSettings();
+        private static readonly ImportRemapSettings _importRemapSettings = new();
 
         /// <summary>
         /// 
@@ -997,35 +993,33 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void importAndRemap2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var p = new PropertyDialog("Import and Retarget", _importRemapSettings))
+            using PropertyDialog p = new("Import and Retarget", _importRemapSettings);
+            if (p.ShowDialog() == DialogResult.OK)
             {
-                if (p.ShowDialog() == DialogResult.OK)
+                if (string.IsNullOrEmpty(_importRemapSettings.ToINI) ||
+                    !File.Exists(_importRemapSettings.ToINI) ||
+                    string.IsNullOrEmpty(_importRemapSettings.FromINI) ||
+                    !File.Exists(_importRemapSettings.FromINI) ||
+                    string.IsNullOrEmpty(_importRemapSettings.FromDAT) ||
+                    !File.Exists(_importRemapSettings.FromDAT))
                 {
-                    if (string.IsNullOrEmpty(_importRemapSettings.ToINI) ||
-                        !File.Exists(_importRemapSettings.ToINI) || 
-                        string.IsNullOrEmpty(_importRemapSettings.FromINI) ||
-                        !File.Exists(_importRemapSettings.FromINI) || 
-                        string.IsNullOrEmpty(_importRemapSettings.FromDAT) ||
-                        !File.Exists(_importRemapSettings.FromDAT))
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    JointMap to = new JointMap(_importRemapSettings.ToINI);
-                    JointMap from = new JointMap(_importRemapSettings.FromINI);
-                    HSD_JOBJ model = new HSDRaw.HSDRawFile(_importRemapSettings.FromDAT).Roots[0].Data as HSD_JOBJ;
-                    if (model == null)
-                        return;
+                JointMap to = new(_importRemapSettings.ToINI);
+                JointMap from = new(_importRemapSettings.FromINI);
+                HSD_JOBJ model = new HSDRaw.HSDRawFile(_importRemapSettings.FromDAT).Roots[0].Data as HSD_JOBJ;
+                if (model == null)
+                    return;
 
-                    var target = RenderJObj.RootJObj.Desc;
-                    var anim = JointAnimManager.LoadFromFile(from);
-                    if (anim != null)
-                    {
-                        var livefrom = new LiveJObj(model);
-                        var liveto = new LiveJObj(RenderJObj.RootJObj.Desc);
-                        anim = AnimationRetarget.Retarget(anim, livefrom, liveto, from, to, null);
-                        LoadAnimation(anim);
-                    }
+                HSD_JOBJ target = RenderJObj.RootJObj.Desc;
+                JointAnimManager anim = JointAnimManager.LoadFromFile(from);
+                if (anim != null)
+                {
+                    LiveJObj livefrom = new(model);
+                    LiveJObj liveto = new(RenderJObj.RootJObj.Desc);
+                    anim = AnimationRetarget.Retarget(anim, livefrom, liveto, from, to, null);
+                    LoadAnimation(anim);
                 }
             }
 
@@ -1037,7 +1031,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (_trackEditor.IsHidden)
                 return;
 
-            foreach (var j in _jointTree.EnumerateJoints())
+            foreach (JObjProxy j in _jointTree.EnumerateJoints())
                 Tools.KeyFilters.EulerFilter.Filter(j.Tracks);
 
             // re apply animation

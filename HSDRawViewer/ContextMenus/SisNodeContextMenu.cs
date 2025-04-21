@@ -1,15 +1,10 @@
-﻿using HSDRaw.Common.Animation;
-using HSDRaw.Common;
+﻿using HSDRaw.Melee;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using HSDRaw.Melee;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -31,12 +26,12 @@ namespace HSDRawViewer.ContextMenus
 
         public SisNodeContextMenu() : base()
         {
-            ToolStripMenuItem export = new ToolStripMenuItem("Export to Text");
+            ToolStripMenuItem export = new("Export to Text");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_SISData root)
                 {
-                    var file = Tools.FileIO.SaveFile("Text (*.txt)|*.txt");
+                    string file = Tools.FileIO.SaveFile("Text (*.txt)|*.txt");
 
                     if (file != null)
                     {

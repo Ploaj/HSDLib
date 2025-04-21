@@ -1,5 +1,4 @@
 ﻿using HSDRaw.Common;
-using HSDRawViewer.Converters;
 using System.ComponentModel;
 using System.Drawing;
 

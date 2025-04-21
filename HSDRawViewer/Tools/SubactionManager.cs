@@ -42,7 +42,7 @@ namespace HSDRawViewer.Tools
                 if (Parameters == null || Parameters.Length == 0)
                     return 32;
 
-                foreach (var param in Parameters)
+                foreach (SubactionParameter param in Parameters)
                 {
                     size += param.BitCount;
                 }
@@ -56,7 +56,7 @@ namespace HSDRawViewer.Tools
         {
             get
             {
-                foreach (var v in Parameters)
+                foreach (SubactionParameter v in Parameters)
                     if (v.IsPointer)
                         return true;
                 return false;
@@ -65,21 +65,21 @@ namespace HSDRawViewer.Tools
 
         public int[] GetParameters(byte[] data, int offset = 0)
         {
-            Bitreader r = new Bitreader(data);
+            Bitreader r = new(data);
 
             r.Skip(offset * 8);
             r.Read(CodeSize);
 
-            List<int> param = new List<int>();
+            List<int> param = new();
 
             for (int i = 0; i < Parameters.Length; i++)
             {
-                var p = Parameters[i];
+                SubactionParameter p = Parameters[i];
 
                 if (p.Name.Contains("None"))
                     continue;
 
-                var value = p.Signed ? r.ReadSigned(p.BitCount) : r.Read(p.BitCount);
+                int value = p.Signed ? r.ReadSigned(p.BitCount) : r.Read(p.BitCount);
 
                 if (p.IsPointer)
                     continue;
@@ -92,13 +92,13 @@ namespace HSDRawViewer.Tools
 
         public byte[] Compile(int[] parameters)
         {
-            BitWriter w = new BitWriter();
+            BitWriter w = new();
 
             w.Write(Code >> (IsCustom ? 0 : 2), CodeSize);
 
-            for(int i = 0; i < Parameters.Length; i++)
+            for (int i = 0; i < Parameters.Length; i++)
             {
-                var bm = Parameters[i];
+                SubactionParameter bm = Parameters[i];
 
                 if (bm.Name.Contains("None") || bm.IsPointer)
                 {
@@ -106,7 +106,7 @@ namespace HSDRawViewer.Tools
                     continue;
                 }
 
-                var value = parameters[i];
+                int value = parameters[i];
 
                 w.Write(value, bm.BitCount);
             }
@@ -153,7 +153,7 @@ namespace HSDRawViewer.Tools
     {
         None,
         // Melee
-        Fighter, 
+        Fighter,
         Item,
         Color,
 
@@ -187,7 +187,7 @@ namespace HSDRawViewer.Tools
         }
         private static List<Subaction> _itemSubactions;
 
-        
+
         public static List<Subaction> ColorSubactions
         {
             get
@@ -238,7 +238,7 @@ namespace HSDRawViewer.Tools
         /// </summary>
         private static void LoadFromFile()
         {
-            var deserializer = new DeserializerBuilder()
+            IDeserializer deserializer = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
@@ -277,31 +277,31 @@ namespace HSDRawViewer.Tools
 
             if (File.Exists(customItemPath))
                 cisa = File.ReadAllText(customPath);
-            
+
             if (File.Exists(riderPath))
                 rsa = File.ReadAllText(riderPath);
 
             if (File.Exists(weaponPath))
                 wsa = File.ReadAllText(weaponPath);
 
-            var subs = deserializer.Deserialize<Subaction[]>(sa);
-            var fsubs = deserializer.Deserialize<Subaction[]>(fsa);
-            var isubs = deserializer.Deserialize<Subaction[]>(isa);
-            var csubs = deserializer.Deserialize<Subaction[]>(clrsa);
-            var customsubs = deserializer.Deserialize<Subaction[]>(csa);
-            var customitemsubs = deserializer.Deserialize<Subaction[]>(cisa);
-            var ridersubs = deserializer.Deserialize<Subaction[]>(rsa);
-            var weaponsubs = deserializer.Deserialize<Subaction[]>(wsa);
+            Subaction[] subs = deserializer.Deserialize<Subaction[]>(sa);
+            Subaction[] fsubs = deserializer.Deserialize<Subaction[]>(fsa);
+            Subaction[] isubs = deserializer.Deserialize<Subaction[]>(isa);
+            Subaction[] csubs = deserializer.Deserialize<Subaction[]>(clrsa);
+            Subaction[] customsubs = deserializer.Deserialize<Subaction[]>(csa);
+            Subaction[] customitemsubs = deserializer.Deserialize<Subaction[]>(cisa);
+            Subaction[] ridersubs = deserializer.Deserialize<Subaction[]>(rsa);
+            Subaction[] weaponsubs = deserializer.Deserialize<Subaction[]>(wsa);
 
             if (subs != null && subs.Length != 0)
             {
-                foreach (var s in subs)
+                foreach (Subaction s in subs)
                     s.Code <<= 2;
 
                 _fighterSubactions = new List<Subaction>();
                 if (fsubs != null && fsubs.Length != 0)
                 {
-                    foreach (var s in fsubs)
+                    foreach (Subaction s in fsubs)
                         s.Code <<= 2;
                     _fighterSubactions.AddRange(subs);
                     _fighterSubactions.AddRange(fsubs);
@@ -310,7 +310,7 @@ namespace HSDRawViewer.Tools
                 _itemSubactions = new List<Subaction>();
                 if (subs != null && subs.Length != 0)
                 {
-                    foreach (var s in isubs)
+                    foreach (Subaction s in isubs)
                         s.Code <<= 2;
                     _itemSubactions.AddRange(subs);
                     _itemSubactions.AddRange(isubs);
@@ -319,7 +319,7 @@ namespace HSDRawViewer.Tools
                 _colorSubactions = new List<Subaction>();
                 if (csubs != null && csubs.Length != 0)
                 {
-                    foreach (var s in csubs)
+                    foreach (Subaction s in csubs)
                         s.Code <<= 2;
                     _colorSubactions.AddRange(subs);
                     _colorSubactions.AddRange(csubs);
@@ -328,7 +328,7 @@ namespace HSDRawViewer.Tools
                 _riderSubactions = new List<Subaction>();
                 if (ridersubs != null && ridersubs.Length != 0)
                 {
-                    foreach (var s in ridersubs)
+                    foreach (Subaction s in ridersubs)
                         s.Code <<= 2;
                     _riderSubactions.AddRange(subs);
                     _riderSubactions.AddRange(ridersubs);
@@ -337,7 +337,7 @@ namespace HSDRawViewer.Tools
                 _weaponSubactions = new List<Subaction>();
                 if (weaponsubs != null && weaponsubs.Length != 0)
                 {
-                    foreach (var s in weaponsubs)
+                    foreach (Subaction s in weaponsubs)
                         s.Code <<= 2;
                     _weaponSubactions.AddRange(subs);
                     _weaponSubactions.AddRange(weaponsubs);
@@ -347,14 +347,14 @@ namespace HSDRawViewer.Tools
             _customSubactions = new List<Subaction>();
             if (customsubs != null && customsubs.Length != 0)
             {
-                foreach (var s in customsubs)
+                foreach (Subaction s in customsubs)
                     s.IsCustom = true;
                 _customSubactions.AddRange(customsubs);
                 _fighterSubactions.AddRange(customsubs);
             }
             if (customitemsubs != null && customitemsubs.Length != 0)
             {
-                foreach (var s in customitemsubs)
+                foreach (Subaction s in customitemsubs)
                     s.IsCustom = true;
                 _customSubactions.AddRange(customitemsubs);
                 _itemSubactions.AddRange(customitemsubs);
@@ -368,7 +368,7 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static Subaction GetSubaction(byte code, SubactionGroup group)
         {
-            var sa = CustomSubactions.Find(e => e.Code == code && e.IsCustom);
+            Subaction sa = CustomSubactions.Find(e => e.Code == code && e.IsCustom);
 
             if (sa == null)
                 sa = GetGroup(group).Find(e => e.Code == (code & 0xFC) && !e.IsCustom);
@@ -415,19 +415,19 @@ namespace HSDRawViewer.Tools
         {
             for (int i = 0; i < data.Length;)
             {
-                var sa = SubactionManager.GetSubaction(data[i], group);
+                Subaction sa = SubactionManager.GetSubaction(data[i], group);
 
                 if (data[i] == 0)
                     break;
 
                 // get parameters
-                var p = sa.GetParameters(data, i);
+                int[] p = sa.GetParameters(data, i);
 
                 // make changes
                 edit(sa, ref p);
 
                 // recompile
-                var test = sa.Compile(p);
+                byte[] test = sa.Compile(p);
                 for (int j = 0; j < test.Length; j++)
                     data[i + j] = test[j];
 
@@ -461,7 +461,7 @@ namespace HSDRawViewer.Tools
 
             if (typeof(System.Collections.IEnumerable).IsAssignableFrom(value.Value.GetType()))
             {   // We have a collection
-                var enumerableObject = (System.Collections.IEnumerable)value.Value;
+                System.Collections.IEnumerable enumerableObject = (System.Collections.IEnumerable)value.Value;
                 if (enumerableObject.GetEnumerator().MoveNext()) // Returns true if the collection is not empty.
                 {   // Serialize it as normal.
                     retVal = base.Enter(value, context);
@@ -488,7 +488,7 @@ namespace HSDRawViewer.Tools
 
             if (typeof(System.Collections.IEnumerable).IsAssignableFrom(value.Value.GetType()))
             {   // We have a collection
-                var enumerableObject = (System.Collections.IEnumerable)value.Value;
+                System.Collections.IEnumerable enumerableObject = (System.Collections.IEnumerable)value.Value;
                 if (enumerableObject.GetEnumerator().MoveNext()) // Returns true if the collection is not empty.
                 {   // Don't skip this item - serialize it as normal.
                     retVal = base.EnterMapping(key, value, context);

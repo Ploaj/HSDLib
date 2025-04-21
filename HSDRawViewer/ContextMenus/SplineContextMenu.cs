@@ -1,13 +1,10 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
-using HSDRaw.GX;
 using HSDRaw.Tools;
-using HSDRawViewer.Rendering.GX;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
@@ -18,16 +15,16 @@ namespace HSDRawViewer.ContextMenus
 
         public SplineContextMenu() : base()
         {
-            ToolStripMenuItem importobj = new ToolStripMenuItem("Import OBJ");
+            ToolStripMenuItem importobj = new("Import OBJ");
             importobj.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
                 {
-                    var f = Tools.FileIO.OpenFile("Wavefront OBJ(*.obj)|*.obj");
+                    string f = Tools.FileIO.OpenFile("Wavefront OBJ(*.obj)|*.obj");
 
                     if (f != null)
                     {
-                        var obj = new SplineOBJ();
+                        SplineOBJ obj = new();
                         obj.Open(f);
 
                         if (obj.Polys.Count == 0)
@@ -40,11 +37,11 @@ namespace HSDRawViewer.ContextMenus
                             MessageBox.Show($"Multiple splines found\nUsing {obj.Polys[0].Name}", "OBJ Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
 
-                        var poly = obj.Polys[0];
+                        Poly poly = obj.Polys[0];
 
                         // connect the lines to form one line
-                        List<HSD_Vector3> lpoints = new List<HSD_Vector3>();
-                        foreach (var i in poly.GetConnectedLine())
+                        List<HSD_Vector3> lpoints = new();
+                        foreach (int i in poly.GetConnectedLine())
                         {
                             lpoints.Add(obj.Vertices[i]);
                         }
@@ -53,7 +50,7 @@ namespace HSDRawViewer.ContextMenus
                         float total_length = 0;
                         for (int i = 1; i < lpoints.Count; i++)
                         {
-                            var length = (lpoints[i] - lpoints[i - 1]).Length;
+                            float length = (lpoints[i] - lpoints[i - 1]).Length;
                             total_length += length;
                         }
 
@@ -68,7 +65,7 @@ namespace HSDRawViewer.ContextMenus
                             }
                             else
                             {
-                                var length = (lpoints[i] - lpoints[i - 1]).Length;
+                                float length = (lpoints[i] - lpoints[i - 1]).Length;
                                 t += length;
                                 lengths[i] = t / total_length;
                             }
@@ -85,33 +82,31 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(importobj);
 
-            
-            ToolStripMenuItem Exportobj = new ToolStripMenuItem("Export OBJ");
+
+            ToolStripMenuItem Exportobj = new("Export OBJ");
             Exportobj.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
                 {
-                    var f = Tools.FileIO.SaveFile("Wavefront OBJ(*.obj)|*.obj");
+                    string f = Tools.FileIO.SaveFile("Wavefront OBJ(*.obj)|*.obj");
 
                     if (f != null)
                     {
-                        using (FileStream stream = new FileStream(f, FileMode.Create))
-                        using (StreamWriter s = new StreamWriter(stream))
+                        using FileStream stream = new(f, FileMode.Create);
+                        using StreamWriter s = new(stream);
+                        HSD_Vector3[] points = spline.Points;
+
+                        foreach (HSD_Vector3 p in points)
                         {
-                            var points = spline.Points;
+                            s.WriteLine($"v {p.X} {p.Y} {p.Z}");
+                        }
 
-                            foreach (var p in points)
-                            {
-                                s.WriteLine($"v {p.X} {p.Y} {p.Z}");
-                            }
-
-                            int i = 1;
-                            s.WriteLine($"o spline");
-                            s.Write($"l ");
-                            foreach (var p in points)
-                            {
-                                s.Write($"{i++} ");
-                            }
+                        int i = 1;
+                        s.WriteLine($"o spline");
+                        s.Write($"l ");
+                        foreach (HSD_Vector3 p in points)
+                        {
+                            s.Write($"{i++} ");
                         }
                     }
                 }
@@ -119,16 +114,16 @@ namespace HSDRawViewer.ContextMenus
             Items.Add(Exportobj);
 
 
-            ToolStripMenuItem anim = new ToolStripMenuItem("Generate Anim Joint");
+            ToolStripMenuItem anim = new("Generate Anim Joint");
             anim.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
                 {
-                    var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+                    string f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
 
                     if (f != null)
                     {
-                        var file = new HSDRaw.HSDRawFile();
+                        HSDRaw.HSDRawFile file = new();
 
                         file.Roots.Add(new HSDRaw.HSDRootNode()
                         {
@@ -146,22 +141,22 @@ namespace HSDRawViewer.ContextMenus
 
         private static HSD_AnimJoint GenerateAnimJoint(HSD_Spline spline)
         {
-            var x = new List<FOBJKey>();
-            var y = new List<FOBJKey>();
-            var z = new List<FOBJKey>();
-            var rx = new List<FOBJKey>();
-            var ry = new List<FOBJKey>();
-            var rz = new List<FOBJKey>();
+            List<FOBJKey> x = new();
+            List<FOBJKey> y = new();
+            List<FOBJKey> z = new();
+            List<FOBJKey> rx = new();
+            List<FOBJKey> ry = new();
+            List<FOBJKey> rz = new();
 
-            var points = spline.Points;
+            HSD_Vector3[] points = spline.Points;
             for (int i = 1; i < points.Length; i++)
             {
-                var p1 = new Vector3(points[i - 1].X, points[i - 1].Y, points[i - 1].Z);
-                var p2 = new Vector3(points[i].X, points[i].Y, points[i].Z);
-                var direction = (p2 - p1).Normalized();
-                var rotation = ConvertDirectionToEulerAngles(direction);
+                Vector3 p1 = new(points[i - 1].X, points[i - 1].Y, points[i - 1].Z);
+                Vector3 p2 = new(points[i].X, points[i].Y, points[i].Z);
+                Vector3 direction = (p2 - p1).Normalized();
+                Vector3 rotation = ConvertDirectionToEulerAngles(direction);
                 rotation.Y -= (float)Math.PI / 2;
-                
+
                 float frame = i * 10;
 
                 x.Add(new FOBJKey()
@@ -204,25 +199,25 @@ namespace HSDRawViewer.ContextMenus
             }
 
             // generate anim joint
-            HSD_AnimJoint joint = new HSD_AnimJoint();
+            HSD_AnimJoint joint = new();
             joint.AOBJ = new HSD_AOBJ()
             {
                 EndFrame = (points.Length - 1) * 10
             };
 
             HSD_FOBJDesc prev = null;
-            foreach (var v in new Tuple<List<FOBJKey>, JointTrackType>[]
+            foreach (Tuple<List<FOBJKey>, JointTrackType> v in new Tuple<List<FOBJKey>, JointTrackType>[]
             {
-                new Tuple<List<FOBJKey>, JointTrackType>(x, JointTrackType.HSD_A_J_TRAX),
-                new Tuple<List<FOBJKey>, JointTrackType>(y, JointTrackType.HSD_A_J_TRAY),
-                new Tuple<List<FOBJKey>, JointTrackType>(z, JointTrackType.HSD_A_J_TRAZ),
-                new Tuple<List<FOBJKey>, JointTrackType>(rx, JointTrackType.HSD_A_J_ROTX),
-                new Tuple<List<FOBJKey>, JointTrackType>(ry, JointTrackType.HSD_A_J_ROTY),
-                new Tuple<List<FOBJKey>, JointTrackType>(rz, JointTrackType.HSD_A_J_ROTZ),
+                new(x, JointTrackType.HSD_A_J_TRAX),
+                new(y, JointTrackType.HSD_A_J_TRAY),
+                new(z, JointTrackType.HSD_A_J_TRAZ),
+                new(rx, JointTrackType.HSD_A_J_ROTX),
+                new(ry, JointTrackType.HSD_A_J_ROTY),
+                new(rz, JointTrackType.HSD_A_J_ROTZ),
             }
             )
             {
-                HSD_FOBJDesc desc = new HSD_FOBJDesc();
+                HSD_FOBJDesc desc = new();
                 desc.SetKeys(v.Item1, (byte)v.Item2);
 
                 if (prev != null)
@@ -265,8 +260,8 @@ namespace HSDRawViewer.ContextMenus
         /// </summary>
         private class SplineOBJ
         {
-            public List<HSD_Vector3> Vertices = new List<HSD_Vector3>();
-            public List<Poly> Polys = new List<Poly>();
+            public List<HSD_Vector3> Vertices = new();
+            public List<Poly> Polys = new();
 
             /// <summary>
             /// 
@@ -274,54 +269,52 @@ namespace HSDRawViewer.ContextMenus
             /// <param name="filePath"></param>
             public void Open(string filePath)
             {
-                using (FileStream stream = new FileStream(filePath, FileMode.Open))
-                using (StreamReader s = new StreamReader(stream))
+                using FileStream stream = new(filePath, FileMode.Open);
+                using StreamReader s = new(stream);
+                Poly poly = null;
+
+                while (!s.EndOfStream)
                 {
-                    Poly poly = null;
+                    string[] line = s.ReadLine()?.Split(' ');
 
-                    while (!s.EndOfStream)
+                    if (line == null || line.Length == 0)
+                        continue;
+
+                    switch (line[0])
                     {
-                        var line = s.ReadLine()?.Split(' ');
-
-                        if (line == null || line.Length == 0)
-                            continue;
-
-                        switch (line[0])
-                        {
-                            case "o":
-                                poly = new Poly()
+                        case "o":
+                            poly = new Poly()
+                            {
+                                Name = line.Length > 1 ? line[1] : string.Empty
+                            };
+                            Polys.Add(poly);
+                            break;
+                        case "v":
+                            {
+                                if (line.Length >= 4 &&
+                                    float.TryParse(line[1], out float x) &&
+                                    float.TryParse(line[2], out float y) &&
+                                    float.TryParse(line[3], out float z))
                                 {
-                                    Name = line.Length > 1 ? line[1] : string.Empty
-                                };
-                                Polys.Add(poly);
-                                break;
-                            case "v":
+                                    Vertices.Add(new HSD_Vector3(x, y, z));
+                                }
+                            }
+                            break;
+                        case "l":
+                            if (poly != null)
+                            {
+                                PolyLine polyLine = new();
+                                for (int i = 1; i < line.Length; i++)
                                 {
-                                    if (line.Length >= 4 &&
-                                        float.TryParse(line[1], out float x) &&
-                                        float.TryParse(line[2], out float y) &&
-                                        float.TryParse(line[3], out float z))
+                                    if (int.TryParse(line[i], out int index))
                                     {
-                                        Vertices.Add(new HSD_Vector3(x, y, z));
+                                        // Adjust indices to be zero-based
+                                        polyLine.Indices.Add(index - 1);
                                     }
                                 }
-                                break;
-                            case "l":
-                                if (poly != null)
-                                {
-                                    var polyLine = new PolyLine();
-                                    for (int i = 1; i < line.Length; i++)
-                                    {
-                                        if (int.TryParse(line[i], out int index))
-                                        {
-                                            // Adjust indices to be zero-based
-                                            polyLine.Indices.Add(index - 1);
-                                        }
-                                    }
-                                    poly.Lines.Add(polyLine);
-                                }
-                                break;
-                        }
+                                poly.Lines.Add(polyLine);
+                            }
+                            break;
                     }
                 }
             }
@@ -333,7 +326,7 @@ namespace HSDRawViewer.ContextMenus
         private class Poly
         {
             public string Name;
-            public List<PolyLine> Lines = new List<PolyLine>();
+            public List<PolyLine> Lines = new();
 
             public IEnumerable<int> GetConnectedLine()
             {
@@ -342,8 +335,8 @@ namespace HSDRawViewer.ContextMenus
                     yield break;
                 }
 
-                HashSet<int> visitedIndices = new HashSet<int>();
-                Queue<int> indexQueue = new Queue<int>();
+                HashSet<int> visitedIndices = new();
+                Queue<int> indexQueue = new();
 
                 // Start with the first line
                 PolyLine firstLine = Lines[0];
@@ -383,7 +376,7 @@ namespace HSDRawViewer.ContextMenus
         /// </summary>
         private class PolyLine
         {
-            public List<int> Indices = new List<int>();
+            public List<int> Indices = new();
         }
     }
 }

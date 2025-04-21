@@ -16,26 +16,22 @@ namespace HSDRawViewer.Converters.Melee
     [Serializable]
     public class SSF
     {
-        public List<SSFPoint> Points = new List<SSFPoint>();
+        public List<SSFPoint> Points = new();
 
-        public List<SSFGroup> Groups = new List<SSFGroup>();
+        public List<SSFGroup> Groups = new();
 
         public static SSF Open(string filePath)
         {
-            using (var stream = System.IO.File.OpenRead(filePath))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(SSF));
-                return serializer.Deserialize(stream) as SSF;
-            }
+            using FileStream stream = System.IO.File.OpenRead(filePath);
+            XmlSerializer serializer = new(typeof(SSF));
+            return serializer.Deserialize(stream) as SSF;
         }
 
         public void Save(string filePath)
         {
-            using (TextWriter writer = new StreamWriter(filePath))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(SSF));
-                serializer.Serialize(writer, this);
-            }
+            using TextWriter writer = new StreamWriter(filePath);
+            XmlSerializer serializer = new(typeof(SSF));
+            serializer.Serialize(writer, this);
         }
     }
 
@@ -50,8 +46,8 @@ namespace HSDRawViewer.Converters.Melee
     {
         public string Name;
         public string Bone;
-        public List<SSFLine> Lines = new List<SSFLine>();
-        public List<SSFVertex> Vertices = new List<SSFVertex>();
+        public List<SSFLine> Lines = new();
+        public List<SSFVertex> Vertices = new();
     }
 
     public class SSFLine

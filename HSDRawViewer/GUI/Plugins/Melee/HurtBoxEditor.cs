@@ -18,7 +18,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
     {
         public override DataNode Node
         {
-            get => _node; set { _node = value;  HBBank = value.Accessor as SBM_HurtboxBank<SBM_Hurtbox>; }
+            get => _node; set { _node = value; HBBank = value.Accessor as SBM_HurtboxBank<SBM_Hurtbox>; }
         }
         private DataNode _node;
 
@@ -28,7 +28,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             set
             {
                 _bank = value;
-                if(_bank != null)
+                if (_bank != null)
                 {
                     editor.SetArrayFromProperty(value, "Hurtboxes");
                 }
@@ -37,13 +37,13 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         private SBM_HurtboxBank<SBM_Hurtbox> _bank;
 
         public DrawOrder DrawOrder => DrawOrder.Last;
-        
-        private ViewportControl viewport;
-        private ArrayMemberEditor editor;
 
-        private HurtboxRenderer hurtboxRenderer = new HurtboxRenderer();
+        private readonly ViewportControl viewport;
+        private readonly ArrayMemberEditor editor;
 
-        private RenderJObj RenderJObj = new RenderJObj();
+        private readonly HurtboxRenderer hurtboxRenderer = new();
+
+        private readonly RenderJObj RenderJObj = new();
 
         /// <summary>
         /// 
@@ -55,7 +55,7 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             editor = new ArrayMemberEditor();
             editor.Dock = DockStyle.Fill;
             hurtboxPanel.Controls.Add(editor);
-            
+
             viewport = new ViewportControl();
             viewport.Dock = DockStyle.Fill;
             viewport.AnimationTrackEnabled = false;
@@ -99,8 +99,8 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         {
             RenderJObj.Render(cam);
 
-            var selected = editor.SelectedObject;
-            var list = new List<SBM_Hurtbox>();
+            object selected = editor.SelectedObject;
+            List<SBM_Hurtbox> list = new();
             foreach (SBM_Hurtbox v in editor.GetItems())
                 list.Add(v);
 
@@ -125,29 +125,29 @@ namespace HSDRawViewer.GUI.Plugins.Melee
         /// <param name="e"></param>
         private void buttonLoadModel_Click(object sender, EventArgs e)
         {
-            var path = System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath);
-            var filename = System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Nr.dat");
+            string path = System.IO.Path.GetDirectoryName(MainForm.Instance.FilePath);
+            string filename = System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Nr.dat");
 
             path = System.IO.Path.Combine(path, filename);
 
             if (System.IO.File.Exists(path))
             {
-                var hsd = new HSDRawFile(path);
+                HSDRawFile hsd = new(path);
                 if (hsd.Roots[0].Data is HSD_JOBJ jobj)
                     LoadModel(jobj);
             }
             else
             {
-                var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
                 if (f != null)
                 {
-                    var hsd = new HSDRawFile(f);
+                    HSDRawFile hsd = new(f);
                     if (hsd.Roots[0].Data is HSD_JOBJ jobj)
                         LoadModel(jobj);
                 }
             }
-            
+
         }
     }
 }

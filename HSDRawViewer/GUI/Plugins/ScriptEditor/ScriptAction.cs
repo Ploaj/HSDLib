@@ -94,7 +94,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             _action = v;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>

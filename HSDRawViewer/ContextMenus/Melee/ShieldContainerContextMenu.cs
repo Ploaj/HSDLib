@@ -12,24 +12,24 @@ namespace HSDRawViewer.ContextMenus.Melee
     public class ShieldContainerContextMenu : CommonContextMenu
     {
         public override Type[] SupportedTypes { get; } = new Type[] { typeof(SBM_ShieldModelContainer) };
-        
+
         public ShieldContainerContextMenu() : base()
         {
-            ToolStripMenuItem ImportPose = new ToolStripMenuItem("Import Pose");
+            ToolStripMenuItem ImportPose = new("Import Pose");
             ImportPose.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_ShieldModelContainer figa)
                 {
                     // load model
-                    var mf = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    string mf = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
                     if (mf != null)
                     {
-                        var af = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                        string af = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
 
                         if (af != null)
                         {
-                            var a = new HSDRawFile(af).Roots[0].Data;
+                            HSDAccessor a = new HSDRawFile(af).Roots[0].Data;
 
                             JointAnimManager anim = null;
 
@@ -41,18 +41,18 @@ namespace HSDRawViewer.ContextMenus.Melee
 
                             if (anim != null)
                             {
-                                var model = new HSDRawFile(mf).Roots[0].Data as HSD_JOBJ;
-                                var live = new LiveJObj(model);
+                                HSD_JOBJ model = new HSDRawFile(mf).Roots[0].Data as HSD_JOBJ;
+                                LiveJObj live = new(model);
                                 anim.ApplyAnimation(live, 0);
 
-                                foreach (var d in model.TreeList)
+                                foreach (HSD_JOBJ d in model.TreeList)
                                 {
                                     // clear model
                                     d.Dobj = null;
                                     d.InverseWorldTransform = null;
 
                                     // set transforms
-                                    var r = live.GetJObjFromDesc(d);
+                                    LiveJObj r = live.GetJObjFromDesc(d);
                                     d.TX = r.Translation.X;
                                     d.TY = r.Translation.Y;
                                     d.TZ = r.Translation.Z;

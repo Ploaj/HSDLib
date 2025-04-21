@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Drawing;
 
 namespace System.Windows.Forms
 {
@@ -24,18 +19,16 @@ namespace System.Windows.Forms
         {
             BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
 
-            Rectangle newBounds = new Rectangle(0, 0, e.Bounds.Width, e.Bounds.Height);
-            using (BufferedGraphics bufferedGraphics = currentContext.Allocate(e.Graphics, newBounds))
-            {
-                DrawItemEventArgs newArgs = new DrawItemEventArgs(
-                    bufferedGraphics.Graphics, e.Font, newBounds, e.Index, e.State, e.ForeColor, e.BackColor);
+            Rectangle newBounds = new(0, 0, e.Bounds.Width, e.Bounds.Height);
+            using BufferedGraphics bufferedGraphics = currentContext.Allocate(e.Graphics, newBounds);
+            DrawItemEventArgs newArgs = new(
+                bufferedGraphics.Graphics, e.Font, newBounds, e.Index, e.State, e.ForeColor, e.BackColor);
 
-                // Supply the real OnTemplateListDrawItem with the off-screen graphics context
-                base.OnDrawItem(newArgs);
+            // Supply the real OnTemplateListDrawItem with the off-screen graphics context
+            base.OnDrawItem(newArgs);
 
-                // Wrapper around BitBlt
-                GDI.CopyGraphics(e.Graphics, e.Bounds, bufferedGraphics.Graphics, new Point(0, 0));
-            }
+            // Wrapper around BitBlt
+            GDI.CopyGraphics(e.Graphics, e.Bounds, bufferedGraphics.Graphics, new Point(0, 0));
         }
         #endregion
     }
@@ -53,7 +46,7 @@ namespace System.Windows.Forms
             IntPtr hdc2 = bufferedGraphics.GetHdc();
 
             BitBlt(hdc1, bounds.X, bounds.Y,
-                bounds.Width, bounds.Height, hdc2, (int)p.X, (int)p.Y, SRCCOPY);
+                bounds.Width, bounds.Height, hdc2, p.X, p.Y, SRCCOPY);
 
             g.ReleaseHdc(hdc1);
             bufferedGraphics.ReleaseHdc(hdc2);

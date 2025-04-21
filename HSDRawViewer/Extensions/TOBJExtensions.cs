@@ -21,41 +21,37 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static HSD_TOBJ ImportTObjFromFile()
         {
-            var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+            string f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
             {
-                using (TextureImportDialog settings = new TextureImportDialog())
+                using TextureImportDialog settings = new();
+                if (FormatFromString(f, out GXTexFmt fmt, out GXTlutFmt pal))
                 {
-                    if (FormatFromString(f, out GXTexFmt fmt, out GXTlutFmt pal))
-                    {
-                        settings.PaletteFormat = pal;
-                        settings.TextureFormat = fmt;
-                    }
+                    settings.PaletteFormat = pal;
+                    settings.TextureFormat = fmt;
+                }
 
-                    if (settings.ShowDialog() == DialogResult.OK)
-                    {
-                        using (Image<Bgra32> image = Image.Load<Bgra32>(f))
-                        {
-                            settings.ApplySettings(image);
+                if (settings.ShowDialog() == DialogResult.OK)
+                {
+                    using Image<Bgra32> image = Image.Load<Bgra32>(f);
+                    settings.ApplySettings(image);
 
-                            var tobj = new HSD_TOBJ()
-                            {
-                                MagFilter = GXTexFilter.GX_LINEAR,
-                                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                                RepeatT = 1,
-                                RepeatS = 1,
-                                WrapS = GXWrapMode.CLAMP,
-                                WrapT = GXWrapMode.CLAMP,
-                                SX = 1,
-                                SY = 1,
-                                SZ = 1,
-                                GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0,
-                                Blending = 1
-                            };
-                            tobj.InjectBitmap(image, settings.TextureFormat, settings.PaletteFormat);
-                            return tobj;
-                        }
-                    }
+                    HSD_TOBJ tobj = new()
+                    {
+                        MagFilter = GXTexFilter.GX_LINEAR,
+                        Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
+                        RepeatT = 1,
+                        RepeatS = 1,
+                        WrapS = GXWrapMode.CLAMP,
+                        WrapT = GXWrapMode.CLAMP,
+                        SX = 1,
+                        SY = 1,
+                        SZ = 1,
+                        GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0,
+                        Blending = 1
+                    };
+                    tobj.InjectBitmap(image, settings.TextureFormat, settings.PaletteFormat);
+                    return tobj;
                 }
             }
 
@@ -67,7 +63,7 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static HSD_TOBJ ImportTObjFromFile(string filePath, GXTexFmt imgFmt, GXTlutFmt tlutFmt)
         {
-            var TOBJ = new HSD_TOBJ()
+            HSD_TOBJ TOBJ = new()
             {
                 MagFilter = GXTexFilter.GX_LINEAR,
                 Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
@@ -113,11 +109,11 @@ namespace HSDRawViewer
             texFmt = GXTexFmt.RGBA8;
             palFmt = GXTlutFmt.RGB5A3;
 
-            var parts = Path.GetFileNameWithoutExtension(name).Split('_');
+            string[] parts = Path.GetFileNameWithoutExtension(name).Split('_');
 
             bool foundFormat = false;
 
-            foreach (var p in parts)
+            foreach (string p in parts)
             {
                 // skip numeric values
                 if (int.TryParse(p, out int i))
@@ -149,7 +145,7 @@ namespace HSDRawViewer
                 (tobj.ImageData.Format == GXTexFmt.CI4 && tobj.TlutData.Format == GXTlutFmt.RGB565))
                 return false;
 
-            var d = tobj.GetDecodedImageData();
+            byte[] d = tobj.GetDecodedImageData();
 
             for (int i = 0; i < d.Length; i += 4)
             {
@@ -179,7 +175,7 @@ namespace HSDRawViewer
         /// <param name="path"></param>
         public static void SaveImagePNG(this HSD_TOBJ tobj)
         {
-            var path = FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
+            string path = FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
             if (!string.IsNullOrEmpty(path))
                 tobj.SaveImagePNG(path);
         }
@@ -191,11 +187,9 @@ namespace HSDRawViewer
         public static void SaveImagePNG(this HSD_TOBJ tobj, string path)
         {
             // Save the image as a PNG file
-            using (var image = tobj.ToImage())
-            using (FileStream output = File.OpenWrite(path))
-            {
-                image.SaveAsPng(output);
-            }
+            using Image<Bgra32> image = tobj.ToImage();
+            using FileStream output = File.OpenWrite(path);
+            image.SaveAsPng(output);
         }
         /// <summary>
         /// 
@@ -233,10 +227,8 @@ namespace HSDRawViewer
             }
 
             //
-            using (Image<Bgra32> image = Image.Load<Bgra32>(filepath))
-            {
-                tobj.InjectBitmap(image, imgFormat, palFormat);
-            }
+            using Image<Bgra32> image = Image.Load<Bgra32>(filepath);
+            tobj.InjectBitmap(image, imgFormat, palFormat);
         }
         /// <summary>
         /// 
@@ -254,11 +246,10 @@ namespace HSDRawViewer
             byte[] bgraBytes = new byte[width * height * 4];
 
             // Get the span of pixels from the image
-            Memory<Bgra32> pixelSpan;
-            if (image.DangerousTryGetSinglePixelMemory(out pixelSpan))
+            if (image.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> pixelSpan))
             {
                 // Copy the BGRA data from the image to the byte array
-                var byteSpan = MemoryMarshal.AsBytes(pixelSpan.Span);
+                Span<byte> byteSpan = MemoryMarshal.AsBytes(pixelSpan.Span);
                 byteSpan.CopyTo(bgraBytes);
             }
             else
@@ -290,7 +281,7 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static HSD_TOBJ ToTObj(this Image<Bgra32> image, GXTexFmt fmt, GXTlutFmt pal)
         {
-            var tobj = new HSD_TOBJ();
+            HSD_TOBJ tobj = new();
             tobj.InjectBitmap(image, fmt, pal);
             return tobj;
         }
@@ -323,15 +314,13 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static System.Drawing.Bitmap ToBitmap(this Image<Bgra32> image)
         {
-            using (var ms = new MemoryStream())
-            {
-                // Save ImageSharp image to a stream in a format that Bitmap can read
-                image.Save(ms, new PngEncoder()); // PNG preserves transparency
-                ms.Seek(0, SeekOrigin.Begin);
+            using MemoryStream ms = new();
+            // Save ImageSharp image to a stream in a format that Bitmap can read
+            image.Save(ms, new PngEncoder()); // PNG preserves transparency
+            ms.Seek(0, SeekOrigin.Begin);
 
-                // Load the stream as a Bitmap
-                return new System.Drawing.Bitmap(ms);
-            }
+            // Load the stream as a Bitmap
+            return new System.Drawing.Bitmap(ms);
         }
     }
 }

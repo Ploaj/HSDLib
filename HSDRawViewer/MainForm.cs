@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using HSDRaw;
-using HSDRawViewer.Rendering;
-using HSDRawViewer.GUI;
-using WeifenLuo.WinFormsUI.Docking;
-using HSDRawViewer.GUI.Plugins;
-using HSDRaw.Common.Animation;
-using HSDRawViewer.GUI.Extra;
-using System.ComponentModel;
+﻿using HSDRaw;
 using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI;
 using HSDRawViewer.GUI.Dialog;
-using HSDRawViewer.Tools;
+using HSDRawViewer.GUI.Extra;
+using HSDRawViewer.GUI.Plugins;
+using HSDRawViewer.Rendering;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer
 {
@@ -23,11 +22,11 @@ namespace HSDRawViewer
         /// </summary>
         public static MainForm Instance { get; internal set; }
 
-        private PropertyView _nodePropertyViewer;
+        private readonly PropertyView _nodePropertyViewer;
 
         public string FilePath { get; internal set; }
 
-        private HSDRawFile RawHSDFile = new HSDRawFile();
+        private HSDRawFile RawHSDFile = new();
 
         public static DataNode SelectedDataNode { get; internal set; } = null;
 
@@ -73,7 +72,7 @@ namespace HSDRawViewer
                     LastActiveContent = dockPanel.ActiveContent;
             };
 
-            ImageList myImageList = new ImageList();
+            ImageList myImageList = new();
             myImageList.ImageSize = new System.Drawing.Size(24, 24);
             myImageList.Images.Add("unknown", Properties.Resources.ico_unknown);
             myImageList.Images.Add("known", Properties.Resources.ico_known);
@@ -206,7 +205,7 @@ namespace HSDRawViewer
         /// <param name="root"></param>
         public static void DeleteRoot(DataNode root)
         {
-            var toDel = Instance.RawHSDFile.Roots.Find(r => r.Data == root.Accessor);
+            HSDRootNode toDel = Instance.RawHSDFile.Roots.Find(r => r.Data == root.Accessor);
             if (toDel != null)
             {
                 Instance.RawHSDFile.Roots.Remove(toDel);
@@ -220,7 +219,7 @@ namespace HSDRawViewer
         /// <param name="root"></param>
         public static void AddRoot(string name, HSDAccessor accesor)
         {
-            var root = new HSDRootNode()
+            HSDRootNode root = new()
             {
                 Name = name,
                 Data = accesor
@@ -243,7 +242,7 @@ namespace HSDRawViewer
             RefreshTree();
 
 #if !DEBUG
-            if(RawHSDFile.Roots.Count > 0 && RawHSDFile.Roots[0].Data is HSDRaw.MEX.MEX_Data)
+            if (RawHSDFile.Roots.Count > 0 && RawHSDFile.Roots[0].Data is HSDRaw.MEX.MEX_Data)
             {
                 if (nodeBox.Visible)
                 {
@@ -269,12 +268,12 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
+            string f = Tools.FileIO.OpenFile("HSD (*.dat,*.usd,*.ssm,*.sem)|*.dat;*.usd;*.ssm;*.sem");
             if (f != null)
             {
                 if (f.ToLower().EndsWith(".sem"))
                 {
-                    SEMEditorTool d = new SEMEditorTool();
+                    SEMEditorTool d = new();
                     {
                         d.Show();
                     }
@@ -284,7 +283,7 @@ namespace HSDRawViewer
                 else
                 if (f.ToLower().EndsWith(".ssm"))
                 {
-                    SSMTool d = new SSMTool();
+                    SSMTool d = new();
                     {
                         d.Show();
                     }
@@ -303,7 +302,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath), "Save File As");
+            string f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath), "Save File As");
             if (f != null)
             {
                 RawHSDFile.Save(f);
@@ -316,7 +315,7 @@ namespace HSDRawViewer
         /// </summary>
         public void SaveDAT()
         {
-            foreach (var c in dockPanel.Contents)
+            foreach (IDockContent c in dockPanel.Contents)
             {
                 if (c is SaveableEditorBase save)
                 {
@@ -336,7 +335,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void saveAsUnoptimizedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath));
+            string f = Tools.FileIO.SaveFile("HSD (*.dat,*.usd)|*.dat;*.usd", System.IO.Path.GetFileName(FilePath));
             if (f != null)
             {
                 RawHSDFile.Save(f, false, false);
@@ -356,11 +355,11 @@ namespace HSDRawViewer
             treeView1.BeginUpdate();
 
             treeView1.Nodes.Clear();
-            foreach (var r in RawHSDFile.Roots)
+            foreach (HSDRootNode r in RawHSDFile.Roots)
             {
                 treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r));
             }
-            foreach (var r in RawHSDFile.References)
+            foreach (HSDRootNode r in RawHSDFile.References)
             {
                 treeView1.Nodes.Add(new DataNode(r.Name, r.Data, root: r, referenceNode: true));
             }
@@ -379,18 +378,18 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void addRootFromFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("HSD (*.dat;*.txg)|*.dat;*.txg");
+            string f = Tools.FileIO.OpenFile("HSD (*.dat;*.txg)|*.dat;*.txg");
             if (f != null)
             {
                 if (f.ToLower().EndsWith(".dat"))
                 {
-                    var file = new HSDRawFile(f);
+                    HSDRawFile file = new(f);
 
                     RawHSDFile.Roots.Add(file.Roots[0]);
                 }
                 if (f.ToLower().EndsWith(".txg"))
                 {
-                    var str = new HSDStruct();
+                    HSDStruct str = new();
                     str.SetData(System.IO.File.ReadAllBytes(f));
 
                     RawHSDFile.Roots.Add(new HSDRootNode()
@@ -412,7 +411,7 @@ namespace HSDRawViewer
         public bool CloseEditor(DataNode n)
         {
             List<Form> toClose = GetEditors(n);
-            foreach (var c in toClose)
+            foreach (Form c in toClose)
                 c.Close();
             return toClose.Count > 0;
         }
@@ -424,8 +423,8 @@ namespace HSDRawViewer
         /// <returns>Editors that are using this node</returns>
         public List<Form> GetEditors(DataNode n)
         {
-            List<Form> editors = new List<Form>();
-            foreach (var c in dockPanel.Contents)
+            List<Form> editors = new();
+            foreach (IDockContent c in dockPanel.Contents)
             {
                 if (c is PluginBase b && b.Node.Accessor._s == n.Accessor._s && c is Form form)
                 {
@@ -442,7 +441,7 @@ namespace HSDRawViewer
         /// <returns></returns>
         public bool IsOpened(DataNode n)
         {
-            foreach (var c in dockPanel.Contents)
+            foreach (IDockContent c in dockPanel.Contents)
             {
                 if (c is PluginBase b && b.Node.Accessor._s == n.Accessor._s)
                 {
@@ -459,8 +458,8 @@ namespace HSDRawViewer
         /// <returns></returns>
         public bool IsChildOpened(HSDStruct s)
         {
-            var structs = s.GetSubStructs();
-            foreach (var c in dockPanel.Contents)
+            List<HSDStruct> structs = s.GetSubStructs();
+            foreach (IDockContent c in dockPanel.Contents)
             {
                 if (c is PluginBase b && structs.Contains(b.Node.Accessor._s))
                 {
@@ -477,8 +476,8 @@ namespace HSDRawViewer
         /// <returns></returns>
         public void ClearWorkspace()
         {
-            List<DockContent> ToRemove = new List<DockContent>();
-            foreach (var c in dockPanel.Contents)
+            List<DockContent> ToRemove = new();
+            foreach (IDockContent c in dockPanel.Contents)
             {
                 if (c is SaveableEditorBase save)
                     save.ForceClose = true;
@@ -488,7 +487,7 @@ namespace HSDRawViewer
                     ToRemove.Add(dc);
                 }
             }
-            foreach (var v in ToRemove)
+            foreach (DockContent v in ToRemove)
                 v.Close();
         }
 
@@ -504,7 +503,7 @@ namespace HSDRawViewer
             if (SelectedDataNode == null)
                 return;
 
-            var edit = PluginManager.GetEditorFromType(SelectedDataNode.Accessor.GetType());
+            PluginBase edit = PluginManager.GetEditorFromType(SelectedDataNode.Accessor.GetType());
 
             // Special animation override
             if (SelectedDataNode.Accessor is HSD_AnimJoint
@@ -557,7 +556,7 @@ namespace HSDRawViewer
                             if (part_select_index > modelPart.Anims.Length)
                                 part_select_index = 0;
 
-                            JointAnimManager manager = new JointAnimManager();
+                            JointAnimManager manager = new();
                             for (int i = 0; i < modelPart.StartingBone; i++)
                                 manager.Nodes.Add(new AnimNode());
                             manager.Nodes.AddRange(new JointAnimManager(modelPart.Anims[part_select_index]).Nodes);
@@ -569,9 +568,10 @@ namespace HSDRawViewer
 
             if (IsOpened(SelectedDataNode))
             {
-                var editor = GetEditors(SelectedDataNode);
+                List<Form> editor = GetEditors(SelectedDataNode);
                 editor[0].BringToFront();
-            } else
+            }
+            else
             if (!IsChildOpened(SelectedDataNode.Accessor._s) &&
                 edit != null &&
                 edit is DockContent dc)
@@ -650,12 +650,10 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void aJToolToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (AJSplitDialog d = new AJSplitDialog())
-            {
-                d.ShowDialog();
-            }
+            using AJSplitDialog d = new();
+            d.ShowDialog();
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -663,7 +661,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void sSMEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SSMTool d = new SSMTool();
+            SSMTool d = new();
             d.Show();
             d.BringToFront();
         }
@@ -717,7 +715,7 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void sEMEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SEMEditorTool d = new SEMEditorTool();
+            SEMEditorTool d = new();
             {
                 d.Show();
             }
@@ -758,7 +756,7 @@ namespace HSDRawViewer
             /*[Browsable(true),
              TypeConverter(typeof(HSDTypeConverter))]
             public Type Type { get; set; } = typeof(HSDAccessor);*/
-            
+
         }
 
         /// <summary>
@@ -768,25 +766,21 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void addRootFromTypeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var settings = new NewRootSettings();
-            using (HSDTypeDialog t = new HSDTypeDialog())
+            NewRootSettings settings = new();
+            using HSDTypeDialog t = new();
+            if (t.ShowDialog() == DialogResult.OK)
             {
-                if(t.ShowDialog() == DialogResult.OK)
+                using PropertyDialog d = new("New Root", settings);
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    using (PropertyDialog d = new PropertyDialog("New Root", settings))
-                    {
-                        if (d.ShowDialog() == DialogResult.OK)
-                        {
-                            var root = new HSDRootNode();
+                    HSDRootNode root = new();
 
-                            root.Name = settings.Symbol;
-                            root.Data = (HSDAccessor)Activator.CreateInstance(t.HSDAccessorType);
+                    root.Name = settings.Symbol;
+                    root.Data = (HSDAccessor)Activator.CreateInstance(t.HSDAccessorType);
 
-                            RawHSDFile.Roots.Add(root);
+                    RawHSDFile.Roots.Add(root);
 
-                            RefreshTree();
-                        }
-                    }
+                    RefreshTree();
                 }
             }
         }
@@ -798,14 +792,14 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void addRootFromFileToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("All Files |*.*");
+            string f = Tools.FileIO.OpenFile("All Files |*.*");
 
-            if(f != null)
+            if (f != null)
             {
-                var root = new HSDRootNode();
+                HSDRootNode root = new();
 
                 root.Name = System.IO.Path.GetFileNameWithoutExtension(f);
-                root.Data = new HSDAccessor() ;
+                root.Data = new HSDAccessor();
                 root.Data._s.SetData(System.IO.File.ReadAllBytes(f));
 
                 RawHSDFile.Roots.Add(root);
@@ -822,7 +816,7 @@ namespace HSDRawViewer
         private void treeView1_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
             // Can only edit root node labels
-            if(!(e.Node is DataNode d && d.IsRootNode && !d.IsReferenceNode))
+            if (!(e.Node is DataNode d && d.IsRootNode && !d.IsReferenceNode))
             {
                 e.CancelEdit = true;
             }
@@ -840,7 +834,7 @@ namespace HSDRawViewer
                 d.RootText = e.Label;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -858,10 +852,10 @@ namespace HSDRawViewer
         /// <param name="e"></param>
         private void trimExcessDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var trimmed = 0;
-            foreach(DataNode d in treeView1.Nodes)
+            int trimmed = 0;
+            foreach (DataNode d in treeView1.Nodes)
             {
-                if(d.Accessor != null)
+                if (d.Accessor != null)
                     trimmed += d.Accessor.Optimize();
             }
             MessageBox.Show($"Trimmed 0x{trimmed.ToString("X")} bytes", "Trimmed File");

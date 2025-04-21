@@ -11,37 +11,35 @@ namespace HSDRawViewer.ContextMenus
 
         public FigatreeContextMenu() : base()
         {
-            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Export As .figatree");
+            ToolStripMenuItem OpenAsAJ = new("Export As .figatree");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_FigaTree figa)
                 {
-                    var f = Tools.FileIO.SaveFile("Figatree (.figatree)|*.figatree");
+                    string f = Tools.FileIO.SaveFile("Figatree (.figatree)|*.figatree");
 
-                    if(f != null)
+                    if (f != null)
                     {
-                        using (StreamWriter w = new StreamWriter(new FileStream(f, FileMode.Create)))
+                        using StreamWriter w = new(new FileStream(f, FileMode.Create));
+                        w.WriteLine($"FrameCount: {figa.FrameCount}");
+
+                        int ni = 0;
+                        foreach (FigaTreeNode n in figa.Nodes)
                         {
-                            w.WriteLine($"FrameCount: {figa.FrameCount}");
+                            w.WriteLine($"Node {ni++}:");
 
-                            var ni = 0;
-                            foreach(var n in figa.Nodes)
+                            foreach (HSD_Track t in n.Tracks)
                             {
-                                w.WriteLine($"Node {ni++}:");
+                                w.WriteLine($"{t.JointTrackType}");
 
-                                foreach(var t in n.Tracks)
+                                w.WriteLine("{");
+
+                                foreach (HSDRaw.Tools.FOBJKey k in t.GetKeys())
                                 {
-                                    w.WriteLine($"{t.JointTrackType}");
-
-                                    w.WriteLine("{");
-
-                                    foreach(var k in t.GetKeys())
-                                    {
-                                        w.WriteLine($"\t{k.Frame} {k.Value} {k.Tan} {k.InterpolationType}");
-                                    }
-
-                                    w.WriteLine("}");
+                                    w.WriteLine($"\t{k.Frame} {k.Value} {k.Tan} {k.InterpolationType}");
                                 }
+
+                                w.WriteLine("}");
                             }
                         }
                     }

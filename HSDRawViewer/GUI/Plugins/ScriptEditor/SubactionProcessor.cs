@@ -1,11 +1,10 @@
-﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using HSDRawViewer.Tools;
-using HSDRaw;
+﻿using HSDRaw;
 using HSDRawViewer.Rendering.Models;
-using System.Linq;
 using HSDRawViewer.Rendering.Widgets;
+using HSDRawViewer.Tools;
+using OpenTK.Mathematics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 {
@@ -58,7 +57,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <returns></returns>
         public Vector3 GetWorldPosition(LiveJObj manager)
         {
-            var transform = GetWorldTransform(manager);
+            Matrix4 transform = GetWorldTransform(manager);
 
             if (!_widget.Interacting)
             {
@@ -84,7 +83,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (manager == null)
                 return Matrix4.Identity;
 
-            var boneID = BoneID;
+            int boneID = BoneID;
             if (boneID == 0)
                 if (manager.GetJObjAtIndex(1) != null && manager.GetJObjAtIndex(1).Child == null) // special case for character like mewtwo with a leading bone
                     boneID = 2;
@@ -94,7 +93,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (boneID < 0 || boneID > manager.JointCount)
                 boneID = 0;
 
-            var transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
+            Matrix4 transform = Matrix4.CreateTranslation(Point1) * manager.GetJObjAtIndex(boneID).WorldTransform;
             //transform = transform.ClearScale();
 
             return transform;
@@ -112,7 +111,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             public SubactionEvent Event;
 
-            public List<Command> ReferenceCommands = new List<Command>();
+            public List<Command> ReferenceCommands = new();
         }
 
         public class GFXSpawn
@@ -124,7 +123,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             public Vector3 Range;
         }
 
-        private List<Command> Commands = new List<Command>();
+        private List<Command> Commands = new();
 
         public Hitbox[] Hitboxes { get; internal set; } = new Hitbox[MaxHitboxCount];
 
@@ -146,7 +145,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public bool ThrownFighter { get; internal set; } = false;
 
-        public Dictionary<int, int> BoneCollisionStates = new Dictionary<int, int>();
+        public Dictionary<int, int> BoneCollisionStates = new();
 
 
         public delegate void UpdateVIS(int structId, int objectId);
@@ -224,18 +223,18 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 structToComman = new Dictionary<HSDStruct, List<Command>>();
             }
 
-            List<Command> commands = new List<Command>();
+            List<Command> commands = new();
 
-            foreach (var ev in events)
+            foreach (SubactionEvent ev in events)
             {
-                var command = new Command()
+                Command command = new()
                 {
                     Event = ev,
                 };
                 commands.Add(command);
 
                 // process pointer data
-                var pointer = ev.GetPointer();
+                HSDStruct pointer = ev.GetPointer();
                 if (pointer != null)
                 {
                     if (structToComman.ContainsKey(pointer))
@@ -245,7 +244,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     else
                     {
                         structToComman.Add(pointer, new List<Command>());
-                        var subcommand = GetCommands(SubactionEvent.GetEvents(subGroup, pointer).ToList(), subGroup, structToComman);
+                        List<Command> subcommand = GetCommands(SubactionEvent.GetEvents(subGroup, pointer).ToList(), subGroup, structToComman);
                         structToComman[pointer] = subcommand;
                         command.ReferenceCommands = subcommand;
                     }
@@ -257,7 +256,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
 
         // prevent recursion...
-        private HashSet<List<Command>> CommandHashes = new HashSet<List<Command>>();
+        private readonly HashSet<List<Command>> CommandHashes = new();
 
         /// <summary>
         /// 
@@ -267,7 +266,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         {
             GFXOnFrame.Clear();
             // disable hitboxes
-            foreach (var v in Hitboxes)
+            foreach (Hitbox v in Hitboxes)
                 v.Active = false;
 
             ResetState();
@@ -288,8 +287,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // process commands
             for (int i = 0; i < commands.Count; i++)
             {
-                var cmd = commands[i];
-                var ev = cmd.Event;
+                Command cmd = commands[i];
+                SubactionEvent ev = cmd.Event;
                 switch (cmd.Event.Code)
                 {
                     case 0 << 2: //end script
@@ -337,7 +336,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         // remove the current hitbox with this id
                         if (ev.GetParameter(0) < Hitboxes.Length)
                         {
-                            var hb = Hitboxes[ev.GetParameter(0)];
+                            Hitbox hb = Hitboxes[ev.GetParameter(0)];
                             hb.EventSource = ev;
                             hb.CreatedOnFrame = time;
                             hb.Active = true;
@@ -360,7 +359,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         break;
                     case 16 << 2:
                         {
-                            foreach (var hb in Hitboxes)
+                            foreach (Hitbox hb in Hitboxes)
                                 hb.Active = false;
                         }
                         break;
@@ -428,7 +427,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             }
 
             // Update hitbox interpolation
-            foreach (var v in Hitboxes)
+            foreach (Hitbox v in Hitboxes)
             {
                 if (v.Active)
                 {

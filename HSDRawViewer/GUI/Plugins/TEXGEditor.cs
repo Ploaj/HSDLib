@@ -1,11 +1,10 @@
 ﻿using HSDRaw.Common;
-using System;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using HSDRawViewer.GUI.Dialog;
 using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.Data;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins
 {
@@ -45,7 +44,7 @@ namespace HSDRawViewer.GUI.Plugins
                 return;
 
             Images = _texGraphic.ConvertToTOBJs().Select(e => new TOBJProxy() { TOBJ = e }).ToArray();
-            arrayMemberEditor1.SetArrayFromProperty(this, "Images");
+            arrayMemberEditor1.SetArrayFromProperty(this, nameof(Images));
         }
 
         /// <summary>
@@ -105,7 +104,7 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (arrayMemberEditor1.SelectedObject is TOBJProxy proxy)
             {
-                var export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
+                string export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
 
                 if (export != null)
                 {
@@ -123,17 +122,17 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (Images != null && Images.Length > 0)
             {
-                var export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
+                string export = Tools.FileIO.SaveFile(ApplicationSettings.ImageFileFilter);
 
                 if (export != null)
                 {
-                    var path = System.IO.Path.GetDirectoryName(export);
-                    var fname = System.IO.Path.GetFileNameWithoutExtension(export);
-                    var extension = System.IO.Path.GetExtension(export);
+                    string path = System.IO.Path.GetDirectoryName(export);
+                    string fname = System.IO.Path.GetFileNameWithoutExtension(export);
+                    string extension = System.IO.Path.GetExtension(export);
                     int index = 0;
-                    foreach(var v in Images)
+                    foreach (TOBJProxy v in Images)
                     {
-                        using (var bmp = v.ToImage())
+                        using (System.Drawing.Image bmp = v.ToImage())
                             bmp.Save($"{path}/{fname}_{index.ToString("D2")}{extension}");
                         index++;
                     }
@@ -149,37 +148,37 @@ namespace HSDRawViewer.GUI.Plugins
         private void buttonImport_Click(object sender, EventArgs e)
         {
             {
-                var imports = Tools.FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
+                string[] imports = Tools.FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
 
                 if (imports != null)
                 {
-                    var texFmt = _texGraphic.ImageFormat;
-                    var palFmt = _texGraphic.PaletteFormat;
-                    var width = -1;
-                    var height = -1;
+                    HSDRaw.GX.GXTexFmt texFmt = _texGraphic.ImageFormat;
+                    HSDRaw.GX.GXTlutFmt palFmt = _texGraphic.PaletteFormat;
+                    int width = -1;
+                    int height = -1;
 
                     if (Images.Length == 0)
                     {
-                        using (var d = new TextureImportDialog())
-                            if (d.ShowDialog() == DialogResult.OK)
-                            {
-                                texFmt = d.TextureFormat;
-                                palFmt = d.PaletteFormat;
-                            }
-                            else
-                                return;
+                        using TextureImportDialog d = new();
+                        if (d.ShowDialog() == DialogResult.OK)
+                        {
+                            texFmt = d.TextureFormat;
+                            palFmt = d.PaletteFormat;
+                        }
+                        else
+                            return;
                     }
 
-                    if(Images.Length > 0)
+                    if (Images.Length > 0)
                     {
                         width = _texGraphic.Width;
                         height = _texGraphic.Height;
                     }
 
-                    foreach (var import in imports)
-                        using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
+                    foreach (string import in imports)
+                        using (SixLabors.ImageSharp.Image<Bgra32> bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
                         {
-                            if(width == -1 || height == -1)
+                            if (width == -1 || height == -1)
                             {
                                 width = bmp.Width;
                                 height = bmp.Height;
@@ -208,14 +207,14 @@ namespace HSDRawViewer.GUI.Plugins
         {
             if (arrayMemberEditor1.SelectedObject is TOBJProxy proxy)
             {
-                var import = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                string import = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                 if (import != null)
                 {
-                    var texFmt = _texGraphic.ImageFormat;
-                    var palFmt = _texGraphic.PaletteFormat;
+                    HSDRaw.GX.GXTexFmt texFmt = _texGraphic.ImageFormat;
+                    HSDRaw.GX.GXTlutFmt palFmt = _texGraphic.PaletteFormat;
 
-                    using (var bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
+                    using (SixLabors.ImageSharp.Image<Bgra32> bmp = SixLabors.ImageSharp.Image.Load<Bgra32>(import))
                         proxy.TOBJ.EncodeImageData(bmp.ToTObj(texFmt, palFmt).GetDecodedImageData(), _texGraphic.Width, _texGraphic.Height, texFmt, palFmt);
 
                     SaveTextures();

@@ -16,54 +16,54 @@ namespace HSDRawViewer.Converters.AirRide
 
         public static KAR_grCollisionNode KCLtoKAR(string kclFile, out KAR_grCollisionTree tree)
         {
-            KAR_grCollisionNode node = new KAR_grCollisionNode();
+            KAR_grCollisionNode node = new();
 
-            List<KAR_CollisionTriangle> tris = new List<KAR_CollisionTriangle>();
-            List<GXVector3> verts = new List<GXVector3>();
+            List<KAR_CollisionTriangle> tris = new();
+            List<GXVector3> verts = new();
 
-            using (FileStream f = new FileStream(kclFile, FileMode.Open))
-            using (BinaryReaderExt r = new BinaryReaderExt(f))
+            using (FileStream f = new(kclFile, FileMode.Open))
+            using (BinaryReaderExt r = new(f))
             {
                 r.BigEndian = true;
 
-                var posOffset = r.ReadInt32();
-                var nrmOffset = r.ReadInt32();
-                var triOffset = r.ReadInt32() + 0x10;
-                var partOffste = r.ReadInt32();
+                int posOffset = r.ReadInt32();
+                int nrmOffset = r.ReadInt32();
+                int triOffset = r.ReadInt32() + 0x10;
+                int partOffste = r.ReadInt32();
 
-                var triCount = (partOffste - triOffset) / 0x10;
+                int triCount = (partOffste - triOffset) / 0x10;
                 for (int i = 0; i < triCount; i++)
                 {
                     r.Seek((uint)(triOffset + i * 0x10));
 
-                    var length = r.ReadSingle();
-                    var pi = r.ReadUInt16();
-                    var di = r.ReadUInt16();
-                    var n1 = r.ReadUInt16();
-                    var n2 = r.ReadUInt16();
-                    var n3 = r.ReadUInt16();
-                    var fl = r.ReadUInt16();
+                    float length = r.ReadSingle();
+                    ushort pi = r.ReadUInt16();
+                    ushort di = r.ReadUInt16();
+                    ushort n1 = r.ReadUInt16();
+                    ushort n2 = r.ReadUInt16();
+                    ushort n3 = r.ReadUInt16();
+                    ushort fl = r.ReadUInt16();
 
                     r.Seek((uint)(posOffset + pi * 0xC));
-                    var position = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+                    Vector3 position = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
 
                     r.Seek((uint)(nrmOffset + di * 0xC));
-                    var direction = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+                    Vector3 direction = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
 
                     r.Seek((uint)(nrmOffset + n1 * 0xC));
-                    var normalA = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+                    Vector3 normalA = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
 
                     r.Seek((uint)(nrmOffset + n2 * 0xC));
-                    var normalB = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+                    Vector3 normalB = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
 
                     r.Seek((uint)(nrmOffset + n3 * 0xC));
-                    var normalC = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+                    Vector3 normalC = new(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
 
-                    var crossA = Vector3.Cross(normalA, direction);
-                    var crossB = Vector3.Cross(normalB, direction);
-                    var vertex1 = position;
-                    var vertex2 = position + crossB * (length / Vector3.Dot(crossB, normalC));
-                    var vertex3 = position + crossA * (length / Vector3.Dot(crossA, normalC));
+                    Vector3 crossA = Vector3.Cross(normalA, direction);
+                    Vector3 crossB = Vector3.Cross(normalB, direction);
+                    Vector3 vertex1 = position;
+                    Vector3 vertex2 = position + crossB * (length / Vector3.Dot(crossB, normalC));
+                    Vector3 vertex3 = position + crossA * (length / Vector3.Dot(crossA, normalC));
 
                     tris.Add(new KAR_CollisionTriangle()
                     {
@@ -90,12 +90,12 @@ namespace HSDRawViewer.Converters.AirRide
             }
 
             {
-                var height = verts.Min(e => e.Y) - 10;
+                float height = verts.Min(e => e.Y) - 10;
 
-                var v1 = new Vector3(-10000, height, -10000);
-                var v2 = new Vector3(10000, height, -10000);
-                var v3 = new Vector3(10000, height, 10000);
-                var v4 = new Vector3(-10000, height, 10000);
+                Vector3 v1 = new(-10000, height, -10000);
+                Vector3 v2 = new(10000, height, -10000);
+                Vector3 v3 = new(10000, height, 10000);
+                Vector3 v4 = new(-10000, height, 10000);
 
                 tris.Add(new KAR_CollisionTriangle()
                 {
@@ -128,7 +128,7 @@ namespace HSDRawViewer.Converters.AirRide
             node.Vertices = verts.ToArray();
             node.Joints = new KAR_CollisionJoint[]
             {
-                new KAR_CollisionJoint()
+                new()
                 {
                     VertexStart = 0,
                     VertexSize = verts.Count,
@@ -144,15 +144,15 @@ namespace HSDRawViewer.Converters.AirRide
 
         public static HSD_Spline KMP_ExtractRouteSpline(string kmpFile)
         {
-            List<HSD_Vector3> points = new List<HSD_Vector3>();
+            List<HSD_Vector3> points = new();
 
-            using (FileStream f = new FileStream(kmpFile, FileMode.Open))
-            using (BinaryReaderExt r = new BinaryReaderExt(f))
+            using (FileStream f = new(kmpFile, FileMode.Open))
+            using (BinaryReaderExt r = new(f))
             {
                 r.BigEndian = true;
 
                 r.Seek(0x14);
-                var enpt = r.ReadUInt32();
+                uint enpt = r.ReadUInt32();
 
                 r.Seek(enpt + 0x4C);
                 r.Skip(4);
@@ -162,17 +162,17 @@ namespace HSDRawViewer.Converters.AirRide
                 for (int i = 0; i < count; i++)
                 {
                     points.Add(new HSD_Vector3() { X = r.ReadSingle() * Scale, Y = r.ReadSingle() * Scale + YTrans, Z = r.ReadSingle() * Scale });
-                    var range = r.ReadSingle();
+                    float range = r.ReadSingle();
                     r.Skip(4); // settings
                 }
             }
 
-            HSD_Spline spline = new HSD_Spline();
+            HSD_Spline spline = new();
             spline.Points = points.ToArray();
             spline.PointCount = (short)points.Count;
 
             float totalLength = 0;
-            foreach (var e in points)
+            foreach (HSD_Vector3 e in points)
                 totalLength += new Vector3(e.X, e.Y, e.Z).Length;
 
             float[] lengths = new float[points.Count];

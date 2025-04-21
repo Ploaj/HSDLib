@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using HSDRaw.GX;
 using HSDRaw.Tools;
-using HSDRaw.GX;
-using System.ComponentModel;
 using IONET.Core.Model;
-using System.Linq;
+using System;
+using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Converters
@@ -77,10 +76,10 @@ namespace HSDRawViewer.Converters
         {
             jointName = null;
 
-            foreach (var v in _poly.Vertices)
+            foreach (IOVertex v in _poly.Vertices)
             {
                 if (v.Envelope != null)
-                    foreach (var e in v.Envelope.Weights)
+                    foreach (IONET.Core.IOBoneWeight e in v.Envelope.Weights)
                     {
                         // weight is not 1 so not single bound
                         if (e.Weight != 1)
@@ -114,7 +113,7 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public bool UseVertexColor(int set)
         {
-            foreach (var v in _poly.Vertices)
+            foreach (IOVertex v in _poly.Vertices)
             {
                 if (v.Colors[set].X != 1 || v.Colors[set].Y != 1 || v.Colors[set].Z != 1 || v.Colors[set].W != 1)
                     return true;
@@ -243,11 +242,11 @@ namespace HSDRawViewer.Converters
         public Color SpecularColor { get; set; } = Color.White;
 
         [Browsable(false)]
-        public SerialColor ambient { get => new SerialColor(AmbientColor); set => AmbientColor = value.ToColor(); }
+        public SerialColor ambient { get => new(AmbientColor); set => AmbientColor = value.ToColor(); }
         [Browsable(false)]
-        public SerialColor diffuse { get => new SerialColor(DiffuseColor); set => DiffuseColor = value.ToColor(); }
+        public SerialColor diffuse { get => new(DiffuseColor); set => DiffuseColor = value.ToColor(); }
         [Browsable(false)]
-        public SerialColor specular { get => new SerialColor(SpecularColor); set => SpecularColor = value.ToColor(); }
+        public SerialColor specular { get => new(SpecularColor); set => SpecularColor = value.ToColor(); }
 
         [Category("Material Params"), DisplayName("Alpha"), Description("Material alpha transparency")]
         public float Alpha { get; set; } = 1;
@@ -257,8 +256,8 @@ namespace HSDRawViewer.Converters
 
 
         [Category("MObj Import Options"), DisplayName("Path to MObj"), Description(""), YamlIgnore]
-        public string MobjPath 
-        { 
+        public string MobjPath
+        {
             get
             {
                 if (_material == null)
@@ -384,7 +383,7 @@ namespace HSDRawViewer.Converters
             {
                 if (!string.IsNullOrEmpty(material.DiffuseMap.Name))
                 {
-                    var found = ((GXTexFmt[])Enum.GetValues(typeof(GXTexFmt)))
+                    IOrderedEnumerable<GXTexFmt> found = ((GXTexFmt[])Enum.GetValues(typeof(GXTexFmt)))
                         .Where(e => material.DiffuseMap.Name.Contains(e.ToString()))
                         .OrderBy(e => material.DiffuseMap.Name.IndexOf(e.ToString()));
 
@@ -394,7 +393,7 @@ namespace HSDRawViewer.Converters
 
                         if (GXImageConverter.IsPalettedFormat(TextureFormat))
                         {
-                            var palfmt = ((GXTlutFmt[])Enum.GetValues(typeof(GXTlutFmt)))
+                            IOrderedEnumerable<GXTlutFmt> palfmt = ((GXTlutFmt[])Enum.GetValues(typeof(GXTlutFmt)))
                                 .Where(e => material.DiffuseMap.Name.Contains(e.ToString()))
                                 .OrderBy(e => material.DiffuseMap.Name.IndexOf(e.ToString()));
 
@@ -446,7 +445,7 @@ namespace HSDRawViewer.Converters
 
         [Category("Importing Options"), DisplayName("Use Triangle Strips"), Description("Slower to import, but significantly better optimized for game")]
         public bool UseStrips { get; set; } = true;
-        
+
         [Category("Importing Options"), DisplayName("Import Skinning"), Description("Import skin data")]
         public bool ImportSkinning { get; set; } = true;
 

@@ -1,14 +1,11 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
-using HSDRaw.GX;
-using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.AirRide
@@ -19,36 +16,36 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         public GrDataContextMenu() : base()
         {
-            ToolStripMenuItem ImportCollModel = new ToolStripMenuItem("Import Collision Model");
+            ToolStripMenuItem ImportCollModel = new("Import Collision Model");
             ImportCollModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
+                    string f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
                     if (f != null)
                     {
                         // generate collision node
                         data.CollisionNode = KARCollisionImporter.GenerateCollisionNode(f);
 
                         // generate partition
-                        var jobj = Converters.ModelImporter.ImportModelFromFile(f);
+                        HSDRaw.Common.HSD_JOBJ jobj = Converters.ModelImporter.ImportModelFromFile(f);
                         data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
                     }
                 }
             };
             Items.Add(ImportCollModel);
 
-            ToolStripMenuItem ExportCollModel = new ToolStripMenuItem("Export Collision Model");
+            ToolStripMenuItem ExportCollModel = new("Export Collision Model");
             ExportCollModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
-                    var modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+                    string modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
+                    string modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
 
                     if (modelPath != null)
                     {
-                        var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "coll_model.dae");
+                        string f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "coll_model.dae");
                         if (f != null)
                         {
                             KARCollisionExporter.ExportCollisionModel(f, modelPath, data);
@@ -78,17 +75,17 @@ namespace HSDRawViewer.ContextMenus.AirRide
             //};
             //Items.Add(ImportZoneModel);
 
-            ToolStripMenuItem ExportZoneModel = new ToolStripMenuItem("Export Zone Model");
+            ToolStripMenuItem ExportZoneModel = new("Export Zone Model");
             ExportZoneModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
-                    var modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+                    string modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
+                    string modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
 
                     if (modelPath != null)
                     {
-                        var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "zone_model.dae");
+                        string f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "zone_model.dae");
                         if (f != null)
                         {
                             KARCollisionExporter.ExportZoneModel(f, modelPath, data);
@@ -103,12 +100,12 @@ namespace HSDRawViewer.ContextMenus.AirRide
             Items.Add(new ToolStripSeparator());
 
 
-            ToolStripMenuItem ExportAreaBones = new ToolStripMenuItem("Export Area Bones");
+            ToolStripMenuItem ExportAreaBones = new("Export Area Bones");
             ExportAreaBones.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "area_pos.dae");
+                    string f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "area_pos.dae");
                     if (f != null)
                     {
                         KARPositionExporter.ExportAreaPositions(f, data.PositionNode.ItemAreaPos[0]);
@@ -119,7 +116,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
 
 
-            ToolStripMenuItem test = new ToolStripMenuItem("Test Edit");
+            ToolStripMenuItem test = new("Test Edit");
             test.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
@@ -128,16 +125,16 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
                     // analyze splitting pattern
 
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
                     if (f != null)
                     {
-                        var file = new HSDRawFile(f);
+                        HSDRawFile file = new(f);
 
-                        foreach (var r in file.Roots)
+                        foreach (HSDRootNode r in file.Roots)
                         {
                             if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
                             {
-                                var jobj = new LiveJObj(m.MainModel.RootNode);
+                                LiveJObj jobj = new(m.MainModel.RootNode);
                                 data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(jobj, data.CollisionNode);
                             }
                         }
@@ -180,18 +177,18 @@ namespace HSDRawViewer.ContextMenus.AirRide
             Items.Add(test);
 
 
-            ToolStripMenuItem clear = new ToolStripMenuItem("Clear Bones");
+            ToolStripMenuItem clear = new("Clear Bones");
             clear.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var j = data.CollisionNode.Joints;
-                    foreach (var joint in j)
+                    KAR_CollisionJoint[] j = data.CollisionNode.Joints;
+                    foreach (KAR_CollisionJoint joint in j)
                         joint.BoneID = 0;
                     data.CollisionNode.Joints = j;
 
-                    var z = data.CollisionNode.ZoneJoints;
-                    foreach (var joint in z)
+                    KAR_ZoneCollisionJoint[] z = data.CollisionNode.ZoneJoints;
+                    foreach (KAR_ZoneCollisionJoint joint in z)
                         joint.BoneID = 0;
                     data.CollisionNode.ZoneJoints = z;
                 }
@@ -199,22 +196,22 @@ namespace HSDRawViewer.ContextMenus.AirRide
             Items.Add(clear);
 
 
-            ToolStripMenuItem ds = new ToolStripMenuItem("Remove Zone Type Flags");
+            ToolStripMenuItem ds = new("Remove Zone Type Flags");
             ds.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var tri = data.CollisionNode.ZoneTriangles;
-                    var joint = data.CollisionNode.ZoneJoints;
+                    KAR_ZoneCollisionTriangle[] tri = data.CollisionNode.ZoneTriangles;
+                    KAR_ZoneCollisionJoint[] joint = data.CollisionNode.ZoneJoints;
 
-                    HashSet<int> flags = new HashSet<int>();
+                    HashSet<int> flags = new();
 
                     int ji = 0;
-                    foreach (var j in joint)
+                    foreach (KAR_ZoneCollisionJoint j in joint)
                     {
                         for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                         {
-                            var t = tri[i];
+                            KAR_ZoneCollisionTriangle t = tri[i];
 
                             if (!flags.Contains(t.Type) || j.x14 != -1)
                             {

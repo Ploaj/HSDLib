@@ -1,15 +1,11 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.Rendering;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
 {
-    public class GrRangeSplineEditor 
+    public class GrRangeSplineEditor
     {
         public KAR_grRangeSpline[] _items { get; set; }
 
@@ -19,7 +15,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
         /// <param name="selected"></param>
         public void Render(object selected)
         {
-            foreach (var s in _items)
+            foreach (KAR_grRangeSpline s in _items)
             {
                 if (s == (KAR_grRangeSpline)selected)
                 {

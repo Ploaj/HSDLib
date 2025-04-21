@@ -6,9 +6,6 @@ using IONET.Core.Skeleton;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.AirRide
@@ -20,34 +17,34 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         public GrPositionListContextMenu() : base()
         {
-            ToolStripMenuItem import = new ToolStripMenuItem("Import Model");
+            ToolStripMenuItem import = new("Import Model");
             import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grPositionList data)
                 {
-                    var f = Tools.FileIO.SaveFile(IOManager.GetImportFileFilter(true, false), "model.dae");
+                    string f = Tools.FileIO.SaveFile(IOManager.GetImportFileFilter(true, false), "model.dae");
                     if (f != null)
                     {
-                        var scene = IOManager.LoadScene(f, new ImportSettings());
+                        IOScene scene = IOManager.LoadScene(f, new ImportSettings());
                         data._s = ToPositionList(scene.Models[0].Skeleton.RootBones[0])._s;
                     }
                 }
             };
             Items.Add(import);
 
-            ToolStripMenuItem export = new ToolStripMenuItem("Export Model");
+            ToolStripMenuItem export = new("Export Model");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grPositionList data)
                 {
-                    var f = Tools.FileIO.SaveFile(IOManager.GetExportFileFilter(true, false), "model.dae");
+                    string f = Tools.FileIO.SaveFile(IOManager.GetExportFileFilter(true, false), "model.dae");
                     if (f != null)
                     {
-                        IOModel model = new IOModel();
+                        IOModel model = new();
                         model.Skeleton = new IOSkeleton();
                         model.Skeleton.RootBones.Add(ToBone(data));
 
-                        IOScene scene = new IOScene();
+                        IOScene scene = new();
                         scene.Models.Add(model);
                         IOManager.ExportScene(scene, f);
                     }
@@ -58,7 +55,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         private static IOBone ToBone(KAR_grPositionList data)
         {
-            IOBone root = new IOBone()
+            IOBone root = new()
             {
                 Name = "Origin"
             };
@@ -66,13 +63,13 @@ namespace HSDRawViewer.ContextMenus.AirRide
             if (data.PositionData != null)
             {
                 int i = 0;
-                foreach (var p in data.PositionData.Array)
+                foreach (KAR_grPositionData p in data.PositionData.Array)
                 {
-                    var rot = new Matrix3(p.M11, p.M12, p.M13,
+                    Quaternion rot = new Matrix3(p.M11, p.M12, p.M13,
                         p.M21, p.M22, p.M23,
                         0, 0, 1).ExtractRotation();
 
-                    IOBone bone = new IOBone()
+                    IOBone bone = new()
                     {
                         Name = $"POS_{i++.ToString("D3")}",
                         Translation = new System.Numerics.Vector3(p.X, p.Y, p.Z),
@@ -88,12 +85,12 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         private static KAR_grPositionList ToPositionList(IOBone root)
         {
-            List<KAR_grPositionData> data = new List<KAR_grPositionData>();
+            List<KAR_grPositionData> data = new();
 
-            foreach (var bone in root.Children)
+            foreach (IOBone bone in root.Children)
             {
-                var br = bone.Rotation;
-                var rot = Matrix3.CreateFromQuaternion(new Quaternion(br.X, br.Y, br.Z, br.W));
+                System.Numerics.Quaternion br = bone.Rotation;
+                Matrix3 rot = Matrix3.CreateFromQuaternion(new Quaternion(br.X, br.Y, br.Z, br.W));
                 data.Add(new KAR_grPositionData()
                 {
                     X = bone.TranslationX,

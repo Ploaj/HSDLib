@@ -1,20 +1,8 @@
-﻿using HSDRaw;
-using HSDRaw.AirRide.Gr;
-using HSDRaw.AirRide.Gr.Data;
-using HSDRaw.GX;
-using HSDRawViewer.Converters;
+﻿using HSDRaw.AirRide.Gr;
 using HSDRawViewer.Rendering;
-using OpenTK.Input;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
@@ -37,7 +25,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             //};
         }
 
-        public override DataNode Node { get => _node; set
+        public override DataNode Node
+        {
+            get => _node; set
             {
                 _node = value;
 
@@ -55,7 +45,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// </summary>
         private KAR_grMainModel mainModel;
 
-        private KAR_grViewRegion SelectedRegion = null;
+        private readonly KAR_grViewRegion SelectedRegion = null;
 
         public KAR_grViewRegion[] ViewRegions { get; set; }
 
@@ -84,7 +74,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
             DynamicBoundingBoxes = mainModel.ModelBounding.DynamicBoundingBoxes;
 
-            arrayMemberEditor1.SetArrayFromProperty(this, "ViewRegions");
+            arrayMemberEditor1.SetArrayFromProperty(this, nameof(ViewRegions));
         }
 
         /// <summary>
@@ -96,7 +86,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
             if (toolStripButton1.Checked)
-                foreach (var v in ViewRegions)
+                foreach (KAR_grViewRegion v in ViewRegions)
                 {
                     if (SelectedRegion == v)
                         DrawShape.DrawBox(Color.White, v.MinX, v.MinY, v.MinZ, v.MaxX, v.MaxY, v.MaxZ);
@@ -105,13 +95,13 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
                 }
 
             if (StaticBoundingBoxes != null)
-                foreach (var v in StaticBoundingBoxes)
+                foreach (KAR_grStaticBoundingBox v in StaticBoundingBoxes)
                 {
                     DrawShape.DrawBox(Color.Yellow, v.MinX, v.MinY, v.MinZ, v.MaxX, v.MaxY, v.MaxZ);
                 }
 
             if (DynamicBoundingBoxes != null)
-                foreach (var v in DynamicBoundingBoxes)
+                foreach (KAR_grDynamicBoundingBoxes v in DynamicBoundingBoxes)
                 {
                     //if (v.BoneIndex >= 0 && v.BoneIndex < _jointEditor.JointManager.JointCount)
                     //    DrawShape.DrawBox(Color.Purple, _jointEditor.JointManager.GetWorldTransform(v.BoneIndex), v.MinX, v.MinY, v.MinZ, v.MaxX, v.MaxY, v.MaxZ);
@@ -127,7 +117,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void arrayMemberEditor1_SelectedObjectChanged(object sender, EventArgs e)
         {
-            if(arrayMemberEditor1.SelectedObject is KAR_grViewRegion bounding)
+            if (arrayMemberEditor1.SelectedObject is KAR_grViewRegion bounding)
             {
                 //var jointManager = _jointEditor.JointManager;
 

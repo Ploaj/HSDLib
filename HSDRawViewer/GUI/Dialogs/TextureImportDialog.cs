@@ -36,8 +36,7 @@ namespace HSDRawViewer.GUI.Dialog
         {
             get
             {
-                GXTexFmt fmt;
-                Enum.TryParse(cbFormat.SelectedValue.ToString(), out fmt);
+                Enum.TryParse(cbFormat.SelectedValue.ToString(), out GXTexFmt fmt);
                 return fmt;
             }
             set
@@ -49,8 +48,7 @@ namespace HSDRawViewer.GUI.Dialog
         {
             get
             {
-                GXTlutFmt fmt;
-                Enum.TryParse(sbPalFormat.SelectedValue.ToString(), out fmt);
+                Enum.TryParse(sbPalFormat.SelectedValue.ToString(), out GXTlutFmt fmt);
                 return fmt;
             }
             set
@@ -127,7 +125,7 @@ namespace HSDRawViewer.GUI.Dialog
         {
             if (TextureFormat == GXTexFmt.IA4 || TextureFormat == GXTexFmt.IA8)
             {
-                for(int x = 0; x < image.Width; x++)
+                for (int x = 0; x < image.Width; x++)
                     for (int y = 0; y < image.Height; y++)
                     {
                         image[x, y] = ApplyChannels(image[x, y], IASettings.LumChannel, IASettings.AlphaChannel);
@@ -155,10 +153,10 @@ namespace HSDRawViewer.GUI.Dialog
 
         private byte GetChannel(Bgra32 input, ChannelType inputChannel, ChannelType channel)
         {
-            var r = input.R;
-            var g = input.G;
-            var b = input.B;
-            var a = input.A;
+            byte r = input.R;
+            byte g = input.G;
+            byte b = input.B;
+            byte a = input.A;
 
             switch (channel)
             {

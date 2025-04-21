@@ -1,10 +1,10 @@
-﻿using System;
-using System.Windows.Forms;
-using HSDRaw;
+﻿using HSDRaw;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.GX;
 using HSDRawViewer.Rendering.GX;
 using OpenTK.Graphics.OpenGL;
+using System;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -42,7 +42,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
         public void Render(HSDAccessor a, int windowWidth, int windowHeight)
         {
-            if(a is KAR_grCollisionNode cn && cn != Node)
+            if (a is KAR_grCollisionNode cn && cn != Node)
             {
                 Node = cn;
                 Vertices = Node.Vertices;
@@ -63,10 +63,10 @@ namespace HSDRawViewer.Rendering.Renderers
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.Begin(PrimitiveType.Triangles);
-            
-            foreach(var t in Triangles)
+
+            foreach (KAR_CollisionTriangle t in Triangles)
             {
-                if(((int)t.Flags & 0x1) == 0x1)
+                if (((int)t.Flags & 0x1) == 0x1)
                     GL.Color4(1f, 0f, 0f, 0.5f);
                 if (((int)t.Flags & 0x2) == 0x2)
                     GL.Color4(0f, 1f, 0f, 0.5f);

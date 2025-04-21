@@ -2,7 +2,6 @@
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using OpenTK.Mathematics;
-using System;
 using System.Collections.Generic;
 
 namespace HSDRawViewer.Rendering.Models
@@ -81,11 +80,11 @@ namespace HSDRawViewer.Rendering.Models
                 yield return this;
 
                 if (Child != null)
-                    foreach (var c in Child.Enumerate)
+                    foreach (LiveJObj c in Child.Enumerate)
                         yield return c;
 
                 if (Sibling != null)
-                    foreach (var c in Sibling.Enumerate)
+                    foreach (LiveJObj c in Sibling.Enumerate)
                         yield return c;
             }
         }
@@ -195,14 +194,14 @@ namespace HSDRawViewer.Rendering.Models
 
             if (Child != null)
             {
-                var c = Child.GetJObjFromDesc(jobj);
+                LiveJObj c = Child.GetJObjFromDesc(jobj);
                 if (c != null)
                     return c;
             }
 
             if (Sibling != null)
             {
-                var s = Sibling.GetJObjFromDesc(jobj);
+                LiveJObj s = Sibling.GetJObjFromDesc(jobj);
                 if (s != null)
                     return s;
             }
@@ -222,14 +221,14 @@ namespace HSDRawViewer.Rendering.Models
 
             if (Child != null)
             {
-                var c = Child.GetJObjAtIndex(index);
+                LiveJObj c = Child.GetJObjAtIndex(index);
                 if (c != null)
                     return c;
             }
 
             if (Sibling != null)
             {
-                var s = Sibling.GetJObjAtIndex(index);
+                LiveJObj s = Sibling.GetJObjAtIndex(index);
                 if (s != null)
                     return s;
             }
@@ -245,7 +244,7 @@ namespace HSDRawViewer.Rendering.Models
         public int GetIndexOfDesc(HSD_JOBJ desc)
         {
             int i = 0;
-            foreach (var v in Enumerate)
+            foreach (LiveJObj v in Enumerate)
             {
                 if (v.Desc == desc)
                     return i;
@@ -270,7 +269,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <returns></returns>
         public void ResetTransforms()
         {
-            foreach (var v in Enumerate)
+            foreach (LiveJObj v in Enumerate)
                 v.SetDefaultSRT();
 
             RecalculateTransforms(null, true);
@@ -281,12 +280,12 @@ namespace HSDRawViewer.Rendering.Models
         /// </summary>
         public void RecalculateInverseBinds()
         {
-            foreach (var v in Enumerate)
+            foreach (LiveJObj v in Enumerate)
                 v.SetDefaultSRT();
 
             RecalculateTransforms(null, true);
 
-            foreach (var v in Enumerate)
+            foreach (LiveJObj v in Enumerate)
                 if (v.Desc.Flags.HasFlag(JOBJ_FLAG.SKELETON) || v.Desc.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
                     v.Desc.InverseWorldTransform = v.WorldTransform.Inverted().ToHsdMatrix();
         }
@@ -308,10 +307,10 @@ namespace HSDRawViewer.Rendering.Models
                 if (Desc.Flags.HasFlag(JOBJ_FLAG.MTX_SCALE_COMPENSATE))
                 {
                     // get parent scale
-                    var parentScale = Parent.LocalTransform.ExtractScale();
+                    Vector3 parentScale = Parent.LocalTransform.ExtractScale();
 
                     // scale the position only
-                    var trans = Translation * parentScale;
+                    Vector3 trans = Translation * parentScale;
 
                     // build the local matrix
                     LocalTransform = Matrix4.CreateScale(Scale) *
@@ -319,7 +318,7 @@ namespace HSDRawViewer.Rendering.Models
                                     Matrix4.CreateTranslation(trans);
 
                     // calculate the compensate scale
-                    var scaleCompensation = Matrix4.CreateScale(1f / parentScale.X, 1f / parentScale.Y, 1f / parentScale.Z);
+                    Matrix4 scaleCompensation = Matrix4.CreateScale(1f / parentScale.X, 1f / parentScale.Y, 1f / parentScale.Z);
 
                     // apply scale compensate
                     WorldTransform = LocalTransform * scaleCompensation * Parent.WorldTransform;
@@ -387,17 +386,17 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="pmtx"></param>
         private void mkBillBoardMtx(Matrix4 mv)
         {
-            var mtx = WorldTransform * mv;
+            Matrix4 mtx = WorldTransform * mv;
 
             Vector3 ax;
-            Vector3 ay = new Vector3(mtx.M21, mtx.M22, mtx.M23);
+            Vector3 ay = new(mtx.M21, mtx.M22, mtx.M23);
             Vector3 az;
 
             float sx = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
             float sz = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
             float sy = ay.LengthFast;
 
-            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+            Vector3 pos = new(mtx.M41, mtx.M42, mtx.M43);
 
             if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
             {
@@ -446,11 +445,11 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="pmtx"></param>
         private void mkHBillBoardMtx(Matrix4 mv)
         {
-            var mtx = WorldTransform * mv;
+            Matrix4 mtx = WorldTransform * mv;
 
-            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+            Vector3 pos = new(mtx.M41, mtx.M42, mtx.M43);
 
-            Vector3 ax = new Vector3(mtx.M11, mtx.M12, mtx.M13);
+            Vector3 ax = new(mtx.M11, mtx.M12, mtx.M13);
             Vector3 ay;
             Vector3 az;
 
@@ -460,7 +459,7 @@ namespace HSDRawViewer.Rendering.Models
             if (Desc.Flags.HasFlag(JOBJ_FLAG.PBILLBOARD))
             {
                 float pos_mag = pos.LengthFast;
-                Vector3 l = new Vector3(
+                Vector3 l = new(
                     pos.X * (-pos.Y / pos_mag),
                     pos_mag,
                     pos.Z * (-pos.Y / pos_mag));
@@ -504,12 +503,12 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="pmtx"></param>
         private void mkVBillBoardMtx(Matrix4 mv)
         {
-            var mtx = WorldTransform * mv;
+            Matrix4 mtx = WorldTransform * mv;
 
-            Vector3 pos = new Vector3(mtx.M41, mtx.M42, mtx.M43);
+            Vector3 pos = new(mtx.M41, mtx.M42, mtx.M43);
 
             Vector3 ax;
-            Vector3 ay = new Vector3(mtx.M21, mtx.M22, mtx.M23);
+            Vector3 ay = new(mtx.M21, mtx.M22, mtx.M23);
             Vector3 az;
 
             float sx = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
@@ -559,15 +558,15 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="pmtx"></param>
         private void mkRBillBoardMtx(Matrix4 mv)
         {
-            var mtx = WorldTransform * mv;
+            Matrix4 mtx = WorldTransform * mv;
 
             float x = new Vector3(mtx.M11, mtx.M12, mtx.M13).LengthFast;
             float y = new Vector3(mtx.M21, mtx.M22, mtx.M23).LengthFast;
             float z = new Vector3(mtx.M31, mtx.M32, mtx.M33).LengthFast;
 
-            var scamtx = Matrix4.CreateScale(x, y, z);
+            Matrix4 scamtx = Matrix4.CreateScale(x, y, z);
 
-            var rotmtx = Matrix4.CreateRotationZ(Rotation.Z);
+            Matrix4 rotmtx = Matrix4.CreateRotationZ(Rotation.Z);
             rotmtx.M41 = mtx.M41;
             rotmtx.M42 = mtx.M42;
             rotmtx.M43 = mtx.M43;

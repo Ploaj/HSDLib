@@ -34,7 +34,7 @@ namespace HSDRawViewer.Rendering.Models
 
             // get robj ikhint
             HSD_ROBJ robj = RObjGetByType(jobj, REFTYPE.IKHINT, 0);
-            var ik_hint = robj.Ref_IkHint;
+            HSD_IKHint ik_hint = robj.Ref_IkHint;
             float rotate_angle = ik_hint.RotateX;
             float bone_length = ik_hint.BoneLength * joint_scale.X;
 
@@ -437,7 +437,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <returns></returns>
         private static LiveJObj Joint_GetIKJoint2(LiveJObj jobj)
         {
-            foreach (var j in jobj.Enumerate)
+            foreach (LiveJObj j in jobj.Enumerate)
             {
                 if ((j.Desc.Flags & JOBJ_FLAG.EFFECTOR) == JOBJ_FLAG.JOINT2)
                 {
@@ -454,7 +454,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <returns></returns>
         private static LiveJObj jobj_get_effector(LiveJObj jobj)
         {
-            foreach (var j in jobj.Enumerate)
+            foreach (LiveJObj j in jobj.Enumerate)
             {
                 if ((j.Desc.Flags & JOBJ_FLAG.EFFECTOR) == JOBJ_FLAG.EFFECTOR)
                 {
@@ -513,7 +513,7 @@ namespace HSDRawViewer.Rendering.Models
             if (jobj == null || jobj.Desc.ROBJ == null)
                 return null;
 
-            foreach (var r in jobj.Desc.ROBJ.List)
+            foreach (HSD_ROBJ r in jobj.Desc.ROBJ.List)
             {
                 if (r.RefType == type)
                 {
@@ -553,7 +553,7 @@ namespace HSDRawViewer.Rendering.Models
                         {
                             HSD_JOBJ j = i.Ref_Joint;
                             // assert(jobj != NULL);
-                            var live = jobj.Root.GetJObjFromDesc(j);
+                            LiveJObj live = jobj.Root.GetJObjFromDesc(j);
                             if (live != null)
                             {
                                 live.RecalculateTransforms(null, false);

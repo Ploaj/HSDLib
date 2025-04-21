@@ -10,11 +10,11 @@ namespace HSDRawViewer.Converters.SBM
     {
         public static void ImportColl(string filePath, SBM_Coll_Data coll)
         {
-            List<CollLineGroup> groups = new List<CollLineGroup>();
-            List<CollLine> lines = new List<CollLine>();
+            List<CollLineGroup> groups = new();
+            List<CollLine> lines = new();
 
-            using (FileStream s = new FileStream(filePath, FileMode.Open))
-            using (BinaryReaderExt r = new BinaryReaderExt(s))
+            using (FileStream s = new(filePath, FileMode.Open))
+            using (BinaryReaderExt r = new(s))
             {
                 r.BigEndian = true;
 
@@ -27,7 +27,7 @@ namespace HSDRawViewer.Converters.SBM
                 uint lineoff = r.ReadUInt32();
                 uint groupoff = r.ReadUInt32();
 
-                List<CollVertex> points = new List<CollVertex>();
+                List<CollVertex> points = new();
                 r.Seek(vecoff);
                 for (int i = 0; i < veccount; i++)
                     points.Add(new CollVertex(r.ReadSingle(), r.ReadSingle()));
@@ -46,16 +46,16 @@ namespace HSDRawViewer.Converters.SBM
                 for (uint i = 0; i < groupcount; i++)
                 {
                     r.Seek(groupoff + i * 0x6C);
-                    var start = r.ReadInt16();
-                    var count = r.ReadInt16();
+                    short start = r.ReadInt16();
+                    short count = r.ReadInt16();
 
-                    var group = new CollLineGroup();
-                    for(var j = start; j < start + count; j++)
+                    CollLineGroup group = new();
+                    for (short j = start; j < start + count; j++)
                         lines[j].Group = group;
                     groups.Add(group);
                 }
 
-                foreach (var l in lines)
+                foreach (CollLine l in lines)
                     l.GuessCollisionFlag();
             }
 

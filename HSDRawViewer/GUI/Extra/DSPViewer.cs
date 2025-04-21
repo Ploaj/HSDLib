@@ -1,8 +1,8 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using HSDRawViewer.Sound;
 using HSDRawViewer.Tools;
+using System;
 using System.IO;
-using HSDRawViewer.Sound;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -10,7 +10,7 @@ namespace HSDRawViewer.GUI.Extra
     {
         public bool ReplaceButtonVisible { get => buttonReplace.Visible; set => buttonReplace.Visible = value; }
 
-        private DSPPlayer Player;
+        private readonly DSPPlayer Player;
 
         private string DefaultFilePath;
 
@@ -25,7 +25,9 @@ namespace HSDRawViewer.GUI.Extra
         /// <summary>
         /// 
         /// </summary>
-        public DSP DSP { get => _dsp;
+        public DSP DSP
+        {
+            get => _dsp;
             set
             {
                 _dsp = value;
@@ -36,7 +38,7 @@ namespace HSDRawViewer.GUI.Extra
                     Player.Position = TimeSpan.Zero;
                     soundTrack.Maximum = Player.Length.Milliseconds;
                 }
-                
+
                 propertyGrid.SelectedObject = _dsp;
 
                 if (_dsp != null)
@@ -45,7 +47,7 @@ namespace HSDRawViewer.GUI.Extra
 
                     channelBox.Items.Clear();
                     channelBox.Items.Add(_dsp);
-                    foreach(var c in _dsp.Channels)
+                    foreach (DSPChannel c in _dsp.Channels)
                         channelBox.Items.Add(c);
                 }
                 else
@@ -69,13 +71,13 @@ namespace HSDRawViewer.GUI.Extra
 
             Player.PlaybackStopped += (sender, args) =>
             {
-                if(_dsp != null && 
+                if (_dsp != null &&
                 _dsp.Channels.Count > 0 &&
-                _dsp.Channels[0].LoopStart != 0 && 
+                _dsp.Channels[0].LoopStart != 0 &&
                 Player.Position == Player.Length)
                 {
                     //var sec = (int)Math.Ceiling(_dsp.Channels[0].LoopStart / 2 / (double)_dsp.Frequency * 1.75f);
-                    var mill = (int)(_dsp.Channels[0].LoopStart / 2 / (double)_dsp.Frequency * 1.75f * 1000);
+                    int mill = (int)(_dsp.Channels[0].LoopStart / 2 / (double)_dsp.Frequency * 1.75f * 1000);
                     Player.Position = TimeSpan.FromMilliseconds(mill);
                     PlaySound();
                 }
@@ -95,7 +97,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="filePath"></param>
         public void LoadFromFile(string filePath)
         {
-            var dsp = new DSP();
+            DSP dsp = new();
 
             dsp.FromFile(filePath);
 
@@ -113,7 +115,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void playButton_Click(object sender, EventArgs e)
         {
-            if(sender == playButton)
+            if (sender == playButton)
                 PlaySound();
             if (sender == pauseButton)
                 PauseSound();
@@ -157,7 +159,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void replaceButton_CLick(object sender, EventArgs e)
         {
-            var file = FileIO.OpenFile("DSP (*.dsp*.hps*.wav)|*.dsp;*.hps;*.wav");
+            string file = FileIO.OpenFile("DSP (*.dsp*.hps*.wav)|*.dsp;*.hps;*.wav");
 
             if (file != null)
             {
@@ -172,8 +174,8 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportButton_Click(object sender, EventArgs e)
         {
-            var file = FileIO.SaveFile(DSP.SupportedExportFilter, DefaultFilePath);
-            
+            string file = FileIO.SaveFile(DSP.SupportedExportFilter, DefaultFilePath);
+
             if (file != null)
             {
                 DSP.ExportFormat(file);
@@ -190,7 +192,7 @@ namespace HSDRawViewer.GUI.Extra
             propertyGrid.SelectedObjects = new object[] { channelBox.SelectedItem };
         }
 
-# region TrackSlider
+        #region TrackSlider
 
         private bool _stopSliderUpdate;
 

@@ -35,11 +35,11 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static string ToString(HSD_FOBJ fobj)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             sb.AppendLine(fobj.JointTrackType.ToString());
 
-            foreach(var v in fobj.GetDecodedKeys())
+            foreach (FOBJKey v in fobj.GetDecodedKeys())
             {
                 sb.AppendLine($"{v.Frame},{v.Value},{v.Tan},{v.InterpolationType}");
             }
@@ -54,13 +54,13 @@ namespace HSDRawViewer.Converters
         /// <param name="lines"></param>
         public static HSD_FOBJ ImportKeys(HSD_FOBJ fobj, string[] lines)
         {
-            List<FOBJKey> keys = new List<FOBJKey>();
+            List<FOBJKey> keys = new();
 
-            var animationType = JointTrackType.HSD_A_J_ROTX;
+            JointTrackType animationType = JointTrackType.HSD_A_J_ROTX;
 
-            foreach(var v in lines)
+            foreach (string v in lines)
             {
-                var args = v.Trim().Split(',');
+                string[] args = v.Trim().Split(',');
 
                 if (args.Length == 1 && Enum.TryParse<JointTrackType>(args[0], out animationType))
                     continue;

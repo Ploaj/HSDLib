@@ -1,9 +1,9 @@
-﻿using System;
+﻿using HSDRawViewer.Rendering.GX;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using System;
 using System.ComponentModel;
 using YamlDotNet.Serialization;
-using OpenTK.Mathematics;
-using HSDRawViewer.Rendering.GX;
 
 namespace HSDRawViewer.Rendering.Shaders
 {
@@ -20,7 +20,7 @@ namespace HSDRawViewer.Rendering.Shaders
 
         public GXShader()
         {
-            var path = AppDomain.CurrentDomain.BaseDirectory;
+            string path = AppDomain.CurrentDomain.BaseDirectory;
             LoadShader(System.IO.Path.Combine(path, @"Shader\gx_material.frag"), ShaderType.VertexShader);
             LoadShader(System.IO.Path.Combine(path, @"Shader\gx.vert"));
             LoadShader(System.IO.Path.Combine(path, @"Shader\gx_uv.frag"));
@@ -47,12 +47,12 @@ namespace HSDRawViewer.Rendering.Shaders
 
 
             // load model view matrix
-            var mvp = camera.MvpMatrix;
+            Matrix4 mvp = camera.MvpMatrix;
             GL.UniformMatrix4(GetVertexAttributeUniformLocation("mvp"), false, ref mvp);
 
             // set camera position
             //var campos = (camera.RotationMatrix * new Vector4(camera.Translation, 1)).Xyz;
-            var campos = camera.TransformedPosition; // Vector4.TransformRow(new Vector4(0, 0, 0, 1), camera.ModelViewMatrix.Inverted());
+            Vector3 campos = camera.TransformedPosition; // Vector4.TransformRow(new Vector4(0, 0, 0, 1), camera.ModelViewMatrix.Inverted());
             SetVector3("cameraPos", campos);
 
             // create sphere matrix

@@ -14,7 +14,7 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public MapGOBJContextMenu() : base()
         {
-            ToolStripMenuItem genJointAnim = new ToolStripMenuItem("Create Joint Animation Bank");
+            ToolStripMenuItem genJointAnim = new("Create Joint Animation Bank");
             genJointAnim.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj &&
@@ -30,23 +30,23 @@ namespace HSDRawViewer.ContextMenus.Melee
             Items.Add(genJointAnim);
 
 
-            ToolStripMenuItem genMatAnim = new ToolStripMenuItem("Create Material Animation Bank");
+            ToolStripMenuItem genMatAnim = new("Create Material Animation Bank");
             genMatAnim.Click += (sender, args) =>
             {
-                if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj && 
+                if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj &&
                     gobj.MaterialAnimations == null &&
                     gobj.RootNode != null)
                 {
                     gobj.MaterialAnimations = new HSDNullPointerArrayAccessor<HSDRaw.Common.Animation.HSD_MatAnimJoint>();
                     gobj.MaterialAnimations.Array = new HSDRaw.Common.Animation.HSD_MatAnimJoint[] { JOBJContextMenu.GenerateMatAnimJointFromJOBJ(gobj.RootNode) };
-                    
+
                     MainForm.SelectedDataNode.Refresh();
                 }
             };
             Items.Add(genMatAnim);
 
 
-            ToolStripMenuItem addFog = new ToolStripMenuItem("Add Fog Struct");
+            ToolStripMenuItem addFog = new("Add Fog Struct");
             addFog.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_Map_GOBJ gobj)
@@ -116,37 +116,37 @@ namespace HSDRawViewer.ContextMenus.Melee
         {
             indices = new List<int>();
 
-            var tree = jobj.TreeList;
+            List<HSD_JOBJ> tree = jobj.TreeList;
 
             // gather all used (either has dobj or rigging)
-            HashSet<HSD_JOBJ> used = new HashSet<HSD_JOBJ>();
-            foreach (var j in tree)
+            HashSet<HSD_JOBJ> used = new();
+            foreach (HSD_JOBJ j in tree)
             {
                 if (j.Dobj != null)
                 {
                     if (!used.Contains(j))
                         used.Add(j);
 
-                    foreach (var d in j.Dobj.List)
+                    foreach (HSD_DOBJ d in j.Dobj.List)
                     {
-                        foreach (var p in d.Pobj?.List)
+                        foreach (HSD_POBJ p in d.Pobj?.List)
                         {
                             if (p.EnvelopeWeights != null)
-                            foreach (var e in p.EnvelopeWeights)
-                            {
-                                foreach (var j2 in e.JOBJs)
+                                foreach (HSD_Envelope e in p.EnvelopeWeights)
                                 {
-                                    if (!used.Contains(j2))
-                                        used.Add(j2);
+                                    foreach (HSD_JOBJ j2 in e.JOBJs)
+                                    {
+                                        if (!used.Contains(j2))
+                                            used.Add(j2);
+                                    }
                                 }
-                            }
                         }
                     }
                 }
             }
 
             // if you are used then your parents are used
-            foreach (var j in tree)
+            foreach (HSD_JOBJ j in tree)
             {
                 if (used.Contains(j))
                     continue;

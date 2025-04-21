@@ -1,5 +1,5 @@
-﻿using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 
 namespace HSDRawViewer.Converters.SBM
@@ -15,7 +15,7 @@ namespace HSDRawViewer.Converters.SBM
         /// <returns></returns>
         private static byte Blend(byte c1, byte c2, float alpha)
         {
-            var col = c1 * alpha + c2 * (1 - alpha);
+            float col = c1 * alpha + c2 * (1 - alpha);
 
             if (col > byte.MaxValue)
                 col = byte.MaxValue;
