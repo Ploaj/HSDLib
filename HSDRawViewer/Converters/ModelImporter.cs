@@ -69,15 +69,39 @@ namespace HSDRawViewer.Converters
         /// </summary>
         /// <param name="f"></param>
         /// <returns></returns>
-        public static HSD_JOBJ ImportModelFromFile(string f)
+        public static HSD_JOBJ ImportModelFromFile(string f, HSD_JOBJ original = null)
         {
             if (f != null)
             {
-                IOScene scene = IONET.IOManager.LoadScene(f, new IONET.ImportSettings()
+                IOScene scene = IOManager.LoadScene(f, new ImportSettings()
                 {
                     Triangulate = true,
                 });
 
+                if (scene.Models.Count == 0)
+                    return null;
+
+                // remove blender's dumb root bone
+                scene.Models[0].Skeleton.RootBones.RemoveAll(e => e.Name.Equals("Armature"));
+
+                // check to replace skeleton
+                bool replace = false;
+                if (original != null)
+                {
+                    if (JointTreeIsSimilar(original, scene.Models[0].Skeleton))
+                    {
+                        if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
+                            "Preserve the current model's skeleton?\n" +
+                            "(Recommended for online play)",
+                            "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            ReplaceWithBonesFromFile(original, scene.Models[0].Skeleton.RootBones[0]);
+                            replace = true;
+                        }
+                    }
+                }
+
+                // import model
                 using ModelImportDialog d = new(scene, scene.Models[0]);
                 if (d.ShowDialog() == DialogResult.OK)
                 {
@@ -88,6 +112,9 @@ namespace HSDRawViewer.Converters
                         pb.DoWork();
                         pb.ShowDialog();
                     }
+
+                    if (replace)
+                        ReplaceWithBonesFromFile(original, imp.NewModel);
 
                     return imp.NewModel;
                 }
@@ -100,34 +127,19 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         /// <param name="toReplace"></param>
-        public static HSD_JOBJ ImportModelFromFile()
+        public static HSD_JOBJ ImportModelFromFile(HSD_JOBJ original)
         {
-            return ImportModelFromFile(Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false)));
+            return ImportModelFromFile(Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false)), original);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="toReplace"></param>
-        public static void ReplaceModelFromFile(HSD_JOBJ toReplace)
+        public static void ReplaceModelFromFile(HSD_JOBJ original)
         {
-            HSD_JOBJ model = ImportModelFromFile();
-
-            if (model != null)
-            {
-                if (JointTreeIsSimilar(toReplace, model))
-                {
-                    if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
-                        "Preserve the current model's skeleton?\n" +
-                        "(Recommended for online play)",
-                        "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    {
-                        ReplaceWithBonesFromFile(toReplace, model);
-                    }
-                }
-
-                toReplace._s.SetFromStruct(model._s);
-            }
+            HSD_JOBJ model = ImportModelFromFile(original);
+            original._s.SetFromStruct(model._s);
         }
 
 
@@ -137,33 +149,33 @@ namespace HSDRawViewer.Converters
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public static bool JointTreeIsSimilar(HSD_JOBJ from, HSD_JOBJ to)
+        public static bool JointTreeIsSimilar(HSD_JOBJ from, IOSkeleton to)
         {
-            List<HSD_JOBJ> fromList = from.TreeList;
-            List<HSD_JOBJ> toList = to.TreeList;
+            //List<HSD_JOBJ> fromList = from.TreeList;
+            //List<IOBone> toList = to.BreathFirstOrder();
 
-            // check if they have save joint count
-            if (fromList.Count != toList.Count)
-                return false;
+            //// check if they have save joint count
+            //if (fromList.Count != toList.Count)
+            //    return false;
 
             // check if structure is the same
-            if (!JointTreeMatchesStructure(from, to))
+            if (!JointTreeMatchesStructure(from, to.RootBones[0]))
                 return false;
 
             // check each joint transforms
-            float epsilon = 0.001f;
-            for (int i = 0; i < fromList.Count; i++)
-            {
-                if (Math.Abs(from.TX - to.TX) > epsilon) return false;
-                if (Math.Abs(from.TY - to.TY) > epsilon) return false;
-                if (Math.Abs(from.TZ - to.TZ) > epsilon) return false;
-                if (Math.Abs(from.RX - to.RX) > epsilon) return false;
-                if (Math.Abs(from.RY - to.RY) > epsilon) return false;
-                if (Math.Abs(from.RZ - to.RZ) > epsilon) return false;
-                if (Math.Abs(from.SX - to.SX) > epsilon) return false;
-                if (Math.Abs(from.SY - to.SY) > epsilon) return false;
-                if (Math.Abs(from.SZ - to.SZ) > epsilon) return false;
-            }
+            //float epsilon = 0.001f;
+            //for (int i = 0; i < fromList.Count; i++)
+            //{
+            //    if (Math.Abs(from.TX - to.TX) > epsilon) return false;
+            //    if (Math.Abs(from.TY - to.TY) > epsilon) return false;
+            //    if (Math.Abs(from.TZ - to.TZ) > epsilon) return false;
+            //    if (Math.Abs(from.RX - to.RX) > epsilon) return false;
+            //    if (Math.Abs(from.RY - to.RY) > epsilon) return false;
+            //    if (Math.Abs(from.RZ - to.RZ) > epsilon) return false;
+            //    if (Math.Abs(from.SX - to.SX) > epsilon) return false;
+            //    if (Math.Abs(from.SY - to.SY) > epsilon) return false;
+            //    if (Math.Abs(from.SZ - to.SZ) > epsilon) return false;
+            //}
 
             // both joint trees are similar enough!
             return true;
@@ -175,21 +187,44 @@ namespace HSDRawViewer.Converters
         /// <param name="j1"></param>
         /// <param name="j2"></param>
         /// <returns></returns>
-        private static bool JointTreeMatchesStructure(HSD_JOBJ j1, HSD_JOBJ j2)
+        private static bool JointTreeMatchesStructure(HSD_JOBJ j1, IOBone j2)
         {
-            if ((j1.Next == null) != (j2.Next == null))
+            if ((j1.Next == null) != (j2.Sibling == null))
                 return false;
 
             if ((j1.Child == null) != (j2.Child == null))
                 return false;
 
-            if (j2.Child != null)
-                return JointTreeMatchesStructure(j1.Child, j2.Child);
+            if (j1.Child != null)
+                if (!JointTreeMatchesStructure(j1.Child, j2.Child))
+                    return false;
 
             if (j1.Next != null)
-                return JointTreeMatchesStructure(j1.Next, j2.Next);
+                if (!JointTreeMatchesStructure(j1.Next, j2.Sibling))
+                return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="j1"></param>
+        /// <param name="j2"></param>
+        /// <returns></returns>
+        private static void ReplaceWithBonesFromFile(HSD_JOBJ j1, IOBone j2)
+        {
+            j2.Translation = new System.Numerics.Vector3(j1.TX, j1.TY, j1.TZ);
+            j2.RotationEuler = new System.Numerics.Vector3(j1.RX, j1.RY, j1.RZ);
+            j2.Scale = new System.Numerics.Vector3(j1.SX, j1.SY, j1.SZ);
+
+            System.Diagnostics.Debug.WriteLine($"{j2.Name} {j1.RX} {j1.RY} {j1.RZ} {j2.RotationEuler.ToString()}");
+
+            if (j1.Child != null)
+                ReplaceWithBonesFromFile(j1.Child, j2.Child);
+
+            if (j1.Next != null)
+                ReplaceWithBonesFromFile(j1.Next, j2.Sibling);
         }
 
         /// <summary>
@@ -236,7 +271,13 @@ namespace HSDRawViewer.Converters
         /// <param name="settings"></param>
         /// <param name="meshSettings"></param>
         /// <param name="materialSettings"></param>
-        public ModelImporter(string folderPath, IOScene scene, IOModel model, ModelImportSettings settings, IEnumerable<MeshImportSettings> meshSettings, IEnumerable<MaterialImportSettings> materialSettings)
+        public ModelImporter(
+            string folderPath,
+            IOScene scene,
+            IOModel model,
+            ModelImportSettings settings,
+            IEnumerable<MeshImportSettings> meshSettings,
+            IEnumerable<MaterialImportSettings> materialSettings)
         {
             this.scene = scene;
             this.model = model;
@@ -962,7 +1003,7 @@ namespace HSDRawViewer.Converters
             // optional mobj loading
             if (settings.ImportMOBJ)
             {
-                string mobjPath = Path.Combine(FolderPath, material.Name + ".mobj");
+                string mobjPath = Path.Combine(FolderPath, settings.MobjPath);
 
                 if (File.Exists(mobjPath))
                 {

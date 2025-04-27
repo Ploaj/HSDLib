@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 
 namespace HSDRawViewer.Converters
@@ -257,18 +258,7 @@ namespace HSDRawViewer.Converters
 
         [Category("MObj Import Options"), DisplayName("Path to MObj"), Description(""), YamlIgnore]
         public string MobjPath
-        {
-            get
-            {
-                if (_material == null)
-                    return "";
-
-                //if (_material.DiffuseMap != null && File.Exists())
-                //    return $"{Path.GetFileNameWithoutExtension(_material.DiffuseMap.FilePath)}.mobj";
-
-                return _material.Name + ".mobj";
-            }
-        }
+        { get;set; }
 
         //[Category("MObj Import Options"), DisplayName("MObj Found"), Description("")]
         //public bool MobjFound { get => _material.DiffuseMap != null ? File.Exists($"{Path.GetFileNameWithoutExtension(_material.DiffuseMap.FilePath)}.mobj") : false; }
@@ -358,6 +348,18 @@ namespace HSDRawViewer.Converters
         {
 
         }
+        static string ExtractMaterialName(string input)
+        {
+            string pattern = @"\w+_[A-Fa-f0-9]{8}";
+
+            Match match = Regex.Match(input, pattern);
+            if (match.Success)
+            {
+                return match.Value;
+            }
+
+            return input; // No match found
+        }
 
         /// <summary>
         /// 
@@ -371,6 +373,8 @@ namespace HSDRawViewer.Converters
                 return;
 
             Name = material.Name;
+
+            MobjPath = ExtractMaterialName(material.Name) + ".mobj";
 
             AmbientColor = Vector4ToColor(material.AmbientColor);
             DiffuseColor = Vector4ToColor(material.DiffuseColor);
