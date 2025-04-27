@@ -45,7 +45,7 @@ namespace HSDRawViewer.Tools
                 GX_Vertex vert2 = isEven ? input[index] : input[index - 1];
                 GX_Vertex vert3 = isEven ? input[index - 1] : input[index];
 
-                if (!vert1.POS.Equals(vert2.POS) && !vert2.POS.Equals(vert3.POS) && !vert3.POS.Equals(vert1.POS))
+                //if (!vert1.POS.Equals(vert2.POS) && !vert2.POS.Equals(vert3.POS) && !vert3.POS.Equals(vert1.POS))
                 {
                     output.Add(vert3);
                     output.Add(vert2);

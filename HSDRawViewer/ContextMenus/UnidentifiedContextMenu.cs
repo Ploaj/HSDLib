@@ -3,6 +3,7 @@ using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Dialog;
 using System;
+using System.Text;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus

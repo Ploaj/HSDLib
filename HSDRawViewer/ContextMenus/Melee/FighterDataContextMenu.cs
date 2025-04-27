@@ -1,4 +1,5 @@
 ﻿using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI.Dialog;
 using System;
 using System.Windows.Forms;
 

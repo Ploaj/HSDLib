@@ -7,6 +7,7 @@ using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.GUI.Plugins;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -1,5 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.Melee.Pl;
+using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.Tools.Animation;
 using System;
 using System.Windows.Forms;
 
