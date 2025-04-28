@@ -80,6 +80,7 @@ namespace HSDRawViewer.GUI.Controls
 
         public enum AnimType
         {
+            None,
             Joint,
             Texture,
             Material,
@@ -110,7 +111,7 @@ namespace HSDRawViewer.GUI.Controls
 
         private int _frame { get => (int)nudFrame.Value; set => nudFrame.Value = Math.Max(Math.Min(value, nudFrame.Maximum), 0); }
 
-        private AnimType _animType = AnimType.Joint;
+        private AnimType _animType = AnimType.None;
 
         private int _frameCount
         {
@@ -411,7 +412,6 @@ namespace HSDRawViewer.GUI.Controls
         {
             _animType = type;
 
-            trackTypeBox.Items.Clear();
             Type tt = typeof(JointTrackType);
             switch (_animType)
             {
@@ -429,8 +429,12 @@ namespace HSDRawViewer.GUI.Controls
                     break;
             }
 
-            foreach (object item in Enum.GetValues(tt))
-                trackTypeBox.Items.Add(item);
+            if (type != _animType)
+            {
+                trackTypeBox.Items.Clear();
+                foreach (object item in Enum.GetValues(tt))
+                    trackTypeBox.Items.Add(item);
+            }
         }
 
         /// <summary>
