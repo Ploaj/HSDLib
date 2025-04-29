@@ -82,7 +82,35 @@ namespace HSDRawViewer.Converters
                     return null;
 
                 // remove blender's dumb root bone
-                scene.Models[0].Skeleton.RootBones.RemoveAll(e => e.Name.Equals("Armature"));
+                for (int i = 0; i < scene.Models[0].Skeleton.RootBones.Count; i++)
+                {
+                    if (scene.Models[0].Skeleton.RootBones[i].Name.Equals("Armature"))
+                    {
+                        scene.Models[0].Skeleton.RootBones[i] = scene.Models[0].Skeleton.RootBones[i].Child;
+
+                        //var joint = scene.Models[0].Skeleton.RootBones[i];
+                        //if (joint.Sibling != null &&
+                        //    joint.Sibling.Type != BoneType.JOINT)
+                        //{
+                        //    joint.Sibling.Parent = null;
+                        //}
+                        //else
+                        //{
+                        //    var sib = joint.Sibling;
+                        //    while (sib != null)
+                        //    {
+                        //        while (sib.Sibling != null &&
+                        //            sib.Sibling.Type != BoneType.JOINT)
+                        //        {
+                        //            sib.Sibling.Parent = null;
+                        //            break;
+                        //        }
+
+                        //        sib = sib.Sibling;
+                        //    }
+                        //}
+                    }
+                }
 
                 // check to replace skeleton
                 bool replace = false;
@@ -159,7 +187,8 @@ namespace HSDRawViewer.Converters
             //    return false;
 
             // check if structure is the same
-            if (!JointTreeMatchesStructure(from, to.RootBones[0]))
+            if (to.RootBones.Count == 0 || 
+                !JointTreeMatchesStructure(from, to.RootBones[0]))
                 return false;
 
             // check each joint transforms
