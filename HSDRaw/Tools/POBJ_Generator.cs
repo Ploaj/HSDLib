@@ -24,7 +24,7 @@ namespace HSDRaw.Tools
 
         public bool UseTriangleStrips { get; set; } = true;
 
-        public bool RoundWeights { get; set; } = true;
+        public bool RoundWeights { get; set; } = false;
 
         public float Tolerance { get; set; } = 0.0f;
 
@@ -263,12 +263,6 @@ namespace HSDRaw.Tools
                     a[j] = (b[j], w[j]);
 
                 a = a.OrderBy(e => e.Item1).ToArray();
-
-                //if (a.Length > 2)
-                //{
-                //    a = ClampWeight(a.ToList());
-                //    System.Diagnostics.Debug.WriteLine(string.Join(", ", a.Select(e => e.Item1 + "-" + e.Item2)));
-                //}
 
                 // optional round weights
                 if (RoundWeights)

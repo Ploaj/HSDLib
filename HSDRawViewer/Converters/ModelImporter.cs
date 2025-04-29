@@ -7,6 +7,7 @@ using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using IONET;
+using IONET.Collada.Kinematics.Joints;
 using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
@@ -88,27 +89,19 @@ namespace HSDRawViewer.Converters
                     {
                         scene.Models[0].Skeleton.RootBones[i] = scene.Models[0].Skeleton.RootBones[i].Child;
 
-                        //var joint = scene.Models[0].Skeleton.RootBones[i];
-                        //if (joint.Sibling != null &&
-                        //    joint.Sibling.Type != BoneType.JOINT)
-                        //{
-                        //    joint.Sibling.Parent = null;
-                        //}
-                        //else
-                        //{
-                        //    var sib = joint.Sibling;
-                        //    while (sib != null)
-                        //    {
-                        //        while (sib.Sibling != null &&
-                        //            sib.Sibling.Type != BoneType.JOINT)
-                        //        {
-                        //            sib.Sibling.Parent = null;
-                        //            break;
-                        //        }
+                        var joint = scene.Models[0].Skeleton.RootBones[i];
+                        while (joint != null)
+                        {
+                            while (joint.Sibling != null &&
+                                    joint.Sibling.Type != BoneType.JOINT)
+                            {
+                                joint.Sibling.Parent = null;
+                            }
 
-                        //        sib = sib.Sibling;
-                        //    }
-                        //}
+                            joint = joint.Sibling;
+                        }
+
+                        scene.Models[0].Skeleton.RootBones[i].Parent = null;
                     }
                 }
 
@@ -167,7 +160,8 @@ namespace HSDRawViewer.Converters
         public static void ReplaceModelFromFile(HSD_JOBJ original)
         {
             HSD_JOBJ model = ImportModelFromFile(original);
-            original._s.SetFromStruct(model._s);
+            if (model != null)
+                original._s.SetFromStruct(model._s);
         }
 
 
