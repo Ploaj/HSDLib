@@ -7,7 +7,7 @@ namespace HSDRaw.Tools
 {
     public class GX_AttributeCompressor
     {
-        public static float Epsilon = 0.0001f;
+        public static float Epsilon { get; } = 0.0001f;
 
         /// <summary>
         /// 
@@ -57,15 +57,31 @@ namespace HSDRaw.Tools
 
             o.Dispose();
         }
-
         /// <summary>
+        /// 
         /// </summary>
+        /// <param name="value"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        private static double Clamp(double value, double min, double max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="attr"></param>
+        /// <param name="values"></param>
+        /// <exception cref="NotSupportedException"></exception>
         private static void OptimizeCompression(GX_Attribute attr, List<float[]> values)
         {
-            // no need to optimize direct
             if (attr.AttributeType == GXAttribType.GX_DIRECT)
                 return;
 
+            // Set component count based on attribute type
             switch (attr.AttributeName)
             {
                 case GXAttribName.GX_VA_POS:
@@ -89,122 +105,139 @@ namespace HSDRaw.Tools
                     break;
                 case GXAttribName.GX_VA_CLR0:
                 case GXAttribName.GX_VA_CLR1:
-                    if (attr.CompType == (GXCompType)GXCompTypeClr.RGBA4 ||
-                        attr.CompType == (GXCompType)GXCompTypeClr.RGBA6 ||
-                        attr.CompType == (GXCompType)GXCompTypeClr.RGBA8 ||
-                        attr.CompType == (GXCompType)GXCompTypeClr.RGBX8)
-                        attr.CompCount = GXCompCnt.ClrRGBA;
-                    else
-                        attr.CompCount = GXCompCnt.ClrRGB;
+                    attr.CompCount = (attr.CompType == (GXCompType)GXCompTypeClr.RGBA4 ||
+                                      attr.CompType == (GXCompType)GXCompTypeClr.RGBA6 ||
+                                      attr.CompType == (GXCompType)GXCompTypeClr.RGBA8 ||
+                                      attr.CompType == (GXCompType)GXCompTypeClr.RGBX8)
+                                      ? GXCompCnt.ClrRGBA
+                                      : GXCompCnt.ClrRGB;
                     break;
                 default:
                     throw new NotSupportedException($"{attr.AttributeName} not supported for optimizing");
             }
 
-            // get normalized value range
-            double max = 0;
-            bool signed = false;
-            foreach (float[] v in values)
+            // Analyze values for max and sign
+            double maxAbs = 0;
+            bool hasNegative = false;
+            foreach (float[] vec in values)
             {
-                foreach(var val in v)
+                foreach (var v in vec)
                 {
-                    max = Math.Max(max, Math.Abs(val));
-                    if (val < 0)
-                        signed = true;
+                    maxAbs = Math.Max(maxAbs, Math.Abs(v));
+                    if (v < 0)
+                        hasNegative = true;
                 }
             }
 
-            // get best scale for 8
-
-            byte scale = 1;
-            byte byteScale = 1;
-            byte sbyteScale = 1;
-            byte shortScale = 1;
-            byte ushortScale = 1;
-
-            while (max != 0 && 
-                max * Math.Pow(2, scale) < ushort.MaxValue && 
-                scale < byte.MaxValue)
+            if (maxAbs == 0)
             {
-                var val = max * Math.Pow(2, scale);
-                if (val < byte.MaxValue)
-                    byteScale = scale;
-                if (val < sbyte.MaxValue)
-                    sbyteScale = scale;
-                if (val < short.MaxValue)
-                    shortScale = scale;
-                if (val < ushort.MaxValue)
-                    ushortScale = scale;
+                // Degenerate case — all zero values
+                attr.CompType = GXCompType.UInt8;
+                attr.Scale = 0;
+                attr.AttributeType = GXAttribType.GX_INDEX8;
+                attr.Stride = AttributeStride(attr);
+                return;
+            }
+
+            // Find best scale
+            byte bestByteScale = 1, bestSByteScale = 1, bestUShortScale = 1, bestShortScale = 1;
+            byte scale = 1;
+
+            while (scale < byte.MaxValue)
+            {
+                double scaled = maxAbs * (1 << scale);
+                if (scaled <= byte.MaxValue)
+                    bestByteScale = scale;
+                if (scaled <= sbyte.MaxValue)
+                    bestSByteScale = scale;
+                if (scaled <= ushort.MaxValue)
+                    bestUShortScale = scale;
+                if (scaled <= short.MaxValue)
+                    bestShortScale = scale;
+
+                if (scaled >= ushort.MaxValue)
+                    break;  // No point scaling further
 
                 scale++;
             }
 
-            // check byte error
-            double error = 0;
-            foreach (float[] v in values)
-                foreach (var val in v)
-                {
-                    if (!signed)
-                        error = Math.Max(error, val - ((byte)(val * Math.Pow(2, byteScale)) / Math.Pow(2, byteScale)));
-                    else
-                        error = Math.Max(error, val - ((sbyte)(val * Math.Pow(2, sbyteScale)) / Math.Pow(2, sbyteScale)));
-                }
-            
-
-
-            if (error < Epsilon)
+            // Helper to compute max quantization error
+            double ComputeError<T>(int bits, byte scaleFactor, Func<double, T> castFunc) where T : struct
             {
-                if (signed)
+                double factor = 1 << scaleFactor;
+                double maxError = 0;
+                double min = hasNegative ? -(Math.Pow(2, bits - 1)) : 0;
+                double max = hasNegative ? (Math.Pow(2, bits - 1) - 1) : (Math.Pow(2, bits) - 1);
+
+                foreach (float[] vec in values)
+                {
+                    foreach (var v in vec)
+                    {
+                        double scaledVal = v * factor;
+                        scaledVal = Clamp(scaledVal, min, max);
+                        double quantized = Convert.ToDouble(castFunc(scaledVal)) / factor;
+                        maxError = Math.Max(maxError, Math.Abs(v - quantized));
+                    }
+                }
+
+                return maxError;
+            }
+
+            double error;
+            if (hasNegative)
+            {
+                error = ComputeError(8, bestSByteScale, x => (sbyte)Math.Round(x));
+                if (error <= Epsilon)
                 {
                     attr.CompType = GXCompType.Int8;
-                    attr.Scale = sbyteScale;
+                    attr.Scale = bestSByteScale;
                 }
                 else
                 {
-                    attr.CompType = GXCompType.UInt8;
-                    attr.Scale = byteScale;
+                    error = ComputeError(16, bestShortScale, x => (short)Math.Round(x));
+                    if (error <= Epsilon)
+                    {
+                        attr.CompType = GXCompType.Int16;
+                        attr.Scale = bestShortScale;
+                    }
+                    else
+                    {
+                        attr.CompType = GXCompType.Float;
+                        attr.Scale = 0;
+                    }
                 }
             }
             else
             {
-                if (signed)
+                error = ComputeError(8, bestByteScale, x => (byte)Math.Round(x));
+                if (error <= Epsilon)
                 {
-                    attr.CompType = GXCompType.Int16;
-                    attr.Scale = shortScale;
+                    attr.CompType = GXCompType.UInt8;
+                    attr.Scale = bestByteScale;
                 }
                 else
                 {
-                    attr.CompType = GXCompType.UInt16;
-                    attr.Scale = ushortScale;
-                }
-
-                // make sure error is acceptable
-                error = 0;
-                foreach (float[] v in values)
-                    foreach (var val in v)
-                        if (signed)
-                            error = Math.Max(error, val - ((short)(val * Math.Pow(2, shortScale)) / Math.Pow(2, shortScale)));
-                        else
-                            error = Math.Max(error, val - ((ushort)(val * Math.Pow(2, ushortScale)) / Math.Pow(2, ushortScale)));
-
-                // if error is still too large then use float type
-                if (error >= Epsilon)
-                {
-                    attr.CompType = GXCompType.Float;
-                    attr.Scale = 0;
+                    error = ComputeError(16, bestUShortScale, x => (ushort)Math.Round(x));
+                    if (error <= Epsilon)
+                    {
+                        attr.CompType = GXCompType.UInt16;
+                        attr.Scale = bestUShortScale;
+                    }
+                    else
+                    {
+                        attr.CompType = GXCompType.Float;
+                        attr.Scale = 0;
+                    }
                 }
             }
 
-            // set index type
-            attr.AttributeType = GXAttribType.GX_INDEX8;
-            if (values.Count > byte.MaxValue)
-                attr.AttributeType = GXAttribType.GX_INDEX16;
-            
-            // calculate stride
+            // Set index type
+            attr.AttributeType = values.Count > byte.MaxValue ? GXAttribType.GX_INDEX16 : GXAttribType.GX_INDEX8;
+
+            // Calculate stride
             attr.Stride = AttributeStride(attr);
 
-            // print picked compression
-            System.Diagnostics.Debug.WriteLine($"{attr.AttributeName} {attr.CompType} {attr.Scale}");
+            System.Diagnostics.Debug.WriteLine($"{attr.AttributeName} {attr.CompType} scale={attr.Scale} error={error}");
         }
 
         /// <summary>

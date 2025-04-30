@@ -41,6 +41,29 @@ namespace HSDRaw.Tools
         private Dictionary<HSD_POBJ, GX_DisplayList> pobjToDisplayList = new Dictionary<HSD_POBJ, GX_DisplayList>();
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        public static int GetApproximateFloatArrayHashCode(float[] array, float tolerance = 1e-5f)
+        {
+            if (array == null)
+                return 0;
+
+            unchecked
+            {
+                int hash = 17;
+                foreach (var value in array)
+                {
+                    // Use BitConverter to ensure exact bitwise hash (handles NaN, -0.0 etc. properly)
+                    int elementHash = value.GetHashCode();
+                    hash = hash * 31 + elementHash;
+                }
+                return hash;
+            }
+        }
+        /// <summary>
         /// Generates the buffer data and writes it to all given <see cref="GX_Attribute"/>
         /// </summary>
         public void SaveChanges()
@@ -49,6 +72,9 @@ namespace HSDRaw.Tools
             foreach (var b in attrToNewData)
             {
                 b.Key.DecodedData = b.Value;
+
+                System.Diagnostics.Debug.WriteLine($"{b.Key.AttributeName} {b.Key.AttributeType} {b.Key.CompCount} {b.Key.CompType} {b.Key.Count} {b.Key.Buffer._s.Length.ToString("X8")}");
+                //System.IO.File.WriteAllText($"{b.Key.AttributeType}.txt", string.Join("\n", b.Value.Select(e => string.Join(", ", e))));
             }
             
             // Set the attributes for all pobjs created by this object
@@ -65,7 +91,6 @@ namespace HSDRaw.Tools
                 pobj.FromDisplayList(dl);
             }
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -102,8 +127,6 @@ namespace HSDRaw.Tools
                         }
                     }
 
-                    System.Diagnostics.Debug.WriteLine(names[i] + " " + attr.CompType);
-
                     nameToAttr.Add(names[i], attr);
                 }
                 attrs[i] = nameToAttr[names[i]];
@@ -115,7 +138,6 @@ namespace HSDRaw.Tools
 
             return attrs;
         }
-
         /// <summary>
         /// Gets the index of a value in the buffer
         /// </summary>
@@ -137,7 +159,7 @@ namespace HSDRaw.Tools
 
             var index = 0;
 
-            var hash = string.Join("", o).GetHashCode();
+            var hash = GetApproximateFloatArrayHashCode(o);
             
             if (hashToIndex.ContainsKey(hash))
             {
@@ -198,8 +220,6 @@ namespace HSDRaw.Tools
                 return hash;
             }
         }
-
-
         /// <summary>
         /// 
         /// </summary>

@@ -128,7 +128,7 @@ namespace HSDRaw.Common
         {
             get
             {
-                return string.Join(", ", ToGXAttributes().Select(e=>e.AttributeName));
+                return string.Join(", ", ToGXAttributes().Select(e=>e.ToString()));
             }
         }
 
