@@ -410,8 +410,6 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="type"></param>
         private void SetTrackType(AnimType type)
         {
-            _animType = type;
-
             Type tt = typeof(JointTrackType);
             switch (_animType)
             {
@@ -435,6 +433,8 @@ namespace HSDRawViewer.GUI.Controls
                 foreach (object item in Enum.GetValues(tt))
                     trackTypeBox.Items.Add(item);
             }
+
+            _animType = type;
         }
 
         /// <summary>
