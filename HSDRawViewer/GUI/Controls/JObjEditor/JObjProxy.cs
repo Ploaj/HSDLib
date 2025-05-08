@@ -81,6 +81,19 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             }
         }
 
+        [DisplayName("Use Scale Compensate"), Category("m-ex"), Description("This feature can only be used by m-ex models")]
+        public bool ScaleCompensate
+        {
+            get => jobj.Flags.HasFlag(JOBJ_FLAG.MTX_SCALE_COMPENSATE);
+            set
+            {
+                if (value)
+                    jobj.Flags |= JOBJ_FLAG.MTX_SCALE_COMPENSATE;
+                else
+                    jobj.Flags &= ~JOBJ_FLAG.MTX_SCALE_COMPENSATE;
+            }
+        }
+
         // custom
         // MTX_SCALE_COMPENSATE = (1 << 26),
 

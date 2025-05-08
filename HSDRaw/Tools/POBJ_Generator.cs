@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,29 +41,6 @@ namespace HSDRaw.Tools
 
         private Dictionary<HSD_POBJ, GX_DisplayList> pobjToDisplayList = new Dictionary<HSD_POBJ, GX_DisplayList>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
-        public static int GetApproximateFloatArrayHashCode(float[] array, float tolerance = 1e-5f)
-        {
-            if (array == null)
-                return 0;
-
-            unchecked
-            {
-                int hash = 17;
-                foreach (var value in array)
-                {
-                    // Use BitConverter to ensure exact bitwise hash (handles NaN, -0.0 etc. properly)
-                    int elementHash = value.GetHashCode();
-                    hash = hash * 31 + elementHash;
-                }
-                return hash;
-            }
-        }
         /// <summary>
         /// Generates the buffer data and writes it to all given <see cref="GX_Attribute"/>
         /// </summary>
@@ -137,6 +115,16 @@ namespace HSDRaw.Tools
             attrs[attrs.Length - 1].AttributeName = GXAttribName.GX_VA_NULL;
 
             return attrs;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        public static int GetApproximateFloatArrayHashCode(float[] array)
+        {
+            return ((IStructuralEquatable)array).GetHashCode(EqualityComparer<float>.Default);
         }
         /// <summary>
         /// Gets the index of a value in the buffer

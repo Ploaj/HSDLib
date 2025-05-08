@@ -347,7 +347,6 @@ namespace HSDRawViewer.Converters
             {
                 UseTriangleStrips = Settings.UseStrips,
                 VertexColorFormat = (GXCompType)Settings.VertexColorFormat,
-
             };
 
             // apply settings to model
@@ -525,7 +524,8 @@ namespace HSDRawViewer.Converters
             HSD_JOBJ parent = rootnode;
             //if (mesh.ParentBone != null && NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
             //    parent = NameToJOBJ[mesh.ParentBone.Name];
-            if (settings.SingleBindJoint != null && NameToJOBJ.ContainsKey(settings.SingleBindJoint))
+            if (settings.SingleBindJoint != null && 
+                NameToJOBJ.ContainsKey(settings.SingleBindJoint))
                 parent = NameToJOBJ[settings.SingleBindJoint];
 
             Console.WriteLine("Processing " + mesh.Name);

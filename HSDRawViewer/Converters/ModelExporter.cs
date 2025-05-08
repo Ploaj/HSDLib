@@ -512,7 +512,9 @@ namespace HSDRawViewer.Converters
                                     if (!pobj.Flags.HasFlag(POBJ_FLAG.SHAPESET_AVERAGE) && !hasEnvelopes)
                                         vec = System.Numerics.Vector3.TransformNormal(vec, parentTransform);
 
-                                    if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) || parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT))
+                                    if (parent.Flags.HasFlag(JOBJ_FLAG.SKELETON) ||
+                                        parent.Flags.HasFlag(JOBJ_FLAG.SKELETON_ROOT) ||
+                                        pobj.Flags.HasFlag(POBJ_FLAG.UNKNOWN2))
                                         vec = System.Numerics.Vector3.TransformNormal(vec, singleMatrix);
 
                                     vec = System.Numerics.Vector3.TransformNormal(vec, singleBindTransform);
