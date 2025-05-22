@@ -301,11 +301,15 @@ namespace HSDRawViewer.GUI.Plugins
             // load points
             foreach (SBM_GeneralPointInfo v in GeneralPoints.Points)
             {
-                PointLinks.Add(new PointLink()
+                var joint = LiveJObj.GetJObjAtIndex(v.JOBJIndex);
+                if (joint != null)
                 {
-                    Type = v.Type,
-                    JObj = LiveJObj.GetJObjAtIndex(v.JOBJIndex),
-                });
+                    PointLinks.Add(new PointLink()
+                    {
+                        Type = v.Type,
+                        JObj = joint,
+                    });
+                }
             }
         }
 

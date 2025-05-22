@@ -74,7 +74,7 @@ namespace HSDRawViewer.Tools.Animation
             target_model.ResetTransforms();
 
             // loop through target bones
-            for (int f = 0; f < source_anim.FrameCount; f++)
+            for (int f = 0; f <= source_anim.FrameCount; f++)
             {
                 source_anim.ApplyAnimation(source_model, f);
                 source_model.RecalculateTransforms(null, true);
