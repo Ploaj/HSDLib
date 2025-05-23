@@ -275,7 +275,7 @@ namespace HSDRawViewer.Converters
                     old.RX = n.RX; old.RY = n.RY; old.RZ = n.RZ;
                     old.SX = n.SX; old.SY = n.SY; old.SZ = n.SZ;
 
-                    if (old.InverseWorldTransform != null)
+                    if (old.InverseWorldTransform == null)
                     {
                         if (n.InverseWorldTransform == null)
                             old.InverseWorldTransform = newlist.GetJObjAtIndex(i).WorldTransform.Inverted().ToHsdMatrix();
