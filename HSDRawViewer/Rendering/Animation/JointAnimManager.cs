@@ -176,8 +176,7 @@ namespace HSDRawViewer.Rendering
                 foreach (FOBJ_Player t in e.Tracks)
                 {
                     HSD_Track track = new();
-                    HSD_FOBJ fobj = t.ToFobj(error);
-                    track.FromFOBJ(fobj);
+                    track.FromFOBJ(t.ToFobj(error));
                     fn.Tracks.Add(track);
                 }
 
@@ -561,6 +560,46 @@ namespace HSDRawViewer.Rendering
                     Name = setting.Symbol
                 });
                 animFile.Save(f);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="toAppend"></param>
+        /// <param name="frame_count"></param>
+        public void AppendAnimation(JointAnimManager toAppend, bool no_bake = false, int frame_count = -1)
+        {
+            if (!no_bake)
+                Bake();
+
+            if (frame_count < 0)
+                frame_count = (int)Math.Ceiling(toAppend.FrameCount);
+
+            int i = 0;
+            foreach (var c in Nodes)
+            {
+                foreach (var t in c.Tracks)
+                {
+                    var track = toAppend.Nodes[i].Tracks.Find(e => e.TrackType == t.TrackType);
+
+                    if (track == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine(t.JointTrackType);
+                        continue;
+                    }
+
+                    var frame = t.Keys.Max(e => e.Frame) + 1;
+                    for (int j = 0; j < frame_count; j++)
+                    {
+                        t.Keys.Add(new FOBJKey()
+                        {
+                            Frame = frame + j,
+                            Value = track.GetValue(j),
+                            InterpolationType = GXInterpolationType.HSD_A_OP_LIN
+                        });
+                    }
+                }
+                i++;
             }
         }
     }

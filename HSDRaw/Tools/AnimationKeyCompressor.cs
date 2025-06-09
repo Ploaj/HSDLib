@@ -22,8 +22,6 @@ namespace HSDRaw.Tools
         public static void OptimizeJointTracks(HSD_JOBJ joint, ref List<FOBJ_Player> tracks, float error = 0.001f)
         {
             List<FOBJ_Player> toRemove = new List<FOBJ_Player>();
-
-
             Parallel.ForEach(tracks, track =>
             {
                 // remove the none tracks
@@ -143,6 +141,36 @@ namespace HSDRaw.Tools
         public static void CompressTrack(FOBJ_Player player, float epsilon = 0.001f)
         {
             var newPlayer = new FOBJ_Player();
+
+            // adaptive compression
+            //if (epsilon <= 0)
+            {
+                //float percent = 0;
+                switch (player.JointTrackType)
+                {
+                    case JointTrackType.HSD_A_J_TRAX:
+                    case JointTrackType.HSD_A_J_TRAY:
+                    case JointTrackType.HSD_A_J_TRAZ:
+                        epsilon = 0.1f;
+                        break;
+                    case JointTrackType.HSD_A_J_ROTX:
+                    case JointTrackType.HSD_A_J_ROTY:
+                    case JointTrackType.HSD_A_J_ROTZ:
+                        epsilon = 0.0087f;
+                        break;
+                    case JointTrackType.HSD_A_J_SCAX:
+                    case JointTrackType.HSD_A_J_SCAY:
+                    case JointTrackType.HSD_A_J_SCAZ:
+                        epsilon = 0.01f;
+                        break;
+                }
+                //if (percent != 0)
+                //{
+                //    var min = player.Keys.Min(k => k.Value);
+                //    var max = player.Keys.Max(k => k.Value);
+                //    epsilon = (max - min) * percent;
+                //}
+            }
 
             // Method 1: Error Redution
 

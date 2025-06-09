@@ -62,7 +62,7 @@ namespace HSDRawViewer.Converters
         /// <param name="boneLabels"></param>
         public static void ExportFile(HSD_JOBJ rootJOBJ, JointMap jointMap = null)
         {
-            string f = Tools.FileIO.SaveFile(IOManager.GetExportFileFilter(animation_support: false));
+            string f = FileIO.SaveFile(IOManager.GetExportFileFilter(animation_support: false));
 
             if (f != null)
             {

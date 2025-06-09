@@ -13,6 +13,7 @@ using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.Animation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1278,28 +1279,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 ExportAsText(f);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public class RebakeAnimationSettings
-        {
-            public bool Optimize { get; set; } = true;
 
-            public bool ApplyDiscontinutyFilter { get; set; } = true;
-
-            public float OptimizeError { get; set; } = 0.01f;
-
-            public float CompressionError { get; set; } = 0.01f;
-
-            public uint TrimStartFrame { get; set; } = 0;
-
-            public uint TrimEndFrame { get; set; } = 0;
-
-            [Description("Desired length to stretch animation to. Use -1 if not desired. This is processed after trim frames.")]
-            public int FitLength { get; set; } = -1;
-        }
-
-        private static readonly RebakeAnimationSettings RebakeSettings = new();
+        private static readonly AnimationBakery RebakeSettings = new();
 
         /// <summary>
         /// 
@@ -1322,31 +1303,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     // get animation
                     JointAnimManager anim = renderer.FighterModel.JointAnim;
 
-                    // bake animation
-                    anim.Bake();
-
-                    // trim frame range
-                    anim.Trim((int)RebakeSettings.TrimStartFrame, (int)RebakeSettings.TrimEndFrame);
-
-                    // fit frame total
-                    if (RebakeSettings.FitLength > 0)
-                    {
-                        anim.ApplyFSMs(new FrameSpeedMultiplier[] {
-                            new()
-                                {
-                                    Frame = 0,
-                                    Rate = (RebakeSettings.TrimEndFrame - RebakeSettings.TrimStartFrame) / (float)RebakeSettings.FitLength
-                                }}, false);
-                    }
-
-                    // optimize
-                    if (RebakeSettings.Optimize)
-                        anim.Optimize(renderer.FighterModel.RootJObj.Desc,
-                            RebakeSettings.ApplyDiscontinutyFilter,
-                            RebakeSettings.OptimizeError);
-
                     //grab symbol
-                    HSD_FigaTree figa = anim.ToFigaTree(RebakeSettings.CompressionError);
+                    HSD_FigaTree figa = RebakeSettings.BakeToFigatree(anim, renderer.FighterModel.RootJObj.Desc);
                     HSDRawFile file = new();
                     file.Roots.Add(new HSDRootNode()
                     {
@@ -1370,7 +1328,6 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     // 
                     _actionList.Invalidate();
                 }
-
             }
         }
     }

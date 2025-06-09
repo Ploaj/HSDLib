@@ -982,6 +982,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 
             [Editor(typeof(System.Windows.Forms.Design.FileNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
             public string FromDAT { get; set; } = null;
+
+            public bool RotationOnly { get; set; } = false;
         }
 
         private static readonly ImportRemapSettings _importRemapSettings = new();
@@ -1019,6 +1021,18 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     LiveJObj livefrom = new(model);
                     LiveJObj liveto = new(RenderJObj.RootJObj.Desc);
                     anim = AnimationRetarget.Retarget(anim, livefrom, liveto, from, to, null);
+
+                    if (_importRemapSettings.RotationOnly)
+                    {
+                        foreach (var c in anim.Nodes)
+                        {
+                            c.Tracks.RemoveAll(e => 
+                            e.JointTrackType != JointTrackType.HSD_A_J_ROTX &&
+                            e.JointTrackType != JointTrackType.HSD_A_J_ROTY &&
+                            e.JointTrackType != JointTrackType.HSD_A_J_ROTZ);
+                        }
+                    }
+
                     LoadAnimation(anim);
                 }
             }

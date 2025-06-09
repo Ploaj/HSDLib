@@ -1,13 +1,105 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
+using HSDRaw.Tools.Melee;
+using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using static HSDRawViewer.Tools.Melee.FighterConverter;
+using System.Threading;
 
 namespace HSDRawViewer.Tools.Animation
 {
     public class AnimationRetarget
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public class RetargetSettings
+        {
+            public string InputFolder { get; set; }
+
+            public string OutputFolder { get; set; }
+
+            public JointMap SourceMap { get; set; }
+
+            public JointMap TargetMap { get; set; }
+
+            public HSD_JOBJ SourceJoint { get; set; }
+
+            public HSD_JOBJ TargetJoint { get; set; }
+
+            public string FighterName { get; set; }
+
+            public float CompressionError { get; set; } = 0.001f; // 0.01 is also acceptable
+
+            //private FighterAJManager AJManager;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="settings"></param>
+        public static void BatchRetarget(RetargetSettings jointSettings)
+        {
+            List<string> files = new();
+            foreach (string f in Directory.GetFiles(jointSettings.InputFolder))
+            {
+                if (f.EndsWith(".chr0"))
+                {
+                    files.Add(f);
+                }
+            }
+
+            int toProcess = files.Count;
+
+            using ManualResetEvent resetEvent = new(false);
+            foreach (string f in files)
+            {
+                ThreadPool.QueueUserWorkItem(
+                   new WaitCallback(x =>
+                   {
+                       var sw = new Stopwatch();
+                       sw.Start();
+                       var name = Path.GetFileNameWithoutExtension(f);
+
+                       JointAnimManager anim = Converters.Animation.JointAnimationLoader.LoadJointAnimFromFile(jointSettings.SourceMap, f);
+
+                       LiveJObj src_jobj = new(jointSettings.SourceJoint);
+                       LiveJObj tar_jobj = new(jointSettings.TargetJoint);
+                       var newanim = Retarget(anim, src_jobj, tar_jobj, jointSettings.SourceMap, jointSettings.TargetMap, null);
+
+                       var b = new AnimationBakery()
+                       {
+                           Optimize = true,
+                           ApplyDiscontinutyFilter = true,
+                           OptimizeError = -1,
+                           CompressionError = jointSettings.CompressionError,
+                           TrimEndFrame = (uint)newanim.FrameCount,
+                       };
+
+                       var figatreeName = $"Ply{jointSettings.FighterName}5K_Share_ACTION_{name}_figatree";
+                       var outputPath = Path.Combine(jointSettings.OutputFolder, figatreeName + ".dat");
+                       var fi = b.BakeToFigatreeFile(newanim, jointSettings.TargetJoint, figatreeName);
+                       fi.Save(outputPath);
+                       sw.Stop();
+
+                       Debug.WriteLine($"{name} -> {sw.Elapsed}");
+                       sw.Restart();
+
+                       // Safely decrement the counter
+                       if (Interlocked.Decrement(ref toProcess) == 0)
+                           resetEvent.Set();
+
+                   }));
+            }
+
+            resetEvent.WaitOne();
+
+        }
         /// <summary>
         /// 
         /// </summary>
