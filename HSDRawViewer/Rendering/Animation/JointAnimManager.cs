@@ -7,11 +7,13 @@ using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools.Animation;
+using IONET.Collada.Kinematics.Joints;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace HSDRawViewer.Rendering
 {
@@ -565,9 +567,42 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="joint"></param>
+        /// <param name="player"></param>
+        private static void FOBJPlayer_AddKey(FOBJ_Player track, float value, float end)
+        {
+            track.Keys.Add(new FOBJKey() { Frame = 0, Value = value, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+            track.Keys.Add(new FOBJKey() { Frame = end, Value = value, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+            track.Bake();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        /// <param name="player"></param>
+        private static FOBJ_Player GenerateKey(HSD_JOBJ joint, JointTrackType type, float end)
+        {
+            var track = new FOBJ_Player() { TrackType = (byte)type };
+            switch (type)
+            {
+                case JointTrackType.HSD_A_J_TRAX: FOBJPlayer_AddKey(track, joint.TX, end); break;
+                case JointTrackType.HSD_A_J_TRAY: FOBJPlayer_AddKey(track, joint.TY, end); break;
+                case JointTrackType.HSD_A_J_TRAZ: FOBJPlayer_AddKey(track, joint.TZ, end); break;
+                case JointTrackType.HSD_A_J_ROTX: FOBJPlayer_AddKey(track, joint.RX, end); break;
+                case JointTrackType.HSD_A_J_ROTY: FOBJPlayer_AddKey(track, joint.RY, end); break;
+                case JointTrackType.HSD_A_J_ROTZ: FOBJPlayer_AddKey(track, joint.RZ, end); break;
+                case JointTrackType.HSD_A_J_SCAX: FOBJPlayer_AddKey(track, joint.SX, end); break;
+                case JointTrackType.HSD_A_J_SCAY: FOBJPlayer_AddKey(track, joint.SY, end); break;
+                case JointTrackType.HSD_A_J_SCAZ: FOBJPlayer_AddKey(track, joint.SZ, end); break;
+            }
+            return track;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="toAppend"></param>
         /// <param name="frame_count"></param>
-        public void AppendAnimation(JointAnimManager toAppend, bool no_bake = false, int frame_count = -1)
+        public void AppendAnimation(JointAnimManager toAppend, HSD_JOBJ model, bool no_bake = false, int frame_count = -1)
         {
             if (!no_bake)
                 Bake();
@@ -576,30 +611,45 @@ namespace HSDRawViewer.Rendering
                 frame_count = (int)Math.Ceiling(toAppend.FrameCount);
 
             int i = 0;
-            foreach (var c in Nodes)
+            foreach (var c in toAppend.Nodes)
             {
+
                 foreach (var t in c.Tracks)
                 {
-                    var track = toAppend.Nodes[i].Tracks.Find(e => e.TrackType == t.TrackType);
+                    var track = Nodes[i].Tracks.Find(e => e.TrackType == t.TrackType);
 
                     if (track == null)
                     {
-                        System.Diagnostics.Debug.WriteLine(t.JointTrackType);
-                        continue;
+                        var j = model.TreeList[i];
+                        track = GenerateKey(j, t.JointTrackType, FrameCount);
+                        Nodes[i].Tracks.Add(track);
                     }
 
-                    var frame = t.Keys.Max(e => e.Frame) + 1;
+                    float frame = track.Keys.Max(e => e.Frame) + 1;
                     for (int j = 0; j < frame_count; j++)
                     {
-                        t.Keys.Add(new FOBJKey()
+                        track.Keys.Add(new FOBJKey()
                         {
                             Frame = frame + j,
-                            Value = track.GetValue(j),
+                            Value = t.GetValue(j),
                             InterpolationType = GXInterpolationType.HSD_A_OP_LIN
                         });
                     }
                 }
                 i++;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="jointMap"></param>
+        internal void ExportAsSMD(HSD_JOBJ root, JointMap jointMap)
+        {
+            string f = Tools.FileIO.SaveFile(ApplicationSettings.SMDFileFilter);
+            if (f != null)
+            {
+                SMDConv.ExportAnimationToSMD(f, root, jointMap, this);
             }
         }
     }

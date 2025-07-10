@@ -1,4 +1,5 @@
-﻿using HSDRaw.Common.Animation;
+﻿using HSDRaw;
+using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Dialog;
@@ -11,7 +12,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Controls
@@ -411,7 +414,7 @@ namespace HSDRawViewer.GUI.Controls
         private void SetTrackType(AnimType type)
         {
             Type tt = typeof(JointTrackType);
-            switch (_animType)
+            switch (type)
             {
                 case AnimType.Material:
                     tt = typeof(MatTrackType);
@@ -1163,7 +1166,6 @@ NONE - None (do not use)";
         /// <param name="e"></param>
         private void shiftValuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             if (_selectedPlayer != null)
             {
                 using PropertyDialog d = new("Shift Settings", _shiftSettings);
@@ -1185,6 +1187,107 @@ NONE - None (do not use)";
                     OnTrackEdited(EventArgs.Empty);
                 }
             }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+        };
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuImportTracks_Click(object sender, EventArgs e)
+        {
+            var f = Tools.FileIO.OpenFile("Supported Image Formats|*.json;*.MaterialColor;");
+
+            if (f == null)
+                return;
+
+            List<FOBJ_Player> newPlayers = null;
+            switch (Path.GetExtension(f).ToLower())
+            {
+                case ".json":
+                    {
+                        try
+                        {
+                            newPlayers = JsonSerializer.Deserialize<List<FOBJ_Player>>(File.ReadAllText(f), jsonOptions);
+                        } 
+                        catch (Exception er)
+                        {
+                            MessageBox.Show(er.Message, "Json Import Error");
+                            return;
+                        }
+                    }
+                    break;
+                case ".materialcolor":
+                    {
+                        using (var stream = new FileStream(f, FileMode.Open))
+                        using (var d = new BinaryReaderExt(stream))
+                        {
+                            FOBJ_Player r = new FOBJ_Player() { TrackType = (byte)MatTrackType.HSD_A_M_DIFFUSE_R };
+                            FOBJ_Player g = new FOBJ_Player() { TrackType = (byte)MatTrackType.HSD_A_M_DIFFUSE_G };
+                            FOBJ_Player b = new FOBJ_Player() { TrackType = (byte)MatTrackType.HSD_A_M_DIFFUSE_B };
+                            FOBJ_Player a = new FOBJ_Player() { TrackType = (byte)MatTrackType.HSD_A_M_ALPHA };
+                            newPlayers = new List<FOBJ_Player>()
+                            {
+                                r, g, b, a
+                            };
+
+                            d.ReadInt32();
+                            d.ReadInt32();
+                            var count = d.ReadInt32();
+
+                            float frame = 0;
+                            for (int i = 0; i < count; i++)
+                            {
+                                if (d.Position + 4 > d.Length)
+                                    break;
+
+                                b.Keys.Add(new FOBJKey() { Frame = frame, Value = d.ReadByte() / 255f, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+                                g.Keys.Add(new FOBJKey() { Frame = frame, Value = d.ReadByte() / 255f, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+                                r.Keys.Add(new FOBJKey() { Frame = frame, Value = d.ReadByte() / 255f, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+                                a.Keys.Add(new FOBJKey() { Frame = frame, Value = d.ReadByte() / 255f, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+                                frame += 1.0f;
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            if (newPlayers == null)
+                return;
+
+            // load new tracks and refresh tree
+            //_players.Clear();
+            //trackTree.Nodes.Clear();
+            foreach (var p in newPlayers)
+                AddPlayer(p);
+
+            // invalidate
+            glviewport.Invalidate();
+            OnTrackListUpdated(EventArgs.Empty);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuExportTracks_Click(object sender, EventArgs e)
+        {
+            if (_players.Count == 0)
+                return;
+
+            var f = Tools.FileIO.SaveFile(ApplicationSettings.JsonFileFilter);
+
+            if (f == null)
+                return;
+
+            var json = JsonSerializer.Serialize(_players, jsonOptions);
+            System.IO.File.WriteAllText(f, json);
         }
     }
 }

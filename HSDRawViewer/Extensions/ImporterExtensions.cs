@@ -91,6 +91,13 @@ namespace HSDRawViewer.Extensions
                                                                 "LLegJA", "LFootJA",
                                                                 "RLegJA", "RFootJA"};
 
+                // reset rotation and scale
+                List<string> specialBones2 = new() { "LShoulderC", "RShoulderC",
+                                                                "RHaveN", "LHaveN",
+                                                                "LLegC", "LFootC",
+                                                                "RLegC", "RFootC"};
+
+
                 Vector3[] specialBoneRotations = new Vector3[]
                 {
                     new(-90, 0, 0), new(-90, 0,-180),
@@ -105,14 +112,19 @@ namespace HSDRawViewer.Extensions
                 };
 
                 int boneIndex = specialBones.IndexOf(bone.Name);
+                if (boneIndex == -1)
+                    boneIndex = specialBones2.IndexOf(bone.Name);
 
                 if (boneIndex != -1)
                 {
                     Vector3 r = specialBoneRotations[boneIndex];
                     bone.RotationEuler = new System.Numerics.Vector3((float)(r.X * Math.PI / 180), (float)(r.Y * Math.PI / 180), (float)(r.Z * Math.PI / 180));
                 }
+                else if (bone.Name.EndsWith("mantNa"))
+                {
+                    bone.RotateX = (float)(Math.PI / 2);
+                }
                 else
-                //if (commonBones.Contains(bone.Name))
                 {
                     bone.Rotation = new System.Numerics.Quaternion(0, 0, 0, 1);
                 }

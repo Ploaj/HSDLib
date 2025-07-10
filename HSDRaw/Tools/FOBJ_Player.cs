@@ -68,12 +68,12 @@ namespace HSDRaw.Tools
     /// </summary>
     public class FOBJ_Player
     {
-        public List<FOBJKey> Keys;
-        public byte TrackType;
+        public List<FOBJKey> Keys { get; set; }
+        public byte TrackType { get; set; }
         public JointTrackType JointTrackType { get => (JointTrackType)TrackType; set => TrackType = (byte)value; }
 
-        public int PtclBank;
-        public int PtclId;
+        public int PtclBank { get; set; }
+        public int PtclId { get; set; }
 
         public FOBJ_Player()
         {

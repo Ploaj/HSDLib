@@ -14,7 +14,7 @@ namespace HSDRawViewer.Converters.Animation
         /// <param name="keys"></param>
         public static void ExportKeys(List<FOBJKey> keys)
         {
-            string f = Tools.FileIO.SaveFile("HSD Keys (*.hsdk)|*.hsdk;*.txt", "keys.hsdk");
+            string f = Tools.FileIO.SaveFile("HSD Keys (*.hsdk)|*.hsdk", "keys.hsdk");
 
             if (f != null)
                 ExportKeys(f, keys);

@@ -576,8 +576,14 @@
 - code: 52
   name: Footsnap Behavior
   parameters:
-  - name: Unknown
-    bitCount: 26
+  - name: None
+    bitCount: 23
+  - name: Orient Entire Model
+    bitCount: 1
+  - name: Orient Right Leg
+    bitCount: 1
+  - name: Orient Left Leg
+    bitCount: 1
 
 - code: 53
   name: Set flag 0x2225 to 10

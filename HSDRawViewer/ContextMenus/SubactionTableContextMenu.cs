@@ -158,6 +158,44 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             Items.Add(soundid);
+
+            ToolStripMenuItem disabledyn = new ToolStripMenuItem("Disable All Dynamics");
+            disabledyn.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
+                {
+                    var tables = table.Commands;
+
+                    foreach (var c in tables)
+                    {
+                        if (c.SymbolName != null &&
+                            !c.SymbolName.Value.Contains("ThrowN"))
+                            c.Flags |= 0x08000000;
+                    }
+
+                    table.Commands = tables;
+                }
+            };
+            Items.Add(disabledyn);
+
+            ToolStripMenuItem enabledyn = new ToolStripMenuItem("Enable All Dynamics");
+            enabledyn.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is SBM_FighterActionTable table)
+                {
+                    var tables = table.Commands;
+
+                    foreach (var c in tables)
+                    {
+                        if (c.SymbolName != null &&
+                            !c.SymbolName.Value.Contains("ThrowN"))
+                            c.Flags = (uint)(c.Flags & ~0x08000000);
+                    }
+
+                    table.Commands = tables;
+                }
+            };
+            Items.Add(enabledyn);
 #endif
 
         }

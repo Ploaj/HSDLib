@@ -78,9 +78,7 @@
     <Compile Update="ContextMenus\ParticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="ContextMenus\Melee\SelectCharContextMenu.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Update="ContextMenus\Melee\SelectCharContextMenu.cs" />
     <Compile Update="ContextMenus\SplineContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>

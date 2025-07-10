@@ -4,12 +4,74 @@ using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools.Animation;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
 using System.IO;
 
 namespace HSDRawViewer.Converters
 {
     public class CHR0Converter
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAllBones(string filePath)
+        {
+            using (BinaryReaderExt r = new(new FileStream(filePath, FileMode.Open)))
+            {
+                r.BigEndian = true;
+                if (r.BaseStream.Length < 4 || new string(r.ReadChars(4)) != "CHR0")
+                    throw new InvalidDataException("CHR0 file is not valid");
+
+                r.Skip(4);
+
+                int versionNum = r.ReadInt32();
+
+                switch (versionNum)
+                {
+                    case 4: // valid cases
+                    case 5:
+                        r.Seek(0x10);
+                        break;
+                    default:
+                        throw new InvalidDataException($"CHR0 version {versionNum} not supported");
+                }
+
+                uint indexGroupOffset = r.ReadUInt32();
+                if (versionNum == 5) // unsure what this is
+                    r.Skip(4);
+                string animName = r.ReadString(r.ReadInt32(), -1);
+
+                r.Skip(4);
+                var FrameCount = r.ReadUInt16() - 1;
+                int animDataCount = r.ReadUInt16();
+                r.Skip(8);
+
+                r.Seek(indexGroupOffset);
+                uint sectionOffset = r.ReadUInt32() + indexGroupOffset;
+                int sectionCount = r.ReadInt32();
+
+                for (uint i = 0; i < sectionCount; i++)
+                {
+                    r.Seek(indexGroupOffset + 8 + 0x10 * i);
+                    r.Skip(4); // id and unknown
+                    r.Skip(2); // let
+                    r.Skip(2); // right
+                    string boneName = r.ReadString(r.ReadInt32() + (int)indexGroupOffset, -1);
+                    uint dataOffset = r.ReadUInt32() + indexGroupOffset;
+                    if (dataOffset == indexGroupOffset)
+                    {
+                        sectionCount += 1;
+                        continue;
+                    }
+
+                    yield return boneName;
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -305,7 +367,7 @@ namespace HSDRawViewer.Converters
             {
                 float stepb = r.ReadSingle();
                 float base2 = r.ReadSingle();
-                for (int i = 0; i < frameCount; i++)
+                for (int i = 0; i <= frameCount; i++)
                 {
                     float v = base2 + stepb * (r.ReadByte());
 
@@ -315,7 +377,7 @@ namespace HSDRawViewer.Converters
 
             if (type == 0x6)
             {
-                for (int i = 0; i < frameCount; i++)
+                for (int i = 0; i <= frameCount; i++)
                 {
                     float v = r.ReadSingle();
 

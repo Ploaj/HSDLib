@@ -137,7 +137,7 @@ namespace HSDRawViewer.GUI.Dialog
                 for (int x = 0; x < image.Width; x++)
                     for (int y = 0; y < image.Height; y++)
                     {
-                        image[x, y] = ApplyChannels(image[x, y], IASettings.AlphaChannel, IASettings.AlphaChannel);
+                        image[x, y] = ApplyChannels(image[x, y], ISettings.AlphaChannel, ISettings.AlphaChannel);
                     }
             }
         }

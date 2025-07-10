@@ -800,7 +800,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             ToJointAnim().ExportAsMayaAnim(_jointTree._jointMap);
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -810,7 +809,6 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             ToJointAnim().ExportAsFigatree();
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -821,8 +819,15 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             if (_root != null)
                 ToJointAnim().ExportAsAnimJoint(_root);
         }
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void asSMDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToJointAnim().ExportAsSMD(_root, _jointTree._jointMap);
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1026,7 +1031,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     {
                         foreach (var c in anim.Nodes)
                         {
-                            c.Tracks.RemoveAll(e => 
+                            c.Tracks.RemoveAll(e =>
                             e.JointTrackType != JointTrackType.HSD_A_J_ROTX &&
                             e.JointTrackType != JointTrackType.HSD_A_J_ROTY &&
                             e.JointTrackType != JointTrackType.HSD_A_J_ROTZ);

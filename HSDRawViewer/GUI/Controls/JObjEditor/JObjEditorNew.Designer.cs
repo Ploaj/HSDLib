@@ -46,6 +46,7 @@
             saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             importAndRemapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            importAndRemap2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             createToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,7 +66,7 @@
             renderModeBox = new System.Windows.Forms.ToolStripComboBox();
             toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
             viewModeBox = new System.Windows.Forms.ToolStripComboBox();
-            importAndRemap2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            asSMDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -150,7 +151,7 @@
             // 
             // toolStripMenuItem1
             // 
-            toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItem2, toolStripMenuItem3, toolStripMenuItem4 });
+            toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItem2, toolStripMenuItem3, toolStripMenuItem4, asSMDToolStripMenuItem });
             toolStripMenuItem1.Name = "toolStripMenuItem1";
             toolStripMenuItem1.Size = new System.Drawing.Size(289, 26);
             toolStripMenuItem1.Text = "Export";
@@ -158,21 +159,21 @@
             // toolStripMenuItem2
             // 
             toolStripMenuItem2.Name = "toolStripMenuItem2";
-            toolStripMenuItem2.Size = new System.Drawing.Size(188, 26);
+            toolStripMenuItem2.Size = new System.Drawing.Size(224, 26);
             toolStripMenuItem2.Text = "As Maya .anim";
             toolStripMenuItem2.Click += toolStripMenuItem2_Click;
             // 
             // toolStripMenuItem3
             // 
             toolStripMenuItem3.Name = "toolStripMenuItem3";
-            toolStripMenuItem3.Size = new System.Drawing.Size(188, 26);
+            toolStripMenuItem3.Size = new System.Drawing.Size(224, 26);
             toolStripMenuItem3.Text = "As Figatree";
             toolStripMenuItem3.Click += toolStripMenuItem3_Click;
             // 
             // toolStripMenuItem4
             // 
             toolStripMenuItem4.Name = "toolStripMenuItem4";
-            toolStripMenuItem4.Size = new System.Drawing.Size(188, 26);
+            toolStripMenuItem4.Size = new System.Drawing.Size(224, 26);
             toolStripMenuItem4.Text = "As AnimJoint";
             toolStripMenuItem4.Click += toolStripMenuItem4_Click;
             // 
@@ -195,6 +196,13 @@
             importAndRemapToolStripMenuItem.Size = new System.Drawing.Size(289, 26);
             importAndRemapToolStripMenuItem.Text = "Import and Remap";
             importAndRemapToolStripMenuItem.Click += importAndRemapToolStripMenuItem_Click;
+            // 
+            // importAndRemap2ToolStripMenuItem
+            // 
+            importAndRemap2ToolStripMenuItem.Name = "importAndRemap2ToolStripMenuItem";
+            importAndRemap2ToolStripMenuItem.Size = new System.Drawing.Size(289, 26);
+            importAndRemap2ToolStripMenuItem.Text = "Import and Remap (Alt)";
+            importAndRemap2ToolStripMenuItem.Click += importAndRemap2ToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
@@ -327,12 +335,12 @@
             viewModeBox.Size = new System.Drawing.Size(159, 28);
             viewModeBox.SelectedIndexChanged += viewModeBox_SelectedIndexChanged;
             // 
-            // importAndRemap2ToolStripMenuItem
+            // asSMDToolStripMenuItem
             // 
-            importAndRemap2ToolStripMenuItem.Name = "importAndRemap2ToolStripMenuItem";
-            importAndRemap2ToolStripMenuItem.Size = new System.Drawing.Size(289, 26);
-            importAndRemap2ToolStripMenuItem.Text = "Import and Remap (Alt)";
-            importAndRemap2ToolStripMenuItem.Click += importAndRemap2ToolStripMenuItem_Click;
+            asSMDToolStripMenuItem.Name = "asSMDToolStripMenuItem";
+            asSMDToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            asSMDToolStripMenuItem.Text = "As SMD";
+            asSMDToolStripMenuItem.Click += asSMDToolStripMenuItem_Click;
             // 
             // JObjEditorNew
             // 
@@ -388,5 +396,6 @@
         private System.Windows.Forms.ToolStripMenuItem applyEulerFilterToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importAndRemap2ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem asSMDToolStripMenuItem;
     }
 }

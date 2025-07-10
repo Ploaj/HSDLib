@@ -96,6 +96,7 @@ namespace HSDRawViewer.Tools
 
             w.Write(Code >> (IsCustom ? 0 : 2), CodeSize);
 
+            int v = 0;
             for (int i = 0; i < Parameters.Length; i++)
             {
                 SubactionParameter bm = Parameters[i];
@@ -106,7 +107,7 @@ namespace HSDRawViewer.Tools
                     continue;
                 }
 
-                int value = parameters[i];
+                int value = parameters[v++];
 
                 w.Write(value, bm.BitCount);
             }

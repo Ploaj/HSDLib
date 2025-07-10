@@ -613,6 +613,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     Tuple<int, int> offsize = AJManager.GetOffsetSize(a.Symbol);
                     a.AnimOffset = offsize.Item1;
                     a.AnimSize = offsize.Item2;
+
+                    if (offsize.Item2 >= 0x8000)
+                    {
+                        MessageBox.Show("Figatree Size Over", $"Warning: {a.Symbol} is too large!\nSize: 0x{offsize.Item2.ToString("X8")}", MessageBoxButtons.OK);
+                    }
                 }
             }
 
