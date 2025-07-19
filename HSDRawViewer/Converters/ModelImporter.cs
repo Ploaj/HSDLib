@@ -523,8 +523,8 @@ namespace HSDRawViewer.Converters
 
             // determine parent
             HSD_JOBJ parent = rootnode;
-            //if (mesh.ParentBone != null && NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
-            //    parent = NameToJOBJ[mesh.ParentBone.Name];
+            if (mesh.ParentBone != null && NameToJOBJ.ContainsKey(mesh.ParentBone.Name))
+                parent = NameToJOBJ[mesh.ParentBone.Name];
             if (settings.SingleBindJoint != null && 
                 NameToJOBJ.ContainsKey(settings.SingleBindJoint))
                 parent = NameToJOBJ[settings.SingleBindJoint];
@@ -610,7 +610,14 @@ namespace HSDRawViewer.Converters
                     if (hasReflection)
                     {
                         Attributes.Add(GXAttribName.GX_VA_TEX0MTXIDX);
-
+#if DEBUG
+                        if (Settings.MetalModel && 
+                            !Attributes.Contains(GXAttribName.GX_VA_TEX1MTXIDX))
+                        {
+                            Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
+                        }
+                        else
+#endif
                         if (mesh.Name.Contains("REFLECTIVE2"))
                             Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
                         else
@@ -622,10 +629,6 @@ namespace HSDRawViewer.Converters
                             if (dobj.Mobj.Textures.List.Count > 2)
                                 Attributes.Add(GXAttribName.GX_VA_TEX2MTXIDX);
                         }
-#if DEBUG
-                        if (Settings.MetalModel && !Attributes.Contains(GXAttribName.GX_VA_TEX1MTXIDX))
-                            Attributes.Add(GXAttribName.GX_VA_TEX1MTXIDX);
-#endif
                     }
                 }
 

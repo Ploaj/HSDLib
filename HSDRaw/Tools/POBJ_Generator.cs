@@ -537,6 +537,9 @@ namespace HSDRaw.Tools
                         case GXAttribName.GX_VA_TEX1MTXIDX:
                             ig.Indices[i] = v.TEX1MTXIDX;
                             break;
+                        case GXAttribName.GX_VA_TEX2MTXIDX:
+                            ig.Indices[i] = v.TEX1MTXIDX;
+                            break;
                         case GXAttribName.GX_VA_NULL: break;
                         case GXAttribName.GX_VA_POS: ig.Indices[i] = GetIndex(b, new float[] { v.POS.X, v.POS.Y, v.POS.Z }); break;
                         case GXAttribName.GX_VA_NRM: ig.Indices[i] = GetIndex(b, new float[] { v.NRM.X, v.NRM.Y, v.NRM.Z }); break;

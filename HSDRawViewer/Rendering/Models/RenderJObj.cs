@@ -711,7 +711,7 @@ namespace HSDRawViewer.Rendering.Models
             // Textures
             for (int i = 0; i < MAX_TEX; i++)
             {
-                _shader.SetBoolToInt($"hasTEX[{i}]", enableAll || mobj.RenderFlags.HasFlag((RENDER_MODE)(i << (i + 4))));
+                _shader.SetBoolToInt($"hasTEX[{i}]", enableAll || mobj.RenderFlags.HasFlag((RENDER_MODE)(1 << (i + 4))));
             }
 
             // initialize bump texture to unused
