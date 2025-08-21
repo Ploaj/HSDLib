@@ -926,7 +926,8 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     index++;
                     System.Diagnostics.Debug.WriteLine($"Starting {i}");
                     List<FOBJ_Player> tracks = joint.Tracks; // Ensure thread-safety if tracks are shared
-                    AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, ref tracks, _settings.ErrorMargin);
+                    tracks = AnimationKeyCompressor.OptimizeJointTracks(joint.jobj, tracks, _settings.ErrorMargin);
+                    joint.Tracks = tracks;
                     System.Diagnostics.Debug.WriteLine($"Done {i}");
                 });
 

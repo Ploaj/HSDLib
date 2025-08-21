@@ -467,7 +467,7 @@ namespace HSDRawViewer.Rendering
                 if (applyDiscontinuityFilter)
                     Tools.KeyFilters.DiscontinuityFilter.Filter(Nodes[i].Tracks);
 
-                AnimationKeyCompressor.OptimizeJointTracks(joints[i], ref Nodes[i].Tracks, error);
+                Nodes[i].Tracks = AnimationKeyCompressor.OptimizeJointTracks(joints[i], Nodes[i].Tracks, error);
             }
         }
 

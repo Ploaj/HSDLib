@@ -871,6 +871,7 @@ namespace HSDRaw
                 x => x.EndsWith("_shape") ?  new AK_Shape() : null,
                 x => x.EndsWith("Color") ?  new HSDColorArray() : null,
                 x => x.EndsWith("camera_param") ?  new MEX_ResultCameraParam() : null,
+                x => x.EndsWith("trophy_icon_param") ?  new SBM_TrophyIcon() : null,
                 x => new HSDAccessor(),
         };
 

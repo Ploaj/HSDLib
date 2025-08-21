@@ -390,7 +390,7 @@ namespace HSDRawViewer.Rendering.Widgets
         /// 
         /// </summary>
         /// <param name="camera"></param>
-        public void Render(Camera camera, GLTextRenderer text)
+        public void Render(Camera camera, GLTextRenderer text = null)
         {
             //
             Update(camera);

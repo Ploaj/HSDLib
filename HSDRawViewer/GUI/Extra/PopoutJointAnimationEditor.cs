@@ -46,7 +46,7 @@ namespace HSDRawViewer.GUI.Extra
                 if (settings.ApplyDiscontinuityFilter)
                     EulerFilter();
 
-                AnimationKeyCompressor.OptimizeJointTracks(JOBJ, ref AnimNode.Tracks, settings.ErrorMargin);
+                AnimNode.Tracks = AnimationKeyCompressor.OptimizeJointTracks(JOBJ, AnimNode.Tracks, settings.ErrorMargin);
 
                 if (optimizeChildren)
                     foreach (JointNode child in Nodes)

@@ -861,7 +861,7 @@ NONE - None (do not use)";
         {
             if (_selectedPlayer != null)
             {
-                AnimationKeyCompressor.BakeTrack(_selectedPlayer);
+                _selectedPlayer.Bake();
                 glviewport.Invalidate();
                 OnTrackEdited(EventArgs.Empty);
             }
@@ -897,8 +897,8 @@ NONE - None (do not use)";
                 using PropertyDialog d = new("Compression Settings", _compSettings);
                 if (d.ShowDialog() == DialogResult.OK)
                 {
-                    AnimationKeyCompressor.BakeTrack(_selectedPlayer);
-                    AnimationKeyCompressor.CompressTrack(_selectedPlayer, _compSettings.CompressionLevel);
+                    _selectedPlayer.Bake();
+                    AnimationKeyCompressor.CompressTrack(_selectedPlayer);
                     glviewport.Invalidate();
                     OnTrackEdited(EventArgs.Empty);
                 }
