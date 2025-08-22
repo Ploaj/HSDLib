@@ -64,28 +64,7 @@ namespace HSDRawViewer
         public static HSD_TOBJ ImportTObjFromFile(GXTexFmt fmt, GXTlutFmt pal)
         {
             string f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
-            if (f != null)
-            {
-                using Image<Bgra32> image = Image.Load<Bgra32>(f);
-                HSD_TOBJ tobj = new()
-                {
-                    MagFilter = GXTexFilter.GX_LINEAR,
-                    Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                    RepeatT = 1,
-                    RepeatS = 1,
-                    WrapS = GXWrapMode.CLAMP,
-                    WrapT = GXWrapMode.CLAMP,
-                    SX = 1,
-                    SY = 1,
-                    SZ = 1,
-                    GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0,
-                    Blending = 1
-                };
-                tobj.InjectBitmap(image, fmt, pal);
-                return tobj;
-            }
-
-            return null;
+            return ImportTObjFromFile(f, fmt, pal);
         }
         /// <summary>
         /// Import TOBJ from PNG file 

@@ -6,11 +6,13 @@ using HSDRaw.Tools;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Widgets;
+using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
 using System;
-using System.Linq;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.Melee
@@ -80,16 +82,16 @@ namespace HSDRawViewer.GUI.Plugins.Melee
                 if (arrayEditor.SelectedObject is TrophyDisplay t)
                 {
                     var trans = tr.ExtractTranslation();
-                    t.XOffset = trans.X;
-                    t.YOffset = trans.Y;
-                    t.ZOffset = trans.Z;
+                    t.XOffset = trans.X != float.NaN ? trans.X : 0;
+                    t.YOffset = trans.Y != float.NaN ? trans.Y : 0;
+                    t.ZOffset = trans.Z != float.NaN ? trans.Z : 0;
+                    //arrayEditor.InvalidatePropertyGrid();
                     UpdateTrophyModel();
                 }
             };
 
             arrayEditor.ArrayUpdated += (s, e) =>
             {
-                System.Diagnostics.Debug.WriteLine("Array edited");
                 UpdateTrophyModel();
             };
 
@@ -125,6 +127,11 @@ namespace HSDRawViewer.GUI.Plugins.Melee
             public float XOffset { get; set; }
             public float YOffset { get; set; }
             public float ZOffset { get; set; }
+
+            public override string ToString()
+            {
+                return $"{Texture.ImageData.Width}x{Texture.ImageData.Height}";
+            }
 
             public void Dispose()
             {
@@ -298,14 +305,29 @@ namespace HSDRawViewer.GUI.Plugins.Melee
 
         private void importButton_Click(object sender, EventArgs e)
         {
-            var t = TOBJExtentions.ImportTObjFromFile(HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB5A3);
-            if (t != null)
+            var files = FileIO.OpenFiles(ApplicationSettings.ImageFileFilter);
+            if (files != null)
             {
-                arrayEditor.AddItem(new TrophyDisplay()
+                var tasks = files.Select(f => Task.Run(() =>
                 {
-                    Texture = t,
-                    Scale = 1,
-                });
+                    var t = TOBJExtentions.ImportTObjFromFile(
+                        f,
+                        HSDRaw.GX.GXTexFmt.CI8,
+                        HSDRaw.GX.GXTlutFmt.RGB5A3);
+
+                    return new TrophyDisplay()
+                    {
+                        Texture = t,
+                        Scale = 1,
+                    };
+                })).ToArray();
+
+                // Wait until all have finished
+                Task.WaitAll(tasks);
+
+                // Safely update UI (sequentially) after all are ready
+                foreach (var trophy in tasks)
+                    arrayEditor.AddItem(trophy.Result);
             }
         }
     }

@@ -133,6 +133,11 @@ namespace HSDRawViewer.GUI
 
         public bool InsertCloneAfterSelected { get; set; } = false;
 
+        public void InvalidatePropertyGrid()
+        {
+            propertyGrid.Refresh();
+        }
+
         /// <summary>
         /// 
         /// </summary>

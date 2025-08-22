@@ -182,6 +182,7 @@ namespace HSDRawViewer.Rendering.Widgets
             Vector3 hit = info.GetPlaneIntersection(plane.plane.Normal, plane.plane.Position) + offset;
             hit = Vector3.TransformPosition(hit, Transform.Inverted());
             return Vector3.TransformPosition(hit * axis, Transform);
+            return hit;
         }
 
         /// <summary>

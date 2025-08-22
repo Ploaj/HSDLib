@@ -80,8 +80,17 @@ namespace HSDRawViewer.Rendering
             Vector3 rayP = Origin;
             Vector3 rayD = Direction;
             Vector3 planeN = Norm;
-            float d = Vector3.Dot(Position, -Norm);
-            float t = -(d + rayP.Z * planeN.Z + rayP.Y * planeN.Y + rayP.X * planeN.X) / (rayD.Z * planeN.Z + rayD.Y * planeN.Y + rayD.X * planeN.X);
+            float d = -Vector3.Dot(Norm, Position); // plane equation: N·X + d = 0
+
+            float denom = Vector3.Dot(rayD, planeN);
+
+            if (Math.Abs(denom) < 1e-6f)
+            {
+                // Ray is parallel to plane → no intersection (or infinite intersections if on plane)
+                return Vector3.Zero;
+            }
+
+            float t = -(d + Vector3.Dot(rayP, planeN)) / denom;
             return rayP + t * rayD;
         }
 
