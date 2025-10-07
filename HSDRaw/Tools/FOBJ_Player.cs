@@ -75,6 +75,21 @@ namespace HSDRaw.Tools
         public int PtclBank { get; set; }
         public int PtclId { get; set; }
 
+        public bool IsConstant
+        {
+            get
+            {
+                if (Keys.Count <= 1)
+                    return true;
+
+                var val = GetValue(0);
+                for (int i = 1; i < FrameCount; i++)
+                    if (Math.Abs(val - GetValue(i)) > 0.001f)
+                        return false;
+                return true;
+            }
+        }
+
         public FOBJ_Player()
         {
             Keys = new List<FOBJKey>();
@@ -127,33 +142,15 @@ namespace HSDRaw.Tools
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="Frame"></param>
+        /// <param name="frame"></param>
         /// <returns></returns>
         public FOBJAnimState GetState(float frame)
         {
-            if (Keys == null || Keys.Count == 0)
-                return default;
-
-            if (Keys.Count == 1 || frame <= Keys[0].Frame)
-            {
-                var key = Keys[0];
-                return new FOBJAnimState
-                {
-                    t0 = key.Frame,
-                    t1 = key.Frame,
-                    p0 = key.Value,
-                    p1 = key.Value,
-                    d0 = key.Tan,
-                    d1 = key.Tan,
-                    op = key.InterpolationType,
-                    op_intrp = key.InterpolationType
-                };
-            }
-
-            if (frame >= Keys[Keys.Count - 1].Frame)
+            // clamp
+            if (Keys.Count > 1 && frame >= Keys[Keys.Count - 1].Frame)
             {
                 var key = Keys[Keys.Count - 1];
-                return new FOBJAnimState
+                return new FOBJAnimState()
                 {
                     t0 = key.Frame,
                     t1 = key.Frame,
@@ -166,82 +163,78 @@ namespace HSDRaw.Tools
                 };
             }
 
-            // Binary search to find key index just after `frame`
-            int low = 0;
-            int high = Keys.Count - 1;
-            int found = -1;
+            // register
+            float p0 = 0;
+            float p1 = 0;
+            float d0 = 0;
+            float d1 = 0;
+            float t0 = 0;
+            float t1 = 0;
+            GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
+            GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
 
-            while (low <= high)
+            // get current frame state
+            for (int i = 0; i < Keys.Count; i++)
             {
-                int mid = (low + high) / 2;
-                if (Keys[mid].Frame > frame)
-                {
-                    found = mid;
-                    high = mid - 1;
-                }
-                else
-                {
-                    low = mid + 1;
-                }
-            }
+                op_intrp = op;
+                op = Keys[i].InterpolationType;
 
-            // Now build the state using up to the found key
-            float p0 = 0, p1 = 0, d0 = 0, d1 = 0, t0 = 0, t1 = 0;
-            GXInterpolationType lastOp = GXInterpolationType.HSD_A_OP_CON;
-            GXInterpolationType currOp = GXInterpolationType.HSD_A_OP_CON;
-
-            for (int i = 0; i <= found; i++)
-            {
-                var key = Keys[i];
-                currOp = key.InterpolationType;
-
-                switch (currOp)
+                switch (op)
                 {
                     case GXInterpolationType.HSD_A_OP_CON:
-                    case GXInterpolationType.HSD_A_OP_LIN:
                         p0 = p1;
-                        p1 = key.Value;
-                        if (lastOp != GXInterpolationType.HSD_A_OP_SLP)
+                        p1 = Keys[i].Value;
+                        if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
                         {
                             d0 = d1;
                             d1 = 0;
                         }
                         t0 = t1;
-                        t1 = key.Frame;
+                        t1 = Keys[i].Frame;
                         break;
-
+                    case GXInterpolationType.HSD_A_OP_LIN:
+                        p0 = p1;
+                        p1 = Keys[i].Value;
+                        if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
+                        {
+                            d0 = d1;
+                            d1 = 0;
+                        }
+                        t0 = t1;
+                        t1 = Keys[i].Frame;
+                        break;
                     case GXInterpolationType.HSD_A_OP_SPL0:
                         p0 = p1;
                         d0 = d1;
-                        p1 = key.Value;
+                        p1 = Keys[i].Value;
                         d1 = 0;
                         t0 = t1;
-                        t1 = key.Frame;
+                        t1 = Keys[i].Frame;
                         break;
-
                     case GXInterpolationType.HSD_A_OP_SPL:
                         p0 = p1;
+                        p1 = Keys[i].Value;
                         d0 = d1;
-                        p1 = key.Value;
-                        d1 = key.Tan;
+                        d1 = Keys[i].Tan;
                         t0 = t1;
-                        t1 = key.Frame;
+                        t1 = Keys[i].Frame;
                         break;
-
                     case GXInterpolationType.HSD_A_OP_SLP:
                         d0 = d1;
-                        d1 = key.Tan;
+                        d1 = Keys[i].Tan;
                         break;
-
                     case GXInterpolationType.HSD_A_OP_KEY:
-                        p0 = p1 = key.Value;
+                        p1 = Keys[i].Value;
+                        p0 = Keys[i].Value;
                         break;
                 }
 
-                lastOp = currOp;
-            }
+                if (t1 > frame && Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
+                    break;
 
-            return new FOBJAnimState
+                op_intrp = Keys[i].InterpolationType;
+            }
+            return new FOBJAnimState()
             {
                 t0 = t0,
                 t1 = t1,
@@ -249,8 +242,8 @@ namespace HSDRaw.Tools
                 p1 = p1,
                 d0 = d0,
                 d1 = d1,
-                op = currOp,
-                op_intrp = lastOp
+                op = op,
+                op_intrp = op_intrp
             };
         }
 
@@ -273,7 +266,9 @@ namespace HSDRaw.Tools
             if (state.op_intrp == GXInterpolationType.HSD_A_OP_LIN)
                 return AnimationInterpolationHelper.Lerp(fterm, time, state.p0, state.p1);
 
-            if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
+            if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || 
+                state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || 
+                state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
                 return AnimationInterpolationHelper.SplineGetHermite(1 / fterm, time, state.p0, state.p1, state.d0, state.d1);
 
             return state.p0;

@@ -48,7 +48,7 @@ namespace HSDRawViewer.Tools.Animation
             List<string> files = new();
             foreach (string f in Directory.GetFiles(jointSettings.InputFolder))
             {
-                if (f.EndsWith(".chr0"))
+                if (f.EndsWith(".anim"))
                 {
                     files.Add(f);
                 }

@@ -253,19 +253,19 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             if (text != null)
             {
                 // try to parse script code
-                List<SubactionEvent> scripts = SubactionFromText.FromBrawlText(text);
-                if (scripts != null)
-                {
-                    // insert scripts
-                    scripts.Reverse();
-                    foreach (SubactionEvent v in scripts)
-                        // only paste subactions the belong to this group
-                        if (v.Type == SubactionGroup.Fighter)
-                            subActionList.Items.Insert(index, v);
+                List<SubactionEvent> scripts = new List<SubactionEvent>();
+                scripts.AddRange(SubactionFromText.FromBrawlText(text));
+                scripts.AddRange(SubactionFromText.FromUltimateText(text));
 
-                    // apply changes
-                    ApplyScriptChanges();
-                }
+                // insert scripts
+                scripts.Reverse();
+                foreach (SubactionEvent v in scripts)
+                    // only paste subactions the belong to this group
+                    if (v.Type == SubactionGroup.Fighter)
+                        subActionList.Items.Insert(index, v);
+
+                // apply changes
+                ApplyScriptChanges();
             }
 
             // Get data object from the clipboard

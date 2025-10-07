@@ -7,6 +7,7 @@ using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools.Animation;
+using HSDRawViewer.Tools.KeyFilters;
 using IONET.Collada.Kinematics.Joints;
 using System;
 using System.Collections.Generic;
@@ -450,7 +451,7 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void Optimize(HSD_JOBJ jobj, bool applyDiscontinuityFilter, float error = 0.001f)
+        public void Optimize(HSD_JOBJ jobj, bool applyDiscontinuityFilter, float error = 0.001f, DiscontinuityStart discontinuityType = DiscontinuityStart.Start)
         {
             if (jobj == null)
                 return;
@@ -465,7 +466,7 @@ namespace HSDRawViewer.Rendering
             for (int i = 0; i < Math.Min(joints.Count, NodeCount); i++)
             {
                 if (applyDiscontinuityFilter)
-                    Tools.KeyFilters.DiscontinuityFilter.Filter(Nodes[i].Tracks);
+                    Tools.KeyFilters.DiscontinuityFilter.Filter(Nodes[i].Tracks, discontinuityType);
 
                 Nodes[i].Tracks = AnimationKeyCompressor.OptimizeJointTracks(joints[i], Nodes[i].Tracks, error);
             }
@@ -650,6 +651,26 @@ namespace HSDRawViewer.Rendering
             if (f != null)
             {
                 SMDConv.ExportAnimationToSMD(f, root, jointMap, this);
+            }
+        }
+        /// <summary>
+        /// Can fix various issues with animation such as duplicate tracks
+        /// </summary>
+        public void RemoveDuplicateTracks()
+        {
+            foreach (var n in Nodes)
+            {
+                var before = n.Tracks.Count;
+                n.Tracks = n.Tracks.DistinctBy(e => e.TrackType).ToList();
+                var after = n.Tracks.Count;
+                if (before != after)
+                    System.Diagnostics.Debug.WriteLine(before + " " + after);
+                //var groups = n.Tracks.GroupBy(e => e.TrackType);
+                //foreach (var group in groups)
+                //{
+                //    if (group.Count() <= 1)
+                //        continue;
+                //}
             }
         }
     }

@@ -119,7 +119,7 @@ namespace HSDRaw.Melee.Pl
 
         public float Unknown0x54 { get => _s.GetFloat(0x54); set => _s.SetFloat(0x54, value); }
 
-        public float Unknown0x58 { get => _s.GetFloat(0x58); set => _s.SetFloat(0x58, value); }
+        public float HitboxDecayAfterBounce { get => _s.GetFloat(0x58); set => _s.SetFloat(0x58, value); }
 
         public float Unknown0x5C { get => _s.GetFloat(0x5C); set => _s.SetFloat(0x5C, value); }
 

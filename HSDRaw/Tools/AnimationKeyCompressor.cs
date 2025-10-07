@@ -11,7 +11,7 @@ namespace HSDRaw.Tools
     /// </summary>
     public class AnimationKeyCompressor
     {
-        private const float TRANSLATION_EPSILON = 0.1f;
+        private const float TRANSLATION_EPSILON = 0.01f;
         private const float ROTATION_EPSILON = 0.0087f;
         private const float SCALE_EPSILON = 0.01f;
 
@@ -26,11 +26,7 @@ namespace HSDRaw.Tools
 
                 if (IsConstant(track, 0.01f))
                 {
-                    if (Math.Abs(joint.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) < 0.01f)
-                    {
-                        continue;
-                    }
-                    else
+                    if (Math.Abs(joint.GetDefaultValue(track.JointTrackType) - track.GetValue(0)) >= 0.01f)
                     {
                         optimizedTracks.Add(new FOBJ_Player()
                         {
@@ -46,6 +42,7 @@ namespace HSDRaw.Tools
                             }
                         });
                     }
+                    continue;
                 }
 
                 if (error != 0)

@@ -1,9 +1,10 @@
-﻿using HSDRaw.Tools;
-using HSDRawViewer.Rendering;
-using System.ComponentModel;
+﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.Common.Animation;
-using HSDRaw;
+using HSDRaw.Tools;
+using HSDRawViewer.Rendering;
+using HSDRawViewer.Tools.KeyFilters;
+using System.ComponentModel;
 
 namespace HSDRawViewer.Tools.Animation
 {
@@ -15,6 +16,8 @@ namespace HSDRawViewer.Tools.Animation
         public bool Optimize { get; set; } = true;
 
         public bool ApplyDiscontinutyFilter { get; set; } = true;
+
+        public DiscontinuityStart DiscontinutyFilterType { get; set; } = DiscontinuityStart.Start;
 
         public float OptimizeError { get; set; } = 0.01f;
 
@@ -79,7 +82,8 @@ namespace HSDRawViewer.Tools.Animation
             if (Optimize)
                 anim.Optimize(model,
                     ApplyDiscontinutyFilter,
-                    OptimizeError);
+                    OptimizeError,
+                    DiscontinutyFilterType);
         }
         /// <summary>
         /// 

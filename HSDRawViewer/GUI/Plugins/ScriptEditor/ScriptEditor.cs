@@ -14,6 +14,7 @@ using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Renderers;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.Animation;
+using HSDRawViewer.Tools.KeyFilters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -926,6 +927,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
             public bool ApplyDiscontinutyFilter { get; set; } = true;
 
+            public DiscontinuityStart DiscontinutyFilterType { get; set; } = DiscontinuityStart.Start;
+
             public float OptimizeError { get; set; } = 0.01f;
 
             public float CompressionError { get; set; } = 0.01f;
@@ -967,7 +970,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                         JointAnimManager anim = Converters.ConvMayaAnim.ImportFromMayaAnim(f, null);
 
                         if (settings.Optimize && renderer.FighterModel != null && renderer.FighterModel.RootJObj != null)
-                            anim.Optimize(renderer.FighterModel.RootJObj.Desc, settings.ApplyDiscontinutyFilter, settings.OptimizeError);
+                            anim.Optimize(renderer.FighterModel.RootJObj.Desc, 
+                                settings.ApplyDiscontinutyFilter, 
+                                settings.OptimizeError, 
+                                settings.DiscontinutyFilterType);
 
                         file = new HSDRawFile();
                         file.Roots.Add(new HSDRootNode()

@@ -3,6 +3,8 @@ using HSDRaw.Melee.Pl;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Tools.Animation;
 using System;
+using System.ArrayExtensions;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
@@ -92,9 +94,22 @@ namespace HSDRawViewer.ContextMenus
                     var tini = new JointMap(target);
 
                     var tables = table.Commands;
-
-                    foreach (var c in tables)
+                    HashSet<HSDStruct> processed = new HashSet<HSDStruct>();
+                    Queue<SBM_FighterAction> queue = new Queue<SBM_FighterAction>();
+                    Array.ForEach(tables, e =>
                     {
+                        queue.Enqueue(e);
+                    });
+
+                    while (queue.Count > 0)
+                    {
+                        var c = queue.Dequeue();
+
+                        // check if already processed
+                        if (processed.Contains(c.SubAction._s))
+                            continue;
+
+                        // remap bone ids
                         var data = c.SubAction._s.GetData();
                         Tools.SubactionManager.EditSubactionData(
                             ref data,
@@ -115,6 +130,18 @@ namespace HSDRawViewer.ContextMenus
                             },
                             Tools.SubactionGroup.Fighter);
                         c.SubAction._s.SetData(data);
+
+                        // mark as processed
+                        processed.Add(c.SubAction._s);
+
+                        // check to queue references
+                        foreach (var r in c.SubAction._s.References)
+                        {
+                            if (!processed.Contains(r.Value))
+                            {
+                                queue.Enqueue(new SBM_FighterAction() { SubAction = new HSDRaw.Melee.Cmd.SBM_FighterSubactionData() { _s = r.Value} });
+                            }
+                        }
                     }
 
                     table.Commands = tables;

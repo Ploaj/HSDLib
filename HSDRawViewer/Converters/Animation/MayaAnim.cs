@@ -213,7 +213,7 @@ namespace HSDRawViewer.Converters
             foreach (MayaAnim.MayaNode mNode in mayaFile.Nodes)
             {
                 AnimNode node = animation.Nodes[index++];
-                System.Diagnostics.Debug.WriteLine(mNode.name);
+                //System.Diagnostics.Debug.WriteLine(mNode.name);
 
                 if (jointMap != null && jointMap.Count > 0)
                 {
@@ -231,7 +231,7 @@ namespace HSDRawViewer.Converters
                     t.Keys = new List<FOBJKey>();
                     t.JointTrackType = jointTrackToMayaTrack.FirstOrDefault(e => e.Value == mTrack.type).Key;
 
-                    System.Diagnostics.Debug.WriteLine("\t" + mTrack.type);
+                    //System.Diagnostics.Debug.WriteLine("\t" + mTrack.type);
 
                     bool degrees = mayaFile.header.angularUnit == "deg";
                     bool trackUnit = (mTrack.IsAngular() && degrees);

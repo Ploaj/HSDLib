@@ -6,18 +6,31 @@ using System.Linq;
 
 namespace HSDRawViewer.Tools.KeyFilters
 {
+    public enum DiscontinuityStart
+    {
+        Start,
+        End,
+    }
+
     public class DiscontinuityFilter
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="tracks"></param>
-        public static bool Filter(List<FOBJ_Player> tracks)
+        public static bool Filter(List<FOBJ_Player> tracks, DiscontinuityStart type = DiscontinuityStart.Start)
         {
             bool filtered = false;
             FOBJ_Player x = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTX);
             FOBJ_Player y = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTY);
             FOBJ_Player z = tracks.FirstOrDefault(e => e.JointTrackType == HSDRaw.Common.Animation.JointTrackType.HSD_A_J_ROTZ);
+
+            if (type == DiscontinuityStart.End)
+            {
+                x.Reverse();
+                y.Reverse();
+                z.Reverse();
+            }
 
             if (x != null && y != null && z != null)
             {
@@ -54,6 +67,13 @@ namespace HSDRawViewer.Tools.KeyFilters
                 x.AxisFilter();
                 y.AxisFilter();
                 z.AxisFilter();
+            }
+
+            if (type == DiscontinuityStart.End)
+            {
+                x.Reverse();
+                y.Reverse();
+                z.Reverse();
             }
 
             return filtered;
