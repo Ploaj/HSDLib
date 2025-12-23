@@ -158,8 +158,8 @@ namespace HSDRawViewer.Tools
                 max = Vector3.ComponentMax(max, t.Max);
             }
 
-            min = new Vector3(-5000, -5000, -5000);
-            max = new Vector3(5000, 5000, 5000);
+            min = new Vector3(-5005, -5005, -5005);
+            max = new Vector3(5005, 5005, 5005);
 
             SpatialBox root = new(min, max);
             foreach (SpatialTriangle t in triangles)
@@ -185,7 +185,7 @@ namespace HSDRawViewer.Tools
             List<SpatialTriangle> triangles = new();
             foreach (KAR_CollisionJoint j in _joints)
             {
-                Matrix4 trans = model.GetJObjAtIndex(j.BoneID).WorldTransform;
+                Matrix4 trans = model == null ? Matrix4.Identity : model.GetJObjAtIndex(j.BoneID).WorldTransform;
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
                     KAR_CollisionTriangle tri = _triangles[i];
@@ -206,6 +206,7 @@ namespace HSDRawViewer.Tools
                     });
                 }
             }
+
             // create initial bucket
             SpatialBox root = Organize(triangles);
 
@@ -228,7 +229,7 @@ namespace HSDRawViewer.Tools
                 foreach (KAR_ZoneCollisionJoint j in zjoints)
                 {
                     List<SpatialTriangle> zt = new();
-                    Matrix4 trans = model.GetJObjAtIndex(j.BoneID).WorldTransform;
+                    Matrix4 trans = model == null ? Matrix4.Identity : model.GetJObjAtIndex(j.BoneID).WorldTransform;
 
                     for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                     {

@@ -58,8 +58,8 @@ namespace HSDRawViewer
             var vp = new GUI.Controls.DockableViewport();
             vp.Dock = DockStyle.Fill;
             vp.Show(dockPanel);
-            TestRendering test = new TestRendering();
-            vp.glViewport.AddRenderer(test);
+            //TestRendering test = new TestRendering();
+            //vp.glViewport.AddRenderer(test);
 #endif
 
             _nodePropertyViewer = new PropertyView();

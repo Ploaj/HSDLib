@@ -1155,6 +1155,9 @@ NONE - None (do not use)";
 
             [Category("Settings"), DisplayName("End Frame"), Description("Frame to end shifting. -1 for all")]
             public int EndFrame { get; set; } = -1;
+
+            [Category("Settings"), DisplayName("Multiply By"), Description("Multiply all keys by this value;")]
+            public float MultiplyAmount { get; set; } = 1;
         }
 
         private static readonly ShiftSettings _shiftSettings = new();
@@ -1182,6 +1185,8 @@ NONE - None (do not use)";
                             continue;
 
                         k.Value += _shiftSettings.ShiftAmount;
+                        k.Value *= _shiftSettings.MultiplyAmount;
+                        k.Tan *= _shiftSettings.MultiplyAmount;
                     }
                     glviewport.Invalidate();
                     OnTrackEdited(EventArgs.Empty);
@@ -1237,6 +1242,7 @@ NONE - None (do not use)";
                                 r, g, b, a
                             };
 
+                            d.BigEndian = true;
                             d.ReadInt32();
                             d.ReadInt32();
                             var count = d.ReadInt32();

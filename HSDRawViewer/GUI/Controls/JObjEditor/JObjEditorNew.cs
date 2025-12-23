@@ -2,6 +2,7 @@
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
 using HSDRawViewer.Converters;
+using HSDRawViewer.Converters.Brawl;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Animation;
@@ -973,7 +974,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             JointAnimManager anim = JointAnimManager.LoadFromFile(to);
             if (anim != null)
             {
-                anim = AnimationRemap.Remap(anim, from, to);
+                anim = RemapUtil.Remap(anim, from, to);
                 LoadAnimation(anim);
             }
         }
@@ -1026,7 +1027,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 {
                     LiveJObj livefrom = new(model);
                     LiveJObj liveto = new(RenderJObj.RootJObj.Desc);
-                    anim = AnimationRetarget.Retarget(anim, livefrom, liveto, from, to, null);
+                    anim = RetargetUtil.Retarget(anim, livefrom, liveto, from, to, null);
 
                     if (_importRemapSettings.RotationOnly)
                     {
@@ -1078,6 +1079,61 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void asMatAnimJointToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void importAndRemapRelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using PropertyDialog p = new("Import and Retarget", _importRemapSettings);
+            if (p.ShowDialog() == DialogResult.OK)
+            {
+                if (string.IsNullOrEmpty(_importRemapSettings.ToINI) ||
+                    !File.Exists(_importRemapSettings.ToINI) ||
+                    string.IsNullOrEmpty(_importRemapSettings.FromINI) ||
+                    !File.Exists(_importRemapSettings.FromINI) ||
+                    string.IsNullOrEmpty(_importRemapSettings.FromDAT) ||
+                    !File.Exists(_importRemapSettings.FromDAT))
+                {
+                    return;
+                }
+
+                JointMap to = new(_importRemapSettings.ToINI);
+                JointMap from = new(_importRemapSettings.FromINI);
+                HSD_JOBJ model = new HSDRaw.HSDRawFile(_importRemapSettings.FromDAT).Roots[0].Data as HSD_JOBJ;
+                if (model == null)
+                    return;
+
+                HSD_JOBJ target = RenderJObj.RootJObj.Desc;
+                JointAnimManager anim = JointAnimManager.LoadFromFile(from);
+                if (anim != null)
+                {
+                    //LiveJObj livefrom = new(model);
+                    //LiveJObj liveto = new(RenderJObj.RootJObj.Desc);
+                    anim = RemapUtil.Remap(anim, from, to, model.TreeList, RenderJObj.RootJObj.Desc.TreeList);
+
+                    if (_importRemapSettings.RotationOnly)
+                    {
+                        foreach (var c in anim.Nodes)
+                        {
+                            c.Tracks.RemoveAll(e =>
+                            e.JointTrackType != JointTrackType.HSD_A_J_ROTX &&
+                            e.JointTrackType != JointTrackType.HSD_A_J_ROTY &&
+                            e.JointTrackType != JointTrackType.HSD_A_J_ROTZ);
+                        }
+                    }
+
+                    LoadAnimation(anim);
+                }
+            }
         }
     }
 }

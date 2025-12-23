@@ -179,5 +179,15 @@
         public ushort RoughCount { get => _s.GetUInt16(0x2e); set => _s.SetUInt16(0x2e, value); }
 
         public byte Depth { get => _s.GetByte(0x4C); set => _s.SetByte(0x4C, value); }
+
+        public override string ToString()
+        {
+            if (CollTriangleCount == 0)
+            {
+                return "Branch";
+            }
+
+            return $"Leaf {CollTriangleCount}";
+        }
     }
 }

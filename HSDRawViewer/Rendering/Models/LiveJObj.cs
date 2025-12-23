@@ -582,16 +582,16 @@ namespace HSDRawViewer.Rendering.Models
             switch (Desc.Flags & JOBJ_FLAG.EFFECTOR)
             {
                 case JOBJ_FLAG.JOINT1:
-                    IKSolver.ResolveIKJoint1(this);
+                    HSDIkSolver.ResolveIKJoint1(this);
                     break;
                 case JOBJ_FLAG.JOINT2:
-                    IKSolver.ResolveIKJoint2(this);
+                    HSDIkSolver.ResolveIKJoint2(this);
                     break;
                 case JOBJ_FLAG.EFFECTOR:
-                    IKSolver.ResolveIKEffector(this);
+                    HSDIkSolver.ResolveIKEffector(this);
                     break;
                 default:
-                    IKSolver.RObjUpdateAll(this);
+                    HSDIkSolver.RObjUpdateAll(this);
                     break;
             }
         }

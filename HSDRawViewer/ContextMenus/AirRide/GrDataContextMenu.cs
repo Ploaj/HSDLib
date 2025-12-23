@@ -1,6 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
+using HSDRawViewer.Converters.AirRide;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
@@ -16,6 +17,38 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         public GrDataContextMenu() : base()
         {
+            ToolStripMenuItem importKdt = new("Import From KDT");
+            importKdt.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    string f = FileIO.OpenFile("KAR Collision (*.kdt)|*.kdt", "collision.kdt");
+                    if (f != null)
+                    {
+                        FormatKDT.ReadKDT(f, out var node, out var tree);
+                        data.CollisionNode = node;
+                        data.PartitionNode.Partition = tree;
+                    }
+                }
+            };
+            Items.Add(importKdt);
+
+            ToolStripMenuItem exportKdt = new("Export To KDT");
+            exportKdt.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    string f = FileIO.SaveFile("KAR Collision (*.kdt)|*.kdt", "collision.kdt");
+                    if (f != null)
+                    {
+                        FormatKDT.WriteKDT(f, data.CollisionNode);
+                    }
+                }
+            };
+            Items.Add(exportKdt);
+
+
+
             ToolStripMenuItem ImportCollModel = new("Import Collision Model");
             ImportCollModel.Click += (sender, args) =>
             {
@@ -116,65 +149,65 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
 
 
-            ToolStripMenuItem test = new("Test Edit");
-            test.Click += (sender, args) =>
-            {
-                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
-                {
-                    //data.PartitionNode.Partition = HSDRaw.Tools.KAR.Bucket.GeneratePartitionNode(data.CollisionNode);
+            //ToolStripMenuItem test = new("Test Edit");
+            //test.Click += (sender, args) =>
+            //{
+            //    if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+            //    {
+            //        //data.PartitionNode.Partition = HSDRaw.Tools.KAR.Bucket.GeneratePartitionNode(data.CollisionNode);
 
-                    // analyze splitting pattern
+            //        // analyze splitting pattern
 
-                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
-                    if (f != null)
-                    {
-                        HSDRawFile file = new(f);
+            //        string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
+            //        if (f != null)
+            //        {
+            //            HSDRawFile file = new(f);
 
-                        foreach (HSDRootNode r in file.Roots)
-                        {
-                            if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
-                            {
-                                LiveJObj jobj = new(m.MainModel.RootNode);
-                                data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(jobj, data.CollisionNode);
-                            }
-                        }
-                    }
+            //            foreach (HSDRootNode r in file.Roots)
+            //            {
+            //                if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
+            //                {
+            //                    LiveJObj jobj = new(m.MainModel.RootNode);
+            //                    data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(jobj, data.CollisionNode);
+            //                }
+            //            }
+            //        }
 
-                    //var tri = data.CollisionNode.Triangles;
+            //        //var tri = data.CollisionNode.Triangles;
 
-                    //var indices = tri
-                    //    .Select((value, index) => new { Value = value, Index = index })
-                    //    .Where(item => item.Value.Rough != 0)
-                    //    .Select(item => item.Index)
-                    //    .ToArray();
+            //        //var indices = tri
+            //        //    .Select((value, index) => new { Value = value, Index = index })
+            //        //    .Where(item => item.Value.Rough != 0)
+            //        //    .Select(item => item.Index)
+            //        //    .ToArray();
 
-                    //var ct = data.PartitionNode.Partition.CollidableTriangles;
-                    //foreach (var b in data.PartitionNode.Partition.Buckets)
-                    //{
-                    //    for (int i = b.RoughStart; i < b.RoughStart + b.RoughCount; i++)
-                    //    {
-                    //        var index = indices[data.PartitionNode.Partition.RoughIndices[i]];
+            //        //var ct = data.PartitionNode.Partition.CollidableTriangles;
+            //        //foreach (var b in data.PartitionNode.Partition.Buckets)
+            //        //{
+            //        //    for (int i = b.RoughStart; i < b.RoughStart + b.RoughCount; i++)
+            //        //    {
+            //        //        var index = indices[data.PartitionNode.Partition.RoughIndices[i]];
 
-                    //        bool found = false;
-                    //        for (int j = b.CollTriangleStart; j < b.CollTriangleStart + b.CollTriangleCount; j++)
-                    //        {
-                    //            if (ct[j] == index)
-                    //            {
-                    //                found = true;
-                    //                break;
-                    //            }
-                    //        }
+            //        //        bool found = false;
+            //        //        for (int j = b.CollTriangleStart; j < b.CollTriangleStart + b.CollTriangleCount; j++)
+            //        //        {
+            //        //            if (ct[j] == index)
+            //        //            {
+            //        //                found = true;
+            //        //                break;
+            //        //            }
+            //        //        }
 
-                    //        if (!found)
-                    //            Console.WriteLine("!found " + tri[index].Rough);
-                    //        else
-                    //            Console.WriteLine("found " + tri[index].Rough);
+            //        //        if (!found)
+            //        //            Console.WriteLine("!found " + tri[index].Rough);
+            //        //        else
+            //        //            Console.WriteLine("found " + tri[index].Rough);
 
-                    //    }
-                    //}
-                }
-            };
-            Items.Add(test);
+            //        //    }
+            //        //}
+            //    }
+            //};
+            //Items.Add(test);
 
 
             ToolStripMenuItem clear = new("Clear Bones");

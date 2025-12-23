@@ -5,16 +5,14 @@ using HSDRaw.Tools.Melee;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using static HSDRawViewer.Tools.Melee.FighterConverter;
 using System.Threading;
 
 namespace HSDRawViewer.Tools.Animation
 {
-    public class AnimationRetarget
+    public class RetargetUtil
     {
         /// <summary>
         /// 
@@ -39,6 +37,7 @@ namespace HSDRawViewer.Tools.Animation
 
             //private FighterAJManager AJManager;
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -220,7 +219,7 @@ namespace HSDRawViewer.Tools.Animation
         /// </summary>
         /// <param name="source"></param>
         /// <param name="target"></param>
-        private static void ConstrainWorldTransform(LiveJObj source, LiveJObj target)
+        public static void ConstrainWorldTransform(LiveJObj source, LiveJObj target)
         {
             OpenTK.Mathematics.Matrix4 bind = target.InvertedTransform.Inverted() * source.InvertedTransform;
 

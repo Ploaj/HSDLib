@@ -105,7 +105,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         public void SetJObj(HSD_JOBJ jobj)
         {
             _root = jobj;
-            _jointMap.Clear();
+            _jointMap.InitFrom(jobj);
 
             treeJOBJ.BeginUpdate();
             treeJOBJ.Nodes.Clear();

@@ -10,7 +10,7 @@ namespace HSDRawViewer.Converters.Animation
 {
     public class JointAnimationLoader
     {
-        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd*.dae)|*.dat;*.anim;*.chr0;*.smd;*.dae";
+        public static readonly string SupportedImportAnimFilter = "Supported Animation Formats (*.dat*.anim*.chr0*.smd*.dae)|*.dat;*.anim;*.chr0;*.smd;*.dae;";
 
         /// <summary>
         /// 

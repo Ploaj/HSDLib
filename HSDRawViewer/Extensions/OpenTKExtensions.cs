@@ -47,6 +47,31 @@ namespace HSDRawViewer
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="scale"></param>
+        /// <param name="rot"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        public static bool Decompose(this Matrix4 m, out Vector3 scale, out Quaternion rot, out Vector3 trans)
+        {
+            scale = m.ExtractScale();
+            rot = m.ExtractRotation();
+            trans = m.ExtractTranslation();
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static Vector3 ExtractRotationEuler(this Quaternion q)
+        {
+            return Matrix4.CreateFromQuaternion(q).ExtractRotationEuler();
+        }
 
         /// <summary>
         /// 
@@ -70,6 +95,17 @@ namespace HSDRawViewer
                 v.Z = (float)Math.Atan2(m.M12, m.M11);
             }
             return v;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param_1"></param>
+        /// <param name="param_2"></param>
+        /// <returns></returns>
+        public static Quaternion FromEuler(this Quaternion quat, Vector3 eul)
+        {
+            return quat.FromEuler(eul.X, eul.Y, eul.Z);
         }
 
         /// <summary>

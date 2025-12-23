@@ -185,9 +185,9 @@ namespace HSDRaw.AirRide.Gr.Data
         /// 11 - AirFlow
         /// 12/13 - Switch 800d2a1c
         /// 25 - Dead
-        /// 32 - 800eefd4 - also checks flag 0x2000020
+        /// 32 - (shadow)800eefd4 - also checks flag 0x2000020
         /// </summary>
-        public int Type { get => _s.GetInt32(0x10) & 0x01FFFFFF; set => _s.SetInt32(0x10, (PolyIndex << 25) | (value & 0x01FFFFFF)); }
+        public int Type { get => _s.GetInt32(0x10) & 0x01FFFFFF; set => _s.SetInt32(0x10, (UnknownIndex << 25) | (value & 0x01FFFFFF)); }
 
         /// <summary>
         /// Collision Flags

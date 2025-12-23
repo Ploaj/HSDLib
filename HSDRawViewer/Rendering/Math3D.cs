@@ -73,6 +73,18 @@ namespace HSDRawViewer.Rendering
         /// <param name="y"></param>
         /// <param name="x"></param>
         /// <returns></returns>
+        public static Quaternion EulerToQuat(Vector3 eul)
+        {
+            return new Quaternion().FromEuler(eul.X, eul.Y, eul.Z);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="z"></param>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static Quaternion EulerToQuat(float x, float y, float z)
         {
             return new Quaternion().FromEuler(x, y, z);

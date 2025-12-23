@@ -1,4 +1,5 @@
 ﻿using HSDRaw.Common;
+using HSDRawViewer.Rendering.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -127,7 +128,7 @@ namespace HSDRawViewer.Tools.Animation
             if (_indexToName.Count > 0)
             {
                 foreach (KeyValuePair<int, JointInfo> b in _indexToName)
-                    w.WriteLine($"JOBJ_{b.Key}={b.Value}");
+                    w.WriteLine($"JOBJ_{b.Key}={b.Value.Name}");
             }
             else
             {
@@ -142,6 +143,23 @@ namespace HSDRawViewer.Tools.Animation
                         ji++;
                     }
                 }
+            }
+        }
+
+        internal void InitFrom(HSD_JOBJ jobj)
+        {
+            Clear();
+            int index = 0;
+            foreach (var j in jobj.TreeList)
+            {
+                if (!string.IsNullOrEmpty(j.ClassName))
+                {
+                    _indexToName.Add(index, new JointInfo()
+                    {
+                        Name = j.ClassName,
+                    });
+                }
+                index++;
             }
         }
     }

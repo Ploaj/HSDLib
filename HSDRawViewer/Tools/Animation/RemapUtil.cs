@@ -3,10 +3,11 @@ using HSDRaw.Common;
 using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.Rendering;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace HSDRawViewer.Tools.Animation
 {
-    public class AnimationRemap
+    public class RemapUtil
     {
         /// <summary>
         /// 
@@ -70,7 +71,7 @@ namespace HSDRawViewer.Tools.Animation
 
         /// <summary>
         /// Generates a new joint anim remapping bones between skeletons
-        /// Note: does *not* retarget <see cref="AnimationRetarget"/> the animation
+        /// Note: does *not* retarget <see cref="RetargetUtil"/> the animation
         /// </summary>
         /// <param name="anim"></param>
         /// <param name="from"></param>
@@ -104,7 +105,7 @@ namespace HSDRawViewer.Tools.Animation
 
         /// <summary>
         /// Generates a new joint anim remapping bones between skeletons
-        /// Note: does *not* retarget <see cref="AnimationRetarget"/> the animation
+        /// Note: does *not* retarget <see cref="RetargetUtil"/> the animation
         /// </summary>
         /// <param name="anim"></param>
         /// <param name="from"></param>
@@ -135,6 +136,11 @@ namespace HSDRawViewer.Tools.Animation
                 {
                     n.Nodes[remap_index].Tracks = anim.Nodes[i].Tracks;
 
+                    var toLength = new Vector3(toj[remap_index].TX, toj[remap_index].TY, toj[remap_index].TZ).Length();
+                    var fromLength = new Vector3(fromj[i].TX, fromj[i].TY, fromj[i].TZ).Length();
+
+                    float scale = fromLength != 0.0f ? toLength / fromLength : 1.0f;
+
                     foreach (HSDRaw.Tools.FOBJ_Player t in n.Nodes[remap_index].Tracks)
                     {
                         switch (t.JointTrackType)
@@ -142,19 +148,19 @@ namespace HSDRawViewer.Tools.Animation
                             case HSDRaw.Common.Animation.JointTrackType.HSD_A_J_TRAX:
                                 foreach (HSDRaw.Tools.FOBJKey k in t.Keys)
                                 {
-                                    k.Value -= fromj[i].TX - toj[remap_index].TX;
+                                    k.Value *= scale;
                                 }
                                 break;
                             case HSDRaw.Common.Animation.JointTrackType.HSD_A_J_TRAY:
                                 foreach (HSDRaw.Tools.FOBJKey k in t.Keys)
                                 {
-                                    k.Value -= fromj[i].TY - toj[remap_index].TY;
+                                    k.Value *= scale;
                                 }
                                 break;
                             case HSDRaw.Common.Animation.JointTrackType.HSD_A_J_TRAZ:
                                 foreach (HSDRaw.Tools.FOBJKey k in t.Keys)
                                 {
-                                    k.Value -= fromj[i].TZ - toj[remap_index].TZ;
+                                    k.Value *= scale;
                                 }
                                 break;
                         }

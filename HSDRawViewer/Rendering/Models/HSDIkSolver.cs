@@ -4,7 +4,7 @@ using System;
 
 namespace HSDRawViewer.Rendering.Models
 {
-    internal class IKSolver
+    internal class HSDIkSolver
     {
 
         /// <summary>

@@ -24,6 +24,7 @@ using HSDRaw.Melee.Pl.ftData;
 using HSDRaw.Melee.Ty;
 using HSDRaw.MEX.Akaneia;
 using HSDRaw.MEX.Characters;
+using HSDRaw.Melee.Cmd;
 
 namespace HSDRaw
 {
@@ -872,6 +873,8 @@ namespace HSDRaw
                 x => x.EndsWith("Color") ?  new HSDColorArray() : null,
                 x => x.EndsWith("camera_param") ?  new MEX_ResultCameraParam() : null,
                 x => x.EndsWith("trophy_icon_param") ?  new SBM_TrophyIcon() : null,
+                x => x.EndsWith("ALDYakuAll") ?  new HSDNullPointerArrayAccessor<SBM_ItemSubactionData>() : null,
+                x => x.EndsWith("hazard_list") ?  new HSDNullPointerArrayAccessor<HSD_String>() : null,
                 x => new HSDAccessor(),
         };
 

@@ -16,6 +16,13 @@ namespace HSDRawViewer.Converters
         Yes,
         YesIfNoVertexColor
     }
+
+    public enum ImportYesNo
+    {
+        No,
+        Yes,
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -42,6 +49,9 @@ namespace HSDRawViewer.Converters
 
         [Category("2. Importing Options"), DisplayName("Import Normals"), Description("Imports normals into model. Normals are used for lighting calcuations and reflections.")]
         public ImportNormalSettings ImportNormals { get; set; } = ImportNormalSettings.No;
+
+        [Category("2. Importing Options"), DisplayName("Import TexCoords"), Description("Imports texcoords into model. Texcoords are used for textures.")]
+        public ImportYesNo ImportUVs { get; set; } = ImportYesNo.Yes;
 
         [Category("2. Importing Options"), DisplayName("Is Reflective"), Description("")]
         public bool IsReflective { get; set; } = false;
@@ -436,6 +446,9 @@ namespace HSDRawViewer.Converters
 
         [Category("Debug Options"), DisplayName("Melee-ify"), Description("")]
         public bool Meleeify { get; set; } = false;
+
+        [Category("Debug Options"), DisplayName("Outline Size"), Description("Used only for generating outline models for KAR")]
+        public float OutlineSize { get; set; } = 0.0f;
 #endif
 
         [Category("Importing Options"), DisplayName("Classical Scaling"), Description("Leave this true if you don't know what it is.")]

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using static HSDRawViewer.Tools.Animation.AnimationRetarget;
+using static HSDRawViewer.Tools.Animation.RetargetUtil;
 
 namespace HSDRawViewer.Tools.Melee
 {
