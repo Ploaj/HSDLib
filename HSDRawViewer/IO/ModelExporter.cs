@@ -2,7 +2,9 @@
 using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRaw.Tools;
+using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
+using HSDRawViewer.IO.Model;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.Animation;
@@ -13,6 +15,7 @@ using IONET.Core.Skeleton;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace HSDRawViewer.Converters
@@ -53,7 +56,10 @@ namespace HSDRawViewer.Converters
     public class ModelExporter
     {
         public static bool TransformUVS { get; set; }
+
         public static bool ScaleUVs { get; set; }
+
+        private static readonly string ModelFileFilter = @"Support Formats|*.dae;*.smd;*.obj;*.hsdm;";
 
         /// <summary>
         /// Exports JOBJ to file
@@ -62,15 +68,59 @@ namespace HSDRawViewer.Converters
         /// <param name="boneLabels"></param>
         public static void ExportFile(HSD_JOBJ rootJOBJ, JointMap jointMap = null)
         {
-            string f = FileIO.SaveFile(IOManager.GetExportFileFilter(animation_support: false));
+            string f = FileIO.SaveFile(ModelFileFilter);
 
             if (f != null)
             {
-                ModelExportSettings settings = new();
-                using PropertyDialog d = new("Model Export Options", settings);
-                if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (Path.GetExtension(f).ToLower() == ".hsdm")
                 {
-                    ExportFile(f, rootJOBJ, settings, jointMap);
+                    var path = Path.GetDirectoryName(f);
+                    var skl = new HsdSkl(rootJOBJ);
+
+                    // set bones names
+                    if (jointMap != null)
+                        for(int i = 0; i < skl.Bones.Count; i++)
+                        {
+                            var name = jointMap[i];
+                            if (name != null)
+                                skl.Bones[i].Name = name;
+                        }
+
+                    // export textures
+                    HashSet<int> exported = new HashSet<int>();
+                    foreach (var j in rootJOBJ.TreeList)
+                    {
+                        if (j.Dobj == null)
+                            continue;
+
+                        foreach (var d in j.Dobj.List)
+                        {
+                            if (d.Mobj.Textures == null)
+                                continue;
+
+                            foreach (var t in d.Mobj.Textures.List)
+                            {
+                                var hash = ImporterExtensions.ComputeHash(t.ImageData.ImageData);
+
+                                if (exported.Contains(hash))
+                                    continue;
+
+                                var filename = $"t{hash.ToString("X8")}.png";
+
+                                t.SaveImagePNG(Path.Combine(path, filename));
+                            }
+                        }
+                    }
+                    HsdJsonHelper.Export(f, skl);
+                }
+                else
+                {
+                    ModelExportSettings settings = new();
+                    using PropertyDialog d = new("Model Export Options", settings);
+                    if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        ExportFile(f, rootJOBJ, settings, jointMap);
+                    }
                 }
             }
 

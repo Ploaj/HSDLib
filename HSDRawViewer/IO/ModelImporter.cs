@@ -4,6 +4,7 @@ using HSDRaw.Tools;
 using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
+using HSDRawViewer.IO.Model;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using IONET;
@@ -11,6 +12,7 @@ using IONET.Collada.Kinematics.Joints;
 using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
+using IONET.Fbx.APITest;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -65,6 +67,8 @@ namespace HSDRawViewer.Converters
         /// 
         /// </summary>
         private readonly IOModel model;
+
+        private static readonly string ModelFileFilter = @"Support Formats|*.dae;*.smd;*.obj;*.fbx;*.hsdm;";
 
         /// <summary>
         /// 
@@ -145,13 +149,46 @@ namespace HSDRawViewer.Converters
             return null;
         }
 
+        private static HSD_JOBJ ImportHSDM(string filePath, HSD_JOBJ original)
+        {
+            var path = Path.GetDirectoryName(filePath);
+            var jobj = HsdImportHelper.ImportSklToJObj(filePath);
+
+            // check to replace skeleton
+            if (original != null)
+            {
+                if (JointTreeIsSimilar(original, jobj))
+                {
+                    if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
+                        "Preserve the current model's skeleton?\n" +
+                        "(Recommended for online play)",
+                        "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        ReplaceWithBonesFromFile(original, jobj);
+                    }
+                }
+            }
+
+            return jobj;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="toReplace"></param>
         public static HSD_JOBJ ImportModelFromFile(HSD_JOBJ original)
         {
-            return ImportModelFromFile(Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false)), original);
+            var f = Tools.FileIO.OpenFile(ModelFileFilter);
+
+            if (f == null)
+                return null;
+
+            if (Path.GetExtension(f).ToLower() == ".hsdm")
+            {
+                return ImportHSDM(f, original);
+            }
+
+            return ImportModelFromFile(f, original);
         }
 
         /// <summary>
@@ -163,6 +200,48 @@ namespace HSDRawViewer.Converters
             HSD_JOBJ model = ImportModelFromFile(original);
             if (model != null)
                 original._s.SetFromStruct(model._s);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        public static bool JointTreeIsSimilar(HSD_JOBJ from, HSD_JOBJ to)
+        {
+            float eps = 0.01f;
+
+            if (Math.Abs(from.TX - to.TX) > eps) return false;
+            if (Math.Abs(from.TY - to.TY) > eps) return false;
+            if (Math.Abs(from.TZ - to.TZ) > eps) return false;
+            if (Math.Abs(from.RX - to.RX) > eps) return false;
+            if (Math.Abs(from.RY - to.RY) > eps) return false;
+            if (Math.Abs(from.RZ - to.RZ) > eps) return false;
+            if (Math.Abs(from.SX - to.SX) > eps) return false;
+            if (Math.Abs(from.SY - to.SY) > eps) return false;
+            if (Math.Abs(from.SZ - to.SZ) > eps) return false;
+
+            if ((from.Child != null) != (to.Child != null))
+                return false;
+
+            if ((from.Next != null) != (to.Next != null))
+                return false;
+            
+            if (from.Child != null)
+            {
+                if (!JointTreeIsSimilar(from.Child, to.Child))
+                    return false;
+            }
+
+            if (from.Next != null)
+            {
+                if (!JointTreeIsSimilar(from.Next, to.Next))
+                    return false;
+            }
+
+            return true;
         }
 
 
@@ -242,7 +321,7 @@ namespace HSDRawViewer.Converters
             j2.RotationEuler = new System.Numerics.Vector3(j1.RX, j1.RY, j1.RZ);
             j2.Scale = new System.Numerics.Vector3(j1.SX, j1.SY, j1.SZ);
 
-            System.Diagnostics.Debug.WriteLine($"{j2.Name} {j1.RX} {j1.RY} {j1.RZ} {j2.RotationEuler.ToString()}");
+            //System.Diagnostics.Debug.WriteLine($"{j2.Name} {j1.RX} {j1.RY} {j1.RZ} {j2.RotationEuler.ToString()}");
 
             if (j1.Child != null)
                 ReplaceWithBonesFromFile(j1.Child, j2.Child);

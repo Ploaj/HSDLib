@@ -9,13 +9,12 @@ namespace HSDRawViewer.Extensions
 {
     public static class ImporterExtensions
     {
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static int ComputeHash(params byte[] data)
+        public static int ComputeHash(byte[] data)
         {
             unchecked
             {
