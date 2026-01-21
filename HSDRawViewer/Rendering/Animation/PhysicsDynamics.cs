@@ -138,8 +138,8 @@ namespace HSDRawViewer.Rendering.Animation
         /// <param name="bone_count"></param>
         public void InitBones(LiveJObj m, int index, int bone_count)
         {
-            var jobj = m.GetJObjAtIndex(index);
-            var desc = jobj.Desc;
+            LiveJObj jobj = m.GetJObjAtIndex(index);
+            HSD_JOBJ desc = jobj.Desc;
 
             if (desc == null)
             {
@@ -154,13 +154,13 @@ namespace HSDRawViewer.Rendering.Animation
 
             while (BoneNum < bone_count)
             {
-                var param = new DynamicsParamHeap();
+                DynamicsParamHeap param = new();
                 PhysicsBones.Add(param);
 
                 // Make matrix dirty 8000fe10
                 // if (jobj != 0) // USER_DEFINED_MTX && jobj.Flags.HasFlag(JOBJ_FLAG.MTX_DIRTY))
 
-                var worldTransform = jobj.WorldTransform;
+                Matrix4 worldTransform = jobj.WorldTransform;
 
                 param.Joint = new PhysicsJobj()
                 {
@@ -188,14 +188,14 @@ namespace HSDRawViewer.Rendering.Animation
             // now calculate direction and lengths
             for (int i = 0; i < PhysicsBones.Count - 1; i++)
             {
-                var current = PhysicsBones[i];
-                var next = PhysicsBones[i + 1];
+                DynamicsParamHeap current = PhysicsBones[i];
+                DynamicsParamHeap next = PhysicsBones[i + 1];
 
                 current.Length = Vector3.Distance(current.WorldPos, next.WorldPos);
 
-                var xabs = Math.Abs(next.Translation.X);
-                var yabs = Math.Abs(next.Translation.Y);
-                var zabs = Math.Abs(next.Translation.Z);
+                float xabs = Math.Abs(next.Translation.X);
+                float yabs = Math.Abs(next.Translation.Y);
+                float zabs = Math.Abs(next.Translation.Z);
 
                 if (zabs <= yabs)
                 {
@@ -231,8 +231,8 @@ namespace HSDRawViewer.Rendering.Animation
 
             for (int i = 0; i < desc.Parameters.Length; i++)
             {
-                var p = PhysicsBones[i];
-                var d = desc.Parameters[i];
+                DynamicsParamHeap p = PhysicsBones[i];
+                SBM_DynamicParams d = desc.Parameters[i];
                 p.x4C = d.PARAM1;
                 p.x50 = d.PARAM2;
                 p.rot_orig = new Vector4(d.RotX, d.RotY, d.RotZ, d.RotW);
@@ -266,7 +266,7 @@ namespace HSDRawViewer.Rendering.Animation
             Console.WriteLine("{0:X8} {1}", BitConverter.ToInt32(BitConverter.GetBytes(xc), 0), xc);
             Console.WriteLine("{0:X8} {1}", BitConverter.ToInt32(BitConverter.GetBytes(x10), 0), x10);
 
-            foreach (var v in PhysicsBones)
+            foreach (DynamicsParamHeap v in PhysicsBones)
             {
                 Console.WriteLine();
 
@@ -458,12 +458,12 @@ namespace HSDRawViewer.Rendering.Animation
                 }
             }
 
-            var dVar11 = param_4.Y - world_pos.Y;
-            var dVar10 = param_4.Z - world_pos.Z;
-            var dVar7 = param_4.X - world_pos.X;
+            float dVar11 = param_4.Y - world_pos.Y;
+            float dVar10 = param_4.Z - world_pos.Z;
+            float dVar7 = param_4.X - world_pos.X;
 
             float dVar9 = 0;
-            var fVar1 = (dVar10 * dVar10 + (dVar7 * dVar7 + (dVar11 * dVar11)));
+            float fVar1 = (dVar10 * dVar10 + (dVar7 * dVar7 + (dVar11 * dVar11)));
             if ((1.0E-5 <= fVar1) || (fVar1 <= -1.0E-5))
             {
                 dVar9 = (-(dVar10 * (world_pos.Z - hit_pos.Z) + (dVar7 * (world_pos.X - hit_pos.X) + (dVar11 * (world_pos.Y - hit_pos.Y)))) / fVar1);
@@ -476,7 +476,7 @@ namespace HSDRawViewer.Rendering.Animation
             }
 
             // salted distance
-            Vector3 param_6 = new Vector3(
+            Vector3 param_6 = new(
                 dVar7 * dVar9 + world_pos.X,
                 dVar11 * dVar9 + world_pos.Y,
                 dVar10 * dVar9 + world_pos.Z
@@ -511,7 +511,7 @@ namespace HSDRawViewer.Rendering.Animation
             DynamicsParamHeap dynamic_params = PhysicsBones[0];
 
             // start transform at parent
-            var matrix = m.GetJObjFromDesc(dynamic_params.Joint.Jobj).Parent.WorldTransform;
+            Matrix4 matrix = m.GetJObjFromDesc(dynamic_params.Joint.Jobj).Parent.WorldTransform;
 
             // get joint
             PhysicsJobj joint;
@@ -519,7 +519,7 @@ namespace HSDRawViewer.Rendering.Animation
             Matrix4 final_matrix;
             Matrix4 rot_matrix;
 
-            var bVar2 = false;
+            bool bVar2 = false;
 
             for (int i = ApplyNum; i < PhysicsBones.Count - 1; i++)
             {
@@ -527,11 +527,11 @@ namespace HSDRawViewer.Rendering.Animation
                 joint = dynamic_params.Joint;
                 child = PhysicsBones[i + 1];
 
-                var mtx_trans = Matrix4.CreateTranslation(joint.Translation);
+                Matrix4 mtx_trans = Matrix4.CreateTranslation(joint.Translation);
                 final_matrix = mtx_trans * matrix;
                 rot_matrix = Math3D.CreateMatrix4FromEuler(dynamic_params.rot_orig.Xyz) * final_matrix;
                 final_matrix = Math3D.CreateMatrix4FromEuler(joint.Rotation.Xyz) * final_matrix;
-                var scale_matrix = Matrix4.CreateScale(joint.Scale);
+                Matrix4 scale_matrix = Matrix4.CreateScale(joint.Scale);
                 final_matrix = scale_matrix * final_matrix;
                 rot_matrix = scale_matrix * rot_matrix;
 
@@ -539,11 +539,11 @@ namespace HSDRawViewer.Rendering.Animation
                 dynamic_params.WorldPos = final_matrix.ExtractTranslation();
 
                 // calculate vectors
-                var rot_vector = Vector3.TransformPosition(new Vector3(child.Translation), rot_matrix) - dynamic_params.WorldPos;
-                var final_vector = Vector3.TransformPosition(new Vector3(child.Translation), final_matrix) - dynamic_params.WorldPos;
+                Vector3 rot_vector = Vector3.TransformPosition(new Vector3(child.Translation), rot_matrix) - dynamic_params.WorldPos;
+                Vector3 final_vector = Vector3.TransformPosition(new Vector3(child.Translation), final_matrix) - dynamic_params.WorldPos;
 
                 // vector from child to self
-                var axis_vector = child.WorldPos - dynamic_params.WorldPos;
+                Vector3 axis_vector = child.WorldPos - dynamic_params.WorldPos;
 
                 // normalize all the vectors
                 rot_vector.Normalize();
@@ -551,7 +551,7 @@ namespace HSDRawViewer.Rendering.Animation
                 axis_vector.Normalize();
 
                 // original axis vector
-                var org_axis_vector = new Vector3(axis_vector.X, axis_vector.Y, axis_vector.Z);
+                Vector3 org_axis_vector = new(axis_vector.X, axis_vector.Y, axis_vector.Z);
 
                 // 800107d8 - 80010878
                 // not sure
@@ -559,10 +559,10 @@ namespace HSDRawViewer.Rendering.Animation
                 // stability related?
                 if (dynamic_params.x4C * x8 < 1)
                 {
-                    var a = Math.Abs(Vector3.CalculateAngle(final_vector, axis_vector));
+                    float a = Math.Abs(Vector3.CalculateAngle(final_vector, axis_vector));
                     if (a != 0)
                     {
-                        var VStack604 = Vector3.Cross(axis_vector, final_vector);
+                        Vector3 VStack604 = Vector3.Cross(axis_vector, final_vector);
                         if (VStack604.Length != 0)
                         {
                             VStack604.Normalize();
@@ -573,11 +573,11 @@ namespace HSDRawViewer.Rendering.Animation
 
                 // 80010888 - 800108d0
                 // gravity
-                var ang = Vector3.CalculateAngle(GravityVector, axis_vector);
+                float ang = Vector3.CalculateAngle(GravityVector, axis_vector);
                 if (ang != 0)
                 {
                     float gravity_angle = (float)Math.Abs(Math.Sin(ang) * dynamic_params.length_scale);
-                    var gravity_direction = Vector3.Cross(axis_vector, GravityVector).Normalized();
+                    Vector3 gravity_direction = Vector3.Cross(axis_vector, GravityVector).Normalized();
                     axis_vector.RotateAboutUnitAxis(gravity_angle, gravity_direction); // lbvector_RotateAboutUnitAxis(gravity_angle, ref axis_vector, gravity_direction);
                 }
 
@@ -607,10 +607,10 @@ namespace HSDRawViewer.Rendering.Animation
                 // corrects the rotation based on MaxAngleChange
                 if ((dynamic_params.length_scale * dynamic_params.Length) > 0)
                 {
-                    var local_2a4 = new Vector3(org_axis_vector.X, org_axis_vector.Y, org_axis_vector.Z);
+                    Vector3 local_2a4 = new(org_axis_vector.X, org_axis_vector.Y, org_axis_vector.Z);
                     if (dynamic_params.MaxAngleChange < Vector3.CalculateAngle(axis_vector, local_2a4))
                     {
-                        var VStack688 = Vector3.Cross(local_2a4, axis_vector).Normalized();
+                        Vector3 VStack688 = Vector3.Cross(local_2a4, axis_vector).Normalized();
                         local_2a4.RotateAboutUnitAxis(dynamic_params.MaxAngleChange, VStack688); // lbvector_RotateAboutUnitAxis(dynamic_params.MaxAngleChange, ref local_2a4, VStack688);
                         axis_vector = local_2a4;
                     }
@@ -622,7 +622,7 @@ namespace HSDRawViewer.Rendering.Animation
                 {
                     if (Vector3.CalculateAngle(axis_vector, rot_vector) >= dynamic_params.x50)
                     {
-                        var VStack700 = Vector3.Cross(axis_vector, rot_vector).Normalized();
+                        Vector3 VStack700 = Vector3.Cross(axis_vector, rot_vector).Normalized();
                         axis_vector.RotateAboutUnitAxis(dynamic_params.x50, VStack700); // lbvector_RotateAboutUnitAxis(dynamic_params.x50, ref axis_vector, VStack700);
                     }
                     else
@@ -635,10 +635,10 @@ namespace HSDRawViewer.Rendering.Animation
 
                 // 80010a8c - 80010aac
                 // limits the amount of rotation a joint can have
-                var rot_axis_angle = Vector3.CalculateAngle(axis_vector, rot_vector);
+                float rot_axis_angle = Vector3.CalculateAngle(axis_vector, rot_vector);
                 if (rot_axis_angle > dynamic_params.RotationLimit)
                 {
-                    var VStack712 = Vector3.Cross(axis_vector, rot_vector).Normalized();
+                    Vector3 VStack712 = Vector3.Cross(axis_vector, rot_vector).Normalized();
                     axis_vector.RotateAboutUnitAxis(rot_axis_angle - dynamic_params.RotationLimit, VStack712); // lbvector_RotateAboutUnitAxis(rot_axis_angle - dynamic_params.RotationLimit, ref axis_vector, VStack712);
                 }
 
@@ -650,13 +650,13 @@ namespace HSDRawViewer.Rendering.Animation
                     axis_vector.Normalize();
 
                     // process each hitbubble
-                    foreach (var hb in hitbubbles)
+                    foreach (SBM_DynamicHitBubble hb in hitbubbles)
                     {
-                        var local_2d4 = axis_vector * dynamic_params.Length + dynamic_params.WorldPos;
-                        var hbPos = (Matrix4.CreateTranslation(hb.X, hb.Y, hb.Z) * m.GetJObjAtIndex(hb.BoneIndex).WorldTransform).ExtractTranslation();
-                        var hitDistance = hbPos - dynamic_params.WorldPos;
+                        Vector3 local_2d4 = axis_vector * dynamic_params.Length + dynamic_params.WorldPos;
+                        Vector3 hbPos = (Matrix4.CreateTranslation(hb.X, hb.Y, hb.Z) * m.GetJObjAtIndex(hb.BoneIndex).WorldTransform).ExtractTranslation();
+                        Vector3 hitDistance = hbPos - dynamic_params.WorldPos;
 
-                        var distance = hitDistance.LengthFast;
+                        float distance = hitDistance.LengthFast;
 
                         if (hb.Size < distance)//&&
                                                //zz_0005c44_(0.1f, hb.Size * 2, dynamic_params.WorldPos, local_2d4, hbPos))
@@ -664,13 +664,13 @@ namespace HSDRawViewer.Rendering.Animation
                             float angle = Vector3.CalculateAngle(axis_vector, hitDistance);
                             if (angle != 0)
                             {
-                                var __y = 0.1f + hb.Size;
-                                var thresDistance = new Vector2(distance, __y).LengthFast;
-                                var reflect_angle = (float)Math.Abs(Math.Atan2(__y, thresDistance));
+                                float __y = 0.1f + hb.Size;
+                                float thresDistance = new Vector2(distance, __y).LengthFast;
+                                float reflect_angle = (float)Math.Abs(Math.Atan2(__y, thresDistance));
                                 reflect_angle -= angle;
                                 if (reflect_angle > 0)
                                 {
-                                    var VStack760 = Vector3.Cross(hitDistance, axis_vector).Normalized();
+                                    Vector3 VStack760 = Vector3.Cross(hitDistance, axis_vector).Normalized();
                                     axis_vector.RotateAboutUnitAxis(reflect_angle, VStack760); // lbvector_RotateAboutUnitAxis(reflect_angle, ref axis_vector, VStack760);
                                 }
                             }
@@ -681,9 +681,9 @@ namespace HSDRawViewer.Rendering.Animation
                 // TODO: air_state != 0 80010cb0 - 80010ea4
                 // stage collision
 
-                var final_angle = Vector3.CalculateAngle(axis_vector, final_vector);
-                var VStack324 = Vector3.Cross(final_vector, axis_vector).Normalized();
-                var local_12c = new Vector3(final_vector.X, final_vector.Y, final_vector.Z);
+                float final_angle = Vector3.CalculateAngle(axis_vector, final_vector);
+                Vector3 VStack324 = Vector3.Cross(final_vector, axis_vector).Normalized();
+                Vector3 local_12c = new(final_vector.X, final_vector.Y, final_vector.Z);
                 local_12c.RotateAboutUnitAxis(final_angle, VStack324); // lbvector_RotateAboutUnitAxis(final_angle, ref local_12c, VStack324); //dVar11, dVar12, 
                 axis_vector = local_12c;
 
@@ -701,8 +701,8 @@ namespace HSDRawViewer.Rendering.Animation
                 // calculate new rotation momentum speed
                 if (dynamic_params.RotMomentum != 0)
                 {
-                    var momCurrent = dynamic_params.RotMomentum;
-                    var momSpeed = dynamic_params.RotMomentumSpeed;
+                    float momCurrent = dynamic_params.RotMomentum;
+                    float momSpeed = dynamic_params.RotMomentumSpeed;
 
                     if (momCurrent > momSpeed)
                         dynamic_params.RotMomentum = momCurrent - momSpeed;
@@ -719,7 +719,7 @@ namespace HSDRawViewer.Rendering.Animation
                 {
                     final_matrix = new Matrix4(matrix.Row0, matrix.Row1, matrix.Row2, matrix.Row3);
                     final_matrix.Transpose();
-                    var local_214 = Vector3.TransformPosition(VStack324, final_matrix);
+                    Vector3 local_214 = Vector3.TransformPosition(VStack324, final_matrix);
 
                     if (((1.0E-5 <= local_214.X) || (local_214.X <= -1.0E-5)) ||
                         ((1.0E-5 <= local_214.Y) || (local_214.Y <= -1.0E-5)) ||
@@ -761,7 +761,7 @@ namespace HSDRawViewer.Rendering.Animation
             // update matricies
             for (int i = 0; i < PhysicsBones.Count - 1; i++)
             {
-                var v = PhysicsBones[i];
+                DynamicsParamHeap v = PhysicsBones[i];
                 if (i >= ApplyNum)
                 {
                     v.Joint.Live.Rotation = v.Joint.Rotation;

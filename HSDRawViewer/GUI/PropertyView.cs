@@ -1,12 +1,11 @@
-﻿using HSDRaw;
-using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
-using System.Text.RegularExpressions;
-using Be.Windows.Forms;
+﻿using Be.Windows.Forms;
+using HSDRaw;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using HSDRawViewer.GUI.Controls;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI
 {
@@ -16,7 +15,7 @@ namespace HSDRawViewer.GUI
         {
             public HSDAccessor accessor;
             public uint CurrentOffset = 0;
-            
+
             [Category("Types")]
             public float Float
             {
@@ -50,14 +49,14 @@ namespace HSDRawViewer.GUI
                         accessor._s.SetInt32((int)CurrentOffset, value);
                 }
             }
-            
+
             [Category("Types")]
             public uint UInt
             {
                 get => (uint)Int;
                 set => Int = (int)value;
             }
-            
+
             [Category("Types")]
             public short Short
             {
@@ -107,7 +106,7 @@ namespace HSDRawViewer.GUI
             }
         }
 
-        private PropertyPoke Poker = new PropertyPoke();
+        private readonly PropertyPoke Poker = new();
 
         private HSDAccessor accessor
         {
@@ -153,7 +152,7 @@ namespace HSDRawViewer.GUI
 
         public void SetNode(DataNode node)
         {
-            var accessor = node.Accessor;
+            HSDAccessor accessor = node.Accessor;
 
             if (accessor == null)
                 return;
@@ -219,13 +218,13 @@ namespace HSDRawViewer.GUI
                 else
                 if (hexbox.ByteProvider.Length > accessor._s.Length)
                 {
-                    var added = (int)hexbox.ByteProvider.Length - accessor._s.Length;
+                    int added = (int)hexbox.ByteProvider.Length - accessor._s.Length;
 
                     accessor._s.Resize((int)hexbox.ByteProvider.Length);
 
                     // shift references
-                    var newref = new Dictionary<int, HSDStruct>();
-                    foreach (var r in accessor._s.References)
+                    Dictionary<int, HSDStruct> newref = new();
+                    foreach (KeyValuePair<int, HSDStruct> r in accessor._s.References)
                     {
                         if (r.Key >= selectedIndex)
                             newref.Add(r.Key + added, r.Value);
@@ -233,7 +232,7 @@ namespace HSDRawViewer.GUI
                             newref.Add(r.Key, r.Value);
                     }
                     accessor._s.References.Clear();
-                    foreach (var r in newref)
+                    foreach (KeyValuePair<int, HSDStruct> r in newref)
                         accessor._s.References.Add(r.Key, r.Value);
 
                     // shift data
@@ -244,11 +243,11 @@ namespace HSDRawViewer.GUI
                 else
                 if (hexbox.ByteProvider.Length < accessor._s.Length)
                 {
-                    var shiftStart = selectedIndex + selectedLength;
+                    int shiftStart = selectedIndex + selectedLength;
 
                     // shift references
-                    var newref = new Dictionary<int, HSDStruct>();
-                    foreach(var r in accessor._s.References)
+                    Dictionary<int, HSDStruct> newref = new();
+                    foreach (KeyValuePair<int, HSDStruct> r in accessor._s.References)
                     {
                         if (r.Key >= selectedIndex)
                             newref.Add(r.Key - selectedLength, r.Value);
@@ -256,7 +255,7 @@ namespace HSDRawViewer.GUI
                             newref.Add(r.Key, r.Value);
                     }
                     accessor._s.References.Clear();
-                    foreach(var r in newref)
+                    foreach (KeyValuePair<int, HSDStruct> r in newref)
                         accessor._s.References.Add(r.Key, r.Value);
 
                     // shift data
@@ -275,7 +274,7 @@ namespace HSDRawViewer.GUI
         private string LastGoodOffset = "0x00000000";
 
         private void offsetBox_TextChanged(object sender, System.EventArgs e)
-        { 
+        {
             // good
             if (Regex.Match(offsetBox.Text, @"^0[xX][0-9a-fA-F]{1,8}$").Success)
             {
@@ -328,9 +327,9 @@ namespace HSDRawViewer.GUI
         /// </summary>
         private void ResizeStruct()
         {
-            if(int.TryParse(structSize.Text.Replace("0x", ""), 
+            if (int.TryParse(structSize.Text.Replace("0x", ""),
                 System.Globalization.NumberStyles.HexNumber,
-                CultureInfo.InvariantCulture, 
+                CultureInfo.InvariantCulture,
                 out int value))
             {
                 if (value < accessor._s.Length)
@@ -357,14 +356,14 @@ namespace HSDRawViewer.GUI
             if (accessor == null)
                 return false;
 
-            foreach(var v in accessor._s.References)
+            foreach (KeyValuePair<int, HSDStruct> v in accessor._s.References)
             {
                 if (offset + byteSize <= v.Key && offset >= v.Key + 4)
                     return true;
             }
             return false;
         }
-        
+
         public void UpdateValues()
         {
             propertyGrid2.Refresh();
@@ -377,9 +376,9 @@ namespace HSDRawViewer.GUI
         /// <param name="e"></param>
         private void offsetBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Control)
+            if (e.Control)
             {
-                if(e.KeyCode == Keys.OemPeriod)
+                if (e.KeyCode == Keys.OemPeriod)
                 {
                     SetPointer();
                 }
@@ -399,7 +398,7 @@ namespace HSDRawViewer.GUI
 
         private void SetPointer()
         {
-            var f = Tools.FileIO.OpenFile("All Files |*.*");
+            string f = Tools.FileIO.OpenFile("All Files |*.*");
 
             if (f != null)
             {
@@ -408,7 +407,7 @@ namespace HSDRawViewer.GUI
 
                 if (f.ToLower().EndsWith(".dat"))
                 {
-                    var datFile = new HSDRawFile(f);
+                    HSDRawFile datFile = new(f);
 
                     accessor._s.SetReferenceStruct((int)Poker.CurrentOffset, datFile.Roots[0].Data._s);
                 }

@@ -4,14 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 
 namespace HSDRawViewer.Tools
 {
     [TypeConverter(typeof(CustomIntPropertyConverter))]
     public class CustomIntProperty
     {
-        private int _bitcount;
+        private readonly int _bitcount;
 
         public long Value
         {
@@ -24,7 +23,7 @@ namespace HSDRawViewer.Tools
                 {
                     _value = SignValue(_value);
 
-                    var mask = (1L << (_bitcount - 1)) - 1L;
+                    long mask = (1L << (_bitcount - 1)) - 1L;
 
                     if (_value > mask)
                         _value = mask;
@@ -34,7 +33,7 @@ namespace HSDRawViewer.Tools
                 }
                 else
                 {
-                    var mask = (1L << _bitcount) - 1L;
+                    long mask = (1L << _bitcount) - 1L;
 
                     if (_value > mask)
                         _value = mask;
@@ -45,9 +44,9 @@ namespace HSDRawViewer.Tools
             }
         }
 
-        private bool Signed;
+        private readonly bool Signed;
 
-        private bool Hex;
+        private readonly bool Hex;
 
         private long _value;
 
@@ -72,11 +71,11 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         private long SignValue(long v)
         {
-            var isSigned = ((v >> (_bitcount - 1)) & 0x1) == 1;
+            bool isSigned = ((v >> (_bitcount - 1)) & 0x1) == 1;
 
             if (isSigned)
             {
-                var bitMask = 0;
+                int bitMask = 0;
                 for (int j = 0; j < _bitcount; j++)
                     bitMask |= (1 << j);
                 v = ~v;
@@ -99,7 +98,7 @@ namespace HSDRawViewer.Tools
             public override object ConvertFrom(ITypeDescriptorContext context,
                 CultureInfo culture, object value)
             {
-                var v = context.PropertyDescriptor.GetValue(context.Instance);
+                object v = context.PropertyDescriptor.GetValue(context.Instance);
 
                 if (value is string str && v is CustomIntProperty i)
                 {
@@ -161,7 +160,7 @@ namespace HSDRawViewer.Tools
 
             public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
             {
-                var value = context.PropertyDescriptor.GetValue(context.Instance);
+                object value = context.PropertyDescriptor.GetValue(context.Instance);
 
                 if (value is EnumValue prop)
                     return new StandardValuesCollection(prop.Parent.Values);
@@ -182,7 +181,7 @@ namespace HSDRawViewer.Tools
 
             public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
             {
-                var p = context.PropertyDescriptor.GetValue(context.Instance);
+                object p = context.PropertyDescriptor.GetValue(context.Instance);
 
                 if (p is EnumValue prop && value is string str)
                 {
@@ -194,13 +193,13 @@ namespace HSDRawViewer.Tools
         }
     }
 
-    public class CustomEnumProperty 
+    public class CustomEnumProperty
     {
         public List<EnumValue> Values { get; internal set; } = new List<EnumValue>();
 
         public CustomEnumProperty(string[] enums)
         {
-            foreach (var v in enums)
+            foreach (string v in enums)
                 Values.Add(new EnumValue(this, v));
         }
     }
@@ -298,9 +297,9 @@ namespace HSDRawViewer.Tools
         public int GetParameter(int i)
         {
             // load description and code byte
-            var desc = SubactionManager.GetSubaction(Code, Type);
+            Subaction desc = SubactionManager.GetSubaction(Code, Type);
 
-            var p = desc.Parameters[i];
+            SubactionParameter p = desc.Parameters[i];
 
             if (p.IsPointer)
             {
@@ -328,11 +327,11 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public HSDStruct GetPointer()
         {
-            var desc = SubactionManager.GetSubaction(Code, Type);
+            Subaction desc = SubactionManager.GetSubaction(Code, Type);
 
             for (int i = 0; i < desc.Parameters.Length; i++)
             {
-                var p = desc.Parameters[i];
+                SubactionParameter p = desc.Parameters[i];
 
                 if (p.IsPointer)
                 {
@@ -361,7 +360,7 @@ namespace HSDRawViewer.Tools
             Code = code;
 
             // get action
-            var desc = SubactionManager.GetSubaction(code, Type);
+            Subaction desc = SubactionManager.GetSubaction(code, Type);
 
             if (!desc.IsCustom)
                 Code &= 0xFC;
@@ -376,7 +375,7 @@ namespace HSDRawViewer.Tools
             // add param from action desciptor
             for (int i = 0; i < desc.Parameters.Length; i++)
             {
-                var p = desc.Parameters[i];
+                SubactionParameter p = desc.Parameters[i];
 
                 // p.IsPointer
                 if (p.IsPointer)
@@ -409,7 +408,7 @@ namespace HSDRawViewer.Tools
             byte code = cmdList[0];
 
             // load description and code byte
-            var desc = SubactionManager.GetSubaction(code, type);
+            Subaction desc = SubactionManager.GetSubaction(code, type);
 
             // setup code
             SetCode(type, code);
@@ -419,19 +418,19 @@ namespace HSDRawViewer.Tools
                 return;
 
             //
-            Bitreader r = new Bitreader(cmdList);
+            Bitreader r = new(cmdList);
             r.Skip(desc.IsCustom ? 8 : 6);
 
             // load params from data
             for (int i = 0; i < desc.Parameters.Length; i++)
             {
-                var p = desc.Parameters[i];
+                SubactionParameter p = desc.Parameters[i];
 
                 int value = r.Read(p.BitCount);
 
                 if (p.IsPointer)
                 {
-                    this[i].Value = CustomPointerValue.Values.Find(e=>e.Struct == reference);
+                    this[i].Value = CustomPointerValue.Values.Find(e => e.Struct == reference);
                 }
                 else
                 if (p.HasEnums)
@@ -458,14 +457,14 @@ namespace HSDRawViewer.Tools
         public HSDStruct CompileCode()
         {
             // load description and code byte
-            var desc = SubactionManager.GetSubaction(Code, Type);
+            Subaction desc = SubactionManager.GetSubaction(Code, Type);
 
             // 
             if (desc.Parameters == null)
                 return null;
 
             //
-            BitWriter r = new BitWriter();
+            BitWriter r = new();
 
             // write code
             if (desc.IsCustom)
@@ -477,7 +476,7 @@ namespace HSDRawViewer.Tools
             HSDStruct pointer = null;
             for (int i = 0; i < desc.Parameters.Length; i++)
             {
-                var p = desc.Parameters[i];
+                SubactionParameter p = desc.Parameters[i];
 
                 if (p.IsPointer)
                 {
@@ -504,7 +503,7 @@ namespace HSDRawViewer.Tools
             r.Align();
 
             // create compiled struct
-            var s = new HSDStruct(r.Bytes.ToArray());
+            HSDStruct s = new(r.Bytes.ToArray());
 
             // add pointer if one exists
             if (pointer != null)
@@ -531,7 +530,7 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public string ToStringDescriptive()
         {
-            var sa = SubactionManager.GetSubaction(Code, Type);
+            Subaction sa = SubactionManager.GetSubaction(Code, Type);
             return $"{sa.Name}({string.Join(", ", GetParamsAsString())})";
         }
 
@@ -545,16 +544,16 @@ namespace HSDRawViewer.Tools
         public static IEnumerable<SubactionEvent> GetEvents(SubactionGroup type, HSDStruct str)
         {
             // get subaction data
-            var data = str.GetData();
+            byte[] data = str.GetData();
 
             // process data
             for (int i = 0; i < data.Length;)
             {
                 // get subaction
-                var sa = SubactionManager.GetSubaction((byte)(data[i]), type);
+                Subaction sa = SubactionManager.GetSubaction(data[i], type);
 
                 // create new script node
-                var sas = new SubactionEvent(type, data[i]);
+                SubactionEvent sas = new(type, data[i]);
 
                 // check if data is out of range
                 if (i + sa.ByteSize > data.Length)
@@ -562,7 +561,7 @@ namespace HSDRawViewer.Tools
 
                 // store any pointers within this subaction
                 HSDStruct reference = null;
-                foreach (var r in str.References)
+                foreach (KeyValuePair<int, HSDStruct> r in str.References)
                 {
                     if (r.Key >= i && r.Key < i + sa.ByteSize)
                         if (reference != null)
@@ -572,7 +571,7 @@ namespace HSDRawViewer.Tools
                 }
 
                 // copy subaction data to script node
-                var sub = new byte[sa.ByteSize];
+                byte[] sub = new byte[sa.ByteSize];
                 for (int j = 0; j < sub.Length; j++)
                     sub[j] = data[i + j];
 
@@ -598,9 +597,9 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static HSDStruct CompileEvent(IEnumerable<SubactionEvent> events)
         {
-            HSDStruct s = new HSDStruct();
+            HSDStruct s = new();
 
-            foreach (var e in events)
+            foreach (SubactionEvent e in events)
                 s.AppendStruct(e.CompileCode());
 
             return s;

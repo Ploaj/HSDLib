@@ -123,7 +123,7 @@ void CalculateDiffuseShading(vec3 vert, vec3 N, inout vec3 amb, inout vec3 diff,
 				{
 					if (dot(N, L) >= 0.0)
 					{
-						spec += vec3(pow(max(0.0, dot(reflect(-L, N), V)), shinniness)) * light[i].color * atten;
+						spec += vec3(pow(max(0.0, dot(N, normalize(L + V))), shinniness)) * light[i].color * atten;
 					}
 				}
 			}

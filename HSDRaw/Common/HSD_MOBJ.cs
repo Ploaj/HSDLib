@@ -155,6 +155,7 @@ namespace HSDRaw.Common
 
     public class HSD_PEDesc : HSDAccessor
     {
+
         public override int TrimmedSize { get; } = 0xC;
 
         public PIXEL_PROCESS_ENABLE Flags { get => (PIXEL_PROCESS_ENABLE)_s.GetByte(0x00); set => _s.SetByte(0x00, (byte)value); }

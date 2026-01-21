@@ -10,7 +10,7 @@ namespace HSDRawViewer.ContextMenus
 
         public MatAnimContextMenu() : base()
         {
-            ToolStripMenuItem AddMatAnim = new ToolStripMenuItem("Add Material Animation");
+            ToolStripMenuItem AddMatAnim = new("Add Material Animation");
             AddMatAnim.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_MatAnim matanim)
@@ -22,7 +22,7 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(AddMatAnim);
 
-            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Add Texture Animation");
+            ToolStripMenuItem OpenAsAJ = new("Add Texture Animation");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_MatAnim matanim)

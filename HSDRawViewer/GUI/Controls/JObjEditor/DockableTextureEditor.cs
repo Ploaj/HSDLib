@@ -1,6 +1,4 @@
-﻿using HSDRaw;
-using HSDRaw.Common;
-using HSDRawViewer.Converters;
+﻿using HSDRaw.Common;
 using System.Linq;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
@@ -67,7 +65,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             // if (TextureLists != null)
             {
                 TextureLists = new TObjProxy[0];
-                textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
+                textureArrayEditor.SetArrayFromProperty(this, nameof(TextureLists));
             }
         }
 
@@ -83,7 +81,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             InitializingList = true;
 
             TextureLists = _mobj.Textures.List.Select(e => new TObjProxy(e)).ToArray();
-            textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
+            textureArrayEditor.SetArrayFromProperty(this, nameof(TextureLists));
 
             InitializingList = false;
         }
@@ -96,7 +94,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         private void textureArrayEditor_ArrayUpdated(object sender, System.EventArgs e)
         {
             // make sure material is not null
-            if (_mobj == null|| InitializingList)
+            if (_mobj == null || InitializingList)
                 return;
 
             // clear all flags by default
@@ -156,7 +154,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (textureArrayEditor.SelectedObject is TObjProxy proxy)
             {
-                proxy.TOBJ.ExportTOBJToFile();
+                proxy.TOBJ.SaveImagePNG();
             }
         }
 
@@ -167,7 +165,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, System.EventArgs e)
         {
-            var tobj = TOBJConverter.ImportTOBJFromFile();
+            HSD_TOBJ tobj = TOBJExtentions.ImportTObjFromFile();
 
             if (tobj != null)
             {
@@ -185,7 +183,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (textureArrayEditor.SelectedObject is TObjProxy proxy)
             {
-                var tobj = TOBJConverter.ImportTOBJFromFile();
+                HSD_TOBJ tobj = TOBJExtentions.ImportTObjFromFile();
 
                 if (tobj != null)
                 {

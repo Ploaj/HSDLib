@@ -263,3 +263,4 @@ __pycache__/
 /HSDRawViewer/Tools/AnimationRetarget.cs
 /HSDRawViewer/Tools/EulerFilter.cs
 /HSDRawViewer/Tools/Optimizers
+/HSDRawViewer/Tools/TestRendering.cs

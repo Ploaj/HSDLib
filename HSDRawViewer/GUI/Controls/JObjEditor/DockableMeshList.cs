@@ -1,7 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.GX;
-using HSDRawViewer.Converters;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
 using HSDRawViewer.Tools;
@@ -12,8 +11,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -21,7 +18,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
 {
     public partial class DockableMeshList : DockContent
     {
-        private ObservableCollection<DObjProxy> dobjList = new ObservableCollection<DObjProxy>();
+        private readonly ObservableCollection<DObjProxy> dobjList = new();
 
         public delegate void DObjSelected(DObjProxy[] dobj, IEnumerable<int> indices);
         public DObjSelected SelectDObj;
@@ -41,7 +38,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             get
             {
-                foreach (var v in dobjList)
+                foreach (DObjProxy v in dobjList)
                     yield return v;
             }
         }
@@ -90,12 +87,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             listDOBJ.DataSource = null;
             dobjList.Clear();
             int ji = 0;
-            foreach (var j in jobj.TreeList)
+            foreach (HSD_JOBJ j in jobj.TreeList)
             {
                 if (j.Dobj != null)
                 {
                     int di = 0;
-                    foreach (var d in j.Dobj.List)
+                    foreach (HSD_DOBJ d in j.Dobj.List)
                     {
                         dobjList.Add(new DObjProxy(j, d, ji, di));
                     }
@@ -161,13 +158,13 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (listDOBJ.SelectedItems.Count > 0 && MessageBox.Show("Are you sure?\nThis cannot be undone", "Delete Object?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                List<DObjProxy> toRem = new List<DObjProxy>();
+                List<DObjProxy> toRem = new();
                 foreach (DObjProxy dobj in listDOBJ.SelectedItems)
                 {
-                    var dobjs = dobj.ParentJOBJ.Dobj.List;
+                    List<HSD_DOBJ> dobjs = dobj.ParentJOBJ.Dobj.List;
 
                     HSD_DOBJ prev = null;
-                    foreach (var d in dobjs)
+                    foreach (HSD_DOBJ d in dobjs)
                     {
                         if (d == dobj.DOBJ)
                         {
@@ -183,7 +180,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     toRem.Add(dobj);
                 }
 
-                foreach (var rem in toRem)
+                foreach (DObjProxy rem in toRem)
                     dobjList.Remove(rem);
 
                 ListUpdated?.Invoke();
@@ -205,7 +202,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             IEnumerable<int> indexes = listDOBJ.SelectedIndices.Cast<int>();
 
             // process selected indicies in reverse
-            foreach (var i in indexes)
+            foreach (int i in indexes)
             {
                 // get object at index
                 DObjProxy moveItem = dobjList[i];
@@ -216,7 +213,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                     // find dobj in jobj list
                     HSD_DOBJ prev = null;
                     HSD_DOBJ prevprev = null;
-                    foreach (var dobj in moveItem.ParentJOBJ.Dobj?.List)
+                    foreach (HSD_DOBJ dobj in moveItem.ParentJOBJ.Dobj?.List)
                     {
                         if (dobj == moveItem.DOBJ)
                         {
@@ -256,12 +253,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 }
             }
 
-            LoopEnd:
+        LoopEnd:
 
-            var sel = listDOBJ.SelectedIndices.Cast<int>().ToArray();
+            int[] sel = listDOBJ.SelectedIndices.Cast<int>().ToArray();
             listDOBJ.DataSource = null;
             listDOBJ.DataSource = dobjList;
-            foreach (var s in sel)
+            foreach (int s in sel)
                 listDOBJ.SetSelected(s, true);
 
             listDOBJ.EndUpdate();
@@ -282,7 +279,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
             IEnumerable<int> indexes = listDOBJ.SelectedIndices.Cast<int>().Reverse();
 
             // process selected indicies in reverse
-            foreach (var i in indexes)
+            foreach (int i in indexes)
             {
                 // get object at index
                 DObjProxy moveItem = dobjList[i];
@@ -296,7 +293,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 {
                     // find dobj in jobj list
                     HSD_DOBJ prev = null;
-                    foreach (var dobj in moveItem.ParentJOBJ.Dobj?.List)
+                    foreach (HSD_DOBJ dobj in moveItem.ParentJOBJ.Dobj?.List)
                     {
                         if (dobj == moveItem.DOBJ)
                         {
@@ -305,7 +302,7 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                                 moveItem.ParentJOBJ.Dobj = moveItem.DOBJ.Next;
                             else
                                 prev.Next = moveItem.DOBJ.Next;
-                            var newNext = moveItem.DOBJ.Next.Next;
+                            HSD_DOBJ newNext = moveItem.DOBJ.Next.Next;
                             moveItem.DOBJ.Next.Next = moveItem.DOBJ;
                             moveItem.DOBJ.Next = newNext;
 
@@ -322,12 +319,12 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
                 }
             }
 
-            LoopEnd:
+        LoopEnd:
 
-            var sel = listDOBJ.SelectedIndices.Cast<int>().ToArray();
+            int[] sel = listDOBJ.SelectedIndices.Cast<int>().ToArray();
             listDOBJ.DataSource = null;
             listDOBJ.DataSource = dobjList;
-            foreach (var s in sel)
+            foreach (int s in sel)
                 listDOBJ.SetSelected(s, true);
 
             listDOBJ.EndUpdate();
@@ -357,68 +354,66 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void addDummyDOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var setting = new DummyDOBJSetting();
+            DummyDOBJSetting setting = new();
 
-            using (PropertyDialog d = new PropertyDialog("Dummy Object Generator", setting))
+            using PropertyDialog d = new("Dummy Object Generator", setting);
+            if (d.ShowDialog() == DialogResult.OK)
             {
-                if (d.ShowDialog() == DialogResult.OK)
-                {
-                    HSD_JOBJ parent = _root;
-                    if (setting.JointIndex < _root.TreeList.Count)
-                        parent = _root.TreeList[setting.JointIndex];
+                HSD_JOBJ parent = _root;
+                if (setting.JointIndex < _root.TreeList.Count)
+                    parent = _root.TreeList[setting.JointIndex];
 
-                    for (int i = 0; i < setting.NumberToGenerate; i++)
+                for (int i = 0; i < setting.NumberToGenerate; i++)
+                {
+                    HSD_DOBJ dobj = new()
                     {
-                        var dobj = new HSD_DOBJ()
+                        Mobj = new HSD_MOBJ()
                         {
-                            Mobj = new HSD_MOBJ()
+                            RenderFlags = RENDER_MODE.CONSTANT,
+                            Material = new HSD_Material()
                             {
-                                RenderFlags = RENDER_MODE.CONSTANT,
-                                Material = new HSD_Material()
-                                {
-                                    DiffuseColor = Color.White,
-                                    SpecularColor = Color.White,
-                                    AmbientColor = Color.White,
-                                    Shininess = 50
-                                }
+                                DiffuseColor = Color.White,
+                                SpecularColor = Color.White,
+                                AmbientColor = Color.White,
+                                Shininess = 50
+                            }
+                        }
+                    };
+
+                    if (setting.AddDummyTexture)
+                    {
+                        dobj.Mobj.RenderFlags |= RENDER_MODE.TEX0;
+                        dobj.Mobj.Textures = new HSD_TOBJ()
+                        {
+                            MagFilter = GXTexFilter.GX_LINEAR,
+                            Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
+                            RepeatT = 1,
+                            RepeatS = 1,
+                            WrapS = GXWrapMode.CLAMP,
+                            WrapT = GXWrapMode.CLAMP,
+                            SX = 1,
+                            SY = 1,
+                            SZ = 1,
+                            GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0,
+                            Blending = 1,
+                            ImageData = new HSD_Image()
+                            {
+                                Format = GXTexFmt.I4,
+                                Width = 8,
+                                Height = 8,
+                                ImageData = new byte[32]
                             }
                         };
-
-                        if (setting.AddDummyTexture)
-                        {
-                            dobj.Mobj.RenderFlags |= RENDER_MODE.TEX0;
-                            dobj.Mobj.Textures = new HSD_TOBJ()
-                            {
-                                MagFilter = GXTexFilter.GX_LINEAR,
-                                Flags = TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COLORMAP_MODULATE | TOBJ_FLAGS.ALPHAMAP_MODULATE,
-                                RepeatT = 1,
-                                RepeatS = 1,
-                                WrapS = GXWrapMode.CLAMP,
-                                WrapT = GXWrapMode.CLAMP,
-                                SX = 1,
-                                SY = 1,
-                                SZ = 1,
-                                GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0,
-                                Blending = 1,
-                                ImageData = new HSD_Image()
-                                {
-                                    Format = GXTexFmt.I4,
-                                    Width = 8, 
-                                    Height = 8,
-                                    ImageData = new byte[32]
-                                }
-                            };
-                            dobj.Mobj.Textures.Optimize();
-                        }
-
-                        if (parent.Dobj == null)
-                            parent.Dobj = dobj;
-                        else
-                            parent.Dobj.Add(dobj);
+                        dobj.Mobj.Textures.Optimize();
                     }
-                    SetJObj(_root);
-                    ListUpdated();
+
+                    if (parent.Dobj == null)
+                        parent.Dobj = dobj;
+                    else
+                        parent.Dobj.Add(dobj);
                 }
+                SetJObj(_root);
+                ListUpdated();
             }
         }
 
@@ -449,15 +444,15 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (listDOBJ.SelectedIndices.Count > 0)
             {
-                var f = FileIO.OpenFile("Material (*.mobj)|*.mobj");
+                string f = FileIO.OpenFile("Material (*.mobj)|*.mobj");
 
                 if (f != null)
                 {
-                    HSDRawFile file = new HSDRawFile(f);
+                    HSDRawFile file = new(f);
 
                     if (file.Roots.Count > 0)
                     {
-                        var mobj = new HSD_MOBJ();
+                        HSD_MOBJ mobj = new();
                         if (file.Roots[0].Data._s.Length >= mobj.TrimmedSize)
                         {
                             mobj._s = file.Roots[0].Data._s;
@@ -484,11 +479,11 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         {
             if (listDOBJ.SelectedIndices.Count == 1 && listDOBJ.SelectedItem is DObjProxy con)
             {
-                var f = Tools.FileIO.SaveFile("Material (*.mobj)|*.mobj");
+                string f = Tools.FileIO.SaveFile("Material (*.mobj)|*.mobj");
 
                 if (f != null)
                 {
-                    HSDRawFile file = new HSDRawFile();
+                    HSDRawFile file = new();
                     file.Roots.Add(new HSDRootNode() { Name = "mobj", Data = con.DOBJ.Mobj });
                     file.Save(f);
                 }
@@ -502,11 +497,9 @@ namespace HSDRawViewer.GUI.Controls.JObjEditor
         /// <param name="e"></param>
         private void massTextureEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (JObjTextureEditorDialog d = new JObjTextureEditorDialog(_root))
-            {
-                d.ShowDialog();
-                ListUpdated?.Invoke();
-            }
+            using JObjTextureEditorDialog d = new(_root);
+            d.ShowDialog();
+            ListUpdated?.Invoke();
         }
     }
 }

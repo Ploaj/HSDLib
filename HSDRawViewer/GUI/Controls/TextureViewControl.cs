@@ -37,7 +37,7 @@ namespace HSDRawViewer.GUI.Controls
                     {
                         ZoomFactor = ZoomFactor / 1.05f;
                     }
-                    
+
                     RepositionImage();
                 }
             };
@@ -75,8 +75,8 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="e"></param>
         private void TexturePanel_Paint(object sender, PaintEventArgs e)
         {
-            using (var brush = new SolidBrush(ForeColor))
-                e.Graphics.DrawString($"Zoom: {(int)(ZoomFactor * 100)} %", Font, brush, new Point(0, 0));
+            using SolidBrush brush = new(ForeColor);
+            e.Graphics.DrawString($"Zoom: {(int)(ZoomFactor * 100)} %", Font, brush, new Point(0, 0));
         }
     }
 }

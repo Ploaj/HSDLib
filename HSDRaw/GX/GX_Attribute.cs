@@ -187,6 +187,10 @@ namespace HSDRaw.GX
 
             return c;
         }
-        
+
+        public override string ToString()
+        {
+            return $"({AttributeName}, {Count}, {AttributeType}, {CompCount}, {CompType}, {Buffer?._s.Length.ToString("X8")})";
+        }
     }
 }

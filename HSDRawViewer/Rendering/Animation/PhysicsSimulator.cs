@@ -15,19 +15,19 @@ namespace HSDRawViewer.Rendering.Animation
         /// <returns></returns>
         public static PhysicsPlayer Init(IEnumerable<SBM_DynamicDesc> dynamicDesc, IEnumerable<SBM_DynamicHitBubble> hitbubbles, LiveJObj m)
         {
-            PhysicsPlayer p = new PhysicsPlayer();
+            PhysicsPlayer p = new();
 
             if (hitbubbles != null)
-                foreach (var v in hitbubbles)
+                foreach (SBM_DynamicHitBubble v in hitbubbles)
                     p.Hitbubbles.Add(v);
 
             if (dynamicDesc != null)
-                foreach (var desc in dynamicDesc)
+                foreach (SBM_DynamicDesc desc in dynamicDesc)
                 {
                     if (desc == null)
                         continue;
 
-                    var set = new Dynamics();
+                    Dynamics set = new();
                     set.InitBones(m, desc.BoneIndex, desc.Parameters.Length);
                     set.ApplyNum = 0;
                     // toggle dynamics

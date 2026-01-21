@@ -47,6 +47,31 @@ namespace HSDRawViewer
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="scale"></param>
+        /// <param name="rot"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        public static bool Decompose(this Matrix4 m, out Vector3 scale, out Quaternion rot, out Vector3 trans)
+        {
+            scale = m.ExtractScale();
+            rot = m.ExtractRotation();
+            trans = m.ExtractTranslation();
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static Vector3 ExtractRotationEuler(this Quaternion q)
+        {
+            return Matrix4.CreateFromQuaternion(q).ExtractRotationEuler();
+        }
 
         /// <summary>
         /// 
@@ -55,8 +80,8 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static Vector3 ExtractRotationEuler(this Matrix4 m)
         {
-            var v = Vector3.Zero;
-            var dVar2 = new Vector2(m.M11, m.M12).LengthFast;
+            Vector3 v = Vector3.Zero;
+            float dVar2 = new Vector2(m.M11, m.M12).LengthFast;
             if (dVar2 <= 1.0E-5)
             {
                 v.X = (float)Math.Atan2(-m.M32, m.M22);
@@ -78,14 +103,25 @@ namespace HSDRawViewer
         /// <param name="param_1"></param>
         /// <param name="param_2"></param>
         /// <returns></returns>
+        public static Quaternion FromEuler(this Quaternion quat, Vector3 eul)
+        {
+            return quat.FromEuler(eul.X, eul.Y, eul.Z);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param_1"></param>
+        /// <param name="param_2"></param>
+        /// <returns></returns>
         public static Quaternion FromEuler(this Quaternion quat, float X, float Y, float Z)
         {
-            var dVar1 = Math.Cos(0.5f * X);
-            var dVar2 = Math.Cos(0.5f * Y);
-            var dVar3 = Math.Cos(0.5f * Z);
-            var dVar4 = Math.Sin(0.5f * X);
-            var dVar5 = Math.Sin(0.5f * Y);
-            var dVar6 = Math.Sin(0.5f * Z);
+            double dVar1 = Math.Cos(0.5f * X);
+            double dVar2 = Math.Cos(0.5f * Y);
+            double dVar3 = Math.Cos(0.5f * Z);
+            double dVar4 = Math.Sin(0.5f * X);
+            double dVar5 = Math.Sin(0.5f * Y);
+            double dVar6 = Math.Sin(0.5f * Z);
 
             quat.W = (float)(dVar1 * (dVar2 * dVar3) + (dVar4 * (dVar5 * dVar6)));
             quat.X = (float)(dVar4 * (dVar2 * dVar3) - (dVar1 * (dVar5 * dVar6)));
@@ -94,7 +130,27 @@ namespace HSDRawViewer
 
             return quat;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static Vector4 ToVector4(this Quaternion q)
+        {
+            return new Vector4(q.X, q.Y, q.Z, q.W);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static double Dot(this Quaternion q1, Quaternion q2)
+        {
+            return Vector4.Dot(q1.ToVector4(), q2.ToVector4());
+        }
 
         /// <summary>
         /// 
@@ -165,6 +221,27 @@ namespace HSDRawViewer
                 v.Y = y;
                 v.Z = z;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="forward"></param>
+        /// <param name="up"></param>
+        public static void ExtractFprwardUp(
+            this Matrix3 m,
+            out Vector3 forward,
+            out Vector3 up)
+        {
+            // Rows are the basis vectors
+            Vector3 right = new Vector3(m.M11, m.M12, m.M13);
+            up = new Vector3(m.M21, m.M22, m.M23);
+            forward = new Vector3(m.M31, m.M32, m.M33);
+
+            // Normalize in case of numerical drift or scale
+            forward.Normalize();
+            up.Normalize();
         }
     }
 }

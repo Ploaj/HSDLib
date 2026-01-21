@@ -1,7 +1,7 @@
-﻿using System;
-using HSDRaw.GX;
-using OpenTK.Mathematics;
+﻿using HSDRaw.GX;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using System;
 
 namespace HSDRawViewer.Rendering.Shaders
 {
@@ -10,8 +10,8 @@ namespace HSDRawViewer.Rendering.Shaders
     /// </summary>
     public class ParticleShader : Shader
     {
-        private int _vb_pos;
-        private int _vao;
+        private readonly int _vb_pos;
+        private readonly int _vao;
 
         public GXAlphaOp AlphaOp = GXAlphaOp.And;
         public GXCompareType AlphaComp0 = GXCompareType.Always;
@@ -35,7 +35,7 @@ namespace HSDRawViewer.Rendering.Shaders
 
         public ParticleShader()
         {
-            var path = AppDomain.CurrentDomain.BaseDirectory;
+            string path = AppDomain.CurrentDomain.BaseDirectory;
             LoadShader(System.IO.Path.Combine(path, @"Shader\ps.vert"));
             LoadShader(System.IO.Path.Combine(path, @"Shader\gx_alpha_test.frag"));
             LoadShader(System.IO.Path.Combine(path, @"Shader\ps.frag"));

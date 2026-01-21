@@ -1,6 +1,4 @@
 ﻿using HSDRaw.Common;
-using HSDRawViewer.Rendering.Renderers;
-using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
@@ -38,8 +36,8 @@ namespace HSDRawViewer.Rendering
             GL.LineWidth(2);
             GL.Begin(PrimitiveType.LineStrip);
 
-            var points = spline.Points;
-            var pointMax = spline.PointCount;
+            HSD_Vector3[] points = spline.Points;
+            short pointMax = spline.PointCount;
 
             for (int i = 0; i < points.Length; i++)
             {
@@ -52,7 +50,7 @@ namespace HSDRawViewer.Rendering
             GL.Color3(1f, 1f, 1f);
             GL.PointSize(4f);
             GL.Begin(PrimitiveType.Points);
-            foreach(var p in points)
+            foreach (HSD_Vector3 p in points)
                 GL.Vertex3(p.X, p.Y, p.Z);
             GL.End();
 
@@ -179,7 +177,7 @@ namespace HSDRawViewer.Rendering
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            
+
             GL.Color4(c);
             GL.Begin(PrimitiveType.Quads);
 
@@ -248,8 +246,8 @@ namespace HSDRawViewer.Rendering
             if (grounded)
                 miny = topN.Y;
 
-            var midx = Math.Abs(minx - maxx) / 2;
-            var midy = (miny + maxy) / 2;
+            float midx = Math.Abs(minx - maxx) / 2;
+            float midy = (miny + maxy) / 2;
 
             GL.PushAttrib(AttribMask.DepthBufferBit);
             GL.Disable(EnableCap.DepthTest);
@@ -258,10 +256,10 @@ namespace HSDRawViewer.Rendering
             Line(topN, topN + new Vector3(0, -2, 0), Vector4.One, 3);
             Line(topN, topN + new Vector3(0, 0, 2), Vector4.One, 3);
             Line(topN, topN + new Vector3(0, 0, -2), Vector4.One, 3);
-            
+
             DrawDiamond(
                 new Vector3(0, midy, topN.Z - midx),
-                new Vector3(0, maxy, topN.Z), 
+                new Vector3(0, maxy, topN.Z),
                 new Vector3(0, midy, topN.Z + midx),
                 new Vector3(0, miny, topN.Z),
                 1,
@@ -371,19 +369,19 @@ namespace HSDRawViewer.Rendering
 
             GL.Disable(EnableCap.DepthTest);
 
-            var arrowSize = length / 8f;
+            float arrowSize = length / 8f;
 
-            var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+            Vector3 pos = Vector3.TransformPosition(Vector3.Zero, transform);
 
-            var rot = Matrix4.CreateRotationX(-angle);
-            var start = pos;
-            var end = start + Vector3.TransformNormal(new Vector3(0, 0, length), rot);
+            Matrix4 rot = Matrix4.CreateRotationX(-angle);
+            Vector3 start = pos;
+            Vector3 end = start + Vector3.TransformNormal(new Vector3(0, 0, length), rot);
 
             GL.LineWidth(2f);
             GL.Color3(Color.White);
-            
+
             GL.Begin(PrimitiveType.Lines);
-            
+
             GL.Vertex3(start);
             GL.Vertex3(end);
 
@@ -394,7 +392,7 @@ namespace HSDRawViewer.Rendering
             GL.Vertex3(start + Vector3.TransformNormal(new Vector3(0, arrowSize, length - arrowSize), rot));
 
             GL.End();
-            
+
             GL.PopAttrib();
         }
 
@@ -409,12 +407,12 @@ namespace HSDRawViewer.Rendering
 
             GL.Disable(EnableCap.DepthTest);
 
-            var pos = Vector3.TransformPosition(Vector3.Zero, transform);
+            Vector3 pos = Vector3.TransformPosition(Vector3.Zero, transform);
 
-            var arrowSize = length / 3;
+            float arrowSize = length / 3;
 
-            var campos = (cam.RotationMatrix * new Vector4(cam.Translation, 1)).Xyz;
-            var world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
+            Vector3 campos = (cam.RotationMatrix * new Vector4(cam.Translation, 1)).Xyz;
+            Matrix4 world = Matrix4.LookAt(pos, campos, Vector3.UnitY).Inverted();
 
             GL.LineWidth(2f);
             GL.Color3(Color.White);
@@ -448,7 +446,7 @@ namespace HSDRawViewer.Rendering
                 GL.Vertex3(x + center.X, y + center.Y, center.Z);
 
                 //apply the rotation matrix
-                var temp = x;
+                float temp = x;
                 x = cosine * x - sine * y;
                 y = sine * temp + cosine * y;
             }
@@ -529,7 +527,7 @@ namespace HSDRawViewer.Rendering
         public static void DrawBox(Color color, float x1, float y1, float z1, float x2, float y2, float z2)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
-            
+
             GL.LineWidth(2f);
             GL.Color3(color);
 
@@ -544,7 +542,7 @@ namespace HSDRawViewer.Rendering
 
             GL.Vertex3(x1, y1, z1);
             GL.Vertex3(x1, y1, z2);
-            
+
 
             GL.Vertex3(x2, y2, z2);
             GL.Vertex3(x1, y2, z2);

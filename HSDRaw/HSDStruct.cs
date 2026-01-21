@@ -637,7 +637,8 @@ namespace HSDRaw
             else
             {
                 var re = GetCreateReference<HSDAccessor>(refloc);
-                re._s.SetData(Encoding.UTF8.GetBytes(value));
+                var bytes = Encoding.UTF8.GetBytes(value);
+                re._s.SetData(bytes);
                 re._s.Resize(re._s.Length + 1);
                 if (re._s.Length % 4 != 0)
                     re._s.Resize(re._s.Length + (4 - (re._s.Length % 4)));
@@ -766,6 +767,51 @@ namespace HSDRaw
             }
 
             return clone;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<byte[]> Enumerate(HashSet<HSDStruct> hashes = null)
+        {
+            if (hashes != null &&
+                hashes.Contains(this))
+                yield break;
+
+            if (hashes == null)
+                hashes = new HashSet<HSDStruct>();
+
+            yield return _data;
+
+            foreach (var r in References)
+            {
+                foreach (var v in r.Value.Enumerate(hashes))
+                {
+                    yield return v;
+                }
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public uint GenerateHash32()
+        {
+            const uint FNV_OFFSET_BASIS = 0x811C9DC5;
+            const uint FNV_PRIME = 0x01000193;
+
+            uint hash = FNV_OFFSET_BASIS;
+
+            foreach (var arr in Enumerate())
+            {
+                foreach (byte b in arr)
+                {
+                    hash ^= b;
+                    hash *= FNV_PRIME;
+                }
+            }
+
+            return hash;
         }
     }
 }

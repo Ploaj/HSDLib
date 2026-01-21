@@ -7,13 +7,14 @@ using HSDRawViewer.Converters.Animation;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools.Animation;
-using OpenTK;
+using HSDRawViewer.Tools.KeyFilters;
+using IONET.Collada.Kinematics.Joints;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace HSDRawViewer.Rendering
 {
@@ -110,7 +111,7 @@ namespace HSDRawViewer.Rendering
             if (jobj == null)
                 return;
 
-            foreach (var j in jobj.Enumerate)
+            foreach (LiveJObj j in jobj.Enumerate)
             {
                 // use bone lookup if enabled
                 int boneIndex = j.Index;
@@ -130,7 +131,7 @@ namespace HSDRawViewer.Rendering
                 }
 
                 // TODO: apply frame modifiers
-                foreach (var fm in FrameModifier)
+                foreach (IJointFrameModifier fm in FrameModifier)
                     fm.OverrideAnim(j, frame);
             }
         }
@@ -149,9 +150,9 @@ namespace HSDRawViewer.Rendering
 
             FrameCount = tree.FrameCount;
             Nodes = new List<AnimNode>();
-            foreach (var tracks in tree.Nodes)
+            foreach (FigaTreeNode tracks in tree.Nodes)
             {
-                AnimNode n = new AnimNode();
+                AnimNode n = new();
                 foreach (HSD_Track t in tracks.Tracks)
                 {
                     n.Tracks.Add(new FOBJ_Player(t.TrackType, t.GetKeys()));
@@ -168,18 +169,17 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public HSD_FigaTree ToFigaTree(float error = 0.0001f)
         {
-            HSD_FigaTree tree = new HSD_FigaTree();
+            HSD_FigaTree tree = new();
             tree.FrameCount = FrameCount;
             tree.Type = 1;
             tree.Nodes = Nodes.Select(e =>
             {
-                var fn = new FigaTreeNode();
+                FigaTreeNode fn = new();
 
-                foreach (var t in e.Tracks)
+                foreach (FOBJ_Player t in e.Tracks)
                 {
-                    HSD_Track track = new HSD_Track();
-                    HSD_FOBJ fobj = t.ToFobj(error);
-                    track.FromFOBJ(fobj);
+                    HSD_Track track = new();
+                    track.FromFOBJ(t.ToFobj(error));
                     fn.Tracks.Add(track);
                 }
 
@@ -200,17 +200,17 @@ namespace HSDRawViewer.Rendering
             if (joint == null)
                 return;
 
-            foreach (var j in joint.TreeList)
+            foreach (HSD_AnimJoint j in joint.TreeList)
             {
-                AnimNode n = new AnimNode();
+                AnimNode n = new();
                 if (j.AOBJ != null && j.AOBJ.FObjDesc != null)
                 {
                     FrameCount = (int)Math.Max(FrameCount, j.AOBJ.EndFrame + 1);
 
-                    foreach (var fdesc in j.AOBJ.FObjDesc.List)
+                    foreach (HSD_FOBJDesc fdesc in j.AOBJ.FObjDesc.List)
                     {
-                        var players = new FOBJ_Player(fdesc);
-                        if(players.Keys != null && players.Keys.Count > 0)
+                        FOBJ_Player players = new(fdesc);
+                        if (players.Keys != null && players.Keys.Count > 0)
                             FrameCount = Math.Max(FrameCount, players.Keys.Max(e => e.Frame + 1));
                         n.Tracks.Add(players);
                     }
@@ -242,7 +242,7 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         private HSD_AnimJoint ToAnimJointRecursive(HSD_JOBJ root, AOBJ_Flags flags)
         {
-            HSD_AnimJoint joint = new HSD_AnimJoint();
+            HSD_AnimJoint joint = new();
             joint.Flags = 1;
 
             AnimNode n = null;
@@ -260,7 +260,7 @@ namespace HSDRawViewer.Rendering
             }
 
             // add all tracks
-            foreach (var t in n.Tracks)
+            foreach (FOBJ_Player t in n.Tracks)
             {
                 joint.AOBJ.EndFrame = Math.Max(joint.AOBJ.EndFrame, t.FrameCount);
 
@@ -273,12 +273,12 @@ namespace HSDRawViewer.Rendering
             }
 
             // set particle flag
-            if (n.Tracks.Any(e=>e.JointTrackType == JointTrackType.HSD_A_J_PTCL))
+            if (n.Tracks.Any(e => e.JointTrackType == JointTrackType.HSD_A_J_PTCL))
             {
                 joint.AOBJ.EndFrame += 0.1f;
             }
 
-            foreach (var c in root.Children)
+            foreach (HSD_JOBJ c in root.Children)
             {
                 joint.AddChild(ToAnimJointRecursive(c, flags));
             }
@@ -294,25 +294,25 @@ namespace HSDRawViewer.Rendering
         /// 
         /// </summary>
         /// <param name="fsms"></param>
-        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> fsms)
+        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> fsms, bool compress = true)
         {
-            foreach (var n in Nodes)
-                foreach (var t in n.Tracks)
-                    t.ApplyFSMs(fsms);
+            foreach (AnimNode n in Nodes)
+                foreach (FOBJ_Player t in n.Tracks)
+                    t.ApplyFSMs(fsms, compress);
 
             // calculate new frame count
             float frameRate = 1;
             float lastFrame = 0;
             float frameCount = 0;
-            foreach (var fsm in fsms)
+            foreach (FrameSpeedMultiplier fsm in fsms)
             {
-                var dis = fsm.Frame - lastFrame;
+                float dis = fsm.Frame - lastFrame;
                 frameCount += dis / frameRate;
 
                 frameRate = fsm.Rate;
                 lastFrame = fsm.Frame;
             }
-            var finaldistance = FrameCount - lastFrame;
+            float finaldistance = FrameCount - lastFrame;
             frameCount += finaldistance / frameRate;
 
             FrameCount = frameCount;
@@ -348,14 +348,14 @@ namespace HSDRawViewer.Rendering
             if (value == 1)
                 return;
 
-            var adjust = (endFrame - startFrame) - value * (endFrame - startFrame);
+            float adjust = (endFrame - startFrame) - value * (endFrame - startFrame);
             FrameCount -= adjust;
-            foreach (var n in Nodes)
+            foreach (AnimNode n in Nodes)
             {
-                foreach (var t in n.Tracks)
+                foreach (FOBJ_Player t in n.Tracks)
                 {
                     int keyIndex = 0;
-                    foreach (var k in t.Keys)
+                    foreach (FOBJKey k in t.Keys)
                     {
                         // scale frames in range
                         if (k.Frame >= startFrame && k.Frame <= endFrame)
@@ -376,6 +376,17 @@ namespace HSDRawViewer.Rendering
             }
         }
 
+        internal void Bake()
+        {
+            foreach (AnimNode n in Nodes)
+            {
+                foreach (FOBJ_Player t in n.Tracks)
+                {
+                    t.Bake();
+                }
+            }
+        }
+
         /// <summary>
         /// Trims frames to given region
         /// </summary>
@@ -388,18 +399,17 @@ namespace HSDRawViewer.Rendering
 
             FrameCount = endFrame - startFrame;
 
-            foreach (var n in Nodes)
+            foreach (AnimNode n in Nodes)
             {
-                foreach (var t in n.Tracks)
+                foreach (FOBJ_Player t in n.Tracks)
                 {
-
                     // the new set of keys after trimming
                     List<FOBJKey> newKeys = t.Keys.Where(e => e.Frame >= startFrame && e.Frame <= endFrame).ToList();
 
                     // if there's not a key on the startframe, it'll create a new one
                     if (!t.Keys.Any(k => k.Frame == startFrame))
                     {
-                        FOBJKey start = new FOBJKey()
+                        FOBJKey start = new()
                         {
                             Frame = startFrame,
                             Tan = 0,
@@ -412,7 +422,7 @@ namespace HSDRawViewer.Rendering
                     // same but for the last frame
                     if (!t.Keys.Any(k => k.Frame == endFrame))
                     {
-                        FOBJKey end = new FOBJKey()
+                        FOBJKey end = new()
                         {
                             Frame = endFrame,
                             Tan = 0,
@@ -423,7 +433,7 @@ namespace HSDRawViewer.Rendering
                     }
 
                     // finally shifts all the keys
-                    foreach (var k in newKeys)
+                    foreach (FOBJKey k in newKeys)
                     {
                         k.Frame -= startFrame;
                     }
@@ -441,12 +451,12 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
-        public void Optimize(HSD_JOBJ jobj, float error = 0.001f)
+        public void Optimize(HSD_JOBJ jobj, bool applyDiscontinuityFilter, float error = 0.001f, DiscontinuityStart discontinuityType = DiscontinuityStart.Start)
         {
             if (jobj == null)
                 return;
 
-            var joints = jobj.TreeList;
+            List<HSD_JOBJ> joints = jobj.TreeList;
 
             if (NodeCount > joints.Count)
             {
@@ -454,7 +464,12 @@ namespace HSDRawViewer.Rendering
             }
 
             for (int i = 0; i < Math.Min(joints.Count, NodeCount); i++)
-                AnimationKeyCompressor.OptimizeJointTracks(joints[i], ref Nodes[i].Tracks, error);
+            {
+                if (applyDiscontinuityFilter)
+                    Tools.KeyFilters.DiscontinuityFilter.Filter(Nodes[i].Tracks, discontinuityType);
+
+                Nodes[i].Tracks = AnimationKeyCompressor.OptimizeJointTracks(joints[i], Nodes[i].Tracks, error);
+            }
         }
 
         /// <summary>
@@ -464,7 +479,7 @@ namespace HSDRawViewer.Rendering
         /// <returns></returns>
         public static JointAnimManager LoadFromFile(JointMap _jointMap)
         {
-            var f = Tools.FileIO.OpenFile(JointAnimationLoader.SupportedImportAnimFilter);
+            string f = Tools.FileIO.OpenFile(JointAnimationLoader.SupportedImportAnimFilter);
 
             if (f != null)
             {
@@ -478,7 +493,7 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void ExportAsMayaAnim(JointMap _jointMap)
         {
-            var f = Tools.FileIO.SaveFile("Supported Formats (*.anim)|*.anim");
+            string f = Tools.FileIO.SaveFile("Supported Formats (*.anim)|*.anim");
 
             if (f != null)
                 ConvMayaAnim.ExportToMayaAnim(f, this, _jointMap);
@@ -501,21 +516,21 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void ExportAsAnimJoint(HSD_JOBJ root)
         {
-            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+            string f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
 
-            var setting = new AnimJointSettings();
+            AnimJointSettings setting = new();
 
-            using (PropertyDialog d = new PropertyDialog("AnimJoint Settings", setting))
-                if (f != null && d.ShowDialog() == DialogResult.OK)
+            using PropertyDialog d = new("AnimJoint Settings", setting);
+            if (f != null && d.ShowDialog() == DialogResult.OK)
+            {
+                HSDRawFile animFile = new();
+                animFile.Roots.Add(new HSDRootNode()
                 {
-                    HSDRawFile animFile = new HSDRawFile();
-                    animFile.Roots.Add(new HSDRootNode()
-                    {
-                        Data = ToAnimJoint(root, setting.Flags),
-                        Name = setting.Symbol
-                    });
-                    animFile.Save(f);
-                }
+                    Data = ToAnimJoint(root, setting.Flags),
+                    Name = setting.Symbol
+                });
+                animFile.Save(f);
+            }
         }
 
         /// <summary>
@@ -535,20 +550,128 @@ namespace HSDRawViewer.Rendering
         /// </summary>
         public void ExportAsFigatree()
         {
-            var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
-            var setting = new FigaTreeSettings();
+            string f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter);
+            FigaTreeSettings setting = new();
 
-            using (PropertyDialog d = new PropertyDialog("Figatree Settings", setting))
-                if (f != null && d.ShowDialog() == DialogResult.OK)
+            using PropertyDialog d = new("Figatree Settings", setting);
+            if (f != null && d.ShowDialog() == DialogResult.OK)
+            {
+                HSDRawFile animFile = new();
+                animFile.Roots.Add(new HSDRootNode()
                 {
-                    HSDRawFile animFile = new HSDRawFile();
-                    animFile.Roots.Add(new HSDRootNode()
+                    Data = ToFigaTree(setting.CompressionError),
+                    Name = setting.Symbol
+                });
+                animFile.Save(f);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        /// <param name="player"></param>
+        private static void FOBJPlayer_AddKey(FOBJ_Player track, float value, float end)
+        {
+            track.Keys.Add(new FOBJKey() { Frame = 0, Value = value, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+            track.Keys.Add(new FOBJKey() { Frame = end, Value = value, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+            track.Bake();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="joint"></param>
+        /// <param name="player"></param>
+        private static FOBJ_Player GenerateKey(HSD_JOBJ joint, JointTrackType type, float end)
+        {
+            var track = new FOBJ_Player() { TrackType = (byte)type };
+            switch (type)
+            {
+                case JointTrackType.HSD_A_J_TRAX: FOBJPlayer_AddKey(track, joint.TX, end); break;
+                case JointTrackType.HSD_A_J_TRAY: FOBJPlayer_AddKey(track, joint.TY, end); break;
+                case JointTrackType.HSD_A_J_TRAZ: FOBJPlayer_AddKey(track, joint.TZ, end); break;
+                case JointTrackType.HSD_A_J_ROTX: FOBJPlayer_AddKey(track, joint.RX, end); break;
+                case JointTrackType.HSD_A_J_ROTY: FOBJPlayer_AddKey(track, joint.RY, end); break;
+                case JointTrackType.HSD_A_J_ROTZ: FOBJPlayer_AddKey(track, joint.RZ, end); break;
+                case JointTrackType.HSD_A_J_SCAX: FOBJPlayer_AddKey(track, joint.SX, end); break;
+                case JointTrackType.HSD_A_J_SCAY: FOBJPlayer_AddKey(track, joint.SY, end); break;
+                case JointTrackType.HSD_A_J_SCAZ: FOBJPlayer_AddKey(track, joint.SZ, end); break;
+            }
+            return track;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="toAppend"></param>
+        /// <param name="frame_count"></param>
+        public void AppendAnimation(JointAnimManager toAppend, HSD_JOBJ model, bool no_bake = false, int frame_count = -1)
+        {
+            if (!no_bake)
+                Bake();
+
+            if (frame_count < 0)
+                frame_count = (int)Math.Ceiling(toAppend.FrameCount);
+
+            int i = 0;
+            foreach (var c in toAppend.Nodes)
+            {
+
+                foreach (var t in c.Tracks)
+                {
+                    var track = Nodes[i].Tracks.Find(e => e.TrackType == t.TrackType);
+
+                    if (track == null)
                     {
-                        Data = ToFigaTree(setting.CompressionError),
-                        Name = setting.Symbol
-                    });
-                    animFile.Save(f);
+                        var j = model.TreeList[i];
+                        track = GenerateKey(j, t.JointTrackType, FrameCount);
+                        Nodes[i].Tracks.Add(track);
+                    }
+
+                    float frame = track.Keys.Max(e => e.Frame) + 1;
+                    for (int j = 0; j < frame_count; j++)
+                    {
+                        track.Keys.Add(new FOBJKey()
+                        {
+                            Frame = frame + j,
+                            Value = t.GetValue(j),
+                            InterpolationType = GXInterpolationType.HSD_A_OP_LIN
+                        });
+                    }
                 }
+                i++;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="jointMap"></param>
+        internal void ExportAsSMD(HSD_JOBJ root, JointMap jointMap)
+        {
+            string f = Tools.FileIO.SaveFile(ApplicationSettings.SMDFileFilter);
+            if (f != null)
+            {
+                SMDConv.ExportAnimationToSMD(f, root, jointMap, this);
+            }
+        }
+        /// <summary>
+        /// Can fix various issues with animation such as duplicate tracks
+        /// </summary>
+        public void RemoveDuplicateTracks()
+        {
+            foreach (var n in Nodes)
+            {
+                var before = n.Tracks.Count;
+                n.Tracks = n.Tracks.DistinctBy(e => e.TrackType).ToList();
+                var after = n.Tracks.Count;
+                if (before != after)
+                    System.Diagnostics.Debug.WriteLine(before + " " + after);
+                //var groups = n.Tracks.GroupBy(e => e.TrackType);
+                //foreach (var group in groups)
+                //{
+                //    if (group.Count() <= 1)
+                //        continue;
+                //}
+            }
         }
     }
 }

@@ -38,6 +38,12 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public KAR_grSplineList CourseSplineList { get => _s.GetReference<KAR_grSplineList>(0x00); set => _s.SetReference(0x00, value); }
 
+        public KAR_grSplineList x04 { get => _s.GetReference<KAR_grSplineList>(0x04); set => _s.SetReference(0x04, value); }
+
+        public KAR_grSplineList x08 { get => _s.GetReference<KAR_grSplineList>(0x08); set => _s.SetReference(0x08, value); }
+
+        public KAR_grSplineList x0C { get => _s.GetReference<KAR_grSplineList>(0x0C); set => _s.SetReference(0x0C, value); }
+
         public bool Loop { get => _s.GetByte(0x10) == 1; set => _s.SetByte(0x10, (byte)(value ? 1 : 0)); }
     }
 

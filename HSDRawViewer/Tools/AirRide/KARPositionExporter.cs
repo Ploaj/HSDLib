@@ -23,7 +23,7 @@ namespace HSDRawViewer.Tools.AirRide
             Vector3 right = Vector3.Cross(forward, up); // Calculate the right vector
 
             // Create a rotation matrix
-            Matrix4x4 rotationMatrix = new Matrix4x4(
+            Matrix4x4 rotationMatrix = new(
                 right.X, up.X, -forward.X, 0,
                 right.Y, up.Y, -forward.Y, 0,
                 right.Z, up.Z, -forward.Z, 0,
@@ -41,18 +41,18 @@ namespace HSDRawViewer.Tools.AirRide
         public static void ExportAreaPositions(string filePath, KAR_grAreaPositionList list)
         {
             // generate io model
-            var iomodel = new IOModel();
+            IOModel iomodel = new();
 
             // setup skeleton
             iomodel.Skeleton = new IOSkeleton();
-            var root = new IOBone()
+            IOBone root = new()
             {
                 Name = "root"
             };
             iomodel.Skeleton.RootBones.Add(root);
 
             int index = 0;
-            foreach (var e in list.AreaPosition.Array)
+            foreach (KAR_grAreaPositionData e in list.AreaPosition.Array)
             {
                 root.AddChild(new IOBone()
                 {
@@ -63,7 +63,7 @@ namespace HSDRawViewer.Tools.AirRide
                 index++;
             }
 
-            IOScene ioscene = new IOScene();
+            IOScene ioscene = new();
             ioscene.Models.Add(iomodel);
             IONET.IOManager.ExportScene(ioscene, filePath, new IONET.ExportSettings()
             {

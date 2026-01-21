@@ -1,5 +1,5 @@
-﻿using System;
-using HSDRaw.Melee.Pl;
+﻿using HSDRaw.Melee.Pl;
+using System;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
@@ -10,16 +10,16 @@ namespace HSDRawViewer.ContextMenus
 
         public FighterArticleContextMenu() : base()
         {
-            ToolStripMenuItem addFromFile = new ToolStripMenuItem("Add Article From File");
+            ToolStripMenuItem addFromFile = new("Add Article From File");
             addFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is SBM_ArticlePointer root)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
                     if (f != null)
                     {
-                        var file = new HSDRaw.HSDRawFile(f);
-                        var mod = root.Articles;
+                        HSDRaw.HSDRawFile file = new(f);
+                        SBM_Article[] mod = root.Articles;
                         Array.Resize(ref mod, mod.Length + 1);
                         mod[mod.Length - 1] = new SBM_Article()
                         {

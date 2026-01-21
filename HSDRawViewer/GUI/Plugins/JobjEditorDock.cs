@@ -72,7 +72,7 @@ namespace HSDRawViewer.GUI.Plugins
         /// <param name="anim"></param>
         public void LoadAnimation(HSD_ShapeAnimJoint anim)
         {
-            ShapeAnimManager m = new ShapeAnimManager();
+            ShapeAnimManager m = new();
             m.FromShapeAnim(anim);
             Editor.LoadAnimation(m);
         }

@@ -10,10 +10,10 @@ namespace HSDRawViewer.ContextMenus
 
         public MatAnimJointContextMenu() : base()
         {
-            ToolStripMenuItem addChild = new ToolStripMenuItem("Add Child");
+            ToolStripMenuItem addChild = new("Add Child");
             Items.Add(addChild);
 
-            ToolStripMenuItem createJOBJ = new ToolStripMenuItem("From Scratch");
+            ToolStripMenuItem createJOBJ = new("From Scratch");
             createJOBJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_MatAnimJoint root)
@@ -27,17 +27,17 @@ namespace HSDRawViewer.ContextMenus
             addChild.DropDownItems.Add(createJOBJ);
 
 
-            ToolStripMenuItem createJOBJFromFile = new ToolStripMenuItem("From File");
+            ToolStripMenuItem createJOBJFromFile = new("From File");
             createJOBJFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_MatAnimJoint root)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
                     if (f != null)
                     {
-                        HSDRaw.HSDRawFile file = new HSDRaw.HSDRawFile(f);
+                        HSDRaw.HSDRawFile file = new(f);
 
-                        var node = file.Roots[0].Data;
+                        HSDRaw.HSDAccessor node = file.Roots[0].Data;
                         if (node is HSD_MatAnimJoint newchild)
                             root.AddChild(newchild);
                     }

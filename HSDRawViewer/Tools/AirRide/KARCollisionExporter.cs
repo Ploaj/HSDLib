@@ -7,10 +7,6 @@ using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Tools.AirRide
 {
@@ -22,8 +18,8 @@ namespace HSDRawViewer.Tools.AirRide
         /// <returns></returns>
         private static IOSkeleton CreateDummySkeleton()
         {
-            var ioskel = new IOSkeleton();
-            var ioroot = new IOBone()
+            IOSkeleton ioskel = new();
+            IOBone ioroot = new()
             {
                 Name = "Root"
             };
@@ -44,7 +40,7 @@ namespace HSDRawViewer.Tools.AirRide
                 return CreateDummySkeleton();
             }
 
-            var f = new HSDRawFile(filePath);
+            HSDRawFile f = new(filePath);
             KAR_grModel grmodel = f.Roots[0].Data as KAR_grModel;
 
             if (grmodel == null)
@@ -52,7 +48,7 @@ namespace HSDRawViewer.Tools.AirRide
                 return CreateDummySkeleton();
             }
 
-            ModelExporter exp = new ModelExporter(
+            ModelExporter exp = new(
                 grmodel.MainModel.RootNode,
                 new ModelExportSettings()
                 {
@@ -73,11 +69,11 @@ namespace HSDRawViewer.Tools.AirRide
         private static IOVertex CreateVertex(GXVector3 vert, KAR_CollisionTriangle triangle, IOBone bone)
         {
             // create vertex
-            var iovert = new IOVertex()
+            IOVertex iovert = new()
             {
                 Position = System.Numerics.Vector3.Transform(new System.Numerics.Vector3(vert.X, vert.Y, vert.Z), bone.WorldTransform),
             };
-            
+
             // add weight
             iovert.Envelope.Weights.Add(
                 new IOBoneWeight()
@@ -86,7 +82,7 @@ namespace HSDRawViewer.Tools.AirRide
                     Weight = 1,
                     BindMatrix = System.Numerics.Matrix4x4.Identity,
                 });
-            
+
 
             return iovert;
         }
@@ -102,7 +98,7 @@ namespace HSDRawViewer.Tools.AirRide
         private static IOVertex CreateVertex(GXVector3 vert, KAR_ZoneCollisionTriangle triangle, IOBone bone)
         {
             // create vertex
-            var iovert = new IOVertex()
+            IOVertex iovert = new()
             {
                 Position = System.Numerics.Vector3.Transform(new System.Numerics.Vector3(vert.X, vert.Y, vert.Z), bone.WorldTransform),
             };
@@ -127,52 +123,52 @@ namespace HSDRawViewer.Tools.AirRide
         public static void ExportCollisionModel(string filepath, string modeldatpath, KAR_grData data)
         {
             // get collision joint
-            var coll = data.CollisionNode;
+            KAR_grCollisionNode coll = data.CollisionNode;
 
-            var _vertices = coll.Vertices;
-            var _triangles = coll.Triangles;
-            var _joints = coll.Joints;
+            GXVector3[] _vertices = coll.Vertices;
+            KAR_CollisionTriangle[] _triangles = coll.Triangles;
+            KAR_CollisionJoint[] _joints = coll.Joints;
 
             // generate io model
-            var iomodel = new IOModel();
+            IOModel iomodel = new();
 
             // setup skeleton
             iomodel.Skeleton = GetSkeletonFromGrModelDat(modeldatpath);
 
             // export joints
             int index = 0;
-            foreach (var j in _joints)
+            foreach (KAR_CollisionJoint j in _joints)
             {
                 // get bone name
                 IOBone bone = iomodel.Skeleton.GetBoneByIndex(j.BoneID);
 
                 // create mesh group
-                var iomesh = new IOMesh()
+                IOMesh iomesh = new()
                 {
                     Name = $"Mesh_{index}_{bone.Name}"
                 };
                 iomodel.Meshes.Add(iomesh);
 
                 // add triangles
-                var iopoly_wall = new IOPolygon()
+                IOPolygon iopoly_wall = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "wall"
                 };
 
-                var iopoly_ceil = new IOPolygon()
+                IOPolygon iopoly_ceil = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "ceil"
                 };
 
-                var iopoly_floor = new IOPolygon()
+                IOPolygon iopoly_floor = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "floor"
                 };
 
-                var iopoly_unknown = new IOPolygon()
+                IOPolygon iopoly_unknown = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "Unknown"
@@ -181,7 +177,7 @@ namespace HSDRawViewer.Tools.AirRide
 
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
-                    var triangle = _triangles[i];
+                    KAR_CollisionTriangle triangle = _triangles[i];
 
                     IOPolygon iopoly;
 
@@ -238,7 +234,7 @@ namespace HSDRawViewer.Tools.AirRide
             }
 
             // export scene
-            IOScene ioscene = new IOScene();
+            IOScene ioscene = new();
             ioscene.Materials.Add(new IOMaterial()
             {
                 Name = "wall",
@@ -275,50 +271,50 @@ namespace HSDRawViewer.Tools.AirRide
         public static void ExportZoneModel(string filepath, string modeldatpath, KAR_grData data)
         {
             // get collision joint
-            var coll = data.CollisionNode;
+            KAR_grCollisionNode coll = data.CollisionNode;
 
             // generate io model
-            var iomodel = new IOModel();
+            IOModel iomodel = new();
 
             // setup skeleton
             iomodel.Skeleton = GetSkeletonFromGrModelDat(modeldatpath);
 
-            var _zonevertices = coll.ZoneVertices;
-            var _zonetriangles = coll.ZoneTriangles;
-            var _zonejoints = coll.ZoneJoints;
-            var index = 0;
-            foreach (var j in _zonejoints)
+            GXVector3[] _zonevertices = coll.ZoneVertices;
+            KAR_ZoneCollisionTriangle[] _zonetriangles = coll.ZoneTriangles;
+            KAR_ZoneCollisionJoint[] _zonejoints = coll.ZoneJoints;
+            int index = 0;
+            foreach (KAR_ZoneCollisionJoint j in _zonejoints)
             {
                 // get bone name
                 IOBone bone = iomodel.Skeleton.GetBoneByIndex(j.BoneID);
 
                 // create mesh group
-                var iomesh = new IOMesh()
+                IOMesh iomesh = new()
                 {
                     Name = $"Zone_{index}_{bone.Name}_{_zonetriangles[j.ZoneFaceStart].Type}"
                 };
                 iomodel.Meshes.Add(iomesh);
 
                 // add triangles
-                var iopoly_wall = new IOPolygon()
+                IOPolygon iopoly_wall = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "wall"
                 };
 
-                var iopoly_ceil = new IOPolygon()
+                IOPolygon iopoly_ceil = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "ceil"
                 };
 
-                var iopoly_floor = new IOPolygon()
+                IOPolygon iopoly_floor = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "floor"
                 };
 
-                var iopoly_unknown = new IOPolygon()
+                IOPolygon iopoly_unknown = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     MaterialName = "Unknown"
@@ -326,7 +322,7 @@ namespace HSDRawViewer.Tools.AirRide
 
                 for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                 {
-                    var triangle = _zonetriangles[i];
+                    KAR_ZoneCollisionTriangle triangle = _zonetriangles[i];
 
                     IOPolygon iopoly;
 
@@ -384,7 +380,7 @@ namespace HSDRawViewer.Tools.AirRide
 
 
             // export scene
-            IOScene ioscene = new IOScene();
+            IOScene ioscene = new();
             ioscene.Materials.Add(new IOMaterial()
             {
                 Name = "wall",

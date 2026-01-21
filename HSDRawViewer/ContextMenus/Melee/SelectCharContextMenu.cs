@@ -1,6 +1,5 @@
 ﻿using HSDRaw.Melee.Mn;
 using System;
-using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -27,7 +26,7 @@ namespace HSDRawViewer.ContextMenus
                 }
             };
             MenuItems.Add(CreateGeckoCode);*/
-            
+
         }
     }
 }

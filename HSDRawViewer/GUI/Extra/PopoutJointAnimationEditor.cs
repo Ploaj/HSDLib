@@ -1,12 +1,12 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Tools;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using static HSDRawViewer.GUI.Controls.GraphEditor;
-using HSDRawViewer.GUI.Dialog;
 
 namespace HSDRawViewer.GUI.Extra
 {
@@ -19,9 +19,11 @@ namespace HSDRawViewer.GUI.Extra
         {
             //public bool BakeAnimation = true;
             public float ErrorMargin { get; set; } = 0.001f;
+
+            public bool ApplyDiscontinuityFilter { get; set; } = true;
         }
 
-        private static OptimizeSettings _settings = new OptimizeSettings();
+        private static readonly OptimizeSettings _settings = new();
 
         public bool CloseOnExit { get; set; } = true;
 
@@ -41,19 +43,23 @@ namespace HSDRawViewer.GUI.Extra
                 if (AnimNode == null || JOBJ == null)
                     return;
 
-                AnimationKeyCompressor.OptimizeJointTracks(JOBJ, ref AnimNode.Tracks, settings.ErrorMargin);
+                if (settings.ApplyDiscontinuityFilter)
+                    EulerFilter();
+
+                AnimNode.Tracks = AnimationKeyCompressor.OptimizeJointTracks(JOBJ, AnimNode.Tracks, settings.ErrorMargin);
 
                 if (optimizeChildren)
                     foreach (JointNode child in Nodes)
                         child.Optimize(settings, optimizeChildren);
             }
-
+            /// <summary>
+            /// 
+            /// </summary>
             public void EulerFilter()
             {
                 if (AnimNode == null || JOBJ == null)
                     return;
 
-                // Tools.KeyFilters.EulerFilter.Filter(AnimNode.Tracks);
                 Tools.KeyFilters.DiscontinuityFilter.Filter(AnimNode.Tracks);
 
                 foreach (JointNode child in Nodes)
@@ -107,18 +113,18 @@ namespace HSDRawViewer.GUI.Extra
             jointTree.BeginUpdate();
             jointTree.Nodes.Clear();
 
-            var jobjs = jobj.TreeList;
+            List<HSD_JOBJ> jobjs = jobj.TreeList;
 
-            Dictionary<HSD_JOBJ, JointNode> childToParent = new Dictionary<HSD_JOBJ, JointNode>();
-            
-            for(int i = 0; i < Math.Min(animManager.NodeCount, jobjs.Count); i++)
+            Dictionary<HSD_JOBJ, JointNode> childToParent = new();
+
+            for (int i = 0; i < Math.Min(animManager.NodeCount, jobjs.Count); i++)
             {
-                var node = new JointNode() { JOBJ = jobjs[i], AnimNode = animManager.Nodes[i], Text = $"Joint_{i}" };
-                
-                foreach (var c in jobjs[i].Children)
+                JointNode node = new() { JOBJ = jobjs[i], AnimNode = animManager.Nodes[i], Text = $"Joint_{i}" };
+
+                foreach (HSD_JOBJ c in jobjs[i].Children)
                     childToParent.Add(c, node);
 
-                if(childToParent.ContainsKey(jobjs[i]))
+                if (childToParent.ContainsKey(jobjs[i]))
                 {
                     childToParent[jobjs[i]].Nodes.Add(node);
                 }
@@ -144,7 +150,6 @@ namespace HSDRawViewer.GUI.Extra
             if (jointTree.SelectedNode is JointNode node)
                 graphEditor1.LoadTracks(AnimType.Joint, node.AnimNode.Tracks);
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -152,30 +157,13 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void optimizeAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (PropertyDialog d = new PropertyDialog("Animation Optimize Settings", _settings))
-            {
-                if (d.ShowDialog() == DialogResult.OK)
-                    foreach (JointNode node in jointTree.Nodes)
-                    {
-                        node.Optimize(_settings);
-                    }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void applyEulerFilterToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Apply Euler Filter to all rotation tracks?", "Apply Euler Filter", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
+            using PropertyDialog d = new("Animation Optimize Settings", _settings);
+            if (d.ShowDialog() == DialogResult.OK)
                 foreach (JointNode node in jointTree.Nodes)
                 {
-                    node.EulerFilter();
+                    node.Optimize(_settings);
+                    MadeChanges = true;
                 }
-            }
         }
     }
 }

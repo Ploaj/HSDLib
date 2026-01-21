@@ -10,21 +10,21 @@ namespace HSDRawViewer.Rendering
 {
     public class MatAnimJoint
     {
-        public List<MatAnim> Nodes = new List<MatAnim>();
+        public List<MatAnim> Nodes = new();
     }
 
     public class MatAnim
     {
-        public List<MatAnimTexture> TextureAnims = new List<MatAnimTexture>();
+        public List<MatAnimTexture> TextureAnims = new();
 
-        public List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
+        public List<FOBJ_Player> Tracks = new();
 
         public float Frame = 0;
 
         public void SetFrame(float frame)
         {
             Frame = frame;
-            foreach (var v in TextureAnims)
+            foreach (MatAnimTexture v in TextureAnims)
                 v.SetFrame(frame);
         }
     }
@@ -33,9 +33,9 @@ namespace HSDRawViewer.Rendering
     {
         public GXTexMapID TextureID;
 
-        public List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
+        public List<FOBJ_Player> Tracks = new();
 
-        public List<HSD_TOBJ> Textures = new List<HSD_TOBJ>();
+        public List<HSD_TOBJ> Textures = new();
 
         public float Frame = 0;
 
@@ -81,7 +81,7 @@ namespace HSDRawViewer.Rendering
         {
             if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[jobj_index].Nodes[dobj_index];
+                MatAnim node = Nodes[jobj_index].Nodes[dobj_index];
 
                 state.ApplyAnim(node.Tracks, node.Frame);
             }
@@ -98,15 +98,15 @@ namespace HSDRawViewer.Rendering
             if (tobj == null)
                 return null;
 
-            var m = new LiveTObj();
+            LiveTObj m = new();
             m.Reset(tobj);
 
             if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[jobj_index].Nodes[dobj_index];
+                MatAnim node = Nodes[jobj_index].Nodes[dobj_index];
 
-                var texAnim = node.TextureAnims.Find(e=>e.TextureID == tobj.TexMapID);
-                if(texAnim != null)
+                MatAnimTexture texAnim = node.TextureAnims.Find(e => e.TextureID == tobj.TexMapID);
+                if (texAnim != null)
                     m.ApplyAnim(texAnim.Textures, texAnim.Tracks, texAnim.Frame);
             }
 
@@ -123,9 +123,9 @@ namespace HSDRawViewer.Rendering
         {
             if (Nodes.Count > jobj_index && Nodes[jobj_index].Nodes.Count > dobj_index)
             {
-                var node = Nodes[jobj_index].Nodes[dobj_index];
+                MatAnim node = Nodes[jobj_index].Nodes[dobj_index];
 
-                var texAnim = node.TextureAnims.Find(e => e.TextureID == mapid);
+                MatAnimTexture texAnim = node.TextureAnims.Find(e => e.TextureID == mapid);
                 if (texAnim != null)
                     m.ApplyAnim(texAnim.Textures, texAnim.Tracks, texAnim.Frame);
             }
@@ -144,26 +144,26 @@ namespace HSDRawViewer.Rendering
             if (joint == null)
                 return this;
 
-            foreach (var j in joint.TreeList)
+            foreach (HSD_MatAnimJoint j in joint.TreeList)
             {
-                MatAnimJoint matjoint = new MatAnimJoint();
+                MatAnimJoint matjoint = new();
                 if (j.MaterialAnimation != null)
-                    foreach (var a in j.MaterialAnimation.List)
+                    foreach (HSD_MatAnim a in j.MaterialAnimation.List)
                     {
-                        MatAnim anm = new MatAnim();
+                        MatAnim anm = new();
 
                         if (a.AnimationObject != null)
                         {
                             FrameCount = (int)Math.Max(FrameCount, a.AnimationObject.EndFrame);
 
-                            foreach (var fdesc in a.AnimationObject.FObjDesc.List)
+                            foreach (HSD_FOBJDesc fdesc in a.AnimationObject.FObjDesc.List)
                                 anm.Tracks.Add(new FOBJ_Player(fdesc));
                         }
 
                         if (a.TextureAnimation != null)
-                            foreach (var t in a.TextureAnimation.List)
+                            foreach (HSD_TexAnim t in a.TextureAnimation.List)
                             {
-                                MatAnimTexture tex = new MatAnimTexture();
+                                MatAnimTexture tex = new();
 
                                 tex.Textures.AddRange(t.ToTOBJs());
 
@@ -175,7 +175,7 @@ namespace HSDRawViewer.Rendering
                                     {
                                         FrameCount = (int)Math.Max(FrameCount, t.AnimationObject.EndFrame);
 
-                                        foreach (var fdesc in t.AnimationObject.FObjDesc.List)
+                                        foreach (HSD_FOBJDesc fdesc in t.AnimationObject.FObjDesc.List)
                                             tex.Tracks.Add(new FOBJ_Player(fdesc));
                                     }
                                 }
@@ -207,8 +207,8 @@ namespace HSDRawViewer.Rendering
         /// <param name="frame"></param>
         public void SetAllFrames(float frame)
         {
-            foreach (var v in Nodes)
-                foreach (var n in v.Nodes)
+            foreach (MatAnimJoint v in Nodes)
+                foreach (MatAnim n in v.Nodes)
                     n.SetFrame(frame);
         }
 
@@ -220,9 +220,9 @@ namespace HSDRawViewer.Rendering
         public MatAnim GetMatAnimAtIndex(int index)
         {
             int i = 0;
-            foreach(var v in Nodes)
+            foreach (MatAnimJoint v in Nodes)
             {
-                foreach(var n in v.Nodes)
+                foreach (MatAnim n in v.Nodes)
                 {
                     if (index == i)
                         return n;
@@ -239,7 +239,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="frame"></param>
         public void SetFrame(int mat_index, float frame)
         {
-            var node = GetMatAnimAtIndex(mat_index);
+            MatAnim node = GetMatAnimAtIndex(mat_index);
             if (node != null)
                 node.SetFrame(frame);
         }

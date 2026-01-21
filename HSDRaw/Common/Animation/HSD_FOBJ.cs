@@ -130,6 +130,31 @@ namespace HSDRaw.Common.Animation
         HSD_A_S_BLEND = 1
     }
 
+    public enum FogTrackType
+    {
+        UNUSED0,
+        HSD_A_F_START = 1,
+        HSD_A_F_END = 2,
+        UNUSED3,
+        UNUSED4,
+        HSD_A_F_R = 5,
+        HSD_A_F_G = 6,
+        HSD_A_F_B = 7,
+        HSD_A_F_A = 8,
+        UNUSED9,
+        UNUSED10,
+        UNUSED11,
+        UNUSED12,
+        UNUSED13,
+        UNUSED14,
+        UNUSED15,
+        UNUSED16,
+        UNUSED17,
+        UNUSED18,
+        UNUSED19,
+        HSD_A_F_ADJCENTER = 20,
+    }
+
     public enum GXInterpolationType
     {
         HSD_A_OP_NONE = 0,

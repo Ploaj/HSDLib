@@ -29,429 +29,430 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GraphEditor));
-            this.graphBox = new System.Windows.Forms.GroupBox();
-            this.glviewport = new OpenTK.WinForms.GLControl();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.trackTree = new System.Windows.Forms.TreeView();
-            this.splitter2 = new System.Windows.Forms.Splitter();
-            this.keyProperty = new System.Windows.Forms.PropertyGrid();
-            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.addTrackButton = new System.Windows.Forms.ToolStripButton();
-            this.removeTrackButton = new System.Windows.Forms.ToolStripButton();
-            this.trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.nudFrame = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.importKeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportKeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addKeyButton = new System.Windows.Forms.ToolStripButton();
-            this.deleteKeyButton = new System.Windows.Forms.ToolStripButton();
-            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.bakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.showAllTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showFrameTicksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showTangentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpButton = new System.Windows.Forms.ToolStripButton();
-            this.shiftValuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.graphBox.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.toolStrip2.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            this.toolStrip1.SuspendLayout();
-            this.SuspendLayout();
+            graphBox = new System.Windows.Forms.GroupBox();
+            glviewport = new OpenTK.WinForms.GLControl();
+            groupBox2 = new System.Windows.Forms.GroupBox();
+            trackTree = new System.Windows.Forms.TreeView();
+            splitter2 = new System.Windows.Forms.Splitter();
+            keyProperty = new System.Windows.Forms.PropertyGrid();
+            toolStrip2 = new System.Windows.Forms.ToolStrip();
+            toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
+            menuImportTracks = new System.Windows.Forms.ToolStripMenuItem();
+            menuExportTracks = new System.Windows.Forms.ToolStripMenuItem();
+            addTrackButton = new System.Windows.Forms.ToolStripButton();
+            removeTrackButton = new System.Windows.Forms.ToolStripButton();
+            trackTypeBox = new System.Windows.Forms.ToolStripComboBox();
+            panel1 = new System.Windows.Forms.Panel();
+            nudFrame = new System.Windows.Forms.NumericUpDown();
+            numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            label4 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            toolStrip1 = new System.Windows.Forms.ToolStrip();
+            toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            importKeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exportKeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            addKeyButton = new System.Windows.Forms.ToolStripButton();
+            deleteKeyButton = new System.Windows.Forms.ToolStripButton();
+            toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
+            bakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            compressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            reverseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            shiftValuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            showAllTracksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            showFrameTicksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            showTangentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            helpButton = new System.Windows.Forms.ToolStripButton();
+            graphBox.SuspendLayout();
+            groupBox2.SuspendLayout();
+            toolStrip2.SuspendLayout();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudFrame).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            toolStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // graphBox
             // 
-            this.graphBox.Controls.Add(this.glviewport);
-            this.graphBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.graphBox.Location = new System.Drawing.Point(366, 49);
-            this.graphBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.graphBox.Name = "graphBox";
-            this.graphBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.graphBox.Size = new System.Drawing.Size(482, 365);
-            this.graphBox.TabIndex = 0;
-            this.graphBox.TabStop = false;
-            this.graphBox.Text = "Graph";
+            graphBox.Controls.Add(glviewport);
+            graphBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            graphBox.Location = new System.Drawing.Point(418, 59);
+            graphBox.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            graphBox.Name = "graphBox";
+            graphBox.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            graphBox.Size = new System.Drawing.Size(551, 493);
+            graphBox.TabIndex = 0;
+            graphBox.TabStop = false;
+            graphBox.Text = "Graph";
             // 
             // glviewport
             // 
-            this.glviewport.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
-            this.glviewport.APIVersion = new System.Version(3, 3, 0, 0);
-            this.glviewport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.glviewport.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
-            this.glviewport.IsEventDriven = true;
-            this.glviewport.Location = new System.Drawing.Point(4, 19);
-            this.glviewport.Name = "glviewport";
-            this.glviewport.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
-            this.glviewport.Size = new System.Drawing.Size(474, 343);
-            this.glviewport.TabIndex = 0;
-            this.glviewport.Load += new System.EventHandler(this.glviewport_Load);
-            this.glviewport.Resize += new System.EventHandler(this.glviewport_Resize);
+            glviewport.API = OpenTK.Windowing.Common.ContextAPI.OpenGL;
+            glviewport.APIVersion = new System.Version(3, 3, 0, 0);
+            glviewport.Dock = System.Windows.Forms.DockStyle.Fill;
+            glviewport.Flags = OpenTK.Windowing.Common.ContextFlags.Default;
+            glviewport.IsEventDriven = true;
+            glviewport.Location = new System.Drawing.Point(5, 24);
+            glviewport.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            glviewport.Name = "glviewport";
+            glviewport.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
+            glviewport.Size = new System.Drawing.Size(541, 465);
+            glviewport.TabIndex = 0;
+            glviewport.Load += glviewport_Load;
+            glviewport.Resize += glviewport_Resize;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.trackTree);
-            this.groupBox2.Controls.Add(this.splitter2);
-            this.groupBox2.Controls.Add(this.keyProperty);
-            this.groupBox2.Controls.Add(this.toolStrip2);
-            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox2.Location = new System.Drawing.Point(0, 0);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox2.Size = new System.Drawing.Size(366, 414);
-            this.groupBox2.TabIndex = 9;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Tracks";
+            groupBox2.Controls.Add(trackTree);
+            groupBox2.Controls.Add(splitter2);
+            groupBox2.Controls.Add(keyProperty);
+            groupBox2.Controls.Add(toolStrip2);
+            groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
+            groupBox2.Location = new System.Drawing.Point(0, 0);
+            groupBox2.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            groupBox2.Size = new System.Drawing.Size(418, 552);
+            groupBox2.TabIndex = 9;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Tracks";
             // 
             // trackTree
             // 
-            this.trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackTree.HideSelection = false;
-            this.trackTree.Location = new System.Drawing.Point(4, 44);
-            this.trackTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.trackTree.Name = "trackTree";
-            this.trackTree.Size = new System.Drawing.Size(170, 367);
-            this.trackTree.TabIndex = 8;
-            this.trackTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trackTree_AfterSelect);
+            trackTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            trackTree.HideSelection = false;
+            trackTree.Location = new System.Drawing.Point(5, 52);
+            trackTree.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            trackTree.Name = "trackTree";
+            trackTree.Size = new System.Drawing.Size(194, 496);
+            trackTree.TabIndex = 8;
+            trackTree.AfterSelect += trackTree_AfterSelect;
             // 
             // splitter2
             // 
-            this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.splitter2.Location = new System.Drawing.Point(174, 44);
-            this.splitter2.Name = "splitter2";
-            this.splitter2.Size = new System.Drawing.Size(3, 367);
-            this.splitter2.TabIndex = 11;
-            this.splitter2.TabStop = false;
+            splitter2.Dock = System.Windows.Forms.DockStyle.Right;
+            splitter2.Location = new System.Drawing.Point(199, 52);
+            splitter2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            splitter2.Name = "splitter2";
+            splitter2.Size = new System.Drawing.Size(3, 496);
+            splitter2.TabIndex = 11;
+            splitter2.TabStop = false;
             // 
             // keyProperty
             // 
-            this.keyProperty.Dock = System.Windows.Forms.DockStyle.Right;
-            this.keyProperty.HelpVisible = false;
-            this.keyProperty.Location = new System.Drawing.Point(177, 44);
-            this.keyProperty.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.keyProperty.Name = "keyProperty";
-            this.keyProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.keyProperty.Size = new System.Drawing.Size(185, 367);
-            this.keyProperty.TabIndex = 10;
-            this.keyProperty.ToolbarVisible = false;
-            this.keyProperty.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.keyProperty_PropertyValueChanged);
+            keyProperty.Dock = System.Windows.Forms.DockStyle.Right;
+            keyProperty.HelpVisible = false;
+            keyProperty.Location = new System.Drawing.Point(202, 52);
+            keyProperty.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            keyProperty.Name = "keyProperty";
+            keyProperty.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+            keyProperty.Size = new System.Drawing.Size(211, 496);
+            keyProperty.TabIndex = 10;
+            keyProperty.ToolbarVisible = false;
+            keyProperty.PropertyValueChanged += keyProperty_PropertyValueChanged;
             // 
             // toolStrip2
             // 
-            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addTrackButton,
-            this.removeTrackButton,
-            this.trackTypeBox});
-            this.toolStrip2.Location = new System.Drawing.Point(4, 19);
-            this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(358, 25);
-            this.toolStrip2.TabIndex = 7;
-            this.toolStrip2.Text = "toolStrip2";
+            toolStrip2.ImageScalingSize = new System.Drawing.Size(20, 20);
+            toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton4, addTrackButton, removeTrackButton, trackTypeBox });
+            toolStrip2.Location = new System.Drawing.Point(5, 24);
+            toolStrip2.Name = "toolStrip2";
+            toolStrip2.Size = new System.Drawing.Size(408, 28);
+            toolStrip2.TabIndex = 7;
+            toolStrip2.Text = "toolStrip2";
+            // 
+            // toolStripDropDownButton4
+            // 
+            toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { menuImportTracks, menuExportTracks });
+            toolStripDropDownButton4.Image = Properties.Resources.ico_folder;
+            toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton4.Name = "toolStripDropDownButton4";
+            toolStripDropDownButton4.Size = new System.Drawing.Size(66, 25);
+            toolStripDropDownButton4.Text = "File";
+            // 
+            // menuImportTracks
+            // 
+            menuImportTracks.Image = Properties.Resources.ts_importfile;
+            menuImportTracks.Name = "menuImportTracks";
+            menuImportTracks.Size = new System.Drawing.Size(224, 26);
+            menuImportTracks.Text = "Import Tracks";
+            menuImportTracks.Click += menuImportTracks_Click;
+            // 
+            // menuExportTracks
+            // 
+            menuExportTracks.Image = Properties.Resources.ts_exportfile;
+            menuExportTracks.Name = "menuExportTracks";
+            menuExportTracks.Size = new System.Drawing.Size(224, 26);
+            menuExportTracks.Text = "Export Tracks";
+            menuExportTracks.Click += menuExportTracks_Click;
             // 
             // addTrackButton
             // 
-            this.addTrackButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.addTrackButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
-            this.addTrackButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.addTrackButton.Name = "addTrackButton";
-            this.addTrackButton.Size = new System.Drawing.Size(23, 22);
-            this.addTrackButton.Text = "Add Track";
-            this.addTrackButton.Click += new System.EventHandler(this.addTrackButton_Click);
+            addTrackButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            addTrackButton.Image = Properties.Resources.ts_add;
+            addTrackButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            addTrackButton.Name = "addTrackButton";
+            addTrackButton.Size = new System.Drawing.Size(29, 25);
+            addTrackButton.Text = "Add Track";
+            addTrackButton.Click += addTrackButton_Click;
             // 
             // removeTrackButton
             // 
-            this.removeTrackButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.removeTrackButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
-            this.removeTrackButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.removeTrackButton.Name = "removeTrackButton";
-            this.removeTrackButton.Size = new System.Drawing.Size(23, 22);
-            this.removeTrackButton.Text = "Remove Track";
-            this.removeTrackButton.Click += new System.EventHandler(this.removeTrackButton_Click);
+            removeTrackButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            removeTrackButton.Image = Properties.Resources.ts_subtract;
+            removeTrackButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            removeTrackButton.Name = "removeTrackButton";
+            removeTrackButton.Size = new System.Drawing.Size(29, 25);
+            removeTrackButton.Text = "Remove Track";
+            removeTrackButton.Click += removeTrackButton_Click;
             // 
             // trackTypeBox
             // 
-            this.trackTypeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.trackTypeBox.Name = "trackTypeBox";
-            this.trackTypeBox.Size = new System.Drawing.Size(140, 25);
-            this.trackTypeBox.SelectedIndexChanged += new System.EventHandler(this.trackTypeBox_SelectedIndexChanged);
+            trackTypeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            trackTypeBox.Name = "trackTypeBox";
+            trackTypeBox.Size = new System.Drawing.Size(159, 28);
+            trackTypeBox.SelectedIndexChanged += trackTypeBox_SelectedIndexChanged;
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.nudFrame);
-            this.panel1.Controls.Add(this.numericUpDown1);
-            this.panel1.Controls.Add(this.label4);
-            this.panel1.Controls.Add(this.label3);
-            this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(366, 25);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(482, 24);
-            this.panel1.TabIndex = 10;
+            panel1.Controls.Add(nudFrame);
+            panel1.Controls.Add(numericUpDown1);
+            panel1.Controls.Add(label4);
+            panel1.Controls.Add(label3);
+            panel1.Controls.Add(label2);
+            panel1.Controls.Add(label1);
+            panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            panel1.Location = new System.Drawing.Point(418, 27);
+            panel1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(551, 32);
+            panel1.TabIndex = 10;
             // 
             // nudFrame
             // 
-            this.nudFrame.Location = new System.Drawing.Point(54, 0);
-            this.nudFrame.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.nudFrame.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.nudFrame.Name = "nudFrame";
-            this.nudFrame.Size = new System.Drawing.Size(166, 23);
-            this.nudFrame.TabIndex = 0;
-            this.nudFrame.ValueChanged += new System.EventHandler(this.nudFrame_ValueChanged);
+            nudFrame.Location = new System.Drawing.Point(62, 0);
+            nudFrame.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            nudFrame.Maximum = new decimal(new int[] { 100000, 0, 0, 0 });
+            nudFrame.Name = "nudFrame";
+            nudFrame.Size = new System.Drawing.Size(190, 27);
+            nudFrame.TabIndex = 0;
+            nudFrame.ValueChanged += nudFrame_ValueChanged;
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(278, 0);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.numericUpDown1.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(77, 23);
-            this.numericUpDown1.TabIndex = 6;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            numericUpDown1.Location = new System.Drawing.Point(318, 0);
+            numericUpDown1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            numericUpDown1.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new System.Drawing.Size(88, 27);
+            numericUpDown1.TabIndex = 6;
+            numericUpDown1.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(460, 6);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(13, 15);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "0";
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(526, 8);
+            label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(17, 20);
+            label4.TabIndex = 5;
+            label4.Text = "0";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(363, 6);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(89, 15);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Value At Frame:";
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(415, 8);
+            label3.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(112, 20);
+            label3.TabIndex = 5;
+            label3.Text = "Value At Frame:";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(229, 5);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 15);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Zoom:";
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(262, 7);
+            label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(52, 20);
+            label2.TabIndex = 5;
+            label2.Text = "Zoom:";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 4);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 15);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Frame:";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(7, 5);
+            label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(53, 20);
+            label1.TabIndex = 5;
+            label1.Text = "Frame:";
             // 
             // toolStrip1
             // 
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripDropDownButton2,
-            this.addKeyButton,
-            this.deleteKeyButton,
-            this.toolStripDropDownButton3,
-            this.toolStripDropDownButton1,
-            this.helpButton});
-            this.toolStrip1.Location = new System.Drawing.Point(366, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(482, 25);
-            this.toolStrip1.TabIndex = 11;
-            this.toolStrip1.Text = "toolStrip1";
+            toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton2, addKeyButton, deleteKeyButton, toolStripDropDownButton3, toolStripDropDownButton1, helpButton });
+            toolStrip1.Location = new System.Drawing.Point(418, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new System.Drawing.Size(551, 27);
+            toolStrip1.TabIndex = 11;
+            toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton2
             // 
-            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importKeysToolStripMenuItem,
-            this.exportKeysToolStripMenuItem});
-            this.toolStripDropDownButton2.Image = global::HSDRawViewer.Properties.Resources.ico_save;
-            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
-            this.toolStripDropDownButton2.Size = new System.Drawing.Size(54, 22);
-            this.toolStripDropDownButton2.Text = "File";
+            toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { importKeysToolStripMenuItem, exportKeysToolStripMenuItem });
+            toolStripDropDownButton2.Image = Properties.Resources.ico_folder;
+            toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            toolStripDropDownButton2.Size = new System.Drawing.Size(66, 24);
+            toolStripDropDownButton2.Text = "File";
             // 
             // importKeysToolStripMenuItem
             // 
-            this.importKeysToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_importfile;
-            this.importKeysToolStripMenuItem.Name = "importKeysToolStripMenuItem";
-            this.importKeysToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.importKeysToolStripMenuItem.Text = "Import Keys";
-            this.importKeysToolStripMenuItem.Click += new System.EventHandler(this.importKeyButton_Click);
+            importKeysToolStripMenuItem.Image = Properties.Resources.ts_importfile;
+            importKeysToolStripMenuItem.Name = "importKeysToolStripMenuItem";
+            importKeysToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            importKeysToolStripMenuItem.Text = "Import Keys";
+            importKeysToolStripMenuItem.Click += importKeyButton_Click;
             // 
             // exportKeysToolStripMenuItem
             // 
-            this.exportKeysToolStripMenuItem.Image = global::HSDRawViewer.Properties.Resources.ts_exportfile;
-            this.exportKeysToolStripMenuItem.Name = "exportKeysToolStripMenuItem";
-            this.exportKeysToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.exportKeysToolStripMenuItem.Text = "Export Keys";
-            this.exportKeysToolStripMenuItem.Click += new System.EventHandler(this.exportKeyButton_Click);
+            exportKeysToolStripMenuItem.Image = Properties.Resources.ts_exportfile;
+            exportKeysToolStripMenuItem.Name = "exportKeysToolStripMenuItem";
+            exportKeysToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            exportKeysToolStripMenuItem.Text = "Export Keys";
+            exportKeysToolStripMenuItem.Click += exportKeyButton_Click;
             // 
             // addKeyButton
             // 
-            this.addKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_add;
-            this.addKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.addKeyButton.Name = "addKeyButton";
-            this.addKeyButton.Size = new System.Drawing.Size(78, 22);
-            this.addKeyButton.Text = "Insert Key";
-            this.addKeyButton.Click += new System.EventHandler(this.addKeyButton_Click);
+            addKeyButton.Image = Properties.Resources.ts_add;
+            addKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            addKeyButton.Name = "addKeyButton";
+            addKeyButton.Size = new System.Drawing.Size(97, 24);
+            addKeyButton.Text = "Insert Key";
+            addKeyButton.Click += addKeyButton_Click;
             // 
             // deleteKeyButton
             // 
-            this.deleteKeyButton.Image = global::HSDRawViewer.Properties.Resources.ts_subtract;
-            this.deleteKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.deleteKeyButton.Name = "deleteKeyButton";
-            this.deleteKeyButton.Size = new System.Drawing.Size(82, 22);
-            this.deleteKeyButton.Text = "Delete Key";
-            this.deleteKeyButton.Click += new System.EventHandler(this.deleteKeyButton_Click);
+            deleteKeyButton.Image = Properties.Resources.ts_subtract;
+            deleteKeyButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            deleteKeyButton.Name = "deleteKeyButton";
+            deleteKeyButton.Size = new System.Drawing.Size(105, 24);
+            deleteKeyButton.Text = "Delete Key";
+            deleteKeyButton.Click += deleteKeyButton_Click;
             // 
             // toolStripDropDownButton3
             // 
-            this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.bakeToolStripMenuItem,
-            this.compressToolStripMenuItem,
-            this.reverseToolStripMenuItem,
-            this.shiftValuesToolStripMenuItem});
-            this.toolStripDropDownButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton3.Image")));
-            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
-            this.toolStripDropDownButton3.Size = new System.Drawing.Size(47, 22);
-            this.toolStripDropDownButton3.Text = "Tools";
+            toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { bakeToolStripMenuItem, compressToolStripMenuItem, reverseToolStripMenuItem, shiftValuesToolStripMenuItem });
+            toolStripDropDownButton3.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton3.Image");
+            toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton3.Name = "toolStripDropDownButton3";
+            toolStripDropDownButton3.Size = new System.Drawing.Size(58, 24);
+            toolStripDropDownButton3.Text = "Tools";
             // 
             // bakeToolStripMenuItem
             // 
-            this.bakeToolStripMenuItem.Name = "bakeToolStripMenuItem";
-            this.bakeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.bakeToolStripMenuItem.Text = "Bake";
-            this.bakeToolStripMenuItem.Click += new System.EventHandler(this.buttonBakeTrack_Click);
+            bakeToolStripMenuItem.Name = "bakeToolStripMenuItem";
+            bakeToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            bakeToolStripMenuItem.Text = "Bake";
+            bakeToolStripMenuItem.Click += buttonBakeTrack_Click;
             // 
             // compressToolStripMenuItem
             // 
-            this.compressToolStripMenuItem.Name = "compressToolStripMenuItem";
-            this.compressToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.compressToolStripMenuItem.Text = "Compress";
-            this.compressToolStripMenuItem.Click += new System.EventHandler(this.buttonCompressTrack_Click);
+            compressToolStripMenuItem.Name = "compressToolStripMenuItem";
+            compressToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            compressToolStripMenuItem.Text = "Compress";
+            compressToolStripMenuItem.Click += buttonCompressTrack_Click;
             // 
             // reverseToolStripMenuItem
             // 
-            this.reverseToolStripMenuItem.Name = "reverseToolStripMenuItem";
-            this.reverseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.reverseToolStripMenuItem.Text = "Reverse";
-            this.reverseToolStripMenuItem.Click += new System.EventHandler(this.reverseButton_Click);
-            // 
-            // toolStripDropDownButton1
-            // 
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showAllTracksToolStripMenuItem,
-            this.showFrameTicksToolStripMenuItem,
-            this.showTangentsToolStripMenuItem});
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(103, 22);
-            this.toolStripDropDownButton1.Text = "Display Options";
-            // 
-            // showAllTracksToolStripMenuItem
-            // 
-            this.showAllTracksToolStripMenuItem.CheckOnClick = true;
-            this.showAllTracksToolStripMenuItem.Name = "showAllTracksToolStripMenuItem";
-            this.showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.showAllTracksToolStripMenuItem.Text = "Show All Tracks";
-            this.showAllTracksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
-            // 
-            // showFrameTicksToolStripMenuItem
-            // 
-            this.showFrameTicksToolStripMenuItem.Checked = true;
-            this.showFrameTicksToolStripMenuItem.CheckOnClick = true;
-            this.showFrameTicksToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.showFrameTicksToolStripMenuItem.Name = "showFrameTicksToolStripMenuItem";
-            this.showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.showFrameTicksToolStripMenuItem.Text = "Show Frame Ticks";
-            this.showFrameTicksToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
-            // 
-            // showTangentsToolStripMenuItem
-            // 
-            this.showTangentsToolStripMenuItem.Checked = true;
-            this.showTangentsToolStripMenuItem.CheckOnClick = true;
-            this.showTangentsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.showTangentsToolStripMenuItem.Name = "showTangentsToolStripMenuItem";
-            this.showTangentsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.showTangentsToolStripMenuItem.Text = "Show Tangents";
-            this.showTangentsToolStripMenuItem.Click += new System.EventHandler(this.OptionCheckChanged);
-            // 
-            // helpButton
-            // 
-            this.helpButton.Image = global::HSDRawViewer.Properties.Resources.ico_known;
-            this.helpButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.helpButton.Name = "helpButton";
-            this.helpButton.Size = new System.Drawing.Size(52, 22);
-            this.helpButton.Text = "Help";
-            this.helpButton.Click += new System.EventHandler(this.helpButton_Click);
+            reverseToolStripMenuItem.Name = "reverseToolStripMenuItem";
+            reverseToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            reverseToolStripMenuItem.Text = "Reverse";
+            reverseToolStripMenuItem.Click += reverseButton_Click;
             // 
             // shiftValuesToolStripMenuItem
             // 
-            this.shiftValuesToolStripMenuItem.Name = "shiftValuesToolStripMenuItem";
-            this.shiftValuesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.shiftValuesToolStripMenuItem.Text = "Shift Values";
-            this.shiftValuesToolStripMenuItem.Click += new System.EventHandler(this.shiftValuesToolStripMenuItem_Click);
+            shiftValuesToolStripMenuItem.Name = "shiftValuesToolStripMenuItem";
+            shiftValuesToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            shiftValuesToolStripMenuItem.Text = "Shift Values";
+            shiftValuesToolStripMenuItem.Click += shiftValuesToolStripMenuItem_Click;
+            // 
+            // toolStripDropDownButton1
+            // 
+            toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { showAllTracksToolStripMenuItem, showFrameTicksToolStripMenuItem, showTangentsToolStripMenuItem });
+            toolStripDropDownButton1.Image = (System.Drawing.Image)resources.GetObject("toolStripDropDownButton1.Image");
+            toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            toolStripDropDownButton1.Size = new System.Drawing.Size(128, 24);
+            toolStripDropDownButton1.Text = "Display Options";
+            // 
+            // showAllTracksToolStripMenuItem
+            // 
+            showAllTracksToolStripMenuItem.CheckOnClick = true;
+            showAllTracksToolStripMenuItem.Name = "showAllTracksToolStripMenuItem";
+            showAllTracksToolStripMenuItem.Size = new System.Drawing.Size(209, 26);
+            showAllTracksToolStripMenuItem.Text = "Show All Tracks";
+            showAllTracksToolStripMenuItem.Click += OptionCheckChanged;
+            // 
+            // showFrameTicksToolStripMenuItem
+            // 
+            showFrameTicksToolStripMenuItem.Checked = true;
+            showFrameTicksToolStripMenuItem.CheckOnClick = true;
+            showFrameTicksToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            showFrameTicksToolStripMenuItem.Name = "showFrameTicksToolStripMenuItem";
+            showFrameTicksToolStripMenuItem.Size = new System.Drawing.Size(209, 26);
+            showFrameTicksToolStripMenuItem.Text = "Show Frame Ticks";
+            showFrameTicksToolStripMenuItem.Click += OptionCheckChanged;
+            // 
+            // showTangentsToolStripMenuItem
+            // 
+            showTangentsToolStripMenuItem.Checked = true;
+            showTangentsToolStripMenuItem.CheckOnClick = true;
+            showTangentsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            showTangentsToolStripMenuItem.Name = "showTangentsToolStripMenuItem";
+            showTangentsToolStripMenuItem.Size = new System.Drawing.Size(209, 26);
+            showTangentsToolStripMenuItem.Text = "Show Tangents";
+            showTangentsToolStripMenuItem.Click += OptionCheckChanged;
+            // 
+            // helpButton
+            // 
+            helpButton.Image = Properties.Resources.ico_known;
+            helpButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            helpButton.Name = "helpButton";
+            helpButton.Size = new System.Drawing.Size(65, 24);
+            helpButton.Text = "Help";
+            helpButton.Click += helpButton_Click;
             // 
             // GraphEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.graphBox);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.toolStrip1);
-            this.Controls.Add(this.groupBox2);
-            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.Name = "GraphEditor";
-            this.Size = new System.Drawing.Size(848, 414);
-            this.graphBox.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.toolStrip2.ResumeLayout(false);
-            this.toolStrip2.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFrame)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(graphBox);
+            Controls.Add(panel1);
+            Controls.Add(toolStrip1);
+            Controls.Add(groupBox2);
+            Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            Name = "GraphEditor";
+            Size = new System.Drawing.Size(969, 552);
+            graphBox.ResumeLayout(false);
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            toolStrip2.ResumeLayout(false);
+            toolStrip2.PerformLayout();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudFrame).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -489,5 +490,8 @@
         private System.Windows.Forms.ToolStripMenuItem reverseToolStripMenuItem;
         private OpenTK.WinForms.GLControl glviewport;
         private System.Windows.Forms.ToolStripMenuItem shiftValuesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton4;
+        private System.Windows.Forms.ToolStripMenuItem menuImportTracks;
+        private System.Windows.Forms.ToolStripMenuItem menuExportTracks;
     }
 }

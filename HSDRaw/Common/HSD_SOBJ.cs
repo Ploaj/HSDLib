@@ -2,6 +2,18 @@
 namespace HSDRaw.Common
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public class HSD_FogAnim : HSDAccessor
+    {
+        public override int TrimmedSize => 0x8;
+
+        public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x00); set => _s.SetReference(0x00, value); }
+
+        public HSD_AOBJ Anim { get => _s.GetReference<HSD_AOBJ>(0x04); set => _s.SetReference(0x04, value); }
+    }
+
+    /// <summary>
     /// Scene Object
     /// </summary>
     public class HSD_SOBJ : HSDAccessor
@@ -14,7 +26,7 @@ namespace HSDRaw.Common
 
         public HSDNullPointerArrayAccessor<HSD_Light> Lights { get => _s.GetReference<HSDNullPointerArrayAccessor<HSD_Light>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public HSD_FogAdjDesc Fog { get => _s.GetReference<HSD_FogAdjDesc>(0x0C); set => _s.SetReference(0x0C, value); }
+        public HSD_FogAnim Fog { get => _s.GetReference<HSD_FogAnim>(0x0C); set => _s.SetReference(0x0C, value); }
     }
 
     /// <summary>

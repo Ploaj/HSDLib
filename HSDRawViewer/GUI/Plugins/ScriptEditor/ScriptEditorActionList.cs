@@ -1,4 +1,5 @@
 ﻿using HSDRaw;
+using HSDRaw.Common.Animation;
 using HSDRaw.Melee.Cmd;
 using HSDRaw.Melee.Pl;
 using System;
@@ -16,7 +17,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
 
         public ScriptSubrountine[] _subroutines { get; set; }
 
-        public delegate void SelectedActionCallback(string symbol, HSDStruct action, int index);
+        public delegate void SelectedActionCallback(string symbol, HSDStruct action, int index, HSD_FigaTree tree);
         public SelectedActionCallback SelectAction;
 
         public delegate void ActionListUpdated();
@@ -83,14 +84,14 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <param name="actions"></param>
         public void LoadActions(SBM_FighterAction[] actions)
         {
-            HashSet<HSDStruct> aHash = new HashSet<HSDStruct>();
-            Queue<HSDStruct> extra = new Queue<HSDStruct>();
-            List<ScriptAction> AllActions = new List<ScriptAction>();
-            List<ScriptSubrountine> Subroutines = new List<ScriptSubrountine>();
+            HashSet<HSDStruct> aHash = new();
+            Queue<HSDStruct> extra = new();
+            List<ScriptAction> AllActions = new();
+            List<ScriptSubrountine> Subroutines = new();
 
             // process actions
             int index = 0;
-            foreach (var v in actions)
+            foreach (SBM_FighterAction v in actions)
             {
                 if (v.SubAction == null)
                     v.SubAction = new SBM_FighterSubactionData();
@@ -102,7 +103,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 AllActions.Add(new ScriptAction(v));
 
                 // cache references
-                foreach (var c in v.SubAction._s.References)
+                foreach (KeyValuePair<int, HSDStruct> c in v.SubAction._s.References)
                 {
                     if (!aHash.Contains(c.Value))
                     {
@@ -117,7 +118,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             index = 0;
             while (extra.Count > 0)
             {
-                var v = extra.Dequeue();
+                HSDStruct v = extra.Dequeue();
                 if (!aHash.Contains(v))
                 {
                     aHash.Add(v);
@@ -127,7 +128,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                     });
                 }
 
-                foreach (var r in v.References)
+                foreach (KeyValuePair<int, HSDStruct> r in v.References)
                     if (!aHash.Contains(r.Value))
                         extra.Enqueue(r.Value);
 
@@ -137,8 +138,8 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
             // initialize array
             _actions = AllActions.ToArray();
             _subroutines = Subroutines.ToArray();
-            actionArrayEditor.SetArrayFromProperty(this, "_actions");
-            subroutineArrayEditor.SetArrayFromProperty(this, "_subroutines");
+            actionArrayEditor.SetArrayFromProperty(this, nameof(_actions));
+            subroutineArrayEditor.SetArrayFromProperty(this, nameof(_subroutines));
         }
 
         /// <summary>
@@ -147,7 +148,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <returns></returns>
         public IEnumerable<SBM_FighterAction> ToActions()
         {
-            foreach (var v in _actions)
+            foreach (ScriptAction v in _actions)
             {
                 yield return v._action;
             }
@@ -184,10 +185,10 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// </summary>
         private void RemoveAllReferences(HSDStruct str)
         {
-            foreach (var v in _actions.Where(e => e._struct.References.ContainsValue(str)).ToArray())
+            foreach (ScriptAction v in _actions.Where(e => e._struct.References.ContainsValue(str)).ToArray())
                 v._struct.RemoveReferenceToStruct(str);
 
-            foreach (var v in _subroutines.Where(e => e._struct.References.ContainsValue(str)).ToArray())
+            foreach (ScriptSubrountine v in _subroutines.Where(e => e._struct.References.ContainsValue(str)).ToArray())
                 v._struct.RemoveReferenceToStruct(str);
 
             // TODO: set these references to dummies or remove the subaction
@@ -199,7 +200,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
         /// <returns></returns>
         public List<Tuple<string, HSDStruct>> GetPointers()
         {
-            List<Tuple<string, HSDStruct>> p = new List<Tuple<string, HSDStruct>>();
+            List<Tuple<string, HSDStruct>> p = new();
 
             p.AddRange(_actions.Select((e, i) => new Tuple<string, HSDStruct>($"{i} {e.ToString()}", e._struct)));
             p.AddRange(_subroutines.Select((e, i) => new Tuple<string, HSDStruct>($"{i} {e.ToString()}", e._struct)));
@@ -221,7 +222,11 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (subroutineArrayEditor != null)
                     subroutineArrayEditor.SelectObject(null);
 
-                SelectAction?.Invoke(action.Symbol, action._struct, Array.FindIndex(_actions, a => a == action));
+                SelectAction?.Invoke(
+                    action.Symbol,
+                    action._struct,
+                    Array.FindIndex(_actions, a => a == action),
+                    action.Animation);
             }
         }
 
@@ -239,7 +244,7 @@ namespace HSDRawViewer.GUI.Plugins.SubactionEditor
                 if (actionArrayEditor != null)
                     actionArrayEditor.SelectObject(null);
 
-                SelectAction?.Invoke(null, action._struct, -1);
+                SelectAction?.Invoke(null, action._struct, -1, null);
             }
         }
 

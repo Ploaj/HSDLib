@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Drawing.Design;
+using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
 namespace HSDRawViewer.Tools
@@ -9,7 +9,7 @@ namespace HSDRawViewer.Tools
     // From https://www.codeproject.com/Articles/13793/A-UITypeEditor-for-easy-editing-of-flag-enum-prope
     public class FlagCheckedListBox : CheckedListBox
     {
-        private System.ComponentModel.Container components = null;
+        private readonly System.ComponentModel.Container components = null;
 
         public FlagCheckedListBox()
         {
@@ -44,7 +44,7 @@ namespace HSDRawViewer.Tools
         // Adds an integer value and its associated description
         public FlagCheckedListBoxItem Add(int v, string c)
         {
-            FlagCheckedListBoxItem item = new FlagCheckedListBoxItem(v, c);
+            FlagCheckedListBoxItem item = new(v, c);
             Items.Add(item);
             return item;
         }
@@ -235,7 +235,7 @@ namespace HSDRawViewer.Tools
     public class FlagEnumUIEditor : UITypeEditor
     {
         // The checklistbox
-        private FlagCheckedListBox flagEnumCB;
+        private readonly FlagCheckedListBox flagEnumCB;
 
         public FlagEnumUIEditor()
         {

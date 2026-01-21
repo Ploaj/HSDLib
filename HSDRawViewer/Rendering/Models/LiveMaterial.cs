@@ -34,7 +34,7 @@ namespace HSDRawViewer.Rendering.Models
             if (mobj == null || mobj.Material == null)
                 return;
 
-            var color = mobj.Material;
+            HSD_Material color = mobj.Material;
 
             Ambient.X = color.AMB_R / 255f;
             Ambient.Y = color.AMB_G / 255f;
@@ -54,7 +54,7 @@ namespace HSDRawViewer.Rendering.Models
             Shininess = color.Shininess;
             Alpha = color.Alpha;
 
-            var pp = mobj.PEDesc;
+            HSD_PEDesc pp = mobj.PEDesc;
             if (pp != null)
             {
                 Ref0 = pp.AlphaRef0 / 255f;
@@ -69,7 +69,7 @@ namespace HSDRawViewer.Rendering.Models
         /// <param name="frame"></param>
         public void ApplyAnim(List<FOBJ_Player> tracks, float frame)
         {
-            foreach (var t in tracks)
+            foreach (FOBJ_Player t in tracks)
             {
                 switch ((MatTrackType)t.TrackType)
                 {

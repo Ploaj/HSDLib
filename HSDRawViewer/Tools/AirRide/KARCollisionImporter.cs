@@ -4,22 +4,19 @@ using HSDRawViewer.Rendering;
 using IONET.Core.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HSDRawViewer.Tools.AirRide
 {
     public class KARCollisionImporter
     {
-        private List<GXVector3> verts = new List<GXVector3>();
-        private List<KAR_CollisionTriangle> triangles = new List<KAR_CollisionTriangle>();
-        private List<KAR_CollisionJoint> joints = new List<KAR_CollisionJoint>();
+        private readonly List<GXVector3> verts = new();
+        private readonly List<KAR_CollisionTriangle> triangles = new();
+        private readonly List<KAR_CollisionJoint> joints = new();
 
-        private List<GXVector3> zverts = new List<GXVector3>();
-        private List<KAR_ZoneCollisionTriangle> ztriangles = new List<KAR_ZoneCollisionTriangle>();
-        private List<KAR_ZoneCollisionJoint> zjoints = new List<KAR_ZoneCollisionJoint>();
+        private readonly List<GXVector3> zverts = new();
+        private readonly List<KAR_ZoneCollisionTriangle> ztriangles = new();
+        private readonly List<KAR_ZoneCollisionJoint> zjoints = new();
 
         /// <summary>
         /// 
@@ -37,11 +34,11 @@ namespace HSDRawViewer.Tools.AirRide
         public KAR_grCollisionNode ImportFromModel(string filepath)
         {
             // import model scene
-            var scene = IONET.IOManager.LoadScene(filepath, new IONET.ImportSettings());
+            IONET.Core.IOScene scene = IONET.IOManager.LoadScene(filepath, new IONET.ImportSettings());
 
             // calculate mesh bounding
             int meshIndex = 0;
-            foreach (var mesh in scene.Models[0].Meshes)
+            foreach (IOMesh mesh in scene.Models[0].Meshes)
             {
                 mesh.MakeTriangles();
 
@@ -78,11 +75,11 @@ namespace HSDRawViewer.Tools.AirRide
         {
             string joint_name = null;
             Matrix4x4 inverse = Matrix4x4.Identity;
-            foreach (var v in mesh.Vertices)
+            foreach (IOVertex v in mesh.Vertices)
             {
                 if (v.Envelope != null)
                 {
-                    foreach (var w in v.Envelope.Weights)
+                    foreach (IONET.Core.IOBoneWeight w in v.Envelope.Weights)
                     {
                         if (w.Weight > 0)
                         {
@@ -106,13 +103,13 @@ namespace HSDRawViewer.Tools.AirRide
             int vertStart = verts.Count;
             int faceStart = triangles.Count;
 
-            foreach (var v in mesh.Vertices)
+            foreach (IOVertex v in mesh.Vertices)
             {
-                var p = Vector3.Transform(v.Position, inverse);
+                Vector3 p = Vector3.Transform(v.Position, inverse);
                 verts.Add(new GXVector3() { X = p.X, Y = p.Y, Z = p.Z });
             }
 
-            foreach (var p in mesh.Polygons)
+            foreach (IOPolygon p in mesh.Polygons)
             {
                 for (int i = 0; i < p.Indicies.Count; i += 3)
                 {
@@ -134,11 +131,11 @@ namespace HSDRawViewer.Tools.AirRide
                     }
                     else
                     {
-                        var v3 = mesh.Vertices[p.Indicies[i + 2]];
-                        var v2 = mesh.Vertices[p.Indicies[i + 1]];
-                        var v1 = mesh.Vertices[p.Indicies[i]];
+                        IOVertex v3 = mesh.Vertices[p.Indicies[i + 2]];
+                        IOVertex v2 = mesh.Vertices[p.Indicies[i + 1]];
+                        IOVertex v1 = mesh.Vertices[p.Indicies[i]];
 
-                        var normal = Math3D.CalculateSurfaceNormal(
+                        OpenTK.Mathematics.Vector3 normal = Math3D.CalculateSurfaceNormal(
                             new OpenTK.Mathematics.Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
                             new OpenTK.Mathematics.Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
                             new OpenTK.Mathematics.Vector3(v3.Position.X, v3.Position.Y, v3.Position.Z));
@@ -187,7 +184,7 @@ namespace HSDRawViewer.Tools.AirRide
             // two triangles per side
             // so first we need to verify this
 
-            foreach (var v in mesh.Vertices)
+            foreach (IOVertex v in mesh.Vertices)
             {
                 v.Normal = Vector3.Zero;
                 v.UVs.Clear();
@@ -211,22 +208,22 @@ namespace HSDRawViewer.Tools.AirRide
             Matrix4x4 inverse = Matrix4x4.Identity;
             string joint_name = null;
 
-            foreach (var v in mesh.Vertices)
+            foreach (IOVertex v in mesh.Vertices)
             {
-                var p = Vector3.Transform(v.Position, inverse);
+                Vector3 p = Vector3.Transform(v.Position, inverse);
                 zverts.Add(new GXVector3() { X = p.X, Y = p.Y, Z = p.Z });
             }
 
-            Dictionary<OpenTK.Mathematics.Vector3, int> normalToPoly = new Dictionary<OpenTK.Mathematics.Vector3, int>();
-            foreach (var p in mesh.Polygons)
+            Dictionary<OpenTK.Mathematics.Vector3, int> normalToPoly = new();
+            foreach (IOPolygon p in mesh.Polygons)
             {
                 for (int i = 0; i < p.Indicies.Count; i += 3)
                 {
-                    var v3 = mesh.Vertices[p.Indicies[i + 2]];
-                    var v2 = mesh.Vertices[p.Indicies[i + 1]];
-                    var v1 = mesh.Vertices[p.Indicies[i]];
+                    IOVertex v3 = mesh.Vertices[p.Indicies[i + 2]];
+                    IOVertex v2 = mesh.Vertices[p.Indicies[i + 1]];
+                    IOVertex v1 = mesh.Vertices[p.Indicies[i]];
 
-                    var normal = Math3D.CalculateSurfaceNormal(
+                    OpenTK.Mathematics.Vector3 normal = Math3D.CalculateSurfaceNormal(
                         new OpenTK.Mathematics.Vector3(v1.Position.X, v1.Position.Y, v1.Position.Z),
                         new OpenTK.Mathematics.Vector3(v2.Position.X, v2.Position.Y, v2.Position.Z),
                         new OpenTK.Mathematics.Vector3(v3.Position.X, v3.Position.Y, v3.Position.Z));

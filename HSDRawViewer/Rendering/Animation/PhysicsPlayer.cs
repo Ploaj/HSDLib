@@ -12,8 +12,8 @@ namespace HSDRawViewer.Rendering.Animation
 
         public void ResetPhyics(LiveJObj manager)
         {
-            foreach (var s in Sets)
-                foreach (var d in s.PhysicsBones)
+            foreach (Dynamics s in Sets)
+                foreach (DynamicsParamHeap d in s.PhysicsBones)
                 {
                     d.Reset(manager);
                 }
@@ -21,7 +21,7 @@ namespace HSDRawViewer.Rendering.Animation
 
         public void ProcessAndApplyDynamics(LiveJObj manager, bool apply_hit)
         {
-            foreach (var v in Sets)
+            foreach (Dynamics v in Sets)
                 v.Think(manager, apply_hit ? Hitbubbles : null, false, 8, 0);
         }
 

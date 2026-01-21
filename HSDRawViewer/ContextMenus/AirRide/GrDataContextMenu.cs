@@ -1,14 +1,12 @@
-﻿using HSDRaw;
-using HSDRaw.AirRide.Gr;
-using HSDRaw.AirRide.Gr.Data;
-using HSDRaw.GX;
-using HSDRawViewer.Rendering;
+﻿using HSDRaw.AirRide.Gr.Data;
+using HSDRawViewer.Converters;
+using HSDRawViewer.IO;
+using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.AirRide
@@ -19,36 +17,79 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
         public GrDataContextMenu() : base()
         {
-            ToolStripMenuItem ImportCollModel = new ToolStripMenuItem("Import Collision Model");
+            ToolStripMenuItem importKdt = new("Import From KDT");
+            importKdt.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    string f = FileIO.OpenFile(JsonHelper.FileFilter);
+                    if (f != null)
+                    {
+                        var kd = KdFile.OpenKdFile(f);
+                        kd.ImportIntoNode(data);
+                    }
+                }
+            };
+            Items.Add(importKdt);
+
+            ToolStripMenuItem exportKdt = new("Export To KDT");
+            exportKdt.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    string f = FileIO.SaveFile("", "map");
+                    if (f != null)
+                    {
+                        var kd = new KdFile(data);
+                        kd.Save(f);
+                    }
+                }
+            };
+            Items.Add(exportKdt);
+
+
+            ToolStripMenuItem recal = new("Recalculate Partition");
+            recal.Click += (sender, args) =>
+            {
+                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+                {
+                    HSDRaw.Common.HSD_JOBJ jobj = ModelImporter.ImportModelFromFile(null);
+                    data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
+                }
+            };
+            Items.Add(recal);
+
+
+            ToolStripMenuItem ImportCollModel = new("Import Collision Model");
             ImportCollModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
+                    string f = FileIO.OpenFile(IONET.IOManager.GetImportFileFilter(true, false), "coll_model.dae");
                     if (f != null)
                     {
                         // generate collision node
                         data.CollisionNode = KARCollisionImporter.GenerateCollisionNode(f);
 
                         // generate partition
-                        var jobj = Converters.ModelImporter.ImportModelFromFile(f);
+                        HSDRaw.Common.HSD_JOBJ jobj = Converters.ModelImporter.ImportModelFromFile(f);
                         data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
                     }
                 }
             };
             Items.Add(ImportCollModel);
 
-            ToolStripMenuItem ExportCollModel = new ToolStripMenuItem("Export Collision Model");
+            ToolStripMenuItem ExportCollModel = new("Export Collision Model");
             ExportCollModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
-                    var modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+                    string modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
+                    string modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
 
                     if (modelPath != null)
                     {
-                        var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "coll_model.dae");
+                        string f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "coll_model.dae");
                         if (f != null)
                         {
                             KARCollisionExporter.ExportCollisionModel(f, modelPath, data);
@@ -78,17 +119,17 @@ namespace HSDRawViewer.ContextMenus.AirRide
             //};
             //Items.Add(ImportZoneModel);
 
-            ToolStripMenuItem ExportZoneModel = new ToolStripMenuItem("Export Zone Model");
+            ToolStripMenuItem ExportZoneModel = new("Export Zone Model");
             ExportZoneModel.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
-                    var modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
+                    string modelFileName = System.IO.Path.GetFileNameWithoutExtension(MainForm.Instance.FilePath) + "Model.dat";
+                    string modelPath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, modelFileName);
 
                     if (modelPath != null)
                     {
-                        var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "zone_model.dae");
+                        string f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "zone_model.dae");
                         if (f != null)
                         {
                             KARCollisionExporter.ExportZoneModel(f, modelPath, data);
@@ -103,12 +144,12 @@ namespace HSDRawViewer.ContextMenus.AirRide
             Items.Add(new ToolStripSeparator());
 
 
-            ToolStripMenuItem ExportAreaBones = new ToolStripMenuItem("Export Area Bones");
+            ToolStripMenuItem ExportAreaBones = new("Export Area Bones");
             ExportAreaBones.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "area_pos.dae");
+                    string f = FileIO.SaveFile(IONET.IOManager.GetExportFileFilter(true, false), "area_pos.dae");
                     if (f != null)
                     {
                         KARPositionExporter.ExportAreaPositions(f, data.PositionNode.ItemAreaPos[0]);
@@ -119,79 +160,79 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
 
 
-            ToolStripMenuItem test = new ToolStripMenuItem("Test Edit");
-            test.Click += (sender, args) =>
-            {
-                if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
-                {
-                    //data.PartitionNode.Partition = HSDRaw.Tools.KAR.Bucket.GeneratePartitionNode(data.CollisionNode);
+            //ToolStripMenuItem test = new("Test Edit");
+            //test.Click += (sender, args) =>
+            //{
+            //    if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
+            //    {
+            //        //data.PartitionNode.Partition = HSDRaw.Tools.KAR.Bucket.GeneratePartitionNode(data.CollisionNode);
 
-                    // analyze splitting pattern
+            //        // analyze splitting pattern
 
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
-                    if (f != null)
-                    {
-                        var file = new HSDRawFile(f);
+            //        string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
+            //        if (f != null)
+            //        {
+            //            HSDRawFile file = new(f);
 
-                        foreach (var r in file.Roots)
-                        {
-                            if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
-                            {
-                                var jobj = new LiveJObj(m.MainModel.RootNode);
-                                data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(jobj, data.CollisionNode);
-                            }
-                        }
-                    }
+            //            foreach (HSDRootNode r in file.Roots)
+            //            {
+            //                if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
+            //                {
+            //                    LiveJObj jobj = new(m.MainModel.RootNode);
+            //                    data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(jobj, data.CollisionNode);
+            //                }
+            //            }
+            //        }
 
-                    //var tri = data.CollisionNode.Triangles;
+            //        //var tri = data.CollisionNode.Triangles;
 
-                    //var indices = tri
-                    //    .Select((value, index) => new { Value = value, Index = index })
-                    //    .Where(item => item.Value.Rough != 0)
-                    //    .Select(item => item.Index)
-                    //    .ToArray();
+            //        //var indices = tri
+            //        //    .Select((value, index) => new { Value = value, Index = index })
+            //        //    .Where(item => item.Value.Rough != 0)
+            //        //    .Select(item => item.Index)
+            //        //    .ToArray();
 
-                    //var ct = data.PartitionNode.Partition.CollidableTriangles;
-                    //foreach (var b in data.PartitionNode.Partition.Buckets)
-                    //{
-                    //    for (int i = b.RoughStart; i < b.RoughStart + b.RoughCount; i++)
-                    //    {
-                    //        var index = indices[data.PartitionNode.Partition.RoughIndices[i]];
+            //        //var ct = data.PartitionNode.Partition.CollidableTriangles;
+            //        //foreach (var b in data.PartitionNode.Partition.Buckets)
+            //        //{
+            //        //    for (int i = b.RoughStart; i < b.RoughStart + b.RoughCount; i++)
+            //        //    {
+            //        //        var index = indices[data.PartitionNode.Partition.RoughIndices[i]];
 
-                    //        bool found = false;
-                    //        for (int j = b.CollTriangleStart; j < b.CollTriangleStart + b.CollTriangleCount; j++)
-                    //        {
-                    //            if (ct[j] == index)
-                    //            {
-                    //                found = true;
-                    //                break;
-                    //            }
-                    //        }
+            //        //        bool found = false;
+            //        //        for (int j = b.CollTriangleStart; j < b.CollTriangleStart + b.CollTriangleCount; j++)
+            //        //        {
+            //        //            if (ct[j] == index)
+            //        //            {
+            //        //                found = true;
+            //        //                break;
+            //        //            }
+            //        //        }
 
-                    //        if (!found)
-                    //            Console.WriteLine("!found " + tri[index].Rough);
-                    //        else
-                    //            Console.WriteLine("found " + tri[index].Rough);
+            //        //        if (!found)
+            //        //            Console.WriteLine("!found " + tri[index].Rough);
+            //        //        else
+            //        //            Console.WriteLine("found " + tri[index].Rough);
 
-                    //    }
-                    //}
-                }
-            };
-            Items.Add(test);
+            //        //    }
+            //        //}
+            //    }
+            //};
+            //Items.Add(test);
 
 
-            ToolStripMenuItem clear = new ToolStripMenuItem("Clear Bones");
+            ToolStripMenuItem clear = new("Clear Bones");
             clear.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var j = data.CollisionNode.Joints;
-                    foreach (var joint in j)
+                    KAR_CollisionJoint[] j = data.CollisionNode.Joints;
+                    foreach (KAR_CollisionJoint joint in j)
                         joint.BoneID = 0;
                     data.CollisionNode.Joints = j;
 
-                    var z = data.CollisionNode.ZoneJoints;
-                    foreach (var joint in z)
+                    KAR_ZoneCollisionJoint[] z = data.CollisionNode.ZoneJoints;
+                    foreach (KAR_ZoneCollisionJoint joint in z)
                         joint.BoneID = 0;
                     data.CollisionNode.ZoneJoints = z;
                 }
@@ -199,22 +240,22 @@ namespace HSDRawViewer.ContextMenus.AirRide
             Items.Add(clear);
 
 
-            ToolStripMenuItem ds = new ToolStripMenuItem("Remove Zone Type Flags");
+            ToolStripMenuItem ds = new("Remove Zone Type Flags");
             ds.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    var tri = data.CollisionNode.ZoneTriangles;
-                    var joint = data.CollisionNode.ZoneJoints;
+                    KAR_ZoneCollisionTriangle[] tri = data.CollisionNode.ZoneTriangles;
+                    KAR_ZoneCollisionJoint[] joint = data.CollisionNode.ZoneJoints;
 
-                    HashSet<int> flags = new HashSet<int>();
+                    HashSet<int> flags = new();
 
                     int ji = 0;
-                    foreach (var j in joint)
+                    foreach (KAR_ZoneCollisionJoint j in joint)
                     {
                         for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                         {
-                            var t = tri[i];
+                            KAR_ZoneCollisionTriangle t = tri[i];
 
                             if (!flags.Contains(t.Type) || j.x14 != -1)
                             {

@@ -23,6 +23,8 @@ using HSDRaw.AirRide;
 using HSDRaw.Melee.Pl.ftData;
 using HSDRaw.Melee.Ty;
 using HSDRaw.MEX.Akaneia;
+using HSDRaw.MEX.Characters;
+using HSDRaw.Melee.Cmd;
 
 namespace HSDRaw
 {
@@ -808,6 +810,7 @@ namespace HSDRaw
                 x => x.StartsWith("vcDataWheel") ?  new KAR_vcDataWheel() : null,
                 x => x.StartsWith("grModelMotion") ?  new KAR_grModelMotion() : null,
                 x => x.StartsWith("grModel") ?  new KAR_grModel() : null,
+                x => x.StartsWith("grDataCommon") ?  new KAR_grDataCommon() : null,
                 x => x.StartsWith("grData") ?  new KAR_grData() : null,
                 x => x.EndsWith("_texg") ?  new HSD_TEXGraphicBank() : null,
                 x => x.EndsWith("_ptcl") ?  new HSD_ParticleGroup() : null,
@@ -855,6 +858,12 @@ namespace HSDRaw
                 x => x.StartsWith("sss_pages") ?  new AK_StagePages() : null,
                 x => x.EndsWith("bitfont") ?  new AK_BitFont() : null,
                 x => x.EndsWith("_shape") ?  new AK_Shape() : null,
+                x => x.EndsWith("Color") ?  new HSDColorArray() : null,
+                x => x.EndsWith("camera_param") ?  new MEX_ResultCameraParam() : null,
+                x => x.EndsWith("trophy_icon_param") ?  new SBM_TrophyIcon() : null,
+                x => x.EndsWith("ALDYakuAll") ?  new HSDNullPointerArrayAccessor<SBM_ItemSubactionData>() : null,
+                x => x.EndsWith("hazard_list") ?  new HSDNullPointerArrayAccessor<HSD_String>() : null,
+                x => x.EndsWith("fog_list") ?  new HSDNullPointerArrayAccessor<HSD_FogAnim>() : null,
                 x => new HSDAccessor(),
         };
 

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HSDRaw.Common;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using HSDRaw.Common;
 
 namespace HSDRawViewer.Rendering
 {
@@ -55,7 +55,7 @@ namespace HSDRawViewer.Rendering
             {
                 if (Loaded || RGBAData.Count == 0)
                     return;
-                
+
                 GL.GenTextures(1, out _glid);
 
                 GL.BindTexture(TextureTarget.Texture2D, _glid);
@@ -87,14 +87,14 @@ namespace HSDRawViewer.Rendering
                 for (int i = 1; i < RGBAData.Count; i++)
                 {
                     GL.TexImage2D(
-                        TextureTarget.Texture2D, 
-                        i, 
-                        PixelInternalFormat.Rgba, 
-                        Width / (int)Math.Pow(2, i), 
-                        Height / (int)Math.Pow(2, i), 
-                        0, 
-                        PixelFormat.Bgra, 
-                        PixelType.UnsignedByte, 
+                        TextureTarget.Texture2D,
+                        i,
+                        PixelInternalFormat.Rgba,
+                        Width / (int)Math.Pow(2, i),
+                        Height / (int)Math.Pow(2, i),
+                        0,
+                        PixelFormat.Bgra,
+                        PixelType.UnsignedByte,
                         RGBAData[i]);
                 }
 
@@ -115,7 +115,7 @@ namespace HSDRawViewer.Rendering
             /// </summary>
             public void Delete()
             {
-                if(Loaded)
+                if (Loaded)
                 {
                     GL.DeleteTexture(_glid);
 
@@ -129,8 +129,8 @@ namespace HSDRawViewer.Rendering
         }
 
         public int TextureCount => Textures.Count;
-        
-        private List<GLTexture> Textures = new List<GLTexture>();
+
+        private readonly List<GLTexture> Textures = new();
 
         /// <summary>
         /// 
@@ -152,7 +152,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="index2"></param>
         public void Swap(int index1, int index2)
         {
-            var t = Textures[index1];
+            GLTexture t = Textures[index1];
             Textures[index1] = Textures[index2];
             Textures[index2] = t;
         }
@@ -163,16 +163,16 @@ namespace HSDRawViewer.Rendering
         /// <param name="bmp"></param>
         public int Add(Bitmap bmp)
         {
-            Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
+            Rectangle rect = new(0, 0, bmp.Width, bmp.Height);
             System.Drawing.Imaging.BitmapData bmpData =
              bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            
+
             IntPtr ptr = bmpData.Scan0;
-            
+
             int bytes = bmpData.Stride * bmp.Height;
             byte[] rgbValues = new byte[bytes];
-            
+
             System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes); bmp.UnlockBits(bmpData);
 
             return Add(rgbValues, bmp.Width, bmp.Height);
@@ -200,7 +200,7 @@ namespace HSDRawViewer.Rendering
             if (tobj.ImageData == null)
                 return -1;
 
-            List<byte[]> mips = new List<byte[]>();
+            List<byte[]> mips = new();
 
             if (tobj.LOD != null && tobj.ImageData.MaxLOD != 0)
             {
@@ -235,7 +235,7 @@ namespace HSDRawViewer.Rendering
         {
             OpenTKResources.MakeCurrentDummy();
 
-            foreach(var tex in Textures)
+            foreach (GLTexture tex in Textures)
                 tex.Delete();
 
             Textures.Clear();
@@ -253,7 +253,7 @@ namespace HSDRawViewer.Rendering
 
             return Vector2.Zero;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -291,7 +291,7 @@ namespace HSDRawViewer.Rendering
         /// <param name="actualSize"></param>
         public void RenderTexture(int index, int windowWidth, int windowHeight, bool actualSize)
         {
-            var texture = Textures[index];
+            GLTexture texture = Textures[index];
 
             RenderTexture(index, windowWidth, windowHeight, actualSize, texture.Width, texture.Height);
         }
@@ -343,13 +343,13 @@ namespace HSDRawViewer.Rendering
             {
                 if (windowHeight > windowWidth)
                 {
-                    var aspect = actualHeight / (float)actualWidth;
+                    float aspect = actualHeight / (float)actualWidth;
                     w = windowWidth;
                     h = windowWidth * aspect;
                 }
                 else
                 {
-                    var aspect = actualWidth / (float)actualHeight;
+                    float aspect = actualWidth / (float)actualHeight;
                     w = windowHeight * aspect;
                     h = windowHeight;
                 }
@@ -357,7 +357,7 @@ namespace HSDRawViewer.Rendering
 
             w /= windowWidth;
             h /= windowHeight;
-            
+
             GL.Color3(1f, 1f, 1f);
             GL.Begin(PrimitiveType.Quads);
             GL.TexCoord2(0, 1); GL.Vertex3(-w, -h, 0);

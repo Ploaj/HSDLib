@@ -12,40 +12,36 @@ namespace HSDRawViewer.ContextMenus
 
         public FOBJContextMenu() : base()
         {
-            ToolStripMenuItem Export = new ToolStripMenuItem("Export Frames TXT");
+            ToolStripMenuItem Export = new("Export Frames TXT");
             Export.Click += (sender, args) =>
             {
-                using (SaveFileDialog d = new SaveFileDialog())
+                using SaveFileDialog d = new();
+                d.Filter = "TXT (*.txt)|*.txt";
+
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    d.Filter = "TXT (*.txt)|*.txt";
+                    if (MainForm.SelectedDataNode.Accessor is HSD_FOBJ fobj)
+                        File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobj));
 
-                    if (d.ShowDialog() == DialogResult.OK)
-                    {
-                        if (MainForm.SelectedDataNode.Accessor is HSD_FOBJ fobj)
-                            File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobj));
-
-                        if (MainForm.SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
-                            File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobjdesc));
-                    }
+                    if (MainForm.SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
+                        File.WriteAllText(d.FileName, ConvFOBJ.ToString(fobjdesc));
                 }
             };
             Items.Add(Export);
 
-            ToolStripMenuItem Import = new ToolStripMenuItem("Import Frames TXT");
+            ToolStripMenuItem Import = new("Import Frames TXT");
             Import.Click += (sender, args) =>
             {
-                using (OpenFileDialog d = new OpenFileDialog())
+                using OpenFileDialog d = new();
+                d.Filter = "TXT (*.txt)|*.txt";
+
+                if (d.ShowDialog() == DialogResult.OK)
                 {
-                    d.Filter = "TXT (*.txt)|*.txt";
+                    if (MainForm.SelectedDataNode.Accessor is HSD_FOBJ fobj)
+                        ConvFOBJ.ImportKeys(fobj, File.ReadAllLines(d.FileName));
 
-                    if (d.ShowDialog() == DialogResult.OK)
-                    {
-                        if (MainForm.SelectedDataNode.Accessor is HSD_FOBJ fobj)
-                            ConvFOBJ.ImportKeys(fobj, File.ReadAllLines(d.FileName));
-
-                        if (MainForm.SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
-                            ConvFOBJ.ImportKeys(fobjdesc, File.ReadAllLines(d.FileName));
-                    }
+                    if (MainForm.SelectedDataNode.Accessor is HSD_FOBJDesc fobjdesc)
+                        ConvFOBJ.ImportKeys(fobjdesc, File.ReadAllLines(d.FileName));
                 }
             };
             Items.Add(Import);

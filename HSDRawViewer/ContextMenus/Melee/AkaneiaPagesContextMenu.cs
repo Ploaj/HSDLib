@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -37,7 +35,7 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public AkaneiaPageContextMenu() : base()
         {
-            ToolStripMenuItem export = new ToolStripMenuItem("Export to Folder");
+            ToolStripMenuItem export = new("Export to Folder");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is AK_StagePage page)
@@ -93,58 +91,58 @@ namespace HSDRawViewer.ContextMenus.Melee
             };
             Items.Add(export);
 
-            ToolStripMenuItem import = new ToolStripMenuItem("Import from Folder");
+            ToolStripMenuItem import = new("Import from Folder");
             import.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is AK_StagePage page)
                 {
-                    var f = FileIO.OpenFolder();
+                    string f = FileIO.OpenFolder();
                     if (f == null)
                         return;
 
                     // load icon file
-                    var iconfile = $"{f}\\icon_data.yml";
+                    string iconfile = $"{f}\\icon_data.yml";
                     AK_StageIconNew[] icons = null;
-                    using (StreamReader r = new StreamReader(iconfile))
+                    using (StreamReader r = new(iconfile))
                     {
-                        var deserializer = new DeserializerBuilder()
+                        IDeserializer deserializer = new DeserializerBuilder()
                             .WithNamingConvention(CamelCaseNamingConvention.Instance)
                             .Build();
                         icons = deserializer.Deserialize<AK_StageIconNew[]>(r);
                     }
 
                     // load position model
-                    var position_file = $"{f}\\position_joint.dat";
+                    string position_file = $"{f}\\position_joint.dat";
                     if (File.Exists(position_file))
                         page.PositionJoint = new HSDRawFile(position_file).Roots[0].Data as HSD_JOBJ;
 
                     // load position animation data
-                    var position_anim_file = $"{f}\\position_animjoint.dat";
+                    string position_anim_file = $"{f}\\position_animjoint.dat";
                     if (File.Exists(position_anim_file))
                         page.PositionAnimEnter = new HSDRawFile(position_anim_file).Roots[0].Data as HSD_AnimJoint;
 
                     // import icons and name textures
-                    Dictionary<string, ushort> iconToIndex = new Dictionary<string, ushort>();
-                    Dictionary<string, ushort> nameToIndex = new Dictionary<string, ushort>();
-                    List<HSD_TOBJ> icon_tobjs = new List<HSD_TOBJ>();
-                    List<HSD_TOBJ> name_tobjs = new List<HSD_TOBJ>();
-                    foreach (var v in icons)
+                    Dictionary<string, ushort> iconToIndex = new();
+                    Dictionary<string, ushort> nameToIndex = new();
+                    List<HSD_TOBJ> icon_tobjs = new();
+                    List<HSD_TOBJ> name_tobjs = new();
+                    foreach (AK_StageIconNew v in icons)
                     {
-                        var icon_file = $"{f}\\{v.IconTexture}";
-                        if (File.Exists(icon_file) && 
+                        string icon_file = $"{f}\\{v.IconTexture}";
+                        if (File.Exists(icon_file) &&
                             !iconToIndex.ContainsKey(v.IconTexture))
                         {
-                            var tobj = new HSD_TOBJ();
+                            HSD_TOBJ tobj = new();
                             tobj.ImportImage(icon_file, HSDRaw.GX.GXTexFmt.CI8, HSDRaw.GX.GXTlutFmt.RGB565);
                             iconToIndex.Add(v.IconTexture, (ushort)icon_tobjs.Count);
                             icon_tobjs.Add(tobj);
                         }
 
-                        var name_file = $"{f}\\{v.NameTexture}";
+                        string name_file = $"{f}\\{v.NameTexture}";
                         if (File.Exists(name_file) &&
                             !nameToIndex.ContainsKey(v.NameTexture))
                         {
-                            var tobj = new HSD_TOBJ();
+                            HSD_TOBJ tobj = new();
                             tobj.ImportImage(name_file, HSDRaw.GX.GXTexFmt.I4, HSDRaw.GX.GXTlutFmt.RGB565);
                             nameToIndex.Add(v.NameTexture, (ushort)name_tobjs.Count);
                             name_tobjs.Add(tobj);
@@ -205,24 +203,24 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public AkaneiaPagesContextMenu() : base()
         {
-            ToolStripMenuItem genPages = new ToolStripMenuItem("Generate Random Stage IDs");
+            ToolStripMenuItem genPages = new("Generate Random Stage IDs");
             genPages.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is AK_StagePages pages)
                 {
-                    var f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "MxPtSSSRn.dat");
+                    string f = Tools.FileIO.SaveFile(ApplicationSettings.HSDFileFilter, "MxPtSSSRn.dat");
                     if (f != null)
                     {
-                        var file = System.IO.File.Exists(f) ? new HSDRaw.HSDRawFile(f) : new HSDRaw.HSDRawFile();
+                        HSDRawFile file = System.IO.File.Exists(f) ? new HSDRaw.HSDRawFile(f) : new HSDRaw.HSDRawFile();
 
-                        var ids = pages.Array.SelectMany(e => e.Icons.Array.Select(e => (ushort)e.ExternalID)).Distinct().Where(e => e != 0).ToArray();
+                        ushort[] ids = pages.Array.SelectMany(e => e.Icons.Array.Select(e => (ushort)e.ExternalID)).Distinct().Where(e => e != 0).ToArray();
 
-                        Stage_IDs data = new Stage_IDs();
+                        Stage_IDs data = new();
                         data.count = ids.Length;
                         data.array = new HSDUShortArray();
                         data.array.Array = ids;
 
-                        var stage_id_node = file.Roots.Find(e => e.Name.Equals("stage_ids"));
+                        HSDRootNode stage_id_node = file.Roots.Find(e => e.Name.Equals("stage_ids"));
 
                         if (stage_id_node == null)
                         {

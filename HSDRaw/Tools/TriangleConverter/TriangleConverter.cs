@@ -15,10 +15,6 @@ namespace HSDRaw.Tools.TriangleConverter
         public uint _minStripLen;
         public bool _backwardSearch;
         public bool _pushCacheHits;
-        private bool useStrips;
-        private uint cacheSize;
-        private uint minStripLen;
-        private bool pushCacheHits;
 
         public TriangleConverter(bool useStrips, uint cacheSize, uint minStripLen, bool pushCacheHits)
         {

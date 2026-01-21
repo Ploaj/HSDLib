@@ -109,9 +109,9 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="e"></param>
         private void PlaybackBar_Paint(object sender, PaintEventArgs e)
         {
-            var rect = e.ClipRectangle;
+            Rectangle rect = e.ClipRectangle;
 
-            using (var backgroundBrush = new LinearGradientBrush(
+            using (LinearGradientBrush backgroundBrush = new(
                 new Point(0, 0),
                 new Point(0, rect.Height),
                 Color.FromArgb(255, 0, 16, 30),
@@ -125,8 +125,8 @@ namespace HSDRawViewer.GUI.Controls
 
 
             float numberOfFrames = EndFrame - StartFrame + 1;
-            var tickWidth = (rect.Width / numberOfFrames);
-            var increment = 1;
+            float tickWidth = (rect.Width / numberOfFrames);
+            int increment = 1;
             float tickStartY = rect.Height * 0.4f;
             float tickTipHeight = (rect.Height - tickStartY) / 3;
 
@@ -134,7 +134,7 @@ namespace HSDRawViewer.GUI.Controls
             float tipMiddleYStart = tickStartY + tickTipHeight;
             float tipLowerYStart = tickStartY + tickTipHeight + tickTipHeight;
 
-            RectangleF tipRect = new RectangleF(0, 0, tickWidth, tickTipHeight);
+            RectangleF tipRect = new(0, 0, tickWidth, tickTipHeight);
 
             // fix infinity
             if (numberOfFrames == 0)
@@ -149,15 +149,15 @@ namespace HSDRawViewer.GUI.Controls
                 increment = (int)(Math.Ceiling(increment / 5f) * 5f);
 
             // vertical
-            using (Font drawFont = new Font("Courier New", 8))
-            using (var fontBrush = new SolidBrush(Color.White))
-            using (var linePen = new Pen(Color.White))
-            using (var sublinePen = new Pen(Color.Gray))
+            using (Font drawFont = new("Courier New", 8))
+            using (SolidBrush fontBrush = new(Color.White))
+            using (Pen linePen = new(Color.White))
+            using (Pen sublinePen = new(Color.Gray))
             {
                 for (float i = 0; i <= numberOfFrames; i++)
                 {
                     // draw frame tip data
-                    foreach (var tip in FrameTips)
+                    foreach (PlaybackBarFrameTip tip in FrameTips)
                     {
                         if (tip.Frame == i)
                         {
@@ -176,20 +176,20 @@ namespace HSDRawViewer.GUI.Controls
                                     break;
                             }
 
-                            using (var brush = new SolidBrush(tip.Color))
-                                switch (tip.Style)
-                                {
-                                    case PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color:
-                                        e.Graphics.FillRectangle(brush, tipRect);
-                                        break;
-                                    case PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Text:
-                                        e.Graphics.DrawString(tip.Text, drawFont, brush, tipRect.X, tipRect.Y - 3);
-                                        break;
-                                }
+                            using SolidBrush brush = new(tip.Color);
+                            switch (tip.Style)
+                            {
+                                case PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Color:
+                                    e.Graphics.FillRectangle(brush, tipRect);
+                                    break;
+                                case PlaybackBarFrameTip.PlaybackBarFrameTipStyle.Text:
+                                    e.Graphics.DrawString(tip.Text, drawFont, brush, tipRect.X, tipRect.Y - 3);
+                                    break;
+                            }
                         }
                     }
 
-                    var x = i * tickWidth;
+                    float x = i * tickWidth;
 
                     if (i % increment == 0)
                     {
@@ -204,7 +204,7 @@ namespace HSDRawViewer.GUI.Controls
             }
 
             // selected frame
-            using (var brush = new SolidBrush(Color.FromArgb(180, Color.LightBlue)))
+            using (SolidBrush brush = new(Color.FromArgb(180, Color.LightBlue)))
             {
                 e.Graphics.FillRectangle(brush, Frame * tickWidth, tickStartY, tickWidth, rect.Height);
             }
@@ -250,10 +250,10 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="x"></param>
         private void PickSelectedFrame(float x)
         {
-            var rect = ClientRectangle;
+            Rectangle rect = ClientRectangle;
 
             float numberOfFrames = EndFrame - StartFrame + 1;
-            var tickWidth = (rect.Width / numberOfFrames);
+            float tickWidth = (rect.Width / numberOfFrames);
 
             // fix infinity
             if (numberOfFrames == 0)

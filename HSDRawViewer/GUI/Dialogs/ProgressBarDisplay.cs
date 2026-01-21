@@ -7,7 +7,7 @@ namespace HSDRawViewer.GUI.Dialog
     public partial class ProgressBarDisplay : Form
     {
         public delegate double WorkDelegate(object sender, DoWorkEventArgs e);
-        private ProgressClass ProgressClass;
+        private readonly ProgressClass ProgressClass;
 
         public ProgressBarDisplay(ProgressClass p)
         {
@@ -24,7 +24,7 @@ namespace HSDRawViewer.GUI.Dialog
 
         public void DoWork()
         {
-            if(!backgroundWorker1.IsBusy)
+            if (!backgroundWorker1.IsBusy)
                 backgroundWorker1.RunWorkerAsync();
         }
 

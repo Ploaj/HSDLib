@@ -78,9 +78,7 @@
     <Compile Update="ContextMenus\ParticleContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Update="ContextMenus\Melee\SelectCharContextMenu.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Update="ContextMenus\Melee\SelectCharContextMenu.cs" />
     <Compile Update="ContextMenus\SplineContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -185,17 +183,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="5.7.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="DockPanelSuite" Version="3.1.0" />
-    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.0" />
+    <PackageReference Include="DockPanelSuite" Version="3.1.1" />
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
       <PrivateAssets>all</PrivateAssets>
@@ -207,9 +198,12 @@
     <PackageReference Include="CSCore" Version="1.2.1.2" />
     <PackageReference Include="DotNetZip.Reduced" Version="1.9.1.8" />
     <PackageReference Include="OpenTK" Version="4.7.4" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.6.1" />
     <PackageReference Include="VGAudio" Version="2.2.1" />
     <PackageReference Include="YamlDotNet" Version="12.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HSDRaw\HSDRaw.csproj" />
   </ItemGroup>
 
 </Project>

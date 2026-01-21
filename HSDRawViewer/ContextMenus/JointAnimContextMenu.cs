@@ -1,12 +1,11 @@
 ﻿using HSDRaw.Common.Animation;
-using System;
-using System.Windows.Forms;
-using System.Linq;
-using HSDRawViewer.GUI.Dialog;
-using HSDRawViewer.Rendering.Models;
 using HSDRaw.Tools;
-using System.Collections.Generic;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Rendering;
+using HSDRawViewer.Rendering.Models;
+using System;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
 {
@@ -23,7 +22,7 @@ namespace HSDRawViewer.ContextMenus
 
         public AnimJointContextMenu() : base()
         {
-            ToolStripMenuItem OpenAsAJ = new ToolStripMenuItem("Add AOBJ");
+            ToolStripMenuItem OpenAsAJ = new("Add AOBJ");
             OpenAsAJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
@@ -35,10 +34,10 @@ namespace HSDRawViewer.ContextMenus
             Items.Add(OpenAsAJ);
 
 
-            ToolStripMenuItem addChild = new ToolStripMenuItem("Add Child");
+            ToolStripMenuItem addChild = new("Add Child");
             Items.Add(addChild);
 
-            ToolStripMenuItem createJOBJ = new ToolStripMenuItem("From Scratch");
+            ToolStripMenuItem createJOBJ = new("From Scratch");
             createJOBJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint root)
@@ -52,17 +51,17 @@ namespace HSDRawViewer.ContextMenus
             addChild.DropDownItems.Add(createJOBJ);
 
 
-            ToolStripMenuItem createJOBJFromFile = new ToolStripMenuItem("From File");
+            ToolStripMenuItem createJOBJFromFile = new("From File");
             createJOBJFromFile.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint root)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter);
                     if (f != null)
                     {
-                        HSDRaw.HSDRawFile file = new HSDRaw.HSDRawFile(f);
+                        HSDRaw.HSDRawFile file = new(f);
 
-                        var node = file.Roots[0].Data;
+                        HSDRaw.HSDAccessor node = file.Roots[0].Data;
                         if (node is HSD_AnimJoint newchild)
                             root.AddChild(newchild);
                     }
@@ -92,24 +91,22 @@ namespace HSDRawViewer.ContextMenus
             };
             Items.Add(reverse);
 #endif
-            ToolStripMenuItem editAOBJ = new ToolStripMenuItem("Edit All AObj Flags");
+            ToolStripMenuItem editAOBJ = new("Edit All AObj Flags");
             editAOBJ.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim)
                 {
-                    AObjClass setting = new AObjClass();
+                    AObjClass setting = new();
 
-                    using (PropertyDialog d = new PropertyDialog("AObj Settings", setting))
+                    using PropertyDialog d = new("AObj Settings", setting);
+                    if (d.ShowDialog() == DialogResult.OK)
                     {
-                        if (d.ShowDialog() == DialogResult.OK)
+                        foreach (HSD_AnimJoint n in anim.TreeList)
                         {
-                            foreach (var n in anim.TreeList)
+                            if (n.AOBJ != null)
                             {
-                                if (n.AOBJ != null)
-                                {
-                                    n.AOBJ.EndFrame = setting.EndFrame;
-                                    n.AOBJ.Flags = setting.Flags;
-                                }
+                                n.AOBJ.EndFrame = setting.EndFrame;
+                                n.AOBJ.Flags = setting.Flags;
                             }
                         }
                     }
@@ -119,33 +116,33 @@ namespace HSDRawViewer.ContextMenus
             Items.Add(editAOBJ);
 
 
-            ToolStripMenuItem invertAnimation = new ToolStripMenuItem("Invert");
+            ToolStripMenuItem invertAnimation = new("Invert");
             invertAnimation.Click += (sender, args) =>
             {
-                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim && 
+                if (MainForm.SelectedDataNode.Accessor is HSD_AnimJoint anim &&
                     anim.AOBJ != null &&
                     anim.AOBJ.FObjDesc != null)
                 {
-                    var jobjdesc = new HSDRaw.Common.HSD_JOBJ()
+                    HSDRaw.Common.HSD_JOBJ jobjdesc = new()
                     {
                         SX = 1,
                         SY = 1,
                         SZ = 1,
                     };
 
-                    LiveJObj jobj = new LiveJObj(jobjdesc);
+                    LiveJObj jobj = new(jobjdesc);
 
-                    var tracks = anim.AOBJ.FObjDesc.List.Select(e => new FOBJ_Player(e)).ToList();
-                    var node = new AnimNode();
+                    System.Collections.Generic.List<FOBJ_Player> tracks = anim.AOBJ.FObjDesc.List.Select(e => new FOBJ_Player(e)).ToList();
+                    AnimNode node = new();
 
                     for (int i = 0; i <= anim.AOBJ.EndFrame; i++)
                     {
                         jobj.ApplyAnimation(tracks, i);
                         jobj.RecalculateTransforms(null, false);
 
-                        var world = jobj.WorldTransform.Inverted();
-                        var t = world.ExtractTranslation();
-                        var r = world.ExtractRotationEuler();
+                        OpenTK.Mathematics.Matrix4 world = jobj.WorldTransform.Inverted();
+                        OpenTK.Mathematics.Vector3 t = world.ExtractTranslation();
+                        OpenTK.Mathematics.Vector3 r = world.ExtractRotationEuler();
 
                         node.AddLinearKey(JointTrackType.HSD_A_J_TRAX, i, t.X);
                         node.AddLinearKey(JointTrackType.HSD_A_J_TRAY, i, t.Y);
@@ -159,9 +156,9 @@ namespace HSDRawViewer.ContextMenus
                         jobj.ApplyAnimation(tracks, 0);
                         jobj.RecalculateTransforms(null, false);
 
-                        var world = jobj.WorldTransform.Inverted();
-                        var t = world.ExtractTranslation();
-                        var r = world.ExtractRotationEuler();
+                        OpenTK.Mathematics.Matrix4 world = jobj.WorldTransform.Inverted();
+                        OpenTK.Mathematics.Vector3 t = world.ExtractTranslation();
+                        OpenTK.Mathematics.Vector3 r = world.ExtractRotationEuler();
 
                         node.AddLinearKey(JointTrackType.HSD_A_J_TRAX, 6000, t.X);
                         node.AddLinearKey(JointTrackType.HSD_A_J_TRAY, 6000, t.Y);
@@ -171,10 +168,10 @@ namespace HSDRawViewer.ContextMenus
                         node.AddLinearKey(JointTrackType.HSD_A_J_ROTZ, 6000, r.Z);
                     }
 
-                    JointAnimManager m = new JointAnimManager();
+                    JointAnimManager m = new();
                     m.Nodes.Add(node);
 
-                    var na = m.ToAnimJoint(jobjdesc, AOBJ_Flags.ANIM_LOOP);
+                    HSD_AnimJoint na = m.ToAnimJoint(jobjdesc, AOBJ_Flags.ANIM_LOOP);
                     anim.AOBJ = na.AOBJ;
                 }
             };

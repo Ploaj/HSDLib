@@ -1,13 +1,12 @@
-﻿using System;
+﻿using HSDRawViewer.Sound;
+using System;
 using System.Windows.Forms;
-using HSDRawViewer.Sound;
-using HSDRawViewer.Tools;
 
 namespace HSDRawViewer.GUI.Extra
 {
     public partial class SoundScriptEditor : UserControl
     {
-        private SoundBankEditor _soundBankEditor;
+        private readonly SoundBankEditor _soundBankEditor;
         private SEMEntry _entry;
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace HSDRawViewer.GUI.Extra
         private void RefreshEntry()
         {
             scriptArrayEditor.SetArrayFromProperty(_entry, "Scripts");
-            
+
             if (_entry.SoundBank != null)
             {
                 _soundBankEditor.Visible = true;
@@ -61,7 +60,7 @@ namespace HSDRawViewer.GUI.Extra
                 soundBox.Dock = DockStyle.Fill;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -71,8 +70,7 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (scriptArrayEditor.SelectedObject is SEMScript sound)
             {
-                byte[] d;
-                if (SEM.CompileSEMScript(scriptBox.Text, out d) == -1)
+                if (SEM.CompileSEMScript(scriptBox.Text, out byte[] d) == -1)
                     sound.CommandData = d;
                 scriptBox.Text = SEM.DecompileSEMScript(sound.CommandData);
             }
@@ -144,10 +142,10 @@ namespace HSDRawViewer.GUI.Extra
             if (scriptArrayEditor.SelectedObject is SEMScript sound)
             {
                 // TODO: figure out how these values are stored
-                var pitch = sound.GetOPCodeValue(0x0C);
+                int pitch = sound.GetOPCodeValue(0x0C);
                 if (pitch == -1)
                     pitch = 0;
-                var reverb = sound.GetOPCodeValue(0x10);
+                int reverb = sound.GetOPCodeValue(0x10);
                 if (reverb == -1)
                     reverb = 0;
                 _soundBankEditor.PlaySound(pitch, reverb);
@@ -161,14 +159,14 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void mushroomButton_Click(object sender, EventArgs e)
         {
-            var entries = _entry.Scripts;
+            SEMScript[] entries = _entry.Scripts;
 
             SEMScript[] newEntries = new SEMScript[((entries.Length - 1) * 3) + 1];
             newEntries[0] = entries[0];
 
             for (int i = 0; i < entries.Length - 1; i++)
             {
-                var entry = entries[1 + i];
+                SEMScript entry = entries[1 + i];
 
                 // normal entry
                 newEntries[1 + i * 3] = entry;
@@ -177,8 +175,8 @@ namespace HSDRawViewer.GUI.Extra
 
                 // mushroom small -350
                 short small_pitch = -350;
-                byte[] small_pitch_command = new byte[] { 0x0C, 0x00, (byte)((small_pitch >> 8) & 0xFF), (byte)((small_pitch) & 0xFF)};
-                var small = new SEMScript();
+                byte[] small_pitch_command = new byte[] { 0x0C, 0x00, (byte)((small_pitch >> 8) & 0xFF), (byte)((small_pitch) & 0xFF) };
+                SEMScript small = new();
                 small.Name = entry.Name + "_small";
                 small.CommandData = new byte[entry.CommandData.Length + 4];
                 Array.Copy(entry.CommandData, 0, small.CommandData, 0, 8);
@@ -189,7 +187,7 @@ namespace HSDRawViewer.GUI.Extra
                 // mushroom big 450
                 short big_pitch = 450;
                 byte[] big_pitch_command = new byte[] { 0x0C, 0x00, (byte)((big_pitch >> 8) & 0xFF), (byte)((big_pitch) & 0xFF) };
-                var big = new SEMScript();
+                SEMScript big = new();
                 big.Name = entry.Name + "_big";
                 big.CommandData = new byte[entry.CommandData.Length + 4];
                 Array.Copy(entry.CommandData, 0, big.CommandData, 0, 8);

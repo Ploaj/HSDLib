@@ -1,7 +1,8 @@
 ﻿using HSDRaw.GX;
 using HSDRaw.Tools;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Dialog
@@ -35,8 +36,7 @@ namespace HSDRawViewer.GUI.Dialog
         {
             get
             {
-                GXTexFmt fmt;
-                Enum.TryParse(cbFormat.SelectedValue.ToString(), out fmt);
+                Enum.TryParse(cbFormat.SelectedValue.ToString(), out GXTexFmt fmt);
                 return fmt;
             }
             set
@@ -48,8 +48,7 @@ namespace HSDRawViewer.GUI.Dialog
         {
             get
             {
-                GXTlutFmt fmt;
-                Enum.TryParse(sbPalFormat.SelectedValue.ToString(), out fmt);
+                Enum.TryParse(sbPalFormat.SelectedValue.ToString(), out GXTlutFmt fmt);
                 return fmt;
             }
             set
@@ -122,44 +121,42 @@ namespace HSDRawViewer.GUI.Dialog
                 propertyGrid1.SelectedObject = ISettings;
         }
 
-        public void ApplySettings(Bitmap bmp)
+        public void ApplySettings(Image<Bgra32> image)
         {
-            Console.WriteLine("Applying settings");
             if (TextureFormat == GXTexFmt.IA4 || TextureFormat == GXTexFmt.IA8)
             {
-                for(int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
+                for (int x = 0; x < image.Width; x++)
+                    for (int y = 0; y < image.Height; y++)
                     {
-                        bmp.SetPixel(x, y, ApplyChannels(bmp.GetPixel(x, y), IASettings.LumChannel, IASettings.AlphaChannel));
+                        image[x, y] = ApplyChannels(image[x, y], IASettings.LumChannel, IASettings.AlphaChannel);
                     }
             }
-
+            else
             if (TextureFormat == GXTexFmt.I8 || TextureFormat == GXTexFmt.I4)
             {
-                for (int x = 0; x < bmp.Width; x++)
-                    for (int y = 0; y < bmp.Height; y++)
+                for (int x = 0; x < image.Width; x++)
+                    for (int y = 0; y < image.Height; y++)
                     {
-                        bmp.SetPixel(x, y, ApplyChannels(bmp.GetPixel(x, y), ISettings.AlphaChannel, ISettings.AlphaChannel));
+                        image[x, y] = ApplyChannels(image[x, y], ISettings.AlphaChannel, ISettings.AlphaChannel);
                     }
-                bmp.Save("test.png");
             }
         }
 
-        private Color ApplyChannels(Color input, ChannelType color, ChannelType alpha)
+        private Bgra32 ApplyChannels(Bgra32 input, ChannelType color, ChannelType alpha)
         {
-            return Color.FromArgb(
-                GetChannel(input, ChannelType.ALPHA, alpha), 
-                GetChannel(input, ChannelType.RED, color), 
-                GetChannel(input, ChannelType.GREEN, color), 
-                GetChannel(input, ChannelType.BLUE, color));
+            return new Bgra32(
+                GetChannel(input, ChannelType.RED, color),
+                GetChannel(input, ChannelType.GREEN, color),
+                GetChannel(input, ChannelType.BLUE, color),
+                GetChannel(input, ChannelType.ALPHA, alpha));
         }
 
-        private byte GetChannel(Color input, ChannelType inputChannel, ChannelType channel)
+        private byte GetChannel(Bgra32 input, ChannelType inputChannel, ChannelType channel)
         {
-            var r = input.R;
-            var g = input.G;
-            var b = input.B;
-            var a = input.A;
+            byte r = input.R;
+            byte g = input.G;
+            byte b = input.B;
+            byte a = input.A;
 
             switch (channel)
             {

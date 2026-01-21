@@ -1,11 +1,6 @@
-﻿using HSDRaw.MEX.Akaneia;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+﻿using HSDRaw.Common;
+using HSDRaw.MEX.Akaneia;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.Melee
@@ -16,16 +11,17 @@ namespace HSDRawViewer.ContextMenus.Melee
 
         public AkaneiaShapeContextMenu() : base()
         {
-            ToolStripMenuItem export = new ToolStripMenuItem("Import Shape From Image");
+            ToolStripMenuItem export = new("Import Shape From Image");
             export.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is AK_Shape page)
                 {
-                    var f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+                    string f = Tools.FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
 
                     if (f != null)
                     {
-                        var tobj = Converters.TOBJConverter.ImportTOBJFromFile(f, HSDRaw.GX.GXTexFmt.RGBA8, HSDRaw.GX.GXTlutFmt.IA8);
+                        HSD_TOBJ tobj = new();
+                        tobj.ImportImage(f, HSDRaw.GX.GXTexFmt.RGBA8, HSDRaw.GX.GXTlutFmt.IA8);
                         page.FromTOBJ(tobj);
                     }
                 }

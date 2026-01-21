@@ -8,7 +8,7 @@ namespace HSDRawViewer.GUI.Extra
     /// </summary>
     public partial class SEMEditorTool : Form
     {
-        private SEMEditor _semeditor;
+        private readonly SEMEditor _semeditor;
 
         public SEMEditorTool()
         {
@@ -48,7 +48,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void openSEMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("SEM (*.sem)|*.sem");
+            string f = Tools.FileIO.OpenFile("SEM (*.sem)|*.sem");
             if (f != null)
             {
                 OpenSEMFile(f);
@@ -62,7 +62,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void exportSEMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("SEM (*.sem)|*.sem");
+            string f = Tools.FileIO.SaveFile("SEM (*.sem)|*.sem");
             if (f != null)
             {
                 SaveSEMFile(f);
@@ -152,7 +152,7 @@ namespace HSDRawViewer.GUI.Extra
                 SoundTestDat.Save(f);
             }*/
         }
-        
+
         /// <summary>
         /// 
         /// </summary>

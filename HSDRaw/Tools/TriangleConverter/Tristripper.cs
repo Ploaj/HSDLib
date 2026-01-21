@@ -486,7 +486,7 @@ namespace HSDRaw.Tools.TriangleConverter
                 if ((!m_Triangles[j].Marked) && (!m_TriHeap.Removed(j)))
                 {
                     uint NewDegree = m_TriHeap[j];
-                    NewDegree = NewDegree - 1;
+                    NewDegree--;
                     m_TriHeap.Update(j, NewDegree);
 
                     //Update the candidate list if cache is enabled

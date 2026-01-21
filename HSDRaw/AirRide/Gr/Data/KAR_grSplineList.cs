@@ -9,25 +9,15 @@ namespace HSDRaw.AirRide.Gr.Data
     {
         public override int TrimmedSize => 0x8;
 
-        public HSD_Spline[] Splines
+        public HSDFixedLengthPointerArrayAccessor<HSD_Spline> Splines
         {
             get
             {
-                var spl = _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_Spline>>(0x00);
-                return spl == null ? null : spl.Array;
+                return _s.GetReference<HSDFixedLengthPointerArrayAccessor<HSD_Spline>>(0x00);
             }
             set
             {
-                if (value == null || value.Length == 0)
-                {
-                    _s.SetReference(0x00, null);
-                    Count = 0;
-                }
-                else
-                {
-                    _s.GetCreateReference<HSDFixedLengthPointerArrayAccessor<HSD_Spline>>(0x00).Array = value;
-                    Count = value.Length;
-                }
+                _s.SetReference(0x00, value);
             }
         }
 

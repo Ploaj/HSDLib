@@ -1,5 +1,4 @@
-﻿using HSDRaw;
-using HSDRaw.AirRide.Gr.Data;
+﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
@@ -28,7 +27,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
             {
                 if (_joint == null)
                 {
-                     _data.Y = value;
+                    _data.Y = value;
                 }
                 else _joint.TY = value;
             }

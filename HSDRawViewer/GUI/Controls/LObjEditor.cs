@@ -125,7 +125,7 @@ namespace HSDRawViewer.GUI.Controls
 
         public class LightPropAttenuation : LightPropEye
         {
-            private HSD_LightAttn _attn;
+            private readonly HSD_LightAttn _attn;
 
             [Category("3. Attenuation Properties")]
             public float A0 { get => _attn.A0; set => _attn.A0 = value; }
@@ -160,7 +160,7 @@ namespace HSDRawViewer.GUI.Controls
 
         public class LightPropAttenuationInterest : LightPropEyeInterest
         {
-            private HSD_LightAttn _attn;
+            private readonly HSD_LightAttn _attn;
 
             [Category("3. Attenuation Properties")]
             public float A0 { get => _attn.A0; set => _attn.A0 = value; }
@@ -195,7 +195,7 @@ namespace HSDRawViewer.GUI.Controls
 
         public class LightPropInfinite : LightPropEye
         {
-            private HSDAccessor _acc;
+            private readonly HSDAccessor _acc;
 
             [Category("3. Infinite Properties")]
             public float Shininess { get => _acc._s.GetFloat(0x00); set => _acc._s.SetFloat(0x00, value); }
@@ -218,7 +218,7 @@ namespace HSDRawViewer.GUI.Controls
 
         public class LightPropPoint : LightPropEye
         {
-            private HSD_LightPoint _point;
+            private readonly HSD_LightPoint _point;
 
             [Category("3. Point Properties"), DisplayName("Ref Brightness"), Description("Specifies the ratio of the brightness at the reference point.\nValid Values are between 0-1")]
             public float ReferenceBrightness { get => _point.RefBrightness; set => _point.RefBrightness = value; }
@@ -250,10 +250,10 @@ namespace HSDRawViewer.GUI.Controls
             public override void Draw()
             {
                 Rendering.DrawShape.DrawSphere(
-                    OpenTK.Mathematics.Matrix4.CreateTranslation(SourceX, SourceY, SourceZ), 
-                    ReferenceDistance, 
-                    16, 
-                    16, 
+                    OpenTK.Mathematics.Matrix4.CreateTranslation(SourceX, SourceY, SourceZ),
+                    ReferenceDistance,
+                    16,
+                    16,
                     new OpenTK.Mathematics.Vector3(Color.R / 255f, Color.G / 255f, Color.B / 255f),
                     0.7f);
             }
@@ -261,7 +261,7 @@ namespace HSDRawViewer.GUI.Controls
 
         public class LightPropSpot : LightPropEyeInterest
         {
-            private HSD_LightSpot _spot;
+            private readonly HSD_LightSpot _spot;
 
             [Category("2. Spotlight Properties"), DisplayName("Ref Brightness"), Description("Specifies the ratio of the brightness at the reference point.\nValid Values are between 0-1")]
             public float ReferenceBrightness { get => _spot.RefBrightness; set => _spot.RefBrightness = value; }
@@ -279,7 +279,7 @@ namespace HSDRawViewer.GUI.Controls
             [Category("2. Spotlight Properties"), DisplayName("Spotlight Function"), Description("Defines type of the illumination distribution within cutoff angle.")]
             public GXSpotFunc SpotFunc { get => _spot.SpotFunc; set => _spot.SpotFunc = value; }
 
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -346,7 +346,7 @@ namespace HSDRawViewer.GUI.Controls
             if (_lobj == null)
                 return;
 
-            var ob = _lobj._s.GetReference<HSDAccessor>(0x18);
+            HSDAccessor ob = _lobj._s.GetReference<HSDAccessor>(0x18);
             if (ob != null)
                 ob._s.SetBytes(0, new byte[ob._s.Length]);
 
@@ -412,7 +412,7 @@ namespace HSDRawViewer.GUI.Controls
         /// <param name="windowHeight"></param>
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            var ob = propertyGrid1.SelectedObject;
+            object ob = propertyGrid1.SelectedObject;
 
             if (ob is LightPropBase prop)
                 prop.Draw();

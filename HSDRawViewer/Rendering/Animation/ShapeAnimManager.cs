@@ -7,12 +7,12 @@ namespace HSDRawViewer.Rendering.Animation
 {
     public class ShapeAnimJoint
     {
-        public List<ShapeAnim> Nodes = new List<ShapeAnim>();
+        public List<ShapeAnim> Nodes = new();
     }
 
     public class ShapeAnim
     {
-        public List<FOBJ_Player> Tracks = new List<FOBJ_Player>();
+        public List<FOBJ_Player> Tracks = new();
 
         public float Frame = 0;
 
@@ -59,9 +59,9 @@ namespace HSDRawViewer.Rendering.Animation
 
             if (Nodes.Count > JOBJIndex && Nodes[JOBJIndex].Nodes.Count > DOBJIndex)
             {
-                var node = Nodes[JOBJIndex].Nodes[DOBJIndex];
+                ShapeAnim node = Nodes[JOBJIndex].Nodes[DOBJIndex];
 
-                foreach (var t in node.Tracks)
+                foreach (FOBJ_Player t in node.Tracks)
                 {
                     switch ((ShapeTrackType)t.TrackType)
                     {
@@ -84,19 +84,19 @@ namespace HSDRawViewer.Rendering.Animation
             if (joint == null)
                 return this;
 
-            foreach (var j in joint.TreeList)
+            foreach (HSD_ShapeAnimJoint j in joint.TreeList)
             {
-                ShapeAnimJoint matjoint = new ShapeAnimJoint();
+                ShapeAnimJoint matjoint = new();
                 if (j.ShapeAnimation != null)
-                    foreach (var a in j.ShapeAnimation.List)
+                    foreach (HSD_ShapeAnim a in j.ShapeAnimation.List)
                     {
-                        ShapeAnim anm = new ShapeAnim();
+                        ShapeAnim anm = new();
 
                         if (a.Animation != null)
                         {
                             FrameCount = (int)Math.Max(FrameCount, a.Animation.AnimationObject.EndFrame);
 
-                            foreach (var fdesc in a.Animation.AnimationObject.FObjDesc.List)
+                            foreach (HSD_FOBJDesc fdesc in a.Animation.AnimationObject.FObjDesc.List)
                                 anm.Tracks.Add(new FOBJ_Player(fdesc));
                         }
 
@@ -114,8 +114,8 @@ namespace HSDRawViewer.Rendering.Animation
         /// <param name="frame"></param>
         public void SetAllFrames(float frame)
         {
-            foreach (var v in Nodes)
-                foreach (var n in v.Nodes)
+            foreach (ShapeAnimJoint v in Nodes)
+                foreach (ShapeAnim n in v.Nodes)
                     n.SetFrame(frame);
         }
 
@@ -127,9 +127,9 @@ namespace HSDRawViewer.Rendering.Animation
         public ShapeAnim GetShapeAnimAtIndex(int index)
         {
             int i = 0;
-            foreach (var v in Nodes)
+            foreach (ShapeAnimJoint v in Nodes)
             {
-                foreach (var n in v.Nodes)
+                foreach (ShapeAnim n in v.Nodes)
                 {
                     if (index == i)
                         return n;
@@ -146,7 +146,7 @@ namespace HSDRawViewer.Rendering.Animation
         /// <param name="frame"></param>
         public void SetFrame(int mat_index, float frame)
         {
-            var node = GetShapeAnimAtIndex(mat_index);
+            ShapeAnim node = GetShapeAnimAtIndex(mat_index);
             if (node != null)
                 node.SetFrame(frame);
         }

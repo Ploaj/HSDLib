@@ -121,11 +121,11 @@ namespace HSDRaw.Tools
                         case GXAttribName.GX_VA_NRM:
                             if (attribute.AttributeType != GXAttribType.GX_DIRECT)
                             {
-                                if (Polygon.ShapeSet != null)
-                                {
-                                    var ss = Polygon.ShapeSet.NormalIndicies[shapeset];
-                                    f = attribute.GetDecodedDataAt(ss[index]);
-                                }
+                                //if (Polygon.ShapeSet != null)
+                                //{
+                                //    var ss = Polygon.ShapeSet.NormalIndicies[shapeset];
+                                //    f = attribute.GetDecodedDataAt(ss[index]);
+                                //}
 
                                 Vertex.NRM.X = f[0];
                                 Vertex.NRM.Y = f[1];

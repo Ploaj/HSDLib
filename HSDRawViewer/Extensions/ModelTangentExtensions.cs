@@ -8,9 +8,9 @@ namespace HSDRawViewer.Extensions
 {
     public static class ModelTangentExtensions
     {
-        public static Vector3 defaultTangent = new Vector3(1, 0, 0);
+        public static Vector3 defaultTangent = new(1, 0, 0);
 
-        public static Vector3 defaultBitangent = new Vector3(0, 1, 0);
+        public static Vector3 defaultBitangent = new(0, 1, 0);
 
         public static void CalculateTangentBitangent(this IOMesh mesh)
         {
@@ -18,9 +18,9 @@ namespace HSDRawViewer.Extensions
             Vector3[] nrm = mesh.Vertices.Select(e => new Vector3(e.Normal.X, e.Normal.Y, e.Normal.Z)).ToArray();
             Vector2[] uvs = mesh.Vertices.Select(e => new Vector2(e.UVs[0].X, e.UVs[0].Y)).ToArray();
 
-            List<int> indices = new List<int>();
+            List<int> indices = new();
 
-            foreach (var poly in mesh.Polygons)
+            foreach (IOPolygon poly in mesh.Polygons)
             {
                 poly.ToTriangles(mesh);
                 if (poly.PrimitiveType == IOPrimitive.TRIANGLE)

@@ -1,18 +1,12 @@
-﻿using HSDRaw.Melee.Ef;
-using HSDRaw.Melee.Mn;
-using HSDRaw.MEX;
-using HSDRaw.MEX.Akaneia;
-using HSDRaw.MEX.Stages;
+﻿using HSDRaw.MEX.Stages;
 using System;
-using System.IO;
-using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus
 {
     public class MexMapDataMenu : CommonContextMenu
     {
         public override Type[] SupportedTypes { get; } = new Type[] { typeof(MEX_mexMapData) };
-        
+
         public MexMapDataMenu() : base()
         {
             //ToolStripMenuItem genPages = new ToolStripMenuItem("Generate SSS Pages");

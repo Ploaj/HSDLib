@@ -21,9 +21,13 @@ namespace HSDRaw.Common
 
     public class HSD_FogAdjDesc : HSDAccessor
     {
-        public override int TrimmedSize => 0x08;
+        public override int TrimmedSize => 0x44;
 
-        public HSD_FogDesc Fog { get => _s.GetReference<HSD_FogDesc>(0x00); set => _s.SetReference(0x00, value); }
+        public ushort Center { get => _s.GetUInt16(0x00); set => _s.SetUInt16(0x00, value); }
+
+        public ushort Width { get => _s.GetUInt16(0x02); set => _s.SetUInt16(0x02, value); }
+
+        // matrix data follows
 
     }
 

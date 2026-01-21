@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using System.Linq;
 
 namespace HSDRawViewer.Tools
 {
@@ -46,7 +45,7 @@ namespace HSDRawViewer.Tools
 
         private static ParticleDescriptor[] Descriptors;
 
-        private static Dictionary<byte, ParticleDescriptor> ParticleDict = new Dictionary<byte, ParticleDescriptor>();
+        private static readonly Dictionary<byte, ParticleDescriptor> ParticleDict = new();
 
         /// <summary>
         /// 
@@ -66,19 +65,19 @@ namespace HSDRawViewer.Tools
             if (Initialized)
                 return;
 
-            var deserializer = new DeserializerBuilder()
+            IDeserializer deserializer = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
             string sa = "";
 
-            var scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\ptcl.yml"); ;
+            string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Scripts\ptcl.yml"); ;
             if (File.Exists(scriptPath))
                 sa = File.ReadAllText(scriptPath);
 
             Descriptors = deserializer.Deserialize<ParticleDescriptor[]>(sa);
 
-            foreach (var v in Descriptors)
+            foreach (ParticleDescriptor v in Descriptors)
             {
                 if (!ParticleDict.ContainsKey(v.Code))
                     ParticleDict.Add(v.Code, v);
@@ -99,7 +98,7 @@ namespace HSDRawViewer.Tools
             if (ParticleDict.ContainsKey(code))
                 return ParticleDict[code];
 
-            foreach (var d in Descriptors)
+            foreach (ParticleDescriptor d in Descriptors)
                 if (code == d.Code)
                     return d;
 
@@ -113,7 +112,7 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static List<ParticleEvent> DecompileCode(byte[] cmdList, int cmdPtr = 0)
         {
-            List<ParticleEvent> events = new List<ParticleEvent>();
+            List<ParticleEvent> events = new();
 
             while (true)
             {
@@ -140,11 +139,11 @@ namespace HSDRawViewer.Tools
         /// <returns></returns>
         public static byte[] CompileCode(IEnumerable<ParticleEvent> events)
         {
-            List<byte> o = new List<byte>();
+            List<byte> o = new();
 
             byte lastCode = 0;
 
-            foreach (var v in events)
+            foreach (ParticleEvent v in events)
             {
                 o.AddRange(v.CompileCode());
                 lastCode = v.Code;

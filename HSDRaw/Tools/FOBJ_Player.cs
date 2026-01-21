@@ -68,12 +68,27 @@ namespace HSDRaw.Tools
     /// </summary>
     public class FOBJ_Player
     {
-        public List<FOBJKey> Keys;
-        public byte TrackType;
+        public List<FOBJKey> Keys { get; set; }
+        public byte TrackType { get; set; }
         public JointTrackType JointTrackType { get => (JointTrackType)TrackType; set => TrackType = (byte)value; }
 
-        public int PtclBank;
-        public int PtclId;
+        public int PtclBank { get; set; }
+        public int PtclId { get; set; }
+
+        public bool IsConstant
+        {
+            get
+            {
+                if (Keys.Count <= 1)
+                    return true;
+
+                var val = GetValue(0);
+                for (int i = 1; i < FrameCount; i++)
+                    if (Math.Abs(val - GetValue(i)) > 0.001f)
+                        return false;
+                return true;
+            }
+        }
 
         public FOBJ_Player()
         {
@@ -127,12 +142,12 @@ namespace HSDRaw.Tools
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="Frame"></param>
+        /// <param name="frame"></param>
         /// <returns></returns>
-        public FOBJAnimState GetState(float Frame)
+        public FOBJAnimState GetState(float frame)
         {
             // clamp
-            if(Keys.Count > 1 && Frame >= Keys[Keys.Count - 1].Frame)
+            if (Keys.Count > 1 && frame >= Keys[Keys.Count - 1].Frame)
             {
                 var key = Keys[Keys.Count - 1];
                 return new FOBJAnimState()
@@ -214,7 +229,7 @@ namespace HSDRaw.Tools
                         break;
                 }
 
-                if (t1 > Frame && Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
+                if (t1 > frame && Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
                     break;
 
                 op_intrp = Keys[i].InterpolationType;
@@ -251,7 +266,9 @@ namespace HSDRaw.Tools
             if (state.op_intrp == GXInterpolationType.HSD_A_OP_LIN)
                 return AnimationInterpolationHelper.Lerp(fterm, time, state.p0, state.p1);
 
-            if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
+            if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL || 
+                state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0 || 
+                state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
                 return AnimationInterpolationHelper.SplineGetHermite(1 / fterm, time, state.p0, state.p1, state.d0, state.d1);
 
             return state.p0;
@@ -303,7 +320,7 @@ namespace HSDRaw.Tools
         /// <summary>
         /// Applies frame speed multiplier's to animation
         /// </summary>
-        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> frameSpeedMultiplers)
+        public void ApplyFSMs(IEnumerable<FrameSpeedMultiplier> frameSpeedMultiplers, bool compress)
         {
             if (Keys.Count <= 1)
                 return;
@@ -347,7 +364,8 @@ namespace HSDRaw.Tools
             Keys = newKeys;
 
             // compress track
-            AnimationKeyCompressor.CompressTrack(this);
+            if (compress)
+                AnimationKeyCompressor.CompressTrack(this);
         }
 
         /// <summary>
@@ -373,33 +391,49 @@ namespace HSDRaw.Tools
 
             Keys = newkeys;
         }
-
         /// <summary>
         /// 
         /// </summary>
-        public void EulerFilter()
+        public void AxisFilter()
         {
-            // only apply to rotation tracks
-            if (JointTrackType != JointTrackType.HSD_A_J_ROTX &&
-                JointTrackType != JointTrackType.HSD_A_J_ROTY &&
-                JointTrackType != JointTrackType.HSD_A_J_ROTZ)
+            var pi = (float)Math.PI;
+            var twopi = (float)Math.PI * 2;
+
+            var k = new List<FOBJKey>();
+            var prev = GetValue(0);
+            k.Add(new FOBJKey() { Frame = 0, Value = prev, InterpolationType = GXInterpolationType.HSD_A_OP_LIN});
+
+            for (int i = 1; i <= FrameCount; i++)
             {
-                return;
+                var v = GetValue(i);
+                var delta = v - prev;
+
+                while (delta > pi)
+                {
+                    v -= twopi;
+                    delta -= twopi;
+                }
+                while (delta < -pi)
+                {
+                    v += twopi;
+                    delta += twopi;
+                }
+                k.Add(new FOBJKey() { Frame = i, Value = v, InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
+                prev = v;
             }
 
-            // fix continuity errors
-            for (int i = 1; i < Keys.Count; i++)
-            {
-                var prevKey = Keys[i - 1];
-                var key = Keys[i];
+            Keys = k;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Bake()
+        {
+            var k = new List<FOBJKey>();
 
-                if (Math.Abs(prevKey.Value - key.Value) > Math.PI)
-                {
-                    if (prevKey.Value < key.Value)
-                        key.Value -= (float)(2 * Math.PI);
-                    else
-                        key.Value += (float)(2 * Math.PI);
-                }
+            for (int i = 0; i <= FrameCount; i++)
+            {
+                k.Add(new FOBJKey() { Frame = i, Value = GetValue(i), InterpolationType = GXInterpolationType.HSD_A_OP_LIN });
             }
         }
     }

@@ -1,24 +1,20 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
-using HSDRaw.Common;
 using HSDRaw.GX;
-using HSDRaw.Tools.KAR;
 using HSDRawViewer.Converters.AirRide;
+using HSDRawViewer.GUI.Plugins.AirRide.GrEditors;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using IONET;
 using IONET.Core;
 using IONET.Core.Model;
-using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
-using HSDRawViewer.GUI.Plugins.AirRide.GrEditors;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide
 {
@@ -72,12 +68,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         public DrawOrder DrawOrder => DrawOrder.Last;
 
-        private ViewportControl _viewport;
+        private readonly ViewportControl _viewport;
 
         private KAR_grPartitionBucket[] _buckets;
         private KAR_grPartitionBucket _selectedBucket;
-        private HashSet<int> _selectedTriangles = new HashSet<int>();
-        private HashSet<int> _selectedZoneTriangles = new HashSet<int>();
+        private readonly HashSet<int> _selectedTriangles = new();
+        private readonly HashSet<int> _selectedZoneTriangles = new();
 
         private ushort[] zoneIndices;
         private ushort[] rough_tri_indices;
@@ -92,7 +88,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private RenderJObj RenderJObj { get; set; } = new RenderJObj();
 
-        private List<IGrEditor> Editors = new List<IGrEditor>();
+        private readonly List<IGrEditor> Editors = new();
 
         /// <summary>
         /// 
@@ -354,8 +350,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
             //RenderJObj.Render(cam, true);
 
 
-            var v = cam.PerspectiveMatrix;
-            var m = cam.ModelViewMatrix;
+            Matrix4 v = cam.PerspectiveMatrix;
+            Matrix4 m = cam.ModelViewMatrix;
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref v);
@@ -392,7 +388,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <returns></returns>
         private Matrix4 GetJointWorldTransform(int index)
         {
-            var root = RenderJObj.RootJObj;
+            LiveJObj root = RenderJObj.RootJObj;
 
             if (root == null)
                 return Matrix4.Identity;
@@ -571,11 +567,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
         private void importFromKCLToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile("KCL (*.kcl)|*.kcl");
+            string f = Tools.FileIO.OpenFile("KCL (*.kcl)|*.kcl");
 
             if (f != null)
             {
-                var node = KCLConv.KCLtoKAR(f, out KAR_grCollisionTree tree);
+                KAR_grCollisionNode node = KCLConv.KCLtoKAR(f, out KAR_grCollisionTree tree);
 
                 node.CalculateCollisionFlags();
 
@@ -730,12 +726,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void importFromOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filePath = Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false));
+            string filePath = Tools.FileIO.OpenFile(IOManager.GetImportFileFilter(animation_support: false));
 
             if (filePath == null)
                 return;
 
-            var scene = IOManager.LoadScene(filePath, new ImportSettings()
+            IOScene scene = IOManager.LoadScene(filePath, new ImportSettings()
             {
                 SmoothNormals = true,
                 Triangulate = true,
@@ -817,7 +813,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void exportOBJToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.SaveFile("Waveform OBJ (*.obj)|*.obj");
+            string f = Tools.FileIO.SaveFile("Waveform OBJ (*.obj)|*.obj");
 
             if (f == null)
                 return;
@@ -831,18 +827,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="f"></param>
         private void ExportCollisionModel(string f)
         {
-            IOScene scene = new IOScene();
+            IOScene scene = new();
 
-            IOModel model = new IOModel();
+            IOModel model = new();
             scene.Models.Add(model);
 
-            foreach (var j in _joints)
+            foreach (KAR_CollisionJoint j in _joints)
             {
-                var mesh = new IOMesh();
+                IOMesh mesh = new();
                 mesh.Name = $"Joint_{j.BoneID}";
                 model.Meshes.Add(mesh);
 
-                var poly = new IOPolygon()
+                IOPolygon poly = new()
                 {
                     PrimitiveType = IOPrimitive.TRIANGLE,
                     Indicies = new List<int>()
@@ -851,11 +847,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
 
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
-                    var tri = _tris[i];
+                    KAR_CollisionTriangle tri = _tris[i];
 
-                    var v1 = _vertices[tri.V1];
-                    var v2 = _vertices[tri.V2];
-                    var v3 = _vertices[tri.V3];
+                    GXVector3 v1 = _vertices[tri.V1];
+                    GXVector3 v2 = _vertices[tri.V2];
+                    GXVector3 v3 = _vertices[tri.V3];
 
                     mesh.Vertices.Add(new IOVertex()
                     {
@@ -890,7 +886,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void recalculateCollisionFlagsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var coll = GenerateCollisionNode();
+            KAR_grCollisionNode coll = GenerateCollisionNode();
             coll.CalculateCollisionFlags();
             LoadCollisionData(coll);
         }
@@ -902,12 +898,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide
         /// <param name="e"></param>
         private void loadGrModelToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
+            string f = Tools.FileIO.OpenFile(ApplicationSettings.HSDFileFilter, System.IO.Path.GetFileName(MainForm.Instance.FilePath).Replace(".dat", "Model.dat"));
             if (f != null)
             {
-                var file = new HSDRawFile(f);
+                HSDRawFile file = new(f);
 
-                foreach (var r in file.Roots)
+                foreach (HSDRootNode r in file.Roots)
                 {
                     if (r.Data is KAR_grModel m && m.MainModel != null && m.MainModel.RootNode != null)
                     {

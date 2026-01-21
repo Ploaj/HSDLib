@@ -146,11 +146,14 @@ namespace HSDRaw.Tools.Melee
         public byte[] RebuildAJFile(string[] symbols, bool storeUnused)
         {
             // collect 
-            var usedAnims = Animations;
+            var usedAnims = Animations
+                .GroupBy(p => p.Symbol)
+                .Select(g => g.First())
+                .ToList();
             
             // optional not store unused
             if (!storeUnused)
-                usedAnims = Animations.Where(e => symbols.Contains(e.Symbol)).ToList();
+                usedAnims = usedAnims.Where(e => symbols.Contains(e.Symbol)).ToList();
 
             // clear anim offsets
             foreach (var a in Animations)

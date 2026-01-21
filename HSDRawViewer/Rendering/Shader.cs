@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using OpenTK.Graphics.OpenGL;
-using System.Windows.Forms;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.Rendering
 {
@@ -24,17 +24,17 @@ namespace HSDRawViewer.Rendering
         public bool HasCheckedCompilation { get { return hasCheckedProgramCreation; } }
 
         public const int MAX_BONES = 200;
-        private int BoneBufferID;
+        private readonly int BoneBufferID;
 
         //private ShaderLog errorLog = new ShaderLog();
 
         // Vertex Attributes and Uniforms
         int activeUniformCount = 0;
         int activeAttributeCount = 0;
-        private Dictionary<string, int> vertexAttributeAndUniformLocations = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> vertexAttributeAndUniformLocations = new();
 
         // Write these names to the error log later rather than throwing an exception.
-        private HashSet<string> invalidUniformNames = new HashSet<string>();
+        private readonly HashSet<string> invalidUniformNames = new();
 
         public Shader()
         {
@@ -54,7 +54,7 @@ namespace HSDRawViewer.Rendering
             GL.BindBuffer(BufferTarget.UniformBuffer, BoneBufferID);
             GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, (IntPtr)(f.Length * Vector4.SizeInBytes * 4), f);
 
-            var blockIndex = GL.GetUniformBlockIndex(programId, "BoneTransforms");
+            int blockIndex = GL.GetUniformBlockIndex(programId, "BoneTransforms");
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, blockIndex, BoneBufferID);
         }
 
@@ -183,8 +183,7 @@ namespace HSDRawViewer.Rendering
 
         public int GetVertexAttributeUniformLocation(string name)
         {
-            int value;
-            if (vertexAttributeAndUniformLocations.TryGetValue(name, out value))
+            if (vertexAttributeAndUniformLocations.TryGetValue(name, out int value))
             {
                 return value;
             }
@@ -238,9 +237,7 @@ namespace HSDRawViewer.Rendering
             for (int i = 0; i < activeUniformCount; i++)
             {
                 // Ignore invalid uniforms. 0 is "None" for type.
-                ActiveUniformType uniformType;
-                int uniformSize;
-                string uniform = GL.GetActiveUniform(programId, i, out uniformSize, out uniformType);
+                string uniform = GL.GetActiveUniform(programId, i, out int uniformSize, out ActiveUniformType uniformType);
                 if (uniformType != 0)
                 {
                     uniform = RemoveEndingBrackets(uniform);
@@ -257,9 +254,7 @@ namespace HSDRawViewer.Rendering
             for (int i = 0; i < activeAttributeCount; i++)
             {
                 // Ignore invalid attributes.
-                ActiveAttribType attributeType;
-                int attributeSize;
-                string attribute = GL.GetActiveAttrib(programId, i, out attributeSize, out attributeType);
+                string attribute = GL.GetActiveAttrib(programId, i, out int attributeSize, out ActiveAttribType attributeType);
                 if (attributeType != ActiveAttribType.None)
                 {
                     attribute = RemoveEndingBrackets(attribute);
@@ -342,9 +337,9 @@ namespace HSDRawViewer.Rendering
             GL.ShaderSource(id, File.ReadAllText(shaderFile));
             GL.CompileShader(id);
             GL.AttachShader(program, id);
-            
-            var error = GL.GetShaderInfoLog(id);
-            if(!string.IsNullOrEmpty(error))
+
+            string error = GL.GetShaderInfoLog(id);
+            if (!string.IsNullOrEmpty(error))
             {
                 MessageBox.Show("Shader Compile Error: " + error);
                 File.WriteAllText(type + "_error.txt", error);
@@ -374,17 +369,14 @@ namespace HSDRawViewer.Rendering
 
             // Rendering should be disabled if any error occurs.
             // Check for linker errors first. 
-            int linkStatus = 1;
-            GL.GetProgram(programId, GetProgramParameterName.LinkStatus, out linkStatus);
+            GL.GetProgram(programId, GetProgramParameterName.LinkStatus, out int linkStatus);
             if (linkStatus == 0)
                 return false;
 
             // Make sure the shaders were compiled correctly.
-            int compileStatusVS = 1;
-            GL.GetShader(vertShaderId, ShaderParameter.CompileStatus, out compileStatusVS);
+            GL.GetShader(vertShaderId, ShaderParameter.CompileStatus, out int compileStatusVS);
 
-            int compileStatusFS = 1;
-            GL.GetShader(fragShaderId, ShaderParameter.CompileStatus, out compileStatusFS);
+            GL.GetShader(fragShaderId, ShaderParameter.CompileStatus, out int compileStatusFS);
 
             // Most shaders won't use a geometry shader.
             int compileStatusGS = 1;

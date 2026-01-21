@@ -1,14 +1,10 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.GX;
-using HSDRawViewer.Rendering.GX;
-using OpenTK.Mathematics;
+using HSDRawViewer.Rendering.Shaders;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDRawViewer.Rendering.Shaders;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -101,7 +97,7 @@ namespace HSDRawViewer.Rendering.Renderers
             ParticleGenerator gen,
             int param_19)
         {
-            Particle p = new Particle()
+            Particle p = new()
             {
                 idNum = gen == null ? (short)0 : gen.IDNum,
                 AppSRT = gen == null ? null : gen.AppSRT,
@@ -166,7 +162,7 @@ namespace HSDRawViewer.Rendering.Renderers
         {
             if (SizeCount != 0)
             {
-                Size += (SizeTarget - Size) / (float)SizeCount;
+                Size += (SizeTarget - Size) / SizeCount;
                 SizeCount -= 1;
             }
 
@@ -231,7 +227,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
             if (RotateCount != 0)
             {
-                Rotate += (RotateTarget - Rotate) / (float)RotateCount;
+                Rotate += (RotateTarget - Rotate) / RotateCount;
                 RotateCount -= 1;
             }
         }
@@ -248,7 +244,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
         private float ReadFloat()
         {
-            var d = new byte[]
+            byte[] d = new byte[]
                 {
                     cmdList[cmdPtr + 3],
                     cmdList[cmdPtr + 2],
@@ -352,7 +348,7 @@ namespace HSDRawViewer.Rendering.Renderers
             if (range < 0)
                 return false;
 
-            var vec = m.ExtractTranslation() - Pos;
+            Vector3 vec = m.ExtractTranslation() - Pos;
 
             if (range * range < vec.LengthSquared)
             {
@@ -404,7 +400,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 else
                 {
                     cmdWait = 0;
-                    var final_cmd = cmd & 0xF8;
+                    int final_cmd = cmd & 0xF8;
 
                     if ((cmd & 0xF8) > 0x98)
                     {
@@ -414,7 +410,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             final_cmd = cmd;
                     }
 
-                    switch(final_cmd)
+                    switch (final_cmd)
                     {
                         case 0x80: // Set Position
                             if ((cmd & 1) != 0)
@@ -475,9 +471,9 @@ namespace HSDRawViewer.Rendering.Renderers
                             {
                                 int ptclId = ReadUShort();
 
-                                var desc = Gen.Parent.GetDescriptor(ptclId);
+                                HSD_ParticleGenerator desc = Gen.Parent.GetDescriptor(ptclId);
 
-                                var ptcl = SpawnParticle0(Vector3.Zero,
+                                Particle ptcl = SpawnParticle0(Vector3.Zero,
                                     new Vector3(desc.VX, desc.VY, desc.VZ),
                                     desc.Size, desc.Gravity, this, linkNo, Bank,
                                     desc.Kind, (byte)desc.TexGroup, desc.TrackData, desc.Life, 0,
@@ -538,11 +534,11 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xAA: // spawn random particle
                             {
-                                var id = ReadShort() + (int)(Randf() * ReadShort());
+                                int id = ReadShort() + (int)(Randf() * ReadShort());
 
-                                var desc = Gen.Parent.GetDescriptor(id);
+                                HSD_ParticleGenerator desc = Gen.Parent.GetDescriptor(id);
 
-                                var ptcl = SpawnParticle0(Vector3.Zero,
+                                Particle ptcl = SpawnParticle0(Vector3.Zero,
                                     new Vector3(desc.VX, desc.VY, desc.VZ),
                                     desc.Size, desc.Gravity, this, linkNo, Bank,
                                     desc.Kind, (byte)desc.TexGroup, desc.TrackData, desc.Life, 0,
@@ -577,7 +573,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             Kind |= ParticleKind.PrimEnv;
                             break;
                         case 0xAE: // No Mirror
-                            Kind &= ~(ParticleKind.MirrorS|ParticleKind.MirrorT);
+                            Kind &= ~(ParticleKind.MirrorS | ParticleKind.MirrorT);
                             break;
                         case 0xAF: // Mirror S
                             Kind &= ~ParticleKind.MirrorT;
@@ -630,7 +626,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         case 0xB7: // Move toward JObj
                             {
                                 Matrix4 jobjMatrix = Matrix4.Identity;
-                                var fVar7 = (jobjMatrix.ExtractTranslation() - Pos);
+                                Vector3 fVar7 = (jobjMatrix.ExtractTranslation() - Pos);
                                 float scale = Velocity.LengthFast / fVar7.LengthFast;
                                 Velocity = fVar7 * scale;
                             }
@@ -651,10 +647,10 @@ namespace HSDRawViewer.Rendering.Renderers
                             {
                                 int ptclId = ReadUShort();
 
-                                var curr = Gen.BankGen;
-                                var desc = Gen.Parent.GetDescriptor(ptclId);
+                                HSD_ParticleGenerator curr = Gen.BankGen;
+                                HSD_ParticleGenerator desc = Gen.Parent.GetDescriptor(ptclId);
 
-                                var ptcl = SpawnParticle0(Vector3.Zero,
+                                Particle ptcl = SpawnParticle0(Vector3.Zero,
                                     new Vector3(curr.VX, curr.VY, curr.VZ),
                                     desc.Size, desc.Gravity, this, linkNo, Bank,
                                     desc.Kind, (byte)desc.TexGroup, desc.TrackData, desc.Life, (int)desc.Kind,
@@ -737,11 +733,11 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xBD: // Randomize Velocity
                             {
-                                var value = ReadFloat();
-                                var value_rand = ReadFloat();
-                                var random_num = Randf();
+                                float value = ReadFloat();
+                                float value_rand = ReadFloat();
+                                float random_num = Randf();
 
-                                var velocity_mag = Velocity.LengthFast;
+                                float velocity_mag = Velocity.LengthFast;
 
                                 if (velocity_mag > 1.0E-10)
                                     Velocity *= (value_rand * random_num + value) / velocity_mag;
@@ -841,22 +837,22 @@ namespace HSDRawViewer.Rendering.Renderers
                             }
 
                             {
-                                var amt = (byte)(cmdList[cmdPtr++] * Randf());
+                                byte amt = (byte)(cmdList[cmdPtr++] * Randf());
                                 PrimColorTarget.R = ClampAddByte(PrimColorTarget.R, amt);
                                 EnvColorTarget.R = ClampAddByte(EnvColorTarget.R, amt);
                             }
                             {
-                                var amt = (byte)(cmdList[cmdPtr++] * Randf());
+                                byte amt = (byte)(cmdList[cmdPtr++] * Randf());
                                 PrimColorTarget.G = ClampAddByte(PrimColorTarget.G, amt);
                                 EnvColorTarget.G = ClampAddByte(EnvColorTarget.G, amt);
                             }
                             {
-                                var amt = (byte)(cmdList[cmdPtr++] * Randf());
+                                byte amt = (byte)(cmdList[cmdPtr++] * Randf());
                                 PrimColorTarget.B = ClampAddByte(PrimColorTarget.B, amt);
                                 EnvColorTarget.B = ClampAddByte(EnvColorTarget.B, amt);
                             }
                             {
-                                var amt = (byte)(cmdList[cmdPtr++] * Randf());
+                                byte amt = (byte)(cmdList[cmdPtr++] * Randf());
                                 PrimColorTarget.A = ClampAddByte(PrimColorTarget.A, amt);
                                 EnvColorTarget.A = ClampAddByte(EnvColorTarget.A, amt);
                             }
@@ -907,7 +903,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xE4: // Set FlipS
                             {
-                                var flip = cmdList[cmdPtr++];
+                                byte flip = cmdList[cmdPtr++];
                                 switch (flip)
                                 {
                                     case 0:
@@ -930,7 +926,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xE5: // Set FlipT
                             {
-                                var flip = cmdList[cmdPtr++];
+                                byte flip = cmdList[cmdPtr++];
                                 switch (flip)
                                 {
                                     case 0:
@@ -958,7 +954,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             Kind &= ~ParticleKind.DirVec;
                             break;
                         case 0xE8: // Set Trail
-                            var a = ReadFloat();
+                            float a = ReadFloat();
                             if (a > 0)
                             {
                                 Kind |= ParticleKind.Trail;
@@ -1058,7 +1054,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
                                 MatColCount = ReadExtendedByte();
 
-                                var flag = cmdList[cmdPtr++];
+                                byte flag = cmdList[cmdPtr++];
 
                                 matRGBTarget = matRGB;
 
@@ -1088,7 +1084,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
                                 AmbColCount = ReadExtendedByte();
 
-                                var flag = cmdList[cmdPtr++];
+                                byte flag = cmdList[cmdPtr++];
 
                                 ambRGBTarget = ambRGB;
 
@@ -1110,9 +1106,9 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xED: // Add Random Rotation
                             {
-                                var base_value = ReadFloat();
-                                var random_range = ReadFloat();
-                                var step = cmdList[cmdPtr++];
+                                float base_value = ReadFloat();
+                                float random_range = ReadFloat();
+                                byte step = cmdList[cmdPtr++];
                                 float rand = Randf();
                                 if (step == 0)
                                 {
@@ -1128,12 +1124,12 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
                         case 0xEF: // Create Generate with flag
                             {
-                                var particleId = ReadUShort();
-                                var flag = cmdList[cmdPtr++];
+                                ushort particleId = ReadUShort();
+                                byte flag = cmdList[cmdPtr++];
 
                                 if (Gen != null && Gen.Parent != null)
                                 {
-                                    var gen = Gen.Parent.SpawnGenerator(particleId, Pos.X, Pos.Y, Pos.Z);
+                                    ParticleGenerator gen = Gen.Parent.SpawnGenerator(particleId, Pos.X, Pos.Y, Pos.Z);
 
                                     gen.Kind &= ~(ParticleKind.BitGroup);
                                     gen.Kind |= (ParticleKind)((flag & 7) << 0x19);
@@ -1168,7 +1164,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             {
                                 // transforms by appsrt before removing
                             }
-                            break;       
+                            break;
                         case 0xEC: // set userdata value
                             {
                                 int userdata_index = cmdList[cmdPtr++];
@@ -1192,7 +1188,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             break;
 
 
-                            // Kirby Air Ride Only
+                        // Kirby Air Ride Only
                         case 0xF3:
                             {
                                 ReadExtendedByte();
@@ -1239,7 +1235,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 if (Kind.HasFlag(ParticleKind.Tornado))
                 {
                     // TODO: tornado physics
-                    var gen = Gen;
+                    ParticleGenerator gen = Gen;
                     float dVar36 = (float)Math.Sin(Gravity);
                     float dVar37 = (float)Math.Sin(Friction);
                     float dVar38 = (float)Math.Cos(Gravity);
@@ -1284,7 +1280,7 @@ namespace HSDRawViewer.Rendering.Renderers
         private Matrix4 InvertedViewMatrix;
         private Matrix4 psProjViewMatrix;
 
-        private static byte[,] TexFlipCoords = new byte[,]
+        private static readonly byte[,] TexFlipCoords = new byte[,]
         {
             { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, },
             { 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, },
@@ -1305,7 +1301,7 @@ namespace HSDRawViewer.Rendering.Renderers
         private void UpdatePosition(Camera cam)
         {
             psViewMatrix = cam.ModelViewMatrix;
-            var inv = psViewMatrix.Inverted();
+            Matrix4 inv = psViewMatrix.Inverted();
             psProjViewMatrix = cam.MvpMatrix;
 
             StartX = inv.M11 + inv.M21;
@@ -1355,7 +1351,7 @@ namespace HSDRawViewer.Rendering.Renderers
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.MirroredRepeat);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.MirroredRepeat);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
-                    Kind.HasFlag(ParticleKind.NearestTex) 
+                    Kind.HasFlag(ParticleKind.NearestTex)
                     ? (int)TextureMagFilter.Nearest : (int)TextureMagFilter.Linear);
 
                 // set wrap modes
@@ -1479,7 +1475,7 @@ namespace HSDRawViewer.Rendering.Renderers
                         e.Z = -InvertedViewMatrix.M23 * Size;
                     }
 
-                    var rotation = Rotate;
+                    float rotation = Rotate;
 
                     // todo 803a2e88 - 803a30ec
                     if (Kind.HasFlag(ParticleKind.Trail) || Kind.HasFlag(ParticleKind.DirVec))
@@ -1500,9 +1496,9 @@ namespace HSDRawViewer.Rendering.Renderers
                         float tz_prev = psViewMatrix.M43 + (psViewMatrix.M33 * prev_z + (psViewMatrix.M13 * prev_x + (psViewMatrix.M23 * prev_y)));
                         if (0 != tz_pos && 0 != tz_prev)
                         {
-                            var vpos = Vector3.TransformPosition(Pos, psProjViewMatrix);
-                            var vprev = Vector3.TransformPosition(new Vector3(prev_x, prev_y, prev_z), psProjViewMatrix);
-                            var cfin = vpos.Xy / -tz_pos - vprev.Xy / -tz_prev;
+                            Vector3 vpos = Vector3.TransformPosition(Pos, psProjViewMatrix);
+                            Vector3 vprev = Vector3.TransformPosition(new Vector3(prev_x, prev_y, prev_z), psProjViewMatrix);
+                            Vector2 cfin = vpos.Xy / -tz_pos - vprev.Xy / -tz_prev;
 
                             if (Math.Abs(cfin.Y) >= 0)
                                 rotation = (float)Math.Atan2(cfin.X, cfin.Y);
@@ -1516,14 +1512,14 @@ namespace HSDRawViewer.Rendering.Renderers
                             rotation += Rotate;
                     }
 
-                    if (Math.Abs(rotation) > 0.01) 
+                    if (Math.Abs(rotation) > 0.01)
                     {
-                        Vector3 local_714 = new Vector3(
+                        Vector3 local_714 = new(
                             s.Y * e.Z - (s.Z * e.Y),
                             s.Z * e.X - (s.X * e.Z),
                             s.X * e.Y - (s.Y * e.X));
 
-                        var axis = Matrix4.CreateFromAxisAngle(local_714, rotation); // PSMTXRotAxisRad(&local_744, &local_714);
+                        Matrix4 axis = Matrix4.CreateFromAxisAngle(local_714, rotation); // PSMTXRotAxisRad(&local_744, &local_714);
 
                         s = Vector3.TransformNormal(s, axis);
                         e = Vector3.TransformNormal(e, axis);
@@ -1531,7 +1527,7 @@ namespace HSDRawViewer.Rendering.Renderers
 
                     if (Kind.HasFlag(ParticleKind.Trail))
                     {
-                        var local_6ec = Vector3.Zero;
+                        Vector3 local_6ec = Vector3.Zero;
                         if (Kind.HasFlag(ParticleKind.Tornado))
                         {
                             // TODO: calcTornadoLastPos
@@ -1597,7 +1593,7 @@ namespace HSDRawViewer.Rendering.Renderers
                             _shader.DrawDynamicPOSTEX(4, ref v);
                         }
                     }
-                    
+
                 }
             }
 
@@ -1609,6 +1605,6 @@ namespace HSDRawViewer.Rendering.Renderers
 
             GL.PopAttrib();
         }
-    
+
     }
 }

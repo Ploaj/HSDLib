@@ -1,13 +1,9 @@
 ﻿using HSDRaw.AirRide.Gr;
-using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using HSDRawViewer.Converters;
 using HSDRawViewer.Tools.Animation;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.AirRide
@@ -21,7 +17,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
         /// </summary>
         public GrModelContextMenu()
         {
-            ToolStripMenuItem genPages = new ToolStripMenuItem("Recalculate Model Bounding");
+            ToolStripMenuItem genPages = new("Recalculate Model Bounding");
             genPages.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grMainModel data)
@@ -39,25 +35,25 @@ namespace HSDRawViewer.ContextMenus.AirRide
         /// <returns></returns>
         private static KAR_grModelBounding CalculateModelBounding(HSD_JOBJ jobj)
         {
-            ModelExporter exp = new ModelExporter(
-                jobj, 
+            ModelExporter exp = new(
+                jobj,
                 new ModelExportSettings()
-                { 
+                {
                     ExportTextures = false,
-                }, 
+                },
                 new JointMap());
 
-            List<KAR_grStaticBoundingBox> staticBoxes = new List<KAR_grStaticBoundingBox>();
-            List<KAR_grDynamicBoundingBoxes> dynamicBoxes = new List<KAR_grDynamicBoundingBoxes>();
-            List<ushort> staticIndices = new List<ushort>();
+            List<KAR_grStaticBoundingBox> staticBoxes = new();
+            List<KAR_grDynamicBoundingBoxes> dynamicBoxes = new();
+            List<ushort> staticIndices = new();
 
             // calculate mesh bounding
             int meshIndex = 0;
-            foreach (var m in exp.Scene.Models[0].Meshes)
+            foreach (IONET.Core.Model.IOMesh m in exp.Scene.Models[0].Meshes)
             {
                 float minx = float.MaxValue, miny = float.MaxValue, minz = float.MaxValue;
                 float maxx = float.MinValue, maxy = float.MinValue, maxz = float.MinValue;
-                foreach (var v in m.Vertices)
+                foreach (IONET.Core.Model.IOVertex v in m.Vertices)
                 {
                     minx = Math.Min(minx, v.Position.X);
                     miny = Math.Min(miny, v.Position.Y);
@@ -81,7 +77,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
                 });
 
                 // TODO: dynamic (mesh with rigging)
-                var boneIndex = -1;
+                int boneIndex = -1;
 
                 if (boneIndex == -1)
                 {
@@ -107,7 +103,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
 
             // calculate view regions
             // TODO: generate view regions
-            KAR_grViewRegion region = new KAR_grViewRegion();
+            KAR_grViewRegion region = new();
             region.MinX = -10000;
             region.MinY = -10000;
             region.MinZ = -10000;
@@ -117,7 +113,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
             region.Indices = staticIndices.ToArray();
 
             // update bounding struct
-            var bound = new KAR_grModelBounding();
+            KAR_grModelBounding bound = new();
             bound.ViewRegions = new KAR_grViewRegion[]
             {
                 region

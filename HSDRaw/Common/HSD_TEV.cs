@@ -119,5 +119,75 @@ namespace HSDRaw.Common
         
         public TOBJ_TEVREG_ACTIVE active { get => (TOBJ_TEVREG_ACTIVE)_s.GetInt32(0x1C); set => _s.SetInt32(0x1C, (int)value); }
 
+        private TOBJ_TEVREG_ACTIVE GetActiveColor(TOBJ_TEV_CC c)
+        {
+            switch (c)
+            {
+                case TOBJ_TEV_CC.KONST_RGB:
+                    return TOBJ_TEVREG_ACTIVE.KONST;
+                case TOBJ_TEV_CC.KONST_AAA:
+                    return TOBJ_TEVREG_ACTIVE.KONST_A;
+                case TOBJ_TEV_CC.KONST_BBB:
+                    return TOBJ_TEVREG_ACTIVE.KONST_B;
+                case TOBJ_TEV_CC.KONST_GGG:
+                    return TOBJ_TEVREG_ACTIVE.KONST_G;
+                case TOBJ_TEV_CC.KONST_RRR:
+                    return TOBJ_TEVREG_ACTIVE.KONST_R;
+
+                case TOBJ_TEV_CC.TEX0_AAA:
+                    return TOBJ_TEVREG_ACTIVE.TEV0_A;
+                case TOBJ_TEV_CC.TEX0_RGB:
+                    return TOBJ_TEVREG_ACTIVE.TEV0;
+
+                case TOBJ_TEV_CC.TEX1_AAA:
+                    return TOBJ_TEVREG_ACTIVE.TEV1_A;
+                case TOBJ_TEV_CC.TEX1_RGB:
+                    return TOBJ_TEVREG_ACTIVE.TEV1;
+            }
+            return 0;
+        }
+
+        private TOBJ_TEVREG_ACTIVE GetActiveAlpha(TOBJ_TEV_CA c)
+        {
+            switch (c)
+            {
+                case TOBJ_TEV_CA.KONST_A:
+                    return TOBJ_TEVREG_ACTIVE.KONST_A;
+                case TOBJ_TEV_CA.KONST_B:
+                    return TOBJ_TEVREG_ACTIVE.KONST_B;
+                case TOBJ_TEV_CA.KONST_G:
+                    return TOBJ_TEVREG_ACTIVE.KONST_G;
+                case TOBJ_TEV_CA.KONST_R:
+                    return TOBJ_TEVREG_ACTIVE.KONST_R;
+
+                case TOBJ_TEV_CA.TEX0_A:
+                    return TOBJ_TEVREG_ACTIVE.TEV0_A;
+                case TOBJ_TEV_CA.TEX1_A:
+                    return TOBJ_TEVREG_ACTIVE.TEV1_A;
+            }
+            return 0;
+        }
+
+        public void AutoFlag()
+        {
+            TOBJ_TEVREG_ACTIVE flag = 0;
+            if (active.HasFlag(TOBJ_TEVREG_ACTIVE.COLOR_TEV))
+            {
+                flag |= TOBJ_TEVREG_ACTIVE.COLOR_TEV;
+                flag |= GetActiveColor(color_a_in);
+                flag |= GetActiveColor(color_b_in);
+                flag |= GetActiveColor(color_c_in);
+                flag |= GetActiveColor(color_d_in);
+            }
+            if (active.HasFlag(TOBJ_TEVREG_ACTIVE.ALPHA_TEV))
+            {
+                flag |= TOBJ_TEVREG_ACTIVE.ALPHA_TEV;
+                flag |= GetActiveAlpha(alpha_a_in);
+                flag |= GetActiveAlpha(alpha_b_in);
+                flag |= GetActiveAlpha(alpha_c_in);
+                flag |= GetActiveAlpha(alpha_d_in);
+            }
+            active = flag;
+        }
     }
 }

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using System.Windows.Forms;
+using System;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 
@@ -40,42 +36,40 @@ namespace HSDRawViewer.Rendering.Renderers
         /// </summary>
         private void LoadFont(string fontFile)
         {
-            string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); 
+            string currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string filePath = Path.Combine(currentDirectory, "lib\\" + fontFile);
 
-            using (FileStream s = new FileStream(filePath, FileMode.Open))
-            using (BinaryReader r = new BinaryReader(s))
+            using FileStream s = new(filePath, FileMode.Open);
+            using BinaryReader r = new(s);
+            if (r.ReadByte() != 0xBF || r.ReadByte() != 0xF2)
+                throw new InvalidDataException($"{fontFile} was not a valid bff file");
+
+            image_width = r.ReadInt32();
+            image_height = r.ReadInt32();
+
+            cell_width = r.ReadInt32();
+            cell_height = r.ReadInt32();
+
+            bpp = r.ReadByte();
+            char_offset = r.ReadChar();
+
+            char_widths = r.ReadBytes(256);
+
+            // TODO: support 24 and 32 bpp
+            byte[] imageData = r.ReadBytes((int)(s.Length - s.Position));
+
+            // extend image data
+            byte[] final = new byte[image_width * image_height * 4];
+            for (int i = 0; i < imageData.Length; i++)
             {
-                if (r.ReadByte() != 0xBF || r.ReadByte() != 0xF2)
-                    throw new InvalidDataException($"{fontFile} was not a valid bff file");
-
-                image_width = r.ReadInt32();
-                image_height = r.ReadInt32();
-
-                cell_width = r.ReadInt32();
-                cell_height = r.ReadInt32();
-
-                bpp = r.ReadByte();
-                char_offset = r.ReadChar();
-
-                char_widths = r.ReadBytes(256);
-                
-                // TODO: support 24 and 32 bpp
-                var imageData = r.ReadBytes((int)(s.Length - s.Position));
-
-                // extend image data
-                byte[] final = new byte[image_width * image_height * 4];
-                for (int i = 0; i < imageData.Length; i++)
-                {
-                    final[i * 4] = 255;
-                    final[i * 4 + 1] = 255;
-                    final[i * 4 + 2] = 255;
-                    final[i * 4 + 3] = imageData[i];
-                }
-
-                // add texture
-                TextureManager.Add(final, image_width, image_height);
+                final[i * 4] = 255;
+                final[i * 4 + 1] = 255;
+                final[i * 4 + 2] = 255;
+                final[i * 4 + 3] = imageData[i];
             }
+
+            // add texture
+            TextureManager.Add(final, image_width, image_height);
         }
 
         /// <summary>
@@ -101,7 +95,7 @@ namespace HSDRawViewer.Rendering.Renderers
             if (!Initialized)
                 return;
 
-            var pos = cam.Project(worldSpace, Vector3.Zero);
+            Vector3 pos = cam.Project(worldSpace, Vector3.Zero);
             RenderText(cam, text, pos.X, pos.Y, align, dropShadow);
         }
 
@@ -141,7 +135,7 @@ namespace HSDRawViewer.Rendering.Renderers
             if (!Initialized)
                 return;
 
-            var mat = Matrix4.CreateOrthographicOffCenter(0, screenwidth, screenheight, 0, 0, 1);
+            Matrix4 mat = Matrix4.CreateOrthographicOffCenter(0, screenwidth, screenheight, 0, 0, 1);
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.PushMatrix();
@@ -178,8 +172,8 @@ namespace HSDRawViewer.Rendering.Renderers
             for (int n = 0; n < text.Length; n++)
             {
                 char idx = text[n];
-                var row = (idx - char_offset) / RowPitch;
-                var col = (idx - char_offset) - (row * RowPitch);
+                int row = (idx - char_offset) / RowPitch;
+                int col = (idx - char_offset) - (row * RowPitch);
 
                 float coll_factor = cell_width / (float)image_width;
                 float row_factor = cell_height / (float)image_height;
@@ -229,8 +223,8 @@ namespace HSDRawViewer.Rendering.Renderers
         /// </summary>
         public void Dispose()
         {
-            if(TextureManager != null)
-            { 
+            if (TextureManager != null)
+            {
                 TextureManager.ClearTextures();
                 TextureManager = null;
             }

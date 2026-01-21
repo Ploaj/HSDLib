@@ -265,8 +265,8 @@
         GX_BL_DSTALPHA,
         GX_BL_INVDSTALPHA,
 
-        GX_BL_DSTCLR = GX_BL_SRCCLR,
-        GX_BL_INVDSTCLR = GX_BL_INVSRCCLR
+        //GX_BL_DSTCLR = GX_BL_SRCCLR,
+        //GX_BL_INVDSTCLR = GX_BL_INVSRCCLR
     }
 
     public enum TevColorOp

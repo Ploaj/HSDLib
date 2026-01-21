@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.ArrayExtensions;
+using System.Collections.Generic;
 using System.Reflection;
-using System.ArrayExtensions;
 
 namespace System
 {
@@ -21,14 +21,14 @@ namespace System
         private static Object InternalCopy(Object originalObject, IDictionary<Object, Object> visited)
         {
             if (originalObject == null) return null;
-            var typeToReflect = originalObject.GetType();
+            Type typeToReflect = originalObject.GetType();
             if (IsPrimitive(typeToReflect)) return originalObject;
             if (visited.ContainsKey(originalObject)) return visited[originalObject];
             if (typeof(Delegate).IsAssignableFrom(typeToReflect)) return null;
-            var cloneObject = CloneMethod.Invoke(originalObject, null);
+            object cloneObject = CloneMethod.Invoke(originalObject, null);
             if (typeToReflect.IsArray)
             {
-                var arrayType = typeToReflect.GetElementType();
+                Type arrayType = typeToReflect.GetElementType();
                 if (IsPrimitive(arrayType) == false)
                 {
                     Array clonedArray = (Array)cloneObject;
@@ -57,8 +57,8 @@ namespace System
             {
                 if (filter != null && filter(fieldInfo) == false) continue;
                 if (IsPrimitive(fieldInfo.FieldType)) continue;
-                var originalFieldValue = fieldInfo.GetValue(originalObject);
-                var clonedFieldValue = InternalCopy(originalFieldValue, visited);
+                object originalFieldValue = fieldInfo.GetValue(originalObject);
+                object clonedFieldValue = InternalCopy(originalFieldValue, visited);
                 fieldInfo.SetValue(cloneObject, clonedFieldValue);
             }
         }
@@ -88,7 +88,7 @@ namespace System
             public static void ForEach(this Array array, Action<Array, int[]> action)
             {
                 if (array.LongLength == 0) return;
-                ArrayTraverse walker = new ArrayTraverse(array);
+                ArrayTraverse walker = new(array);
                 do action(array, walker.Position);
                 while (walker.Step());
             }
@@ -97,7 +97,7 @@ namespace System
         internal class ArrayTraverse
         {
             public int[] Position;
-            private int[] maxLengths;
+            private readonly int[] maxLengths;
 
             public ArrayTraverse(Array array)
             {

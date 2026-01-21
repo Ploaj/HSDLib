@@ -1,12 +1,13 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
 using HSDRaw.GX;
-using HSDRawViewer.Converters;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.Tools;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Extra
@@ -16,7 +17,7 @@ namespace HSDRawViewer.GUI.Extra
 
         public class TextureListProxy : ImageArrayItem
         {
-            private List<HSD_TOBJ> tobjs = new List<HSD_TOBJ>();
+            private readonly List<HSD_TOBJ> tobjs = new();
 
             //private Bitmap PreviewImage;
 
@@ -59,6 +60,26 @@ namespace HSDRawViewer.GUI.Extra
                 }
             }
 
+            public System.Drawing.Color Color
+            {
+                get
+                {
+                    using (Image<Bgra32> img = GetTObj().ToImage())
+                    {
+                        Bgra32? color = img.GetSolidColor();
+                        if (color != null)
+                        {
+                            return System.Drawing.Color.FromArgb(
+                                ((color.Value.A & 0xFF) << 24) |
+                                ((color.Value.R & 0xFF) << 16) |
+                                ((color.Value.G & 0xFF) << 8) |
+                                ((color.Value.B & 0xFF)));
+                        }
+                    }
+                    return System.Drawing.Color.Black;
+                }
+            }
+
             public TextureListProxy(int hash)
             {
                 _hash = hash;
@@ -83,7 +104,7 @@ namespace HSDRawViewer.GUI.Extra
 
             public void Replace(HSD_TOBJ newTOBJ)
             {
-                foreach (var t in tobjs)
+                foreach (HSD_TOBJ t in tobjs)
                 {
                     if (newTOBJ.ImageData != null)
                     {
@@ -120,20 +141,20 @@ namespace HSDRawViewer.GUI.Extra
             public void Export()
             {
                 if (tobjs.Count > 0)
-                    tobjs[0].ExportTOBJToFile();
+                    tobjs[0].SaveImagePNG();
             }
 
             public void Export(string file_path)
             {
                 if (tobjs.Count > 0)
-                    using (var bmp = tobjs[0].ToBitmap())
+                    using (Image<Bgra32> bmp = tobjs[0].ToImage())
                         bmp.Save(file_path);
             }
 
-            public Image ToImage()
+            public System.Drawing.Image ToImage()
             {
                 if (tobjs.Count > 0)
-                    return TOBJConverter.ToBitmap(tobjs[0]);
+                    return tobjs[0].ToImage().ToBitmap();
                 return null;
             }
 
@@ -164,23 +185,23 @@ namespace HSDRawViewer.GUI.Extra
         {
             UnloadTextureList();
 
-            var tex = new List<TextureListProxy>();
+            List<TextureListProxy> tex = new();
 
-            foreach (var jobj in root.TreeList)
+            foreach (HSD_JOBJ jobj in root.TreeList)
             {
                 if (jobj.Dobj == null)
                     continue;
 
-                foreach (var dobj in jobj.Dobj.List)
+                foreach (HSD_DOBJ dobj in jobj.Dobj.List)
                 {
                     if (dobj.Mobj == null || dobj.Mobj.Textures == null)
                         continue;
 
-                    foreach (var tobj in dobj.Mobj.Textures.List)
+                    foreach (HSD_TOBJ tobj in dobj.Mobj.Textures.List)
                     {
-                        var hash = HSDRawFile.ComputeHash(tobj.GetDecodedImageData());
+                        int hash = HSDRawFile.ComputeHash(tobj.GetDecodedImageData());
 
-                        var proxy = tex.Find(e => e._hash == hash);
+                        TextureListProxy proxy = tex.Find(e => e._hash == hash);
 
                         if (proxy == null)
                         {
@@ -194,7 +215,7 @@ namespace HSDRawViewer.GUI.Extra
             }
 
             TextureLists = tex.ToArray();
-            textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
+            textureArrayEditor.SetArrayFromProperty(this, nameof(TextureLists));
         }
 
         /// <summary>
@@ -204,10 +225,10 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (TextureLists != null)
             {
-                foreach (var t in TextureLists)
+                foreach (TextureListProxy t in TextureLists)
                     t.Dispose();
                 TextureLists = new TextureListProxy[0];
-                textureArrayEditor.SetArrayFromProperty(this, "TextureLists");
+                textureArrayEditor.SetArrayFromProperty(this, nameof(TextureLists));
             }
         }
 
@@ -219,19 +240,19 @@ namespace HSDRawViewer.GUI.Extra
         {
             if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
             {
-                if (!TOBJConverter.FormatFromString(f, out GXTexFmt imgFormat, out GXTlutFmt palFormat))
+                if (!TOBJExtentions.FormatFromString(f, out GXTexFmt imgFormat, out GXTlutFmt palFormat))
                 {
-                    using (var teximport = new TextureImportDialog())
-                        if (teximport.ShowDialog() == DialogResult.OK)
-                        {
-                            imgFormat = teximport.TextureFormat;
-                            palFormat = teximport.PaletteFormat;
-                        }
-                        else
-                            return;
+                    using TextureImportDialog teximport = new();
+                    if (teximport.ShowDialog() == DialogResult.OK)
+                    {
+                        imgFormat = teximport.TextureFormat;
+                        palFormat = teximport.PaletteFormat;
+                    }
+                    else
+                        return;
                 }
 
-                proxy.Replace(TOBJConverter.ImportTOBJFromFile(f, imgFormat, palFormat));
+                proxy.Replace(TOBJExtentions.ImportTObjFromFile(f, imgFormat, palFormat));
                 textureArrayEditor.Invalidate();
                 textureArrayEditor.Update();
             }
@@ -257,7 +278,7 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void replaceTextureButton_Click(object sender, EventArgs e)
         {
-            var f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
+            string f = FileIO.OpenFile(ApplicationSettings.ImageFileFilter);
             if (f != null)
                 ReplaceTexture(f);
         }
@@ -297,6 +318,18 @@ namespace HSDRawViewer.GUI.Extra
         private void textureArrayEditor_SelectedObjectChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = textureArrayEditor.SelectedObject;
+
+            if (pictureBox1.Image != null)
+                pictureBox1.Image.Dispose();
+
+            if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
+            {
+                pictureBox1.Image = proxy.ToImage();
+            }
+            else
+            {
+                pictureBox1.Image = null;
+            }
         }
 
         /// <summary>
@@ -306,14 +339,60 @@ namespace HSDRawViewer.GUI.Extra
         /// <param name="e"></param>
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            var path = FileIO.OpenFolder();
+            string path = FileIO.OpenFolder();
 
             if (path != null)
             {
                 int ti = 0;
-                foreach (var proxy in TextureLists)
+                foreach (TextureListProxy proxy in TextureLists)
                 {
-                    proxy.Export(path + $"\\{TOBJConverter.FormatName($"Texture_{ti++}_", proxy.GetTObj())}.png");
+                    proxy.Export(path + $"\\{proxy.GetTObj().FormatName($"Texture_{ti++}_")}.png");
+                }
+            }
+        }
+
+        public class EditTextureSettings
+        {
+            public int Width { get; set; }
+
+            public int Height { get; set; }
+
+            public GXTexFmt TextureFormat { get; set; }
+
+            public GXTlutFmt PaletteFormat { get; set; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            if (textureArrayEditor.SelectedObject is TextureListProxy proxy)
+            {
+                EditTextureSettings settings = new()
+                {
+                    Width = proxy.Width,
+                    Height = proxy.Height,
+                    TextureFormat = proxy.ImageFormat,
+                    PaletteFormat = proxy.PaletteFormat,
+                };
+
+                using PropertyDialog d = new("Edit Texture", settings);
+                if (settings.Width < 4)
+                    settings.Width = 4;
+
+                if (settings.Height < 4)
+                    settings.Height = 4;
+
+                if (d.ShowDialog() == DialogResult.OK)
+                {
+                    using Image<Bgra32> img = proxy.GetTObj().ToImage();
+                    img.Mutate(x => x.Resize(settings.Width, settings.Height));
+                    proxy.Replace(img.ToTObj(settings.TextureFormat, settings.PaletteFormat));
+                    textureArrayEditor.Invalidate();
+                    textureArrayEditor.Update();
                 }
             }
         }

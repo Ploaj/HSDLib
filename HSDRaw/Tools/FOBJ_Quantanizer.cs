@@ -9,18 +9,18 @@ namespace HSDRaw.Tools
     /// </summary>
     public class FOBJQuantanizer
     {
-        private float MaxValue = float.MinValue;
-        private bool ValueSigned = false;
-        private int ValueScale = 0;
-        private GXAnimDataFormat ValueType = GXAnimDataFormat.HSD_A_FRAC_FLOAT;
-        private bool Quantanized = false;
+        private float maxAbsValue = float.MinValue;
+        private bool isSigned = false;
+        private int scalePower = 0;
+        private float scaleFactor = 1f;
+        private GXAnimDataFormat dataFormat = GXAnimDataFormat.HSD_A_FRAC_FLOAT;
+        private bool quantized = false;
+
+        private List<float> values = new List<float>();
+
         public float Error { get; set; } = 0.0001f;
-        private List<float> Values = new List<float>();
 
-        public FOBJQuantanizer()
-        {
-
-        }
+        public FOBJQuantanizer() { }
 
         public FOBJQuantanizer(float error)
         {
@@ -29,165 +29,147 @@ namespace HSDRaw.Tools
 
         public void AddValue(float value)
         {
-            if (value < 0) ValueSigned = true;
-            Values.Add(value);
-            MaxValue = Math.Max(Math.Abs(value), MaxValue);
-            Quantanized = false;
+            if (value < 0) isSigned = true;
+            values.Add(value);
+            maxAbsValue = Math.Max(Math.Abs(value), maxAbsValue);
+            quantized = false;
         }
 
-        private void Quantanize()
+        private void Quantize()
         {
-            Quantanized = true;
-            ValueScale = QuantizeScaler();
+            quantized = true;
+            scalePower = FindOptimalScale();
+            scaleFactor = (float)Math.Pow(2, scalePower);
         }
 
         private int Clamp(int value, int min, int max)
         {
-            if (value < min)
-                return min;
-            if (value > max)
-                return max;
-            return value;
+            return Math.Min(Math.Max(value, min), max);
         }
 
-        private int Quantanize(float value, GXAnimDataFormat format, int scale)
+        private int QuantizeToInt(float value)
         {
-            switch (format)
-            {
-                case GXAnimDataFormat.HSD_A_FRAC_U8:
-                    return Clamp((byte)(scale * value), byte.MinValue, byte.MaxValue);
-                case GXAnimDataFormat.HSD_A_FRAC_S8:
-                    return Clamp((sbyte)(scale * value), sbyte.MinValue, sbyte.MaxValue);
-                case GXAnimDataFormat.HSD_A_FRAC_S16:
-                    return Clamp((short)(scale * value), short.MinValue, short.MaxValue);
-                case GXAnimDataFormat.HSD_A_FRAC_U16:
-                    return Clamp((ushort)(scale * value), ushort.MinValue, ushort.MaxValue);
-            }
-            return 0;
+            return (int)Math.Round(scaleFactor * value);
         }
 
-        private bool IsAcceptable(GXAnimDataFormat format, int scale)
+        private bool IsAcceptable(GXAnimDataFormat format, int power)
         {
-            foreach (var v in Values)
+            float scale = (float)Math.Pow(2, power);
+
+            foreach (var v in values)
             {
-                var value = Math.Pow(2, scale) * v;
+                int quantizedInt = (int)Math.Round(v * scale);
+
                 switch (format)
                 {
                     case GXAnimDataFormat.HSD_A_FRAC_U8:
-                        if (v > byte.MaxValue)
+                        if (quantizedInt < byte.MinValue || quantizedInt > byte.MaxValue)
                             return false;
                         break;
                     case GXAnimDataFormat.HSD_A_FRAC_S8:
-                        if (v > sbyte.MaxValue)
-                            return false;
-                        break;
-                    case GXAnimDataFormat.HSD_A_FRAC_S16:
-                        if (v > short.MaxValue)
+                        if (quantizedInt < sbyte.MinValue || quantizedInt > sbyte.MaxValue)
                             return false;
                         break;
                     case GXAnimDataFormat.HSD_A_FRAC_U16:
-                        if (v > ushort.MaxValue)
+                        if (quantizedInt < ushort.MinValue || quantizedInt > ushort.MaxValue)
+                            return false;
+                        break;
+                    case GXAnimDataFormat.HSD_A_FRAC_S16:
+                        if (quantizedInt < short.MinValue || quantizedInt > short.MaxValue)
                             return false;
                         break;
                 }
-                float Estimated = (float)(Quantanize(v, format, (int)Math.Pow(2, scale)) / Math.Pow(2, scale));
 
-                if (Math.Abs(v - Estimated) > Error)
+                float reconstructed = quantizedInt / scale;
+                if (Math.Abs(v - reconstructed) > Error)
                     return false;
             }
 
             return true;
         }
 
-        private int QuantizeScaler()
+        private int FindOptimalScale()
         {
-            if (ValueSigned)
+            // Try signed formats first
+            if (isSigned)
             {
-                ValueType = GXAnimDataFormat.HSD_A_FRAC_S8;
-                for (int i = 0; i < 0x1F; i++)
+                dataFormat = GXAnimDataFormat.HSD_A_FRAC_S8;
+                for (int i = 0; i < 31; i++)
                 {
-                    if (IsAcceptable(ValueType, i))
-                        return (int)Math.Pow(2, i);
+                    if (IsAcceptable(dataFormat, i))
+                        return i;
                 }
-                ValueType = GXAnimDataFormat.HSD_A_FRAC_S16;
-                for (int i = 0; i < 0x1F; i++)
+
+                dataFormat = GXAnimDataFormat.HSD_A_FRAC_S16;
+                for (int i = 0; i < 31; i++)
                 {
-                    if (IsAcceptable(ValueType, i))
-                        return (int)Math.Pow(2, i);
+                    if (IsAcceptable(dataFormat, i))
+                        return i;
                 }
             }
             else
             {
-                ValueType = GXAnimDataFormat.HSD_A_FRAC_U8;
-                for (int i = 0; i < 0x1F; i++)
+                dataFormat = GXAnimDataFormat.HSD_A_FRAC_U8;
+                for (int i = 0; i < 31; i++)
                 {
-                    if (IsAcceptable(ValueType, i))
-                        return (int)Math.Pow(2, i);
+                    if (IsAcceptable(dataFormat, i))
+                        return i;
                 }
-                ValueType = GXAnimDataFormat.HSD_A_FRAC_U16;
-                for (int i = 0; i < 0x1F; i++)
+
+                dataFormat = GXAnimDataFormat.HSD_A_FRAC_U16;
+                for (int i = 0; i < 31; i++)
                 {
-                    if (IsAcceptable(ValueType, i))
-                        return (int)Math.Pow(2, i);
+                    if (IsAcceptable(dataFormat, i))
+                        return i;
                 }
             }
-            ValueType = GXAnimDataFormat.HSD_A_FRAC_FLOAT;
-            return (int)Math.Pow(2, 0);
+
+            dataFormat = GXAnimDataFormat.HSD_A_FRAC_FLOAT;
+            return 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public uint GetValueScale()
         {
-            if (!Quantanized)
-                Quantanize();
+            if (!quantized)
+                Quantize();
 
-            return (uint)ValueScale;
+            return (uint)scaleFactor;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public GXAnimDataFormat GetDataFormat()
         {
-            if (!Quantanized)
-                Quantanize();
+            if (!quantized)
+                Quantize();
 
-            return ValueType;
+            return dataFormat;
         }
 
-        /// <summary>
-        /// writes quantanized value to stream
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="Value"></param>
-        public void WriteValue(BinaryWriterExt d, float Value)
+        public void WriteValue(BinaryWriterExt d, float value)
         {
-            if (!Quantanized)
-                Quantanize();
+            if (!quantized)
+                Quantize();
 
-            switch (ValueType)
+            int quantizedInt = QuantizeToInt(value);
+
+            switch (dataFormat)
             {
                 case GXAnimDataFormat.HSD_A_FRAC_FLOAT:
-                    d.Write(Value * ValueScale);
+                    d.Write(value * scaleFactor);
                     break;
                 case GXAnimDataFormat.HSD_A_FRAC_S16:
-                    d.Write((short)(Quantanize(Value, ValueType, ValueScale)));
+                    d.Write((short)Clamp(quantizedInt, short.MinValue, short.MaxValue));
                     break;
                 case GXAnimDataFormat.HSD_A_FRAC_U16:
-                    d.Write((ushort)(Quantanize(Value, ValueType, ValueScale)));
+                    d.Write((ushort)Clamp(quantizedInt, ushort.MinValue, ushort.MaxValue));
                     break;
                 case GXAnimDataFormat.HSD_A_FRAC_S8:
-                    d.Write((sbyte)(Quantanize(Value, ValueType, ValueScale)));
+                    d.Write((sbyte)Clamp(quantizedInt, sbyte.MinValue, sbyte.MaxValue));
                     break;
                 case GXAnimDataFormat.HSD_A_FRAC_U8:
-                    d.Write((byte)(Quantanize(Value, ValueType, ValueScale)));
+                    d.Write((byte)Clamp(quantizedInt, byte.MinValue, byte.MaxValue));
                     break;
                 default:
-                    throw new Exception("Unknown GXAnimDataFormat " + ValueType.ToString());
+                    throw new Exception("Unknown GXAnimDataFormat " + dataFormat);
             }
         }
     }

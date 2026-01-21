@@ -1,9 +1,10 @@
-﻿using HSDRaw.Tools;
+﻿using HSDRaw.Common.Animation;
+using HSDRaw.Tools;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
 
 namespace HSDRawViewer.Rendering.Renderers
 {
@@ -12,7 +13,7 @@ namespace HSDRawViewer.Rendering.Renderers
     /// </summary>
     public class GraphRenderer
     {
-        private FOBJ_Player _player = new FOBJ_Player();
+        private FOBJ_Player _player = new();
 
         public float MaxValue { get => _maxValue; }
         public float MinValue { get => _minValue; }
@@ -20,10 +21,10 @@ namespace HSDRawViewer.Rendering.Renderers
         private float _minValue;
         private float _maxValue;
 
-        private List<float> _valueCache = new List<float>();
+        private readonly List<float> _valueCache = new();
 
         private int _frameCount { get => _player.FrameCount; }
-        
+
         private float _range { get => (_maxValue - _minValue); }
 
         private float _xScale;
@@ -32,18 +33,18 @@ namespace HSDRawViewer.Rendering.Renderers
         private float _xOffset;
         private float _yOffset;
 
-        private float _zoom = 10f;
+        private readonly float _zoom = 10f;
 
         public bool RenderTangents { get; set; } = true;
 
-        public Vector4 SelectedPointColor = new Vector4(1f, 1f, 0f, 1f);
-        public Vector4 PointColor = new Vector4(1f, 1f, 1f, 1f);
-        public Vector4 PointOutline = new Vector4(0f, 0f, 0f, 1f);
+        public Vector4 SelectedPointColor = new(1f, 1f, 0f, 1f);
+        public Vector4 PointColor = new(1f, 1f, 1f, 1f);
+        public Vector4 PointOutline = new(0f, 0f, 0f, 1f);
 
-        public Vector4 LineColor = new Vector4(1f, 1f, 1f, 1f);
+        public Vector4 LineColor = new(1f, 1f, 1f, 1f);
 
-        public Vector4 SlopeColor = new Vector4(1f, 0f, 1f, 1f);
-        public Vector4 SelectedSlopeColor = new Vector4(1f, 1f, 0f, 1f);
+        public Vector4 SlopeColor = new(1f, 0f, 1f, 1f);
+        public Vector4 SelectedSlopeColor = new(1f, 1f, 0f, 1f);
 
         public bool RenderPoints { get; set; } = true;
 
@@ -64,15 +65,15 @@ namespace HSDRawViewer.Rendering.Renderers
             _minValue = float.MaxValue;
             _maxValue = float.MinValue;
             _valueCache.Clear();
-            for(int i = 0; i < (_player.FrameCount == 0 ? _player.Keys.Count : _player.FrameCount); i++)
+            for (int i = 0; i < (_player.FrameCount == 0 ? _player.Keys.Count : _player.FrameCount); i++)
             {
-                var v = _player.GetValue(i);
+                float v = _player.GetValue(i);
                 _minValue = Math.Min(_minValue, v);
                 _maxValue = Math.Max(_maxValue, v);
                 _valueCache.Add(v);
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -80,134 +81,105 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="e"></param>
         public void Draw(Rectangle bounds, int selectedFrameStart, int selectedFrameEnd)
         {
-            if (_frameCount == 0)
+            if (_frameCount == 0 || 
+                _valueCache == null || 
+                _valueCache.Count != _frameCount)
                 return;
 
+            // --- Precomputations ---
             _xOffset = 0;
             _yOffset = _zoom;
-
             _xScale = bounds.Width / (float)_frameCount;
-            _yScale = (bounds.Height - _zoom * 2) / _range;
+            _yScale = (_range == 0)
+                ? bounds.Height
+                : (bounds.Height - _zoom * 2) / _range;
+
+            float stride = _frameCount / (float)bounds.Width;
 
             if (_yScale == 0)
                 _yScale = 0.00001f;
-            
-            if (_range == 0)
-                _yScale = bounds.Height / 1f;
 
-
-            // draw line
-            var prevX = 0f;
-            var prevY = 0f;
+            // --- Draw Line ---
             GL.Color4(LineColor);
             GL.Begin(PrimitiveType.Lines);
-            for (int i = 0; i < _frameCount; i++)
+
+            float prevX = 0f;
+            float prevY = (_valueCache[0] - _minValue) * _yScale + _yOffset;
+
+            for (int i = 1; i < _frameCount; i++)
             {
-                var v = _valueCache[i];
-                var x = i * _xScale;
-                var y = (v - _minValue) * _yScale;
+                float v = _valueCache[i];
+                float x = i * _xScale + _xOffset;
+                float y = (v - _minValue) * _yScale + _yOffset;
 
-                x += _xOffset;
-                y += _yOffset;
+                var interp = _player.Keys.Count > 0 ? _player.GetState(i).op_intrp : GXInterpolationType.HSD_A_OP_LIN;
 
-                if (i == 0)
-                {
-                    prevX = x;
-                    prevY = y;
-                }
-
-                if (_player.GetState(i).op_intrp == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_CON)
+                if (interp == GXInterpolationType.HSD_A_OP_CON)
                 {
                     GL.Vertex2(x, prevY); GL.Vertex2(prevX, prevY);
-                    //g.DrawLine(LineColor, new PointF(x, prevY), new PointF(prevX, prevY));
-
                     GL.Vertex2(x, y); GL.Vertex2(x, prevY);
-                    //g.DrawLine(LineColor, new PointF(x, y), new PointF(x, prevY));
                 }
                 else
                 {
                     GL.Vertex2(x, y); GL.Vertex2(prevX, prevY);
-                    // g.DrawLine(LineColor, new PointF(x, y), new PointF(prevX, prevY));
                 }
 
                 prevX = x;
                 prevY = y;
             }
+
             GL.End();
 
-            // draw points
-            if(RenderPoints && _player.Keys != null && _player.Keys.Count > 1)
+            // --- Draw Key Points ---
+            if (!RenderPoints || _player?.Keys == null || _player.Keys.Count < 2)
+                return;
+
+            for (int i = 0; i < _player.Keys.Count; i++)
             {
-                for (int i = 0; i < _player.Keys.Count; i++)
+                var key = _player.Keys[i];
+                if (key.InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
+                    continue;
+
+                float x = key.Frame * _xScale + _xOffset;
+                float y = (key.Value - _minValue) * _yScale + _yOffset;
+
+                bool selected = key.Frame >= selectedFrameStart && key.Frame <= selectedFrameEnd;
+                Vector4 clr = selected ? SelectedPointColor : PointColor;
+
+                // Tangent
+                if (RenderTangents && (key.InterpolationType == GXInterpolationType.HSD_A_OP_SPL || key.InterpolationType == GXInterpolationType.HSD_A_OP_SPL0))
                 {
-                    var key = _player.Keys[i];
-                    var outTan = key.Tan;
+                    float outTan = key.Tan;
 
-                    if (key.InterpolationType == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SLP)
-                        continue;
-
-                    if (i + 1 < _player.Keys.Count && _player.Keys[i+1].InterpolationType == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SLP)
+                    if (i + 1 < _player.Keys.Count && _player.Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
                         outTan = _player.Keys[i + 1].Tan;
 
-                    var clr = PointColor;
+                    float prevFrame = i > 0 ? _player.Keys[i - 1].Frame : -5;
+                    float nextFrame = i + 1 < _player.Keys.Count ? _player.Keys[i + 1].Frame : _player.FrameCount + 5;
 
-                    var selected = key.Frame >= selectedFrameStart && key.Frame <= selectedFrameEnd;
+                    DrawTangent(key, prevFrame, nextFrame, outTan, selected);
+                }
 
-                    if (selected)
-                        clr = SelectedPointColor;
+                // Draw Shape
+                int size = (int)_xScale;
+                Rectangle rect = new((int)(x - size / 2f), (int)(y - size / 2f), size, size);
 
-                    var x = key.Frame * _xScale;
-                    var y = (key.Value - _minValue) * _yScale;
-
-                    x += _xOffset;
-                    y += _yOffset;
-
-                    float prevFrame = 0 - 5;
-                    float nextFrame = _player.FrameCount + 5;
-
-                    if (i + 1 < _player.Keys.Count)
-                        nextFrame = _player.Keys[i + 1].Frame;
-
-                    if (i > 0)
-                        prevFrame = _player.Keys[i - 1].Frame;
-
-                    if (RenderTangents &&
-                        (
-                        key.InterpolationType == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL ||
-                        key.InterpolationType == HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL0
-                        )
-                       )
-                        DrawTangent(key, prevFrame, nextFrame, outTan, selected);
-
-                    var rect = new Rectangle((int)(x - _xScale / 2), (int)(y - _xScale / 2), (int)(_xScale), (int)(_xScale));
-
-                    switch (key.InterpolationType)
-                    {
-                        case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_NONE:
-                            DrawCircle(PointOutline, clr, new Vector2(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), rect.Width / 2);
-                            //g.DrawEllipse(LineColor, rect);
-                            break;
-                        case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_KEY:
-                        case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_CON:
-                            //g.FillRectangle(clr, rect);
-                            //g.DrawRectangle(PointOutline, rect);
-                            DrawSquare(PointOutline, clr, rect);
-                            break;
-                        case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_LIN:
-                            //g.TranslateTransform(x, y);
-                            //g.RotateTransform(45);
-                            //g.FillRectangle(clr, -_xScale / 2, -_xScale / 2, _xScale, _xScale);
-                            //g.DrawRectangle(PointOutline, -_xScale / 2, -_xScale / 2, _xScale, _xScale);
-                            //g.Transform = tra;
-                            DrawDiamond(PointOutline, clr, rect);
-                            break;
-                        case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL:
-                        case HSDRaw.Common.Animation.GXInterpolationType.HSD_A_OP_SPL0:
-                            //g.FillEllipse(clr, rect);
-                            //g.DrawEllipse(PointOutline, rect);
-                            DrawCircle(PointOutline, clr, new Vector2(rect.X + rect.Width / 2, rect.Y + rect.Height / 2), rect.Width / 2);
-                            break;
-                    }
+                switch (key.InterpolationType)
+                {
+                    case GXInterpolationType.HSD_A_OP_NONE:
+                        DrawCircle(PointOutline, clr, new Vector2(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f), rect.Width / 2f);
+                        break;
+                    case GXInterpolationType.HSD_A_OP_KEY:
+                    case GXInterpolationType.HSD_A_OP_CON:
+                        DrawSquare(PointOutline, clr, rect);
+                        break;
+                    case GXInterpolationType.HSD_A_OP_LIN:
+                        DrawDiamond(PointOutline, clr, rect);
+                        break;
+                    case GXInterpolationType.HSD_A_OP_SPL:
+                    case GXInterpolationType.HSD_A_OP_SPL0:
+                        DrawCircle(PointOutline, clr, new Vector2(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f), rect.Width / 2f);
+                        break;
                 }
             }
         }
@@ -268,7 +240,7 @@ namespace HSDRawViewer.Rendering.Renderers
         private void DrawCircle(Vector4 outline, Vector4 fill, Vector2 center, float radius)
         {
             int i;
-            float x = center.X; 
+            float x = center.X;
             float y = center.Y;
             double twicePi = 2.0 * 3.142;
 
@@ -292,7 +264,7 @@ namespace HSDRawViewer.Rendering.Renderers
             GL.End();
         }
 
-        private float _tanLen = 5;
+        private readonly float _tanLen = 5;
 
         /// <summary>
         /// 
@@ -302,34 +274,34 @@ namespace HSDRawViewer.Rendering.Renderers
         /// <param name="selected"></param>
         private void DrawTangent(FOBJKey key, float prevFrame, float nextFrame, float outTangent, bool selected)
         {
-            var x = key.Frame;
-            var y = key.Value;
-            var tan = key.Tan;
+            float x = key.Frame;
+            float y = key.Value;
+            float tan = key.Tan;
 
-            var i1 = -(_tanLen / 2);
-            var i2 = (_tanLen / 2);
+            float i1 = -(_tanLen / 2);
+            float i2 = (_tanLen / 2);
 
-            var p = (float)Math.Sqrt((x - prevFrame) ) / 3;
+            float p = (float)Math.Sqrt((x - prevFrame)) / 3;
 
-            var one_x = (x + i1 * p) * _xScale + _xOffset;
-            var one_y = (y - _minValue + tan * i1 * p) * _yScale + _yOffset;
+            float one_x = (x + i1 * p) * _xScale + _xOffset;
+            float one_y = (y - _minValue + tan * i1 * p) * _yScale + _yOffset;
 
-            var two_x = (x) * _xScale + _xOffset;
-            var two_y = (y - _minValue) * _yScale + _yOffset;
+            float two_x = (x) * _xScale + _xOffset;
+            float two_y = (y - _minValue) * _yScale + _yOffset;
 
             p = (float)Math.Sqrt((nextFrame - x)) / 3;
 
-            var one_x_o = (x) * _xScale + _xOffset;
-            var one_y_o = (y - _minValue) * _yScale + _yOffset;
+            float one_x_o = (x) * _xScale + _xOffset;
+            float one_y_o = (y - _minValue) * _yScale + _yOffset;
 
-            var two_x_o = (x + i2 * p) * _xScale + _xOffset;
-            var two_y_o = (y - _minValue + outTangent * i2 * p) * _yScale + _yOffset;
+            float two_x_o = (x + i2 * p) * _xScale + _xOffset;
+            float two_y_o = (y - _minValue + outTangent * i2 * p) * _yScale + _yOffset;
 
 
             float angle1 = (float)Math.Atan((tan * _yScale) / _xScale) * 180 / (float)Math.PI;
             float angle2 = (float)Math.Atan((outTangent * _yScale) / _xScale) * 180 / (float)Math.PI;
 
-            var clr = selected ? SelectedSlopeColor : SlopeColor;
+            Vector4 clr = selected ? SelectedSlopeColor : SlopeColor;
 
             GL.Color4(clr);
             GL.Begin(PrimitiveType.Lines);
@@ -374,6 +346,6 @@ namespace HSDRawViewer.Rendering.Renderers
 
             //g.Transform = tra;
         }
-        
+
     }
 }

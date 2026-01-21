@@ -172,22 +172,47 @@ namespace HSDRaw.AirRide.Gr.Data
         }
 
         /// <summary>
-        /// 0 - 35
-        /// 2/3 - Dash Gate	
+        /// 0 - 35 different types
+        /// 0 - Grounded boost pad (index is used) (matrix)
+        /// 1 - ??
+        /// 2/3 - Dash Gate	(for 3 x18 has 4 bytes) (this also has matrix information)
         /// 	- 0x9C of stage
         /// 	- index< 2
-        /// 4 - Dash Ring 
+        /// 4 - Dash Ring (x18 param is 4-8 bytes of something) (this also has matrix information)
         /// 	- 0xB4 of stage
-        /// 	- Index< 2
-        /// 7 - SuperJump
+        /// 	- Index < 2
+        /// 5 - ??
+        /// 6 - ??
+        /// 7 - SuperJump (x18 param has 16 bytes)
+        /// 8 - ?? surrounds the jump, but doesn't hold much data
         /// 9 - Jump
         /// 10 - Spin
         /// 11 - AirFlow
         /// 12/13 - Switch 800d2a1c
-        /// 25 - Dead
-        /// 32 - 800eefd4 - also checks flag 0x2000020
+        /// 14 - ??
+        /// 15 - Ability Randomizer (technically has matrix but I think it is unused)
+        /// 16 - ??
+        /// 17 - ??
+        /// 18 - ?? used at city wheel bottom (no params, no matrix)
+        /// 19 - ?? used on city wheel top (no params, no matrix)
+        /// 20 - ??
+        /// 21 - ??
+        /// 22 - ??
+        /// 23 - ?? used on city wheel top (no params, no matrix)
+        /// 24 - Dead?? Some kind of death indicator (is at origin in city)
+        /// 25 - Dead??
+        /// 26 - ??
+        /// 27 - ??
+        /// 28 - ??
+        /// 29 - ??
+        /// 30 - (shadow) x18 (not param) references some kind of lighting index maybe
+        /// 31 - (shadow) x18 param is 8 bytes
+        /// 32 - (shadow)800eefd4 - also checks flag 0x2000020 (0x18 param is shadow params (size 64 bytes)) (index is used) (has matrix data sometimes, but probably unused)
+        /// 33 - ??
+        /// 34 - (shadow) - no param data at all (used in underground in city)
+        /// 35 - (shadow)?? used in the city castle vault thing, no additional params
         /// </summary>
-        public int Type { get => _s.GetInt32(0x10) & 0x01FFFFFF; set => _s.SetInt32(0x10, (PolyIndex << 25) | (value & 0x01FFFFFF)); }
+        public int Type { get => _s.GetInt32(0x10) & 0x01FFFFFF; set => _s.SetInt32(0x10, (UnknownIndex << 25) | (value & 0x01FFFFFF)); }
 
         /// <summary>
         /// Collision Flags

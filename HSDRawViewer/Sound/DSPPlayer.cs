@@ -1,11 +1,9 @@
-﻿using CSCore.SoundOut;
-using System.IO;
-using CSCore;
+﻿using CSCore;
 using CSCore.Codecs.WAV;
-using CSCore.CoreAudioAPI;
-using System.Collections.Generic;
-using System;
+using CSCore.SoundOut;
 using CSCore.Streams.Effects;
+using System;
+using System.IO;
 
 namespace HSDRawViewer.Sound
 {
@@ -44,7 +42,7 @@ namespace HSDRawViewer.Sound
                 return TimeSpan.Zero;
             }
         }
-        
+
         public DSPPlayer()
         {
 
@@ -83,7 +81,7 @@ namespace HSDRawViewer.Sound
             if (reverb > 96)
                 reverb = 96;
 
-            var reverbPass = new DmoWavesReverbEffect(_waveSource)
+            DmoWavesReverbEffect reverbPass = new(_waveSource)
             {
                 ReverbTime = 1000,
                 ReverbMix = -96 + reverb
@@ -101,7 +99,7 @@ namespace HSDRawViewer.Sound
             if (_waveSource == null)
                 return;
 
-            var pitchPass = new PitchShifter(_waveSource.ToSampleSource());
+            PitchShifter pitchPass = new(_waveSource.ToSampleSource());
 
             pitchPass.PitchShiftFactor = pitch;
 
@@ -117,16 +115,16 @@ namespace HSDRawViewer.Sound
             if (dsp == null)
                 return;
 
-            var data = dsp.ToWAVE();
+            byte[] data = dsp.ToWAVE();
 
             CleanUpSource();
 
             _memoryStream = new MemoryStream(data);
-            var waveSource = new WaveFileReader(_memoryStream);
+            WaveFileReader waveSource = new(_memoryStream);
 
             InitPlayback(waveSource);
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -150,7 +148,7 @@ namespace HSDRawViewer.Sound
                 _soundOut.Play();
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -210,6 +208,6 @@ namespace HSDRawViewer.Sound
             CleanupPlayback();
         }
 
-        
+
     }
 }

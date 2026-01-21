@@ -2,7 +2,6 @@
 using HSDRaw.AirRide.Gr.Data;
 using HSDRaw.Common;
 using HSDRawViewer.Rendering;
-using System;
 using System.Drawing;
 using System.Linq;
 
@@ -11,12 +10,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
     /// <summary>
     /// 
     /// </summary>
-    public class GrPositionEditor 
+    public class GrPositionEditor
     {
         public AirRideGrDataPositionProxy[] _items { get; set; }
 
-        private KAR_grPositionList _list;
-        private HSD_JOBJ _joint;
+        private readonly KAR_grPositionList _list;
+        private readonly HSD_JOBJ _joint;
 
         /// <summary>
         /// 
@@ -33,7 +32,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
 
             if (list.JointIndices != null)
             {
-                var joints = joint.TreeList;
+                System.Collections.Generic.List<HSD_JOBJ> joints = joint.TreeList;
                 _items = list.JointIndices.Array.Select(e => new AirRideGrDataPositionProxy(joints[e])).ToArray();
             }
             else
@@ -52,7 +51,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
             _list.JointIndices = null;
             _list.PositionData = null;
 
-            foreach (var v in _items)
+            foreach (AirRideGrDataPositionProxy v in _items)
             {
                 // joint index
                 if (v._joint != null)
@@ -95,7 +94,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
             if (_items == null)
                 return;
 
-            foreach (var p in _items)
+            foreach (AirRideGrDataPositionProxy p in _items)
             {
                 DrawShape.DrawBox(selected != null && p == selected ? Color.Yellow : Color.Red, p.X, p.Y, p.Z, 1f);
             }
@@ -105,12 +104,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
         /// <summary>
         /// 
         /// </summary>
-        public class GrAreaPositionEditor 
+        public class GrAreaPositionEditor
         {
             public AirRideGrDataAreaPositionProxy[] _items { get; set; }
 
-            private KAR_grAreaPositionList _list;
-            private HSD_JOBJ _joint;
+            private readonly KAR_grAreaPositionList _list;
+            private readonly HSD_JOBJ _joint;
 
             /// <summary>
             /// 
@@ -127,7 +126,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
 
                 if (list.JointIndices != null)
                 {
-                    var joints = joint.TreeList;
+                    System.Collections.Generic.List<HSD_JOBJ> joints = joint.TreeList;
                     _items = list.JointIndices.Array.Select(e => new AirRideGrDataAreaPositionProxy(joints[e])).ToArray();
                 }
                 else
@@ -146,7 +145,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
                 _list.JointIndices = null;
                 _list.AreaPosition = null;
 
-                foreach (var v in _items)
+                foreach (AirRideGrDataAreaPositionProxy v in _items)
                 {
                     // joint index
                     if (v._joint != null)
@@ -189,7 +188,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrEditors
                 if (_items == null)
                     return;
 
-                foreach (var p in _items)
+                foreach (AirRideGrDataAreaPositionProxy p in _items)
                 {
                     DrawShape.DrawBox(selected != null && p == selected ? Color.Yellow : Color.Red, p.X, p.Y, p.Z, 1f);
                 }

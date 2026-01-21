@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace System.Windows.Forms
 {
@@ -11,7 +6,7 @@ namespace System.Windows.Forms
     {
         public event PaintEventHandler PaintOver;
 
-        private static Brush HitboxBrush = new SolidBrush(Color.Red);
+        private static readonly Brush HitboxBrush = new SolidBrush(Color.Red);
 
         public CustomPaintTrackBar()
             : base()
@@ -26,8 +21,8 @@ namespace System.Windows.Forms
             // WM_PAINT
             if (m.Msg == 0x0F)
             {
-                using (Graphics lgGraphics = Graphics.FromHwndInternal(m.HWnd))
-                    OnPaintOver(new PaintEventArgs(lgGraphics, this.ClientRectangle));
+                using Graphics lgGraphics = Graphics.FromHwndInternal(m.HWnd);
+                OnPaintOver(new PaintEventArgs(lgGraphics, this.ClientRectangle));
             }
         }
 

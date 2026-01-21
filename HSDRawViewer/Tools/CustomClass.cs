@@ -53,7 +53,7 @@ namespace HSDRawViewer.Tools
             }
             set
             {
-                base.List[index] = (CustomProperty)value;
+                base.List[index] = value;
             }
         }
 
@@ -139,7 +139,7 @@ namespace HSDRawViewer.Tools
             for (int i = 0; i < this.Count; i++)
             {
 
-                CustomProperty prop = (CustomProperty)this[i];
+                CustomProperty prop = this[i];
                 newProps[i] = new CustomPropertyDescriptor(ref prop, attributes);
             }
 
@@ -166,9 +166,9 @@ namespace HSDRawViewer.Tools
     /// </summary>
     public class CustomProperty
     {
-        private string sName = string.Empty;
-        private bool bReadOnly = false;
-        private bool bVisible = true;
+        private readonly string sName = string.Empty;
+        private readonly bool bReadOnly = false;
+        private readonly bool bVisible = true;
         private object objValue = null;
 
         public CustomProperty(string sName, object value, bool bReadOnly, bool bVisible)
@@ -226,7 +226,7 @@ namespace HSDRawViewer.Tools
     /// </summary>
     public class CustomPropertyDescriptor : PropertyDescriptor
     {
-        CustomProperty m_Property;
+        readonly CustomProperty m_Property;
         public CustomPropertyDescriptor(ref CustomProperty myProperty, Attribute[] attrs) : base(myProperty.Name, attrs)
         {
             m_Property = myProperty;

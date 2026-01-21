@@ -1,10 +1,8 @@
-﻿using OpenTK.Mathematics;
-using OpenTK.Graphics.OpenGL;
-using System.Drawing;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
-using OpenTK.Input;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace HSDRawViewer.Rendering
 {
@@ -88,9 +86,9 @@ namespace HSDRawViewer.Rendering
             GL.Begin(PrimitiveType.TriangleFan);
 
             GL.Color3(Color);
-            
+
             GL.Vertex3(Position); // center of circle
-            for (var i = 0; i <= 20; i++)
+            for (int i = 0; i <= 20; i++)
             {
                 GL.Vertex3(
                     (Position.X + (Radius * Math.Cos(i * Math3D.TwoPI / 20))),

@@ -1,57 +1,24 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
-using HSDRawViewer.Converters;
+using HSDRaw.GX;
 using HSDRawViewer.Rendering;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace HSDRawViewer
 {
     public static class JOBJExtensions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="jobj"></param>
-        public static void CleanRootNode(this HSD_JOBJ jobj)
-        {
-            var joints = jobj.TreeList;
-
-            Matrix4 rot = Matrix4.Identity; ;
-            for (int i = 0; i < joints.Count; i++)
-            {
-                var j = joints[i];
-
-                if(i == 0)
-                {
-                    rot = Math3D.CreateMatrix4FromEuler(j.RX, j.RY, j.RZ);
-                    j.RX = 0;
-                    j.RY = 0;
-                    j.RZ = 0;
-                }
-                else
-                {
-                    // fix position
-                    var pos = Vector3.TransformNormal(new Vector3(j.TX, j.TY, j.TZ), rot);
-                    j.TX = pos.X;
-                    j.TY = pos.Y;
-                    j.TZ = pos.Z;
-                }
-
-                // clean scale
-                j.SX = 1;
-                j.SY = 1;
-                j.SZ = 1;
-            }
-        }
 
         /// <summary>
         /// 
         /// </summary>
         public static Dictionary<HSD_JOBJ, Matrix4> ApplyMeleeFighterTransforms(HSD_JOBJ root)
         {
-            Dictionary<HSD_JOBJ, Matrix4> newTransforms = new Dictionary<HSD_JOBJ, Matrix4>();
+            Dictionary<HSD_JOBJ, Matrix4> newTransforms = new();
 
             ZeroOutRotations(newTransforms, root, Matrix4.Identity, Matrix4.Identity);
 
@@ -61,7 +28,7 @@ namespace HSDRawViewer
         /// <summary>
         /// 
         /// </summary>
-        private static Dictionary<string, Vector3> FighterDefaults = new Dictionary<string, Vector3>() {
+        private static readonly Dictionary<string, Vector3> FighterDefaults = new() {
 
             // Every other bone has 0 rotation
 
@@ -89,14 +56,14 @@ namespace HSDRawViewer
         /// <param name="parentTransform"></param>
         private static void ZeroOutRotations(Dictionary<HSD_JOBJ, Matrix4> newTransforms, HSD_JOBJ root, Matrix4 oldParent, Matrix4 parentTransform)
         {
-            var oldTransform =
+            Matrix4 oldTransform =
                 Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
                 Math3D.CreateMatrix4FromEuler(root.RX, root.RY, root.RZ) *
                 Matrix4.CreateTranslation(root.TX, root.TY, root.TZ) * oldParent;
 
-            var targetPoint = Vector3.TransformPosition(Vector3.Zero, oldTransform);
-            
-            var trimName = root.ClassName;
+            Vector3 targetPoint = Vector3.TransformPosition(Vector3.Zero, oldTransform);
+
+            string trimName = root.ClassName;
 
             if (trimName != null && FighterDefaults.ContainsKey(trimName))
             {
@@ -122,7 +89,7 @@ namespace HSDRawViewer
                 Math3D.CreateMatrix4FromEuler(root.RX, root.RY, root.RZ) *
                 parentTransform;
 
-            var relPoint = Vector3.TransformPosition(targetPoint, parentTransform.Inverted());
+            Vector3 relPoint = Vector3.TransformPosition(targetPoint, parentTransform.Inverted());
 
             root.TX = relPoint.X;
             root.TY = relPoint.Y;
@@ -135,14 +102,14 @@ namespace HSDRawViewer
                 root.TZ = 0;
             }
 
-            var newTransform =
+            Matrix4 newTransform =
                 Matrix4.CreateScale(root.SX, root.SY, root.SZ) *
                 Math3D.CreateMatrix4FromEuler(root.RX, root.RY, root.RZ) *
                 Matrix4.CreateTranslation(root.TX, root.TY, root.TZ) * parentTransform;
 
             newTransforms.Add(root, newTransform);
 
-            foreach (var c in root.Children)
+            foreach (HSD_JOBJ c in root.Children)
                 ZeroOutRotations(newTransforms, c, oldTransform, newTransform);
         }
 
@@ -154,10 +121,10 @@ namespace HSDRawViewer
         /// <param name="rootjobj"></param>
         private static void ApplyNarutoMaterials(HSD_JOBJ rootjobj)
         {
-            foreach (var j in rootjobj.TreeList)
+            foreach (HSD_JOBJ j in rootjobj.TreeList)
             {
                 if (j.Dobj != null)
-                    foreach (var d in j.Dobj.List)
+                    foreach (HSD_DOBJ d in j.Dobj.List)
                     {
                         d.Mobj.Material.SPC_A = 255;
                         d.Mobj.Material.SPC_B = 0;
@@ -177,14 +144,14 @@ namespace HSDRawViewer
 
             HSD_DOBJ result = null;
 
-            List<HSD_POBJ> pobj = new List<HSD_POBJ>();
-            foreach(var j in jobj.TreeList)
+            List<HSD_POBJ> pobj = new();
+            foreach (HSD_JOBJ j in jobj.TreeList)
             {
                 if (j.Dobj != null)
                 {
-                    foreach (var d in j.Dobj.List)
+                    foreach (HSD_DOBJ d in j.Dobj.List)
                         if (d.Pobj != null)
-                            foreach (var p in d.Pobj.List)
+                            foreach (HSD_POBJ p in d.Pobj.List)
                                 pobj.Add(p);
 
                     if (result == null)
@@ -195,9 +162,9 @@ namespace HSDRawViewer
                 }
                 j.Dobj = null;
             }
-            
+
             // link pobjs
-            for(int i = 0; i < pobj.Count; i++)
+            for (int i = 0; i < pobj.Count; i++)
             {
                 if (i == pobj.Count - 1)
                     pobj[i].Next = null;
@@ -215,30 +182,30 @@ namespace HSDRawViewer
         /// </summary>
         public static void ExportTextures(HSD_JOBJ jobj)
         {
-            var folder = Tools.FileIO.OpenFolder();
+            string folder = Tools.FileIO.OpenFolder();
 
-            if(!string.IsNullOrEmpty(folder))
+            if (!string.IsNullOrEmpty(folder))
             {
-                HashSet<int> textures = new HashSet<int>();
+                HashSet<int> textures = new();
 
                 // get all tobjs
-                foreach(var j in jobj.TreeList)
+                foreach (HSD_JOBJ j in jobj.TreeList)
                 {
                     if (j.Dobj != null)
-                        foreach (var dobj in j.Dobj.List)
+                        foreach (HSD_DOBJ dobj in j.Dobj.List)
                         {
-                            if(dobj.Mobj != null && dobj.Mobj.Textures != null)
+                            if (dobj.Mobj != null && dobj.Mobj.Textures != null)
                             {
-                                foreach(var tobj in dobj.Mobj.Textures.List)
+                                foreach (HSD_TOBJ tobj in dobj.Mobj.Textures.List)
                                 {
                                     // generate hashes and export textures and formatting
 
-                                    var hash = ComputeHash(tobj.GetDecodedImageData());
+                                    int hash = ComputeHash(tobj.GetDecodedImageData());
 
-                                    if(!textures.Contains(hash))
+                                    if (!textures.Contains(hash))
                                     {
-                                        using (var bmp = TOBJConverter.ToBitmap(tobj))
-                                            bmp.Save(System.IO.Path.Combine(folder, TOBJConverter.FormatName(hash.ToString("X8"), tobj) + ".png"));
+                                        using (Image<SixLabors.ImageSharp.PixelFormats.Bgra32> img = tobj.ToImage())
+                                            img.SaveAsPng(Path.Combine(folder, tobj.FormatName(hash.ToString("X8")) + ".png"));
 
                                         textures.Add(hash);
                                     }
@@ -274,45 +241,45 @@ namespace HSDRawViewer
         /// </summary>
         public static void ImportTextures(HSD_JOBJ jobj)
         {
-            var folder = Tools.FileIO.OpenFolder();
+            string folder = Tools.FileIO.OpenFolder();
 
             if (!string.IsNullOrEmpty(folder))
             {
                 // get all tobjs
-                Dictionary<int, HSD_TOBJ> hashToImage = new Dictionary<int, HSD_TOBJ>();
+                Dictionary<int, HSD_TOBJ> hashToImage = new();
 
                 // load all textures from file
-                foreach(var tf in System.IO.Directory.GetFiles(folder))
+                foreach (string tf in Directory.GetFiles(folder))
                 {
                     if (tf.ToLower().EndsWith(".png"))
                     {
-                        var fn = System.IO.Path.GetFileNameWithoutExtension(tf);
-                        if(fn.Length >= 8 && 
-                            int.TryParse(fn.Substring(0, 8), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hash) && 
-                            TOBJConverter.FormatFromString(fn, out HSDRaw.GX.GXTexFmt texFmt, out HSDRaw.GX.GXTlutFmt tlutFmt))
+                        string fn = Path.GetFileNameWithoutExtension(tf);
+                        if (fn.Length >= 8 &&
+                            int.TryParse(fn.Substring(0, 8), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int hash) &&
+                            TOBJExtentions.FormatFromString(fn, out GXTexFmt texFmt, out GXTlutFmt tlutFmt))
                         {
-                            hashToImage.Add(hash, TOBJConverter.ImportTOBJFromFile(tf, texFmt, tlutFmt));
+                            hashToImage.Add(hash, TOBJExtentions.ImportTObjFromFile(tf, texFmt, tlutFmt));
                         }
                     }
                 }
 
                 // get all tobjs
-                foreach (var j in jobj.TreeList)
+                foreach (HSD_JOBJ j in jobj.TreeList)
                 {
                     if (j.Dobj != null)
-                        foreach (var dobj in j.Dobj.List)
+                        foreach (HSD_DOBJ dobj in j.Dobj.List)
                         {
                             if (dobj.Mobj != null && dobj.Mobj.Textures != null)
                             {
-                                foreach (var tobj in dobj.Mobj.Textures.List)
+                                foreach (HSD_TOBJ tobj in dobj.Mobj.Textures.List)
                                 {
                                     // generate hashes and export textures and formatting
 
-                                    var hash = ComputeHash(tobj.GetDecodedImageData());
+                                    int hash = ComputeHash(tobj.GetDecodedImageData());
 
                                     if (hashToImage.ContainsKey(hash))
                                     {
-                                        var imgClone = HSDAccessor.DeepClone<HSD_TOBJ>(hashToImage[hash]);
+                                        HSD_TOBJ imgClone = HSDAccessor.DeepClone<HSD_TOBJ>(hashToImage[hash]);
                                         tobj.ImageData = imgClone.ImageData;
                                         tobj.TlutData = imgClone.TlutData;
                                     }
