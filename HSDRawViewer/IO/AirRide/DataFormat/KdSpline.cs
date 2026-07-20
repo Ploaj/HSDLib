@@ -25,11 +25,12 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             Tension = s.Tension;
             Type = s.Type;
 
-
             //if (s.SegPolys != null)
             //{
             //    throw new NotSupportedException();
             //}
         }
+
+        // TODO: to spline
     }
 }

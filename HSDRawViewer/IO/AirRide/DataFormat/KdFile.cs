@@ -15,7 +15,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         private readonly string PositionFile = "_positions.json";
         private readonly string SplineFile = "_splines.json";
 
-        public List<KdBone> Bones { get; set; } = new List<KdBone>();
+        //public List<KdBone> Bones { get; set; } = new List<KdBone>();
 
         public List<KdMesh> Collisions { get; set; } = new List<KdMesh>();
 
@@ -86,6 +86,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 node.PositionNode = ToPositionNode();
             }
 
+            // TODO: 
             if (Splines != null)
             {
                 node.SplineNode = Splines.ToSplineNode();
@@ -149,6 +150,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     }
                 }
             }
+            if (coll.ZoneJoints != null)
             {
                 Zones.Clear();
                 var vertices = coll.ZoneVertices;
@@ -204,15 +206,15 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             node = gen.GenerateNode();
 
             // get bone
-            if (Bones == null || Bones.Count == 0)
-            {
-                node = null;
-                tree = null;
-                return false;
-            }
+            //if (Bones == null || Bones.Count == 0)
+            //{
+            //    node = null;
+            //    tree = null;
+            //    return false;
+            //}
 
             // generate partition
-            tree = SpatialPartitionOrganizer.GeneratePartition(Bones.Select(e=>e.ToMatrix()).ToArray(), node);
+            tree = SpatialPartitionOrganizer.GeneratePartition(node); // Bones.Select(e=>e.ToMatrix()).ToArray()
             return true;
         }
 
@@ -345,14 +347,16 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         /// <param name="filepath"></param>
         public void Save(string filename)
         {
-            if (Collisions.Count > 0)
-                JsonHelper.Export($"{filename}{CollisionFile}", new KdFile() { Collisions = Collisions, Zones = Zones, Bones = Bones });
+            JsonHelper.Export(filename, this);
 
-            if (Positions.Count > 0)
-                JsonHelper.Export($"{filename}{PositionFile}", new KdFile() { Positions = Positions, PositionsArea = PositionsArea });
+            //if (Collisions.Count > 0)
+            //    JsonHelper.Export($"{filename}{CollisionFile}", new KdFile() { Collisions = Collisions, Zones = Zones, Bones = Bones });
 
-            if (Splines != null)
-                JsonHelper.Export($"{filename}{SplineFile}", new KdFile() { Splines = Splines });
+            //if (Positions.Count > 0)
+            //    JsonHelper.Export($"{filename}{PositionFile}", new KdFile() { Positions = Positions, PositionsArea = PositionsArea });
+
+            //if (Splines != null)
+            //    JsonHelper.Export($"{filename}{SplineFile}", new KdFile() { Splines = Splines });
         }
     }
 }

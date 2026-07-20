@@ -7,6 +7,7 @@ using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.ContextMenus.AirRide
@@ -26,7 +27,18 @@ namespace HSDRawViewer.ContextMenus.AirRide
                     if (f != null)
                     {
                         var kd = KdFile.OpenKdFile(f);
+
+                        // get bone file
+                        if (kd.Collisions != null && 
+                            kd.Collisions.Any(e=>e.Parent != 0))
+                        {
+                            // needs model data
+                        }
+
                         kd.ImportIntoNode(data);
+
+                        HSDRaw.Common.HSD_JOBJ jobj = ModelImporter.ImportModelFromFile(null);
+                        data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
                     }
                 }
             };
@@ -37,7 +49,7 @@ namespace HSDRawViewer.ContextMenus.AirRide
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
-                    string f = FileIO.SaveFile("", "map");
+                    string f = FileIO.SaveFile(JsonHelper.FileFilter, "map.json", "KAR Map File Export");
                     if (f != null)
                     {
                         var kd = new KdFile(data);

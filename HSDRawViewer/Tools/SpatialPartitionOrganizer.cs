@@ -173,6 +173,16 @@ namespace HSDRawViewer.Tools
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="coll"></param>
+        /// <returns></returns>
+        public static KAR_grCollisionTree GeneratePartition(KAR_grCollisionNode coll)
+        {
+            return GeneratePartition((Matrix4[])null, coll);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="model"></param>
         /// <param name="coll"></param>
         /// <returns></returns>
@@ -198,7 +208,8 @@ namespace HSDRawViewer.Tools
             List<SpatialTriangle> triangles = new();
             foreach (KAR_CollisionJoint j in _joints)
             {
-                Matrix4 trans = bones[j.BoneID];
+                Matrix4 trans = bones == null ? Matrix4.Identity : bones[j.BoneID];
+
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {
                     KAR_CollisionTriangle tri = _triangles[i];
@@ -242,7 +253,7 @@ namespace HSDRawViewer.Tools
                 foreach (KAR_ZoneCollisionJoint j in zjoints)
                 {
                     List<SpatialTriangle> zt = new();
-                    Matrix4 trans = bones[j.BoneID];
+                    Matrix4 trans = bones == null ? Matrix4.Identity : bones[j.BoneID];
 
                     for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                     {
