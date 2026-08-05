@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
-    internal class KdSpline
+    public class KdSpline
     {
         public int Type { get; set; }
 

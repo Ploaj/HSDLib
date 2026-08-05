@@ -1,4 +1,5 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
+using System;
 using System.Text.Json.Serialization;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
@@ -21,7 +22,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         RIGHT,
     }
 
-    internal class KdMaterial
+    public class KdMaterial
     {
         //[JsonPropertyName("name")]
         //public string Name { get; set; }
@@ -139,6 +140,41 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             v.StageNodeForceReflectIndex = Restitution2;
             v.ConveyorDirection = GetConveyorFlag();
             v.SegmentMove = SegmentMove;
+        }
+
+        public override string ToString()
+        {
+            return string.Join("_",
+                "Kd",
+                $"T{Type}",
+                $"Cmn{CommonType}",
+                $"Fr{Friction}",
+                $"R1{Restitution}",
+                $"R2{Restitution2}",
+                $"Seg{(SegmentMove ? 1 : 0)}",
+                $"CV{ConveyorVertical}",
+                $"CH{ConveyorHorizontal}"
+            );
+        }
+
+        public static KdMaterial Parse(string name)
+        {
+            var parts = name.Split('_');
+
+            if (parts.Length != 9 || parts[0] != "Kd")
+                throw new FormatException($"Invalid KdMaterial name: {name}");
+
+            return new KdMaterial
+            {
+                Type = Enum.Parse<KdType>(parts[1][1..]),
+                CommonType = byte.Parse(parts[2][3..]),
+                Friction = byte.Parse(parts[3][2..]),
+                Restitution = byte.Parse(parts[4][2..]),
+                Restitution2 = byte.Parse(parts[5][2..]),
+                SegmentMove = parts[6][3..] == "1",
+                ConveyorVertical = Enum.Parse<KdConveyor>(parts[7][2..]),
+                ConveyorHorizontal = Enum.Parse<KdConveyor>(parts[8][2..])
+            };
         }
     }
 }

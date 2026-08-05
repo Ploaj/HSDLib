@@ -2,7 +2,7 @@
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
-    internal class KdTriangle
+    public class KdTriangle
     {
         [JsonPropertyName("v")]
         public int[] Indices { get; set; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
-    internal class KdBone
+    public class KdBone
     {
 
         [JsonPropertyName("parent")]

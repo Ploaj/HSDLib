@@ -326,17 +326,17 @@ namespace HSDRawViewer.Tools.AirRide
 
                     IOPolygon iopoly;
 
-                    switch (triangle.CollFlags)
+                    switch (triangle.Flags)
                     {
-                        case KCCollFlag.Wall:
-                            iopoly = iopoly_wall;
-                            break;
-                        case KCCollFlag.Ceiling:
-                            iopoly = iopoly_ceil;
-                            break;
-                        case KCCollFlag.Floor:
-                            iopoly = iopoly_floor;
-                            break;
+                        //case KCCollFlag.Wall:
+                        //    iopoly = iopoly_wall;
+                        //    break;
+                        //case KCCollFlag.Ceiling:
+                        //    iopoly = iopoly_ceil;
+                        //    break;
+                        //case KCCollFlag.Floor:
+                        //    iopoly = iopoly_floor;
+                        //    break;
                         default:
                             iopoly = iopoly_unknown;
                             break;

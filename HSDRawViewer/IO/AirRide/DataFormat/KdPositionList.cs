@@ -24,7 +24,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         YAKUMONO,
     }
 
-    internal class KdPosition
+    public class KdPosition
     {
         public float[] Position { get; set; }
         public float[] Forward { get; set; }
@@ -57,7 +57,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         }
     }
 
-    internal class KdPositionList
+    public class KdPositionList
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public KdPositionKind Kind { get; set; }

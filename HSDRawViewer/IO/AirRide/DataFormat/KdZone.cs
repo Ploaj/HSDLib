@@ -1,26 +1,45 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
-    internal class KdZone
+    public class KdZone
     {
+        [Browsable(false)]
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonPropertyName("type")]
+        public int Type { get; set; }
+
+        [JsonPropertyName("flags")]
+        public uint Flags { get; set; }
+
+        [DisplayName("Parent Joint")]
         [JsonPropertyName("parent")]
         public int Parent { get; set; } = -1;
 
+        [Browsable(false)]
         [JsonPropertyName("vertices")]
         public List<List<float>> Vertices { get; set; }
 
+        [Browsable(false)]
         [JsonPropertyName("triangles")]
         public List<KdZoneTriangle> Triangles { get; set; }
 
         // param type 1
+        public int Type1 { get; set; }
+
+        public object Type1Data { get; set; }
 
         // param type 2
+        public int Type2 { get; set; }
+
+        public object Type2Data { get; set; }
 
         // matrix ??
+
+        public float[] Matrix { get; set; }
     }
 }

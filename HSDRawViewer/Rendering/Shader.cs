@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Compute.OpenCL;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -332,11 +333,16 @@ namespace HSDRawViewer.Rendering
 
         private void AttachAndCompileShader(string shaderFile, ShaderType type, int program, out int id)
         {
+            LoadShaderSource(File.ReadAllText(shaderFile), type, out id);
+        }
+
+        public void LoadShaderSource(string source, ShaderType type, out int id)
+        {
             id = GL.CreateShader(type);
 
-            GL.ShaderSource(id, File.ReadAllText(shaderFile));
+            GL.ShaderSource(id, source);
             GL.CompileShader(id);
-            GL.AttachShader(program, id);
+            GL.AttachShader(programId, id);
 
             string error = GL.GetShaderInfoLog(id);
             if (!string.IsNullOrEmpty(error))

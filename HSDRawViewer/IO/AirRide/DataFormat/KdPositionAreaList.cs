@@ -13,7 +13,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         VEHICLE_AREA
     }
 
-    internal class KdPositionArea
+    public class KdPositionArea
     {
         public float[] Position { get; set; }
 
@@ -49,7 +49,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         }
     }
 
-    internal class KdPositionAreaList
+    public class KdPositionAreaList
     {
 
         [JsonConverter(typeof(JsonStringEnumConverter))]

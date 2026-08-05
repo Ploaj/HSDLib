@@ -22,6 +22,7 @@ namespace HSDRawViewer.GUI.Controls
             propertyGrid1.PropertyValueChanged += (sender, args) =>
             {
                 PropertyValueUpdated?.Invoke(sender, args);
+                propertyGrid1.Refresh();
             };
 
             // prevent user closing

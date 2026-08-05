@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
-    internal class KdSplineData
+    public class KdSplineData
     {
         public List<KdSpline> Course { get; set; }
 

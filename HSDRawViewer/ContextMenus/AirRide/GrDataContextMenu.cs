@@ -35,10 +35,10 @@ namespace HSDRawViewer.ContextMenus.AirRide
                             // needs model data
                         }
 
-                        kd.ImportIntoNode(data);
 
                         HSDRaw.Common.HSD_JOBJ jobj = ModelImporter.ImportModelFromFile(null);
-                        data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
+                        kd.ImportIntoNode(new LiveJObj(jobj), data);
+                        //data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
                     }
                 }
             };

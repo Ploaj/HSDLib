@@ -8,6 +8,7 @@ namespace HSDRawViewer.Rendering
         public Vector2 ScreenPoint { get; internal set; }
 
         public Vector3 Origin { get; internal set; }
+
         public Vector3 End { get; internal set; }
 
         public Vector3 Direction { get { return (Origin - End).Normalized(); } }
@@ -23,6 +24,18 @@ namespace HSDRawViewer.Rendering
             ScreenPoint = screenPoint;
             Origin = p1;
             End = p2;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="matrix"></param>
+        public PickInformation Transform(Matrix4 matrix)
+        {
+            Vector3 origin = Vector3.TransformPosition(Origin, matrix);
+            Vector3 end = Vector3.TransformPosition(End, matrix);
+
+            return new PickInformation(ScreenPoint, origin, end);
         }
 
         /// <summary>
@@ -212,8 +225,8 @@ namespace HSDRawViewer.Rendering
 
             float a = Vector3.Dot(e1, h);
 
-            if (a > -0.00001 && a < 0.00001)
-                return (false);
+            if (a <= float.Epsilon)
+                return false;
 
             float f = 1 / a;
             Vector3 s = p - v0;

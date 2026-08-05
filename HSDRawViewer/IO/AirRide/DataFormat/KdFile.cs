@@ -1,6 +1,5 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr.Data;
-using HSDRawViewer.Converters;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
-    internal class KdFile
+    public class KdFile
     {
         private readonly string CollisionFile = "_collision.json";
         private readonly string PositionFile = "_positions.json";
@@ -69,11 +68,11 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         /// 
         /// </summary>
         /// <param name="node"></param>
-        public void ImportIntoNode(KAR_grData node)
+        public void ImportIntoNode(LiveJObj jobj, KAR_grData node)
         {
             if (Collisions != null && Collisions.Count > 0)
             {
-                if (ToCollisionNode(out KAR_grCollisionNode coll, out KAR_grCollisionTree tree))
+                if (ToCollisionNode(jobj, out KAR_grCollisionNode coll, out KAR_grCollisionTree tree))
                 {
                     node.CollisionNode = coll;
                     node.PartitionNode.Partition = tree;
@@ -87,10 +86,10 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             }
 
             // TODO: 
-            if (Splines != null)
-            {
-                node.SplineNode = Splines.ToSplineNode();
-            }
+            //if (Splines != null)
+            //{
+            //    node.SplineNode = Splines.ToSplineNode();
+            //}
         }
 
         /// <summary>
@@ -165,6 +164,23 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                         Parent = n.BoneID,
                         Vertices = new List<List<float>>(),
                         Triangles = new List<KdZoneTriangle>(),
+
+                        Type = triangles[n.ZoneFaceStart].Type,
+                        Flags = triangles[n.ZoneFaceStart].Flags,
+
+                        Matrix = new float[]
+                        {
+                            n.Mtx00, n.Mtx01, n.Mtx02,
+                            n.Mtx10, n.Mtx11, n.Mtx12,
+                            n.Mtx20, n.Mtx21, n.Mtx22,
+                            n.Mtx30, n.Mtx31, n.Mtx32,
+                        },
+
+                        Type1 = n.x14,
+                        Type1Data = n.x14_param,
+
+                        Type2 = n.x18,
+                        Type2Data = n.x18_param,
                     };
                     Zones.Add(m);
 
@@ -174,8 +190,16 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     for (int i = n.ZoneFaceStart; i < n.ZoneFaceStart + n.ZoneFaceSize; i++)
                     {
                         var tri = triangles[i];
+
+                        if (tri.Type != m.Type)
+                            throw new System.Exception("Triangle Type mismatch");
+
+                        if (tri.Flags != m.Flags)
+                            throw new System.Exception("Triangle Flags mismatch");
+
                         m.Triangles.Add(new KdZoneTriangle()
                         {
+                            UnknownIndex = tri.UnknownIndex,
                             Indices = new int[]
                             {
                                 tri.V3 - n.ZoneVertexStart,
@@ -193,28 +217,22 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         /// </summary>
         /// <param name="node"></param>
         /// <param name="tree"></param>
-        private bool ToCollisionNode(out KAR_grCollisionNode node, out KAR_grCollisionTree tree)
+        private bool ToCollisionNode(LiveJObj jobj, out KAR_grCollisionNode node, out KAR_grCollisionTree tree)
         {
             // dump data into node
             var gen = new KdCollisionGenerator();
             foreach (var m in Collisions)
                 gen.ParseMesh(m);
 
-            // TODO: zones
+            // zones
+            foreach (var z in Zones)
+                gen.ParseZone(z);
 
             // generate collision node
             node = gen.GenerateNode();
 
-            // get bone
-            //if (Bones == null || Bones.Count == 0)
-            //{
-            //    node = null;
-            //    tree = null;
-            //    return false;
-            //}
-
             // generate partition
-            tree = SpatialPartitionOrganizer.GeneratePartition(node); // Bones.Select(e=>e.ToMatrix()).ToArray()
+            tree = SpatialPartitionOrganizer.GeneratePartition(jobj.Enumerate.Select(e => e.WorldTransform).ToArray(), node);
             return true;
         }
 

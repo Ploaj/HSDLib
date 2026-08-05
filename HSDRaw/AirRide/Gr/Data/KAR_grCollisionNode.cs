@@ -217,7 +217,7 @@ namespace HSDRaw.AirRide.Gr.Data
         /// <summary>
         /// Collision Flags
         /// </summary>
-        public KCCollFlag CollFlags { get => (KCCollFlag)_s.GetInt32(0x14); set => _s.SetInt32(0x14, (int)value); }
+        public uint Flags { get => _s.GetUInt32(0x14); set => _s.SetUInt32(0x14, value); }
     }
 
     public class KAR_ZoneCollisionJoint : HSDAccessor
