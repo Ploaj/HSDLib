@@ -249,8 +249,8 @@ namespace HSDRawViewer.Tools.AirRide
                 ZoneFaceSize = ztriangles.Count - faceStart,
                 ZoneVertexStart = vertStart,
                 ZoneVertexSize = zverts.Count - vertStart,
-                x14 = -1,
-                x18 = -1,
+                ZoneLinkIndex = -1,
+                x18 = 0,
             });
 
         }

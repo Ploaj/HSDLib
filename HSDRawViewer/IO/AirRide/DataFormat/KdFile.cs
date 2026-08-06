@@ -176,8 +176,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                             n.Mtx30, n.Mtx31, n.Mtx32,
                         },
 
-                        Type1 = n.x14,
-                        Type1Data = n.x14_param,
+                        LinkedZone = n.ZoneLinkIndex,
 
                         Type2 = n.x18,
                         Type2Data = n.x18_param,
@@ -199,7 +198,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
                         m.Triangles.Add(new KdZoneTriangle()
                         {
-                            UnknownIndex = tri.UnknownIndex,
+                            Index = tri.Index,
+                            Flags = tri.UnknownFlags,
+                            
                             Indices = new int[]
                             {
                                 tri.V3 - n.ZoneVertexStart,

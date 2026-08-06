@@ -1,12 +1,16 @@
-﻿using HSDRawViewer.IO.AirRide.DataFormat;
+﻿using HSDRaw.AirRide.Gr;
+using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters;
+using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Rendering.Renderers;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using System;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
-    public class GrRenderResource
+    public class GrRenderResource : IDisposable
     {
         public Camera Camera { get; set; }
 
@@ -14,7 +18,37 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public int WindowHeight { get; set; }
 
-        public LiveJObj Joints { get; set; }
+        public LiveJObj Joints { get => RenderJObj != null ? RenderJObj.RootJObj : null; }
+
+        public JobjDisplaySettings RenderSettings { get => RenderJObj._settings; }
+
+        private readonly GLTextRenderer TextRenderer = new();
+
+
+        private RenderJObj RenderJObj;
+
+        public bool RenderBones { get => RenderJObj._settings.RenderBones; set => RenderJObj._settings.RenderBones = value; }
+
+        public bool RenderModel { get; set; }
+
+        public bool RenderBoneLabels { get; set; }
+
+        public GrRenderResource()
+        {
+            RenderJObj = new RenderJObj();
+        }
+
+        public void GLInit()
+        {
+            RenderJObj.Invalidate();
+            TextRenderer.InitializeRender(@"Consolas.bff");
+        }
+
+        public void GLFree()
+        {
+            RenderJObj.FreeResources();
+            TextRenderer.Dispose();
+        }
 
         public void BeginDraw()
         {
@@ -24,6 +58,32 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public void BeginOverlay()
         {
             GL.Disable(EnableCap.DepthTest);
+        }
+
+        internal void LoadModel(KAR_grModel model)
+        {
+            RenderJObj.LoadJObj(model.MainModel.RootNode);
+        }
+
+        public void DrawModel(Camera cam)
+        {
+            if (RenderJObj != null && RenderModel)
+            {
+                RenderJObj.Render(cam, false);
+            }
+        }
+
+        public void DrawBoneLabels(Camera cam)
+        {
+            if (RenderJObj != null && RenderBoneLabels)
+            {
+                int i = 0;
+                foreach (var j in RenderJObj.RootJObj.Enumerate)
+                {
+                    TextRenderer.RenderText(cam, $"{i}", j.WorldTransform, dropShadow: true);
+                    i++;
+                }
+            }
         }
 
         public void DrawKdMesh(KdMesh mesh, bool is_selected)
@@ -152,7 +212,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         }
 
 
-        public void DrawKdZone(KdZone mesh, bool is_selected)
+        public void DrawKdZone(KdZone mesh, bool is_selected, object selected_object)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
 
@@ -189,6 +249,28 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             GL.End();
 
 
+            GL.LineWidth(2f);
+            GL.Enable(EnableCap.CullFace);
+            GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
+
+            GL.Begin(PrimitiveType.Triangles);
+            if (is_selected)
+                GL.Color4(0.8f, 0, 0f, 1f);
+            else
+                GL.Color4(0.8f, 0.8f, 0.8f, 1f);
+            foreach (var t in mesh.Triangles)
+            {
+                foreach (var i in t.Indices)
+                {
+                    var p = mesh.Vertices[i];
+                    if (p.Count != 3)
+                        continue;
+                    GL.Vertex3(p[0], p[1], p[2]);
+                }
+            }
+            GL.End();
+
+
             GL.PointSize(10f);
             GL.Disable(EnableCap.CullFace);
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
@@ -201,6 +283,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             }
             GL.End();
 
+
+            if (is_selected && selected_object is EdgeAccessor edge)
+            {
+                GL.LineWidth(4f);
+                GL.Disable(EnableCap.CullFace);
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+
+                GL.Begin(PrimitiveType.Lines);
+                GL.Vertex3(edge.Vertex1.X, edge.Vertex1.Y, edge.Vertex1.Z);
+                GL.Vertex3(edge.Vertex2.X, edge.Vertex2.Y, edge.Vertex2.Z);
+                GL.End();
+            }
 
             //GL.LineWidth(4f);
             //GL.Disable(EnableCap.CullFace);
@@ -226,5 +320,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             GL.PopAttrib();
         }
 
+        public void Dispose()
+        {
+            TextRenderer.Dispose();
+        }
     }
 }

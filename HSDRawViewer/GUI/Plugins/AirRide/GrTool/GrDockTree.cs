@@ -1,4 +1,5 @@
-﻿using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
+﻿using HSDRaw.AirRide.Gr.Data;
+using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
@@ -7,9 +8,12 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
-
     public partial class GrDockTree : DockContent
     {
+        private GrStageNode StageNode { get; }
+
+        private GrModelNode ModelNode { get; }
+
         private GrCategoryCollision CollisionNode { get; }
 
         private GrCategoryNode<KdZone, GrZoneNode> ZoneNode { get; }
@@ -18,6 +22,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public delegate void SelectedNodeChanged(GrNode node);
 
         public SelectedNodeChanged OnSelectedNodeChanged;
+
+
+        public TreeNode SelectedNode { get => treeView1.SelectedNode; }
+
 
         public GrDockTree(GrDataResource res)
         {
@@ -42,11 +50,20 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 }
             };
 
+            StageNode = new GrStageNode();
+            ModelNode = new GrModelNode();
             CollisionNode = new GrCategoryCollision("Collisions", res.Meshes);
             ZoneNode = new GrCategoryNode<KdZone, GrZoneNode>("Zones", res.Zones);
 
+            treeView1.Nodes.Add(StageNode);
+            treeView1.Nodes.Add(ModelNode);
             treeView1.Nodes.Add(CollisionNode);
             treeView1.Nodes.Add(ZoneNode);
+        }
+
+        public void LoadMiscData(KAR_grData data)
+        {
+            StageNode.Tag = data.StageNode;
         }
 
         private (TreeNode Node, float Distance) TryPickNodes(

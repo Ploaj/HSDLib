@@ -269,15 +269,11 @@ namespace HSDRawViewer.ContextMenus.AirRide
                         {
                             KAR_ZoneCollisionTriangle t = tri[i];
 
-                            if (!flags.Contains(t.Type) || j.x14 != -1)
+                            if (!flags.Contains(t.Type))
                             {
                                 flags.Add(t.Type);
 
-                                System.Diagnostics.Debug.WriteLine($"Index: {ji} Type: {t.Type} x14: {j.x14} x18: {j.x18}");
-                                if (j.x14_param != null)
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"\t0x14 {j.x14_param._s.Length}");
-                                }
+                                System.Diagnostics.Debug.WriteLine($"Index: {ji} Type: {t.Type} x18: {j.x18}");
                                 if (j.x18_param != null)
                                 {
                                     System.Diagnostics.Debug.WriteLine($"\t0x18 {j.x18_param._s.Length}");

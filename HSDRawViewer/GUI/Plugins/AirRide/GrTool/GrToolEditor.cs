@@ -4,9 +4,9 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
 using HSDRawViewer.Rendering;
-using HSDRawViewer.Rendering.Models;
-using HSDRawViewer.Rendering.Renderers;
+using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
+using OpenTK.Mathematics;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -31,7 +31,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private DataNode _node;
 
-        private readonly GLTextRenderer TextRenderer = new();
+        public bool TranslationEnabled = false;
+        private TranslationWidget _translationWidget;
         public override DataNode Node
         {
             get => _node;
@@ -39,7 +40,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 _node = value;
                 if (value != null && value.Accessor is KAR_grData d)
+                {
                     _resource.Load(d);
+                    _dockTree.LoadMiscData(d);
+                }
             }
         }
 
@@ -52,11 +56,26 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             buttonSelectTriangle.Click += SelectMode_Click;
         }
 
+        private void SetupWidgets()
+        {
+            _translationWidget = new TranslationWidget();
+            _translationWidget.TransformUpdated += (t) =>
+            {
+                if (_dockTree == null) return;
+
+                if (_dockTree.SelectedNode is not IGrTranslate node)
+                    return;
+
+                node.SetTranslate(_propertyGrid.SelectedObject, t.ExtractTranslation());
+            };
+        }
+
         public GrToolEditor()
         {
             InitializeComponent();
 
             SetupSelectUI();
+            SetupWidgets();
 
             dockPanel.Theme = new VS2015LightTheme();
 
@@ -73,7 +92,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 if (n != null)
                 {
-                    _propertyGrid.SetObject(n.Text, n.Tag);
+                    SelectObject(n.Text, n.Tag);
 
                     //toolStrip2.SuspendLayout();
                     //toolStrip2.Items.Clear();
@@ -90,23 +109,14 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             // dipose of resources
             Disposed += (s, a) =>
             {
-                TextRenderer.Dispose();
+                _render.Dispose();
                 _propertyGrid.Dispose();
                 _viewport.Dispose();
             };
 
-
             // initialize joint manager
-            RenderJObj = new RenderJObj();
-            RenderJObj.Initialize += () =>
-            {
-
-            };
             TryLoadModelFile(false);
         }
-
-        private HSDRawFile ModelFile;
-        private RenderJObj RenderJObj;
 
         private void TryLoadModelFile(bool use_dialog)
         {
@@ -133,13 +143,13 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             if (model_path != null)
             {
-                ModelFile = new HSDRawFile(model_path);
+                var ModelFile = new HSDRawFile(model_path);
                 bool found = false;
                 foreach (var r in ModelFile.Roots)
                 {
                     if (r.Data is KAR_grModel model)
                     {
-                        RenderJObj.LoadJObj(model.MainModel.RootNode);
+                        _render.LoadModel(model);
                         found = true;
                         return;
                     }
@@ -158,13 +168,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public void Draw(Camera cam, int windowWidth, int windowHeight)
         {
-            if (RenderJObj != null && modelToolStripMenuItem.Checked)
-            {
-                RenderJObj._settings.RenderBones = bonesToolStripMenuItem.Checked;
-
-                RenderJObj.Render(cam, false);
-                _render.Joints = RenderJObj.RootJObj;
-            }
+            _render.DrawModel(cam);
 
             _render.Camera = cam;
             _render.WindowWidth = windowWidth;
@@ -176,27 +180,20 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             _render.BeginOverlay();
             _dockTree.DrawOverlay(_render, _propertyGrid.SelectedObject);
 
-            if (RenderJObj != null && boneNamesToolStripMenuItem.Checked)
-            {
-                int i = 0;
-                foreach (var j in RenderJObj.RootJObj.Enumerate)
-                {
-                    TextRenderer.RenderText(cam, $"{i}", j.WorldTransform, dropShadow: true);
-                    i++;
-                }
-            }
+            if (TranslationEnabled)
+                _translationWidget.Render(cam);
+
+            _render.DrawBoneLabels(cam);
         }
 
         public void GLInit()
         {
-            RenderJObj.Invalidate();
-            TextRenderer.InitializeRender(@"Consolas.bff");
+            _render.GLInit();
         }
 
         public void GLFree()
         {
-            RenderJObj.FreeResources();
-            TextRenderer.Dispose();
+            _render.GLFree();
         }
 
         public void ViewportKeyPress(KeyEventArgs kbState)
@@ -205,6 +202,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public void ScreenClick(MouseButtons button, PickInformation pick)
         {
+
         }
 
         private GrSelectModeKind SelectMode = GrSelectModeKind.Node;
@@ -222,15 +220,45 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             SelectMode = (GrSelectModeKind)button.Tag;
         }
 
+        public void SelectObject(string name, object o)
+        {
+            _propertyGrid.SetObject(name, o);
+
+            if (_dockTree.SelectedNode is IGrTranslate t && t.CanTranslate(o))
+            {
+                TranslationEnabled = true;
+                _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o));
+            }
+            else
+            {
+                TranslationEnabled = false;
+            }
+        }
+
         public void ScreenDoubleClick(PickInformation pick)
         {
-            var n = _dockTree.TryPickNode(SelectMode, pick, RenderJObj.RootJObj);
+            var n = _dockTree.TryPickNode(SelectMode, pick, _render.Joints);
             if (n != null)
-                _propertyGrid.SetObject(n.ToString(), n);
+                SelectObject(n.ToString(), n);
         }
 
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
+            if (TranslationEnabled)
+            {
+                if (args.Button == MouseButtons.Left)
+                    _translationWidget.MouseDown(pick);
+                else
+                    _translationWidget.MouseUp();
+
+                _translationWidget.Drag(pick);
+
+                if (_translationWidget.PendingUpdate)
+                {
+                    _translationWidget.PendingUpdate = false;
+                }
+            }
+
         }
 
         public void ScreenSelectArea(PickInformation start, PickInformation end)
@@ -239,15 +267,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public bool FreezeCamera()
         {
-            return false;
+            return TranslationEnabled && _translationWidget.Interacting;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (_node.Accessor is not KAR_grData d) return;
-            if (RenderJObj == null) return;
-            if (RenderJObj.RootJObj == null) return;
-            _resource.Save(RenderJObj.RootJObj, d);
+            if (_render.Joints == null)
+            {
+                MessageBox.Show("The model must be loaded before saving.", "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            _resource.Save(_render.Joints, d);
             MessageBox.Show("Saved Changes");
         }
 

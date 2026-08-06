@@ -34,10 +34,6 @@
             loadModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             buttonSave = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
-            modelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            boneNamesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             buttonSelectCollision = new System.Windows.Forms.ToolStripButton();
@@ -56,7 +52,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripDropDownButton2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1062, 27);
@@ -93,42 +89,6 @@
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
-            // 
-            // toolStripDropDownButton2
-            // 
-            toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { modelToolStripMenuItem, bonesToolStripMenuItem, boneNamesToolStripMenuItem });
-            toolStripDropDownButton2.Image = Properties.Resources.ts_visible;
-            toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            toolStripDropDownButton2.Name = "toolStripDropDownButton2";
-            toolStripDropDownButton2.Size = new System.Drawing.Size(79, 24);
-            toolStripDropDownButton2.Text = "Show";
-            // 
-            // modelToolStripMenuItem
-            // 
-            modelToolStripMenuItem.Checked = true;
-            modelToolStripMenuItem.CheckOnClick = true;
-            modelToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            modelToolStripMenuItem.Name = "modelToolStripMenuItem";
-            modelToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            modelToolStripMenuItem.Text = "Model";
-            // 
-            // bonesToolStripMenuItem
-            // 
-            bonesToolStripMenuItem.Checked = true;
-            bonesToolStripMenuItem.CheckOnClick = true;
-            bonesToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
-            bonesToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            bonesToolStripMenuItem.Text = "Bones";
-            bonesToolStripMenuItem.Click += bonesToolStripMenuItem_Click;
-            // 
-            // boneNamesToolStripMenuItem
-            // 
-            boneNamesToolStripMenuItem.CheckOnClick = true;
-            boneNamesToolStripMenuItem.Name = "boneNamesToolStripMenuItem";
-            boneNamesToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            boneNamesToolStripMenuItem.Text = "Bone Labels";
-            boneNamesToolStripMenuItem.Click += boneNamesToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
@@ -183,14 +143,10 @@
         private System.Windows.Forms.ToolStripButton buttonSave;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem loadModelToolStripMenuItem;
-        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
-        private System.Windows.Forms.ToolStripMenuItem modelToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripButton buttonSelectCollision;
         private System.Windows.Forms.ToolStripButton buttonSelectTriangle;
-        private System.Windows.Forms.ToolStripMenuItem bonesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem boneNamesToolStripMenuItem;
     }
 }

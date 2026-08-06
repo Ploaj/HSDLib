@@ -122,8 +122,8 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             {
                 CommonType = t.GrCommonIndex,
                 Friction = t.Rough,
-                Restitution = t.StageNodeReflectIndex,
-                Restitution2 = t.StageNodeForceReflectIndex,
+                Restitution = t.PlayerRestituionIndex,
+                Restitution2 = t.ItemRestitutionIndex,
                 SegmentMove = t.SegmentMove,
             };
             m.SetRealFlag(t.Flags);
@@ -136,8 +136,8 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             v.Flags = GetRealFlag();
             v.GrCommonIndex = CommonType;
             v.Rough = Friction;
-            v.StageNodeReflectIndex = Restitution;
-            v.StageNodeForceReflectIndex = Restitution2;
+            v.PlayerRestituionIndex = Restitution;
+            v.ItemRestitutionIndex = Restitution2;
             v.ConveyorDirection = GetConveyorFlag();
             v.SegmentMove = SegmentMove;
         }

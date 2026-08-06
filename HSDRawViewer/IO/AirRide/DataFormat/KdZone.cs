@@ -28,10 +28,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         [JsonPropertyName("triangles")]
         public List<KdZoneTriangle> Triangles { get; set; }
 
-        // param type 1
-        public int Type1 { get; set; }
-
-        public object Type1Data { get; set; }
+        [DisplayName("Linked Zone Index")]
+        [Description("Specifies the index of the destination or connected zone. Used by warps and connected movement zones.")]
+        public int LinkedZone { get; set; }
 
         // param type 2
         public int Type2 { get; set; }

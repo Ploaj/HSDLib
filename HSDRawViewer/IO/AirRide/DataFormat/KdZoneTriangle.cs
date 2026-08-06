@@ -4,7 +4,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 {
     public class KdZoneTriangle
     {
-        public int UnknownIndex { get; set; }
+        public int Index { get; set; }
+
+        public int Flags { get; set; }
 
 
         [JsonPropertyName("v")]

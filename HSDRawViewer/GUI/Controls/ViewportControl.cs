@@ -428,7 +428,7 @@ namespace HSDRawViewer.GUI
 
             // CrossHair = p1;
 
-            PickInformation info = new(new Vector2(point.X, point.Y), p1, p2);
+            PickInformation info = new(_camera.MvpMatrix, glControl.Width, glControl.Height, new Vector2(point.X, point.Y), p1, p2);
 
             return info;
         }

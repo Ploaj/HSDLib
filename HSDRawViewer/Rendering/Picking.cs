@@ -13,15 +13,24 @@ namespace HSDRawViewer.Rendering
 
         public Vector3 Direction { get { return (Origin - End).Normalized(); } }
 
+        public Matrix4 ViewProjection { get; init; }
+
+        public float ViewportWidth { get; init; }
+
+        public float ViewportHeight { get; init; }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="screenPoint"></param>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
-        public PickInformation(Vector2 screenPoint, Vector3 p1, Vector3 p2)
+        public PickInformation(Matrix4 view, float width, float height, Vector2 screenPoint, Vector3 p1, Vector3 p2)
         {
+            ViewProjection = view;
             ScreenPoint = screenPoint;
+            ViewportHeight = height;
+            ViewportWidth = width;
             Origin = p1;
             End = p2;
         }
@@ -35,7 +44,102 @@ namespace HSDRawViewer.Rendering
             Vector3 origin = Vector3.TransformPosition(Origin, matrix);
             Vector3 end = Vector3.TransformPosition(End, matrix);
 
-            return new PickInformation(ScreenPoint, origin, end);
+            return new PickInformation(ViewProjection, ViewportWidth, ViewportHeight, ScreenPoint, origin, end);
+        }
+
+        private static Vector3 WorldToScreen(
+            Vector3 point,
+            Matrix4 mvp,
+            float viewportWidth,
+            float viewportHeight)
+        {
+            // Transform into clip space
+            Vector4 clip = Vector4.TransformRow(new Vector4(point, 1.0f), mvp);
+
+            // Behind the camera
+            if (clip.W <= 0)
+                return new Vector3(float.NaN);
+
+            // Perspective divide
+            Vector3 ndc = clip.Xyz / clip.W;
+
+            // Convert to screen coordinates
+            float x = (ndc.X * 0.5f + 0.5f) * viewportWidth;
+            float y = (1.0f - (ndc.Y * 0.5f + 0.5f)) * viewportHeight;
+
+            // Depth (0 = near, 1 = far)
+            float z = ndc.Z * 0.5f + 0.5f;
+
+            return new Vector3(x, y, z);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="radius"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public bool CheckScreenPoint(Vector3 point, float radius, out float distance)
+        {
+            Vector3 s = WorldToScreen(point, ViewProjection, ViewportWidth, ViewportHeight);
+
+            var distance_2d = Vector2.Distance(s.Xy, ScreenPoint);
+            if (distance_2d < radius)
+            {
+                distance = Vector3.Distance(point, Origin);
+                return true;
+            }
+
+            distance = float.PositiveInfinity;
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="width"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public bool CheckScreenLine(
+            Vector3 start,
+            Vector3 end,
+            float width,
+            out float distance)
+        {
+            Vector3 s0 = WorldToScreen(start, ViewProjection, ViewportWidth, ViewportHeight);
+            Vector3 s1 = WorldToScreen(end, ViewProjection, ViewportWidth, ViewportHeight);
+
+            Vector2 a = s0.Xy;
+            Vector2 b = s1.Xy;
+
+            Vector2 ab = b - a;
+            float lenSq = ab.LengthSquared;
+
+            // Degenerate line
+            if (lenSq < float.Epsilon)
+            {
+                distance = float.PositiveInfinity;
+                return false;
+            }
+
+            float t = Vector2.Dot(ScreenPoint - a, ab) / lenSq;
+            t = Math.Clamp(t, 0.0f, 1.0f);
+
+            Vector2 closest = a + ab * t;
+
+            if (Vector2.Distance(ScreenPoint, closest) <= width)
+            {
+                // Distance along the world-space segment
+                Vector3 worldPoint = Vector3.Lerp(start, end, t);
+                distance = Vector3.Distance(worldPoint, Origin);
+                return true;
+            }
+
+            distance = float.PositiveInfinity;
+            return false;
         }
 
         /// <summary>

@@ -66,7 +66,7 @@ namespace HSDRaw.AirRide.Gr.Data
         /// <summary>
         /// starts at 0x20 in stage node
         /// </summary>
-        public byte StageNodeReflectIndex
+        public byte PlayerRestituionIndex
         {
             get => (byte)((_materialflag >> 2) & 0x7);
             set => _materialflag = (_materialflag & ~0x1C) | ((value & 0x7) << 2);
@@ -94,7 +94,7 @@ namespace HSDRaw.AirRide.Gr.Data
         /// <summary>
         /// starts at 0x40 in stage node
         /// </summary>
-        public byte StageNodeForceReflectIndex
+        public byte ItemRestitutionIndex
         {
             get => (byte)((_materialflag >> 10) & 0x7);
             set => _materialflag = (_materialflag & ~0x1C00) | ((value & 0x7) << 10);
@@ -163,12 +163,21 @@ namespace HSDRaw.AirRide.Gr.Data
         public int V3 { get => _s.GetInt32(0xc); set => _s.SetInt32(0xc, value); }
 
         /// <summary>
-        /// 
+        /// >> 28 & 0x7 
         /// </summary>
-        public byte UnknownIndex 
+        public byte Index 
         {
-            get => (byte)((_s.GetInt32(0x10) >> 25) & 0x7F);
-            set => _s.SetInt32(0x10, ((value & 0x7F) << 25) | (Type & 0x01FFFFFF));
+            get => (byte)((Flag10 >> 28) & 0xF);
+            set => Flag10 = (Flag10 & ~(0xF << 28)) | ((value & 0xF) << 28);
+        }
+
+        /// <summary>
+        /// >> 25 & 0x7
+        /// </summary>
+        public byte UnknownFlags
+        {
+            get => (byte)((Flag10 >> 25) & 0x7);
+            set => Flag10 = (Flag10 & ~(0x7 << 25)) | ((value & 0x7) << 25);
         }
 
         /// <summary>
@@ -212,10 +221,14 @@ namespace HSDRaw.AirRide.Gr.Data
         /// 34 - (shadow) - no param data at all (used in underground in city)
         /// 35 - (shadow)?? used in the city castle vault thing, no additional params
         /// </summary>
-        public int Type { get => _s.GetInt32(0x10) & 0x01FFFFFF; set => _s.SetInt32(0x10, (UnknownIndex << 25) | (value & 0x01FFFFFF)); }
+        public int Type { get => Flag10 & 0x01FFFFFF; set => Flag10 = (value) | (Flag10 & ~0x01FFFFFF); }
+
+        private int Flag10 { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         /// <summary>
-        /// Collision Flags
+        /// Collision Flags 
+        /// 0x00000020 - rough 
+        /// 0x00040000 - has audio?
         /// </summary>
         public uint Flags { get => _s.GetUInt32(0x14); set => _s.SetUInt32(0x14, value); }
     }
@@ -234,11 +247,9 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public int ZoneFaceSize { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
-        public int x14 { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int ZoneLinkIndex { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
         public int x18 { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
-
-        public HSDAccessor x14_param { get => _s.GetReference<HSDAccessor>(0x14); set => _s.SetReference(0x14, value); }
 
         public HSDAccessor x18_param { get => _s.GetReference<HSDAccessor>(0x18); set => _s.SetReference(0x18, value); }
 
