@@ -1,6 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
+using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
 using HSDRawViewer.Rendering;
@@ -8,6 +9,7 @@ using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
@@ -104,6 +106,16 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             _propertyGrid = new DockablePropertyGrid();
             _propertyGrid.Show(dockPanel, DockState.DockRight);
+
+            foreach (GrCollisionNodeRenderKind e in Enum.GetValues(typeof(GrCollisionNodeRenderKind)))
+            {
+                collViewComboBox.Items.Add(e.ToString());
+            }
+            collViewComboBox.SelectedIndex = 0;
+            collViewComboBox.SelectedIndexChanged += (s, e) =>
+            {
+                _render.CollisionRenderKind = (GrCollisionNodeRenderKind)collViewComboBox.SelectedIndex;
+            };
 
 
             // dipose of resources

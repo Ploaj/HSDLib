@@ -14,12 +14,25 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
     public enum GrCollisionNodeRenderKind
     {
         Type,
+
         Material,
         Segment,
-        Friction,
-        PlayerRestitution,
-        ItemRestitution,
+        Rough,
+        Restitution1,
+        Restitution2,
         Conveyer,
+
+        Flag00002000,
+        Flag00004000,
+        Flag00008000,
+        Flag00010000,
+        Flag00020000,
+        Flag00040000,
+        Flag00080000,
+        Flag00100000,
+        Flag00200000,
+        Flag00400000,
+        Flag00800000,
     }
 
     public class GrRenderResource : IDisposable
@@ -168,6 +181,21 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             }
         }
 
+        private static Vector3[] DebugColors =
+        {
+            new Vector3(1.0f, 0.2f, 0.2f), // Red
+            new Vector3(0.2f, 1.0f, 0.4f), // Green
+            new Vector3(0.2f, 0.6f, 1.0f), // Blue
+            new Vector3(1.0f, 1.0f, 0.2f), // Yellow
+            new Vector3(1.0f, 0.2f, 1.0f), // Magenta
+
+            new Vector3(0.2f, 1.0f, 1.0f), // Cyan
+            new Vector3(1.0f, 0.6f, 0.2f), // Orange
+            new Vector3(0.6f, 0.2f, 1.0f), // Purple
+            new Vector3(0.6f, 1.0f, 0.2f), // Lime
+            new Vector3(1.0f, 0.4f, 0.6f), // Pink
+        };
+
         private Vector3 GetMaterialColor(KdMaterial mat)
         {
             switch (CollisionRenderKind)
@@ -189,14 +217,43 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                         return Vector3.UnitZ;
                 case GrCollisionNodeRenderKind.Material:
                     break;
-                case GrCollisionNodeRenderKind.Friction:
-                    break;
+                case GrCollisionNodeRenderKind.Rough:
+                    if (mat.Rough >= 0 && mat.Rough < DebugColors.Length)
+                    {
+                        return DebugColors[mat.Rough];
+                    }
+                    return Vector3.One;
                 case GrCollisionNodeRenderKind.Conveyer:
-                    break;
-                case GrCollisionNodeRenderKind.PlayerRestitution:
-                    break;
-                case GrCollisionNodeRenderKind.ItemRestitution:
-                    break;
+                    var k = mat.ConveyorVertical | mat.ConveyorHorizontal;
+                    var v = Vector3.Zero;
+                    if (k.HasFlag(KdConveyor.FORWARD))  v.Z = 1;
+                    if (k.HasFlag(KdConveyor.BACKWARD)) v.Z = 0;
+                    if (k.HasFlag(KdConveyor.RIGHT))    v.X = 1;
+                    if (k.HasFlag(KdConveyor.LEFT))     v.X = 0;
+                    return v;
+                case GrCollisionNodeRenderKind.Restitution1:
+                    if (mat.PlayerRestitutionIndex >= 0 && mat.PlayerRestitutionIndex < DebugColors.Length)
+                    {
+                        return DebugColors[mat.PlayerRestitutionIndex];
+                    }
+                    return Vector3.One;
+                case GrCollisionNodeRenderKind.Restitution2:
+                    if (mat.ItemRestitutionIndex >= 0 && mat.ItemRestitutionIndex < DebugColors.Length)
+                    {
+                        return DebugColors[mat.ItemRestitutionIndex];
+                    }
+                    return Vector3.One;
+                case GrCollisionNodeRenderKind.Flag00002000: return mat.Flag00002000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00004000: return mat.Flag00004000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00008000: return mat.Flag00008000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00010000: return mat.Flag00010000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00020000: return mat.Flag00020000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00040000: return mat.Flag00040000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00080000: return mat.Flag00080000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00100000: return mat.Flag00100000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00200000: return mat.Flag00200000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00400000: return mat.Flag00400000 ? Vector3.UnitX : Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Flag00800000: return mat.Flag00800000 ? Vector3.UnitX : Vector3.UnitZ;
             }
 
             return Vector3.One;
@@ -225,15 +282,17 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             GL.Enable(EnableCap.CullFace);
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
 
+            Vector3[] colors = new Vector3[mesh.Materials.Count];
+            for (int i = 0; i < colors.Length; i++)
+                colors[i] = GetMaterialColor(mesh.Materials[i]);
+
             GL.Begin(PrimitiveType.Triangles);
             foreach (var t in mesh.Triangles)
             {
                 if (t.Material < 0 || t.Material >= mesh.Materials.Count)
                     continue;
 
-                var mat = mesh.Materials[t.Material];
-
-                var color = GetMaterialColor(mat);
+                var color = colors[t.Material];
 
                 if (!is_selected)
                     color *= 0.75f;

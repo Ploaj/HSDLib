@@ -33,7 +33,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters
             scene.Models.Add(model);
 
             var mesh = new IOMesh();
-            mesh.Name = "CollisionMesh";
+            mesh.Name = m.ToMeshString();
             model.Meshes.Add(mesh);
 
             mesh.Vertices.AddRange(m.Vertices.Select(e =>
@@ -76,6 +76,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters
             {
                 foreach (var mesh in model.Meshes)
                 {
+                    m.FromMeshString(mesh.Name);
                     var offset = m.Vertices.Count;
                     foreach (var p in mesh.Polygons)
                     {

@@ -1,6 +1,8 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
@@ -28,62 +30,86 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         //[JsonPropertyName("name")]
         //public string Name { get; set; }
 
+        [Category("0 - General")]
         [JsonPropertyName("type")]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public KdType Type { get; set; }
 
+        [Category("0 - General")]
         [DisplayName("Common Kind")]
         [Description("Index of surface material to use. Surface materials can be found in GrCommon.dat")]
         [JsonPropertyName("cmn")]
         public byte CommonType { get; set; }
 
-        [DisplayName("Friction")]
-        [Description("Index of friction data to use for this surface.")]
-        [JsonPropertyName("fric")]
-        public byte Friction { get; set; }
+        [Category("0 - General")]
+        [DisplayName("Rough")]
+        [Description("Some index related to rough.")]
+        [Range(0, 3)]
+        [JsonPropertyName("rough")]
+        public byte Rough { get; set; }
 
+        [Category("0 - General")]
         [DisplayName("Player Restitution Index")]
         [Description("Index of restitution in the Stage Node to use for this surface.")]
+        [Range(0, 9)]
         [JsonPropertyName("r1")]
         public byte PlayerRestitutionIndex { get; set; }
 
+        [Category("0 - General")]
         [DisplayName("Item Restitution Index")]
         [Description("Index of restitution in the Stage Node to use for this surface.")]
+        [Range(0, 9)]
         [JsonPropertyName("r2")]
         public byte ItemRestitutionIndex { get; set; }
 
-        [DisplayName("Segmented")]
+        [Category("1 - Flags")]
+        [DisplayName("Segmented Move")]
         [Description("If enabled this surface will not use static lookup and will be able to be moved around in game.")]
         [JsonPropertyName("seg")]
         public bool SegmentMove { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00002000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00004000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00008000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00010000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00020000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00040000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00080000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00100000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00200000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00400000 { get; set; }
 
+        [Category("1 - Flags")]
         public bool Flag00800000 { get; set; }
 
 
+        [Category("2 - Conveyor")]
+        [DisplayName("Vertical")]
         [JsonPropertyName("conv")]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public KdConveyor ConveyorVertical { get; set; }
 
+        [Category("2 - Conveyor")]
+        [DisplayName("Horizontal")]
         [JsonPropertyName("conh")]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public KdConveyor ConveyorHorizontal { get; set; }
@@ -119,7 +145,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             return dir;
         }
 
-        public void SetRealFlag(KCCollFlag f)
+        public void SetCollFlag(KCCollFlag f)
         {
             switch (f)
             {
@@ -160,6 +186,30 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             value = set ? (value | mask) : (value & ~mask);
         }
 
+        private void SetFlags(KAR_CollisionTriangle t)
+        {
+            Rough = t.Rough;
+            PlayerRestitutionIndex = t.PlayerRestituionIndex;
+            ItemRestitutionIndex = t.ItemRestitutionIndex;
+
+            var flag = t._s.GetInt32(0x10);
+
+            SegmentMove = t.SegmentMove;
+            Flag00002000 = GetBitFlag(flag, 13);
+            Flag00004000 = GetBitFlag(flag, 14);
+            Flag00008000 = GetBitFlag(flag, 15);
+            Flag00010000 = GetBitFlag(flag, 16);
+            Flag00020000 = GetBitFlag(flag, 17);
+            Flag00040000 = GetBitFlag(flag, 18);
+            Flag00080000 = GetBitFlag(flag, 19);
+            Flag00100000 = GetBitFlag(flag, 20);
+            Flag00200000 = GetBitFlag(flag, 21);
+            Flag00400000 = GetBitFlag(flag, 22);
+            Flag00800000 = GetBitFlag(flag, 23);
+
+            SetConveyorFlag(t.ConveyorDirection);
+        }
+
         public static KdMaterial FromTriangle(KAR_CollisionTriangle t)
         {
             var flag = t._s.GetInt32(0x10);
@@ -167,24 +217,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             var m = new KdMaterial()
             {
                 CommonType = t.GrCommonIndex,
-                Friction = t.Rough,
-                PlayerRestitutionIndex = t.PlayerRestituionIndex,
-                ItemRestitutionIndex = t.ItemRestitutionIndex,
-                SegmentMove = t.SegmentMove,
-                Flag00002000 = GetBitFlag(flag, 13),
-                Flag00004000 = GetBitFlag(flag, 14),
-                Flag00008000 = GetBitFlag(flag, 15),
-                Flag00010000 = GetBitFlag(flag, 16),
-                Flag00020000 = GetBitFlag(flag, 17),
-                Flag00040000 = GetBitFlag(flag, 18),
-                Flag00080000 = GetBitFlag(flag, 19),
-                Flag00100000 = GetBitFlag(flag, 20),
-                Flag00200000 = GetBitFlag(flag, 21),
-                Flag00400000 = GetBitFlag(flag, 22),
-                Flag00800000 = GetBitFlag(flag, 23),
             };
-            m.SetRealFlag(t.Flags);
-            m.SetConveyorFlag(t.ConveyorDirection);
+            m.SetCollFlag(t.Flags);
+            m.SetFlags(t);
             return m;
         }
 
@@ -192,7 +227,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         {
             v.Flags = GetRealFlag();
             v.GrCommonIndex = CommonType;
-            v.Rough = Friction;
+            v.Rough = Rough;
             v.PlayerRestituionIndex = PlayerRestitutionIndex;
             v.ItemRestitutionIndex = ItemRestitutionIndex;
             v.ConveyorDirection = GetConveyorFlag();
@@ -217,37 +252,51 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         public override string ToString()
         {
+            var temp = new KAR_CollisionTriangle();
+            SetMaterial(temp);
+
             return string.Join("_",
                 "Kd",
                 $"T{Type}",
-                $"Cmn{CommonType}",
-                $"Fr{Friction}",
-                $"R1{PlayerRestitutionIndex}",
-                $"R2{ItemRestitutionIndex}",
-                $"Seg{(SegmentMove ? 1 : 0)}",
-                $"CV{ConveyorVertical}",
-                $"CH{ConveyorHorizontal}"
-            );
+                $"C{CommonType}",
+                $"F{temp._s.GetInt32(0x10):X8}");
         }
 
         public static KdMaterial Parse(string name)
         {
-            var parts = name.Split('_');
+            var m = new KdMaterial();
 
-            if (parts.Length != 9 || parts[0] != "Kd")
-                throw new FormatException($"Invalid KdMaterial name: {name}");
-
-            return new KdMaterial
+            foreach (var part in name.Split('_'))
             {
-                Type = Enum.Parse<KdType>(parts[1][1..]),
-                CommonType = byte.Parse(parts[2][3..]),
-                Friction = byte.Parse(parts[3][2..]),
-                PlayerRestitutionIndex = byte.Parse(parts[4][2..]),
-                ItemRestitutionIndex = byte.Parse(parts[5][2..]),
-                SegmentMove = parts[6][3..] == "1",
-                ConveyorVertical = Enum.Parse<KdConveyor>(parts[7][2..]),
-                ConveyorHorizontal = Enum.Parse<KdConveyor>(parts[8][2..])
-            };
+                if (part.StartsWith("T"))
+                {
+                    if (Enum.TryParse(part[1..], out KdType result))
+                    {
+                        m.Type = result;
+                    }
+                }
+                else if (part.StartsWith("C"))
+                {
+                    if (byte.TryParse(part[1..], out byte result))
+                    {
+                        m.CommonType = result;
+                    }
+                }
+                else if (part.StartsWith("F"))
+                {
+                    if (int.TryParse(part[1..], 
+                        NumberStyles.HexNumber, 
+                        CultureInfo.InvariantCulture, 
+                        out int flags))
+                    {
+                        var tri = new KAR_CollisionTriangle();
+                        tri._s.SetInt32(0x10, flags);
+                        m.SetFlags(tri);
+                    }
+                }
+            }
+
+            return m;
         }
     }
 }

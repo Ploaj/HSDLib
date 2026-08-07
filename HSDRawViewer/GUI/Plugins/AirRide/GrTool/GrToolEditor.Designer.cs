@@ -38,24 +38,27 @@
             toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             buttonSelectCollision = new System.Windows.Forms.ToolStripButton();
             buttonSelectTriangle = new System.Windows.Forms.ToolStripButton();
+            collViewComboBox = new System.Windows.Forms.ToolStripComboBox();
+            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // dockPanel
             // 
             dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            dockPanel.Location = new System.Drawing.Point(0, 27);
+            dockPanel.Location = new System.Drawing.Point(0, 28);
             dockPanel.Name = "dockPanel";
-            dockPanel.Size = new System.Drawing.Size(1062, 646);
+            dockPanel.Size = new System.Drawing.Size(1062, 645);
             dockPanel.TabIndex = 0;
             // 
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new System.Drawing.Size(1062, 27);
+            toolStrip1.Size = new System.Drawing.Size(1062, 28);
             toolStrip1.TabIndex = 2;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -65,7 +68,7 @@
             toolStripDropDownButton1.Image = Properties.Resources.ts_importfile;
             toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            toolStripDropDownButton1.Size = new System.Drawing.Size(66, 24);
+            toolStripDropDownButton1.Size = new System.Drawing.Size(66, 25);
             toolStripDropDownButton1.Text = "File";
             // 
             // loadModelToolStripMenuItem
@@ -80,7 +83,7 @@
             buttonSave.Image = Properties.Resources.ico_save;
             buttonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             buttonSave.Name = "buttonSave";
-            buttonSave.Size = new System.Drawing.Size(64, 24);
+            buttonSave.Size = new System.Drawing.Size(64, 25);
             buttonSave.Text = "Save";
             buttonSave.ToolTipText = "Save";
             buttonSave.Click += saveToolStripMenuItem_Click;
@@ -88,17 +91,17 @@
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
+            toolStripSeparator2.Size = new System.Drawing.Size(6, 28);
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            toolStripSeparator1.Size = new System.Drawing.Size(6, 28);
             // 
             // toolStripLabel1
             // 
             toolStripLabel1.Name = "toolStripLabel1";
-            toolStripLabel1.Size = new System.Drawing.Size(116, 24);
+            toolStripLabel1.Size = new System.Drawing.Size(116, 25);
             toolStripLabel1.Text = "Selection Mode:";
             // 
             // buttonSelectCollision
@@ -109,7 +112,7 @@
             buttonSelectCollision.Image = Properties.Resources.ts_solid;
             buttonSelectCollision.ImageTransparentColor = System.Drawing.Color.Magenta;
             buttonSelectCollision.Name = "buttonSelectCollision";
-            buttonSelectCollision.Size = new System.Drawing.Size(70, 24);
+            buttonSelectCollision.Size = new System.Drawing.Size(70, 25);
             buttonSelectCollision.Text = "Node";
             // 
             // buttonSelectTriangle
@@ -118,8 +121,25 @@
             buttonSelectTriangle.Image = Properties.Resources.ts_play;
             buttonSelectTriangle.ImageTransparentColor = System.Drawing.Color.Magenta;
             buttonSelectTriangle.Name = "buttonSelectTriangle";
-            buttonSelectTriangle.Size = new System.Drawing.Size(65, 24);
+            buttonSelectTriangle.Size = new System.Drawing.Size(65, 25);
             buttonSelectTriangle.Text = "Data";
+            // 
+            // collViewComboBox
+            // 
+            collViewComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            collViewComboBox.Name = "collViewComboBox";
+            collViewComboBox.Size = new System.Drawing.Size(121, 28);
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new System.Drawing.Size(6, 28);
+            // 
+            // toolStripLabel2
+            // 
+            toolStripLabel2.Name = "toolStripLabel2";
+            toolStripLabel2.Size = new System.Drawing.Size(122, 25);
+            toolStripLabel2.Text = "Collision Display:";
             // 
             // GrToolEditor
             // 
@@ -148,5 +168,8 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripButton buttonSelectCollision;
         private System.Windows.Forms.ToolStripButton buttonSelectTriangle;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ToolStripComboBox collViewComboBox;
     }
 }
