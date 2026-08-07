@@ -2,21 +2,71 @@
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Tools;
+using IONET;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
-    public class GrZoneNode : GrDrawNode//, IGrTranslate
+    public class GrZoneNode : GrDrawNode, IGrTranslate
     {
         private const float PICK_RADIUS_POINT = 8f;
         private const float PICK_RADIUS_LINE = 8f;
 
         public override bool HasTransform => false;
 
+        public void ImportModelFile()
+        {
+            if (Tag is not KdZone m) return;
+
+            var f = FileIO.OpenFile(IOManager.GetImportFileFilter());
+            if (f == null) return;
+
+            var scene = IOManager.LoadScene(f, new ImportSettings()
+            {
+                Triangulate = true,
+            });
+
+            if (KdZoneIOConverter.FromIOScene(scene, out KdZone temp, out string error))
+            {
+                m.Triangles.Clear();
+                m.Vertices.Clear();
+
+                m.Triangles.AddRange(temp.Triangles);
+                m.Vertices.AddRange(temp.Vertices);
+            }
+            else
+            {
+                MessageBox.Show(error, 
+                    "Mesh Import Error",
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        public void ExportToObjectFile()
+        {
+            if (Tag is not KdZone m) return;
+
+            var f = FileIO.SaveFile("Wavefront OBJ|*.obj", Text + ".obj");
+            if (f == null) return;
+
+            IOManager.ExportScene(KdZoneIOConverter.ToIOScene(m), f, new ExportSettings());
+        }
+
+
         public override void BuildContextMenu(ContextMenuStrip menu)
         {
+            menu.Items.Add("Import Model", null, (s, e) => {
+                ImportModelFile();
+            });
+
+            menu.Items.Add("Export Model", null, (s, e) => {
+                ExportToObjectFile();
+            });
+
             menu.Items.Add("Delete", null, (s, e) => {
                 OnDeleteNode?.Invoke(this);
             });
@@ -24,7 +74,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 
         public override bool HandleShortcut(Keys key, Keys modifier)
         {
-            if (key == Keys.D)
+            if (key == Keys.D || key == Keys.Delete)
             {
                 OnDeleteNode?.Invoke(this);
                 return true;
@@ -84,14 +134,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             if (Tag is not KdZone m) return false;
             if (!Visible) return false;
 
-            Matrix4 modelview = Matrix4.Identity;
-            PickInformation localPick = pick;
-
-            if (joint != null && m.Parent >= 0 && m.Parent < joint.JointCount)
-            {
-                modelview = joint.GetJObjAtIndex(m.Parent).WorldTransform;
-                localPick = pick.Transform(modelview.Inverted());
-            }
+            var ModelView = GetTransform(joint);
+            PickInformation localPick = pick.Transform(ModelView.Inverted());
 
             foreach (var t in m.Triangles)
             {
@@ -106,8 +150,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
                 Vector3 hit = Vector3.Zero;
                 if (localPick.CheckTriangleHit(p1, p2, p3, ref hit, out float depth))
                 {
-                    Vector3 worldHit = Vector3.TransformPosition(hit, modelview);
-                    float worldDistance = (worldHit - pick.Origin).Length;
+                    Vector3 worldHit = Vector3.TransformPosition(hit, ModelView);
+                    float worldDistance = (worldHit - localPick.Origin).Length;
 
                     if (worldDistance < distance)
                     {
@@ -120,7 +164,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             return tri != null;
         }
 
-        private EdgeAccessor TryPickEdge(PickInformation pick)
+        private EdgeAccessor TryPickEdge(PickInformation pick, Matrix4 modelView)
         {
             if (Tag is not KdZone m) return null;
 
@@ -140,6 +184,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
                 var v1 = m.Vertices[t.Indices[0]];
                 var v2 = m.Vertices[t.Indices[1]];
                 var v3 = m.Vertices[t.Indices[2]];
+
+                p1 = Vector3.TransformPosition(p1, modelView);
+                p2 = Vector3.TransformPosition(p2, modelView);
+                p3 = Vector3.TransformPosition(p3, modelView);
 
                 if (pick.CheckScreenLine(p1, p2, PICK_RADIUS_LINE, out d) && d < distance)
                 {
@@ -190,6 +238,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             {
                 if (TryGetPoint(m, i, out Vector3 p))
                 {
+                    p = Vector3.TransformPosition(p, modelview);
                     if (localPick.CheckScreenPoint(p, PICK_RADIUS_POINT, out float d) &&
                         d < distance)
                     {
@@ -205,7 +254,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
                 return selected_vertex;
             }
 
-            var edge = TryPickEdge(localPick);
+            var edge = TryPickEdge(localPick, modelview);
             if (edge != null) return edge;
 
 
@@ -215,6 +264,20 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         public override bool TryPickNode(PickInformation pick, LiveJObj joint, out float distance)
         {
             return TryPickTriangle(pick, joint, out KdZoneTriangle tri, out distance);
+        }
+
+        private Matrix4 GetTransform(LiveJObj joint)
+        {
+            if (Tag is not KdZone m) return Matrix4.Identity;
+
+            if (joint != null && 
+                m.Parent >= 0 && 
+                m.Parent < joint.JointCount)
+            {
+                return joint.GetJObjAtIndex(m.Parent).WorldTransform;
+            }
+
+            return Matrix4.Identity;
         }
 
         public bool CanTranslate(object selected_object)
@@ -231,22 +294,28 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             return false;
         }
 
-        public Vector3 GetTranslate(object selected_object)
+        public Vector3 GetTranslate(object selected_object, LiveJObj joint)
         {
+            var vec = Vector3.Zero;
+
             if (selected_object == this)
-                return new Vector3(Vector3.Zero);
+                vec = new Vector3(Vector3.Zero);
 
             if (selected_object == selected_vertex)
-                return new Vector3(selected_vertex.X, selected_vertex.Y, selected_vertex.Z);
+                vec = new Vector3(selected_vertex.X, selected_vertex.Y, selected_vertex.Z);
 
             if (selected_object == selected_edge)
-                return selected_edge.MidPoint;
+                vec = selected_edge.MidPoint;
 
-            return Vector3.Zero;
+            vec = Vector3.TransformPosition(vec, GetTransform(joint));
+
+            return vec;
         }
 
-        public void SetTranslate(object selected_object, Vector3 value)
+        public void SetTranslate(object selected_object, LiveJObj joint, Vector3 value)
         {
+            value = Vector3.TransformPosition(value, GetTransform(joint).Inverted());
+
             if (selected_object == this)
                 return;
 

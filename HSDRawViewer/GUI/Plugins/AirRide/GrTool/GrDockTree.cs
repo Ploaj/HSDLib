@@ -1,6 +1,5 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
-using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using System.Windows.Forms;
@@ -16,7 +15,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private GrCategoryCollision CollisionNode { get; }
 
-        private GrCategoryNode<KdZone, GrZoneNode> ZoneNode { get; }
+        private GrCategoryZone ZoneNode { get; }
 
 
         public delegate void SelectedNodeChanged(GrNode node);
@@ -53,7 +52,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             StageNode = new GrStageNode();
             ModelNode = new GrModelNode();
             CollisionNode = new GrCategoryCollision("Collisions", res.Meshes);
-            ZoneNode = new GrCategoryNode<KdZone, GrZoneNode>("Zones", res.Zones);
+            ZoneNode = new GrCategoryZone("Zones", res.Zones);
 
             treeView1.Nodes.Add(StageNode);
             treeView1.Nodes.Add(ModelNode);

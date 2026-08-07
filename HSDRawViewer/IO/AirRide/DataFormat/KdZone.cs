@@ -22,11 +22,11 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         [Browsable(false)]
         [JsonPropertyName("vertices")]
-        public List<List<float>> Vertices { get; set; }
+        public List<List<float>> Vertices { get; set; } = new List<List<float>>();
 
         [Browsable(false)]
         [JsonPropertyName("triangles")]
-        public List<KdZoneTriangle> Triangles { get; set; }
+        public List<KdZoneTriangle> Triangles { get; set; } = new List<KdZoneTriangle>();
 
         [DisplayName("Linked Zone Index")]
         [Description("Specifies the index of the destination or connected zone. Used by warps and connected movement zones.")]
@@ -39,6 +39,6 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         // matrix ??
 
-        public float[] Matrix { get; set; }
+        public float[] Matrix { get; set; } = new float[12];
     }
 }

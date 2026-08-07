@@ -8,6 +8,7 @@ using HSDRawViewer.Rendering.Renderers;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
+using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
@@ -37,6 +38,32 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
     public class GrRenderResource : IDisposable
     {
+        public class DisplaySettings
+        {
+            [Category("0 - Collisions")]
+            [DisplayName("Opacity")]
+            [Description("Opacity of collisions when not selected")]
+            public float CollisionOpacity { get; set; } = 0.75f;
+
+            [Category("0 - Collisions")]
+            [DisplayName("Opacity (Selected)")]
+            [Description("Opacity of collisions when selected")]
+            public float CollisionSelectedOpacity { get; set; } = 0.9f;
+
+            [Category("1 - Zones")]
+            [DisplayName("Opacity")]
+            [Description("Opacity of zones when not selected")]
+            public float ZonesOpacity { get; set; } = 0.5f;
+
+            [Category("1 - Zones")]
+            [DisplayName("Opacity (Selected)")]
+            [Description("Opacity of zones when selected")]
+            public float ZonesSelectedOpacity { get; set; } = 0.7f;
+
+        }
+
+        public static DisplaySettings Settings { get; } = new DisplaySettings();
+
         public Camera Camera { get; set; }
 
         public int WindowWidth { get; set; }
@@ -282,9 +309,14 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             GL.Enable(EnableCap.CullFace);
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
 
-            Vector3[] colors = new Vector3[mesh.Materials.Count];
+            Vector4[] colors = new Vector4[mesh.Materials.Count];
+            Vector4[] colors_sel = new Vector4[mesh.Materials.Count];
             for (int i = 0; i < colors.Length; i++)
-                colors[i] = GetMaterialColor(mesh.Materials[i]);
+            {
+                var c = GetMaterialColor(mesh.Materials[i]);
+                colors[i] = new Vector4(c, 1.0f) * Settings.CollisionOpacity;
+                colors_sel[i] = new Vector4(c, 1.0f) * Settings.CollisionSelectedOpacity;
+            }
 
             GL.Begin(PrimitiveType.Triangles);
             foreach (var t in mesh.Triangles)
@@ -292,12 +324,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 if (t.Material < 0 || t.Material >= mesh.Materials.Count)
                     continue;
 
-                var color = colors[t.Material];
+                var color = is_selected ? colors_sel[t.Material] : colors[t.Material];
 
-                if (!is_selected)
-                    color *= 0.75f;
-
-                GL.Color4(color.X, color.Y, color.Z, is_selected ? 1f : 0.75f);
+                GL.Color4(color);
                 foreach (var i in t.Indices)
                 {
                     var p = mesh.Vertices[i];
@@ -403,9 +432,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             GL.Begin(PrimitiveType.Triangles);
             if (is_selected)
-                GL.Color4(1f, 1f, 0f, 0.7f);
+                GL.Color4(1f, 1f, 0f, Settings.ZonesSelectedOpacity);
             else
-                GL.Color4(1f, 1f, 1f, 0.5f);
+                GL.Color4(1f, 1f, 1f, Settings.ZonesOpacity);
             foreach (var t in mesh.Triangles)
             {
                 foreach (var i in t.Indices)

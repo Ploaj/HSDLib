@@ -10,6 +10,8 @@ namespace HSDRawViewer.GUI.Controls
         public delegate void GLLoaded();
         public GLLoaded GLLoad;
 
+        public event KeyEventHandler ViewportKeyDown;
+
         public DockableViewport()
         {
             InitializeComponent();
@@ -21,6 +23,11 @@ namespace HSDRawViewer.GUI.Controls
             glViewport = new ViewportControl();
             glViewport.Dock = DockStyle.Fill;
             glViewport.DisplayGrid = true;
+
+            glViewport.ControlKeyDown += (s, e) =>
+            {
+                ViewportKeyDown?.Invoke(this, e);
+            };
 
             // add viewport
             Controls.Add(glViewport);

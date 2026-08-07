@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GrToolEditor));
             dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             toolStrip1 = new System.Windows.Forms.ToolStrip();
             toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
@@ -38,9 +39,10 @@
             toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             buttonSelectCollision = new System.Windows.Forms.ToolStripButton();
             buttonSelectTriangle = new System.Windows.Forms.ToolStripButton();
-            collViewComboBox = new System.Windows.Forms.ToolStripComboBox();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            collViewComboBox = new System.Windows.Forms.ToolStripComboBox();
+            toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -55,7 +57,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox, toolStripButton1 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1062, 28);
@@ -124,12 +126,6 @@
             buttonSelectTriangle.Size = new System.Drawing.Size(65, 25);
             buttonSelectTriangle.Text = "Data";
             // 
-            // collViewComboBox
-            // 
-            collViewComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            collViewComboBox.Name = "collViewComboBox";
-            collViewComboBox.Size = new System.Drawing.Size(121, 28);
-            // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
@@ -140,6 +136,21 @@
             toolStripLabel2.Name = "toolStripLabel2";
             toolStripLabel2.Size = new System.Drawing.Size(122, 25);
             toolStripLabel2.Text = "Collision Display:";
+            // 
+            // collViewComboBox
+            // 
+            collViewComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            collViewComboBox.Name = "collViewComboBox";
+            collViewComboBox.Size = new System.Drawing.Size(121, 28);
+            // 
+            // toolStripButton1
+            // 
+            toolStripButton1.Image = (System.Drawing.Image)resources.GetObject("toolStripButton1.Image");
+            toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new System.Drawing.Size(139, 25);
+            toolStripButton1.Text = "Display Settings";
+            toolStripButton1.Click += toolStripButton1_Click;
             // 
             // GrToolEditor
             // 
@@ -171,5 +182,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripComboBox collViewComboBox;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }

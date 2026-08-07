@@ -11,5 +11,16 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         [JsonPropertyName("v")]
         public int[] Indices { get; set; }
+
+        public KdZoneTriangle()
+        {
+        }
+
+        public KdZoneTriangle(int index, int flags, int[] indices)
+        {
+            Index = index;
+            Flags = flags;
+            Indices = indices;
+        }
     }
 }

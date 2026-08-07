@@ -219,6 +219,8 @@ namespace HSDRawViewer.GUI
             }
         }
 
+        public event KeyEventHandler ControlKeyDown;
+
         public ViewportControl()
         {
             InitializeComponent();
@@ -247,6 +249,8 @@ namespace HSDRawViewer.GUI
 
                 if (args.KeyCode == Keys.ControlKey)
                     IsControlKey = true;
+
+                ControlKeyDown?.Invoke(sender, args);
 
                 /*if (args.Alt)
                 {

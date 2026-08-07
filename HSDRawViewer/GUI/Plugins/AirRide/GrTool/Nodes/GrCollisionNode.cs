@@ -84,7 +84,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 
         public override bool HandleShortcut(Keys key, Keys modifier)
         {
-            if (key == Keys.D)
+            if (key == Keys.D || key == Keys.Delete)
             {
                 OnDeleteNode?.Invoke(this);
                 return true;

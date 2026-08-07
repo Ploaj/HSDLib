@@ -1,15 +1,14 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr;
 using HSDRaw.AirRide.Gr.Data;
-using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Controls;
+using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
@@ -68,7 +67,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 if (_dockTree.SelectedNode is not IGrTranslate node)
                     return;
 
-                node.SetTranslate(_propertyGrid.SelectedObject, t.ExtractTranslation());
+                node.SetTranslate(_propertyGrid.SelectedObject, _render.Joints, t.ExtractTranslation());
             };
         }
 
@@ -88,7 +87,31 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             _dockTree = new GrDockTree(_resource);
             _dockTree.Show(dockPanel, DockState.DockLeft);
 
-            dockPanel.KeyDown += _dockTree.treeView1_KeyDown;
+            _viewport.ViewportKeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.E)
+                {
+                    if (SelectMode == GrSelectModeKind.Data)
+                    {
+                        buttonSelectCollision.PerformClick();
+                    }
+                    else
+                    {
+                        buttonSelectTriangle.PerformClick();
+                    }
+                    e.Handled = true;
+                }
+                else
+                if (e.KeyCode == Keys.G)
+                {
+                    collViewComboBox.SelectedIndex = (collViewComboBox.SelectedIndex + 1) % collViewComboBox.Items.Count;
+                    e.Handled = true;
+                }
+                else
+                {
+                    _dockTree.treeView1_KeyDown(s, e);
+                }
+            };
 
             _dockTree.OnSelectedNodeChanged += (GrNode n) =>
             {
@@ -242,7 +265,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             if (_dockTree.SelectedNode is IGrTranslate t && t.CanTranslate(o))
             {
                 TranslationEnabled = true;
-                _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o));
+                _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o, _render.Joints));
             }
             else
             {
@@ -314,6 +337,14 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private void boneNamesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            using (var p = new PropertyDialog("Display Settings", GrRenderResource.Settings))
+            {
+                p.ShowDialog();
+            }
         }
     }
 }

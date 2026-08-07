@@ -253,7 +253,7 @@ namespace HSDRawViewer.Tools
                 foreach (KAR_ZoneCollisionJoint j in zjoints)
                 {
                     List<SpatialTriangle> zt = new();
-                    Matrix4 trans = bones == null ? Matrix4.Identity : bones[j.BoneID];
+                    Matrix4 trans = bones == null || j.BoneID < 0 || j.BoneID >= bones.Length ? Matrix4.Identity : bones[j.BoneID];
 
                     for (int i = j.ZoneFaceStart; i < j.ZoneFaceStart + j.ZoneFaceSize; i++)
                     {

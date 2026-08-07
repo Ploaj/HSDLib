@@ -14,6 +14,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 
         public override void BuildContextMenu(ContextMenuStrip menu)
         {
+            menu.Items.Add("Add New", null, (s, e) => {
+                list.Add(KdZoneIOConverter.CreateBlankSize(40f));
+            });
+
+            menu.Items.Add(new ToolStripSeparator());
+
             menu.Items.Add("Import From Model", null, (s, e) => {
                 var f = FileIO.OpenFile(IOManager.GetImportFileFilter());
                 if (f == null) return;
@@ -23,12 +29,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
                     Triangulate = true,
                 });
 
-                var zone = KdZoneIOConverter.FromIOScene(scene, out string error);
-
-                if (zone != null)
+                if (KdZoneIOConverter.FromIOScene(scene, out KdZone zone, out string error))
+                {
                     list.Add(zone);
+                }
                 else
-                    MessageBox.Show(error, "Collision Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                {
+                    MessageBox.Show(
+                        error, 
+                        "Collision Import Error", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Error);
+                }
             });
         }
     }
