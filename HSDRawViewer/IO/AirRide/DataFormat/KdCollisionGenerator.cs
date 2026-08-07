@@ -43,6 +43,13 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 FaceSize = triangles.Count - faceStart,
                 VertexStart = vertStart,
                 VertexSize = verts.Count - vertStart,
+                Kind = (int)mesh.Kind,
+                Force = (mesh.Kind == KdMeshKind.Conveyor2 || mesh.Kind == KdMeshKind.Conveyor1) ? new HSDRaw.Common.HSD_Vector3()
+                {
+                    X = mesh.ConveyorForceX,
+                    Y = mesh.ConveyorForceY,
+                    Z = mesh.ConveyorForceZ,
+                } : null
             });
         }
 

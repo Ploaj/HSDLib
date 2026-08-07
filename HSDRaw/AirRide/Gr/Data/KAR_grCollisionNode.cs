@@ -1,4 +1,5 @@
 ﻿
+using HSDRaw.Common;
 using HSDRaw.GX;
 using System;
 
@@ -134,16 +135,16 @@ namespace HSDRaw.AirRide.Gr.Data
         public int FaceSize { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         /// <summary>
-        /// Values between 0-4
+        /// Values between 0-5
         /// 0 - seems to be used on bones that are animated, such as the spiny thing at top of city trial
         /// </summary>
-        public int Flags { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public int Kind { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
 
         /// <summary>
-        /// When Flag is set to 2 this exists
+        /// When Flag is set to 1 or 2 this exists
         /// Seems to point to a Vec3
         /// </summary>
-        public int Pointer { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+        public HSD_Vector3 Force { get => _s.GetReference<HSD_Vector3>(0x18); set => _s.SetReference(0x18, value); }
     }
 
     public class KAR_ZoneCollisionTriangle : HSDAccessor

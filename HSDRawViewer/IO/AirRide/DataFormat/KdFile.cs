@@ -113,7 +113,14 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                         Vertices = new List<List<float>>(),
                         Triangles = new List<KdTriangle>(),
                         Materials = new List<KdMaterial>(),
+                        Kind = (KdMeshKind)n.Kind,
                     };
+                    if (n.Force != null)
+                    {
+                        m.ConveyorForceX = n.Force.X;
+                        m.ConveyorForceY = n.Force.Y;
+                        m.ConveyorForceZ = n.Force.Z;
+                    }
                     Collisions.Add(m);
 
                     for (int i = n.VertexStart; i < n.VertexStart + n.VertexSize; i++)

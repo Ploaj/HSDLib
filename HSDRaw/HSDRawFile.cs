@@ -888,6 +888,7 @@ namespace HSDRaw
                 x => x.EndsWith("_dynamics") ?  new SBM_PhysicsGroup() : null,
                 x => x.EndsWith("rdDataCommon") ?  new KAR_RdDataCommon() : null,
                 x => x.StartsWith("dbEffectData") ?  new KAR_dbEffectData() : null,
+                x => x.StartsWith("smSoundTestFGMGroupTable") ?  new HSDArrayAccessor<KAR_smSoundTestFGMGroupTable>() : null,
                 x => new HSDAccessor(),
         };
 
