@@ -78,6 +78,22 @@ namespace HSDRawViewer.Rendering
         public float Y { get => translation.Y; set => Translation = new Vector3(translation.X, value, translation.Z); }
         public float Z { get => translation.Z; set => Translation = new Vector3(translation.X, translation.Y, value); }
 
+        public Vector3 Right
+        {
+            get => -new Vector3(
+                MvpMatrix.M11,
+                MvpMatrix.M21,
+                MvpMatrix.M31);
+
+        }
+        public Vector3 Up
+        {
+            get => -new Vector3(
+                MvpMatrix.M12,
+                MvpMatrix.M22,
+                MvpMatrix.M32);
+        }
+
         /// <summary>
         /// The scale for all objects. Defaults to 1.
         /// </summary>

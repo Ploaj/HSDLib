@@ -1,6 +1,7 @@
 ﻿using HSDRaw.AirRide.Gr;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters;
 using HSDRawViewer.IO.AirRide.DataFormat;
+using HSDRawViewer.Properties;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
@@ -10,6 +11,17 @@ using System;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
+    public enum GrCollisionNodeRenderKind
+    {
+        Type,
+        Material,
+        Segment,
+        Friction,
+        PlayerRestitution,
+        ItemRestitution,
+        Conveyer,
+    }
+
     public class GrRenderResource : IDisposable
     {
         public Camera Camera { get; set; }
@@ -33,21 +45,30 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public bool RenderBoneLabels { get; set; }
 
+        public GrCollisionNodeRenderKind CollisionRenderKind { get; set; } = GrCollisionNodeRenderKind.Type;
+
+        private TextureManager _textures { get; set; }
+        private int tex_id;
+
         public GrRenderResource()
         {
             RenderJObj = new RenderJObj();
+            _textures = new TextureManager();
         }
 
         public void GLInit()
         {
             RenderJObj.Invalidate();
             TextRenderer.InitializeRender(@"Consolas.bff");
+
+            tex_id = _textures.Add(Resources.ico3d_sound);
         }
 
         public void GLFree()
         {
             RenderJObj.FreeResources();
             TextRenderer.Dispose();
+            _textures.ClearTextures();
         }
 
         public void BeginDraw()
@@ -58,6 +79,67 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public void BeginOverlay()
         {
             GL.Disable(EnableCap.DepthTest);
+        }
+
+        public void DrawTexture(
+            Camera cam,
+            Vector3 position,
+            float pixelWidth,
+            float pixelHeight,
+            bool constant_size)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            _textures.BindTexture(tex_id, TextureMagFilter.Nearest, TextureMinFilter.Nearest);
+
+            float width = pixelWidth;
+            float height = pixelHeight;
+
+            if (constant_size)
+            {
+                // Distance from camera
+                float distance = (position - cam.TransformedPosition).Length;
+
+                // Convert desired pixel size to world size
+                float worldHeight =
+                    2.0f * distance *
+                    MathF.Tan(cam.FovRadians * 0.5f) *
+                    (pixelHeight / cam.RenderHeight);
+
+                float worldWidth =
+                    2.0f * distance *
+                    MathF.Tan(cam.FovRadians * 0.5f) *
+                    cam.AspectRatio *
+                    (pixelWidth / cam.RenderWidth);
+
+                width = (worldWidth * 0.5f);
+                height = (worldHeight * 0.5f);
+            }
+
+            Vector3 right = cam.Right * width;
+            Vector3 up = cam.Up * height;
+
+            GL.Begin(PrimitiveType.Quads);
+
+            GL.TexCoord2(1, 0);
+            GL.Vertex3(position - right - up);
+
+            GL.TexCoord2(0, 0);
+            GL.Vertex3(position + right - up);
+
+            GL.TexCoord2(0, 1);
+            GL.Vertex3(position + right + up);
+
+            GL.TexCoord2(1, 1);
+            GL.Vertex3(position - right + up);
+
+            GL.End();
+
+            GL.PopAttrib();
         }
 
         internal void LoadModel(KAR_grModel model)
@@ -84,6 +166,41 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     i++;
                 }
             }
+        }
+
+        private Vector3 GetMaterialColor(KdMaterial mat)
+        {
+            switch (CollisionRenderKind)
+            {
+                case GrCollisionNodeRenderKind.Type:
+                    switch (mat.Type)
+                    {
+                        case KdType.CEILING: return Vector3.UnitX;
+                        case KdType.FLOOR: return Vector3.UnitY;
+                        case KdType.WALL: return Vector3.UnitZ;
+                        case KdType.UNKNOWN: return new Vector3(1f, 0f, 1f);
+                    }
+
+                    break;
+                case GrCollisionNodeRenderKind.Segment:
+                    if (mat.SegmentMove)
+                        return Vector3.UnitX;
+                    else
+                        return Vector3.UnitZ;
+                case GrCollisionNodeRenderKind.Material:
+                    break;
+                case GrCollisionNodeRenderKind.Friction:
+                    break;
+                case GrCollisionNodeRenderKind.Conveyer:
+                    break;
+                case GrCollisionNodeRenderKind.PlayerRestitution:
+                    break;
+                case GrCollisionNodeRenderKind.ItemRestitution:
+                    break;
+            }
+
+            return Vector3.One;
+
         }
 
         public void DrawKdMesh(KdMesh mesh, bool is_selected)
@@ -116,13 +233,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
                 var mat = mesh.Materials[t.Material];
 
-                var color = Vector3.One;
-                switch (mat.Type)
-                {
-                    case KdType.CEILING: color = Vector3.UnitX; break;
-                    case KdType.FLOOR: color = Vector3.UnitY; break;
-                    case KdType.WALL: color = Vector3.UnitZ; break;
-                }
+                var color = GetMaterialColor(mat);
 
                 if (!is_selected)
                     color *= 0.75f;

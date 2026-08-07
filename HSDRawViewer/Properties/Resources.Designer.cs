@@ -643,5 +643,17 @@ namespace HSDRawViewer.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ico3d_sound
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("ico3d_sound", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

@@ -180,6 +180,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             _render.BeginOverlay();
             _dockTree.DrawOverlay(_render, _propertyGrid.SelectedObject);
 
+            //_render.DrawTexture(cam, Vector3.Zero, 50, 50, true);
+            //_render.DrawTexture(cam, Vector3.Zero, 50, 50, false);
+
             if (TranslationEnabled)
                 _translationWidget.Render(cam);
 

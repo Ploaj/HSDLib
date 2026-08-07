@@ -369,5 +369,16 @@ namespace HSDRawViewer.Rendering
             GL.PopMatrix();
             GL.PopAttrib();
         }
+
+        internal void BindTexture(int tex_id, TextureMagFilter mag, TextureMinFilter min)
+        {
+            var tex = GetGLID(tex_id);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, tex);
+
+            GL.TextureParameter(tex, TextureParameterName.TextureMagFilter, (int)mag);
+            GL.TextureParameter(tex, TextureParameterName.TextureMinFilter, (int)min);
+        }
     }
 }
