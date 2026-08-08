@@ -1,7 +1,7 @@
 ﻿using HSDRaw;
 using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.Rendering.Models;
-using HSDRawViewer.Tools;
+using HSDRawViewer.Tools.SpatialOrganizer;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -75,6 +75,8 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 if (ToCollisionNode(jobj, out KAR_grCollisionNode coll, out KAR_grCollisionTree tree))
                 {
                     node.CollisionNode = coll;
+
+                    if (node.PartitionNode == null) node.PartitionNode = new KAR_grCollisionTreeNode();
                     node.PartitionNode.Partition = tree;
                 }
             }
@@ -172,7 +174,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                         Vertices = new List<List<float>>(),
                         Triangles = new List<KdZoneTriangle>(),
 
-                        Type = triangles[n.ZoneFaceStart].Type,
+                        Type = (ZoneKind)triangles[n.ZoneFaceStart].Kind,
                         Flags = triangles[n.ZoneFaceStart].Flags,
 
                         Matrix = new float[]
@@ -184,10 +186,8 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                         },
 
                         LinkedZone = n.ZoneLinkIndex,
-
-                        Type2 = n.x18,
-                        Type2Data = n.x18_param,
                     };
+                    m.SetParam(n.x18, n.x18_param);
                     Zones.Add(m);
 
                     for (int i = n.ZoneVertexStart; i < n.ZoneVertexStart + n.ZoneVertexSize; i++)
@@ -197,7 +197,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     {
                         var tri = triangles[i];
 
-                        if (tri.Type != m.Type)
+                        if (tri.Kind != (int)m.Type)
                             throw new System.Exception("Triangle Type mismatch");
 
                         if (tri.Flags != m.Flags)
@@ -240,7 +240,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             node = gen.GenerateNode();
 
             // generate partition
-            tree = SpatialPartitionOrganizer.GeneratePartition(jobj.Enumerate.Select(e => e.WorldTransform).ToArray(), node);
+            tree = SpatialPartitionOrganizer.GeneratePartition(jobj != null ? jobj.Enumerate.Select(e => e.WorldTransform).ToArray() : null, node);
             return true;
         }
 

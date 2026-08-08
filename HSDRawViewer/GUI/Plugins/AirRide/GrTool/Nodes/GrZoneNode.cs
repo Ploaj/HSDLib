@@ -17,6 +17,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 
         public override bool HasTransform => false;
 
+        private VertexAccessor selected_vertex = null;
+        private EdgeAccessor selected_edge = null;
+
         public void ImportModelFile()
         {
             if (Tag is not KdZone m) return;
@@ -91,19 +94,30 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
                 render.DrawKdZone(m, false, selected_object);
         }
 
-        private VertexAccessor selected_vertex = null;
-        private EdgeAccessor selected_edge = null;
-
+        private int my_index = -1;
         public override void DrawOverlay(GrRenderResource render, object selected_object)
         {
             if (Tag is not KdZone m) return;
+
+            if (selected_object is GrPartitionNode part)
+            {
+                if (my_index == -1)
+                {
+                    my_index = Parent.Nodes.IndexOf(this);
+                }
+                if (part.ContainsZone(my_index))
+                {
+                    render.DrawKdZone(m, true, selected_object);
+                }
+            }
+
             if (!Visible) return;
 
             if (IsSelected)
             {
                 render.DrawKdZone(m, true, selected_object);
-                
             }
+
             //if (selected_object is TriangleAccessor acc &&
             //    acc._mesh == Tag)
             //{
@@ -219,21 +233,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         {
             if (Tag is not KdZone m) return null;
 
-            //if (TryPickTriangle(pick, joint, out KdZoneTriangle tri, out float distance))
-            //    return tri;
+            Matrix4 modelview = GetTransform(joint);
+            PickInformation localPick = pick.Transform(modelview.Inverted());
 
-            Matrix4 modelview = Matrix4.Identity;
-            PickInformation localPick = pick;
-
-            if (joint != null && m.Parent >= 0 && m.Parent < joint.JointCount)
-            {
-                modelview = joint.GetJObjAtIndex(m.Parent).WorldTransform;
-                localPick = pick.Transform(modelview.Inverted());
-            }
-
-            float distance = float.PositiveInfinity;
             List<float> vd = null;
-
+            float distance = float.PositiveInfinity;
             for (int i = 0; i < m.Vertices.Count; i++)
             {
                 if (TryGetPoint(m, i, out Vector3 p))
@@ -257,6 +261,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             var edge = TryPickEdge(localPick, modelview);
             if (edge != null) return edge;
 
+            if (TryPickTriangle(pick, joint, out KdZoneTriangle tri, out distance))
+                return tri;
 
             return null;
         }
@@ -282,7 +288,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 
         public bool CanTranslate(object selected_object)
         {
-            if (selected_object == this)
+            if (selected_object == Tag)
                 return true;
 
             if (selected_object == selected_vertex)
@@ -298,8 +304,16 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         {
             var vec = Vector3.Zero;
 
-            if (selected_object == this)
-                vec = new Vector3(Vector3.Zero);
+            if (selected_object == Tag)
+            {
+                if (Tag is not KdZone m) return Vector3.Zero;
+
+                for (int i = 0; i < m.Vertices.Count; i++)
+                    if (TryGetPoint(m, i, out Vector3 p))
+                        vec += p;
+
+                vec /= m.Vertices.Count;
+            }
 
             if (selected_object == selected_vertex)
                 vec = new Vector3(selected_vertex.X, selected_vertex.Y, selected_vertex.Z);
@@ -316,8 +330,27 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         {
             value = Vector3.TransformPosition(value, GetTransform(joint).Inverted());
 
-            if (selected_object == this)
-                return;
+            if (selected_object == Tag)
+            {
+                if (Tag is not KdZone m) return;
+
+                var vec = Vector3.Zero;
+                for (int i = 0; i < m.Vertices.Count; i++)
+                    if (TryGetPoint(m, i, out Vector3 p))
+                        vec += p;
+                vec /= m.Vertices.Count;
+
+                var diff = value - vec;
+                foreach (var v in m.Vertices)
+                {
+                    for (int i = 0; i < v.Count; i += 3)
+                    {
+                        v[i] += diff.X;
+                        v[i + 1] += diff.Y;
+                        v[i + 2] += diff.Z;
+                    }
+                }
+            }
 
             if (selected_object == selected_vertex)
             {

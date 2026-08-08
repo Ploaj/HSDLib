@@ -291,7 +291,7 @@ namespace HSDRawViewer.Tools.AirRide
                 // create mesh group
                 IOMesh iomesh = new()
                 {
-                    Name = $"Zone_{index}_{bone.Name}_{_zonetriangles[j.ZoneFaceStart].Type}"
+                    Name = $"Zone_{index}_{bone.Name}_{_zonetriangles[j.ZoneFaceStart].Kind}"
                 };
                 iomodel.Meshes.Add(iomesh);
 

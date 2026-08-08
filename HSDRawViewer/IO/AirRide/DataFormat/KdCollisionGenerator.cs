@@ -70,11 +70,12 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     V2 = t.Indices[1] + vertStart,
                     V3 = t.Indices[0] + vertStart,
                     Flags = zone.Flags,
-                    Type = zone.Type,
+                    Kind = (int)zone.Type,
                     PolyIndex = i / 2,
                     Index = (byte)t.Index,
                     UnknownFlags = (byte)t.Flags,
                 };
+
                 ztriangles.Add(tri);
             }
 
@@ -88,7 +89,6 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 ZoneVertexSize = zverts.Count - vertStart,
 
                 ZoneLinkIndex = zone.LinkedZone,
-                x18 = zone.Type2,
 
                 Mtx00 = zone.Matrix[0],
                 Mtx01 = zone.Matrix[1],
@@ -104,8 +104,19 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 Mtx32 = zone.Matrix[11],
             };
 
-            if (zone.Type2Data != null)
-                new_zone.x18_param = (HSDAccessor)zone.Type2Data;
+            var param = zone.GetParam();
+            if (param is HSDAccessor acc)
+            {
+                new_zone.x18_param = acc;
+            }
+            else if (param is int acc2)
+            {
+                new_zone.x18 = acc2;
+            }
+            else
+            {
+                new_zone.x18_param = null;
+            }
 
             zjoints.Add(new_zone);
         }

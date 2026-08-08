@@ -5,6 +5,7 @@ using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
 using HSDRawViewer.Tools.AirRide;
+using HSDRawViewer.Tools.SpatialOrganizer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -269,11 +270,11 @@ namespace HSDRawViewer.ContextMenus.AirRide
                         {
                             KAR_ZoneCollisionTriangle t = tri[i];
 
-                            if (!flags.Contains(t.Type))
+                            if (!flags.Contains(t.Kind))
                             {
-                                flags.Add(t.Type);
+                                flags.Add(t.Kind);
 
-                                System.Diagnostics.Debug.WriteLine($"Index: {ji} Type: {t.Type} x18: {j.x18}");
+                                System.Diagnostics.Debug.WriteLine($"Index: {ji} Type: {t.Kind} x18: {j.x18}");
                                 if (j.x18_param != null)
                                 {
                                     System.Diagnostics.Debug.WriteLine($"\t0x18 {j.x18_param._s.Length}");

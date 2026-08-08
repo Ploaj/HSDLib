@@ -7,140 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HSDRawViewer.Tools
+namespace HSDRawViewer.Tools.SpatialOrganizer
 {
-    public class SpatialTriangle
-    {
-        public int Index;
-
-        public Vector3 p1;
-        public Vector3 p2;
-        public Vector3 p3;
-
-        public Vector3 Min => Vector3.ComponentMin(p1, Vector3.ComponentMin(p2, p3));
-
-        public Vector3 Max => Vector3.ComponentMax(p1, Vector3.ComponentMax(p2, p3));
-
-        public override string ToString()
-        {
-            return $"{p1} {p2} {p3}";
-        }
-    }
-
-    public class SpatialBox
-    {
-        public static readonly int MAX_TRIANGLE_COUNT = 80;
-
-        private readonly BoundingBox box;
-
-        public float MinX => box.Min.X;
-        public float MinY => box.Min.Y;
-        public float MinZ => box.Min.Z;
-
-        public float MaxX => box.Max.X;
-        public float MaxY => box.Max.Y;
-        public float MaxZ => box.Max.Z;
-
-
-        public List<SpatialTriangle> _triangles = new();
-
-        public int TriangleCount => _triangles.Count;
-
-        public SpatialBox Child1 { get; internal set; }
-        public SpatialBox Child2 { get; internal set; }
-
-        public float Depth { get; internal set; } = 0;
-
-        public SpatialBox(Vector3 min, Vector3 max)
-        {
-            box = new BoundingBox(min, max);
-        }
-
-        public void AddTriangle(SpatialTriangle t)
-        {
-            if (!box.Intersects(t.p1, t.p2, t.p3))
-                return;
-
-            _triangles.Add(t);
-        }
-
-        public bool ContainsPoly(IEnumerable<SpatialTriangle> tris)
-        {
-            foreach (SpatialTriangle t in tris)
-            {
-                if (box.Intersects(t.p1, t.p2, t.p3))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void Optimize()
-        {
-            if (TriangleCount > MAX_TRIANGLE_COUNT)
-            {
-                Vector3 min = box.Min;
-                Vector3 max = box.Max;
-                Vector3 mid = box.Center;
-                Vector3 ext = box.Extents;
-
-                if (ext.X > ext.Y && ext.X > ext.Z)
-                {
-                    Child1 = new SpatialBox(
-                        new Vector3(min.X, min.Y, min.Z),
-                        new Vector3(mid.X, max.Y, max.Z));
-                    Child2 = new SpatialBox(
-                        new Vector3(mid.X, min.Y, min.Z),
-                        new Vector3(max.X, max.Y, max.Z));
-                }
-                else if (ext.Y > ext.Z)
-                {
-                    Child1 = new SpatialBox(
-                        new Vector3(min.X, min.Y, min.Z),
-                        new Vector3(max.X, mid.Y, max.Z));
-                    Child2 = new SpatialBox(
-                        new Vector3(min.X, mid.Y, min.Z),
-                        new Vector3(max.X, max.Y, max.Z));
-                }
-                else
-                {
-                    Child1 = new SpatialBox(
-                        new Vector3(min.X, min.Y, min.Z),
-                        new Vector3(max.X, max.Y, mid.Z));
-                    Child2 = new SpatialBox(
-                        new Vector3(min.X, min.Y, mid.Z),
-                        new Vector3(max.X, max.Y, max.Z));
-                }
-
-                foreach (SpatialTriangle t in _triangles)
-                {
-                    Child1.AddTriangle(t);
-                    Child2.AddTriangle(t);
-                }
-
-                // clear triangles
-                _triangles.Clear();
-
-                // set child depth
-                Child1.Depth = Depth + 1;
-                Child2.Depth = Depth + 1;
-
-                // optimize new children
-                Child1.Optimize();
-                Child2.Optimize();
-            }
-            else
-            {
-                Console.WriteLine($"Bucket {Depth} {TriangleCount}");
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"{box.Min.ToString()} {box.Max.ToString()} {_triangles.Count}";
-        }
-    }
-
+    
     public class SpatialPartitionOrganizer
     {
         /// <summary>
@@ -148,19 +17,19 @@ namespace HSDRawViewer.Tools
         /// </summary>
         /// <param name="triangles"></param>
         /// <returns></returns>
-        private static SpatialBox Organize(IEnumerable<SpatialTriangle> triangles)
+        private static SpatialBox Organize(List<SpatialTriangle> triangles)
         {
             Vector3 min = new(float.MaxValue);
             Vector3 max = new(float.MinValue);
+
+            //min = new Vector3(-5005, -5005, -5005);
+            //max = new Vector3(5005, 5005, 5005);
 
             foreach (SpatialTriangle t in triangles)
             {
                 min = Vector3.ComponentMin(min, t.Min);
                 max = Vector3.ComponentMax(max, t.Max);
             }
-
-            min = new Vector3(-5005, -5005, -5005);
-            max = new Vector3(5005, 5005, 5005);
 
             SpatialBox root = new(min, max);
             foreach (SpatialTriangle t in triangles)
@@ -231,9 +100,6 @@ namespace HSDRawViewer.Tools
                 }
             }
 
-            // create initial bucket
-            SpatialBox root = Organize(triangles);
-
             // gather rough lookup
             Dictionary<int, ushort> triangleToRough = new();
             for (int i = 0; i < _triangles.Length; i++)
@@ -250,6 +116,8 @@ namespace HSDRawViewer.Tools
             KAR_ZoneCollisionJoint[] zjoints = coll.ZoneJoints;
             List<List<SpatialTriangle>> zonetris = new();
             if (zjoints != null)
+            {
+                int zoneIndex = 0;
                 foreach (KAR_ZoneCollisionJoint j in zjoints)
                 {
                     List<SpatialTriangle> zt = new();
@@ -263,16 +131,27 @@ namespace HSDRawViewer.Tools
                         Vector3 v2 = GXTranslator.toVector3(zvertices[tri.V2]);
                         Vector3 v3 = GXTranslator.toVector3(zvertices[tri.V1]);
 
-                        zt.Add(new SpatialTriangle()
+                        // TODO: move flag?
+
+                        var t = new SpatialTriangle()
                         {
+                            ZoneIndex = zoneIndex,
                             p1 = Vector3.TransformPosition(v1, trans),
                             p2 = Vector3.TransformPosition(v2, trans),
                             p3 = Vector3.TransformPosition(v3, trans),
-                        });
+                        };
+
+                        zt.Add(t);
+                        triangles.Add(t);
                     }
 
                     zonetris.Add(zt);
+                    zoneIndex++;
                 }
+            }
+
+            // create initial bucket
+            SpatialBox root = Organize(triangles);
 
             // gather partition data
             List<KAR_grPartitionBucket> partBuckets = new();
@@ -302,8 +181,19 @@ namespace HSDRawViewer.Tools
                 partBuckets.Add(pt);
 
                 // tris
+                HashSet<int> addedZones = new HashSet<int>();
                 foreach (SpatialTriangle tri in b._triangles)
                 {
+                    if (tri.ZoneIndex >= 0)
+                    {
+                        if (!addedZones.Contains(tri.ZoneIndex))
+                        {
+                            addedZones.Add(tri.ZoneIndex);
+                            zones.Add((ushort)tri.ZoneIndex);
+                        }
+                        continue;
+                    }
+
                     KAR_CollisionTriangle t = _triangles[tri.Index];
 
                     // skip seg move
@@ -321,13 +211,13 @@ namespace HSDRawViewer.Tools
                 }
 
                 // check zone collisions
-                for (int i = 0; i < zonetris.Count; i++)
-                {
-                    if (b.ContainsPoly(zonetris[i]))
-                    {
-                        zones.Add((ushort)i);
-                    }
-                }
+                //for (int i = 0; i < zonetris.Count; i++)
+                //{
+                //    if (b.ContainsPoly(zonetris[i]))
+                //    {
+                //        zones.Add((ushort)i);
+                //    }
+                //}
 
                 // set counts
                 pt.CollTriangleCount = (ushort)(collTris.Count - pt.CollTriangleStart);
@@ -337,10 +227,10 @@ namespace HSDRawViewer.Tools
                 // process children
                 if (b.Child1 != null && b.Child2 != null)
                 {
-                    pt.Child1 = (short)(partBuckets.Count);
+                    pt.Child1 = (short)partBuckets.Count;
                     processBucket(b.Child1);
 
-                    pt.Child2 = (short)(partBuckets.Count);
+                    pt.Child2 = (short)partBuckets.Count;
                     processBucket(b.Child2);
                 }
             };

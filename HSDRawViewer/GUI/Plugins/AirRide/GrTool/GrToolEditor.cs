@@ -4,6 +4,7 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.GUI.Controls;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
+using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Widgets;
 using HSDRawViewer.Tools;
@@ -71,6 +72,32 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             };
         }
 
+        public bool ProcessKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.E)
+            {
+                if (SelectMode == GrSelectModeKind.Data)
+                {
+                    buttonSelectCollision.PerformClick();
+                }
+                else
+                {
+                    buttonSelectTriangle.PerformClick();
+                }
+                e.Handled = true;
+                return true;
+            }
+            else
+            if (e.KeyCode == Keys.G)
+            {
+                collViewComboBox.SelectedIndex = (collViewComboBox.SelectedIndex + 1) % collViewComboBox.Items.Count;
+                e.Handled = true;
+                return true;
+            }
+
+            return false;
+        }
+
         public GrToolEditor()
         {
             InitializeComponent();
@@ -87,25 +114,15 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             _dockTree = new GrDockTree(_resource);
             _dockTree.Show(dockPanel, DockState.DockLeft);
 
+            //_dockTree.KeyDown += (s, e) =>
+            //{
+            //    ProcessKeyDown(s, e);
+            //};
+
             _viewport.ViewportKeyDown += (s, e) =>
             {
-                if (e.KeyCode == Keys.E)
+                if (ProcessKeyDown(s, e))
                 {
-                    if (SelectMode == GrSelectModeKind.Data)
-                    {
-                        buttonSelectCollision.PerformClick();
-                    }
-                    else
-                    {
-                        buttonSelectTriangle.PerformClick();
-                    }
-                    e.Handled = true;
-                }
-                else
-                if (e.KeyCode == Keys.G)
-                {
-                    collViewComboBox.SelectedIndex = (collViewComboBox.SelectedIndex + 1) % collViewComboBox.Items.Count;
-                    e.Handled = true;
                 }
                 else
                 {
@@ -129,6 +146,13 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             _propertyGrid = new DockablePropertyGrid();
             _propertyGrid.Show(dockPanel, DockState.DockRight);
+            _propertyGrid.PropertyValueUpdated += (object s, PropertyValueChangedEventArgs e) =>
+            {
+                if (e.ChangedItem.PropertyDescriptor.Name == nameof(KdZone.Type))
+                {
+                    _propertyGrid.Refresh();
+                }
+            };
 
             foreach (GrCollisionNodeRenderKind e in Enum.GetValues(typeof(GrCollisionNodeRenderKind)))
             {

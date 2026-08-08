@@ -8,7 +8,7 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public KAR_grSubAnim SuperJump { get => _s.GetReference<KAR_grSubAnim>(0x00); set => _s.SetReference(0x00, value); }
 
-        public KAR_grSubAnim x04 { get => _s.GetReference<KAR_grSubAnim>(0x04); set => _s.SetReference(0x04, value); }
+        public KAR_grSubAnim Leap { get => _s.GetReference<KAR_grSubAnim>(0x04); set => _s.SetReference(0x04, value); }
 
         public KAR_grSubAnim Rail { get => _s.GetReference<KAR_grSubAnim>(0x08); set => _s.SetReference(0x08, value); }
 

@@ -222,12 +222,18 @@ namespace HSDRaw.AirRide.Gr.Data
         /// 34 - (shadow) - no param data at all (used in underground in city)
         /// 35 - (shadow)?? used in the city castle vault thing, no additional params
         /// </summary>
-        public int Type { get => Flag10 & 0x01FFFFFF; set => Flag10 = (value) | (Flag10 & ~0x01FFFFFF); }
+        public int Kind { get => Flag10 & 0x01FFFFFF; set => Flag10 = (value) | (Flag10 & ~0x01FFFFFF); }
 
+        /// <summary>
+        /// 0b 11110000 00000000 00000000 00000000 - Index
+        /// 0b 00001110 00000000 00000000 00000000 - Flags (Unique Per Triangle)
+        /// 0b 00000001 11111111 11111111 11111111 - Kind
+        /// </summary>
         private int Flag10 { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
         /// <summary>
         /// Collision Flags 
+        /// Same for every triangle for a given zone
         /// 0x00000020 - rough 
         /// 0x00040000 - has audio?
         /// </summary>

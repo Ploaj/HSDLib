@@ -236,7 +236,7 @@ namespace HSDRawViewer.Tools.AirRide
                         V1 = p.Indicies[i + 2] + vertStart,
                         V2 = p.Indicies[i + 1] + vertStart,
                         V3 = p.Indicies[i + 0] + vertStart,
-                        Type = 0,
+                        Kind = 0,
                         PolyIndex = normalToPoly[normal],
                     });
                 }

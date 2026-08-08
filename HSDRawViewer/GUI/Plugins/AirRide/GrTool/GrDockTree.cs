@@ -63,6 +63,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public void LoadMiscData(KAR_grData data)
         {
             StageNode.Tag = data.StageNode;
+
+#if DEBUG
+            treeView1.Nodes.Add(new GrPartitionNode(0, data.PartitionNode.Partition.Buckets[0], data.PartitionNode.Partition.Buckets, data.PartitionNode.Partition.ZoneIndices));
+#endif
         }
 
         private (TreeNode Node, float Distance) TryPickNodes(
