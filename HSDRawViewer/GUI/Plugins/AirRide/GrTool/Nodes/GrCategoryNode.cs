@@ -58,10 +58,19 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 
         private void RefreshNodeNames()
         {
-            int i = 0;
-            foreach (TreeNode t in Nodes)
+            TreeView tree = Nodes.Count > 0 ? Nodes[0].TreeView : null;
+
+            tree?.BeginUpdate();
+
+            try
             {
-                t.Text = $"{Text}_{i++:D3}";
+                int i = 0;
+                foreach (TreeNode t in Nodes)
+                    t.Text = $"{Text}_{i++:D3}";
+            }
+            finally
+            {
+                tree?.EndUpdate();
             }
         }
     }

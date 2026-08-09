@@ -1,5 +1,6 @@
 ﻿using HSDRaw;
 using HSDRaw.Common;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -374,63 +375,145 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         }
     }
 
+    public class KdZoneVector
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+
+        public KdZoneVector()
+        {
+        }
+
+        public KdZoneVector(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public override string ToString()
+        {
+            return "Vector";
+        }
+    }
+
     public class KdZoneParamLight : KdZoneParam
     {
-        // Priority?
-        public int x00 { get; set; } 
+        [DisplayName("Priority")]
+        [Description("High values increase prioity of light to affect objects. There are a limited number of lights that can affect each object at one time.")]
+        public int Priority { get; set; }
 
-        public float x04 { get; set; }
+        [DisplayName("Unknown (x04)")]
+        [Description("")]
+        public byte x04 { get; set; }
 
-        public Color x08 { get; set; }
 
-        public Color x0C { get; set; }
+        [DisplayName("Flag0")]
+        [Description("")]
+        public bool AmbientEnabled { get; set; }
 
-        public int x10 { get; set; }
+        [DisplayName("Flag1")]
+        [Description("")]
+        public bool UnknownEnabled { get; set; }
 
-        public int x14 { get; set; }
+        [DisplayName("Flag2")]
+        [Description("")]
+        public bool DiffuseEnabled { get; set; }
 
-        public int x18 { get; set; }
 
-        public Color x1C { get; set; }
+        [DisplayName("Light[0] Enabled")]
+        [Description("Enables the use of this lighting.")]
+        public bool Light0Enabled { get; set; }
 
-        public int x20 { get; set; }
 
-        public int x24 { get; set; }
+        [DisplayName("Light[1] Enabled")]
+        [Description("Enables the use of this lighting.")]
+        public bool Light1Enabled { get; set; }
 
-        public int x28 { get; set; }
 
+        [DisplayName("Light[2] Enabled")]
+        [Description("Enables the use of this lighting.")]
+        public bool Light2Enabled { get; set; }
+
+
+        [DisplayName("Light[0] Color")]
+        [Description("Base color of this light.")]
+        public Color Color0 { get; set; }
+
+        [DisplayName("Light[1] Color")]
+        [Description("Base color of this light.")]
+        public Color Color1 { get; set; }
+
+        [DisplayName("Light[0] Direction")]
+        [Description("")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdZoneVector Direction0 { get; } = new KdZoneVector();
+
+        [DisplayName("Light[2] Color")]
+        [Description("Base color of this light.")]
+        public Color Color2 { get; set; }
+
+        [DisplayName("Light[1] Direction")]
+        [Description("")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdZoneVector Direction1 { get; } = new KdZoneVector();
+
+        [DisplayName("Unknown Interpolation Value")]
+        [Description("")]
         public float x2C { get; set; }
 
-        public int x30 { get; set; }
+        [DisplayName("Light[2] Direction")]
+        [Description("")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdZoneVector Direction2 { get; } = new KdZoneVector();
 
-        public int x34 { get; set; }
+        [DisplayName("Direction Enabled")]
+        [Description("")]
+        public byte UseDirectionVectors { get; set; }
 
-        public int x38 { get; set; }
-
-        public int x3C { get; set; }
 
         public void SetParam(HSDAccessor acc)
         {
             if (acc == null) return;
-            x00 = acc._s.GetInt32(0x00);
-            x04 = acc._s.GetFloat(0x04);
-            x08 = acc._s.GetColorRGBA(0x08);
-            x0C = acc._s.GetColorRGBA(0x0C);
+            Priority = acc._s.GetInt32(0x00);
 
-            x10 = acc._s.GetInt32(0x10);
-            x14 = acc._s.GetInt32(0x14);
-            x18 = acc._s.GetInt32(0x18);
-            x1C = acc._s.GetColorRGBA(0x1C);
+            x04 = acc._s.GetByte(0x04);
 
-            x20 = acc._s.GetInt32(0x20);
-            x24 = acc._s.GetInt32(0x24);
-            x28 = acc._s.GetInt32(0x28);
+            var enable_flag = acc._s.GetByte(0x05);
+            Light0Enabled   = (enable_flag & 0b00000001) != 0;
+            Light1Enabled   = (enable_flag & 0b00000010) != 0;
+            Light2Enabled   = (enable_flag & 0b00000100) != 0;
+            AmbientEnabled  = (enable_flag & 0b00001000) != 0;
+            UnknownEnabled  = (enable_flag & 0b00010000) != 0;
+            DiffuseEnabled  = (enable_flag & 0b00100000) != 0;
+
+            Color0 = acc._s.GetColorRGBA(0x08);
+            Color1 = acc._s.GetColorRGBA(0x0C);
+
+            Direction0.X = acc._s.GetFloat(0x10);
+            Direction0.Y = acc._s.GetFloat(0x14);
+            Direction0.Z = acc._s.GetFloat(0x18);
+
+            Color2 = acc._s.GetColorRGBA(0x1C);
+
+            Direction1.X = acc._s.GetFloat(0x20);
+            Direction1.Y = acc._s.GetFloat(0x24);
+            Direction1.Z = acc._s.GetFloat(0x28);
+
             x2C = acc._s.GetFloat(0x2C);
 
-            x30 = acc._s.GetInt32(0x30);
-            x34 = acc._s.GetInt32(0x34);
-            x38 = acc._s.GetInt32(0x38);
-            x3C = acc._s.GetInt32(0x3C);
+            Direction2.X = acc._s.GetFloat(0x20);
+            Direction2.Y = acc._s.GetFloat(0x24);
+            Direction2.Z = acc._s.GetFloat(0x28);
+
+            UseDirectionVectors = acc._s.GetByte(0x3C);
+
+            var flag = acc._s.GetUInt32(0x3C);
+            if ((flag & 0x00FFFFFF) != 0)
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public HSDAccessor GetParam()
@@ -438,25 +521,39 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             HSDAccessor acc = new();
             acc._s.Resize(0x40);
 
-            acc._s.SetInt32(0x00, x00);
-            acc._s.SetFloat(0x04, x04);
-            acc._s.SetColorRGBA(0x08, x08);
-            acc._s.SetColorRGBA(0x0C, x0C);
+            acc._s.SetInt32(0x00, Priority);
 
-            acc._s.SetInt32(0x10, x10);
-            acc._s.SetInt32(0x14, x14);
-            acc._s.SetInt32(0x18, x18);
-            acc._s.SetColorRGBA(0x1C, x1C);
+            acc._s.SetByte(0x04, x04);
 
-            acc._s.SetInt32(0x20, x20);
-            acc._s.SetInt32(0x24, x24);
-            acc._s.SetInt32(0x28, x28);
+            int enable_flag = 0;
+            enable_flag |= (Light0Enabled ? 1 : 0) << 0;
+            enable_flag |= (Light1Enabled ? 1 : 0) << 1;
+            enable_flag |= (Light2Enabled ? 1 : 0) << 2;
+            enable_flag |= (AmbientEnabled ? 1 : 0) << 3;
+            enable_flag |= (UnknownEnabled ? 1 : 0) << 4;
+            enable_flag |= (DiffuseEnabled ? 1 : 0) << 5;
+            acc._s.SetByte(0x05, (byte)enable_flag);
+
+            acc._s.SetColorRGBA(0x08, Color0);
+            acc._s.SetColorRGBA(0x0C, Color1);
+
+            acc._s.SetFloat(0x10, Direction0.X);
+            acc._s.SetFloat(0x14, Direction0.Y);
+            acc._s.SetFloat(0x18, Direction0.Z);
+
+            acc._s.SetColorRGBA(0x1C, Color2);
+
+            acc._s.SetFloat(0x20, Direction1.X);
+            acc._s.SetFloat(0x24, Direction1.X);
+            acc._s.SetFloat(0x28, Direction1.Z);
+
             acc._s.SetFloat(0x2C, x2C);
 
-            acc._s.SetInt32(0x30, x30);
-            acc._s.SetInt32(0x34, x34);
-            acc._s.SetInt32(0x38, x38);
-            acc._s.SetInt32(0x3C, x3C);
+            acc._s.SetFloat(0x30, Direction2.X);
+            acc._s.SetFloat(0x34, Direction2.Y);
+            acc._s.SetFloat(0x38, Direction2.Z);
+
+            acc._s.SetByte(0x3C, UseDirectionVectors);
             return acc;
         }
 
