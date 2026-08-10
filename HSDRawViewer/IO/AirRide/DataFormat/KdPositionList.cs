@@ -1,11 +1,9 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.Rendering.Models;
-using IONET.Collada.Core.Lighting;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using System.Linq;
+using HSDRawViewer.Tools;
+using System.ComponentModel;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
@@ -24,55 +22,15 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         YAKUMONO,
     }
 
-    public class KdPosition
-    {
-        public float[] Position { get; set; }
-        public float[] Forward { get; set; }
-        public float[] Up { get; set; }
-
-        public KAR_grPositionData ToPositionData()
-        {
-            KAR_grPositionData d = new();
-
-            if (Position != null && Position.Length >= 3)
-            {
-                d.X = Position[0];
-                d.Y = Position[1];
-                d.Z = Position[2];
-            }
-            if (Forward != null && Forward.Length >= 3)
-            {
-                d.FX = Forward[0];
-                d.FY = Forward[1];
-                d.FZ = Forward[2];
-            }
-            if (Up != null && Up.Length >= 3)
-            {
-                d.UX = Up[0];
-                d.UY = Up[1];
-                d.UZ = Up[2];
-            }
-
-            return d;
-        }
-    }
-
     public class KdPositionList
     {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public KdPositionKind Kind { get; set; }
-
-        public int Slot { get; set; } = 0;
-
-        public List<KdPosition> Positions { get; set; } = new List<KdPosition>();
+        [Browsable(false)]
+        public ObservableList<KdPosition> Positions { get; set; } = new ObservableList<KdPosition>();
 
         public KdPositionList() { }
 
-        public KdPositionList(KdPositionKind kind, int slot, LiveJObj root, KAR_grPositionList list)
+        public KdPositionList(LiveJObj root, KAR_grPositionList list)
         {
-            Kind = kind;
-            Slot = slot;
-
             if (list.JointIndices != null)
             {
                 var ids = list.JointIndices.Array;
@@ -99,9 +57,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
                     Positions.Add(new KdPosition()
                     {
-                        Position    = new float[] { p.X, p.Y, p.Z },
-                        Forward     = new float[] { forward.X, forward.Y, forward.Z},
-                        Up          = new float[] { up.X, up.Y, up.Z },
+                        Position    = new KdVector(p.X, p.Y, p.Z),
+                        Forward     = new KdVector(forward.X, forward.Y, forward.Z),
+                        Up          = new KdVector(up.X, up.Y, up.Z),
                     });
 
                     index++;
@@ -118,9 +76,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     var p = data[i];
                     Positions.Add(new KdPosition()
                     {
-                        Position    = new float[] { p.X, p.Y, p.Z },
-                        Forward     = new float[] { p.FX, p.FY, p.FZ },
-                        Up          = new float[] { p.UX, p.UY, p.UZ },
+                        Position = new KdVector(p.X, p.Y, p.Z ),
+                        Forward = new KdVector(p.FX, p.FY, p.FZ),
+                        Up = new KdVector(p.UX, p.UY, p.UZ),
                     });
                 }
             }
@@ -134,7 +92,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 {
                     Array = Positions.Select(p => p.ToPositionData()).ToArray(),
                 },
-                Count = Positions.Count,
+                Count = Positions.Count(),
             };
 
             return ls;

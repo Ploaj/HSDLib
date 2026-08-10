@@ -655,5 +655,29 @@ namespace HSDRawViewer.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_xray
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("ts_xray", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ts_wireframe
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("ts_wireframe", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

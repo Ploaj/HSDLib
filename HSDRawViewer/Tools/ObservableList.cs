@@ -26,6 +26,16 @@ namespace HSDRawViewer.Tools
             return true;
         }
 
+        public void Refresh()
+        {
+            var temp = new List<T>();
+            temp.AddRange(_items);
+            foreach (var a in temp)
+                Remove(a);
+            foreach (var a in temp)
+                Add(a);
+        }
+
         public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

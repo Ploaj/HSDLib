@@ -6,8 +6,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
     public class GrCategoryNode<T, K> : GrNode where K : GrNode
     {
-        public override bool HasTransform => false;
-
         private readonly Dictionary<T, K> _nodes = new Dictionary<T, K>();
 
         protected ObservableList<T> list;
@@ -20,11 +18,16 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             SetDataSource(list);
         }
 
+        protected virtual K CreateChild(T m)
+        {
+            return System.Activator.CreateInstance<K>();
+        }
+
         private void SetDataSource(ObservableList<T> list)
         {
             list.Added += (T m) =>
             {
-                var node = System.Activator.CreateInstance<K>();
+                var node = CreateChild(m);
                 node.Checked = true;
                 node.Tag = m;
 

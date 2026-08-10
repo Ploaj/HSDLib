@@ -5,8 +5,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
     public class GrModelNode : GrDrawNode
     {
-        public override bool HasTransform => false;
-
         public class Settings
         {
             public bool DisplayBones { get; set; } = false;

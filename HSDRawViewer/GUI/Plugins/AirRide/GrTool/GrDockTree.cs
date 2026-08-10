@@ -17,6 +17,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private GrCategoryZone ZoneNode { get; }
 
+        private GrRootPositionNode PositionNode { get; }
+
+
 
         public delegate void SelectedNodeChanged(GrNode node);
 
@@ -49,24 +52,46 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 }
             };
 
+            treeView1.BeginUpdate();
+
             StageNode = new GrStageNode();
             ModelNode = new GrModelNode();
             CollisionNode = new GrCategoryCollision("Collisions", res.Meshes);
             ZoneNode = new GrCategoryZone("Zones", res.Zones);
+            PositionNode = new GrRootPositionNode(res);
 
             treeView1.Nodes.Add(StageNode);
             treeView1.Nodes.Add(ModelNode);
             treeView1.Nodes.Add(CollisionNode);
             treeView1.Nodes.Add(ZoneNode);
+            treeView1.Nodes.Add(PositionNode);
+
+            treeView1.EndUpdate();
         }
 
         public void LoadMiscData(KAR_grData data)
         {
             StageNode.Tag = data.StageNode;
 
+            foreach (TreeNode c1 in PositionNode.Nodes)
+            {
+                foreach (TreeNode c2 in c1.Nodes)
+                    c2.Checked = false;
+
+                if (c1.Nodes.Count > 0)
+                {
+                    c1.Nodes[0].Checked = true;
+                }
+            }
+
 #if DEBUG
-            treeView1.Nodes.Add(new GrPartitionNode(0, data.PartitionNode.Partition.Buckets[0], data.PartitionNode.Partition.Buckets, data.PartitionNode.Partition.ZoneIndices));
+                    treeView1.Nodes.Add(new GrPartitionNode(0, data.PartitionNode.Partition.Buckets[0], data.PartitionNode.Partition.Buckets, data.PartitionNode.Partition.ZoneIndices));
 #endif
+        }
+
+        public void SaveMiscData(KAR_grData data)
+        {
+
         }
 
         private (TreeNode Node, float Distance) TryPickNodes(

@@ -1,9 +1,8 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.Rendering.Models;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
-using OpenTK.Mathematics;
+using HSDRawViewer.Tools;
+using System.ComponentModel;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
@@ -15,57 +14,64 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
     public class KdPositionArea
     {
-        public float[] Position { get; set; }
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdVector StartPosition { get; set; } = new KdVector();
 
-        public float[] Plane { get; set; }
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdVector StartDirection { get; set; } = new KdVector(0, 0, 1);
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdVector EndPosition { get; set; } = new KdVector();
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdVector EndDirection { get; set; } = new KdVector(0, 0, 1);
 
         public KdPositionArea() { }
 
-        public KdPositionArea(Vector3 position, Vector3 plane)
+        public KdPositionArea(KAR_grAreaPositionData d1, KAR_grAreaPositionData d2)
         {
-            Position = new float[] { position.X, position.Y, position.Z };
-            Plane = new float[] { plane.X, plane.Y, plane.Z };
+            StartPosition = new KdVector (d1.X, d1.Y, d1.Z);
+            StartDirection = new KdVector (d1.DX, d1.DY, d1.DZ);
+
+            EndPosition = new KdVector(d2.X, d2.Y, d2.Z);
+            EndDirection = new KdVector(d2.DX, d2.DY, d2.DZ);
         }
 
-        public KAR_grAreaPositionData ToPositionData()
+        public (KAR_grAreaPositionData, KAR_grAreaPositionData) ToPositionData()
         {
-            KAR_grAreaPositionData d = new();
-
-            if (Position != null && Position.Length >= 3)
+            KAR_grAreaPositionData d1 = new()
             {
-                d.X = Position[0];
-                d.Y = Position[1];
-                d.Z = Position[2];
-            }
+                X = StartPosition.X,
+                Y = StartPosition.Y,
+                Z = StartPosition.Z,
+                DX = StartDirection.X,
+                DY = StartDirection.Y,
+                DZ = StartDirection.Z,
+            };
 
-            if (Plane != null && Plane.Length >= 3)
+            KAR_grAreaPositionData d2 = new()
             {
-                d.DX = Plane[0];
-                d.DY = Plane[1];
-                d.DZ = Plane[2];
-            }
+                X = EndPosition.X,
+                Y = EndPosition.Y,
+                Z = EndPosition.Z,
+                DX = EndDirection.X,
+                DY = EndDirection.Y,
+                DZ = EndDirection.Z,
+            };
 
-            return d;
+            return (d1, d2);
         }
     }
 
     public class KdPositionAreaList
     {
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public KdAreaPositionKind Kind { get; set; }
-
-        public int Slot { get; set; }
-
-        public List<KdPositionArea> Positions { get; set; } = new List<KdPositionArea>();
+        [Browsable(false)]
+        public ObservableList<KdPositionArea> Positions { get; set; } = new ObservableList<KdPositionArea>();
 
         public KdPositionAreaList() { }
 
-        public KdPositionAreaList(KdAreaPositionKind kind, int slot, LiveJObj root, KAR_grAreaPositionList list)
+        public KdPositionAreaList(LiveJObj root, KAR_grAreaPositionList list)
         {
-            Kind = kind;
-            Slot = slot;
-
             if (list.JointIndices != null)
             {
                 var ids = list.JointIndices.Array;
@@ -77,7 +83,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     var world = joint.WorldTransform;
                     var loc = world.ExtractTranslation();
 
-                    Positions.Add(new KdPositionArea(loc, new Vector3(0, 0, -1)));
+                    Positions.Add(new KdPositionArea());
 
                     index++;
                     if (index >= list.Count)
@@ -86,18 +92,10 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             }
             else if (list.AreaPosition != null)
             {
-                int index = 0;
-                foreach (var p in list.AreaPosition.Array)
+                var arr = list.AreaPosition.Array;
+                for (int i = 0; i < list.Count; i += 2)
                 {
-                    Positions.Add(new KdPositionArea()
-                    {
-                        Position = new float[] { p.X, p.Y, p.Z },
-                        Plane = new float[] { p.DX, p.DY, p.DZ },
-                    });
-
-                    index++;
-                    if (index >= list.Count)
-                        break;
+                    Positions.Add(new KdPositionArea(arr[i], arr[i + 1]));
                 }
             }
         }
@@ -108,9 +106,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             {
                 AreaPosition = new HSDRaw.HSDArrayAccessor<KAR_grAreaPositionData>()
                 {
-                    Array = Positions.Select(p => p.ToPositionData()).ToArray(),
+                    Array = Positions.SelectMany(p => new KAR_grAreaPositionData[] { p.ToPositionData().Item1, p.ToPositionData().Item2 }).ToArray(),
                 },
-                Count = Positions.Count,
+                Count = Positions.Count(),
             };
 
             return ls;

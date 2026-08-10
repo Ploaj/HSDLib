@@ -81,11 +81,11 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 }
             }
 
-            if ((Positions != null && Positions.Count > 0) ||
-                (PositionsArea != null && PositionsArea.Count > 0))
-            {
-                node.PositionNode = ToPositionNode();
-            }
+            //if ((Positions != null && Positions.Count > 0) ||
+            //    (PositionsArea != null && PositionsArea.Count > 0))
+            //{
+            //    node.PositionNode = ToPositionNode();
+            //}
 
             // TODO: 
             //if (Splines != null)
@@ -258,7 +258,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
             var list = n.Array;
             for (int i = 0; i < list.Length; i++)
-                Positions.Add(new KdPositionList(kind, i, root, list[i]));
+                Positions.Add(new KdPositionList(root, list[i]));
         }
 
         /// <summary>
@@ -272,9 +272,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             if (n == null || n.Length == 0)
                 return;
 
-            var list = n.Array;
-            for (int i = 0; i < list.Length; i++)
-                PositionsArea.Add(new KdPositionAreaList(kind, i, root, list[i]));
+            //var list = n.Array;
+            //for (int i = 0; i < list.Length; i++)
+            //    PositionsArea.Add(new KdPositionAreaList(kind, i, root, list[i]));
         }
 
         /// <summary>
@@ -305,7 +305,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             if (arr == null)
                 arr = new HSDArrayAccessor<KAR_grPositionList>();
 
-            arr.Set(list.Slot, list.ToPositionList());
+            //arr.Set(list.Slot, list.ToPositionList());
 
             return arr;
         }
@@ -315,7 +315,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             if (arr == null)
                 arr = new HSDArrayAccessor<KAR_grAreaPositionList>();
 
-            arr.Set(list.Slot, list.ToPositionList());
+            //arr.Set(list.Slot, list.ToPositionList());
 
             return arr;
         }
@@ -329,29 +329,29 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
             foreach (var p in Positions)
             {
-                switch (p.Kind)
-                {
-                    case KdPositionKind.START:          node.Startpos       = SetPositionInList(p, node.Startpos); break;
-                    case KdPositionKind.ENEMY:          node.Enemypos       = SetPositionInList(p, node.Enemypos); break;
-                    case KdPositionKind.GRAVITY:        node.Gravitypos     = SetPositionInList(p, node.Gravitypos); break;
-                    case KdPositionKind.AIRFLOW:        node.Airflowpos     = SetPositionInList(p, node.Airflowpos); break;
-                    case KdPositionKind.CONVEYOR:       node.Conveyorpos    = SetPositionInList(p, node.Conveyorpos); break;
-                    case KdPositionKind.ITEM:           node.ItemPos        = SetPositionInList(p, node.ItemPos); break;
-                    case KdPositionKind.EVENT:          node.Eventpos       = SetPositionInList(p, node.Eventpos); break;
-                    case KdPositionKind.VEHICLE:        node.Vehiclepos     = SetPositionInList(p, node.Vehiclepos); break;
-                    case KdPositionKind.GLOBAL_DEAD:    node.GlobalDeadPos  = SetPositionInList(p, node.GlobalDeadPos); break;
-                    case KdPositionKind.LOCAL_DEAD:     node.LocalDeadPos   = SetPositionInList(p, node.LocalDeadPos); break;
-                    case KdPositionKind.YAKUMONO:       node.Yakumonopos    = SetPositionInList(p, node.Yakumonopos); break;
-                }
+                //switch (p.Kind)
+                //{
+                //    case KdPositionKind.START:          node.Startpos       = SetPositionInList(p, node.Startpos); break;
+                //    case KdPositionKind.ENEMY:          node.Enemypos       = SetPositionInList(p, node.Enemypos); break;
+                //    case KdPositionKind.GRAVITY:        node.Gravitypos     = SetPositionInList(p, node.Gravitypos); break;
+                //    case KdPositionKind.AIRFLOW:        node.Airflowpos     = SetPositionInList(p, node.Airflowpos); break;
+                //    case KdPositionKind.CONVEYOR:       node.Conveyorpos    = SetPositionInList(p, node.Conveyorpos); break;
+                //    case KdPositionKind.ITEM:           node.ItemPos        = SetPositionInList(p, node.ItemPos); break;
+                //    case KdPositionKind.EVENT:          node.Eventpos       = SetPositionInList(p, node.Eventpos); break;
+                //    case KdPositionKind.VEHICLE:        node.Vehiclepos     = SetPositionInList(p, node.Vehiclepos); break;
+                //    case KdPositionKind.GLOBAL_DEAD:    node.GlobalDeadPos  = SetPositionInList(p, node.GlobalDeadPos); break;
+                //    case KdPositionKind.LOCAL_DEAD:     node.LocalDeadPos   = SetPositionInList(p, node.LocalDeadPos); break;
+                //    case KdPositionKind.YAKUMONO:       node.Yakumonopos    = SetPositionInList(p, node.Yakumonopos); break;
+                //}
             }
 
             foreach (var p in PositionsArea)
             {
-                switch (p.Kind)
-                {
-                    case KdAreaPositionKind.ITEM_AREA:      node.ItemAreaPos = SetPositionInList(p, node.ItemAreaPos); break;
-                    case KdAreaPositionKind.VEHICLE_AREA:   node.VehicleAreapos = SetPositionInList(p, node.VehicleAreapos); break;
-                }
+                //switch (p.Kind)
+                //{
+                //    case KdAreaPositionKind.ITEM_AREA:      node.ItemAreaPos = SetPositionInList(p, node.ItemAreaPos); break;
+                //    case KdAreaPositionKind.VEHICLE_AREA:   node.VehicleAreapos = SetPositionInList(p, node.VehicleAreapos); break;
+                //}
             }
 
             return node;

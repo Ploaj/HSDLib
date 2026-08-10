@@ -15,8 +15,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         private const float PICK_RADIUS_POINT = 8f;
         private const float PICK_RADIUS_LINE = 8f;
 
-        public override bool HasTransform => false;
-
         private VertexAccessor selected_vertex = null;
         private EdgeAccessor selected_edge = null;
 

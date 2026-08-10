@@ -271,6 +271,93 @@ namespace HSDRawViewer.Rendering
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="thickness"></param>
+        /// <param name="length"></param>
+        /// <param name="color"></param>
+        public static void DrawArrow(
+            Matrix4 transform,
+            float thickness,
+            float length,
+            Vector3 direction,
+            Vector3 color,
+            float alpha)
+        {
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            Vector3 origin = transform.ExtractTranslation();
+
+            // direction is LOCAL space.
+            // Convert it to world space using the transform.
+            Vector3 worldDirection = Vector3.Normalize(
+                Vector3.TransformNormal(direction, transform));
+
+            float headLength = length * 0.3f;
+            float shaftLength = length - headLength;
+
+            float shaftRadius = thickness * 0.5f;
+            float headRadius = thickness;
+
+            Vector3 shaftEnd = origin + worldDirection * shaftLength;
+            Vector3 tip = origin + worldDirection * length;
+
+            // Build a basis perpendicular to the direction.
+            Vector3 up = Vector3.UnitY;
+
+            if (MathF.Abs(Vector3.Dot(worldDirection, up)) > 0.999f)
+                up = Vector3.UnitX;
+
+            Vector3 right = Vector3.Normalize(
+                Vector3.Cross(up, worldDirection));
+
+            up = Vector3.Normalize(
+                Vector3.Cross(worldDirection, right));
+
+            GL.Color4(color.X, color.Y, color.Z, alpha);
+
+            const int segments = 12;
+
+            // Shaft
+            GL.Begin(PrimitiveType.TriangleStrip);
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = MathF.Tau * i / segments;
+
+                Vector3 offset =
+                    right * (MathF.Cos(angle) * shaftRadius) +
+                    up * (MathF.Sin(angle) * shaftRadius);
+
+                GL.Vertex3(origin + offset);
+                GL.Vertex3(shaftEnd + offset);
+            }
+
+            GL.End();
+
+            // Head
+            GL.Begin(PrimitiveType.TriangleFan);
+
+            GL.Vertex3(tip);
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = MathF.Tau * i / segments;
+
+                Vector3 offset =
+                    right * (MathF.Cos(angle) * headRadius) +
+                    up * (MathF.Sin(angle) * headRadius);
+
+                GL.Vertex3(shaftEnd + offset);
+            }
+
+            GL.End();
+
+            GL.PopAttrib();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="x2"></param>

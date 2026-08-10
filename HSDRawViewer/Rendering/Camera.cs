@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using IONET.Collada.B_Rep.Transformation;
+using OpenTK.Mathematics;
 using System;
 using System.ComponentModel;
 using YamlDotNet.Serialization;
@@ -612,6 +613,14 @@ namespace HSDRawViewer.Rendering
             p2.Y = 1 - p2.Y;
             p2.Xy *= new Vector2(RenderWidth, renderHeight);
             return p2;
+        }
+
+        public float GetScreenConstantScale(Vector3 point)
+        {
+            float distance = (point - TransformedPosition).Length;
+            return
+                (2.0f * distance * MathF.Tan(fovRadians * 0.5f))
+                / RenderHeight;
         }
     }
 }

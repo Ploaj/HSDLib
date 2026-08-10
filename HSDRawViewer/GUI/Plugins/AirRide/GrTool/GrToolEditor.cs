@@ -232,6 +232,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             _render.Camera = cam;
             _render.WindowWidth = windowWidth;
             _render.WindowHeight = windowHeight;
+            _render.IsXRay = buttonXRay.Checked;
+            _render.DrawWireframe = wireframeButton.Checked;
 
             _render.BeginDraw();
             _dockTree.Draw(_render, _propertyGrid.SelectedObject);
@@ -241,6 +243,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             //_render.DrawTexture(cam, Vector3.Zero, 50, 50, true);
             //_render.DrawTexture(cam, Vector3.Zero, 50, 50, false);
+
+            _render.EndDraw();
 
             if (TranslationEnabled)
                 _translationWidget.Render(cam);
@@ -275,7 +279,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             foreach (ToolStripItem item in toolStrip1.Items)
             {
-                if (item is ToolStripButton other)
+                if (item is ToolStripButton other && other.Tag is GrSelectModeKind)
                     other.Checked = other == button;
             }
 
@@ -341,6 +345,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 return;
             }
             _resource.Save(_render.Joints, d);
+            _dockTree.SaveMiscData(d);
             MessageBox.Show("Saved Changes");
         }
 

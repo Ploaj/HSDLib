@@ -9,8 +9,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
     public class GrPartitionNode : GrDrawNode
     {
-        public override bool HasTransform => false;
-
         private HashSet<int> zones { get; set; } = new HashSet<int>();
 
 

@@ -1,17 +1,9 @@
-﻿using OpenTK.Mathematics;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
     public abstract class GrNode : TreeNode
     {
-        public abstract bool HasTransform { get; }
-
-        public Matrix4 LocalTransform { get; set; }
-
-        public Matrix4 GlobalTransform { get; set; }
-
-
         public delegate void DeleteNode(GrNode self);
 
         public DeleteNode OnDeleteNode;
@@ -20,6 +12,19 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         public bool Visible
         {
             get => Checked && (Parent is not GrNode node || node.Visible);
+        }
+
+        public virtual bool IsParentSelected()
+        {
+            if (Parent == null) return false;
+
+            if (Parent.IsSelected)
+                return true;
+
+            if (Parent is GrNode node)
+                return node.IsParentSelected();
+
+            return false;
         }
 
         public virtual bool HandleShortcut(Keys key, Keys modifier)

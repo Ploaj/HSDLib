@@ -43,6 +43,8 @@
             toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             collViewComboBox = new System.Windows.Forms.ToolStripComboBox();
             toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            buttonXRay = new System.Windows.Forms.ToolStripButton();
+            wireframeButton = new System.Windows.Forms.ToolStripButton();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -57,7 +59,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox, toolStripButton1 });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox, toolStripButton1, buttonXRay, wireframeButton });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1062, 28);
@@ -152,6 +154,30 @@
             toolStripButton1.Text = "Display Settings";
             toolStripButton1.Click += toolStripButton1_Click;
             // 
+            // buttonXRay
+            // 
+            buttonXRay.Checked = true;
+            buttonXRay.CheckOnClick = true;
+            buttonXRay.CheckState = System.Windows.Forms.CheckState.Checked;
+            buttonXRay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            buttonXRay.Image = Properties.Resources.ts_xray;
+            buttonXRay.ImageTransparentColor = System.Drawing.Color.Magenta;
+            buttonXRay.Name = "buttonXRay";
+            buttonXRay.Size = new System.Drawing.Size(29, 25);
+            buttonXRay.Text = "X - Ray";
+            // 
+            // wireframeButton
+            // 
+            wireframeButton.Checked = true;
+            wireframeButton.CheckOnClick = true;
+            wireframeButton.CheckState = System.Windows.Forms.CheckState.Checked;
+            wireframeButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            wireframeButton.Image = Properties.Resources.ts_wireframe;
+            wireframeButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            wireframeButton.Name = "wireframeButton";
+            wireframeButton.Size = new System.Drawing.Size(29, 25);
+            wireframeButton.Text = "Show Wireframe";
+            // 
             // GrToolEditor
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -183,5 +209,7 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripComboBox collViewComboBox;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton buttonXRay;
+        private System.Windows.Forms.ToolStripButton wireframeButton;
     }
 }

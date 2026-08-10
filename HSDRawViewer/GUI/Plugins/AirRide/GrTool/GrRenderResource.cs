@@ -1,14 +1,16 @@
 ﻿using HSDRaw.AirRide.Gr;
+using HSDRaw.GX;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters;
+using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Properties;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
+using IONET.Collada.FX.Texturing;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
-using System.ComponentModel;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
@@ -38,31 +40,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
     public class GrRenderResource : IDisposable
     {
-        public class DisplaySettings
-        {
-            [Category("0 - Collisions")]
-            [DisplayName("Opacity")]
-            [Description("Opacity of collisions when not selected")]
-            public float CollisionOpacity { get; set; } = 0.75f;
-
-            [Category("0 - Collisions")]
-            [DisplayName("Opacity (Selected)")]
-            [Description("Opacity of collisions when selected")]
-            public float CollisionSelectedOpacity { get; set; } = 0.9f;
-
-            [Category("1 - Zones")]
-            [DisplayName("Opacity")]
-            [Description("Opacity of zones when not selected")]
-            public float ZonesOpacity { get; set; } = 0.5f;
-
-            [Category("1 - Zones")]
-            [DisplayName("Opacity (Selected)")]
-            [Description("Opacity of zones when selected")]
-            public float ZonesSelectedOpacity { get; set; } = 0.7f;
-
-        }
-
-        public static DisplaySettings Settings { get; } = new DisplaySettings();
+        public static GrDisplaySettings Settings { get; } = new GrDisplaySettings();
 
         public Camera Camera { get; set; }
 
@@ -88,6 +66,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public GrCollisionNodeRenderKind CollisionRenderKind { get; set; } = GrCollisionNodeRenderKind.Type;
 
         private TextureManager _textures { get; set; }
+
+        public bool IsXRay { get; internal set; }
+
+        public bool DrawWireframe { get; set; }
+
+
         private int tex_id;
 
         public GrRenderResource()
@@ -113,12 +97,30 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public void BeginDraw()
         {
-            GL.Clear(ClearBufferMask.DepthBufferBit);
+            if (IsXRay)
+            {
+                GL.Clear(ClearBufferMask.DepthBufferBit);
+                return;
+            }
+
+            GL.Enable(EnableCap.PolygonOffsetFill);
+            GL.PolygonOffset(-1.0f, -1.0f);
+
+            GL.Enable(EnableCap.PolygonOffsetLine);
+            GL.PolygonOffset(-1.0f, -1.0f);
+
+            GL.DepthFunc(DepthFunction.Lequal);
         }
 
         public void BeginOverlay()
         {
             GL.Disable(EnableCap.DepthTest);
+        }
+
+        public void EndDraw()
+        {
+            GL.Disable(EnableCap.PolygonOffsetFill);
+            GL.Disable(EnableCap.PolygonOffsetLine);
         }
 
         public void DrawTexture(
@@ -230,9 +232,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 case GrCollisionNodeRenderKind.Type:
                     switch (mat.Type)
                     {
-                        case KdType.CEILING: return Vector3.UnitX;
-                        case KdType.FLOOR: return Vector3.UnitY;
-                        case KdType.WALL: return Vector3.UnitZ;
+                        case KdType.FLOOR: return Vector3.UnitX;
+                        case KdType.WALL: return Vector3.UnitY;
+                        case KdType.CEILING: return Vector3.UnitZ;
                         case KdType.UNKNOWN: return new Vector3(1f, 0f, 1f);
                     }
 
@@ -300,7 +302,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 GL.MultMatrix(ref t);
             }
 
-            //GL.Disable(EnableCap.DepthTest);
             //GL.Clear(ClearBufferMask.DepthBufferBit);
 
             GL.Enable(EnableCap.Blend);
@@ -337,26 +338,28 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             }
             GL.End();
 
-
-            GL.LineWidth(2f);
-            GL.Disable(EnableCap.CullFace);
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
-
-            GL.Begin(PrimitiveType.Triangles);
-            if (is_selected)
-                GL.Color3(Vector3.One);
-            else
-                GL.Color3(Vector3.Zero);
-            foreach (var t in mesh.Triangles)
+            if (DrawWireframe)
             {
-                foreach (var i in t.Indices)
+                GL.LineWidth(2f);
+                GL.Disable(EnableCap.CullFace);
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+
+                GL.Begin(PrimitiveType.Triangles);
+                if (is_selected)
+                    GL.Color3(Vector3.One);
+                else
+                    GL.Color3(Vector3.Zero);
+                foreach (var t in mesh.Triangles)
                 {
-                    var p = mesh.Vertices[i];
-                    if (p.Count != 3) continue;
-                    GL.Vertex3(p[0], p[1], p[2]);
+                    foreach (var i in t.Indices)
+                    {
+                        var p = mesh.Vertices[i];
+                        if (p.Count != 3) continue;
+                        GL.Vertex3(p[0], p[1], p[2]);
+                    }
                 }
+                GL.End();
             }
-            GL.End();
 
             GL.PopMatrix();
             GL.PopAttrib();
@@ -448,26 +451,29 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             GL.End();
 
 
-            GL.LineWidth(2f);
-            GL.Enable(EnableCap.CullFace);
-            GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
-
-            GL.Begin(PrimitiveType.Triangles);
-            if (is_selected)
-                GL.Color4(0.8f, 0, 0f, 1f);
-            else
-                GL.Color4(0.8f, 0.8f, 0.8f, 1f);
-            foreach (var t in mesh.Triangles)
+            if (DrawWireframe)
             {
-                foreach (var i in t.Indices)
+                GL.LineWidth(2f);
+                GL.Enable(EnableCap.CullFace);
+                GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
+
+                GL.Begin(PrimitiveType.Triangles);
+                if (is_selected)
+                    GL.Color4(0.8f, 0, 0f, 1f);
+                else
+                    GL.Color4(0.8f, 0.8f, 0.8f, 1f);
+                foreach (var t in mesh.Triangles)
                 {
-                    var p = mesh.Vertices[i];
-                    if (p.Count != 3)
-                        continue;
-                    GL.Vertex3(p[0], p[1], p[2]);
+                    foreach (var i in t.Indices)
+                    {
+                        var p = mesh.Vertices[i];
+                        if (p.Count != 3)
+                            continue;
+                        GL.Vertex3(p[0], p[1], p[2]);
+                    }
                 }
+                GL.End();
             }
-            GL.End();
 
 
             GL.PointSize(10f);
@@ -517,6 +523,263 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             GL.PopMatrix();
             GL.PopAttrib();
+        }
+        public static Matrix4 CreateTransform(
+            Vector3 position,
+            Vector3 forward,
+            Vector3 up)
+        {
+            forward = Vector3.Normalize(forward);
+
+            // Make up perpendicular to forward
+            Vector3 right = Vector3.Normalize(Vector3.Cross(up, forward));
+            up = Vector3.Cross(forward, right);
+
+            return new Matrix4(
+                right.X, right.Y, right.Z, 0.0f,
+                up.X, up.Y, up.Z, 0.0f,
+                forward.X, forward.Y, forward.Z, 0.0f,
+                position.X, position.Y, position.Z, 1.0f);
+        }
+
+        public static Vector3 ToTkVector(KdVector vec)
+        {
+            return new Vector3(vec.X, vec.Y, vec.Z);
+        }
+
+        public void DrawKdPosition(
+            KdPosition mesh, 
+            bool is_selected, 
+            object selected_object, 
+            Vector3 colorX,
+            Vector3 colorY,
+            Vector3 colorZ)
+        {
+            float s = Settings.PositionRadius;
+
+            var m = CreateTransform(ToTkVector(mesh.Position), ToTkVector(mesh.Forward), ToTkVector(mesh.Up));
+
+            var alpha = is_selected ? Settings.PositionSelectedOpacity : Settings.PositionOpacity;
+
+            float width = is_selected ? 8 : 4;
+
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PushMatrix();
+            GL.MultMatrix(ref m);
+
+            GL.LineWidth(width);
+
+            GL.Begin(PrimitiveType.Lines);
+
+            GL.Color4(colorX.X, colorX.Y, colorX.Z, alpha);
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(s, 0, 0);
+
+            GL.Color4(colorY.X, colorY.Y, colorY.Z, alpha);
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(0, s, 0);
+
+            GL.Color4(colorZ.X, colorZ.Y, colorZ.Z, alpha);
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(0, 0, s);
+
+            GL.End();
+
+            GL.PopMatrix();
+            GL.PopAttrib();
+        }
+
+        public static void DrawBoxOutline(
+            Vector3 p1,
+            Vector3 p2,
+            Vector3 forward,
+            Vector3 up,
+            Vector4 color)
+        {
+            Vector3 center = (p1 + p2) * 0.5f;
+            Vector3 half = (p2 - p1) * 0.5f;
+
+            forward = Vector3.Normalize(forward);
+            up = Vector3.Normalize(up);
+
+            Vector3 right = Vector3.Normalize(
+                Vector3.Cross(up, forward));
+
+            up = Vector3.Normalize(
+                Vector3.Cross(forward, right));
+
+            Vector3[] c = new Vector3[8];
+
+            // Bottom
+            c[0] = center - right * half.X - up * half.Y - forward * half.Z;
+            c[1] = center + right * half.X - up * half.Y - forward * half.Z;
+            c[2] = center + right * half.X + up * half.Y - forward * half.Z;
+            c[3] = center - right * half.X + up * half.Y - forward * half.Z;
+
+            // Top
+            c[4] = center - right * half.X - up * half.Y + forward * half.Z;
+            c[5] = center + right * half.X - up * half.Y + forward * half.Z;
+            c[6] = center + right * half.X + up * half.Y + forward * half.Z;
+            c[7] = center - right * half.X + up * half.Y + forward * half.Z;
+
+            GL.Color4(color);
+
+            GL.Begin(PrimitiveType.Lines);
+
+            // Bottom
+            GL.Vertex3(c[0]);
+            GL.Vertex3(c[1]);
+
+            GL.Vertex3(c[1]);
+            GL.Vertex3(c[2]);
+
+            GL.Vertex3(c[2]);
+            GL.Vertex3(c[3]);
+
+            GL.Vertex3(c[3]);
+            GL.Vertex3(c[0]);
+
+            // Top
+            GL.Vertex3(c[4]);
+            GL.Vertex3(c[5]);
+
+            GL.Vertex3(c[5]);
+            GL.Vertex3(c[6]);
+
+            GL.Vertex3(c[6]);
+            GL.Vertex3(c[7]);
+
+            GL.Vertex3(c[7]);
+            GL.Vertex3(c[4]);
+
+            // Vertical edges
+            GL.Vertex3(c[0]);
+            GL.Vertex3(c[4]);
+
+            GL.Vertex3(c[1]);
+            GL.Vertex3(c[5]);
+
+            GL.Vertex3(c[2]);
+            GL.Vertex3(c[6]);
+
+            GL.Vertex3(c[3]);
+            GL.Vertex3(c[7]);
+
+            GL.End();
+        }
+
+        public static void DrawBox(
+            Vector3 p1,
+            Vector3 p2,
+            Vector3 forward,
+            Vector3 up,
+            Vector4 color)
+        {
+            Vector3 center = (p1 + p2) * 0.5f;
+            Vector3 half = (p2 - p1) * 0.5f;
+
+            forward = Vector3.Normalize(forward);
+            up = Vector3.Normalize(up);
+
+            // Build the third axis.
+            Vector3 right = Vector3.Normalize(
+                Vector3.Cross(up, forward));
+
+            // Re-orthogonalize up.
+            up = Vector3.Normalize(
+                Vector3.Cross(forward, right));
+
+            // Local box corners.
+            Vector3[] corners =
+            {
+                -right * half.X - up * half.Y - forward * half.Z,
+                 right * half.X - up * half.Y - forward * half.Z,
+                 right * half.X + up * half.Y - forward * half.Z,
+                -right * half.X + up * half.Y - forward * half.Z,
+
+                -right * half.X - up * half.Y + forward * half.Z,
+                 right * half.X - up * half.Y + forward * half.Z,
+                 right * half.X + up * half.Y + forward * half.Z,
+                -right * half.X + up * half.Y + forward * half.Z,
+            };
+
+            for (int i = 0; i < corners.Length; i++)
+                corners[i] += center;
+
+            GL.Color4(color);
+
+            GL.Begin(PrimitiveType.Quads);
+
+            // -Z
+            GL.Vertex3(corners[0]);
+            GL.Vertex3(corners[1]);
+            GL.Vertex3(corners[2]);
+            GL.Vertex3(corners[3]);
+
+            // +Z
+            GL.Vertex3(corners[5]);
+            GL.Vertex3(corners[4]);
+            GL.Vertex3(corners[7]);
+            GL.Vertex3(corners[6]);
+
+            // -Y
+            GL.Vertex3(corners[0]);
+            GL.Vertex3(corners[4]);
+            GL.Vertex3(corners[5]);
+            GL.Vertex3(corners[1]);
+
+            // +Y
+            GL.Vertex3(corners[3]);
+            GL.Vertex3(corners[2]);
+            GL.Vertex3(corners[6]);
+            GL.Vertex3(corners[7]);
+
+            // -X
+            GL.Vertex3(corners[4]);
+            GL.Vertex3(corners[0]);
+            GL.Vertex3(corners[3]);
+            GL.Vertex3(corners[7]);
+
+            // +X
+            GL.Vertex3(corners[1]);
+            GL.Vertex3(corners[5]);
+            GL.Vertex3(corners[6]);
+            GL.Vertex3(corners[2]);
+
+            GL.End();
+        }
+
+        internal void DrawKdPositionArea(KdPositionArea p, bool isSelected, object selected_object, Vector3 color)
+        {
+            var alpha = isSelected ? Settings.PositionAreaSelectedOpacity : Settings.PositionAreaOpacity;
+
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            GL.Enable(EnableCap.CullFace);
+
+            var p1 = ToTkVector(p.StartPosition);
+            var p2 = ToTkVector(p.EndPosition);
+            var forward = ToTkVector(p.StartDirection).Normalized();
+            Vector3 up = Vector3.UnitY;
+
+            DrawBox(p1, p2, forward, up, new Vector4(color, alpha));
+
+            GL.PopMatrix();
+            GL.PopAttrib();
+        }
+
+        public void DrawKdPositionAreaOverlay(KdPositionArea p, object selected_object)
+        {
+            var p1 = ToTkVector(p.StartPosition);
+            var p2 = ToTkVector(p.EndPosition);
+            var forward = ToTkVector(p.StartDirection).Normalized();
+            Vector3 up = Vector3.UnitY;
+            DrawBoxOutline(p1, p2, forward, up, Vector4.One);
         }
 
         public void Dispose()

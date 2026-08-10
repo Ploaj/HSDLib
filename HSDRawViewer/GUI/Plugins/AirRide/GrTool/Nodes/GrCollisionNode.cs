@@ -16,8 +16,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
     public class GrCollisionNode : GrDrawNode
     {
-        public override bool HasTransform => false;
-
         public void ImportModelFile()
         {
             if (Tag is not KdMesh m) return;
