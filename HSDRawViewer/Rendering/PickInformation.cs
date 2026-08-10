@@ -19,15 +19,18 @@ namespace HSDRawViewer.Rendering
 
         public float ViewportHeight { get; init; }
 
+        public Camera Camera { get; internal set; }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="screenPoint"></param>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
-        public PickInformation(Matrix4 view, float width, float height, Vector2 screenPoint, Vector3 p1, Vector3 p2)
+        public PickInformation(Camera cam, float width, float height, Vector2 screenPoint, Vector3 p1, Vector3 p2)
         {
-            ViewProjection = view;
+            Camera = cam;
+            ViewProjection = cam.MvpMatrix;
             ScreenPoint = screenPoint;
             ViewportHeight = height;
             ViewportWidth = width;
@@ -44,7 +47,7 @@ namespace HSDRawViewer.Rendering
             Vector3 origin = Vector3.TransformPosition(Origin, matrix);
             Vector3 end = Vector3.TransformPosition(End, matrix);
 
-            return new PickInformation(ViewProjection, ViewportWidth, ViewportHeight, ScreenPoint, origin, end);
+            return new PickInformation(Camera, ViewportWidth, ViewportHeight, ScreenPoint, origin, end);
         }
 
         private static Vector3 WorldToScreen(

@@ -5,5 +5,9 @@
         public void Undo(object selected_object);
 
         public void Redo(object selected_object);
+
+        public void Commit(object selected_object);
+
+        public void ClearHistory();
     }
 }

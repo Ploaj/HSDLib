@@ -1,12 +1,21 @@
 ﻿using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
-    public class GrPositionNode : GrDrawNode, IGrTranslate
+    public class GrPositionNode : GrDrawNode, IGrTranslate, IGrRotate, IUndo
     {
+        public override void BuildContextMenu(ContextMenuStrip menu)
+        {
+            menu.Items.Add("Delete", null, (s, e) => {
+                OnDeleteNode?.Invoke(this);
+            });
+        }
+
         public override void Draw(GrRenderResource render, object selected_object)
         {
             if (Tag is not KdPosition p) return;
@@ -83,5 +92,77 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             }
         }
 
+        private ObjectUndoManager _undo = new ObjectUndoManager();
+
+        public void Undo(object selected_object)
+        {
+            if (selected_object != Tag ||
+                Tag is not KdPosition p)
+                return;
+
+            _undo.Undo();
+        }
+
+        public void Commit(object selected_object)
+        {
+            if (selected_object != Tag ||
+                Tag is not KdPosition p)
+                return;
+
+            _undo.Commit(p);
+        }
+
+        public void Redo(object selected_object)
+        {
+            if (selected_object != Tag ||
+                Tag is not KdPosition p)
+                return;
+
+            _undo.Redo();
+        }
+
+        public void ClearHistory()
+        {
+            if (Tag is not KdPosition p)
+                return;
+
+            _undo.ClearHistory();
+        }
+
+        public bool CanRotate(object selected_object)
+        {
+            return selected_object == Tag;
+        }
+
+        public Matrix4 GetRotation(object selected_object, LiveJObj joint)
+        {
+            if (selected_object != Tag ||
+                selected_object is not KdPosition p)
+                return Matrix4.Identity;
+
+            var forward = new Vector3(p.Forward.X, p.Forward.Y, p.Forward.Z);
+            var up = Vector3.UnitY;
+            var mid = new Vector3(p.Position.X, p.Position.Y, p.Position.Z);
+
+            return Matrix4.CreateFromQuaternion(Math3D.FromForwardUp(forward, up)) * Matrix4.CreateTranslation(mid);
+        }
+
+        public void SetRotation(object selected_object, LiveJObj joint, Quaternion value)
+        {
+            if (selected_object != Tag ||
+                selected_object is not KdPosition p)
+                return;
+
+            var forward = Vector3.Transform(Vector3.UnitZ, value);
+            var up = Vector3.Transform(Vector3.UnitY, value);
+
+            p.Forward.X = forward.X;
+            p.Forward.Y = forward.Y;
+            p.Forward.Z = forward.Z;
+
+            p.Up.X = up.X;
+            p.Up.Y = up.Y;
+            p.Up.Z = up.Z;
+        }
     }
 }

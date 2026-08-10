@@ -198,5 +198,42 @@ namespace HSDRawViewer.Rendering
 
             return m;
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="forward"></param>
+        /// <param name="up"></param>
+        /// <returns></returns>
+        public static Quaternion FromForwardUp(Vector3 forward, Vector3 up)
+        {
+            forward = Vector3.Normalize(forward);
+
+            Vector3 right = Vector3.Cross(up, forward);
+
+            if (right.LengthSquared < 0.000001f)
+            {
+                // Forward and up are nearly parallel.
+                // Pick an arbitrary perpendicular axis.
+                Vector3 fallback =
+                    MathF.Abs(forward.Y) < 0.999f
+                        ? Vector3.UnitY
+                        : Vector3.UnitX;
+
+                right = Vector3.Cross(fallback, forward);
+            }
+
+            right.Normalize();
+            up = Vector3.Cross(forward, right);
+            up.Normalize();
+
+            Matrix3 rotation = new Matrix3(
+                right.X, up.X, forward.X,
+                right.Y, up.Y, forward.Y,
+                right.Z, up.Z, forward.Z);
+
+            return Quaternion.FromMatrix(rotation);
+        }
     }
 }

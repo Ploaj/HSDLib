@@ -1,13 +1,22 @@
 ﻿using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
 using System;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
-    public class GrPositionAreaNode : GrDrawNode, IGrTranslate
+    public class GrPositionAreaNode : GrDrawNode, IGrTranslate, IGrRotate, IUndo
     {
+        public override void BuildContextMenu(ContextMenuStrip menu)
+        {
+            menu.Items.Add("Delete", null, (s, e) => {
+                OnDeleteNode?.Invoke(this);
+            });
+        }
+
         public override void Draw(GrRenderResource render, object selected_object)
         {
             if (Tag is not KdPositionArea p) return;
@@ -150,9 +159,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             if (RayTest(
                 pick.Origin, 
                 -pick.Direction, 
-                new Vector3(p.StartPosition.X, p.StartPosition.Y, p.StartPosition.Z),
-                new Vector3(p.EndPosition.X, p.EndPosition.Y, p.EndPosition.Z),
-                new Vector3(p.StartDirection.X, p.StartDirection.Y, p.StartDirection.Z),
+                new Vector3(p.P1.X, p.P1.Y, p.P1.Z),
+                new Vector3(p.P2.X, p.P2.Y, p.P2.Z),
+                new Vector3(p.Forward.X, p.Forward.Y, p.Forward.Z),
                 Vector3.UnitY,
                 out distance, 
                 out Vector3 hit))
@@ -173,7 +182,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             if (selected_object == Tag &&
                 selected_object is KdPositionArea p)
             {
-                var mid = (new Vector3(p.StartPosition.X, p.StartPosition.Y, p.StartPosition.Z) + new Vector3(p.EndPosition.X, p.EndPosition.Y, p.EndPosition.Z)) * 0.5f;
+                var mid = (new Vector3(p.P1.X, p.P1.Y, p.P1.Z) + new Vector3(p.P2.X, p.P2.Y, p.P2.Z)) * 0.5f;
 
                 return mid;
             }
@@ -186,17 +195,86 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             if (selected_object == Tag &&
                 selected_object is KdPositionArea p)
             {
-                var mid = (new Vector3(p.StartPosition.X, p.StartPosition.Y, p.StartPosition.Z) + new Vector3(p.EndPosition.X, p.EndPosition.Y, p.EndPosition.Z)) * 0.5f;
+                var mid = (new Vector3(p.P1.X, p.P1.Y, p.P1.Z) + new Vector3(p.P2.X, p.P2.Y, p.P2.Z)) * 0.5f;
                 var diff = value - mid;
 
-                p.StartPosition.X += diff.X;
-                p.StartPosition.Y += diff.Y;
-                p.StartPosition.Z += diff.Z;
+                p.P1.X += diff.X;
+                p.P1.Y += diff.Y;
+                p.P1.Z += diff.Z;
 
-                p.EndPosition.X += diff.X;
-                p.EndPosition.Y += diff.Y;
-                p.EndPosition.Z += diff.Z;
+                p.P2.X += diff.X;
+                p.P2.Y += diff.Y;
+                p.P2.Z += diff.Z;
             }
+        }
+
+        public bool CanRotate(object selected_object)
+        {
+            return selected_object == Tag;
+        }
+
+        public Matrix4 GetRotation(object selected_object, LiveJObj joint)
+        {
+            if (selected_object != Tag ||
+                selected_object is not KdPositionArea p)
+                return Matrix4.Identity;
+
+            var forward = new Vector3(p.Forward.X, p.Forward.Y, p.Forward.Z);
+            var up = Vector3.UnitY;
+            var mid = (new Vector3(p.P1.X, p.P1.Y, p.P1.Z) + new Vector3(p.P2.X, p.P2.Y, p.P2.Z)) * 0.5f;
+
+            return Matrix4.CreateFromQuaternion(Math3D.FromForwardUp(forward, up)) * Matrix4.CreateTranslation(mid);
+        }
+
+        public void SetRotation(object selected_object, LiveJObj joint, Quaternion value)
+        {
+            if (selected_object != Tag ||
+                selected_object is not KdPositionArea p)
+                return;
+
+            Vector3 forward = Vector3.Transform(Vector3.UnitZ, value);
+
+            p.Forward.X = forward.X;
+            p.Forward.Y = forward.Y;
+            p.Forward.Z = forward.Z;
+        }
+
+
+        private ObjectUndoManager _undo = new ObjectUndoManager();
+
+        public void Undo(object selected_object)
+        {
+            if (selected_object != Tag ||
+                Tag is not KdPositionArea p)
+                return;
+
+            _undo.Undo();
+        }
+
+        public void Commit(object selected_object)
+        {
+            if (selected_object != Tag ||
+                Tag is not KdPositionArea p)
+                return;
+
+            _undo.Commit(p);
+        }
+
+        public void Redo(object selected_object)
+        {
+            if (selected_object != Tag ||
+                Tag is not KdPositionArea p)
+                return;
+
+            _undo.Redo();
+        }
+
+        public void ClearHistory()
+        {
+            if (Tag is not KdPositionArea p)
+                return;
+
+            _undo.ClearHistory();
         }
     }
 }

@@ -11,6 +11,10 @@ namespace HSDRawViewer.Tools
         public event Action<T> Added;
         public event Action<T> Removed;
 
+        public int Count => _items.Count;
+
+        public T this[int i] => _items[i];
+
         public void Add(T item)
         {
             _items.Add(item);

@@ -1,4 +1,6 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
+using HSDRawViewer.Rendering;
+using OpenTK.Mathematics;
 using System.ComponentModel;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
@@ -13,6 +15,12 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public KdVector Up { get; set; } = new KdVector();
+
+        public Quaternion ToQuaternion()
+        {
+
+            return Math3D.FromForwardUp(new Vector3(Forward.X, Forward.Y, Forward.Z), new Vector3(Up.X, Up.Y, Up.Z));
+        }
 
         public KAR_grPositionData ToPositionData()
         {

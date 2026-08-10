@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
-    public class GrZoneNode : GrDrawNode, IGrTranslate
+    public class GrZoneNode : GrDrawNode, IGrTranslate //, IUndo
     {
         private const float PICK_RADIUS_POINT = 8f;
         private const float PICK_RADIUS_LINE = 8f;
@@ -360,5 +360,43 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             if (selected_object == selected_edge)
                 selected_edge.SetMidpoint(value);
         }
+
+
+        //private ObjectUndoManager _undo = new ObjectUndoManager();
+
+        //public void Undo(object selected_object)
+        //{
+        //    if (selected_object != Tag ||
+        //        Tag is not KdZone p)
+        //        return;
+
+        //    _undo.Undo();
+        //}
+
+        //public void Commit(object selected_object)
+        //{
+        //    if (selected_object != Tag ||
+        //        Tag is not KdZone p)
+        //        return;
+
+        //    _undo.Commit(p);
+        //}
+
+        //public void Redo(object selected_object)
+        //{
+        //    if (selected_object != Tag ||
+        //        Tag is not KdZone p)
+        //        return;
+
+        //    _undo.Redo();
+        //}
+
+        //public void ClearHistory()
+        //{
+        //    if (Tag is not KdZone p)
+        //        return;
+
+        //    _undo.ClearHistory();
+        //}
     }
 }

@@ -15,48 +15,44 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
     public class KdPositionArea
     {
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public KdVector StartPosition { get; set; } = new KdVector();
+        public KdVector P1 { get; set; } = new KdVector();
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public KdVector StartDirection { get; set; } = new KdVector(0, 0, 1);
+        public KdVector P2 { get; set; } = new KdVector();
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public KdVector EndPosition { get; set; } = new KdVector();
-
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        public KdVector EndDirection { get; set; } = new KdVector(0, 0, 1);
+        public KdVector Forward { get; set; } = new KdVector(0, 0, 1);
 
         public KdPositionArea() { }
 
         public KdPositionArea(KAR_grAreaPositionData d1, KAR_grAreaPositionData d2)
         {
-            StartPosition = new KdVector (d1.X, d1.Y, d1.Z);
-            StartDirection = new KdVector (d1.DX, d1.DY, d1.DZ);
+            P1 = new KdVector (d1.X, d1.Y, d1.Z);
+            Forward = new KdVector (d1.DX, d1.DY, d1.DZ);
 
-            EndPosition = new KdVector(d2.X, d2.Y, d2.Z);
-            EndDirection = new KdVector(d2.DX, d2.DY, d2.DZ);
+            P2 = new KdVector(d2.X, d2.Y, d2.Z);
         }
 
         public (KAR_grAreaPositionData, KAR_grAreaPositionData) ToPositionData()
         {
             KAR_grAreaPositionData d1 = new()
             {
-                X = StartPosition.X,
-                Y = StartPosition.Y,
-                Z = StartPosition.Z,
-                DX = StartDirection.X,
-                DY = StartDirection.Y,
-                DZ = StartDirection.Z,
+                X = P1.X,
+                Y = P1.Y,
+                Z = P1.Z,
+                DX = Forward.X,
+                DY = Forward.Y,
+                DZ = Forward.Z,
             };
 
             KAR_grAreaPositionData d2 = new()
             {
-                X = EndPosition.X,
-                Y = EndPosition.Y,
-                Z = EndPosition.Z,
-                DX = EndDirection.X,
-                DY = EndDirection.Y,
-                DZ = EndDirection.Z,
+                X = P2.X,
+                Y = P2.Y,
+                Z = P2.Z,
+                DX = Forward.X,
+                DY = Forward.Y,
+                DZ = Forward.Z,
             };
 
             return (d1, d2);

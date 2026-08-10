@@ -16,6 +16,12 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
+    public enum GrToolMode
+    {
+        Translation,
+        Rotation,
+    }
+
     [SupportedTypes(new Type[] { typeof(KAR_grData) })]
     public partial class GrToolEditor : PluginBase, IDrawableInterface
     {
@@ -33,8 +39,14 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private DataNode _node;
 
+        public GrToolMode TransformMode = GrToolMode.Translation;
+
         public bool TranslationEnabled = false;
         private TranslationWidget _translationWidget;
+
+        public bool RotationEnabled = false;
+        private RotationWidget _rotationWidget;
+
         public override DataNode Node
         {
             get => _node;
@@ -70,10 +82,41 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
                 node.SetTranslate(_propertyGrid.SelectedObject, _render.Joints, t.ExtractTranslation());
             };
+
+            _rotationWidget = new RotationWidget();
+            _rotationWidget.TransformUpdated += (t) =>
+            {
+                if (_dockTree == null) return;
+
+                if (_dockTree.SelectedNode is not IGrRotate node)
+                    return;
+
+                node.SetRotation(_propertyGrid.SelectedObject, _render.Joints, t.ExtractRotation());
+            };
         }
 
         public bool ProcessKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Control && e.KeyCode == Keys.Z)
+            {
+                if (_dockTree.SelectedNode is IUndo undo)
+                {
+                    undo.Undo(_propertyGrid.SelectedObject);
+                    e.Handled = true;
+                    SelectObject(_propertyGrid.ObjectName, _propertyGrid.SelectedObject);
+                    return true;
+                }
+            }
+            if (e.Control && e.KeyCode == Keys.Y)
+            {
+                if (_dockTree.SelectedNode is IUndo undo)
+                {
+                    undo.Redo(_propertyGrid.SelectedObject);
+                    e.Handled = true;
+                    SelectObject(_propertyGrid.ObjectName, _propertyGrid.SelectedObject);
+                    return true;
+                }
+            }
             if (e.KeyCode == Keys.E)
             {
                 if (SelectMode == GrSelectModeKind.Data)
@@ -150,6 +193,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 if (e.ChangedItem.PropertyDescriptor.Name == nameof(KdZone.Type))
                 {
+                    if (_propertyGrid.SelectedObject is IUndo undo)
+                    {
+                        undo.ClearHistory();
+                    }
                     _propertyGrid.Refresh();
                 }
             };
@@ -246,8 +293,17 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             _render.EndDraw();
 
-            if (TranslationEnabled)
-                _translationWidget.Render(cam);
+            switch (TransformMode)
+            {
+                case GrToolMode.Translation:
+                    if (TranslationEnabled)
+                        _translationWidget.Render(cam);
+                    break;
+                case GrToolMode.Rotation:
+                    if (RotationEnabled)
+                        _rotationWidget.Render(cam);
+                    break;
+            }
 
             _render.DrawBoneLabels(cam);
         }
@@ -290,14 +346,28 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         {
             _propertyGrid.SetObject(name, o);
 
-            if (_dockTree.SelectedNode is IGrTranslate t && t.CanTranslate(o))
+            _translationWidget.MouseUp();
+            _rotationWidget.MouseUp();
+
+            TranslationEnabled = false;
+            RotationEnabled = false;
+
+            switch (TransformMode)
             {
-                TranslationEnabled = true;
-                _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o, _render.Joints));
-            }
-            else
-            {
-                TranslationEnabled = false;
+                case GrToolMode.Translation:
+                    if (_dockTree.SelectedNode is IGrTranslate t && t.CanTranslate(o))
+                    {
+                        TranslationEnabled = true;
+                        _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o, _render.Joints));
+                    }
+                    break;
+                case GrToolMode.Rotation:
+                    if (_dockTree.SelectedNode is IGrRotate r && r.CanRotate(o))
+                    {
+                        RotationEnabled = true;
+                        _rotationWidget.Transform = r.GetRotation(o, _render.Joints);
+                    }
+                    break;
             }
         }
 
@@ -310,21 +380,48 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public void ScreenDrag(MouseEventArgs args, PickInformation pick, float deltaX, float deltaY)
         {
-            if (TranslationEnabled)
+            switch (TransformMode)
             {
-                if (args.Button == MouseButtons.Left)
-                    _translationWidget.MouseDown(pick);
-                else
-                    _translationWidget.MouseUp();
+                case GrToolMode.Translation:
+                    if (TranslationEnabled)
+                    {
+                        if (args.Button == MouseButtons.Left)
+                        {
+                            if (!_translationWidget.Interacting && 
+                                _dockTree.SelectedNode is IUndo undo)
+                                undo.Commit(_propertyGrid.SelectedObject);
 
-                _translationWidget.Drag(pick);
+                            _translationWidget.MouseDown(pick);
+                        }
+                        else
+                            _translationWidget.MouseUp();
 
-                if (_translationWidget.PendingUpdate)
-                {
-                    _translationWidget.PendingUpdate = false;
-                }
+                        _translationWidget.Drag(pick);
+
+                        if (_translationWidget.PendingUpdate)
+                        {
+                            _translationWidget.PendingUpdate = false;
+                        }
+                    }
+                    break;
+                case GrToolMode.Rotation:
+                    if (RotationEnabled)
+                    {
+                        if (args.Button == MouseButtons.Left)
+                        {
+                            if (!_rotationWidget.Interacting && 
+                                _dockTree.SelectedNode is IUndo undo)
+                                undo.Commit(_propertyGrid.SelectedObject);
+
+                            _rotationWidget.MouseDown(pick);
+                        }
+                        else
+                            _rotationWidget.MouseUp();
+
+                        _rotationWidget.Drag(pick);
+                    }
+                    break;
             }
-
         }
 
         public void ScreenSelectArea(PickInformation start, PickInformation end)
@@ -333,7 +430,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public bool FreezeCamera()
         {
-            return TranslationEnabled && _translationWidget.Interacting;
+            return (TranslationEnabled && _translationWidget.Interacting) || (_rotationWidget.Interacting && RotationEnabled);
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)

@@ -36,8 +36,11 @@ namespace HSDRawViewer.GUI.Controls
             };
         }
 
+        public string ObjectName { get; internal set; }
+
         public void SetObject(string name, object o)
         {
+            ObjectName = name;
             Text = $"Properties: {name}";
 
             propertyGrid1.SelectedObject = o;

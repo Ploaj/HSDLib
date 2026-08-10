@@ -762,9 +762,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             GL.Enable(EnableCap.CullFace);
 
-            var p1 = ToTkVector(p.StartPosition);
-            var p2 = ToTkVector(p.EndPosition);
-            var forward = ToTkVector(p.StartDirection).Normalized();
+            var p1 = ToTkVector(p.P1);
+            var p2 = ToTkVector(p.P2);
+            var forward = ToTkVector(p.Forward).Normalized();
             Vector3 up = Vector3.UnitY;
 
             DrawBox(p1, p2, forward, up, new Vector4(color, alpha));
@@ -775,9 +775,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         public void DrawKdPositionAreaOverlay(KdPositionArea p, object selected_object)
         {
-            var p1 = ToTkVector(p.StartPosition);
-            var p2 = ToTkVector(p.EndPosition);
-            var forward = ToTkVector(p.StartDirection).Normalized();
+            var p1 = ToTkVector(p.P1);
+            var p2 = ToTkVector(p.P2);
+            var forward = ToTkVector(p.Forward).Normalized();
             Vector3 up = Vector3.UnitY;
             DrawBoxOutline(p1, p2, forward, up, Vector4.One);
         }

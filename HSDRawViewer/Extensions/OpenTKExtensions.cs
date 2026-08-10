@@ -230,7 +230,7 @@ namespace HSDRawViewer
         /// <param name="m"></param>
         /// <param name="forward"></param>
         /// <param name="up"></param>
-        public static void ExtractFprwardUp(
+        public static void ExtractForwardUp(
             this Matrix3 m,
             out Vector3 forward,
             out Vector3 up)
@@ -244,6 +244,7 @@ namespace HSDRawViewer
             forward.Normalize();
             up.Normalize();
         }
+
         /// <summary>
         /// 
         /// </summary>

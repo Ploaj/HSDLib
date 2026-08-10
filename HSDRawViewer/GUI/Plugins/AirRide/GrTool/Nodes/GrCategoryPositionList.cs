@@ -1,6 +1,7 @@
 ﻿using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
+using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
@@ -19,6 +20,16 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         protected override GrCategoryPositionNode CreateChild(KdPositionList m)
         {
             return new GrCategoryPositionNode("", m.Positions);
+        }
+
+        public override void BuildContextMenu(ContextMenuStrip menu)
+        {
+            menu.Items.Add("New Position List", null, (s, e) => {
+                list.Add(new KdPositionList()
+                {
+
+                });
+            });
         }
     }
 }
