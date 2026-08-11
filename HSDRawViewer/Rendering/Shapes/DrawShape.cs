@@ -36,8 +36,8 @@ namespace HSDRawViewer.Rendering
             GL.LineWidth(2);
             GL.Begin(PrimitiveType.LineStrip);
 
-            HSD_Vector3[] points = spline.Points;
-            short pointMax = spline.PointCount;
+            HSD_Vector3[] points = spline.CV;
+            short pointMax = spline.NumCV;
 
             for (int i = 0; i < points.Length; i++)
             {

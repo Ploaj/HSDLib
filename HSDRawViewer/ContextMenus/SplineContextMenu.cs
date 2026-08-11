@@ -78,7 +78,7 @@ namespace HSDRawViewer.ContextMenus
 
                         // dump to spline
                         spline.TotalLength = total_length;
-                        spline.Points = lpoints.ToArray();
+                        spline.CV = lpoints.ToArray();
                         spline.Lengths = new HSDRaw.HSDFloatArray() { Array = lengths };
 
                         return;
@@ -99,7 +99,7 @@ namespace HSDRawViewer.ContextMenus
                     {
                         using FileStream stream = new(f, FileMode.Create);
                         using StreamWriter s = new(stream);
-                        HSD_Vector3[] points = spline.Points;
+                        HSD_Vector3[] points = spline.CV;
 
                         foreach (HSD_Vector3 p in points)
                         {
@@ -149,7 +149,7 @@ namespace HSDRawViewer.ContextMenus
             {
                 if (MainForm.SelectedDataNode.Accessor is HSD_Spline spline)
                 {
-                    var p = spline.Points;
+                    var p = spline.CV;
                     var len = spline.Lengths;
 
                     float total_length = 0;
@@ -458,7 +458,7 @@ namespace HSDRawViewer.ContextMenus
             List<FOBJKey> ry = new();
             List<FOBJKey> rz = new();
 
-            HSD_Vector3[] points = spline.Points;
+            HSD_Vector3[] points = spline.CV;
             for (int i = 1; i < points.Length; i++)
             {
                 Vector3 p1 = new(points[i - 1].X, points[i - 1].Y, points[i - 1].Z);

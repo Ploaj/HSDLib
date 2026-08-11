@@ -3,6 +3,8 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
@@ -40,6 +42,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public ObservableList<KdPositionAreaList> ItemAreaPositions = new ObservableList<KdPositionAreaList>();
 
         public ObservableList<KdPositionAreaList> VehicleAreaPositions = new ObservableList<KdPositionAreaList>();
+
+
+        public KdCourseSplineSetup CourseSpline { get; } = new KdCourseSplineSetup();
 
         private void LoadList(LiveJObj joint, ObservableList<KdPositionList> list, HSDArrayAccessor<KAR_grPositionList> src)
         {
@@ -94,9 +99,17 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     }
                 }
             }
+
+            if (d.SplineNode != null)
+            {
+                if (d.SplineNode.SplineSetup != null)
+                {
+                    CourseSpline.Load(d.SplineNode.SplineSetup);
+                }
+            }
         }
 
-        private HSDRaw.HSDArrayAccessor<KAR_grPositionList> CreatePositionList(ObservableList<KdPositionList> list)
+        private HSDArrayAccessor<KAR_grPositionList> CreatePositionList(ObservableList<KdPositionList> list)
         {
             if (list.Count() == 0)
                 return null;
@@ -148,6 +161,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 d.PositionNode.VehicleAreapos = null;
             }
+
+            // save spline data
+            d.SplineNode.SplineSetup = CourseSpline.Save();
         }
     }
 }

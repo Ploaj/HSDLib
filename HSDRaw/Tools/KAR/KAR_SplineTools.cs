@@ -25,7 +25,7 @@ namespace HSDRaw.Tools.KAR
                 TotalLength = spline.TotalLength,
             };
 
-            var points = spline.Points;
+            var points = spline.CV;
             HSD_Vector3[] lp = new HSD_Vector3[points.Length];
             HSD_Vector3[] rp = new HSD_Vector3[points.Length];
             for (int i = 0; i < points.Length; i++)
@@ -60,8 +60,8 @@ namespace HSDRaw.Tools.KAR
                 rp[i] = new HSD_Vector3() { X = r.X, Y = r.Y, Z = r.Z };
             }
 
-            left.Points = lp;
-            right.Points = rp;
+            left.CV = lp;
+            right.CV = rp;
         }
     }
 }

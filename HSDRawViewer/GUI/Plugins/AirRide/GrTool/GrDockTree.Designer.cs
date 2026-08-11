@@ -59,6 +59,7 @@
             treeView1.TabIndex = 1;
             treeView1.NodeMouseClick += treeView1_NodeMouseClick;
             treeView1.KeyDown += treeView1_KeyDown;
+            treeView1.MouseDown += treeView1_MouseDown;
             // 
             // GrDockTree
             // 

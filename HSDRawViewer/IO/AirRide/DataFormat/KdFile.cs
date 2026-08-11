@@ -25,7 +25,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         // Scene Params?
 
         // Spline
-        public KdSplineData Splines { get; set; }
+        //public KdSplineData Splines { get; set; }
 
         // Position
         public List<KdPositionList> Positions { get; set; } = new List<KdPositionList>();
@@ -61,7 +61,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         {
             FromCollisionNode(data.CollisionNode);
             FromPositionNode(data.PositionNode);
-            Splines = new KdSplineData(data.SplineNode);
+            //Splines = new KdSplineData(data.SplineNode);
         }
 
         /// <summary>

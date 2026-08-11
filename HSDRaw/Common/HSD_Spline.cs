@@ -7,29 +7,35 @@
     {
         public override int TrimmedSize => 0x18;
 
+        /// <summary>
+        /// Type 0 - Linear
+        /// Type 1 - Cubic Bézier
+        /// Type 2 - Uniform cubic B-spline
+        /// Type 3 - Tension spline
+        /// </summary>
         public byte Type { get => _s.GetByte(0x00); set => _s.SetByte(0x00, value); }
 
-        public short PointCount { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
+        public short NumCV { get => _s.GetInt16(0x02); set => _s.SetInt16(0x02, value); }
 
         public float Tension { get => _s.GetFloat(0x04); set => _s.SetFloat(0x04, value); }
 
-        public HSD_Vector3[] Points
+        public HSD_Vector3[] CV
         {
             get
             {
-                return _s.GetCreateReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Slice(PointCount);
+                return _s.GetCreateReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Array;
             }
             set
             {
                 if(value == null || value.Length == 0)
                 {
                     _s.SetReference(0x08, null);
-                    PointCount = 0;
+                    NumCV = 0;
                 }
                 else
                 {
                     _s.GetCreateReference<HSDArrayAccessor<HSD_Vector3>>(0x08).Array = value;
-                    PointCount = (short)value.Length;
+                    NumCV = (short)value.Length;
                 }
             }
         }
@@ -59,7 +65,7 @@
             Y = 0;
             Z = 0;
 
-            for (int i = 0; i < PointCount; i++)
+            for (int i = 0; i < NumCV; i++)
             {
                 if (path < Lengths[i])
                 {
@@ -68,16 +74,16 @@
                     float prevLength = Lengths[i];
                     float nextLength = Lengths[i + 1];
 
-                    HSD_Vector3 prevPoint = Points[i];
+                    HSD_Vector3 prevPoint = CV[i];
                     HSD_Vector3 nextPoint;
 
-                    if (i >= PointCount)
+                    if (i >= NumCV)
                     {
-                        nextPoint = Points[0];
+                        nextPoint = CV[0];
                     }
                     else
                     {
-                        nextPoint = Points[i + 1];
+                        nextPoint = CV[i + 1];
                     }
 
                     var weight = (path - prevLength) / (nextLength - prevLength);

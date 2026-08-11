@@ -38,15 +38,37 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public KAR_grSplineList CourseSplineList { get => _s.GetReference<KAR_grSplineList>(0x00); set => _s.SetReference(0x00, value); }
 
-        public KAR_grSplineList x04 { get => _s.GetReference<KAR_grSplineList>(0x04); set => _s.SetReference(0x04, value); }
+        /// <summary>
+        /// The groups that players must hit in order for lap to count
+        /// </summary>
+        public KAR_grSplineLinkList KeyGroups { get => _s.GetReference<KAR_grSplineLinkList>(0x04); set => _s.SetReference(0x04, value); }
 
-        public KAR_grSplineList x08 { get => _s.GetReference<KAR_grSplineList>(0x08); set => _s.SetReference(0x08, value); }
+        /// <summary>
+        /// The AltPath looks for the splines. Most the time every path is unique and sequential. The only exception in base game is GrSky2 Splines (1-4)
+        /// </summary>
+        public HSDArrayAccessor<KAR_grSplineLinkList> SplineAltPathLookup { get => _s.GetReference<HSDArrayAccessor<KAR_grSplineLinkList>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public KAR_grSplineList x0C { get => _s.GetReference<KAR_grSplineList>(0x0C); set => _s.SetReference(0x0C, value); }
+        /// <summary>
+        /// The groups this splines are considered hitting in KeyGroups. Most of the time is just the next KeyGroup in sequence, but the exceptions are GrHeat2, GrSimple, GrSky2 because of shortcuts.
+        /// </summary>
+        public HSDArrayAccessor<KAR_grSplineLinkList> SplineGroupLookup { get => _s.GetReference<HSDArrayAccessor<KAR_grSplineLinkList>>(0x0C); set => _s.SetReference(0x0C, value); }
 
         public bool Loop { get => _s.GetByte(0x10) == 1; set => _s.SetByte(0x10, (byte)(value ? 1 : 0)); }
+
+        /// <summary>
+        /// This is only found in Simple so I assume it's mostly unused
+        /// </summary>
+        public HSDFloatArray x1C { get => _s.GetReference<HSDFloatArray>(0x1C); set => _s.SetReference(0x1C, value); }
     }
 
+    public class KAR_grSplineLinkList : HSDAccessor
+    {
+        public override int TrimmedSize => 0x8;
+
+        public HSDIntArray List { get => _s.GetReference<HSDIntArray>(0x00); set => _s.SetReference(0x00, value); }
+
+        public int Count { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+    }
 
     public class KAR_grRangeSplineSetup : HSDAccessor
     {

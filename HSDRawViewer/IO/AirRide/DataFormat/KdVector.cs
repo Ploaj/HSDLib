@@ -1,4 +1,6 @@
-﻿namespace HSDRawViewer.IO.AirRide.DataFormat
+﻿using OpenTK.Mathematics;
+
+namespace HSDRawViewer.IO.AirRide.DataFormat
 {
     public class KdVector
     {
@@ -17,6 +19,11 @@
             X = x;
             Y = y;
             Z = z;
+        }
+
+        public Vector3 ToTkVector()
+        {
+            return new Vector3(X, Y, Z);
         }
     }
 }

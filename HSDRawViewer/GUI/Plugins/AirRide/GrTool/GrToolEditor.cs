@@ -199,6 +199,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     }
                     _propertyGrid.Refresh();
                 }
+
+                if (_dockTree.SelectedNode is GrNode n)
+                    n.OnTagPropertyUpdate(e);
             };
 
             foreach (GrCollisionNodeRenderKind e in Enum.GetValues(typeof(GrCollisionNodeRenderKind)))

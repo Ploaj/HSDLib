@@ -2,6 +2,7 @@
 using HSDRaw.GX;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
+using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Render;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Properties;
 using HSDRawViewer.Rendering;
@@ -11,6 +12,7 @@ using IONET.Collada.FX.Texturing;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {

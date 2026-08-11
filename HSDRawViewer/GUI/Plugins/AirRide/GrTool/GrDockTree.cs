@@ -19,6 +19,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private GrRootPositionNode PositionNode { get; }
 
+        private GrCategoryCourseSpline CourseSplineNode { get; }
+
 
 
         public delegate void SelectedNodeChanged(GrNode node);
@@ -59,12 +61,14 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             CollisionNode = new GrCategoryCollision("Collisions", res.Meshes);
             ZoneNode = new GrCategoryZone("Zones", res.Zones);
             PositionNode = new GrRootPositionNode(res);
+            CourseSplineNode = new GrCategoryCourseSpline("Course Spline", res.CourseSpline.Splines, res.CourseSpline);
 
             treeView1.Nodes.Add(StageNode);
             treeView1.Nodes.Add(ModelNode);
             treeView1.Nodes.Add(CollisionNode);
             treeView1.Nodes.Add(ZoneNode);
             treeView1.Nodes.Add(PositionNode);
+            treeView1.Nodes.Add(CourseSplineNode);
 
             treeView1.EndUpdate();
         }
@@ -85,7 +89,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             }
 
 #if DEBUG
-                    treeView1.Nodes.Add(new GrPartitionNode(0, data.PartitionNode.Partition.Buckets[0], data.PartitionNode.Partition.Buckets, data.PartitionNode.Partition.ZoneIndices));
+            treeView1.Nodes.Add(new GrPartitionNode(0, data.PartitionNode.Partition.Buckets[0], data.PartitionNode.Partition.Buckets, data.PartitionNode.Partition.ZoneIndices));
 #endif
         }
 
@@ -221,6 +225,12 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 node.BuildContextMenu(_contextMenu);
 
             treeView1.ContextMenuStrip = _contextMenu;
+        }
+
+        private void treeView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            treeView1.SelectedNode = treeView1.GetNodeAt(e.X, e.Y);
+            OnSelectedNodeChanged.Invoke(treeView1.SelectedNode as GrNode);
         }
     }
 }

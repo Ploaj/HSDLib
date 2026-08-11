@@ -168,8 +168,8 @@ namespace HSDRawViewer.Converters.AirRide
             }
 
             HSD_Spline spline = new();
-            spline.Points = points.ToArray();
-            spline.PointCount = (short)points.Count;
+            spline.CV = points.ToArray();
+            spline.NumCV = (short)points.Count;
 
             float totalLength = 0;
             foreach (HSD_Vector3 e in points)

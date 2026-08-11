@@ -254,5 +254,10 @@ namespace HSDRawViewer
         {
             return new Vector3(color.R, color.G, color.B) / 255f;
         }
+
+        public static Vector3 ToTKVector(this System.Numerics.Vector3 v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
     }
 }

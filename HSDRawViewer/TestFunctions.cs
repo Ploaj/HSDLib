@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace HSDRawViewer
@@ -123,11 +124,16 @@ namespace HSDRawViewer
 
             for (int i = 0; i < f1.Roots.Count; i++)
             {
-                CompareNode(f1.Roots[i].Data._s, f2.Roots[i].Data._s, new HashSet<HSDStruct>(), $"{(i * 4).ToString("X8")}->");
+                CompareNode(f1.Roots[i].Data._s, f2.Roots[i].Data._s, new HashSet<HSDStruct>(), $"{(i * 4).ToString("X8")}->", new StringBuilder());
             }
         }
 
-        private static void CompareNode(HSDStruct s1, HSDStruct s2, HashSet<HSDStruct> done, string path)
+        public static void CompareNode(HSDStruct s1, HSDStruct s2, StringBuilder o)
+        {
+            CompareNode(s1, s2, new HashSet<HSDStruct>(), $"", o);
+        }
+
+        private static void CompareNode(HSDStruct s1, HSDStruct s2, HashSet<HSDStruct> done, string path, StringBuilder o)
         {
             if (done.Contains(s1))
                 return;
@@ -136,23 +142,23 @@ namespace HSDRawViewer
             //System.Console.WriteLine("Checking " + s1.Length + " " + s2.Length + " " + s1.References.Count + " "  + s2.References.Count);
             if (s1.Length != s2.Length)
             {
-                Console.WriteLine($"{path} Size mismatch");
+                o.AppendLine($"{path} Size mismatch {s1.Length:X8} != {s2.Length:X8}");
             }
             else
                 for (int i = 0; i < s1.Length; i++)
                 {
                     if (s1.GetByte(i) != s2.GetByte(i))
                     {
-                        Console.WriteLine($"{path} Content mismatch");
+                        o.AppendLine($"{path} Content mismatch");
                     }
                 }
             if (s1.References.Count != s2.References.Count)
             {
-                Console.WriteLine($"{path} Reference mismatch");
+                o.AppendLine($"{path} Reference mismatch {s1.References.Count} != {s2.References.Count}");
             }
             foreach (KeyValuePair<int, HSDStruct> re in s2.References)
             {
-                CompareNode(s1.References[re.Key], s2.References[re.Key], done, path + $"{re.Key.ToString("X8")}->");
+                CompareNode(s1.References[re.Key], s2.References[re.Key], done, path + $"{re.Key.ToString("X8")}->", o);
             }
         }
 

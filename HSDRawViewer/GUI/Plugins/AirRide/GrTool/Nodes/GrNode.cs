@@ -39,5 +39,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         public virtual void BuildToolStrip(ToolStrip strip)
         {
         }
+
+        public virtual void OnTagPropertyUpdate(PropertyValueChangedEventArgs args)
+        {
+        }
     }
 }

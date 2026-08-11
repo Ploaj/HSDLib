@@ -30,6 +30,14 @@ namespace HSDRawViewer.Tools
             return true;
         }
 
+        public void Clear()
+        {
+            var temp = new List<T>();
+            temp.AddRange(_items);
+            foreach (var a in temp)
+                Remove(a);
+        }
+
         public void Refresh()
         {
             var temp = new List<T>();
