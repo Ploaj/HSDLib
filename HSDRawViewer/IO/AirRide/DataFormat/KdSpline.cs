@@ -74,6 +74,31 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 SegPoly = s.SegPolys.Array.Select(e => new KdSegPoly(e.Value1, e.Value2, e.Value3, e.Value4, e.Value5)).ToList();
         }
 
+        public override string ToString()
+        {
+            return $"{Kind} {Points.Count}";
+        }
+
+        public bool Equals(KdSpline s)
+        {
+            if (s.Points.Count != Points.Count) return false;
+
+            bool points_equal = true;
+            for (int i = 0; i < Points.Count; i++)
+            {
+                if (!Points[i].Equals(s.Points[i]))
+                {
+                    points_equal = false;
+                    break;
+                }
+            }
+
+            return Kind == s.Kind &&
+                Tension == s.Tension &&
+                TotalLength == s.TotalLength &&
+                points_equal;
+        }
+
         public HSD_Spline ToHsdSpline()
         {
             return new HSD_Spline()

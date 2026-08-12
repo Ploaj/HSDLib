@@ -150,6 +150,8 @@ namespace HSDRawViewer
                     if (s1.GetByte(i) != s2.GetByte(i))
                     {
                         o.AppendLine($"{path} Content mismatch");
+                        o.AppendLine(string.Join(" ", s1.GetData().Select(e=>e.ToString("X2"))));
+                        o.AppendLine(string.Join(" ", s2.GetData().Select(e => e.ToString("X2"))));
                     }
                 }
             if (s1.References.Count != s2.References.Count)
