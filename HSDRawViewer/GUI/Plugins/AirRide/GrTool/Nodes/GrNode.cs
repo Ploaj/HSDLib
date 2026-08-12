@@ -27,6 +27,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
             return false;
         }
 
+        public virtual void OnSelect(GrRenderResource _render, GrDataResource _data)
+        {
+
+        }
+
         public virtual bool HandleShortcut(Keys key, Keys modifier)
         {
             return false;

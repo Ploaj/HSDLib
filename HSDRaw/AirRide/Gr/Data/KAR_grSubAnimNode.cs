@@ -16,7 +16,7 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public KAR_grSubAnim x10 { get => _s.GetReference<KAR_grSubAnim>(0x10); set => _s.SetReference(0x10, value); }
 
-        public KAR_grSubAnim x14 { get => _s.GetReference<KAR_grSubAnim>(0x14); set => _s.SetReference(0x14, value); }
+        public KAR_grSubAnim EventAnim { get => _s.GetReference<KAR_grSubAnim>(0x14); set => _s.SetReference(0x14, value); }
     }
 
     public class KAR_grSubAnim : HSDAccessor

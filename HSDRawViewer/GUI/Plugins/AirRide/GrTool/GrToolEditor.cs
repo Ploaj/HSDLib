@@ -55,6 +55,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 _node = value;
                 if (value != null && value.Accessor is KAR_grData d)
                 {
+                    _render.StageScale = d.StageNode.StageScale;
                     _resource.Load(d);
                     _dockTree.LoadMiscData(d);
                 }
@@ -117,6 +118,18 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     return true;
                 }
             }
+            if (e.Control && e.KeyCode == Keys.Add)
+            {
+                pauseToolStripMenuItem.Checked = false;
+                _render.AdvanceFrame();
+                e.Handled = true;
+            }
+            if (e.Control && e.KeyCode == Keys.Subtract)
+            {
+                pauseToolStripMenuItem.Checked = false;
+                _render.RewindFrame();
+                e.Handled = true;
+            }
             if (e.KeyCode == Keys.E)
             {
                 if (SelectMode == GrSelectModeKind.Data)
@@ -173,11 +186,21 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 }
             };
 
+            //railAnimationButton.Visible = false;
+
             _dockTree.OnSelectedNodeChanged += (GrNode n) =>
             {
+                // clear rail animation
+                _render.LoadRailAnimation(null);
+                //railAnimationButton.Visible = false;
+
                 if (n != null)
                 {
                     SelectObject(n.Text, n.Tag);
+
+                    n.OnSelect(_render, _resource);
+
+                    //railAnimationButton.Visible = _render.HasAnimation();
 
                     //toolStrip2.SuspendLayout();
                     //toolStrip2.Items.Clear();
@@ -390,7 +413,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     {
                         if (args.Button == MouseButtons.Left)
                         {
-                            if (!_translationWidget.Interacting && 
+                            if (!_translationWidget.Interacting &&
                                 _dockTree.SelectedNode is IUndo undo)
                                 undo.Commit(_propertyGrid.SelectedObject);
 
@@ -412,7 +435,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     {
                         if (args.Button == MouseButtons.Left)
                         {
-                            if (!_rotationWidget.Interacting && 
+                            if (!_rotationWidget.Interacting &&
                                 _dockTree.SelectedNode is IUndo undo)
                                 undo.Commit(_propertyGrid.SelectedObject);
 
@@ -474,6 +497,31 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 p.ShowDialog();
             }
+        }
+
+        private void loopAnimationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _render.LoopAnimation = loopAnimationToolStripMenuItem.Checked;
+        }
+
+        private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _render.PlayAnimation = pauseToolStripMenuItem.Checked;
+        }
+
+        private void advanceFrameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _render.AdvanceFrame();
+        }
+
+        private void rewindFrameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _render.RewindFrame();
+        }
+
+        private void loadStarModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _render.TryLoadStarModel();
         }
     }
 }

@@ -1,18 +1,17 @@
-﻿using HSDRaw.AirRide.Gr;
-using HSDRaw.GX;
+﻿using HSDRaw;
+using HSDRaw.AirRide.Gr;
+using HSDRaw.AirRide.Vc;
+using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Converters;
-using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes;
-using HSDRawViewer.GUI.Plugins.AirRide.GrTool.Render;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Properties;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Rendering.Renderers;
-using IONET.Collada.FX.Texturing;
+using HSDRawViewer.Tools;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
-using System.Collections.Generic;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 {
@@ -56,6 +55,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private readonly GLTextRenderer TextRenderer = new();
 
+        public float StageScale { get; set; } = 1f;
+
 
         private RenderJObj RenderJObj;
 
@@ -76,15 +77,39 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private int tex_id;
 
+
+        private RenderJObj TurkeyStar;
+
+        private JointAnimManager _animManager;
+
+        private LiveJObj RailJoint;
+
+        private float FrameCount;
+
+        private float Frame;
+
+        public bool PlayAnimation { get; set; } = true;
+
+        public bool LoopAnimation { get; set; } = true;
+
+
         public GrRenderResource()
         {
             RenderJObj = new RenderJObj();
+            TurkeyStar = new RenderJObj();
             _textures = new TextureManager();
+
+            RailJoint = new LiveJObj(new HSDRaw.Common.HSD_JOBJ()
+            {
+                SX = 1, SY = 1, SZ = 1
+            });
+            _animManager = new JointAnimManager();
         }
 
         public void GLInit()
         {
             RenderJObj.Invalidate();
+            TurkeyStar.Invalidate();
             TextRenderer.InitializeRender(@"Consolas.bff");
 
             tex_id = _textures.Add(Resources.ico3d_sound);
@@ -93,6 +118,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
         public void GLFree()
         {
             RenderJObj.FreeResources();
+            TurkeyStar.FreeResources();
+
             TextRenderer.Dispose();
             _textures.ClearTextures();
         }
@@ -191,12 +218,116 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             RenderJObj.LoadJObj(model.MainModel.RootNode);
         }
 
+        public bool HasAnimation()
+        {
+            return _animManager != null && _animManager.NodeCount > 0;
+        }
+
+        public void AdvanceFrame()
+        {
+            Frame++;
+
+            if (Frame > FrameCount)
+            {
+                if (LoopAnimation)
+                    Frame = 0;
+                else
+                    Frame = FrameCount;
+            }
+
+            RailJoint.ApplyAnimation(_animManager.Nodes[0].Tracks, Frame);
+            RailJoint.RecalculateTransforms(Camera, true);
+
+            if (TurkeyStar != null && TurkeyStar.RootJObj != null)
+            {
+                float scale = (1f / StageScale) * 2;
+                TurkeyStar.RootJObj.WorldTransform = Matrix4.CreateScale(scale) * RailJoint.WorldTransform;
+                TurkeyStar.RootJObj.Child?.RecalculateTransforms(Camera, true);
+            }
+        }
+
+        public void RewindFrame()
+        {
+            Frame--;
+
+            if (Frame < 0)
+            {
+                if (LoopAnimation)
+                    Frame = FrameCount;
+                else
+                    Frame = 0;
+            }
+
+            RailJoint.ApplyAnimation(_animManager.Nodes[0].Tracks, Frame);
+            RailJoint.RecalculateTransforms(Camera, true);
+
+            if (TurkeyStar != null && TurkeyStar.RootJObj != null)
+            {
+                float scale = (1f / StageScale) * 2;
+                TurkeyStar.RootJObj.WorldTransform = Matrix4.CreateScale(scale) * RailJoint.WorldTransform;
+                TurkeyStar.RootJObj.Child?.RecalculateTransforms(Camera, true);
+            }
+        }
+
+        public void TryLoadStarModel()
+        {
+            var filePath = FileIO.OpenFile(ApplicationSettings.HSDFileFilter, "VcStarLight.dat");
+            if (filePath == null) return;
+
+            var d = new HSDRawFile(filePath);
+            foreach (var r in d.Roots)
+            {
+                if (r.Data is KAR_vcDataStar star)
+                {
+                    TurkeyStar.LoadJObj(star.ModelData.MainModelRoot);
+                    return;
+                }
+                if (r.Data is KAR_vcDataWheel wheel)
+                {
+                    TurkeyStar.LoadJObj(wheel.ModelData.MainModelRoot);
+                    return;
+                }
+            }
+        }
+
         public void DrawModel(Camera cam)
         {
             if (RenderJObj != null && RenderModel)
             {
                 RenderJObj.Render(cam, false);
             }
+
+            if (HasAnimation())
+            {
+                if (PlayAnimation)
+                {
+                    AdvanceFrame();
+                }
+
+                if (TurkeyStar != null && TurkeyStar.RootJObj != null && TurkeyStar.RootJObj.Child != null)
+                {
+                    TurkeyStar.Render(cam, false);
+                }
+                else
+                {
+                    DrawShape.DrawSphere(RailJoint.WorldTransform, 5, 8, 8, Vector3.UnitX, 1.0f);
+                }
+            }
+        }
+
+        public void LoadRailAnimation(HSD_AnimJoint j)
+        {
+            if (j == null)
+            {
+                _animManager.Nodes.Clear();
+                FrameCount = 0;
+                return;
+            }
+
+            RailJoint.ResetTransforms();
+            _animManager.FromAnimJoint(j);
+            Frame = 0;
+            FrameCount = _animManager.FrameCount;
         }
 
         public void DrawBoneLabels(Camera cam)

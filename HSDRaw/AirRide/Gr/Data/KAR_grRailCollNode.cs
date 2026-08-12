@@ -4,7 +4,7 @@
     {
         public override int TrimmedSize => 0x8;
 
-        public HSDFixedLengthPointerArrayAccessor<KAR_grRailColl> Animations { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grRailColl>>(0x00); set => _s.SetReference(0x00, value); }
+        public HSDFixedLengthPointerArrayAccessor<KAR_grRailColl> RailColl { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grRailColl>>(0x00); set => _s.SetReference(0x00, value); }
 
         public int Count { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
     }
@@ -60,20 +60,23 @@
 
         public int AltRail2 { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
+
         public HSDArrayAccessor<KAR_grRailDataParam> Data { get => _s.GetReference<HSDArrayAccessor<KAR_grRailDataParam>>(0x14); set => _s.SetReference(0x14, value); }
 
         public int DataCount { get => _s.GetInt32(0x18); set => _s.SetInt32(0x18, value); }
+
 
         public HSDArrayAccessor<KAR_grRailDashParam> Dash { get => _s.GetReference<HSDArrayAccessor<KAR_grRailDashParam>>(0x1C); set => _s.SetReference(0x1C, value); }
 
         public int DashCount { get => _s.GetInt32(0x20); set => _s.SetInt32(0x20, value); }
 
+
         public HSDArrayAccessor<KAR_grRailDashParam> Dash2 { get => _s.GetReference<HSDArrayAccessor<KAR_grRailDashParam>>(0x24); set => _s.SetReference(0x24, value); }
 
         public int Dash2Count { get => _s.GetInt32(0x28); set => _s.SetInt32(0x28, value); }
 
-        public HSDArrayAccessor<KAR_grRailLeapParam> Leap { get => _s.GetReference<HSDArrayAccessor<KAR_grRailLeapParam>>(0x2C); set => _s.SetReference(0x2C, value); }
 
+        public HSDArrayAccessor<KAR_grRailLeapParam> Leap { get => _s.GetReference<HSDArrayAccessor<KAR_grRailLeapParam>>(0x2C); set => _s.SetReference(0x2C, value); }
 
         public int LeapCount { get => _s.GetInt32(0x30); set => _s.SetInt32(0x30, value); }
     }

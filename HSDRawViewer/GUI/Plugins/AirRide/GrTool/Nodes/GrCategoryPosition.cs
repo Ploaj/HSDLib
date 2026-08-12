@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
-    public class GrCategoryPositionNode : GrCategoryNode<KdPosition, GrPositionNode>
+    public class GrCategoryPosition : GrCategoryNode<KdPosition, GrPositionNode>
     {
-        public GrCategoryPositionNode(string name, ObservableList<KdPosition> list) : base(name, list)
+        public GrCategoryPosition(string name, ObservableList<KdPosition> list) : base(name, list)
         {
             list.Refresh();
         }

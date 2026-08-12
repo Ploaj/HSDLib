@@ -45,6 +45,13 @@
             toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             buttonXRay = new System.Windows.Forms.ToolStripButton();
             wireframeButton = new System.Windows.Forms.ToolStripButton();
+            toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            railAnimationButton = new System.Windows.Forms.ToolStripDropDownButton();
+            loopAnimationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            advanceFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            rewindFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            loadStarModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -59,7 +66,7 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox, toolStripButton1, buttonXRay, wireframeButton });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripDropDownButton1, buttonSave, toolStripSeparator2, toolStripSeparator1, toolStripLabel1, buttonSelectCollision, buttonSelectTriangle, toolStripSeparator3, toolStripLabel2, collViewComboBox, toolStripButton1, buttonXRay, wireframeButton, toolStripSeparator4, railAnimationButton });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1062, 28);
@@ -178,6 +185,61 @@
             wireframeButton.Size = new System.Drawing.Size(29, 25);
             wireframeButton.Text = "Show Wireframe";
             // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new System.Drawing.Size(6, 28);
+            // 
+            // railAnimationButton
+            // 
+            railAnimationButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { loopAnimationToolStripMenuItem, pauseToolStripMenuItem, advanceFrameToolStripMenuItem, rewindFrameToolStripMenuItem, loadStarModelToolStripMenuItem });
+            railAnimationButton.Image = Properties.Resources.ts_play;
+            railAnimationButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            railAnimationButton.Name = "railAnimationButton";
+            railAnimationButton.Size = new System.Drawing.Size(141, 25);
+            railAnimationButton.Text = "Rail Animation";
+            // 
+            // loopAnimationToolStripMenuItem
+            // 
+            loopAnimationToolStripMenuItem.Checked = true;
+            loopAnimationToolStripMenuItem.CheckOnClick = true;
+            loopAnimationToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            loopAnimationToolStripMenuItem.Name = "loopAnimationToolStripMenuItem";
+            loopAnimationToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            loopAnimationToolStripMenuItem.Text = "Loop Animation";
+            loopAnimationToolStripMenuItem.Click += loopAnimationToolStripMenuItem_Click;
+            // 
+            // pauseToolStripMenuItem
+            // 
+            pauseToolStripMenuItem.Checked = true;
+            pauseToolStripMenuItem.CheckOnClick = true;
+            pauseToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
+            pauseToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            pauseToolStripMenuItem.Text = "Play";
+            pauseToolStripMenuItem.Click += pauseToolStripMenuItem_Click;
+            // 
+            // advanceFrameToolStripMenuItem
+            // 
+            advanceFrameToolStripMenuItem.Name = "advanceFrameToolStripMenuItem";
+            advanceFrameToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            advanceFrameToolStripMenuItem.Text = "Advance Frame";
+            advanceFrameToolStripMenuItem.Click += advanceFrameToolStripMenuItem_Click;
+            // 
+            // rewindFrameToolStripMenuItem
+            // 
+            rewindFrameToolStripMenuItem.Name = "rewindFrameToolStripMenuItem";
+            rewindFrameToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            rewindFrameToolStripMenuItem.Text = "Rewind Frame";
+            rewindFrameToolStripMenuItem.Click += rewindFrameToolStripMenuItem_Click;
+            // 
+            // loadStarModelToolStripMenuItem
+            // 
+            loadStarModelToolStripMenuItem.Name = "loadStarModelToolStripMenuItem";
+            loadStarModelToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            loadStarModelToolStripMenuItem.Text = "Load Star Model";
+            loadStarModelToolStripMenuItem.Click += loadStarModelToolStripMenuItem_Click;
+            // 
             // GrToolEditor
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -211,5 +273,12 @@
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton buttonXRay;
         private System.Windows.Forms.ToolStripButton wireframeButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripDropDownButton railAnimationButton;
+        private System.Windows.Forms.ToolStripMenuItem loopAnimationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pauseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem advanceFrameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rewindFrameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadStarModelToolStripMenuItem;
     }
 }

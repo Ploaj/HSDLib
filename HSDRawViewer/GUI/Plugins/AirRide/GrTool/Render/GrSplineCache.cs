@@ -25,7 +25,8 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Render
 
                 for (int i = 0; i < spline.Points.Count; i++)
                 {
-                    buffer[i] = spline.ArcLengthPoint(spline.SegLengths[i]).ToTKVector();
+                    if (i < spline.SegLengths.Count)
+                        buffer[i] = spline.ArcLengthPoint(spline.SegLengths[i]).ToTKVector();
                 }
             }
             else

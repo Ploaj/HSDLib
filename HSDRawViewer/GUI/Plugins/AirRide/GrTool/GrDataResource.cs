@@ -3,8 +3,6 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
@@ -45,6 +43,22 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
 
         public KdCourseSplineSetup CourseSpline { get; } = new KdCourseSplineSetup();
+
+        public ObservableList<KdSpline> ConveyorSplines = new ObservableList<KdSpline>();
+
+
+        public ObservableList<KdAnimation> SuperJumpAnimations = new ObservableList<KdAnimation>();
+
+        public ObservableList<KdAnimation> LeapAnimations = new ObservableList<KdAnimation>();
+
+        public ObservableList<KdAnimation> RailAnimations = new ObservableList<KdAnimation>();
+
+        public ObservableList<KdAnimation> x0CAnimations = new ObservableList<KdAnimation>();
+
+        public ObservableList<KdAnimation> x10Animations = new ObservableList<KdAnimation>();
+
+        public ObservableList<KdAnimation> EventAnimations = new ObservableList<KdAnimation>();
+
 
         private void LoadList(LiveJObj joint, ObservableList<KdPositionList> list, HSDArrayAccessor<KAR_grPositionList> src)
         {
@@ -100,11 +114,46 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 }
             }
 
+            if (d.SubAnimNode != null)
+            {
+                if (d.SubAnimNode.SuperJump != null)
+                    foreach (var a in d.SubAnimNode.SuperJump.Animations.Array)
+                        SuperJumpAnimations.Add(new KdAnimation(a));
+
+                if (d.SubAnimNode.Leap != null)
+                    foreach (var a in d.SubAnimNode.Leap.Animations.Array)
+                        LeapAnimations.Add(new KdAnimation(a));
+
+                if (d.SubAnimNode.Rail != null)
+                    foreach (var a in d.SubAnimNode.Rail.Animations.Array)
+                        RailAnimations.Add(new KdAnimation(a));
+
+                if (d.SubAnimNode.x0C != null)
+                    foreach (var a in d.SubAnimNode.x0C.Animations.Array)
+                        x0CAnimations.Add(new KdAnimation(a));
+
+                if (d.SubAnimNode.x10 != null)
+                    foreach (var a in d.SubAnimNode.x10.Animations.Array)
+                        x10Animations.Add(new KdAnimation(a));
+
+                if (d.SubAnimNode.EventAnim != null)
+                    foreach (var a in d.SubAnimNode.EventAnim.Animations.Array)
+                        EventAnimations.Add(new KdAnimation(a));
+            }
+
             if (d.SplineNode != null)
             {
                 if (d.SplineNode.SplineSetup != null)
                 {
                     CourseSpline.Load(d.SplineNode.SplineSetup);
+                }
+
+                if (d.SplineNode.ConveyorSpline != null)
+                {
+                    foreach (var v in d.SplineNode.ConveyorSpline.SplineList.Splines.Array)
+                    {
+                        ConveyorSplines.Add(new KdSpline(v));
+                    }
                 }
             }
         }
@@ -118,6 +167,22 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 Array = list.Select(e => e.ToPositionList()).ToArray(),
             };
+        }
+
+        private KAR_grSubAnim GenerateSubanim(ObservableList<KdAnimation> animations)
+        {
+            if (animations.Count > 0)
+            {
+                return new KAR_grSubAnim()
+                {
+                    Animations = new HSDFixedLengthPointerArrayAccessor<HSDRaw.Common.Animation.HSD_AnimJoint>
+                    {
+                        Array = animations.Select(e => e.Animation).ToArray()
+                    },
+                    Count = animations.Count
+                };
+            }
+            return null;
         }
 
         internal void Save(LiveJObj jobj, KAR_grData d)
@@ -162,8 +227,50 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                 d.PositionNode.VehicleAreapos = null;
             }
 
+
+            d.SubAnimNode = new KAR_grSubAnimNode();
+            d.SubAnimNode.SuperJump = GenerateSubanim(SuperJumpAnimations);
+            d.SubAnimNode.Leap = GenerateSubanim(LeapAnimations);
+            d.SubAnimNode.Rail = GenerateSubanim(RailAnimations);
+            d.SubAnimNode.x0C = GenerateSubanim(x0CAnimations);
+            d.SubAnimNode.x10 = GenerateSubanim(x10Animations);
+            d.SubAnimNode.EventAnim = GenerateSubanim(EventAnimations);
+
+
+            if (SuperJumpAnimations.Count > 0)
+            {
+                d.SubAnimNode.SuperJump = new KAR_grSubAnim()
+                {
+                    Animations = new HSDFixedLengthPointerArrayAccessor<HSDRaw.Common.Animation.HSD_AnimJoint>
+                    {
+                        Array = SuperJumpAnimations.Select(e=>e.Animation).ToArray()
+                    },
+                    Count = SuperJumpAnimations.Count
+                };
+            }
+
             // save spline data
             d.SplineNode.SplineSetup = CourseSpline.Save();
+
+            if (ConveyorSplines.Count > 0)
+            {
+                var data = ConveyorSplines.Select(e => e.ToHsdSpline()).ToArray();
+                d.SplineNode.ConveyorSpline = new KAR_grConveyorPath()
+                {
+                    SplineList = new KAR_grSplineList()
+                    {
+                        Count = data.Length,
+                        Splines = new HSDFixedLengthPointerArrayAccessor<HSDRaw.Common.HSD_Spline>()
+                        {
+                            Array = data
+                        }
+                    }
+                };
+            }
+            else
+            {
+                d.SplineNode.ConveyorSpline = null;
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
 {
-    public class GrCategoryPositionList : GrCategoryNode<KdPositionList, GrCategoryPositionNode>
+    public class GrCategoryPositionList : GrCategoryNode<KdPositionList, GrCategoryPosition>
     {
         public Vector3 DisplayColorX = Vector3.UnitX;
 
@@ -17,9 +17,9 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool.Nodes
         {
         }
 
-        protected override GrCategoryPositionNode CreateChild(KdPositionList m)
+        protected override GrCategoryPosition CreateChild(KdPositionList m)
         {
-            return new GrCategoryPositionNode("", m.Positions);
+            return new GrCategoryPosition("", m.Positions);
         }
 
         public override void BuildContextMenu(ContextMenuStrip menu)

@@ -21,6 +21,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private GrCategoryCourseSpline CourseSplineNode { get; }
 
+        private GrCategoryConveyorSpline ConveyorSplineNode { get; }
+
+        private GrNode Animations { get; }
+
 
 
         public delegate void SelectedNodeChanged(GrNode node);
@@ -62,13 +66,24 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             ZoneNode = new GrCategoryZone("Zones", res.Zones);
             PositionNode = new GrRootPositionNode(res);
             CourseSplineNode = new GrCategoryCourseSpline("Course Spline", res.CourseSpline.Splines, res.CourseSpline);
+            ConveyorSplineNode = new GrCategoryConveyorSpline("Conveyor Spline", res.ConveyorSplines);
+
+            Animations = new GrAnimationNode() { Text = "Animations", Checked = true };
+            Animations.Nodes.Add(new GrCategoryAnimation("SuperJump", res.SuperJumpAnimations));
+            Animations.Nodes.Add(new GrCategoryAnimation("Leap", res.LeapAnimations));
+            Animations.Nodes.Add(new GrCategoryAnimation("Rail", res.RailAnimations));
+            Animations.Nodes.Add(new GrCategoryAnimation("x0C", res.x0CAnimations));
+            Animations.Nodes.Add(new GrCategoryAnimation("x10", res.x10Animations));
+            Animations.Nodes.Add(new GrCategoryAnimation("Event Animations", res.EventAnimations));
 
             treeView1.Nodes.Add(StageNode);
             treeView1.Nodes.Add(ModelNode);
             treeView1.Nodes.Add(CollisionNode);
             treeView1.Nodes.Add(ZoneNode);
             treeView1.Nodes.Add(PositionNode);
+            treeView1.Nodes.Add(Animations);
             treeView1.Nodes.Add(CourseSplineNode);
+            treeView1.Nodes.Add(ConveyorSplineNode);
 
             treeView1.EndUpdate();
         }
