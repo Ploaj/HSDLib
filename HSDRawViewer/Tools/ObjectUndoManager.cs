@@ -8,33 +8,17 @@ namespace HSDRawViewer.Tools
         private class Entry
         {
             public object Original;
-            public object Before;
-            public object After;
+            public object Backup;
 
-            public Entry(object original, object before, object after)
+            public Entry(object original, object backup)
             {
                 Original = original;
-                Before = before;
-                After = after;
+                Backup = backup;
             }
         }
 
-        private readonly Stack<Entry> undoStack = new();
-        private readonly Stack<Entry> redoStack = new();
-
-        public void Commit(object o)
-        {
-            if (o == null)
-                return;
-
-            // Capture the state before the modification.
-            undoStack.Push(new Entry(
-                o,
-                o.Copy(),
-                null));
-
-            redoStack.Clear();
-        }
+        private Stack<Entry> undoStack = new Stack<Entry>();
+        private Stack<Entry> redoStack = new Stack<Entry>();
 
         public void Undo()
         {
@@ -43,13 +27,16 @@ namespace HSDRawViewer.Tools
 
             var e = undoStack.Pop();
 
-            // Capture the state after the modification.
-            e.After = e.Original.Copy();
-
-            // Restore the state from Commit().
-            e.Before.CopyTo(e.Original);
-
             redoStack.Push(e);
+
+            e.Backup.CopyTo(e.Original);
+        }
+
+        public void Commit(object o)
+        {
+            undoStack.Push(new Entry(o, o.Copy()));
+
+            redoStack.Clear();
         }
 
         public void Redo()
@@ -59,10 +46,9 @@ namespace HSDRawViewer.Tools
 
             var e = redoStack.Pop();
 
-            // Restore the state after the modification.
-            e.After.CopyTo(e.Original);
-
             undoStack.Push(e);
+
+            e.Backup.CopyTo(e.Original);
         }
 
         public void ClearHistory()

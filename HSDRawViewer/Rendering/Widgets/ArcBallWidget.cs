@@ -120,23 +120,26 @@ namespace HSDRawViewer.Rendering.Widgets
         /// <summary>
         /// Begin interaction.
         /// </summary>
-        public void MouseDown(PickInformation info)
+        public bool MouseDown(PickInformation info)
         {
             if (info == null || Interacting)
-                return;
+                return false;
 
             if (!info.CheckSphereHitIntersection(
                 Center,
                 Radius * scale,
                 out Vector3 hit))
-                return;
+                return false;
 
+            var prev = Interacting;
             Interacting = true;
 
             DragStartVector =
                 (hit - Center).Normalized();
 
             DirectionBeforeDrag = Direction;
+
+            return !prev && Interacting;
         }
 
         /// <summary>

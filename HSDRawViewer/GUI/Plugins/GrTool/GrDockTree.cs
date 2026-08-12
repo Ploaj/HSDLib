@@ -22,7 +22,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
         private GrCategoryCourseSpline CourseSplineNode { get; }
 
-        private GrCategoryConveyorSpline ConveyorSplineNode { get; }
+        private GrCategoryRangeSpline RangeSpline { get; }
+
+        private GrCategorySpline ConveyorSplineNode { get; }
+
+        private GrCategorySpline HeavySplineNode { get; }
 
         private GrNode Animations { get; }
 
@@ -66,10 +70,28 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             StageNode = new GrStageNode();
             ModelNode = new GrModelNode();
             CollisionNode = new GrCategoryCollision("Collisions", res.Meshes);
-            ZoneNode = new GrCategoryZone("Zones", res.Zones);
+            ZoneNode = new GrCategoryZone("Zones", res.Zones)
+            {
+                Checked = false
+            };
             PositionNode = new GrRootPositionNode(res);
+
             CourseSplineNode = new GrCategoryCourseSpline("Course Spline", res.CourseSpline.Splines, res.CourseSpline);
-            ConveyorSplineNode = new GrCategoryConveyorSpline("Conveyor Spline", res.ConveyorSplines);
+
+            RangeSpline = new GrCategoryRangeSpline("CPU Range Splines", res.RangeSplines)
+            {
+                Checked = false,
+            };
+            ConveyorSplineNode = new GrCategorySpline("CPU Conveyor Spline", res.ConveyorSplines)
+            {
+                Checked = false,
+                SplineColor = new OpenTK.Mathematics.Vector4(1f, 0, 1f, 1f)
+            };
+            HeavySplineNode = new GrCategorySpline("CPU Heavy Spline", res.HeavySplines)
+            {
+                Checked = false,
+                SplineColor = new OpenTK.Mathematics.Vector4(1f, 0.5f, 0f, 1f)
+            };
 
             Animations = new GrAnimationNode() { Text = "Animations", Checked = true };
             Animations.Nodes.Add(new GrCategoryAnimation("SuperJump", res.SuperJumpAnimations));
@@ -88,10 +110,10 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             treeView1.Nodes.Add(PositionNode);
             treeView1.Nodes.Add(Animations);
             treeView1.Nodes.Add(CourseSplineNode);
+            treeView1.Nodes.Add(RangeSpline);
             treeView1.Nodes.Add(ConveyorSplineNode);
-            // TODO: range spline
+            treeView1.Nodes.Add(HeavySplineNode);
             treeView1.Nodes.Add(RailNode);
-            // TODO: rail 2
 
             treeView1.EndUpdate();
         }

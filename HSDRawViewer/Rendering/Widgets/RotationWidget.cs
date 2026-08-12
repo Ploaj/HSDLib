@@ -691,12 +691,14 @@ namespace HSDRawViewer.Rendering.Widgets
             }
         }
 
-        public void MouseDown(PickInformation info)
+        public bool MouseDown(PickInformation info)
         {
+            bool isStart = false;
             if (SelectedComponent != RotationComponent.None &&
                 !WasInteracting)
             {
                 Interacting = true;
+                isStart = true;
 
                 if (SelectedComponent ==
                     RotationComponent.View)
@@ -712,6 +714,7 @@ namespace HSDRawViewer.Rendering.Widgets
             }
 
             WasInteracting = true;
+            return isStart;
         }
 
         public void MouseUp()

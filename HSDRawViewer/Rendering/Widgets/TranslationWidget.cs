@@ -18,8 +18,6 @@ namespace HSDRawViewer.Rendering.Widgets
 
     public class TranslationWidget : IWidget
     {
-        // TODO: option to make x move into negative axis
-
         public Matrix4 Transform = Matrix4.Identity;
 
         public float Size { get; set; } = 4;
@@ -318,13 +316,16 @@ namespace HSDRawViewer.Rendering.Widgets
         /// 
         /// </summary>
         /// <param name="info"></param>
-        public void MouseDown(PickInformation info)
+        public bool MouseDown(PickInformation info)
         {
+            bool onStart = false;
             if (SelectedComponent != TranslationComponent.None && !WasInteracting)
             {
                 Interacting = true;
+                onStart = true;
             }
             WasInteracting = true;
+            return onStart;
         }
 
         /// <summary>

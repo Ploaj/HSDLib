@@ -6,7 +6,7 @@ namespace HSDRawViewer.Rendering.Widgets
     {
         public bool Interacting { get; }
 
-        public void MouseDown(PickInformation pick);
+        public bool MouseDown(PickInformation pick);
 
         public void MouseUp();
 

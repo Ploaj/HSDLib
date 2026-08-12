@@ -21,7 +21,7 @@ namespace HSDRaw.AirRide.Gr.Data
         public KAR_grSplineList RailSpline1 { get => _s.GetReference<KAR_grSplineList>(0x14); set => _s.SetReference(0x14, value); }
 
         // 18 grDesert
-        public KAR_grSplineList RailSpline2 { get => _s.GetReference<KAR_grSplineList>(0x18); set => _s.SetReference(0x18, value); }
+        public KAR_grSplineList HeavySplines { get => _s.GetReference<KAR_grSplineList>(0x18); set => _s.SetReference(0x18, value); }
     }
 
     public class KAR_grConveyorPath : HSDAccessor
@@ -72,7 +72,7 @@ namespace HSDRaw.AirRide.Gr.Data
 
     public class KAR_grRangeSplineSetup : HSDAccessor
     {
-        public override int TrimmedSize => 0x8;
+        public override int TrimmedSize => 0xC;
 
         public KAR_grRangeSpline[] Splines
         {
@@ -97,6 +97,8 @@ namespace HSDRaw.AirRide.Gr.Data
         }
 
         public int Count { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+
+        public HSDAccessor CityParam { get => _s.GetReference<HSDAccessor>(0x08); set => _s.SetReference(0x08, value); }
     }
 
     public class KAR_grRangeSpline : HSDAccessor
@@ -107,12 +109,21 @@ namespace HSDRaw.AirRide.Gr.Data
 
         public HSD_Spline RightSpline { get => _s.GetReference<HSD_Spline>(0x04); set => _s.SetReference(0x04, value); }
 
+        /// <summary>
+        /// Always -1
+        /// </summary>
         public int x08 { get => _s.GetInt32(0x08); set => _s.SetInt32(0x08, value); }
 
+        /// <summary>
+        /// Always -1
+        /// </summary>
         public int x0C { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
 
+        /// <summary>
+        /// Used by City and Colosseum5
+        /// </summary>
         public int x10 { get => _s.GetInt32(0x10); set => _s.SetInt32(0x10, value); }
 
-        public int x14 { get => _s.GetInt32(0x14); set => _s.SetInt32(0x14, value); }
+        public uint Flags { get => _s.GetUInt32(0x14); set => _s.SetUInt32(0x14, value); }
     }
 }

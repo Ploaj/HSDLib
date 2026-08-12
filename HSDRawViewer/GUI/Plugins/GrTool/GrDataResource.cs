@@ -56,7 +56,11 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
 
         public KdCourseSplineSetup CourseSpline { get; } = new KdCourseSplineSetup();
 
+        public ObservableList<KdRangeSpline> RangeSplines = new ObservableList<KdRangeSpline>();
+
         public ObservableList<KdSpline> ConveyorSplines = new ObservableList<KdSpline>();
+
+        public ObservableList<KdSpline> HeavySplines = new ObservableList<KdSpline>();
 
         /// <summary>
         /// Animations
@@ -191,11 +195,27 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
                     CourseSpline.Load(d.SplineNode.SplineSetup);
                 }
 
+                if (d.SplineNode.RangeSplineSetup != null)
+                {
+                    foreach (var v in d.SplineNode.RangeSplineSetup.Splines)
+                    {
+                        RangeSplines.Add(new KdRangeSpline(v));
+                    }
+                }
+
                 if (d.SplineNode.ConveyorSpline != null)
                 {
                     foreach (var v in d.SplineNode.ConveyorSpline.SplineList.Splines.Array)
                     {
                         ConveyorSplines.Add(new KdSpline(v));
+                    }
+                }
+
+                if (d.SplineNode.HeavySplines != null)
+                {
+                    foreach (var v in d.SplineNode.HeavySplines.Splines.Array)
+                    {
+                        HeavySplines.Add(new KdSpline(v));
                     }
                 }
             }
@@ -311,6 +331,20 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
 
             d.SplineNode.SplineSetup = CourseSpline.Save();
 
+            if (RangeSplines.Count > 0)
+            {
+                var data = RangeSplines.Select(e => e.ToRangeSpline()).ToArray();
+                d.SplineNode.RangeSplineSetup = new KAR_grRangeSplineSetup()
+                {
+                    Splines = data,
+                    Count = RangeSplines.Count
+                };
+            }
+            else
+            {
+                d.SplineNode.RangeSplineSetup = null;
+            }
+
             if (ConveyorSplines.Count > 0)
             {
                 var data = ConveyorSplines.Select(e => e.ToHsdSpline()).ToArray();
@@ -329,6 +363,23 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
             else
             {
                 d.SplineNode.ConveyorSpline = null;
+            }
+
+            if (HeavySplines.Count > 0)
+            {
+                var data = HeavySplines.Select(e => e.ToHsdSpline()).ToArray();
+                d.SplineNode.HeavySplines = new KAR_grSplineList()
+                {
+                    Count = data.Length,
+                    Splines = new HSDFixedLengthPointerArrayAccessor<HSDRaw.Common.HSD_Spline>()
+                    {
+                        Array = data
+                    }
+                };
+            }
+            else
+            {
+                d.SplineNode.HeavySplines = null;
             }
 
             // Rails

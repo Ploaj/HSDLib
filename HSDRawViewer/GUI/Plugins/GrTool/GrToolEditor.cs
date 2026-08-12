@@ -414,11 +414,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     {
                         if (args.Button == MouseButtons.Left)
                         {
-                            if (!_translationWidget.Interacting &&
-                                _dockTree.SelectedNode is IUndo undo)
-                                undo.Commit(_propertyGrid.SelectedObject);
-
-                            _translationWidget.MouseDown(pick);
+                            if (_translationWidget.MouseDown(pick))
+                            {
+                                if (_dockTree.SelectedNode is IUndo undo)
+                                    undo.Commit(_propertyGrid.SelectedObject);
+                            }
                         }
                         else
                             _translationWidget.MouseUp();
@@ -436,11 +436,11 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     {
                         if (args.Button == MouseButtons.Left)
                         {
-                            if (!_rotationWidget.Interacting &&
-                                _dockTree.SelectedNode is IUndo undo)
-                                undo.Commit(_propertyGrid.SelectedObject);
-
-                            _rotationWidget.MouseDown(pick);
+                            if (_rotationWidget.MouseDown(pick))
+                            {
+                                if (_dockTree.SelectedNode is IUndo undo)
+                                    undo.Commit(_propertyGrid.SelectedObject);
+                            }
                         }
                         else
                             _rotationWidget.MouseUp();

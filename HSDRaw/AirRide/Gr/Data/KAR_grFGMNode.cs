@@ -6,13 +6,13 @@ namespace HSDRaw.AirRide.Gr.Data
     {
         public override int TrimmedSize => 0x10;
 
-        public HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry> Entry1 { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry>>(0x00); set => _s.SetReference(0x00, value); }
+        public HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry> PositionalAudio { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry>>(0x00); set => _s.SetReference(0x00, value); }
 
-        public int Count1 { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
+        public int PositionalAudioCount { get => _s.GetInt32(0x04); set => _s.SetInt32(0x04, value); }
 
-        public HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry> Entry2 { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry>>(0x08); set => _s.SetReference(0x08, value); }
+        public HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry> TriggeredAudio { get => _s.GetReference<HSDFixedLengthPointerArrayAccessor<KAR_grFGMNodeEntry>>(0x08); set => _s.SetReference(0x08, value); }
 
-        public int Count2 { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
+        public int TriggeredAudioCount { get => _s.GetInt32(0x0C); set => _s.SetInt32(0x0C, value); }
 
     }
 
