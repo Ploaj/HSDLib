@@ -240,7 +240,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             node = gen.GenerateNode();
 
             // generate partition
-            tree = SpatialPartitionOrganizer.GeneratePartition(jobj != null ? jobj.Enumerate.Select(e => e.WorldTransform).ToArray() : null, node);
+            tree = SpatialPartitionOrganizer.GeneratePartition(jobj, node);
             return true;
         }
 

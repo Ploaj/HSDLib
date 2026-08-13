@@ -65,10 +65,13 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         public KdSpline(HSD_Spline s)
         {
+            if (s == null) return;
             Kind = (KdSplineKind)s.Type;
             Tension = s.Tension;
             TotalLength = s.TotalLength;
             Points = s.CV.Select(e => new KdVector(e.X, e.Y, e.Z)).ToList();
+            while (Points.Count > s.NumCV)
+                Points.RemoveAt(Points.Count - 1);
             SegLengths = s.Lengths.Array.ToList();
             if (s.SegPolys != null)
                 SegPoly = s.SegPolys.Array.Select(e => new KdSegPoly(e.Value1, e.Value2, e.Value3, e.Value4, e.Value5)).ToList();

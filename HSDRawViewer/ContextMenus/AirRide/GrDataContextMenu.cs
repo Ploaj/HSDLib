@@ -67,7 +67,8 @@ namespace HSDRawViewer.ContextMenus.AirRide
                 if (MainForm.SelectedDataNode.Accessor is KAR_grData data)
                 {
                     HSDRaw.Common.HSD_JOBJ jobj = ModelImporter.ImportModelFromFile(null);
-                    data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
+                    if (jobj != null)
+                        data.PartitionNode.Partition = SpatialPartitionOrganizer.GeneratePartition(new LiveJObj(jobj), data.CollisionNode);
                 }
             };
             Items.Add(recal);

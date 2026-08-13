@@ -22,14 +22,17 @@ namespace HSDRawViewer.Tools.SpatialOrganizer
             Vector3 min = new(float.MaxValue);
             Vector3 max = new(float.MinValue);
 
-            //min = new Vector3(-5005, -5005, -5005);
-            //max = new Vector3(5005, 5005, 5005);
+            min = new Vector3(-5005, -5005, -5005);
+            max = new Vector3(5005, 5005, 5005);
 
             foreach (SpatialTriangle t in triangles)
             {
                 min = Vector3.ComponentMin(min, t.Min);
                 max = Vector3.ComponentMax(max, t.Max);
             }
+
+            //min -= Vector3.One * 10;
+            //min += Vector3.One * 10;
 
             SpatialBox root = new(min, max);
             foreach (SpatialTriangle t in triangles)
@@ -77,7 +80,7 @@ namespace HSDRawViewer.Tools.SpatialOrganizer
             List<SpatialTriangle> triangles = new();
             foreach (KAR_CollisionJoint j in _joints)
             {
-                Matrix4 trans = bones == null ? Matrix4.Identity : bones[j.BoneID];
+                Matrix4 trans = bones != null && j.BoneID < bones.Length && j.BoneID > 0 ? bones[j.BoneID] : Matrix4.Identity;
 
                 for (int i = j.FaceStart; i < j.FaceStart + j.FaceSize; i++)
                 {

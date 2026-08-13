@@ -4,6 +4,7 @@ using OpenTK.Mathematics;
 using System.Linq;
 using HSDRawViewer.Tools;
 using System.ComponentModel;
+using System;
 
 namespace HSDRawViewer.IO.AirRide.DataFormat
 {
@@ -71,7 +72,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             {
                 int count = list.Count;
                 var data = list.PositionData.Array;
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < Math.Min(count, data.Length); i++)
                 {
                     var p = data[i];
                     Positions.Add(new KdPosition()

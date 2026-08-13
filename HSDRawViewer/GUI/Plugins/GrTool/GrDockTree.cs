@@ -134,7 +134,7 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             }
 
 #if DEBUG
-            treeView1.Nodes.Add(new GrPartitionNode(0, data.PartitionNode.Partition.Buckets[0], data.PartitionNode.Partition.Buckets, data.PartitionNode.Partition.ZoneIndices));
+            treeView1.Nodes.Add(new GrPartitionNode(data));
 #endif
         }
 

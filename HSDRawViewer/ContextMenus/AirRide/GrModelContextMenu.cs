@@ -17,11 +17,33 @@ namespace HSDRawViewer.ContextMenus.AirRide
         /// </summary>
         public GrModelContextMenu()
         {
-            ToolStripMenuItem genPages = new("Recalculate Model Bounding");
+            ToolStripMenuItem genPages = new("Regenerate Model Info");
             genPages.Click += (sender, args) =>
             {
                 if (MainForm.SelectedDataNode.Accessor is KAR_grMainModel data)
                 {
+                    int jobj_num = 0;
+                    int dobj_num = 0;
+                    int pobj_num = 0;
+
+                    foreach (var j in data.RootNode.TreeList)
+                    {
+                        jobj_num++;
+                        if (j.Dobj == null) continue;
+
+                        foreach (var d in j.Dobj.List)
+                        {
+                            dobj_num++;
+
+                            if (d.Pobj != null)
+                                pobj_num += d.Pobj.List.Count;
+                        }
+                    }
+
+                    data.JobjCount = jobj_num;
+                    data.DobjCount = dobj_num;
+                    data.PobjCount = pobj_num;
+
                     data.ModelBounding = CalculateModelBounding(data.RootNode);
                 }
             };
