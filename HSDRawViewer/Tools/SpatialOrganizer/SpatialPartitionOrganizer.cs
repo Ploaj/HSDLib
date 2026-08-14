@@ -268,8 +268,12 @@ namespace HSDRawViewer.Tools.SpatialOrganizer
 
             // process bit table
             partition.BitTableDataType = 3;
-            partition._s.SetBuffer(0x54, new byte[(int)Math.Ceiling(collTris.Count / 8f)]);
-            partition.BitTableCount = (ushort)collTris.Count;
+            // there needs to be a bit table entry for each spline point.
+            // It's probably better to count them rather than just guess here. For most stages the tri count should be enough.
+            int bitTableCount = (ushort)Math.Max(collTris.Count, 64);
+            int bitTableSize = (int)Math.Ceiling(bitTableCount / 8f);
+            partition._s.SetBuffer(0x54, new byte[bitTableSize]);
+            partition.BitTableCount = (ushort)bitTableCount;
 
             return partition;
         }
