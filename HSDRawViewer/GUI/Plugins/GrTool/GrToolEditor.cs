@@ -217,15 +217,20 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             {
                 if (e.ChangedItem.PropertyDescriptor.Name == nameof(KdZone.Type))
                 {
-                    if (_propertyGrid.SelectedObject is IUndo undo)
-                    {
-                        undo.ClearHistory();
-                    }
+                    //if (_propertyGrid.SelectedObject is IUndo undo)
+                    //{
+                    //    undo.ClearHistory();
+                    //}
                     _propertyGrid.Refresh();
                 }
 
                 if (_dockTree.SelectedNode is GrNode n)
                     n.OnTagPropertyUpdate(e);
+
+                //if (_propertyGrid.SelectedObject is IUndo undo)
+                //    undo.ClearHistory();
+
+                RefreshTranslationWidgets();
             };
 
             foreach (GrCollisionNodeRenderKind e in Enum.GetValues(typeof(GrCollisionNodeRenderKind)))
@@ -369,6 +374,26 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             SelectMode = (GrSelectModeKind)button.Tag;
         }
 
+        private void RefreshTranslationWidgets()
+        {
+            var o = _propertyGrid.SelectedObject;
+            switch (TransformMode)
+            {
+                case GrToolMode.Translation:
+                    if (_dockTree.SelectedNode is IGrTranslate t && t.CanTranslate(o))
+                    {
+                        _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o, _render.Joints));
+                    }
+                    break;
+                case GrToolMode.Rotation:
+                    if (_dockTree.SelectedNode is IGrRotate r && r.CanRotate(o))
+                    {
+                        _rotationWidget.Transform = r.GetRotation(o, _render.Joints);
+                    }
+                    break;
+            }
+        }
+
         public void SelectObject(string name, object o)
         {
             _propertyGrid.SetObject(name, o);
@@ -385,17 +410,16 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
                     if (_dockTree.SelectedNode is IGrTranslate t && t.CanTranslate(o))
                     {
                         TranslationEnabled = true;
-                        _translationWidget.Transform = Matrix4.CreateTranslation(t.GetTranslate(o, _render.Joints));
                     }
                     break;
                 case GrToolMode.Rotation:
                     if (_dockTree.SelectedNode is IGrRotate r && r.CanRotate(o))
                     {
                         RotationEnabled = true;
-                        _rotationWidget.Transform = r.GetRotation(o, _render.Joints);
                     }
                     break;
             }
+            RefreshTranslationWidgets();
         }
 
         public void ScreenDoubleClick(PickInformation pick)

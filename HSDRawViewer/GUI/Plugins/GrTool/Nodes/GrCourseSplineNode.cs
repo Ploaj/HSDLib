@@ -34,8 +34,10 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             TreeView.EndUpdate();
         }
 
-        public override void BuildContextMenu(ContextMenuStrip menu)
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
+            if (selected_node != this) return;
+
             menu.Items.Add("Import and Add All...", null, (s, e) =>
             {
                 var splines = KdSplineIO.ImportSplines().ToArray();

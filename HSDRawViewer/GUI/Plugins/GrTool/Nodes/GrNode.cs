@@ -1,15 +1,9 @@
-﻿using HSDRawViewer.GUI.Plugins.GrTool;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
 {
     public abstract class GrNode : TreeNode
     {
-        public delegate void DeleteNode(GrNode self);
-
-        public DeleteNode OnDeleteNode;
-
-
         public bool Visible
         {
             get => Checked && (Parent is not GrNode node || node.Visible);
@@ -33,12 +27,12 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
 
         }
 
-        public virtual bool HandleShortcut(Keys key, Keys modifier)
+        public virtual bool HandleShortcut(Keys key, Keys modifier, GrNode selected_node)
         {
             return false;
         }
 
-        public virtual void BuildContextMenu(ContextMenuStrip menu)
+        public virtual void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
         }
 

@@ -2,64 +2,90 @@
 using IONET.Core;
 using IONET.Core.Model;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace HSDRawViewer.GUI.Plugins.GrTool.Converters
 {
     public class KdMeshIOConverter
     {
-        public static IOScene ToIOScene(KdMesh m)
+        public static IOScene ToIOScene(IEnumerable<KdMesh> meshes)
         {
             var scene = new IOScene();
-            foreach (var mat in m.Materials)
-            {
-                var iomat = new IOMaterial()
-                {
-                    Name = mat.ToString(),
-                };
 
-                switch (mat.Type)
+            HashSet<string> materials = new HashSet<string>();
+
+            foreach (var m in meshes)
+            {
+                foreach (var mat in m.Materials)
                 {
-                    case KdType.CEILING: iomat.DiffuseColor = new System.Numerics.Vector4(1, 0, 0, 1); break;
-                    case KdType.FLOOR: iomat.DiffuseColor = new System.Numerics.Vector4(0, 1, 0, 1); break;
-                    case KdType.WALL: iomat.DiffuseColor = new System.Numerics.Vector4(0, 0, 1, 1); break;
+                    var mat_key = mat.ToString();
+
+                    if (materials.Contains(mat_key))
+                        continue;
+
+                    var iomat = new IOMaterial()
+                    {
+                        Name = mat.ToString(),
+                    };
+
+                    switch (mat.Type)
+                    {
+                        case KdType.FLOOR: iomat.DiffuseColor = new System.Numerics.Vector4(1, 0, 0, 1); break;
+                        case KdType.WALL: iomat.DiffuseColor = new System.Numerics.Vector4(0, 1, 0, 1); break;
+                        case KdType.CEILING: iomat.DiffuseColor = new System.Numerics.Vector4(0, 0, 1, 1); break;
+                    }
+
+                    materials.Add(mat_key);
+                    scene.Materials.Add(iomat);
                 }
 
-                scene.Materials.Add(iomat);
-            }
-            var material_names = m.Materials.Select(e => e.ToString()).ToArray();
+                var material_names = m.Materials.Select(e => e.ToString()).ToArray();
 
-            var model = new IOModel();
-            scene.Models.Add(model);
+                var model = new IOModel();
+                scene.Models.Add(model);
 
-            var mesh = new IOMesh();
-            mesh.Name = m.ToMeshString();
-            model.Meshes.Add(mesh);
+                var mesh = new IOMesh();
+                mesh.Name = m.ToMeshString();
+                model.Meshes.Add(mesh);
 
-            mesh.Vertices.AddRange(m.Vertices.Select(e =>
-            {
-                if (e == null || e.Count < 3) return new IOVertex();
-                return new IOVertex()
+                mesh.Vertices.AddRange(m.Vertices.Select(e =>
                 {
-                    Position = new System.Numerics.Vector3(e[0], e[1], e[2])
-                };
-            }));
+                    if (e == null || e.Count < 3) return new IOVertex();
+                    return new IOVertex()
+                    {
+                        Position = new System.Numerics.Vector3(e[0], e[1], e[2])
+                    };
+                }));
 
-            foreach (var g in m.Triangles.GroupBy(e => e.Material))
-            {
-                var poly = new IOPolygon()
+                foreach (var g in m.Triangles.GroupBy(e => e.Material))
                 {
-                    PrimitiveType = IOPrimitive.TRIANGLE,
-                    MaterialName = material_names[g.Key],
-                };
-                mesh.Polygons.Add(poly);
+                    var poly = new IOPolygon()
+                    {
+                        PrimitiveType = IOPrimitive.TRIANGLE,
+                        MaterialName = material_names[g.Key],
+                    };
+                    mesh.Polygons.Add(poly);
 
-                foreach (var t in g)
-                    poly.Indicies.AddRange(t.Indices);
+                    foreach (var t in g)
+                        poly.Indicies.AddRange(t.Indices);
+                }
             }
 
             return scene;
         }
+
+        public class ImportSettings
+        {
+            [DisplayName("Parent Bone")]
+            [Description("Index of parent bone to attach to.")]
+            public int ParentBone { get; set; }
+
+            //[DisplayName("Import Material")]
+            //public bool GenerateMaterial { get; set; }
+        }
+
+        public static ImportSettings Settings { get; } = new ImportSettings();
 
         public static KdMesh FromIOScene(IOScene scene)
         {
@@ -72,6 +98,14 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Converters
                 m.Materials.Add(KdMaterial.Parse(iomat.Name));
             }
 
+            if (scene.Materials.Count == 0)
+            {
+                m.Materials.Add(new KdMaterial()
+                {
+                    Type = KdType.FLOOR,
+                });
+            }
+
             foreach (var model in scene.Models)
             {
                 foreach (var mesh in model.Meshes)
@@ -80,7 +114,11 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Converters
                     var offset = m.Vertices.Count;
                     foreach (var p in mesh.Polygons)
                     {
-                        int material_index = material_lookup[p.MaterialName];
+                        int material_index = 0;
+                        if (material_lookup.ContainsKey(p.MaterialName))
+                        {
+                            material_index = material_lookup[p.MaterialName];
+                        }
 
                         for (int i = 0; i < p.Indicies.Count; i += 3)
                         {
@@ -88,10 +126,10 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Converters
                             {
                                 Material = material_index,
                                 Indices = new int[] {
-                                    offset + p.Indicies[i],
-                                    offset + p.Indicies[i + 1],
-                                    offset + p.Indicies[i + 2],
-                                },
+                                offset + p.Indicies[i],
+                                offset + p.Indicies[i + 1],
+                                offset + p.Indicies[i + 2],
+                            },
                             });
                         }
                     }

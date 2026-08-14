@@ -47,21 +47,19 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             var f = FileIO.SaveFile("Wavefront OBJ|*.obj", Text + ".obj");
             if (f == null) return;
 
-            IOManager.ExportScene(KdMeshIOConverter.ToIOScene(m), f, new ExportSettings());
+            IOManager.ExportScene(KdMeshIOConverter.ToIOScene(new KdMesh[] { m }), f, new ExportSettings());
         }
 
-        public override void BuildContextMenu(ContextMenuStrip menu)
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
+            if (selected_node != this) return;
+
             menu.Items.Add("Import Model", null, (s, e) => {
                 ImportModelFile();
             });
 
             menu.Items.Add("Export Model", null, (s, e) => {
                 ExportToObjectFile();
-            });
-
-            menu.Items.Add("Delete", null, (s, e) => {
-                OnDeleteNode?.Invoke(this);
             });
         }
 
@@ -79,16 +77,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
 
             //strip.Items.Add(exportButton);
             //strip.Items.Add(deleteButton);
-        }
-
-        public override bool HandleShortcut(Keys key, Keys modifier)
-        {
-            if (key == Keys.D || key == Keys.Delete)
-            {
-                OnDeleteNode?.Invoke(this);
-                return true;
-            }
-            return false;
         }
 
 

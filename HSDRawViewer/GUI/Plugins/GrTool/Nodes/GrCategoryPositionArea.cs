@@ -11,8 +11,12 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             list.Refresh();
         }
 
-        public override void BuildContextMenu(ContextMenuStrip menu)
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
+            base.BuildContextMenu(menu, selected_node);
+
+            if (selected_node != this) return;
+
             menu.Items.Add("New Position Area", null, (s, e) => {
                 list.Add(new KdPositionArea()
                 {
@@ -83,11 +87,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
 
             //    IOManager.ExportScene(scene, filePath);
             //});
-
-
-            menu.Items.Add("Delete", null, (s, e) => {
-                OnDeleteNode?.Invoke(this);
-            });
         }
 
     }

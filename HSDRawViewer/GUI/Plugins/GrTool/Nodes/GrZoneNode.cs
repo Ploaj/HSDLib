@@ -59,8 +59,10 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
         }
 
 
-        public override void BuildContextMenu(ContextMenuStrip menu)
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
+            if (selected_node != this) return;
+
             menu.Items.Add("Import Model", null, (s, e) => {
                 ImportModelFile();
             });
@@ -68,20 +70,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             menu.Items.Add("Export Model", null, (s, e) => {
                 ExportToObjectFile();
             });
-
-            menu.Items.Add("Delete", null, (s, e) => {
-                OnDeleteNode?.Invoke(this);
-            });
-        }
-
-        public override bool HandleShortcut(Keys key, Keys modifier)
-        {
-            if (key == Keys.D || key == Keys.Delete)
-            {
-                OnDeleteNode?.Invoke(this);
-                return true;
-            }
-            return false;
         }
 
         public override void Draw(GrRenderResource render, object selected_object)

@@ -1,5 +1,6 @@
 ﻿using HSDRawViewer.Tools;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
@@ -23,6 +24,44 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             return System.Activator.CreateInstance<K>();
         }
 
+        private bool TryDelete(GrNode node, T obj)
+        {
+            if (!list.Contains(obj))
+                return false;
+
+            if (MessageBox.Show(
+                $"Are you sure you want to delete {node.Text}?\n\nThis action cannot be undone.",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                list.Remove(obj);
+                return true;
+            }
+            return false;
+        }
+
+        public override bool HandleShortcut(Keys key, Keys modifier, GrNode node)
+        {
+            if (key == Keys.Delete && node.Tag is T obj)
+            {
+                TryDelete(node, obj);
+                return true;
+            }
+            return false;
+        }
+
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selectedNode)
+        {
+            if (selectedNode is K &&
+                selectedNode.Tag is T obj)
+            {
+                menu.Items.Add("Delete", null, (s, e) => {
+                    TryDelete(selectedNode, obj);
+                });
+            }
+        }
+
         private void SetDataSource(ObservableList<T> list)
         {
             list.Added += (m) =>
@@ -30,18 +69,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
                 var node = CreateChild(m);
                 node.Checked = true;
                 node.Tag = m;
-
-                node.OnDeleteNode += (n) =>
-                {
-                    if (MessageBox.Show(
-                        $"Are you sure you want to delete {n.Text}?\n\nThis action cannot be undone.",
-                        "Confirm Delete",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning) == DialogResult.Yes)
-                    {
-                        list.Remove(m);
-                    }
-                };
 
                 _nodes.Add(m, node);
                 Nodes.Add(node);
@@ -69,7 +96,7 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             {
                 int i = 0;
                 foreach (TreeNode t in Nodes)
-                    t.Text = $"{Text}_{i++:D3}";
+                    t.Text = $"{i++:D3}";
             }
             finally
             {

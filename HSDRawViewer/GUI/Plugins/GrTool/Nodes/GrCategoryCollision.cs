@@ -12,9 +12,11 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
         {
         }
 
-        public override void BuildContextMenu(ContextMenuStrip menu)
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
-            menu.Items.Add("Import Collision", null, (s, e) => {
+            if (selected_node != this) return;
+
+            menu.Items.Add("Import New Collision...", null, (s, e) => {
                 var f = FileIO.OpenFile(IOManager.GetImportFileFilter());
                 if (f == null) return;
 
@@ -26,6 +28,12 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
                 var m = KdMeshIOConverter.FromIOScene(scene);
 
                 list.Add(m);
+            });
+
+            menu.Items.Add("Export All...", null, (s, e) => {
+                var f = FileIO.SaveFile(IOManager.GetExportFileFilter());
+                if (f == null) return;
+                IOManager.ExportScene(KdMeshIOConverter.ToIOScene(list), f, new ExportSettings());
             });
         }
     }

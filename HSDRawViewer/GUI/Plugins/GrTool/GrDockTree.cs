@@ -3,6 +3,7 @@ using HSDRawViewer.GUI.Plugins.GrTool;
 using HSDRawViewer.GUI.Plugins.GrTool.Nodes;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -245,12 +246,16 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             }
             else
             {
-                if (treeView1.SelectedNode is GrNode node)
+                var n = treeView1.SelectedNode as GrNode;
+                while (n != null)
                 {
-                    if (node.HandleShortcut(e.KeyCode, e.Modifiers))
+                    if (n.HandleShortcut(e.KeyCode, e.Modifiers, treeView1.SelectedNode as GrNode))
                     {
                         e.Handled = true;
+                        return;
                     }
+
+                    n = n.Parent as GrNode;
                 }
             }
         }
@@ -266,8 +271,21 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
 
             _contextMenu.Items.Clear();
 
-            if (e.Node is GrNode node)
-                node.BuildContextMenu(_contextMenu);
+            var n = e.Node as GrNode;
+            if (n != null)
+            {
+                while (n != null)
+                {
+                    int count = _contextMenu.Items.Count;
+
+                    n.BuildContextMenu(_contextMenu, e.Node as GrNode);
+
+                    if (count > 0 && count != _contextMenu.Items.Count)
+                        _contextMenu.Items.Insert(count, new ToolStripSeparator());
+
+                    n = n.Parent as GrNode;
+                }
+            }
 
             treeView1.ContextMenuStrip = _contextMenu;
         }

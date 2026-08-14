@@ -42,7 +42,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         [Category("0 - General")]
         [DisplayName("Parent Bone")]
         [JsonPropertyName("parent")]
-        public int Parent { get; set; } = -1;
+        public int Parent { get; set; } = 0;
 
         [Category("1 - Conveyor")]
         [DisplayName("Force X")]

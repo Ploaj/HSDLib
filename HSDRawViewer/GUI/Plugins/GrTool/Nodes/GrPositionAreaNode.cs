@@ -1,5 +1,4 @@
-﻿using HSDRawViewer.GUI.Plugins.GrTool;
-using HSDRawViewer.IO.AirRide.DataFormat;
+﻿using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
@@ -11,13 +10,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
 {
     public class GrPositionAreaNode : GrDrawNode, IGrTranslate, IGrRotate, IUndo
     {
-        public override void BuildContextMenu(ContextMenuStrip menu)
-        {
-            menu.Items.Add("Delete", null, (s, e) => {
-                OnDeleteNode?.Invoke(this);
-            });
-        }
-
         public override void Draw(GrRenderResource render, object selected_object)
         {
             if (Tag is not KdPositionArea p) return;

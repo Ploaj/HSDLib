@@ -10,13 +10,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
 {
     public class GrPositionNode : GrDrawNode, IGrTranslate, IGrRotate, IUndo
     {
-        public override void BuildContextMenu(ContextMenuStrip menu)
-        {
-            menu.Items.Add("Delete", null, (s, e) => {
-                OnDeleteNode?.Invoke(this);
-            });
-        }
-
         public override void Draw(GrRenderResource render, object selected_object)
         {
             if (Tag is not KdPosition p) return;

@@ -54,8 +54,10 @@ namespace HSDRawViewer.GUI.Plugins.GrTool.Nodes
             }
         }
 
-        public override void BuildContextMenu(ContextMenuStrip menu)
+        public override void BuildContextMenu(ContextMenuStrip menu, GrNode selected_node)
         {
+            if (selected_node != this) return;
+
             menu.Items.Add("Import Spline from OBJ...", null, (s, e) =>
             {
                 if (GetSpline() == null) return;
