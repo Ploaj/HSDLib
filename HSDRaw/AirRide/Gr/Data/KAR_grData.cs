@@ -29,7 +29,7 @@
 
         public HSDArrayAccessor<KAR_grItemNode> ItemNode { get => _s.GetReference<HSDArrayAccessor<KAR_grItemNode>>(0x2C); set => _s.SetReference(0x2C, value); }
 
-        // x30 Runtime city event
+        public HSDArrayAccessor<KAR_grEventConfig> EventNode { get => _s.GetReference<HSDArrayAccessor<KAR_grEventConfig>>(0x30); set => _s.SetReference(0x30, value); }
 
         public KAR_grFogNode FogNode { get => _s.GetReference<KAR_grFogNode>(0x34); set => _s.SetReference(0x34, value); }
 

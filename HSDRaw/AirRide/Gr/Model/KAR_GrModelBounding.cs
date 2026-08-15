@@ -41,7 +41,7 @@
                 if (str == null)
                     return null;
 
-                var regions = str._s.GetEmbeddedAccessorArray<KAR_grDynamicBoundingBoxes>(0x00, UnknownCount);
+                var regions = str._s.GetEmbeddedAccessorArray<KAR_grDynamicBoundingBoxes>(0x00, DynamicBoxNum);
 
                 return regions;
             }
@@ -49,18 +49,18 @@
             {
                 if (value == null || value.Length == 0)
                 {
-                    UnknownCount = 0;
+                    DynamicBoxNum = 0;
                     _s.SetReference(0x08, null);
                 }
                 else
                 {
-                    UnknownCount = (short)value.Length;
+                    DynamicBoxNum = (short)value.Length;
                     _s.GetCreateReference<HSDAccessor>(0x08)._s.SetEmbeddedAccessorArray(0x00, value);
                 }
             }
         }
 
-        public short UnknownCount { get => _s.GetInt16(0x0C); internal set => _s.SetInt16(0x0C, value); }
+        public short DynamicBoxNum { get => _s.GetInt16(0x0C); internal set => _s.SetInt16(0x0C, value); }
 
         public KAR_grStaticBoundingBox[] StaticBoundingBoxes
         {
@@ -70,7 +70,7 @@
                 if (str == null)
                     return null;
 
-                var regions = str._s.GetEmbeddedAccessorArray<KAR_grStaticBoundingBox>(0x00, BoundingBoxCount);
+                var regions = str._s.GetEmbeddedAccessorArray<KAR_grStaticBoundingBox>(0x00, StaticBoxNum);
 
                 return regions;
             }
@@ -78,18 +78,18 @@
             {
                 if (value == null || value.Length == 0)
                 {
-                    BoundingBoxCount = 0;
+                    StaticBoxNum = 0;
                     _s.SetReference(0x10, null);
                 }
                 else
                 {
-                    BoundingBoxCount = (short)value.Length;
+                    StaticBoxNum = (short)value.Length;
                     _s.GetCreateReference<HSDAccessor>(0x10)._s.SetEmbeddedAccessorArray(0x00, value);
                 }
             }
         }
 
-        public short BoundingBoxCount { get => _s.GetInt16(0x14); internal set => _s.SetInt16(0x14, value); }
+        public short StaticBoxNum { get => _s.GetInt16(0x14); internal set => _s.SetInt16(0x14, value); }
 
 
         public ushort[] Indices
