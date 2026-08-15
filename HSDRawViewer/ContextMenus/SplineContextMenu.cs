@@ -1,6 +1,7 @@
 ﻿using HSDRaw.Common;
 using HSDRaw.Common.Animation;
 using HSDRaw.Tools;
+using HSDRawViewer.Tools;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -133,7 +134,7 @@ namespace HSDRawViewer.ContextMenus
                         file.Roots.Add(new HSDRaw.HSDRootNode()
                         {
                             Name = "_animjoint",
-                            Data = GenerateAnimJoint(spline)
+                            Data = SplineTools.GenerateAnimJoint(spline)
                         });
 
                         file.Save(f);
@@ -449,121 +450,6 @@ namespace HSDRawViewer.ContextMenus
             //}
         }
 
-        private static HSD_AnimJoint GenerateAnimJoint(HSD_Spline spline)
-        {
-            List<FOBJKey> x = new();
-            List<FOBJKey> y = new();
-            List<FOBJKey> z = new();
-            List<FOBJKey> rx = new();
-            List<FOBJKey> ry = new();
-            List<FOBJKey> rz = new();
-
-            HSD_Vector3[] points = spline.CV;
-            for (int i = 1; i < points.Length; i++)
-            {
-                Vector3 p1 = new(points[i - 1].X, points[i - 1].Y, points[i - 1].Z);
-                Vector3 p2 = new(points[i].X, points[i].Y, points[i].Z);
-                Vector3 direction = (p2 - p1).Normalized();
-                Vector3 rotation = ConvertDirectionToEulerAngles(direction);
-                rotation.Y -= (float)Math.PI / 2;
-
-                float frame = i * 10;
-
-                x.Add(new FOBJKey()
-                {
-                    Frame = frame,
-                    Value = p1.X,
-                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                });
-                y.Add(new FOBJKey()
-                {
-                    Frame = frame,
-                    Value = p1.Y,
-                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                });
-                z.Add(new FOBJKey()
-                {
-                    Frame = frame,
-                    Value = p1.Z,
-                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                });
-                rx.Add(new FOBJKey()
-                {
-                    Frame = frame,
-                    Value = rotation.X,
-                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                });
-                ry.Add(new FOBJKey()
-                {
-                    Frame = frame,
-                    Value = rotation.Y,
-                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                });
-                rz.Add(new FOBJKey()
-                {
-                    Frame = frame,
-                    Value = rotation.Z,
-                    InterpolationType = GXInterpolationType.HSD_A_OP_LIN
-                });
-
-            }
-
-            // generate anim joint
-            HSD_AnimJoint joint = new();
-            joint.AOBJ = new HSD_AOBJ()
-            {
-                EndFrame = (points.Length - 1) * 10
-            };
-
-            HSD_FOBJDesc prev = null;
-            foreach (Tuple<List<FOBJKey>, JointTrackType> v in new Tuple<List<FOBJKey>, JointTrackType>[]
-            {
-                new(x, JointTrackType.HSD_A_J_TRAX),
-                new(y, JointTrackType.HSD_A_J_TRAY),
-                new(z, JointTrackType.HSD_A_J_TRAZ),
-                new(rx, JointTrackType.HSD_A_J_ROTX),
-                new(ry, JointTrackType.HSD_A_J_ROTY),
-                new(rz, JointTrackType.HSD_A_J_ROTZ),
-            }
-            )
-            {
-                HSD_FOBJDesc desc = new();
-                desc.SetKeys(v.Item1, (byte)v.Item2);
-
-                if (prev != null)
-                {
-                    prev.Next = desc;
-                }
-                else
-                {
-                    joint.AOBJ.FObjDesc = desc;
-                }
-                prev = desc;
-            }
-
-            return joint;
-        }
-
-        public static Vector3 ConvertDirectionToEulerAngles(Vector3 direction)
-        {
-            // Ensure the direction vector is normalized
-            direction.Normalize();
-
-            // Calculate the pitch (rotation around the X-axis)
-            float pitch = (float)Math.Asin(-direction.Y);
-
-            // Calculate the yaw (rotation around the Y-axis)
-            float yaw = (float)Math.Atan2(direction.X, direction.Z);
-
-            // Adjust the angle to be between 0 and TwoPi
-            while (yaw < 0)
-                yaw += MathHelper.TwoPi;
-
-            while (yaw > MathHelper.TwoPi)
-                yaw -= MathHelper.TwoPi;
-
-            return new Vector3(pitch, yaw, 0f);
-        }
 
         /// <summary>
         /// 

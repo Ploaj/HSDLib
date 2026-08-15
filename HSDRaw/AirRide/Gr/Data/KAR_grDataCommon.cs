@@ -39,10 +39,10 @@ namespace HSDRaw.AirRide.Gr.Data
             }
         }
 
-        public float x584 { get => _s.GetFloat(0x584); set => _s.SetFloat(0x584, value); }
-        public float x588 { get => _s.GetFloat(0x588); set => _s.SetFloat(0x588, value); }
-        public float x58C { get => _s.GetFloat(0x58C); set => _s.SetFloat(0x58C, value); }
-        public float x590 { get => _s.GetFloat(0x590); set => _s.SetFloat(0x590, value); }
+        public float RailStopSpeed1 { get => _s.GetFloat(0x584); set => _s.SetFloat(0x584, value); }
+        public float RailStopSpeed2 { get => _s.GetFloat(0x588); set => _s.SetFloat(0x588, value); }
+        public float RailStopSpeed3 { get => _s.GetFloat(0x58C); set => _s.SetFloat(0x58C, value); }
+        public float RailStopSpeed4 { get => _s.GetFloat(0x590); set => _s.SetFloat(0x590, value); }
     }
 
     public class KAR_grMaterial : HSDAccessor

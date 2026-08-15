@@ -3,6 +3,7 @@ using HSDRaw.AirRide.Gr.Data;
 using HSDRawViewer.IO.AirRide.DataFormat;
 using HSDRawViewer.Rendering.Models;
 using HSDRawViewer.Tools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,8 +70,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
         public ObservableList<KdAnimation> SuperJumpAnimations = new ObservableList<KdAnimation>();
 
         public ObservableList<KdAnimation> LeapAnimations = new ObservableList<KdAnimation>();
-
-        public ObservableList<KdAnimation> RailAnimations = new ObservableList<KdAnimation>();
 
         public ObservableList<KdAnimation> x0CAnimations = new ObservableList<KdAnimation>();
 
@@ -150,13 +149,16 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
 
                 if (d.RailCollNode != null && 
                     d.SplineNode != null && 
-                    d.SplineNode.RailSpline1 != null)
+                    d.SplineNode.RailSpline1 != null &&
+                    d.SubAnimNode != null &&
+                    d.SubAnimNode.Rail != null)
                 {
                     var src_rails = d.RailCollNode.RailColl.Array;
-                    var splineNode = d.SplineNode;
+                    var splineNode = d.SplineNode.RailSpline1.Splines.Array;
+                    var railAnimations = d.SubAnimNode.Rail.Animations.Array;
 
                     foreach (var t in src_rails)
-                        Rails.Add(new KdRail(t, splineNode));
+                        Rails.Add(new KdRail(t, splineNode, railAnimations));
                 }
 
             }
@@ -170,10 +172,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
                 if (d.SubAnimNode.Leap != null)
                     foreach (var a in d.SubAnimNode.Leap.Animations.Array)
                         LeapAnimations.Add(new KdAnimation(a));
-
-                if (d.SubAnimNode.Rail != null)
-                    foreach (var a in d.SubAnimNode.Rail.Animations.Array)
-                        RailAnimations.Add(new KdAnimation(a));
 
                 if (d.SubAnimNode.x0C != null)
                     foreach (var a in d.SubAnimNode.x0C.Animations.Array)
@@ -242,9 +240,10 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
         /// </summary>
         /// <param name="animations"></param>
         /// <returns></returns>
-        private KAR_grSubAnim GenerateSubanim(ObservableList<KdAnimation> animations)
+        private KAR_grSubAnim GenerateSubanim(IEnumerable<KdAnimation> animations)
         {
-            if (animations.Count > 0)
+            int count = animations.Count();
+            if (count > 0)
             {
                 return new KAR_grSubAnim()
                 {
@@ -252,7 +251,7 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
                     {
                         Array = animations.Select(e => e.Animation).ToArray()
                     },
-                    Count = animations.Count
+                    Count = count
                 };
             }
             return null;
@@ -309,7 +308,6 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
             d.SubAnimNode = new KAR_grSubAnimNode();
             d.SubAnimNode.SuperJump = GenerateSubanim(SuperJumpAnimations);
             d.SubAnimNode.Leap = GenerateSubanim(LeapAnimations);
-            d.SubAnimNode.Rail = GenerateSubanim(RailAnimations);
             d.SubAnimNode.x0C = GenerateSubanim(x0CAnimations);
             d.SubAnimNode.x10 = GenerateSubanim(x10Animations);
             d.SubAnimNode.EventAnim = GenerateSubanim(EventAnimations);
@@ -387,10 +385,11 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
             if (Rails.Count > 0)
             {
                 List<KdSpline> splines = new List<KdSpline>();
+                List<KdAnimation> anims = new List<KdAnimation>();
                 d.RailCollNode = new KAR_grRailCollNode()
                 {
                     Count = Rails.Count,
-                    RailColl = new HSDFixedLengthPointerArrayAccessor<KAR_grRailColl>() { Array = Rails.Select(e => e.ToRailColl(splines)).ToArray() }
+                    RailColl = new HSDFixedLengthPointerArrayAccessor<KAR_grRailColl>() { Array = Rails.Select(e => e.ToRailColl(splines, anims)).ToArray() }
                 };
 
                 d.SplineNode.RailSpline1 = new KAR_grSplineList()
@@ -398,11 +397,22 @@ namespace HSDRawViewer.GUI.Plugins.GrTool
                     Count = splines.Count,
                     Splines = new HSDFixedLengthPointerArrayAccessor<HSDRaw.Common.HSD_Spline>() { Array = splines.Select(e => e.ToHsdSpline()).ToArray() }
                 };
+
+                d.SubAnimNode.Rail = GenerateSubanim(anims);
             }
             else
             {
                 d.RailCollNode = null;
             }
+
+            // TODO: ensure bit table has enough entries for all splines...
+            var railpoints = Rails.Sum(e => e.Spline1.Points.Count + e.Spline2.Points.Count);
+
+            int bitTableCount = (ushort)Math.Max(railpoints, d.PartitionNode.Partition.BitTableCount);
+            int bitTableSize = (int)Math.Ceiling(bitTableCount / 8f);
+
+            d.PartitionNode.Partition.BitTableCount = (ushort)bitTableCount;
+            d.PartitionNode.Partition._s.SetBuffer(0x54, new byte[bitTableSize]);
         }
     }
 }

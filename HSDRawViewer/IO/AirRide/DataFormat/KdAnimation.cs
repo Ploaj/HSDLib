@@ -11,11 +11,26 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         [Browsable(false)]
         public HSD_AnimJoint Animation { get; set; }
 
-        public float FrameCount { get => Animation.AOBJ.EndFrame; }
+        public float FrameCount { get => Animation.AOBJ != null ? Animation.AOBJ.EndFrame : 0; }
 
         [TypeConverter(typeof(ListConverter<string>))]
-        public List<string> TrackList { get => Animation.AOBJ.FObjDesc.List.Select(e => e.JointTrackType.ToString()).ToList(); }
+        public List<string> TrackList 
+        { 
+            get
+            {
+                if (Animation == null) return null;
+                if (Animation.AOBJ == null) return null;
+                if (Animation.AOBJ.FObjDesc == null) return null;
 
+                return Animation.AOBJ.FObjDesc.List.Select(e => e.JointTrackType.ToString()).ToList();
+            }
+        }
+
+        public KdAnimation()
+        {
+            Animation = new HSD_AnimJoint();
+        }
+        
         public KdAnimation(HSD_AnimJoint animation)
         {
             Animation = animation;

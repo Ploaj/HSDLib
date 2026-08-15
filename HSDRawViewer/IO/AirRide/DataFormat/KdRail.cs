@@ -1,4 +1,6 @@
 ﻿using HSDRaw.AirRide.Gr.Data;
+using HSDRaw.Common;
+using HSDRaw.Common.Animation;
 using HSDRawViewer.GUI.PropertyGrid;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,7 +16,8 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public KdSpline Spline2 { get; set; } = new KdSpline();
 
-        public int AnimationIndex { get; set; }
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public KdAnimation Animation { get; set; } = new KdAnimation();
 
         public int NextRail1 { get; set; }
 
@@ -48,31 +51,31 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
         public int ParamAltRail2 { get; set; }
 
-        [TypeConverter(typeof(ListConverter<RailData>))]
-        public List<RailData> Data { get; set; } = new List<RailData>();
+        [TypeConverter(typeof(ListConverter<RailSpeed>))]
+        public List<RailSpeed> Speed { get; set; } = new List<RailSpeed>();
 
-        [TypeConverter(typeof(ListConverter<RailDash>))]
-        public List<RailDash> Dash1 { get; set; } = new List<RailDash>();
+        [TypeConverter(typeof(ListConverter<RailDataIndex>))]
+        public List<RailDataIndex> StopFriction { get; set; } = new List<RailDataIndex>();
 
-        [TypeConverter(typeof(ListConverter<RailDash>))]
-        public List<RailDash> Dash2 { get; set; } = new List<RailDash>();
+        [TypeConverter(typeof(ListConverter<RailDataIndex>))]
+        public List<RailDataIndex> Material { get; set; } = new List<RailDataIndex>();
 
         [TypeConverter(typeof(ListConverter<RailLeap>))]
         public List<RailLeap> Leap { get; set; } = new List<RailLeap>();
 
         public KdRail() { }
 
-        public KdRail(KAR_grRailColl coll, KAR_grSplineNode splineNode)
+        public KdRail(KAR_grRailColl coll, HSD_Spline[] splines, HSD_AnimJoint[] animations)
         {
-            var splines = splineNode.RailSpline1.Splines.Array;
-
-            if (coll.StartSplineIndex > 0 && coll.StartSplineIndex < splines.Length)
+            if (coll.StartSplineIndex >= 0 && coll.StartSplineIndex < splines.Length)
                 Spline1 = new KdSpline(splines[coll.StartSplineIndex]);
 
-            if (coll.SplineLengthIndex > 0 && coll.SplineLengthIndex < splines.Length)
+            if (coll.SplineLengthIndex >= 0 && coll.SplineLengthIndex < splines.Length)
                 Spline2 = new KdSpline(splines[coll.SplineLengthIndex]);
 
-            AnimationIndex = coll.SubAnimIndex;
+            if (coll.SubAnimIndex >= 0 && coll.SubAnimIndex < animations.Length)
+                Animation = new KdAnimation(animations[coll.SubAnimIndex]);
+
             NextRail1 = coll.x10;
             NextRail2 = coll.x14;
             NextRail3 = coll.x18;
@@ -90,16 +93,16 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
             ParamAltRail1 = coll.Param.AltRail1;
             ParamAltRail2 = coll.Param.AltRail2;
             if (coll.Param.DataCount > 0)
-                Data.AddRange(coll.Param.Data.Array.Select(e => new RailData(e)));
+                Speed.AddRange(coll.Param.Speed.Array.Select(e => new RailSpeed(e)));
             if (coll.Param.DashCount > 0)
-                Dash1.AddRange(coll.Param.Dash.Array.Select(e => new RailDash(e)));
+                StopFriction.AddRange(coll.Param.StopFriction.Array.Select(e => new RailDataIndex(e)));
             if (coll.Param.Dash2Count > 0)
-                Dash2.AddRange(coll.Param.Dash2.Array.Select(e => new RailDash(e)));
+                Material.AddRange(coll.Param.Material.Array.Select(e => new RailDataIndex(e)));
             if (coll.Param.LeapCount > 0)
                 Leap.AddRange(coll.Param.Leap.Array.Select(e => new RailLeap(e)));
         }
 
-        public KAR_grRailColl ToRailColl(List<KdSpline> railSplines)
+        public KAR_grRailColl ToRailColl(List<KdSpline> railSplines, List<KdAnimation> animations)
         {
             int railIndex1 = railSplines.Count;
             int railIndex2 = railSplines.Count;
@@ -112,11 +115,14 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 railSplines.Add(Spline2);
             }
 
+            int anim_index = animations.Count;
+            animations.Add(Animation);
+
             return new KAR_grRailColl()
             {
                 StartSplineIndex = railIndex1,
                 SplineLengthIndex = railIndex2,
-                SubAnimIndex = AnimationIndex,
+                SubAnimIndex = anim_index,
                 x10 = NextRail1,
                 x14 = NextRail2,
                 x18 = NextRail3,
@@ -134,12 +140,12 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                     x08 = Param08,
                     AltRail1 = ParamAltRail1,
                     AltRail2 = ParamAltRail2,
-                    DataCount = Data.Count,
-                    Data = Data.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailDataParam>() { Array = Data.Select(e => e.ToParam()).ToArray() } : null,
-                    DashCount = Dash1.Count,
-                    Dash = Dash1.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailDashParam>() { Array = Dash1.Select(e => e.ToParam()).ToArray() } : null,
-                    Dash2Count = Dash2.Count,
-                    Dash2 = Dash2.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailDashParam>() { Array = Dash2.Select(e => e.ToParam()).ToArray() } : null,
+                    DataCount = Speed.Count,
+                    Speed = Speed.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailDataParam>() { Array = Speed.Select(e => e.ToParam()).ToArray() } : null,
+                    DashCount = StopFriction.Count,
+                    StopFriction = StopFriction.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailDashParam>() { Array = StopFriction.Select(e => e.ToParam()).ToArray() } : null,
+                    Dash2Count = Material.Count,
+                    Material = Material.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailDashParam>() { Array = Material.Select(e => e.ToParam()).ToArray() } : null,
                     LeapCount = Leap.Count,
                     Leap = Leap.Count > 0 ? new HSDRaw.HSDArrayAccessor<KAR_grRailLeapParam>() { Array = Leap.Select(e => e.ToParam()).ToArray() } : null,
                 }
@@ -147,7 +153,7 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         }
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public class RailData
+        public class RailSpeed
         {
             public float Offset { get; set; }
 
@@ -155,9 +161,9 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
 
             public float Speed2 { get; set; } = 0.001f;
 
-            public RailData() { }
+            public RailSpeed() { }
 
-            public RailData(KAR_grRailDataParam d)
+            public RailSpeed(KAR_grRailDataParam d)
             {
                 Offset = d.Offset;
                 Speed1 = d.Speed1;
@@ -181,15 +187,15 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         }
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public class RailDash
+        public class RailDataIndex
         {
             public float Offset { get; set; }
 
             public int Index { get; set; }
 
-            public RailDash() { }
+            public RailDataIndex() { }
 
-            public RailDash(KAR_grRailDashParam d)
+            public RailDataIndex(KAR_grRailDashParam d)
             {
                 Offset = d.Offset;
                 Index = d.Index;
@@ -213,19 +219,25 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public class RailLeap
         {
+            [DisplayName("Offset")]
+            [Description("The offset (0-1) of the spline this data will start on.")]
             public float Offset { get; set; }
 
-            public int Index1 { get; set; }
+            [DisplayName("Left Rail")]
+            [Description("The index of the left rail.")]
+            public int LeftRailIndex { get; set; }
 
-            public int Index2 { get; set; }
+            [DisplayName("Right Rail")]
+            [Description("The index of the right rail.")]
+            public int RightRailIndex { get; set; }
 
             public RailLeap() { }
 
             public RailLeap(KAR_grRailLeapParam d)
             {
                 Offset = d.Offset;
-                Index1 = d.RailIndex1;
-                Index2 = d.RailIndex2;
+                LeftRailIndex = d.LeftRailIndex;
+                RightRailIndex = d.RightRailIndex;
             }
 
             public KAR_grRailLeapParam ToParam()
@@ -233,14 +245,14 @@ namespace HSDRawViewer.IO.AirRide.DataFormat
                 return new KAR_grRailLeapParam()
                 {
                     Offset = Offset,
-                    RailIndex1 = Index1,
-                    RailIndex2 = Index2,
+                    LeftRailIndex = LeftRailIndex,
+                    RightRailIndex = RightRailIndex,
                 };
             }
 
             public override string ToString()
             {
-                return $"{Offset}: {Index1}, {Index2}";
+                return $"{Offset}: L: {LeftRailIndex}, R: {RightRailIndex}";
             }
         }
     }

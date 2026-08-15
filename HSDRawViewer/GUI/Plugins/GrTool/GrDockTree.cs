@@ -97,7 +97,6 @@ namespace HSDRawViewer.GUI.Plugins.AirRide.GrTool
             Animations = new GrAnimationNode() { Text = "Animations", Checked = true };
             Animations.Nodes.Add(new GrCategoryAnimation("SuperJump", res.SuperJumpAnimations));
             Animations.Nodes.Add(new GrCategoryAnimation("Leap", res.LeapAnimations));
-            Animations.Nodes.Add(new GrCategoryAnimation("Rail", res.RailAnimations));
             Animations.Nodes.Add(new GrCategoryAnimation("x0C", res.x0CAnimations));
             Animations.Nodes.Add(new GrCategoryAnimation("x10", res.x10Animations));
             Animations.Nodes.Add(new GrCategoryAnimation("Event Animations", res.EventAnimations));

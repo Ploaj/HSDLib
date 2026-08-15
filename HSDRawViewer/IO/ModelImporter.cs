@@ -908,28 +908,28 @@ namespace HSDRawViewer.Converters
                         vertex.BITAN.Z *= -1;
                     }
 
-                    if (mesh.HasUVSet(0))
+                    if (mesh.HasUVSet(0) && v.UVs.Count >= 0)
                         vertex.TEX0 = new GXVector2(v.UVs[0].X, v.UVs[0].Y);
 
-                    if (mesh.HasUVSet(1))
+                    if (mesh.HasUVSet(1) && v.UVs.Count >= 1)
                         vertex.TEX1 = new GXVector2(v.UVs[1].X, v.UVs[1].Y);
 
-                    if (mesh.HasUVSet(2))
+                    if (mesh.HasUVSet(2) && v.UVs.Count >= 2)
                         vertex.TEX2 = new GXVector2(v.UVs[2].X, v.UVs[2].Y);
 
-                    if (mesh.HasUVSet(3))
+                    if (mesh.HasUVSet(3) && v.UVs.Count >= 3)
                         vertex.TEX3 = new GXVector2(v.UVs[3].X, v.UVs[3].Y);
 
-                    if (mesh.HasUVSet(4))
+                    if (mesh.HasUVSet(4) && v.UVs.Count >= 4)
                         vertex.TEX4 = new GXVector2(v.UVs[4].X, v.UVs[4].Y);
 
-                    if (mesh.HasUVSet(5))
+                    if (mesh.HasUVSet(5) && v.UVs.Count >= 5)
                         vertex.TEX5 = new GXVector2(v.UVs[5].X, v.UVs[5].Y);
 
-                    if (mesh.HasUVSet(6))
+                    if (mesh.HasUVSet(6) && v.UVs.Count >= 6)
                         vertex.TEX6 = new GXVector2(v.UVs[6].X, v.UVs[6].Y);
 
-                    if (mesh.HasUVSet(7))
+                    if (mesh.HasUVSet(7) && v.UVs.Count >= 7)
                         vertex.TEX7 = new GXVector2(v.UVs[7].X, v.UVs[7].Y);
 
                     if (mesh.HasColorSet(0))
