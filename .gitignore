@@ -267,3 +267,6 @@ __pycache__/
 /HSDRawViewer/Tools/TestPhysicsRendering.cs
 /HSDRawViewer/Tools/Physics/TestBonePhysics.cs
 /HSDRawViewer/Tools/Animation/SpringPhysics.cs
+/HSDRawViewer/IO/GLTF
+/HSDRawViewer/IO/GLTF/GLTFExporter.cs
+/HSDRawViewer/IO/GLTF/GLTFImporter.cs
