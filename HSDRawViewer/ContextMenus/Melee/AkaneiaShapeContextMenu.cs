@@ -4,8 +4,6 @@ using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Windows.Forms;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Linq;
 
 namespace HSDRawViewer.ContextMenus.Melee
@@ -52,7 +50,7 @@ namespace HSDRawViewer.ContextMenus.Melee
                                 (byte)(e & 0xFF),
                             };
                         }).ToArray();
-
+                        
                         byte[] bgraBytes = page.IndexData.Array.SelectMany(e => pal[e]).ToArray();
 
                         using var img = Image.LoadPixelData<Rgba32>(bgraBytes, page.Width, page.Height);

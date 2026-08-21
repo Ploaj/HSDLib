@@ -241,7 +241,7 @@ namespace HSDRawViewer.Converters
 
 
         [Category("Material Params"), DisplayName("Import Material Params"), Description("Imports the material info from model file.")]
-        public bool ImportMaterialInfo { get; set; } = false;
+        public bool ImportMaterialInfo { get; set; } = true;
 
         [Category("Material Params"), DisplayName("Ambient Color"), Description("Color of ambient light"), YamlIgnore]
         public Color AmbientColor { get; set; } = Color.FromArgb(0xFF, 0x7f, 0x7f, 0x7f);
@@ -296,7 +296,11 @@ namespace HSDRawViewer.Converters
                     return null;
 
                 if (_material.DiffuseMap != null)
-                    return _material.DiffuseMap.Name;
+                    if (_material.DiffuseMap.Type != ImageFileType.NONE)
+                        return $"{_material.DiffuseMap.Type}_{_material.DiffuseMap.FileBlob.Length:X8}";
+                    else
+                        return _material.DiffuseMap.Name;
+
                 return null;
             }
             set

@@ -118,6 +118,9 @@ namespace HSDRawViewer
             texFmt = GXTexFmt.RGBA8;
             palFmt = GXTlutFmt.RGB5A3;
 
+            if (name == null)
+                return false;
+
             string[] parts = Path.GetFileNameWithoutExtension(name).Split('_');
 
             bool foundFormat = false;
@@ -199,6 +202,30 @@ namespace HSDRawViewer
             using Image<Bgra32> image = tobj.ToImage();
             using FileStream output = File.OpenWrite(path);
             image.SaveAsPng(output);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobj"></param>
+        /// <param name="path"></param>
+        public static byte[] ToPNG(this HSD_TOBJ tobj)
+        {
+            // Save the image as a PNG file
+            using Image<Bgra32> image = tobj.ToImage();
+            using MemoryStream output = new MemoryStream();
+            image.SaveAsPng(output);
+            return output.ToArray();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tobj"></param>
+        /// <param name="path"></param>
+        public static void FromPNG(this HSD_TOBJ tobj, byte[] pngData, GXTexFmt imgFmt, GXTlutFmt tlutFmt)
+        {
+            using MemoryStream stream = new(pngData);
+            using Image<Bgra32> image = Image.Load<Bgra32>(stream);
+            tobj.InjectBitmap(image, imgFmt, tlutFmt);
         }
         /// <summary>
         /// 

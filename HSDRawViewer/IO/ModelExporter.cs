@@ -5,6 +5,7 @@ using HSDRaw.Tools;
 using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.IO;
+using HSDRawViewer.IO.GLTF;
 using HSDRawViewer.IO.Model;
 using HSDRawViewer.Rendering;
 using HSDRawViewer.Tools;
@@ -16,6 +17,7 @@ using IONET.Core.Skeleton;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -49,6 +51,9 @@ namespace HSDRawViewer.Converters
         public bool ExportModelInfoSheet { get; set; } = false;
 
         //public bool BlenderExportMode { get; set; } = false;
+
+        [Browsable(false)]
+        public bool ExportTextureBlob { get; set; } = false;
     }
 
     /// <summary>
@@ -60,7 +65,7 @@ namespace HSDRawViewer.Converters
 
         public static bool ScaleUVs { get; set; }
 
-        private static readonly string ModelFileFilter = @"Support Formats|*.dae;*.smd;*.obj;*.hsdm;";
+        private static readonly string ModelFileFilter = @"Support Formats|*.dae;*.smd;*.obj;*.hsdm;*.glb;*.gltf;";
 
         /// <summary>
         /// Exports JOBJ to file
@@ -155,7 +160,16 @@ namespace HSDRawViewer.Converters
                 ModelInfoSheet.Export(settings.Directory + "model_sheet.json", rootJOBJ);
             }
 
-            IOManager.ExportScene(exp.Scene, filePath, exportsettings);
+            switch (Path.GetExtension(filePath).ToLower())
+            {
+                case ".glb":
+                case ".gltf":
+                    GLTFModelExporter.ExportToGLTF(exp.Scene, filePath, exp.MaterialToMObj);
+                    break;
+                default:
+                    IOManager.ExportScene(exp.Scene, filePath, exportsettings);
+                    break;
+            }
         }
 
         // parameters
@@ -166,7 +180,10 @@ namespace HSDRawViewer.Converters
         private readonly Dictionary<HSD_JOBJ, IOBone> jobjToBone = new();
 
         private readonly Dictionary<byte[], string> imageToName = new();
+        private readonly Dictionary<byte[], byte[]> imageToBlob = new();
         private readonly HSD_JOBJ _root;
+
+        public readonly Dictionary<IOMaterial, HSD_MOBJ> MaterialToMObj = new ();
 
         /// <summary>
         /// 
@@ -283,6 +300,41 @@ namespace HSDRawViewer.Converters
             return hash;
         }
 
+        private static WrapMode GetWrapMode(GXWrapMode w)
+        {
+            switch (w)
+            {
+                case GXWrapMode.REPEAT: return WrapMode.REPEAT;
+                case GXWrapMode.MIRROR: return WrapMode.MIRROR;
+                default: return WrapMode.CLAMP;
+            }
+        }
+
+        private static int GetUVChannel(GXTexGenSrc src)
+        {
+            switch (src)
+            {
+                case GXTexGenSrc.GX_TG_TEX0:
+                case GXTexGenSrc.GX_TG_TEX1:
+                case GXTexGenSrc.GX_TG_TEX2:
+                case GXTexGenSrc.GX_TG_TEX3:
+                case GXTexGenSrc.GX_TG_TEX4:
+                case GXTexGenSrc.GX_TG_TEX5:
+                case GXTexGenSrc.GX_TG_TEX6:
+                case GXTexGenSrc.GX_TG_TEX7:
+                    return (int)(src - GXTexGenSrc.GX_TG_TEX0);
+                case GXTexGenSrc.GX_TG_TEXCOORD0:
+                case GXTexGenSrc.GX_TG_TEXCOORD1:
+                case GXTexGenSrc.GX_TG_TEXCOORD2:
+                case GXTexGenSrc.GX_TG_TEXCOORD3:
+                case GXTexGenSrc.GX_TG_TEXCOORD4:
+                case GXTexGenSrc.GX_TG_TEXCOORD5:
+                case GXTexGenSrc.GX_TG_TEXCOORD6:
+                    return (int)(src - GXTexGenSrc.GX_TG_TEXCOORD0);
+            }
+            return 0;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -311,24 +363,25 @@ namespace HSDRawViewer.Converters
                         if (!Scene.Materials.Exists(e => e.Name.Equals(matName)))
                         {
                             IOMaterial m = new();
+                            var mobj = dobj.Mobj;
                             m.Name = matName;
                             m.AmbientColor = new System.Numerics.Vector4(
-                                dobj.Mobj.Material.AMB_R / 255f,
-                                dobj.Mobj.Material.AMB_G / 255f,
-                                dobj.Mobj.Material.AMB_B / 255f,
-                                dobj.Mobj.Material.AMB_A / 255f);
+                                mobj.Material.AMB_R / 255f,
+                                mobj.Material.AMB_G / 255f,
+                                mobj.Material.AMB_B / 255f,
+                                mobj.Material.AMB_A / 255f);
                             m.DiffuseColor = new System.Numerics.Vector4(
-                                dobj.Mobj.Material.DIF_R / 255f,
-                                dobj.Mobj.Material.DIF_G / 255f,
-                                dobj.Mobj.Material.DIF_B / 255f,
-                                dobj.Mobj.Material.DIF_A / 255f);
+                                mobj.Material.DIF_R / 255f,
+                                mobj.Material.DIF_G / 255f,
+                                mobj.Material.DIF_B / 255f,
+                                mobj.Material.DIF_A / 255f);
                             m.SpecularColor = new System.Numerics.Vector4(
-                                dobj.Mobj.Material.SPC_R / 255f,
-                                dobj.Mobj.Material.SPC_G / 255f,
-                                dobj.Mobj.Material.SPC_B / 255f,
-                                dobj.Mobj.Material.SPC_A / 255f);
-                            m.Shininess = dobj.Mobj.Material.Shininess;
-                            m.Alpha = dobj.Mobj.Material.Alpha;
+                                mobj.Material.SPC_R / 255f,
+                                mobj.Material.SPC_G / 255f,
+                                mobj.Material.SPC_B / 255f,
+                                mobj.Material.SPC_A / 255f);
+                            m.Shininess = mobj.Material.Shininess;
+                            m.Alpha = mobj.Material.Alpha;
 
                             // optionally export mobj
                             if (_settings.ExportMOBJs)
@@ -337,17 +390,22 @@ namespace HSDRawViewer.Converters
                                 mobjFile.Roots.Add(new HSDRootNode()
                                 {
                                     Name = matName,
-                                    Data = dobj.Mobj
+                                    Data = mobj
                                 });
                                 mobjFile.Save(_settings.Directory + matName + ".mobj");
                             }
 
                             // process and export textures
-                            if (dobj.Mobj.Textures != null)
+                            if (mobj.Textures != null)
                             {
-                                foreach (HSD_TOBJ t in dobj.Mobj.Textures.List)
+                                foreach (HSD_TOBJ t in mobj.Textures.List)
                                 {
-                                    if (t.ImageData != null && t.ImageData.ImageData != null && !imageToName.ContainsKey(t.ImageData.ImageData))
+                                    if (t.ImageData == null) continue;
+                                    if (t.ImageData.ImageData == null) continue;
+
+                                    var imageData = t.ImageData.ImageData;
+
+                                    if (!imageToName.ContainsKey(imageData))
                                     {
                                         string name = $"Texture_{imageToName.Count}_{t.ImageData.Format}";
 
@@ -359,30 +417,56 @@ namespace HSDRawViewer.Converters
                                             t.SaveImagePNG(_settings.Directory + name + ".png");
                                         }
 
-                                        imageToName.Add(t.ImageData.ImageData, name);
+                                        if (_settings.ExportTextureBlob)
+                                        {
+                                            imageToBlob.Add(imageData, t.ToPNG());
+                                        }
+
+                                        imageToName.Add(imageData, name);
                                     }
 
                                     if (t.DiffuseLightmap)
                                     {
                                         m.DiffuseMap = new IOTexture()
                                         {
-                                            Name = System.IO.Path.GetFileNameWithoutExtension(imageToName[dobj.Mobj.Textures.ImageData.ImageData]),
-                                            FilePath = imageToName[dobj.Mobj.Textures.ImageData.ImageData] + ".png"
+                                            Name = Path.GetFileNameWithoutExtension(imageToName[imageData]),
+                                            FilePath = imageToName[imageData] + ".png",
+                                            WrapS = GetWrapMode(t.WrapS),
+                                            WrapT = GetWrapMode(t.WrapT),
+                                            UVChannel = GetUVChannel(t.GXTexGenSrc),
                                         };
+
+                                        if (_settings.ExportTextureBlob &&
+                                            imageToBlob.ContainsKey(imageData))
+                                        {
+                                            m.DiffuseMap.Type = ImageFileType.PNG;
+                                            m.DiffuseMap.FileBlob = imageToBlob[imageData];
+                                        }
                                     }
 
                                     if (t.SpecularLightmap)
                                     {
                                         m.SpecularMap = new IOTexture()
                                         {
-                                            Name = System.IO.Path.GetFileNameWithoutExtension(imageToName[dobj.Mobj.Textures.ImageData.ImageData]),
-                                            FilePath = imageToName[dobj.Mobj.Textures.ImageData.ImageData] + ".png"
+                                            Name = Path.GetFileNameWithoutExtension(imageToName[imageData]),
+                                            FilePath = imageToName[imageData] + ".png",
+                                            WrapS = GetWrapMode(t.WrapS),
+                                            WrapT = GetWrapMode(t.WrapT),
+                                            UVChannel = GetUVChannel(t.GXTexGenSrc),
                                         };
+
+                                        if (_settings.ExportTextureBlob &&
+                                            imageToBlob.ContainsKey(imageData))
+                                        {
+                                            m.SpecularMap.Type = ImageFileType.PNG;
+                                            m.SpecularMap.FileBlob = imageToBlob[imageData];
+                                        }
                                     }
                                 }
 
                             }
                             Scene.Materials.Add(m);
+                            MaterialToMObj.Add(m, mobj);
                         }
 
                         // additional attribtues

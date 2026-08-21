@@ -1,26 +1,28 @@
-﻿using HSDRaw.Common;
+﻿using HSDRaw;
+using HSDRaw.Common;
 using HSDRaw.GX;
 using HSDRaw.Tools;
 using HSDRawViewer.Extensions;
 using HSDRawViewer.GUI.Dialog;
 using HSDRawViewer.GUI.Extra;
+using HSDRawViewer.IO.GLTF;
 using HSDRawViewer.IO.Model;
 using HSDRawViewer.Rendering.GX;
 using HSDRawViewer.Rendering.Models;
 using IONET;
-using IONET.Collada.Kinematics.Joints;
 using IONET.Core;
 using IONET.Core.Model;
 using IONET.Core.Skeleton;
-using IONET.Fbx.APITest;
 using OpenTK.Mathematics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace HSDRawViewer.Converters
 {
@@ -68,7 +70,9 @@ namespace HSDRawViewer.Converters
         /// </summary>
         private readonly IOModel model;
 
-        private static readonly string ModelFileFilter = @"Support Formats|*.dae;*.smd;*.obj;*.fbx;*.hsdm;";
+        private Dictionary<IOMaterial, HSD_MOBJ> materialOverride;
+
+        private static readonly string ModelFileFilter = @"Support Formats|*.dae;*.smd;*.obj;*.fbx;*.hsdm;*.glb;*.gltf;";
 
         /// <summary>
         /// 
@@ -77,73 +81,77 @@ namespace HSDRawViewer.Converters
         /// <returns></returns>
         public static HSD_JOBJ ImportModelFromFile(string f, HSD_JOBJ original = null)
         {
-            if (f != null)
+            if (f == null) return null;
+
+            IOScene scene = IOManager.LoadScene(f, new ImportSettings()
             {
-                IOScene scene = IOManager.LoadScene(f, new ImportSettings()
-                {
-                    Triangulate = true,
-                });
+                Triangulate = true,
+            });
 
-                if (scene.Models.Count == 0)
-                    return null;
+            return ImportModelFromScene(scene, Path.GetDirectoryName(f), original);
+        }
 
-                // remove blender's dumb root bone
-                for (int i = 0; i < scene.Models[0].Skeleton.RootBones.Count; i++)
+        public static HSD_JOBJ ImportModelFromScene(IOScene scene, string directory, HSD_JOBJ original = null, Dictionary<IOMaterial, HSD_MOBJ> materialOverride = null)
+        {
+            if (scene.Models.Count == 0)
+                return null;
+
+            // remove blender's dumb root bone
+            for (int i = 0; i < scene.Models[0].Skeleton.RootBones.Count; i++)
+            {
+                if (scene.Models[0].Skeleton.RootBones[i].Name.Equals("Armature"))
                 {
-                    if (scene.Models[0].Skeleton.RootBones[i].Name.Equals("Armature"))
+                    scene.Models[0].Skeleton.RootBones[i] = scene.Models[0].Skeleton.RootBones[i].Child;
+
+                    var joint = scene.Models[0].Skeleton.RootBones[i];
+                    while (joint != null)
                     {
-                        scene.Models[0].Skeleton.RootBones[i] = scene.Models[0].Skeleton.RootBones[i].Child;
-
-                        var joint = scene.Models[0].Skeleton.RootBones[i];
-                        while (joint != null)
+                        while (joint.Sibling != null &&
+                                joint.Sibling.Type != BoneType.JOINT)
                         {
-                            while (joint.Sibling != null &&
-                                    joint.Sibling.Type != BoneType.JOINT)
-                            {
-                                joint.Sibling.Parent = null;
-                            }
-
-                            joint = joint.Sibling;
+                            joint.Sibling.Parent = null;
                         }
 
-                        scene.Models[0].Skeleton.RootBones[i].Parent = null;
+                        joint = joint.Sibling;
                     }
-                }
 
-                // check to replace skeleton
-                bool replace = false;
-                if (original != null)
+                    scene.Models[0].Skeleton.RootBones[i].Parent = null;
+                }
+            }
+
+            // check to replace skeleton
+            bool replace = false;
+            if (original != null)
+            {
+                if (JointTreeIsSimilar(original, scene.Models[0].Skeleton))
                 {
-                    if (JointTreeIsSimilar(original, scene.Models[0].Skeleton))
+                    if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
+                        "Preserve the current model's skeleton?\n" +
+                        "(Recommended for online play)",
+                        "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        if (MessageBox.Show("The imported model shares the same skeletal structure of the current model.\n\n" +
-                            "Preserve the current model's skeleton?\n" +
-                            "(Recommended for online play)",
-                            "Preserve Skeleton", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                        {
-                            ReplaceWithBonesFromFile(original, scene.Models[0].Skeleton.RootBones[0]);
-                            replace = true;
-                        }
+                        ReplaceWithBonesFromFile(original, scene.Models[0].Skeleton.RootBones[0]);
+                        replace = true;
                     }
                 }
+            }
 
-                // import model
-                using ModelImportDialog d = new(scene, scene.Models[0]);
-                if (d.ShowDialog() == DialogResult.OK)
+            // import model
+            using ModelImportDialog d = new(scene, scene.Models[0]);
+            if (d.ShowDialog() == DialogResult.OK)
+            {
+                ModelImporter imp = new(directory, scene, scene.Models[0], d.settings, d.GetMeshSettings(), d.GetMaterialSettings(), materialOverride);
+
+                using (ProgressBarDisplay pb = new(imp))
                 {
-                    ModelImporter imp = new(Path.GetDirectoryName(f), scene, scene.Models[0], d.settings, d.GetMeshSettings(), d.GetMaterialSettings());
-
-                    using (ProgressBarDisplay pb = new(imp))
-                    {
-                        pb.DoWork();
-                        pb.ShowDialog();
-                    }
-
-                    if (replace)
-                        ReplaceWithBonesFromFile(original, imp.NewModel);
-
-                    return imp.NewModel;
+                    pb.DoWork();
+                    pb.ShowDialog();
                 }
+
+                if (replace)
+                    ReplaceWithBonesFromFile(original, imp.NewModel);
+
+                return imp.NewModel;
             }
 
             return null;
@@ -183,9 +191,15 @@ namespace HSDRawViewer.Converters
             if (f == null)
                 return null;
 
-            if (Path.GetExtension(f).ToLower() == ".hsdm")
+            switch (Path.GetExtension(f).ToLower())
             {
-                return ImportHSDM(f, original);
+                case ".hsdm":
+                    return ImportHSDM(f, original);
+                case ".glb":
+                case ".gltf":
+                    var import = GLTFModelImporter.Import(f, out Dictionary<IOMaterial, HSD_MOBJ> materialOverride);
+                    var newjobj = ImportModelFromScene(import, Path.GetDirectoryName(f), original, materialOverride: materialOverride);
+                    return newjobj;
             }
 
             return ImportModelFromFile(f, original);
@@ -380,12 +394,14 @@ namespace HSDRawViewer.Converters
             IOModel model,
             ModelImportSettings settings,
             IEnumerable<MeshImportSettings> meshSettings,
-            IEnumerable<MaterialImportSettings> materialSettings)
+            IEnumerable<MaterialImportSettings> materialSettings,
+            Dictionary<IOMaterial, HSD_MOBJ> materialOverride)
         {
             this.scene = scene;
             this.model = model;
             this.FolderPath = folderPath;
             this.Settings = settings;
+            this.materialOverride = materialOverride;
 
             // generate mesh lookup
             foreach (MeshImportSettings m in meshSettings)
@@ -1007,9 +1023,9 @@ namespace HSDRawViewer.Converters
                     RenderFlags = RENDER_MODE.CONSTANT,
                     Material = new HSD_Material()
                     {
-                        DiffuseColor = Color.White,
-                        SpecularColor = Color.White,
-                        AmbientColor = Color.White,
+                        DiffuseColor = System.Drawing.Color.White,
+                        SpecularColor = System.Drawing.Color.White,
+                        AmbientColor = System.Drawing.Color.White,
                         Shininess = 50
                     }
                 }
@@ -1123,6 +1139,105 @@ namespace HSDRawViewer.Converters
             return texturePath;
         }
 
+        private HSD_TOBJ GenerateTObj(HSD_MOBJ mobj, IOTexture tex, MaterialImportSettings settings)
+        {
+            HSD_TOBJ tobj = null;
+
+            // check for blob first
+            if (tex.Type != ImageFileType.NONE &&
+                tex.FilePath != null)
+            {
+                var name = tex.Name;
+
+                var key = tex.FileBlob.GetHashCode().ToString("X8");
+                if (pathToTObj.ContainsKey(key))
+                {
+                    tobj = HSDRaw.HSDAccessor.DeepClone<HSD_TOBJ>(pathToTObj[key]);
+                }
+                else
+                {
+                    var imgFormat = settings.TextureFormat;
+                    var palFormat = settings.PaletteFormat;
+                    if (TOBJExtentions.FormatFromString(name, out GXTexFmt fmt, out GXTlutFmt pal))
+                    {
+                        palFormat = pal;
+                        imgFormat = fmt;
+                    }
+
+                    using Image<Bgra32> image = Image.Load<Bgra32>(tex.FileBlob);
+
+                    tobj = new HSD_TOBJ();
+                    tobj.InjectBitmap(image, imgFormat, palFormat);
+
+                    pathToTObj.Add(key, tobj);
+                }
+
+            }
+            else if (!string.IsNullOrEmpty(tex.FilePath))
+            {
+                string texturePath = GetFullTexturePath(tex.FilePath);
+
+                if (!File.Exists(texturePath))
+                    return null;
+
+                var ext = texturePath.ToLower();
+                switch (ext)
+                {
+                    case ".png":
+                    case ".bmp":
+                        break;
+                    default: return null;
+                }
+
+                mobj.RenderFlags |= RENDER_MODE.TEX0;
+
+                var key = texturePath;
+                if (pathToTObj.ContainsKey(key))
+                {
+                    mobj.Textures = HSDRaw.HSDAccessor.DeepClone<HSD_TOBJ>(pathToTObj[key]);
+                }
+                else
+                {
+                    tobj = new HSD_TOBJ();
+                    tobj.ImportImage(texturePath, settings.TextureFormat, settings.PaletteFormat);
+
+                    pathToTObj.Add(key, tobj);
+                }
+            }
+
+            if (tobj != null)
+            {
+                mobj.RenderFlags |= RENDER_MODE.TEX0;
+
+                tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
+
+                tobj.GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0;
+                tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
+
+                tobj.WrapS = tex.WrapS.ToGXWrapMode();
+                tobj.WrapT = tex.WrapT.ToGXWrapMode();
+
+                if (mobj.Textures == null)
+                    mobj.Textures = tobj;
+                else
+                    mobj.Textures.Add(tobj);
+
+                if (tobj.IsTransparent())
+                {
+                    mobj.RenderFlags |= RENDER_MODE.XLU;
+                    tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;
+                }
+            }
+
+            return tobj;
+        }
+
+        private void ImportTexture(IOMaterial material, HSD_MOBJ mobj, MaterialImportSettings settings)
+        {
+            if (material.DiffuseMap != null)
+                GenerateTObj(mobj, material.DiffuseMap, settings);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1132,8 +1247,8 @@ namespace HSDRawViewer.Converters
         private HSD_MOBJ GenerateMaterial(MeshImportSettings mesh, IOMaterial material)
         {
             // create blank mobj
-            HSD_MOBJ Mobj = new();
-            Mobj.Material = new HSD_Material()
+            HSD_MOBJ mobj = new();
+            mobj.Material = new HSD_Material()
             {
                 AMB_A = 0xFF,
                 AMB_R = 0x7F,
@@ -1147,7 +1262,7 @@ namespace HSDRawViewer.Converters
 
             // no material data
             if (material == null)
-                return Mobj;
+                return mobj;
 
             // get settings if they exist
             MaterialImportSettings settings;
@@ -1163,8 +1278,8 @@ namespace HSDRawViewer.Converters
 
                 if (File.Exists(mobjPath))
                 {
-                    Mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
-                    return Mobj;
+                    mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
+                    return mobj;
                 }
                 else if (settings.ImportTexture &&
                     material.DiffuseMap != null &&
@@ -1175,85 +1290,55 @@ namespace HSDRawViewer.Converters
 
                     if (File.Exists(mobjPath))
                     {
-                        Mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
-                        return Mobj;
+                        mobj._s = new HSDRaw.HSDRawFile(mobjPath).Roots[0].Data._s;
+                        return mobj;
                     }
                 }
+            }
+
+            // material override
+            if (materialOverride != null && 
+                materialOverride.TryGetValue(material, out HSD_MOBJ m))
+            {
+                return HSDAccessor.DeepClone<HSD_MOBJ>(m);
             }
 
             // detect and set flags
             if (mesh.ImportVertexColor)
-                Mobj.RenderFlags |= RENDER_MODE.VERTEX;
+                mobj.RenderFlags |= RENDER_MODE.VERTEX;
 
             if (settings.EnableDiffuse && mesh.ImportVertexColor == false)
-                Mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
+                mobj.RenderFlags |= RENDER_MODE.DIFFUSE;
 
             if (settings.EnableConstant)
-                Mobj.RenderFlags |= RENDER_MODE.CONSTANT;
+                mobj.RenderFlags |= RENDER_MODE.CONSTANT;
 
             // Properties
             if (settings.ImportMaterialInfo)
             {
-                Mobj.Material.Shininess = settings.Shininess;
-                Mobj.Material.Alpha = settings.Alpha;
-                Mobj.Material.AmbientColor = settings.AmbientColor;
-                Mobj.Material.DiffuseColor = settings.DiffuseColor;
-                Mobj.Material.SpecularColor = settings.SpecularColor;
+                mobj.Material.Shininess = settings.Shininess;
+                mobj.Material.Alpha = settings.Alpha;
+                mobj.Material.AmbientColor = settings.AmbientColor;
+                mobj.Material.DiffuseColor = settings.DiffuseColor;
+                mobj.Material.SpecularColor = settings.SpecularColor;
             }
 
             // Textures
             if (settings.ImportTexture)
-            {
-                if (material.DiffuseMap != null && !string.IsNullOrEmpty(material.DiffuseMap.FilePath))
-                {
-                    string texturePath = GetFullTexturePath(material.DiffuseMap.FilePath);
-
-                    if (File.Exists(texturePath) && (texturePath.ToLower().EndsWith(".png") || texturePath.ToLower().EndsWith(".bmp")))
-                    {
-                        Mobj.RenderFlags |= RENDER_MODE.TEX0;
-
-                        if (pathToTObj.ContainsKey(texturePath))
-                        {
-                            Mobj.Textures = HSDRaw.HSDAccessor.DeepClone<HSD_TOBJ>(pathToTObj[texturePath]);
-                        }
-                        else
-                        {
-                            HSD_TOBJ tobj = new();
-                            tobj.ImportImage(texturePath, settings.TextureFormat, settings.PaletteFormat);
-                            tobj.Flags = TOBJ_FLAGS.LIGHTMAP_DIFFUSE | TOBJ_FLAGS.COORD_UV | TOBJ_FLAGS.COLORMAP_MODULATE;
-
-                            tobj.GXTexGenSrc = GXTexGenSrc.GX_TG_TEX0;
-                            tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
-
-                            tobj.WrapS = material.DiffuseMap.WrapS.ToGXWrapMode();
-                            tobj.WrapT = material.DiffuseMap.WrapT.ToGXWrapMode();
-
-                            if (tobj.IsTransparent())
-                            {
-                                Mobj.RenderFlags |= RENDER_MODE.XLU;
-                                tobj.Flags |= TOBJ_FLAGS.ALPHAMAP_MODULATE;
-                            }
-
-                            Mobj.Textures = tobj;
-
-                            pathToTObj.Add(texturePath, tobj);
-                        }
-                    }
-                }
-            }
+                ImportTexture(material, mobj, settings);
 
             // additional name information from materila name
             var matname = material.Name.ToLowerInvariant();
 
             if (matname.Contains("transparent"))
-                Mobj.RenderFlags |= RENDER_MODE.XLU;
+                mobj.RenderFlags |= RENDER_MODE.XLU;
 
             if (matname.Contains("shadow"))
-                Mobj.RenderFlags |= RENDER_MODE.SHADOW;
+                mobj.RenderFlags |= RENDER_MODE.SHADOW;
 
-            if (Mobj.Textures != null)
+            if (mobj.Textures != null)
             {
-                foreach (var t in Mobj.Textures.List)
+                foreach (var t in mobj.Textures.List)
                 {
                     if (matname.Contains("clamps"))
                         t.WrapS = GXWrapMode.CLAMP;
@@ -1263,7 +1348,7 @@ namespace HSDRawViewer.Converters
                 }
             }
 
-            return Mobj;
+            return mobj;
         }
     }
 }
