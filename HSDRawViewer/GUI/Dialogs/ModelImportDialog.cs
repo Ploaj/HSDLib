@@ -212,28 +212,35 @@ namespace HSDRawViewer.GUI.Extra
 
         private class SettingsExport
         {
-            public MeshImportSettings[] meshes;
-            public MaterialImportSettings[] materials;
+            public MeshImportSettings[] meshes = [];
 
-            public int[] highpoly;
-            public int[] lowpoly;
-            public int[] metalpoly;
+            public MaterialImportSettings[] materials = [];
 
-            public MeshPosition[] positions;
-            public DobjInfo[] objects;
+            public int[] highpoly = [];
+
+            public int[] lowpoly = [];
+
+            public int[] metalpoly = [];
+
+            public MeshPosition[] positions = [];
+
+            public DobjInfo[] objects = [];
         }
 
         private class MeshPosition
         {
-            public string Name;
-            public int Position;
+            public string Name = null;
+
+            public int Position = 0;
         }
 
         private class DobjInfo
         {
-            public int Position;
-            public int Count;
-            public int Joint;
+            public int Position = 0;
+
+            public int Count = 0;
+
+            public int Joint = 0;
         }
 
         /// <summary>

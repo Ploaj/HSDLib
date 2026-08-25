@@ -353,7 +353,9 @@ namespace HSDRawViewer.Converters
                         mesh.Name = $"Joint_{jIndex}_Object_{dIndex}";
 
                         bool reflective = false;
-                        bool single = j != _root;
+                        bool single = 
+                            j != _root || 
+                            (dobj.Pobj != null && !dobj.Pobj.List.Any(e=>e.HasAttribute(GXAttribName.GX_VA_PNMTXIDX)));
 
                         if (!string.IsNullOrEmpty(dobj.ClassName))
                             mesh.Name = dobj.ClassName;
@@ -552,28 +554,32 @@ namespace HSDRawViewer.Converters
                     IOVertex vertex = new();
                     mesh.Vertices.Add(vertex);
 
+                    //
+                    bool hasEnvelopes = pobj.HasAttribute(GXAttribName.GX_VA_PNMTXIDX);
+
                     // joint parented fake rigging
-                    if (parent != null && parent != _root && !parent.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL) && jobjToBone.ContainsKey(parent))
+                    if (parent != null && (parent != _root || !hasEnvelopes) && !parent.Flags.HasFlag(JOBJ_FLAG.ENVELOPE_MODEL) && jobjToBone.ContainsKey(parent))
                     {
-                        IOBoneWeight vertexWeight = new();
-                        vertexWeight.BoneName = jobjToBone[parent].Name;
-                        vertexWeight.Weight = 1;
+                        IOBoneWeight vertexWeight = new()
+                        {
+                            BoneName = jobjToBone[parent].Name,
+                            Weight = 1.0f
+                        };
                         vertex.Envelope.Weights.Add(vertexWeight);
                     }
 
                     // single bind rigging
                     if (singleBind != null)
                     {
-                        IOBoneWeight vertexWeight = new();
-                        vertexWeight.BoneName = jobjToBone[singleBind].Name;
-                        vertexWeight.Weight = 1;
+                        IOBoneWeight vertexWeight = new()
+                        {
+                            BoneName = jobjToBone[singleBind].Name,
+                            Weight = 1.0f
+                        };
                         vertex.Envelope.Weights.Add(vertexWeight);
                     }
 
-                    //
                     System.Numerics.Matrix4x4 singleMatrix = System.Numerics.Matrix4x4.Identity;
-                    bool hasEnvelopes = pobj.HasAttribute(GXAttribName.GX_VA_PNMTXIDX);
-
                     // process attributes
                     foreach (GX_Attribute a in pobj.ToGXAttributes())
                     {

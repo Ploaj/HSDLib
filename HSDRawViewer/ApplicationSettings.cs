@@ -7,19 +7,25 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Versioning;
+
+[assembly: SupportedOSPlatform("windows6.1")]
 
 namespace HSDRawViewer
 {
     public class ApplicationSettings
     {
         [Browsable(false),]
-        public static Brush SystemWindowTextColorBrush = new SolidBrush(System.Drawing.SystemColors.WindowText);
+        public static Brush SystemWindowTextColorBrush =
+            new SolidBrush(SystemColors.WindowText);
 
         [Browsable(false),]
-        public static Brush SystemWindowTextRedColorBrush = new SolidBrush(Color.Red);
+        public static Brush SystemWindowTextRedColorBrush =
+            new SolidBrush(Color.Red);
 
         [Browsable(false),]
-        public static Brush SystemGrayTextColorBrush = new SolidBrush(System.Drawing.SystemColors.GrayText);
+        public static Brush SystemGrayTextColorBrush = 
+            new SolidBrush(SystemColors.GrayText);
 
         [Browsable(false),]
         public static bool UnlockedViewport { get; set; } = false;

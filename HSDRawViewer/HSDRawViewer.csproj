@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <TargetFramework>net6.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>dogg.ico</ApplicationIcon>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GCILib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -20,11 +17,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\IONET.dll</HintPath>
     </Reference>
-    <Reference Include="netstandard" />
     <Reference Include="OpenTK.WinForms">
       <HintPath>lib\OpenTK.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="System.Design" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="ContextMenus\Melee\CollDataContextMenu.cs">
@@ -196,12 +191,12 @@
     <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.6" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="4.1.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.30" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Be.Windows.Forms.HexBox" Version="1.6.1" />

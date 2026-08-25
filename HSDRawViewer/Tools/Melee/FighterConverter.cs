@@ -522,15 +522,13 @@ namespace HSDRawViewer.Tools.Melee
 
                     return new_anim;
                 }
-                catch (IOException e)
+                catch (IOException)
                 {
                     /* file unavailable */
                 }
 
                 Thread.Sleep(100); // Wait for the file to be available
             }
-
-            return null;
         }
 
 

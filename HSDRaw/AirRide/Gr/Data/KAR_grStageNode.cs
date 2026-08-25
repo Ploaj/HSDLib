@@ -1,8 +1,5 @@
 ﻿using HSDRaw.Common;
-using HSDRaw.GX;
-using System;
 using System.ComponentModel;
-using System.Linq;
 
 namespace HSDRaw.AirRide.Gr.Data
 {
@@ -176,7 +173,6 @@ namespace HSDRaw.AirRide.Gr.Data
 
             public float AccelerationTimeL { get => _s.GetFloat(offset + 8); set => _s.SetFloat(offset + 8, value); }
 
-            private HSDStruct _s;
             private int offset;
 
             public BoostAccessor(HSDStruct s, int offset)

@@ -26,9 +26,9 @@ namespace HSDRawViewer
         /// <returns></returns>
         public static ContextMenuStrip GetContextMenuFromType(Type t)
         {
-            if (typeToContextMenu.ContainsKey(t))
+            if (typeToContextMenu.TryGetValue(t, out ContextMenuStrip value))
             {
-                return typeToContextMenu[t];
+                return value;
             }
             return commonContextMenu;
         }
